@@ -3,7 +3,7 @@
 		<h2><strong>My Download Basket</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
-				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+				<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 				/ Download Basket
 			</ol>
 		</div>
@@ -11,7 +11,7 @@
 	<div class="alert alert-info" role="alert">
 		<strong>RSS Feed</strong> <br/>
 		Your download basket can also be accessed via an <a
-				href="{$smarty.const.WWW_TOP}/rss/cart?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}&amp;del=1">RSS
+				href="{{url("/rss/cart?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}&amp;del=1")}}">RSS
 			feed</a>. Some NZB downloaders can read this feed and automatically start downloading.
 	</div>
 	{if $results|@count > 0}
@@ -52,7 +52,7 @@
 									</td>
 									<td>
 										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/details/{$result->release->guid}">{$result->release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+										   href="{{url("/details/{$result->release->guid}")}}">{$result->release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 									</td>
 									<td class="less"
 										title="Added on {$result.created_at}">{$result.created_at}</td>

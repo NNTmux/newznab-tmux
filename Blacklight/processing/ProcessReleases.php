@@ -925,8 +925,8 @@ class ProcessReleases
         }
 
         if ((int) $this->crossPostTime !== 0) {
-            // Crossposted releases.
-            $releases = Release::query()->where('adddate', '>', now()->subHours($this->crossPostTime))->havingRaw('COUNT(name) > 1')->select(['id', 'guid'])->get();
+            // Cross posted releases.
+            $releases = Release::query()->where('adddate', '>', now()->subHours($this->crossPostTime))->havingRaw('COUNT(name) > 1')->groupBy('name')->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $duplicateDeleted++;

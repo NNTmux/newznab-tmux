@@ -7,7 +7,9 @@ use App\Models\Category;
 use Blacklight\http\RSS;
 use App\Models\UserRequest;
 use Illuminate\Support\Arr;
+use App\Models\UserDownload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class RssController extends BasePageController
 {
@@ -213,12 +215,18 @@ class RssController extends BasePageController
         $uid = $res['id'];
         $rssToken = $res['api_token'];
         $maxRequests = $res->role->apirequests;
+        $maxDownloads = $res->role->downloadrequests;
+        $usedRequests = UserRequest::getApiRequests($uid);
+        $time = UserRequest::whereUsersId($uid)->min('timestamp');
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $grabTime = UserDownload::whereUsersId($uid)->min('timestamp');
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
 
         if ($res->hasRole('Disabled')) {
             return response()->json(['error' => 'Your account is disabled'], 403);
         }
 
-        if (UserRequest::getApiRequests($uid) > $maxRequests) {
+        if ($usedRequests > $maxRequests) {
             return response()->json(['error' => 'You have reached your daily limit for API requests!'], 403);
         } else {
             UserRequest::addApiRequest($rssToken, $request->getRequestUri());
@@ -230,6 +238,12 @@ class RssController extends BasePageController
                 'extended' => 1,
                 'uid'      => $uid,
                 'token'    => $rssToken,
+                'apilimit'    => $maxRequests,
+                'requests' => $usedRequests,
+                'downloadlimit' => $maxDownloads,
+                'grabs' => UserDownload::getDownloadRequests($uid),
+                'oldestapi' => $apiOldestTime,
+                'oldestgrab' => $oldestGrabTime,
             ];
 
         return ['user' => $res, 'user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];

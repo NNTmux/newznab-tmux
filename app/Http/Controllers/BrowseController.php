@@ -30,6 +30,7 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('lastvisit', $this->userdata->lastlogin);
 
+        $browse = [];
         foreach ($results as $result) {
             $browse[] = $result;
         }

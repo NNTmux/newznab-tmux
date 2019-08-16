@@ -2,16 +2,6 @@
 <html>
 
 <head>
-	{literal}
-	<script>
-        /* <![CDATA[ */
-        var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
-        var SERVERROOT = "{/literal}{$serverroot}{literal}";
-        var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
-        var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.api_token}{else}{/if}{literal}";
-        /* ]]> */
-	</script>
-	{/literal}
 	<!-- Meta, title, CSS, favicons, etc. -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +9,7 @@
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 
 
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/all-css.css")}}
+	{{Html::style("{{asset("/assets/css/all-css.css")}}")}}
 
 </head>
 <body class="nav-md">
@@ -78,7 +68,7 @@
 
 </div>
 
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/all-js.js")}}
+{{Html::script("{{asset("/assets/js/all-js.js")}}")}}
 
 </body>
 

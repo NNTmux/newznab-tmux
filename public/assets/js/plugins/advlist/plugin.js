@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var advlist = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -105,8 +104,9 @@ var advlist = (function () {
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
@@ -289,7 +289,7 @@ var advlist = (function () {
       if (styles.length > 0) {
         addSplitButton(editor, id, tooltip, cmd, nodeName, styles);
       } else {
-        addButton(editor, id, tooltip, cmd, nodeName, styles);
+        addButton(editor, id, tooltip, cmd, nodeName);
       }
     };
     var register$1 = function (editor) {
@@ -298,20 +298,19 @@ var advlist = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('advlist', function (editor) {
-      var hasPlugin = function (editor, plugin) {
-        var plugins = editor.settings.plugins ? editor.settings.plugins : '';
-        return global$1.inArray(plugins.split(/[ ,]/), plugin) !== -1;
-      };
-      if (hasPlugin(editor, 'lists')) {
-        Buttons.register(editor);
-        Commands.register(editor);
-      }
-    });
     function Plugin () {
+      global.add('advlist', function (editor) {
+        var hasPlugin = function (editor, plugin) {
+          var plugins = editor.settings.plugins ? editor.settings.plugins : '';
+          return global$1.inArray(plugins.split(/[ ,]/), plugin) !== -1;
+        };
+        if (hasPlugin(editor, 'lists')) {
+          Buttons.register(editor);
+          Commands.register(editor);
+        }
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

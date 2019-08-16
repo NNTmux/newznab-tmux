@@ -8,7 +8,9 @@ use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\ReleaseNfo;
 use App\Models\UserRequest;
+use App\Models\UserDownload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\BasePageController;
@@ -62,9 +64,9 @@ class ApiController extends BasePageController
             Utility::showApiError(200, 'Missing parameter (t)');
         }
 
-        $uid = $apiKey = '';
+        $uid = $apiKey = $oldestGrabTime = $apiOldestTime = '';
         $res = $catExclusions = [];
-        $maxRequests = 0;
+        $maxRequests = $apiRequests = $maxDownloads = $grabs = 0;
 
         // Page is accessible only by the apikey
 
@@ -86,12 +88,18 @@ class ApiController extends BasePageController
             $uid = $res['id'];
             $catExclusions = User::getCategoryExclusionForApi($request);
             $maxRequests = $res->role->apirequests;
+            $maxDownloads = $res->role->downloadrequests;
+            $time = UserRequest::whereUsersId($uid)->min('timestamp');
+            $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+            $grabTime = UserDownload::whereUsersId($uid)->min('timestamp');
+            $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
         }
 
         // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
         if ($uid !== '') {
             event(new UserAccessedApi($res));
             $apiRequests = UserRequest::getApiRequests($uid);
+            $grabs = UserDownload::getDownloadRequests($uid);
             if ($apiRequests > $maxRequests) {
                 Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');
             }
@@ -110,6 +118,12 @@ class ApiController extends BasePageController
         $params['del'] = $request->has('del') && (int) $request->input('del') === 1 ? '1' : '0';
         $params['uid'] = $uid;
         $params['token'] = $apiKey;
+        $params['apilimit'] = $maxRequests;
+        $params['requests'] = $apiRequests;
+        $params['downloadlimit'] = $maxDownloads;
+        $params['grabs'] = $grabs;
+        $params['oldestapi'] = $apiOldestTime;
+        $params['oldestgrab'] = $oldestGrabTime;
 
         switch ($function) {
            // Search releases.

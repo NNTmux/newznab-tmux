@@ -16,11 +16,11 @@ Auth::routes();
 Route::group(['middleware' => ['fw-block-blacklisted']], function () {
     Route::get('/', 'ContentController@show');
 
-    Route::get('register', 'Auth\RegisterController@showRegistrationForm');
-    Route::post('register', 'Auth\RegisterController@register');
+    Route::get('register', 'Auth\RegisterController@showregistrationForm');
+    Route::post('register', 'Auth\RegisterController@register')->name('register');
 
-    Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
-    Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+    Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
+    Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
 });
 
 Route::get('terms-and-conditions', 'TermsController@terms');
@@ -54,107 +54,107 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
     Route::get('details/{guid}', 'DetailsController@show');
     Route::post('details/{guid}', 'DetailsController@show');
 
-    Route::get('getnzb', 'GetNzbController@getNzb');
-    Route::post('getnzb', 'GetNzbController@getNzb');
+    Route::get('getnzb', 'GetNzbController@getNzb')->name('getnzb');
+    Route::post('getnzb', 'GetNzbController@getNzb')->name('getnzb');
 
-    Route::get('rsshelp', 'RssController@showRssDesc');
-    Route::post('rsshelp', 'RssController@showRssDesc');
+    Route::get('rsshelp', 'RssController@showRssDesc')->name('rsshelp');
+    Route::post('rsshelp', 'RssController@showRssDesc')->name('rsshelp');
 
-    Route::get('profile', 'ProfileController@show');
+    Route::get('profile', 'ProfileController@show')->name('profile');
 
-    Route::get('apihelp', 'ApiHelpController@index');
-    Route::get('apiv2help', 'ApiHelpController@apiv2');
+    Route::get('apihelp', 'ApiHelpController@index')->name('apihelp');
+    Route::get('apiv2help', 'ApiHelpController@apiv2')->name('apiv2help');
 
-    Route::get('browsegroup', 'BrowseGroupController@show');
+    Route::get('browsegroup', 'BrowseGroupController@show')->name('browsegroup');
 
-    Route::get('content', 'ContentController@show');
+    Route::get('content', 'ContentController@show')->name('content');
 
-    Route::post('content', 'ContentController@show');
+    Route::post('content', 'ContentController@show')->name('content');
 
-    Route::get('failed', 'FailedReleasesController@failed');
+    Route::get('failed', 'FailedReleasesController@failed')->name('failed');
 
-    Route::post('failed', 'FailedReleasesController@failed');
+    Route::post('failed', 'FailedReleasesController@failed')->name('failed');
 
     Route::group(['middleware' => 'clearance'], function () {
-        Route::get('Games', 'GamesController@show');
-        Route::post('Games', 'GamesController@show');
+        Route::get('Games', 'GamesController@show')->name('Games');
+        Route::post('Games', 'GamesController@show')->name('Games');
 
-        Route::get('Movies/{id?}', 'MovieController@showMovies');
+        Route::get('Movies/{id?}', 'MovieController@showMovies')->name('Movies');
 
-        Route::get('movie', 'MovieController@showMovie');
+        Route::get('movie', 'MovieController@showMovie')->name('movie');
 
-        Route::get('movietrailers', 'MovieController@showTrailer');
+        Route::get('movietrailers', 'MovieController@showTrailer')->name('movietrailers');
 
-        Route::post('Movies/{id?}', 'MovieController@showMovies');
+        Route::post('Movies/{id?}', 'MovieController@showMovies')->name('Movies');
 
-        Route::post('movie', 'MovieController@showMovie');
+        Route::post('movie', 'MovieController@showMovie')->name('movie');
 
-        Route::post('movietrailers', 'MovieController@showTrailer');
+        Route::post('movietrailers', 'MovieController@showTrailer')->name('movietrailers');
 
-        Route::get('Audio/{id?}', 'MusicController@show');
+        Route::get('Audio/{id?}', 'MusicController@show')->name('Audio');
 
-        Route::post('Audio/{id?}', 'MusicController@show');
+        Route::post('Audio/{id?}', 'MusicController@show')->name('Audio');
 
-        Route::get('Console/{id?}', 'ConsoleController@show');
+        Route::get('Console/{id?}', 'ConsoleController@show')->name('Console');
 
-        Route::post('Console/{id?}', 'ConsoleController@show');
+        Route::post('Console/{id?}', 'ConsoleController@show')->name('Console');
 
-        Route::get('XXX/{id?}', 'AdultController@show');
+        Route::get('XXX/{id?}', 'AdultController@show')->name('XXX');
 
-        Route::post('XXX/{id?}', 'AdultController@show');
+        Route::post('XXX/{id?}', 'AdultController@show')->name('XXX');
 
-        Route::get('anime', 'AnimeController@showAnime');
-        Route::post('anime', 'AnimeController@showAnime');
+        Route::get('anime', 'AnimeController@showAnime')->name('anime');
+        Route::post('anime', 'AnimeController@showAnime')->name('anime');
 
-        Route::get('animelist', 'AnimeController@showList');
-        Route::post('animelist', 'AnimeController@showList');
+        Route::get('animelist', 'AnimeController@showList')->name('animelist');
+        Route::post('animelist', 'AnimeController@showList')->name('animelist');
 
-        Route::get('Books/{id?}', 'BooksController@index');
-        Route::post('Books/{id?}', 'BooksController@index');
+        Route::get('Books/{id?}', 'BooksController@index')->name('Books');
+        Route::post('Books/{id?}', 'BooksController@index')->name('Books');
     });
 
-    Route::get('nfo/{id?}', 'NfoController@showNfo');
+    Route::get('nfo/{id?}', 'NfoController@showNfo')->name('nfo');
 
-    Route::post('nfo/{id?}', 'NfoController@showNfo');
+    Route::post('nfo/{id?}', 'NfoController@showNfo')->name('nfo');
 
-    Route::get('contact-us', 'ContactUsController@showContactForm');
-    Route::post('contact-us', 'ContactUsController@contact');
+    Route::get('contact-us', 'ContactUsController@showContactForm')->name('contact-us');
+    Route::post('contact-us', 'ContactUsController@contact')->name('contact-us');
 
-    Route::get('forum', 'ForumController@forum');
+    Route::get('forum', 'ForumController@forum')->name('forum');
 
-    Route::post('forum', 'ForumController@forum');
+    Route::post('forum', 'ForumController@forum')->name('forum');
 
-    Route::get('forumpost/{id}', 'ForumController@getPosts');
+    Route::get('forumpost/{id}', 'ForumController@getPosts')->name('forumpost');
 
-    Route::post('forumpost/{id}', 'ForumController@getPosts');
+    Route::post('forumpost/{id}', 'ForumController@getPosts')->name('forumpost');
 
-    Route::get('topic_delete', 'ForumController@deleteTopic');
+    Route::get('topic_delete', 'ForumController@deleteTopic')->name('topic_delete');
 
-    Route::post('topic_delete', 'ForumController@deleteTopic');
+    Route::post('topic_delete', 'ForumController@deleteTopic')->name('topic_delete');
 
-    Route::get('post_edit', 'ForumController@edit');
+    Route::get('post_edit', 'ForumController@edit')->name('post_edit');
 
-    Route::post('post_edit', 'ForumController@edit');
+    Route::post('post_edit', 'ForumController@edit')->name('post_edit');
 
-    Route::get('profileedit', 'ProfileController@edit');
+    Route::get('profileedit', 'ProfileController@edit')->name('profileedit');
 
-    Route::post('profileedit', 'ProfileController@edit');
+    Route::post('profileedit', 'ProfileController@edit')->name('profileedit');
 
-    Route::get('/profile_delete', 'ProfileController@destroy');
+    Route::get('profile_delete', 'ProfileController@destroy')->name('profile_delete');
 
-    Route::post('/profile_delete', 'ProfileController@destroy');
+    Route::post('profile_delete', 'ProfileController@destroy')->name('profile_delete');
 
-    Route::get('search', 'SearchController@search');
+    Route::get('search', 'SearchController@search')->name('search');
 
-    Route::post('search', 'SearchController@search');
+    Route::post('search', 'SearchController@search')->name('search');
 
-    Route::get('mymovies', 'MyMoviesController@show');
+    Route::get('mymovies', 'MyMoviesController@show')->name('mymovies');
 
-    Route::post('mymovies', 'MyMoviesController@show');
+    Route::post('mymovies', 'MyMoviesController@show')->name('mymovies');
 
-    Route::get('myshows', 'MyShowsController@show');
+    Route::get('myshows', 'MyShowsController@show')->name('myshows');
 
-    Route::post('myshows', 'MyShowsController@show');
+    Route::post('myshows', 'MyShowsController@show')->name('myshows');
 
     Route::get('myshows/browse', 'MyShowsController@browse');
 
@@ -164,17 +164,17 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
 
     Route::post('filelist/{guid}', 'FileListController@show');
 
-    Route::get('btc_payment', 'BtcPaymentController@show');
+    Route::get('btc_payment', 'BtcPaymentController@show')->name('btc_payment');
 
-    Route::post('btc_payment', 'BtcPaymentController@show');
+    Route::post('btc_payment', 'BtcPaymentController@show')->name('btc_payment');
 
-    Route::get('btc_payment_callback', 'BtcPaymentController@callback');
+    Route::get('btc_payment_callback', 'BtcPaymentController@callback')->name('btc_payment_callback');
 
-    Route::post('btc_payment_callback', 'BtcPaymentController@callback');
+    Route::post('btc_payment_callback', 'BtcPaymentController@callback')->name('btc_payment_callback');
 
-    Route::get('queue', 'QueueController@index');
+    Route::get('queue', 'QueueController@index')->name('queue');
 
-    Route::post('queue', 'QueueController@index');
+    Route::post('queue', 'QueueController@index')->name('queue');
 
     Route::get('nzbgetqueuedata', 'QueueController@nzbget');
 
@@ -200,13 +200,17 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
 
     Route::post('sendtocouch', 'SendReleaseController@couchPotato');
 
-    Route::get('series/{id?}', 'SeriesController@index');
+    Route::get('series/{id?}', 'SeriesController@index')->name('series');
 
-    Route::post('series/{id?}', 'SeriesController@index');
+    Route::post('series/{id?}', 'SeriesController@index')->name('series');
 
     Route::get('nzbvortex', 'QueueController@nzbvortex');
 
     Route::post('nzbvortex', 'QueueController@nzbvortex');
+
+    Route::get('ajax_profile', 'AjaxController@profile');
+
+    Route::post('ajax_profile', 'AjaxController@profile');
 });
 
 Route::get('forum-delete/{id}', 'ForumController@destroy')->middleware('role:Admin');

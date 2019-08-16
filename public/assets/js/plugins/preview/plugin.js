@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var preview = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -23,10 +22,14 @@ var preview = (function () {
     var getContentStyle = function (editor) {
       return editor.getParam('content_style', '');
     };
+    var shouldUseContentCssCors = function (editor) {
+      return editor.getParam('content_css_cors', false, 'boolean');
+    };
     var Settings = {
       getPreviewDialogWidth: getPreviewDialogWidth,
       getPreviewDialogHeight: getPreviewDialogHeight,
-      getContentStyle: getContentStyle
+      getContentStyle: getContentStyle,
+      shouldUseContentCssCors: shouldUseContentCssCors
     };
 
     var getPreviewHtml = function (editor) {
@@ -37,8 +40,9 @@ var preview = (function () {
       if (contentStyle) {
         headHtml += '<style type="text/css">' + contentStyle + '</style>';
       }
+      var cors = Settings.shouldUseContentCssCors(editor) ? ' crossorigin="anonymous"' : '';
       global$1.each(editor.contentCSS, function (url) {
-        headHtml += '<link type="text/css" rel="stylesheet" href="' + encode(editor.documentBaseURI.toAbsolute(url)) + '">';
+        headHtml += '<link type="text/css" rel="stylesheet" href="' + encode(editor.documentBaseURI.toAbsolute(url)) + '"' + cors + '>';
       });
       var bodyId = editor.settings.body_id || 'tinymce';
       if (bodyId.indexOf('=') !== -1) {
@@ -107,14 +111,13 @@ var preview = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('preview', function (editor) {
-      Commands.register(editor);
-      Buttons.register(editor);
-    });
     function Plugin () {
+      global.add('preview', function (editor) {
+        Commands.register(editor);
+        Buttons.register(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

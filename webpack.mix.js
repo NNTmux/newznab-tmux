@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+require('laravel-mix-purgecss');
 
 /*
  |--------------------------------------------------------------------------
@@ -33,6 +34,7 @@ mix
             'node_modules/multiselect/css/multi-select.css',
             'resources/assets/css/custom.css'
     ], 'public/assets/css/all-css.css')
+    .purgeCss()
     .scripts(
         [
             'node_modules/jquery/dist/jquery.min.js',
@@ -69,6 +71,5 @@ mix
             'resources/assets/js/custom.js',
             'resources/assets/js/functions.js'
         ]
-    , 'public/assets/js/all-js.js')
-    .sourceMaps();
+    , 'public/assets/js/all-js.js');
 

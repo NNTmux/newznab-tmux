@@ -79,9 +79,9 @@
         {foreach $userlist as $user}
             <tr class="{cycle values=",alt"}">
                 <td><a title="Edit user"
-                       href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user->id}">{$user->username}</a>
+                       href="{{url("/admin/user-edit?id={$user->id}")}}">{$user->username}</a>
                 </td>
-                <td><a title="View profile" href="{$smarty.const.WWW_TOP}/profile?id={$user->id}">{$user->email}</a>
+                <td><a title="View profile" href="{{url("/profile?id={$user->id}")}}">{$user->email}</a>
                 </td>
                 <td>{$user->host}</td>
                 <td title="{$user->created_at}">{$user->created_at}</td>
@@ -91,14 +91,14 @@
                 <td class="mid">{$user->grabs}</td>
                 <td class="mid">{$user->invites}</td>
                 <td class="mid"><a title="{if $user->notes|count_characters > 0}View{else}Add{/if} Notes"
-                                   href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user->id}#notes"><img
-                            src="{$smarty.const.WWW_TOP}/shared/images/icons/{if $user->notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
+                                   href="{{url("/admin/user-edit?id={$user->id}#notes")}}"><img
+                            src="{{url("/shared/images/icons/{if $user->notes|count_characters > 0}note_edit.png{else}note_add.png{/if}")}}"
                             alt=""/></a></td>
                 <td>{$user->rolename}</td>
                 <td>{if !empty($user->rolechangedate)}{$user->rolechangedate}{/if}</td>
                 <td>{if {$user->verified} == 1} Yes {else} No {/if}</td>
                 <td>{if $user->roles_id !="2"}<a class="confirm_action"
-                                                 href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">
+                                                 href="{{url("/admin/user-delete?id={$user->id}")}}">
                             delete</a>{/if}
                 </td>
             </tr>

@@ -1,9 +1,13 @@
 <?php
 
 use Colors\Color;
+use Blacklight\NZB;
 use Blacklight\XXX;
 use GuzzleHttp\Client;
+use App\Models\Release;
+use Chumper\Zipper\Zipper;
 use Tuna\CloudflareMiddleware;
+use Blacklight\utility\Utility;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use Illuminate\Support\Facades\DB;
@@ -22,11 +26,11 @@ if (! function_exists('getRawHtml')) {
      */
     function getRawHtml($url, $cookie = false)
     {
-        $cookiejar = new CookieJar();
+        $cookieJar = new CookieJar();
         $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         if ($cookie !== false) {
-            $cookieJar = $cookiejar->setCookie(SetCookie::fromString($cookie));
-            $client = new Client(['cookies' => $cookieJar, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
+            $cookie = $cookieJar->setCookie(SetCookie::fromString($cookie));
+            $client = new Client(['cookies' => $cookie, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         }
         try {
             $response = $client->get($url)->getBody()->getContents();
@@ -348,6 +352,44 @@ if (! function_exists('makeFieldLinks')) {
             json_decode($isIt);
 
             return json_last_error() === JSON_ERROR_NONE;
+        }
+    }
+
+    if (! function_exists('getZipped')) {
+
+        /**
+         * @param array $guids
+         *
+         * @return string
+         * @throws \Exception
+         */
+        function getZipped(array $guids = []): string
+        {
+            $nzb = new NZB();
+            $zipped = new Zipper();
+            $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
+            $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
+
+            foreach ($guids as $guid) {
+                $nzbPath = $nzb->NZBPath($guid);
+
+                if ($nzbPath) {
+                    $nzbContents = Utility::unzipGzipFile($nzbPath);
+
+                    if ($nzbContents) {
+                        $filename = $guid;
+                        $r = Release::getByGuid($guid);
+                        if ($r) {
+                            $filename = $r['searchname'];
+                        }
+                        $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
+                    }
+                }
+            }
+
+            $zipped->close();
+
+            return File::isFile($zippedFilePath) ? $zippedFilePath : '';
         }
     }
 }

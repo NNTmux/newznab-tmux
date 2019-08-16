@@ -2,7 +2,7 @@
 	<h2>View > <strong>Movie</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+			<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 			/ View Movie
 		</ol>
 	</div>
@@ -16,11 +16,11 @@
 					{if $result->cover == 1}
 						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
-							 src="{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg"/>
+							 src="{{url("/covers/movies/{$result->imdbid}-cover.jpg")}}"/>
 					{else}
 						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
-							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
+							 src="{asset("/assets/images/nomoviecover.jpg")}}"/>
 					{/if}
 					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"} ({$result->year})</span>
 					<a class="btn btn-transparent btn-success" target="_blank"
@@ -63,7 +63,7 @@
 				<div class="well well-sm">
 					<div class="nzb_multi_operations">
 						{if isset($section) && $section != ''}View:
-							<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+							<a href="{{url("/{$section}?t={$category}")}}">Covers</a>
 							|
 							<b>List</b>
 							<br/>
@@ -134,12 +134,12 @@
 														   value="{$mguid[$m@index]}"/></td>
 												<td class="item">
 													<a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
+													   href="{{url("/details/{$mguid[$m@index]}")}}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 													<br/>
 													<span class="badge badge-info">{$mgrabs[$m@index]}
 														grab{if $mgrabs[$m@index] != 1}s{/if}</span>
 													{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span><a
-																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+																href="{{url("/nfo/{$mguid[$m@index]}")}}"
 																class="modal_nfo badge badge-info text-muted">NFO</a>
 														</span>{/if}
 													{if $mpass[$m@index] == 2}
@@ -155,12 +155,12 @@
 													title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
 												<td class="less right">{$msize[$m@index]|filesize}</td>
 												<td>
-													<a href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"
+													<a href="{{url("/getnzb?id={$mguid[$m@index]}")}}"
 													   class="icon_nzb text-muted"><i
 																class="fa fa-cloud-download text-muted"
 																data-toggle="tooltip" data-placement="top" title
 																data-original-title="Download NZB"></i></a>
-													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+													<a href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																class="fa fa-comments-o text-muted"
 																data-toggle="tooltip" data-placement="top" title
 																data-original-title="Comments"></i></a>
@@ -197,7 +197,7 @@
 											<div class="col-md-8">
 												<div class="nzb_multi_operations">
 													{if isset($section) && $section != ''}View:
-														<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+														<a href="{{url("/{$section}?t={$category}")}}">Covers</a>
 														|
 														<b>List</b>
 														<br/>

@@ -67,7 +67,7 @@
         }
     ],
   "require": {
-    "php": ">=7.2.0",
+    "php": ">=7.3.0",
     "ext-bcmath": "*",
     "ext-ctype": "*",
     "ext-curl": "*",
@@ -118,9 +118,10 @@
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "jrean/laravel-user-verification": "^7.0",
+    "junaidnasir/larainvite": "^2.0",
     "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "5.8.*",
-    "laravel/horizon": "^2.0",
+    "laravel/horizon": "^3.0",
     "laravel/scout": "^7.0",
     "laravel/telescope": "^2.0",
     "laravel/tinker": "~1.0",
@@ -147,7 +148,7 @@
     "spatie/laravel-permission": "^2.12",
     "tunaabutbul/cloudflare-middleware": "^1.2",
     "vlucas/phpdotenv": "^3.3",
-    "voku/simple_html_dom": "4.3.*",
+    "voku/simple_html_dom": "^4.3",
     "wandersonwhcr/illuminate-romans": "^1.0",
     "watson/rememberable": "^2.0",
     "wildbit/swiftmailer-postmark": "^3.0",
@@ -160,6 +161,8 @@
     "barryvdh/laravel-debugbar": "^3.1",
     "barryvdh/laravel-ide-helper": "^2.4",
     "beyondcode/laravel-dump-server": "^1.0",
+    "captainhook/captainhook": "^4.4",
+    "captainhook/plugin-composer": "^4.0",
     "filp/whoops": "~2.0",
     "friendsofphp/php-cs-fixer": "^2.14",
     "fzaninotto/faker": "~1.4",
@@ -186,8 +189,7 @@
     ],
     "post-update-cmd": [
       "Blacklight\\build\\ComposerScripts::postUpdate",
-      "@php artisan ide-helper:generate --ansi",
-      "@php artisan ide-helper:meta --ansi"
+      "@php artisan ide-helper:generate --ansi"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

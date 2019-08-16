@@ -3,18 +3,18 @@
 		<h2>My > <strong>TV Shows</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
-				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+				<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 				/ My TV Shows
 			</ol>
 		</div>
 	</div>
 	<div class="btn-group">
-		<a class="btn btn-sm btn-success" title="View available TV series" href="{$smarty.const.WWW_TOP}/series">View
+		<a class="btn btn-sm btn-success" title="View available TV series" href="{{route('series')}}">View
 			all series</a>
 		<a class="btn btn-sm btn-success" title="View a list of all releases in your shows"
-		   href="{$smarty.const.WWW_TOP}/myshows/browse">View releases for My Shows</a>
+		   href="{{url("/myshows/browse")}}">View releases for My Shows</a>
 		<a class="btn btn-sm btn-success" title="All releases in your shows as an RSS feed"
-		   href="{$smarty.const.WWW_TOP}/rss/myshows?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">RSS Feed for
+		   href="{{url("/rss/myshows?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">RSS Feed for
 			My Shows <i class="fa fa-rss"></i></a>
 	</div>
 	<hr>
@@ -35,7 +35,7 @@
 									<tr>
 										<td>
 											<a title="View details"
-											   href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+											   href="{{url("/series/{$show.videos_id}")}}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 										</td>
 										<td>
 											<span class="badge badge-info">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
@@ -44,11 +44,11 @@
 										<td>
 											<div class="btn-group">
 												<a class="btn btn-xs btn-warning myshows"
-												   href="{$smarty.const.WWW_TOP}/myshows?action=edit&id={$show.videos_id}"
+												   href="{{url("/myshows?action=edit&id={$show.videos_id}")}}"
 												   rel="edit" name="series{$show.videos_id}"
 												   title="Edit Categories">Edit</a>
 												<a class="btn btn-xs btn-danger confirm_action myshows"
-												   href="{$smarty.const.WWW_TOP}/myshows?action=delete&id={$show.videos_id}"
+												   href="{{url("/myshows?action=delete&id={$show.videos_id}")}}"
 												   rel="remove" name="series{$show.videos_id}"
 												   title="Remove from My Shows">Remove</a>
 											</div>

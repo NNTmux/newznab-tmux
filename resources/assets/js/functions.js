@@ -1,8 +1,9 @@
 // event bindings
 jQuery(function($) {
+    const base_url = window.location.origin;
     $('.cartadd').click(function(e) {
         if ($(this).hasClass('icon_cart_clicked')) return false;
-        var guid = $('.guid')
+        let guid = $('.guid')
             .attr('id')
             .substring(4);
         //alert(guid);
@@ -11,7 +12,7 @@ jQuery(function($) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
         });
-        $.post(SERVERROOT + '/cart/add?id=' + guid, function(resp) {
+        $.post(base_url + '/cart/add?id=' + guid, function(resp) {
             $(e.target)
                 .addClass('icon_cart_clicked')
                 .attr('title', 'Added to Cart');
@@ -37,10 +38,10 @@ jQuery(function($) {
     $('.sabsend').click(function(e) {
         if ($(this).hasClass('icon_sab_clicked')) return false;
 
-        var guid = $('.guid')
+        let guid = $('.guid')
             .attr('id')
             .substring(4);
-        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+        let nzburl = base_url + '/sendtoqueue/' + guid;
 
         $.post(nzburl, function(resp) {
             $(e.target)
@@ -68,10 +69,10 @@ jQuery(function($) {
     $('.getsend').click(function(e) {
         if ($(this).hasClass('icon_nzbget_clicked')) return false;
 
-        var guid = $('.guid')
+        let guid = $('.guid')
             .attr('id')
             .substring(4);
-        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+        let nzburl = base_url + '/sendtoqueue/' + guid;
 
         $.post(nzburl, function(resp) {
             $(e.target)
@@ -98,10 +99,10 @@ jQuery(function($) {
 
     $('.sendtocouch').click(function(e) {
         if ($(this).hasClass('icon_cp_clicked')) return false;
-        var id = $(this)
+        let id = $(this)
             .attr('id')
             .substring(4);
-        var cpurl = SERVERROOT + 'sendtocouch/' + id;
+        let cpurl = base_url + 'sendtocouch/' + id;
 
         $.post(cpurl, function(resp) {
             $(e.target)
@@ -128,17 +129,17 @@ jQuery(function($) {
 
     $('.vortexsend').click(function(event) {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;
-        var guid = $('.guid')
+        let guid = $('.guid')
             .attr('id')
             .substring(4);
 
         if (guid && guid.length > 0) {
             $.ajax({
-                url: SERVERROOT + 'nzbvortex?addQueue=' + guid + '&isAjax',
+                url: base_url + 'nzbvortex?addQueue=' + guid + '&isAjax',
                 cache: false,
             })
                 .done(function(html) {
-                    var message = 'Added ' + guid + ' to queue.';
+                    let message = 'Added ' + guid + ' to queue.';
                     $(event.target)
                         .addClass('icon_nzbvortex_clicked')
                         .attr('title', message);
@@ -165,7 +166,7 @@ jQuery(function($) {
         return false;
     });
 
-    var vortexStates = new Array();
+    let vortexStates = new Array();
     vortexStates[0] = 'Waiting';
     vortexStates[1] = 'Downloading';
     vortexStates[2] = 'Downloaded';
@@ -174,7 +175,7 @@ jQuery(function($) {
     vortexStates[5] = 'Skipped';
 
     // browse.tpl, search.tpl -- show icons on hover
-    var orig_opac = $('table.data tr')
+    let orig_opac = $('table.data tr')
         .children('td.icons')
         .children('div.icon')
         .css('opacity');
@@ -239,7 +240,7 @@ jQuery(function($) {
     });
 
     $('.nzb_check_all_season').change(function() {
-        var season = $(this).attr('name');
+        let season = $(this).attr('name');
         $('table.data tr td input:checkbox').each(function(i, row) {
             if ($(row).attr('name') == season) {
                 $(row).attr('checked', !$(row).attr('checked'));
@@ -250,17 +251,17 @@ jQuery(function($) {
     // browse.tpl, search.tpl
     $('.icon_cart').click(function(e) {
         if ($(this).hasClass('icon_cart_clicked')) return false;
-        var guid = $(this)
+        let guid = $(this)
             .attr('id')
             .substring(4);
         //alert(guid);
-        //alert(SERVERROOT + "/cart/add?id=" + guid);
+        //alert(base_url + "/cart/add?id=" + guid);
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
         });
-        $.post(SERVERROOT + '/cart/add?id=' + guid, function(resp) {
+        $.post(base_url + '/cart/add?id=' + guid, function(resp) {
             $(e.target)
                 .addClass('icon_cart_clicked')
                 .attr('title', ' Release added to Cart');
@@ -285,7 +286,7 @@ jQuery(function($) {
 
     $('.icon_nzbvortex').click(function(event) {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;
-        var guid = $(this)
+        let guid = $(this)
             .parent()
             .parent()
             .attr('id')
@@ -293,11 +294,11 @@ jQuery(function($) {
 
         if (guid && guid.length > 0) {
             $.ajax({
-                url: SERVERROOT + '/nzbvortex?addQueue=' + guid + '&isAjax',
+                url: base_url + '/nzbvortex?addQueue=' + guid + '&isAjax',
                 cache: false,
             })
                 .done(function(html) {
-                    var message = 'Added ' + guid + ' to queue.';
+                    let message = 'Added ' + guid + ' to queue.';
                     $(event.target)
                         .addClass('icon_nzbvortex_clicked')
                         .attr('title', message);
@@ -328,7 +329,7 @@ jQuery(function($) {
     $(document).on('click', 'a.vortex-resume', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + 'nzbvortex?resume=' + $(this).attr('href') + '&isAjax');
+        $.get(base_url + 'nzbvortex?resume=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
@@ -336,7 +337,7 @@ jQuery(function($) {
     $(document).on('click', 'a.vortex-pause', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + 'nzbvortex?pause=' + $(this).attr('href') + '&isAjax');
+        $.get(base_url + 'nzbvortex?pause=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
@@ -344,7 +345,7 @@ jQuery(function($) {
     $(document).on('click', 'a.vortex-moveup', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + 'nzbvortex?moveup=' + $(this).attr('href') + '&isAjax');
+        $.get(base_url + 'nzbvortex?moveup=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
@@ -352,7 +353,7 @@ jQuery(function($) {
     $(document).on('click', 'a.vortex-movedown', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + 'nzbvortex?movedown=' + $(this).attr('href') + '&isAjax');
+        $.get(base_url + 'nzbvortex?movedown=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
@@ -360,7 +361,7 @@ jQuery(function($) {
     $(document).on('click', 'a.vortex-movetop', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + 'nzbvortex?movetop=' + $(this).attr('href') + '&isAjax');
+        $.get(base_url + 'nzbvortex?movetop=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
@@ -368,7 +369,7 @@ jQuery(function($) {
     $(document).on('click', 'a.vortex-movebottom', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + 'nzbvortex?movebottom=' + $(this).attr('href') + '&isAjax');
+        $.get(base_url + 'nzbvortex?movebottom=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
@@ -376,25 +377,25 @@ jQuery(function($) {
     $(document).on('click', 'a.vortex-trash', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + 'nzbvortex?delete=' + $(this).attr('href') + '&isAjax');
+        $.get(base_url + 'nzbvortex?delete=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
     $(document).on('click', 'a.vortex-filelist', function(event) {
         event.preventDefault();
-        var id = $(this).attr('href');
+        let id = $(this).attr('href');
         $('#vortex-overlay-' + id).show();
 
         $.colorbox({});
 
         $.ajax({
-            url: SERVERROOT + '/nzbvortex?filelist=' + id + '&isAjax',
+            url: base_url + '/nzbvortex?filelist=' + id + '&isAjax',
             cache: false,
         })
             .done(function(response) {
                 $('#cboxLoadingGraphic').hide();
-                var json = $.parseJSON(response);
+                let json = $.parseJSON(response);
                 console.log(json);
                 $.each(json.files, function(k, v) {
                     $('#cboxContent').append(
@@ -413,10 +414,10 @@ jQuery(function($) {
     $('.icon_sab').click(function(e) {
         if ($(this).hasClass('icon_sab_clicked')) return false;
 
-        var guid = $(this)
+        let guid = $(this)
             .attr('id')
             .substring(4);
-        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+        let nzburl = base_url + '/sendtoqueue/' + guid;
 
         $.post(nzburl, function(resp) {
             $(e.target)
@@ -444,10 +445,10 @@ jQuery(function($) {
     $('.icon_nzbget').click(function(e) {
         if ($(this).hasClass('icon_nzbget_clicked')) return false;
 
-        var guid = $(this)
+        let guid = $(this)
             .attr('id')
             .substring(4);
-        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+        let nzburl = base_url + '/sendtoqueue/' + guid;
 
         $.post(nzburl, function(resp) {
             $(e.target)
@@ -503,7 +504,7 @@ jQuery(function($) {
             // IMDB modal
             href: function() {
                 return (
-                    SERVERROOT +
+                    base_url +
                     'movie/' +
                     $(this)
                         .attr('name')
@@ -536,7 +537,7 @@ jQuery(function($) {
             // IMDB trailer modal
             href: function() {
                 return (
-                    SERVERROOT +
+                    base_url +
                     'movietrailer/' +
                     $(this)
                         .attr('name')
@@ -569,7 +570,7 @@ jQuery(function($) {
             // Music modal
             href: function() {
                 return (
-                    SERVERROOT +
+                    base_url +
                     'musicmodal/' +
                     $(this)
                         .attr('name')
@@ -601,7 +602,7 @@ jQuery(function($) {
             // Console modal
             href: function() {
                 return (
-                    SERVERROOT +
+                    base_url +
                     'consolemodal/' +
                     $(this)
                         .attr('name')
@@ -633,7 +634,7 @@ jQuery(function($) {
             // Book modal
             href: function() {
                 return (
-                    SERVERROOT +
+                    base_url +
                     'bookmodal/' +
                     $(this)
                         .attr('name')
@@ -666,33 +667,33 @@ jQuery(function($) {
     });
 
     $('button.nzb_multi_operations_download').on('click', function() {
-        var ids = '';
+        let ids = '';
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             if ($(row).val() != 'on') ids += $(row).val() + ',';
         });
         ids = ids.substring(0, ids.length - 1);
-        if (ids) window.location = SERVERROOT + '/getnzb?zip=1&id=' + ids;
+        if (ids) window.location = base_url + '/getnzb?zip=1&id=' + ids;
     });
 
     $('input.nzb_multi_operations_download_cart').on('click', function() {
-        var ids = '';
+        let ids = '';
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             if ($(row).val() != 'on') ids += $(row).val() + ',';
         });
         ids = ids.substring(0, ids.length - 1);
-        if (ids) window.location = SERVERROOT + '/getnzb?zip=1&id=' + ids;
+        if (ids) window.location = base_url + '/getnzb?zip=1&id=' + ids;
     });
 
     $('button.nzb_multi_operations_cart').on('click', function() {
-        var guids = new Array();
+        let guids = new Array();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
         });
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
-            var guid = $(row).val();
-            var $cartIcon = $(row)
+            let guid = $(row).val();
+            let $cartIcon = $(row)
                 .parent()
                 .children('div.icons')
                 .children('.icon_cart');
@@ -717,21 +718,21 @@ jQuery(function($) {
             }
             $(this).attr('checked', false);
         });
-        var guidstring = guids.toString();
+        let guidstring = guids.toString();
         //alert (guidstring); // This is just for testing shit
-        $.post(SERVERROOT + '/cart/add?id=' + guidstring);
+        $.post(base_url + '/cart/add?id=' + guidstring);
     });
     $('button.nzb_multi_operations_sab').on('click', function() {
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
-            var $sabIcon = $(row)
+            let $sabIcon = $(row)
                 .parent()
                 .parent()
                 .children('td.icons')
                 .children('.icon_sab');
-            var guid = $(row).val();
+            let guid = $(row).val();
             //alert(guid);
             if (guid && !$sabIcon.hasClass('icon_sab_clicked')) {
-                var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+                let nzburl = base_url + '/sendtoqueue/' + guid;
                 // alert(nzburl);
                 $.post(nzburl, function(resp) {
                     $sabIcon.addClass('icon_sab_clicked').attr('title', 'Added to Queue');
@@ -757,14 +758,14 @@ jQuery(function($) {
     });
     $('input.nzb_multi_operations_nzbget').on('click', function() {
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
-            var $nzbgetIcon = $(row)
+            let $nzbgetIcon = $(row)
                 .parent()
                 .parent()
                 .children('td.icons')
                 .children('.icon_nzbget');
-            var guid = $(row).val();
+            let guid = $(row).val();
             if (guid && !$nzbgetIcon.hasClass('icon_nzbget_clicked')) {
-                var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+                let nzburl = base_url + '/sendtoqueue/' + guid;
                 $.post(nzburl, function(resp) {
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title', 'Added to Queue');
                     PNotify.defaults.icons = 'fontawesome5';
@@ -790,7 +791,7 @@ jQuery(function($) {
 
     //front end admin functions
     $('input.nzb_multi_operations_edit').click(function() {
-        var ids = '';
+        let ids = '';
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             if ($(row).val() != 'on') ids += '&id[]=' + $(row).val();
         });
@@ -798,7 +799,7 @@ jQuery(function($) {
             $('input.nzb_multi_operations_edit').colorbox({
                 href: function() {
                     return (
-                        SERVERROOT +
+                        base_url +
                         'ajax_release-admin?action=edit' +
                         ids +
                         '&from=' +
@@ -815,7 +816,7 @@ jQuery(function($) {
             });
     });
     $('input.nzb_multi_operations_delete').click(function() {
-        var ids = '';
+        let ids = '';
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             if ($(row).val() != 'on') ids += '&id[]=' + $(row).val();
         });
@@ -840,7 +841,7 @@ jQuery(function($) {
                 },
             });
             notice.on('pnotify.confirm', function() {
-                $.post(SERVERROOT + 'ajax_release-admin?action=dodelete' + ids, function(resp) {
+                $.post(base_url + 'ajax_release-admin?action=dodelete' + ids, function(resp) {
                     location.reload(true);
                 });
             });
@@ -850,20 +851,20 @@ jQuery(function($) {
         }
     });
     $('input.nzb_multi_operations_rebuild').click(function() {
-        var ids = '';
+        let ids = '';
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             if ($(row).val() != 'on') ids += '&id[]=' + $(row).val();
         });
         if (ids)
             if (confirm('Are you sure you want to rebuild the selected releases?')) {
-                $.post(SERVERROOT + 'ajax_release-admin?action=dorebuild' + ids, function(resp) {
+                $.post(base_url + 'ajax_release-admin?action=dorebuild' + ids, function(resp) {
                     location.reload(true);
                 });
             }
     });
     //cart functions
     $('input.nzb_multi_operations_cartdelete').click(function() {
-        var ids = new Array();
+        let ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             if ($(row).val() != 'on') ids.push($(row).val());
         });
@@ -873,7 +874,7 @@ jQuery(function($) {
             },
         });
 
-        //alert(SERVERROOT + "/cart/delete/" + ids);
+        //alert(base_url + "/cart/delete/" + ids);
         if (ids) {
             PNotify.defaults.icons = 'fontawesome5';
             const notice = PNotify.alert({
@@ -894,7 +895,7 @@ jQuery(function($) {
                 },
             });
             notice.on('pnotify.confirm', function() {
-                $.post(SERVERROOT + '/cart/delete/' + ids);
+                $.post(base_url + '/cart/delete/' + ids);
             });
             notice.on('pnotify.cancel', function() {
                 alert('Cancelled');
@@ -902,10 +903,10 @@ jQuery(function($) {
         }
     });
     $('input.nzb_multi_operations_cartsab').click(function() {
-        var ids = new Array();
+        let ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
-            var guid = $(row).val();
-            var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+            let guid = $(row).val();
+            let nzburl = base_url + '/sendtoqueue/' + guid;
             $.post(nzburl, function() {
                 PNotify.defaults.icons = 'fontawesome5';
                 PNotify.success({
@@ -941,9 +942,9 @@ jQuery(function($) {
     });
     $('#headsearch_go').click(function() {
         if ($('#headsearch').val() && $('#headsearch').val() != 'Search...') {
-            var sText = $('#headsearch').val();
-            var sCat = $('#headcat').val() != -1 ? '&t=' + $('#headcat').val() : '';
-            document.location = WWW_TOP + '/search?id=' + sText + sCat;
+            let sText = $('#headsearch').val();
+            let sCat = $('#headcat').val() != -1 ? '&t=' + $('#headcat').val() : '';
+            document.location = base_url + '/search?id=' + sText + sCat;
         }
     });
 
@@ -951,7 +952,7 @@ jQuery(function($) {
     $('#search_search_button').click(function() {
         if ($('#search').val())
             document.location =
-                WWW_TOP +
+                base_url +
                 '/search?id=' +
                 $('#search').val() +
                 ($('#search_cat').val() != -1 ? '&t=' + $('#search_cat').val() : '');
@@ -964,7 +965,7 @@ jQuery(function($) {
 
     // searchraw.tpl
     $('#searchraw_search_button').click(function() {
-        if ($('#search').val()) document.location = WWW_TOP + '/searchraw/' + $('#search').val();
+        if ($('#search').val()) document.location = base_url + '/searchraw/' + $('#search').val();
         return false;
     });
     $('#searchraw_download_selected').click(function() {
@@ -989,7 +990,7 @@ jQuery(function($) {
 
     // play audio preview
     $('.audioprev').click(function() {
-        var a = document.getElementById(
+        let a = document.getElementById(
             $(this)
                 .next('audio')
                 .attr('ID')
@@ -1034,7 +1035,7 @@ jQuery(function($) {
 
     // searchraw.tpl, viewfilelist.tpl -- checkbox operations
     // selections
-    var last1, last2;
+    let last1, last2;
     $('.checkbox_operations .select_all').click(function() {
         $("table.data INPUT[type='checkbox']")
             .attr('checked', true)
@@ -1070,7 +1071,7 @@ jQuery(function($) {
     });
     $('table.data td.check INPUT[type="checkbox"]').click(function(e) {
         // range event interaction -- see further above
-        var rowNum = $(e.target)
+        let rowNum = $(e.target)
             .parent()
             .parent()[0].rowIndex;
         if (last1) last2 = last1;
@@ -1093,13 +1094,13 @@ jQuery(function($) {
     $('table.data a.data_filename').click(function(e) {
         // click filenames to select
         // range event interaction -- see further above
-        var rowNum = $(e.target)
+        let rowNum = $(e.target)
             .parent()
             .parent()[0].rowIndex;
         if (last1) last2 = last1;
         last1 = rowNum;
 
-        var $checkbox = $(
+        let $checkbox = $(
             'table.data tr:nth-child(' + (rowNum + 1) + ') td.selection INPUT[type="checkbox"]'
         );
         $checkbox.attr('checked', !$checkbox.attr('checked'));
@@ -1127,11 +1128,11 @@ jQuery(function($) {
 
     // send an invite
     $('#frmSendInvite').submit(function() {
-        var inputEmailto = $('#txtInvite').val();
+        let inputEmailto = $('#txtInvite').val();
         if (isValidEmailAddress(inputEmailto)) {
             // no caching of results
             $.ajax({
-                url: WWW_TOP + '/ajax_profile?action=1&rand=' + $.now(),
+                url: base_url + '/ajax_profile?action=1&rand=' + $.now(),
                 data: { emailto: inputEmailto },
                 dataType: 'html',
                 success: function(data) {
@@ -1173,10 +1174,10 @@ jQuery(function($) {
 
     // lookup tmdb for a movie
     $('#frmMyMovieLookup').submit(function() {
-        var movSearchText = $('#txtsearch').val();
+        let movSearchText = $('#txtsearch').val();
         // no caching of results
         $.ajax({
-            url: WWW_TOP + '/ajax_mymovies?rand=' + $.now(),
+            url: base_url + '/ajax_mymovies?rand=' + $.now(),
             data: { id: movSearchText },
             dataType: 'html',
             success: function(data) {
@@ -1211,20 +1212,20 @@ jQuery(function($) {
 $.extend({
     // http://plugins.jquery.com/project/URLEncode
     URLEncode: function(c) {
-        var o = '';
-        var x = 0;
+        let o = '';
+        let x = 0;
         c = c.toString();
-        var r = /(^[a-zA-Z0-9_.]*)/;
+        let r = /(^[a-zA-Z0-9_.]*)/;
         while (x < c.length) {
-            var m = r.exec(c.substr(x));
+            let m = r.exec(c.substr(x));
             if (m != null && m.length > 1 && m[1] != '') {
                 o += m[1];
                 x += m[1].length;
             } else {
                 if (c[x] == ' ') o += '+';
                 else {
-                    var d = c.charCodeAt(x);
-                    var h = d.toString(16);
+                    let d = c.charCodeAt(x);
+                    let h = d.toString(16);
                     o += '%' + (h.length < 2 ? '0' : '') + h.toUpperCase();
                 }
                 x++;
@@ -1233,9 +1234,9 @@ $.extend({
         return o;
     },
     URLDecode: function(s) {
-        var o = s;
-        var binVal, t;
-        var r = /(%[^%]{2})/;
+        let o = s;
+        let binVal, t;
+        let r = /(%[^%]{2})/;
         while ((m = r.exec(o)) != null && m.length > 1 && m[1] != '') {
             b = parseInt(m[1].substr(1), 16);
             t = String.fromCharCode(b);
@@ -1246,7 +1247,7 @@ $.extend({
 });
 
 function isValidEmailAddress(emailAddress) {
-    var pattern = new RegExp(
+    let pattern = new RegExp(
         /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
     );
     return pattern.test(emailAddress);
@@ -1254,7 +1255,7 @@ function isValidEmailAddress(emailAddress) {
 
 function mymovie_del(imdbID, btn) {
     $.ajax({
-        url: WWW_TOP + '/ajax_mymovies?rand=' + $.now(),
+        url: base_url + '/ajax_mymovies?rand=' + $.now(),
         data: { del: imdbID },
         dataType: 'html',
         success: function(data) {
@@ -1276,7 +1277,7 @@ function mymovie_add(imdbID, btn) {
         .show();
 
     $.ajax({
-        url: WWW_TOP + '/ajax_mymovies?rand=' + $.now(),
+        url: base_url + '/ajax_mymovies?rand=' + $.now(),
         data: { add: imdbID },
         dataType: 'html',
         success: function(data) {},
@@ -1284,13 +1285,6 @@ function mymovie_add(imdbID, btn) {
     });
 
     return false;
-}
-
-//reset users api counts
-function resetapireq(uid, type) {
-    $.post(SERVERROOT + 'ajax_resetusergrabs-admin?id=' + uid + '&action=' + type, function(
-        resp
-    ) {});
 }
 
 function getNzbGetQueue() {
@@ -1328,8 +1322,8 @@ function getHistory() {
 /** ******  iswitch  *********************** **/
 
 $(function() {
-    var checkAll = $('input.flat-all');
-    var checkboxes = $('input.flat');
+    let checkAll = $('input.flat-all');
+    let checkboxes = $('input.flat');
 
     $('input').iCheck({
         checkboxClass: 'icheckbox_flat-green',
@@ -1362,7 +1356,7 @@ tinyMCE.init({
     plugins: [
         'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
         'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
-        'save table contextmenu directionality emoticons template paste textcolor code',
+        'save table directionality emoticons template paste code',
     ],
     theme_advanced_toolbar_location: 'top',
     theme_advanced_toolbar_align: 'left',

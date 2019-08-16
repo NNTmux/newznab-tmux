@@ -19,7 +19,7 @@
 			{foreach from=$releaselist item=release}
 				<tr class="{cycle values=",alt"}">
 					<td title="{$release.name}"><a
-								href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+								href="{{url("/admin/release-edit?id={$release.guid}")}}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 					</td>
 					<td class="less">{$release.category_name}</td>
 					<td class="less right">{$release.size|filesize}</td>
@@ -28,8 +28,8 @@
 					<td class="less">{$release.adddate|date_format}</td>
 					<td class="less mid">{$release.grabs}</td>
 					<td>
-						{if $release.guid}<a href="{$smarty.const.WWW_TOP}/details/{$release.guid}">view</a> |{/if}
-						<a href="{$smarty.const.WWW_TOP}/admin/release-delete/{$release.guid}">delete</a></td>
+						{if $release.guid}<a href="{{url("/details/{$release.guid}")}}">view</a> |{/if}
+						<a href="{{url("/admin/release-delete/{$release.guid}")}}">delete</a></td>
 				</tr>
 			{/foreach}
 

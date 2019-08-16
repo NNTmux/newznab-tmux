@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var visualblocks = (function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -103,16 +102,15 @@ var visualblocks = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('visualblocks', function (editor, pluginUrl) {
-      var enabledState = Cell(false);
-      Commands.register(editor, pluginUrl, enabledState);
-      Buttons.register(editor, enabledState);
-      Bindings.setup(editor, pluginUrl, enabledState);
-    });
     function Plugin () {
+      global.add('visualblocks', function (editor, pluginUrl) {
+        var enabledState = Cell(false);
+        Commands.register(editor, pluginUrl, enabledState);
+        Buttons.register(editor, enabledState);
+        Bindings.setup(editor, pluginUrl, enabledState);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

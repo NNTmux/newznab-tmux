@@ -1,9 +1,9 @@
 <div class="header">
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/  {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->parent->title}">{$catname->parent->title}</a>{else}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{/if}
-			/ {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{else}All{/if}
+			<li><a href="{{url({$site->home_link})}}">Home</a></li>
+			/  {if !empty({$catname->parent->title})}<a href="{{url("browse/{$catname->parent->title}")}}">{$catname->parent->title}</a>{else}<a href="{{url("/browse/{$catname->title}")}}">{$catname->title}</a>{/if}
+			/ {if !empty({$catname->parent->title})}<a href="{{url("/browse/{$catname->title}")}}">{$catname->title}</a>{else}All{/if}
 		</ol>
 	</div>
 </div>
@@ -20,7 +20,7 @@
 						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/Audio/{$categorytitle}">List</a><br/>
+										href="{{url("/browse/Audio/{$categorytitle}")}}">List</a><br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
@@ -63,8 +63,8 @@
 								<div class="row">
 									<div class="col-md-2 small-gutter-left">
 										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">
-											<img src="{$smarty.const.WWW_TOP}/covers/music/{if $result->cover == 1}{$result->musicinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+										   href="{{url("/details/{$result->guid}")}}">
+											<img src="{{url("/covers/music/{if $result->cover == 1}{$result->musicinfo_id}.jpg{else}{{url("/images/no-cover.png")}}{/if}")}}"
 												 class="img-fluid rounded"
 												 width="140" border="0"
 												 alt="{$result->artist|escape:"htmlall"} - {$result->title|escape:"htmlall"}"/>{if !empty($result->failed)}
@@ -78,11 +78,11 @@
 																 title="View Amazon/iTunes page">
 												Amazon</a>{/if}
 										{if $result->nfoid > 0}<a
-											href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
+											href="{{url("/nfo/{$result->guid}")}}"
 											title="View NFO" class="badge badge-info" rel="nfo">
 												NFO</a>{/if}
 										<a class="badge badge-info"
-										   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
+										   href="{{url("/browse/group?g={$result->group_name}")}}"
 										   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 										{if !empty($result->failed)}
 											<span class="btn btn-light btn-xs"
@@ -95,10 +95,10 @@
 									</div>
 									<div class="col-md-10 small-gutter-left">
 										<h4><a title="View details"
-											   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->artist|escape:"htmlall"}
+											   href="{{url("/details/{$result->guid}")}}">{$result->artist|escape:"htmlall"}
 												- {$result->title|escape:"htmlall"}</a> (<a class="title"
 																						   title="{$result->year}"
-																						   href="{$smarty.const.WWW_TOP}/music?year={$result->year}">{$result->year}</a>)
+																						   href="{{url("/music?year={$result->year}")}}">{$result->year}</a>)
 										</h4>
 										<table class="data table table-striped responsive-utilities jambo-table">
 											<tr>
@@ -112,13 +112,13 @@
 													<span class="badge badge-info">Posted {$result->postdate|timeago}
 														ago</span>
 													{if isset($isadmin)}<a class="badge badge-warning"
-																		   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result->guid}"
+																		   href="{{url("/admin/release-edit?id={$result->guid}")}}"
 																		   title="Edit release">
 															Edit</a>{/if}
 													<br/>
 													{if $result->genre != ""}
 														<b>Genre:</b>
-														<a href="{$smarty.const.WWW_TOP}/music/?genre={$result->genres_id}">{$result->genre|escape:"htmlall"}</a>
+														<a href="{{url("/music/?genre={$result->genres_id}")}}">{$result->genre|escape:"htmlall"}</a>
 														<br/>
 													{/if}
 													{if $result->publisher != ""}
@@ -135,12 +135,12 @@
 														<a role="button" class="btn btn-light btn-xs"
 														   data-toggle="tooltip" data-placement="top" title
 														   data-original-title="Download NZB"
-														   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
+														   href="{{url("/getnzb?id={$result->guid}")}}"><i
 																	class="fa fa-cloud-download"></i><span
 																	class="badge"> {$result->grabs}
 																Grab{if $result->grabs != 1}s{/if}</span></a>
 														<a role="button" class="btn btn-light btn-xs"
-														   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
+														   href="{{url("/details/{$result->guid}/#comments")}}"><i
 																	class="fa fa-comment-o"></i><span
 																	class="badge"> {$result->comments}
 																Comment{if $result->comments != 1}s{/if}</span></a>
@@ -180,7 +180,7 @@
 						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/Audio/{$categorytitle}">List</a><br/>
+										href="{{url("/browse/Audio/{$categorytitle}")}}">List</a><br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"

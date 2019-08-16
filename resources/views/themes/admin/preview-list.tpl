@@ -29,9 +29,9 @@
 			{foreach from=$releaselist item=release}
 				<tr class="{cycle values=",alt"}">
 					<td title="{$release.name}">
-						<img src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg"/>
+						<img src="{{url("/covers/preview/{$release.guid}_thumb.jpg")}}"/>
 						<br/>
-						<a href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.id}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+						<a href="{{url("/admin/release-edit?id={$release.id}")}}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 					</td>
 				</tr>
 			{/foreach}

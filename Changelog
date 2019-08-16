@@ -1,3 +1,168 @@
+2019-08-16 DariusIII
+	* Chg: Add misc/testing/DB/mark_as_passworded.php script
+	* Chg: Set release as passworded if files inside archives are passworded
+	* Chg: Update tinyMCE config
+	* Fix: Fix opening existing forum posts
+	* Fix: Fix bad order of variables in PostProcess class
+2019-08-15 DariusIII
+	* Chg: Add install_composer shell script to install latest version of composer
+2019-08-14 DariusIII
+	* Chg: Add and start updating nntmux:resetpp command
+2019-08-13 DariusIII
+	* Chg: Update used libraries to latest versions
+	* Chg: Reset $this->posterUrl in TVDB class
+	* Chg: Update nikic/php-parser (v4.2.2 => v4.2.3)
+2019-08-12 DariusIII
+	* Fix: Fix bad crosspost check query
+	* Chg: Remove api and download hits reset functionality
+	* Chg: Update javascript and tpls
+	* Chg: Slightly improve movie matching
+	* Fix: Fix game covers 
+	* Chg: Update rtconner/laravel-tagging (3.2.2 => 3.2.3)
+2019-08-11 DariusIII
+	* Chg: Add year check in processMovieReleases function to help better movie matching
+2019-08-09 DariusIII
+	* Chg: Update doctrine/annotations (v1.6.1 => v1.7.0)
+	* Chg: Add basic notifications
+2019-08-08 DariusIII
+	* Chg: Create registration and logout messages
+2019-08-07 DariusIII
+	* Chg: Update tinymce and fontawesome
+	* Chg: Update used libraries to latest versions
+2019-08-06 DariusIII
+	* Chg: Update invite code
+2019-08-05 DariusIII
+	* Chg: Fix sending invites when site is in invite mode
+2019-08-04 DariusIII
+	* Chg: Update used libraries to their latest versions
+2019-08-02 DariusIII
+	* Chg: Update captainhook/captainhook (4.4.2 => 4.4.3)
+2019-08-01 DariusIII
+	* Chg: Update nesbot/carbon (2.21.3 => 2.22.0)
+2019-07-31 DariusIII
+	* Chg: Replace ends_with function with Str:endsWith()
+	* Chg: Update laravel/framework (v5.8.29 => v5.8.30) and rest of the used components to their latest version
+2019-07-30 DariusIII
+	* Chg: Update fontawesome to latest version
+2019-07-29 DariusIII
+	* Chg: Update used components to their latest versions
+	* Chg: Update simfony components
+2019-07-25 DariusIII
+	* Chg: Update phpunit/php-token-stream (3.0.2 => 3.1.0)
+2019-07-24 DariusIII
+	* Chg: Add captainhook/captainhook for dev work
+2019-07-22 DariusIII
+	* Chg: Update spatie/async (1.0.2 => 1.0.3)
+2019-07-21 DariusIII
+	* Chg: Update used libraries to their latest versions
+	* Chg: Update API and RSS XML output to be same as the new newznab API 0.7 specification (newznab:apilimits)
+2019-07-19 DariusIII
+	* Chg: Update nesbot/carbon and voku/simplehtmldom to latest versions
+2019-07-18 DariusIII
+	* Chg: Update tinyMCE to latest version
+2019-07-17 DariusIII
+	* Chg: Update nesbot/carbon (2.21.0 => 2.21.2)
+	* Chg: NNTmux now requires PHP 7.3 minimum
+	* Chg: Update laravel/framework (v5.8.28 => v5.8.29)
+	* Chg: Update APIv1 and RSS xml responses and APIv2 json output for api and grab limits
+2019-07-16 DariusIII
+	* Fix: Fix adding of new 8 digit imdbid movies in admin movie add
+	* Chg: Categorize TRASHBIN releases into XXX HDClips category
+2019-07-14 DariusIII
+	* Chg: Update nesbot/carbon to latest version
+2019-07-13 DariusIII
+	* Chg: Fix $apiRequests variable for capabilities check
+2019-07-12 DariusIII
+	* Chg: Add grab and limit to APIv1, APIv2 and RSS responses
+	* Chg: Update used web components
+	* Chg: Update laravel/horizon and laravel/telescope to latest versions
+2019-07-10 DariusIII
+	* Chg: Update laravel/framework (v5.8.27 => v5.8.28)
+2019-07-09 DariusIII
+	* Chg: Update registration page with email adress clarification text
+	* Chg: Update tinyMCE to latest version
+2019-07-08 DariusIII
+	* Chg: Update used libraries
+2019-07-06 DariusIII
+	* Chg: Update expiring/expired roles email sending and account demotion
+	* Chg: Update used libraries to their latest versions
+2019-07-05 DariusIII
+	* Chg: Update filp/whoops (2.4.0 => 2.4.1)
+2019-07-04 DariusIII
+	* Chg: Remove byGroup release categorization, update isSportTV regexes
+2019-07-03 DariusIII
+	* Chg: Update expired roles handling (send emails for 1, 7, 30 days expiration notice)
+	* Chg: Update laravel/framework, laravel/horizon and rtconner/laravel-tagging to latest versions
+2019-07-02 DariusIII
+	* Chg: Update guzzlehttp/psr7 (1.6.0 => 1.6.1)
+2019-07-01 DariusIII
+	* Chg: Update used libraries to their latest versions
+2019-06-30 DariusIII
+	* Chg: Add artisan commands to update expired roles and delete unverified users
+	* Chg: Update tinyMCE to latest version
+2019-06-29 DariusIII
+	* Chg: Update used libraries to their latest versions
+2019-06-13 DariusIII
+	* Chg: Simplify API response checks
+	* Chg: Update phpspec/prophecy (1.8.0 => 1.8.1)
+	* Chg: Update laravel/framework (v5.8.21 => v5.8.22), cakephp/chronos, composer/composer and barryvdh/laravel-debugbar to their latest versions
+2019-06-11 DariusIII
+	* Chg: Update used libraries to latest versions
+2019-06-07 DariusIII
+	* Fix: Fix xml response from API when there are no releases as result
+	* Fix: Fix xml responses from API
+	* Chg: Update symfony components to latest versions
+2019-06-06 DariusIII
+	* Chg: Update dariusiii/laravel to latest commit
+	* Fix: Fix display of release details when using api
+2019-06-05 DariusIII
+	* Chg: Update fontawesome to latest version
+	* Fix: Fix safe backfill $backfilldays variable. Closes #978
+	* Chg: Update laravel/framework, nesbot/carbon and laravel/horizon to latest versions
+2019-06-04 DariusIII
+	* Chg: Update commit script to include composer fix-style command
+2019-06-03 DariusIII
+	* Chg: Move getZipped function from Releases class to helpers file
+	* Chg: Update used libraries to their latest versions
+2019-05-31 DariusIII
+	* Chg: Check if content is set, if not use empty string
+	* CHg: Update config/database, AuthServiceProvider and env.example
+	* Chg: Update laravel/horizon to version 3.2.1
+2019-05-30 DariusIII
+	* Chg: Update used libraries to their latest versions
+2019-05-29 DariusIII
+	* Chg: Update animate.css to latest version(3.9.1)
+	* Chg: Update laravel/framework (v5.8.18 => v5.8.19) and symfony components to their latest versions
+2019-05-28 DariusIII
+	* Chg: Update symfony components to latest versions
+	* Chg: Update dariusiii/php-itunes-api (v1.0.8.2 => v1.0.9)
+2019-05-27 DariusIII
+	* Chg: Update google/recaptcha and nikic/php-parser to latest versions
+2019-05-24 DariusIII
+	* Chg: Update tinyMCE to version 5.0.6 and bootstrap-datepicker to 1.9.0
+2019-05-23 DariusIII
+	* Chg: Update dariusiii/php-itunes-api (v1.0.8 => v1.0.8.1)
+	* Chg: Update dariusiii/php-itunes-api (v1.0.7 => v1.0.8)
+2019-05-22 DariusIII
+	* Chg: Update egulias/email-validator (2.1.7 => 2.1.8)
+2019-05-21 DariusIII
+	* Chg: Update laravel/framework (v5.8.17 => v5.8.18)
+2019-05-20 DariusIII
+	* Chg: Update voku/simple_html_dom (4.5.2 => 4.5.3)
+	* Fix: Fix browse pages when no releases are indexed yet
+	* Chg: Update voku/simple_html_dom (4.3.3 => 4.5.2)
+2019-05-19 DariusIII
+	* Chg: Update spatie/async (1.0.1 => 1.0.2)
+2019-05-14 DariusIII
+	* Chg: Update laravel/framework (v5.8.16 => v5.8.17)
+	* Chg: Update package.json and webpack.mix.js
+	* Chg: Remove unused basePage() function from BasePageController
+	* Chg: Update phpunit/phpunit (7.5.10 => 7.5.11)
+2019-05-13 DariusIII
+	* Chg: Add link to advanced search to Articles & links menu
+	* Chg: Update orchestra/testbench, league/fractal and spatie/fractalitic to latest versions
+2019-05-10 DariusIII
+	* Chg: Update getBrowseRange query, it should add back missing group name on release browse pages
 2019-05-09 DariusIII
 	* Chg: Update fontawesome and tinyMCE to latest versions
 	* Fix: Fix browse queries and add back missing jpgstatus column select (should fix missing sample button on browse pages)

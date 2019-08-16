@@ -151,7 +151,7 @@ class UserController extends BasePageController
                             \Firewall::blacklist($editedUser->host);
                         }
                         $editedUser->refresh();
-                        SendAccountChangedEmail::dispatch($editedUser);
+                        SendAccountChangedEmail::dispatch($editedUser)->onQueue('emails');
                     }
                 }
 

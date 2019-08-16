@@ -147,7 +147,7 @@ class ProfileController extends BasePageController
                 break;
             case 'submit':
 
-                if ($request->has('saburl') && ! ends_with($request->input('saburl'), '/') && trim($request->input('saburl')) !== '') {
+                if ($request->has('saburl') && ! Str::endsWith($request->input('saburl'), '/') && trim($request->input('saburl')) !== '') {
                     $request->merge(['saburl' => $request->input('saburl').'/']);
                 }
 
@@ -272,7 +272,7 @@ class ProfileController extends BasePageController
                         UserVerification::send($this->userdata, 'User email verification required');
                     }
 
-                    return redirect('profile');
+                    return redirect('profile')->with('success', 'Profile changes saved');
                 }
                 break;
 
@@ -357,6 +357,6 @@ class ProfileController extends BasePageController
             return redirect('profile');
         }
 
-        return view('errors.badboy')->with('Message', 'Dont try to delete another user account!');
+        return view('errors.badboy')->with('warning', 'Dont try to delete another user account!');
     }
 }

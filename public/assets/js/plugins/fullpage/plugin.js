@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
-(function () {
-var fullpage = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -308,17 +307,20 @@ var fullpage = (function (domGlobals) {
     var baseMerge = function (merger) {
       return function () {
         var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++)
+        for (var i = 0; i < objects.length; i++) {
           objects[i] = arguments[i];
-        if (objects.length === 0)
+        }
+        if (objects.length === 0) {
           throw new Error('Can\'t merge zero objects');
+        }
         var ret = {};
         for (var j = 0; j < objects.length; j++) {
           var curObject = objects[j];
-          for (var key in curObject)
+          for (var key in curObject) {
             if (hasOwnProperty.call(curObject, key)) {
               ret[key] = merger(ret[key], curObject[key]);
             }
+          }
         }
         return ret;
       };
@@ -566,16 +568,15 @@ var fullpage = (function (domGlobals) {
     };
     var Buttons = { register: register$1 };
 
-    global.add('fullpage', function (editor) {
-      var headState = Cell(''), footState = Cell('');
-      Commands.register(editor, headState);
-      Buttons.register(editor);
-      FilterContent.setup(editor, headState, footState);
-    });
     function Plugin () {
+      global.add('fullpage', function (editor) {
+        var headState = Cell(''), footState = Cell('');
+        Commands.register(editor, headState);
+        Buttons.register(editor);
+        FilterContent.setup(editor, headState, footState);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

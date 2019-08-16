@@ -5,13 +5,12 @@ namespace Blacklight;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use Chumper\Zipper\Zipper;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class Releases.
@@ -59,14 +58,14 @@ class Releases extends Release
      * @param int   $groupName
      * @param int   $minSize
      *
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function getBrowseRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0, array $tags = [])
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(
-            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, cp.title AS parent_category, c.title AS sub_category, r.group_name,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				df.failed AS failed,
@@ -169,10 +168,10 @@ class Releases extends Release
     /**
      * @return string
      */
-    public function showPasswords()
+    public function showPasswords(): ?string
     {
-        $setting = (int) Settings::settingValue('..showpasswordedrelease');
-        $setting = $setting ?? 10;
+        $show = (int) Settings::settingValue('..showpasswordedrelease');
+        $setting = $show ?? 10;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
@@ -254,7 +253,7 @@ class Releases extends Release
      * @param string $postTo
      * @param string $groupID
      *
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return Collection|\Illuminate\Support\Collection|static[]
      */
     public function getForExport($postFrom = '', $postTo = '', $groupID = '')
     {
@@ -290,7 +289,7 @@ class Releases extends Release
     /**
      * Get date in this format : 01/01/2014 of the oldest release.
      *
-     * @note Used for exporting NZB's.
+     * @note Used for exporting NZBs.
      * @return mixed
      */
     public function getEarliestUsenetPostDate()
@@ -303,7 +302,7 @@ class Releases extends Release
     /**
      * Get date in this format : 01/01/2014 of the newest release.
      *
-     * @note Used for exporting NZB's.
+     * @note Used for exporting NZBs.
      * @return mixed
      */
     public function getLatestUsenetPostDate()
@@ -318,7 +317,7 @@ class Releases extends Release
      *
      * @param bool $blnIncludeAll
      *
-     * @note Used for exporting NZB's.
+     * @note Used for exporting NZBs.
      * @return array
      */
     public function getReleasedGroupsForSelect($blnIncludeAll = true): array
@@ -379,7 +378,7 @@ class Releases extends Release
      * @param $orderBy
      * @param int $maxAge
      * @param array $excludedCats
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
@@ -540,7 +539,7 @@ class Releases extends Release
     /**
      * Creates part of a query for some functions.
      *
-     * @param array|\Illuminate\Database\Eloquent\Collection  $userQuery
+     * @param array|Collection  $userQuery
      * @param string $type
      *
      * @return string
@@ -585,7 +584,7 @@ class Releases extends Release
      * @param int          $minSize
      * @param array        $tags
      *
-     * @return array|\Illuminate\Database\Eloquent\Collection|mixed
+     * @return array|Collection|mixed
      */
     public function search($searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
@@ -705,7 +704,7 @@ class Releases extends Release
      * @param int   $minSize
      * @param array $tags
      *
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $tags = [])
     {
@@ -793,7 +792,7 @@ class Releases extends Release
      * @param int $minSize
      * @param array $excludedCategories
      * @param array $tags
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
@@ -939,7 +938,7 @@ class Releases extends Release
      * @param int $minSize
      * @param array $excludedCategories
      * @param array $tags
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
@@ -1073,7 +1072,7 @@ class Releases extends Release
      * @param array $cat
      * @param int $maxAge
      * @param array $excludedCategories
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
@@ -1147,7 +1146,7 @@ class Releases extends Release
      * @param int $minSize
      * @param array $excludedCategories
      * @param array $tags
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
@@ -1216,7 +1215,7 @@ class Releases extends Release
      * @param $currentID
      * @param $name
      * @param array $excludedCats
-     * @return array|\Illuminate\Database\Eloquent\Collection
+     * @return array|Collection
      */
     public function searchSimilar($currentID, $name, array $excludedCats = [])
     {
@@ -1241,41 +1240,6 @@ class Releases extends Release
         }
 
         return $ret;
-    }
-
-    /**
-     * @param array $guids
-     *
-     * @return string
-     * @throws \Exception
-     */
-    public function getZipped(array $guids = []): string
-    {
-        $nzb = new NZB();
-        $zipped = new Zipper();
-        $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
-        $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
-
-        foreach ($guids as $guid) {
-            $nzbPath = $nzb->NZBPath($guid);
-
-            if ($nzbPath) {
-                $nzbContents = Utility::unzipGzipFile($nzbPath);
-
-                if ($nzbContents) {
-                    $filename = $guid;
-                    $r = self::getByGuid($guid);
-                    if ($r) {
-                        $filename = $r['searchname'];
-                    }
-                    $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
-                }
-            }
-        }
-
-        $zipped->close();
-
-        return File::isFile($zippedFilePath) ? $zippedFilePath : '';
     }
 
     /**

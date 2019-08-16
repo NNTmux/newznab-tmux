@@ -17,9 +17,9 @@
 			<tr class="{cycle values=",alt"}">
 				<td>{$content->ordinal}</td>
 				<td>{$content->id}</td>
-				<td><a href="{$smarty.const.WWW_TOP}/admin/content-add?id={$content->id}"
+				<td><a href="{{url("/admin/content-add?id={$content->id}")}}"
 					   title="Edit {$content->title}">{$content->title}</a></td>
-				<td><a title="Preview in new window" href="{$smarty.const.WWW_TOP}/{$content->url}c{$content->id}"
+				<td><a title="Preview in new window" href="{{url("/{$content->url}c{$content->id}")}}"
 					   target="null">{$content->url}c{$content->id}</a></td>
 				<td>
 					{if $content->contenttype == "1"}
@@ -55,7 +55,7 @@
 				</td>
 				<td title="{$content->body|escape:'htmlall'}">{$content->body|truncate:100|escape:'htmlall'}</td>
 				<td><a class="confirm_action"
-					   href="{$smarty.const.WWW_TOP}/admin/content-delete?id={$content->id}">delete</a></td>
+					   href="{{url("/admin/content-delete?id={$content->id}")}}">delete</a></td>
 			</tr>
 		{/foreach}
 	</table>

@@ -7,6 +7,7 @@ use App\Models\Binary;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -106,7 +107,7 @@ class NZB
         $nzbSplitLevel = (int) Settings::settingValue('..nzbsplitlevel');
         $this->nzbSplitLevel = $nzbSplitLevel ?? 1;
         $this->siteNzbPath = (string) Settings::settingValue('..nzbpath');
-        if (! ends_with($this->siteNzbPath, '/')) {
+        if (! Str::endsWith($this->siteNzbPath, '/')) {
             $this->siteNzbPath .= '/';
         }
         $this->_nzbCommentString = sprintf(

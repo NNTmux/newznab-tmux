@@ -3,7 +3,7 @@
 
     <div class="breadcrumb-wrapper">
         <ol class="breadcrumb">
-            <li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+            <li><a href="{{url("{$site->home_link}")}}">Home</a></li>
             / Profile / {$user.username|escape:"htmlall"}
         </ol>
     </div>
@@ -101,21 +101,19 @@
                                                     <tr>
                                                         <th>API Hits last 24 hours</th>
                                                         <td>
-                                                            <span id="uatd">{$apirequests}</span> {if isset($isadmin) && $apirequests > 0}
-                                                            <a
-                                                                onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
-                                                                href="#" class="badge badge-danger">
-                                                                    Reset</a>{/if}</td>
+                                                            <span>
+                                                                {$apirequests}
+                                                            </span>
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Downloads last 24 hours</th>
-                                                        <td><span id="ugrtd">{$grabstoday}</span> /</span>
+                                                        <td>
+                                                            <span>
+                                                                {$grabstoday}
+                                                            </span> /
                                                             {$user->role->downloadrequests}
-                                                            {if isset($isadmin) && $grabstoday > 0}
-                                                                <a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
-                                                                   href="#" class="badge badge-danger">
-                                                                    Reset</a>
-                                                            {/if}</td>
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Downloads Total</th>
@@ -141,8 +139,8 @@
                                                         <tr>
                                                             <th title="Not public">API/RSS Key</th>
                                                             <td>
-                                                                <a href="{$smarty.const.WWW_TOP}rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}">{$user.api_token}</a>
-                                                                <a href="{$smarty.const.WWW_TOP}profileedit?action=newapikey"
+                                                                <a href="{{url("/rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}")}}">{$user.api_token}</a>
+                                                                <a href="{{url("profileedit?action=newapikey")}}"
                                                                    class="badge badge-danger">GENERATE NEW
                                                                     KEY</a>
                                                             </td>
@@ -152,7 +150,7 @@
                                                             <td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}
                                                                     <br/>
                                                                 {/if}{if isset($isadmin)}<a
-                                                                    href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes"
+                                                                    href="{{url("/admin/user-edit.php?id={$user.id}#notes")}}"
                                                                     class="badge badge-info">Add/Edit</a>{/if}</td>
                                                         </tr>
                                                     {/if}
@@ -183,7 +181,6 @@
                                                                     <div style="display:none;" id="divInvite">
                                                                         {{Form::open(['id' => 'frmSendInvite', 'method' => 'get'])}}
                                                                         {{Form::label('txtInvite', 'Email')}}
-                                                                        {{Form::text(['id' => txtInvite])}}
                                                                         {{Form::text('txtInvite', null, ['id' => 'txtInvite'])}}
                                                                         {{Form::submit('Send')}}
                                                                         {{Form::close()}}
@@ -197,7 +194,7 @@
                                                                 {if $privileged || !$privateprofiles}
                                                                     <td>
                                                                         <a title="View {$userinvitedby.username}'s profile"
-                                                                           href="{$smarty.const.WWW_TOP}/profile?name={$userinvitedby.username}">{$userinvitedby.username}</a>
+                                                                           href="{{url("/profile?name={$userinvitedby.username}")}}">{$userinvitedby.username}</a>
                                                                     </td>
                                                                 {else}
                                                                     <td>
@@ -234,7 +231,7 @@
                                                                 <td width="80"
                                                                     title="{$download.timestamp}">{$download.timestamp|date_format}</td>
                                                                 <td>{if $download->release->guid == ""}n/a{else}<a
-                                                                        href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}
+                                                                        href="{{url("/details/{$download->release->guid}")}}">{$download->release->searchname}</a>{/if}
                                                                 </td>
                                                             </tr>
                                                         {/foreach}
@@ -248,12 +245,12 @@
                             </ul>
                         </div>
                         {if isset($isadmin) || !$publicview}
-                            <a class="btn btn-success" href="{$smarty.const.WWW_TOP}profileedit">Edit
+                            <a class="btn btn-success" href="{{route("profileedit")}}">Edit
                                 Profile</a>
                         {/if}
                         {if !isset($isadmin)}
                             <a class="btn btn-warning confirm_action"
-                               href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
+                               href="{{url("profile_delete?id={$user.id}")}}">Delete your account</a>
                         {/if}
                     </div>
                 </div>

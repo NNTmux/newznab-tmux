@@ -42,7 +42,7 @@ class ContactUsController extends BasePageController
             }
 
             if (! preg_match("/\n/i", $request->input('useremail'))) {
-                SendContactUsEmail::dispatch($email, $mailTo, $mailBody);
+                SendContactUsEmail::dispatch($email, $mailTo, $mailBody)->onQueue('contactemail');
             }
             $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
         }

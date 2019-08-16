@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h2><a href="{$smarty.const.WWW_TOP}/forum">Forum</a></h2>
+	<h2><a href="{{route('forum')}}">Forum</a></h2>
 	{if $results|@count > 0}
 		<h3>{$results[0].subject|escape:"htmlall"}</h3>
 		<a id="top"></a>
@@ -14,7 +14,7 @@
 						{if isset($isadmin) && $isadmin == 1}<strong>{/if}
 							<a {if $smarty.foreach.result.last}id="last"{/if}
 							   title="{if isset($isadmin) && $isadmin == 1}Admin{else}View profile{/if}"
-							   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+							   href="{{url("/profile/?name={$result.username}")}}"><h5>
 									<strong>{$result.username}</strong></h5></a>
 							{if isset($isadmin) && $isadmin == 1}</strong>{/if}
 						{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
@@ -33,7 +33,7 @@
 						{if $userdata.id == $result.users_id && $result.locked != 1 || isset($isadmin)}
 							<div>
 								<a class="btn btn-sm btn-warning"
-								   href="{$smarty.const.WWW_TOP}/post_edit?id={$result.id}"
+								   href="{{url("/post_edit?id={$result.id}")}}"
 								   title="Edit Post">Edit</a>
 							</div>
 						{/if}
@@ -41,7 +41,7 @@
 							<br/>
 							<div>
 								<a class="confirm_action btn btn-sm btn-danger"
-								   href="{$smarty.const.WWW_TOP}/admin/forum-delete/{$result.id}"
+								   href="{{url("/admin/forum-delete/{$result.id}")}}"
 								   title="Delete Post">Delete</a>
 							</div>
 						{/if}

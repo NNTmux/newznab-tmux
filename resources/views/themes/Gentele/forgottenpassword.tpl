@@ -17,7 +17,7 @@
 			<p class="login-box-msg">Please enter the email address you used to register and we will send an email to
 				reset your password. If you
 				cannot remember your email, or no longer have access to it, please <a
-						href="{$smarty.const.WWW_TOP}/contact-us">contact
+						href="{{route('contact-us')}}">contact
 					us</a>.</p>
             {{Form::open(['url' => 'forgottenpassword?action=submit'])}}
 				<div class="form-group has-feedback">

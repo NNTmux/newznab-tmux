@@ -3,7 +3,7 @@
 	<div class="error">{$error}</div>
 {/if}
 <div class="card card-body">
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/category_regexes-list"><i
+	<a class="btn btn-success" href="{{url("/admin/category_regexes-list")}}"><i
 				class="fa fa-arrow-left"></i>
 		Go back</a>
 	<form action="category_regexes-edit?action=submit" method="POST">

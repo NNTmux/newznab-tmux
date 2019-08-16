@@ -3,7 +3,7 @@
 		<h2>Anime > <strong>List</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
-				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+				<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 				/ Anime List
 			</ol>
 		</div>
@@ -11,10 +11,10 @@
 	{$site->adbrowse}
 	<p><b>Jump to</b>:
 		&nbsp;&nbsp;[ {if $animeletter == '0-9'}<b><u>{/if}<a
-						href="{$smarty.const.WWW_TOP}/animelist">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
+						href="{{url("/animelist")}}">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
 		{foreach $animerange as $range}
 		{if $range == $animeletter}<b><u>{/if}<a
-		href="{$smarty.const.WWW_TOP}/animelist?id={$range}">{$range}</a>{if $range == $animeletter}</u></b>{/if}
+		href="{{url("/animelist?id={$range}")}}">{$range}</a>{if $range == $animeletter}</u></b>{/if}
 		{/foreach}]
 	</p>
 	{$site->adbrowse}
@@ -42,7 +42,7 @@
 				{foreach $anime as $a}
 					<tr>
 						<td><a class="title" title="View anime"
-							   href="{$smarty.const.WWW_TOP}/anime?id={$a->anidbid}">{$a->title|escape:"htmlall"}</a>{if {$a->startdate} != ''}
+							   href="{{url("/anime?id={$a->anidbid}")}}">{$a->title|escape:"htmlall"}</a>{if {$a->startdate} != ''}
 							<br/><span class="badge badge-info">({$a->startdate|date_format}
 								- {/if}{if $a->enddate != ''}{$a->enddate|date_format}){/if}</span></td>
 						<td>{if {$a->type} != ''}{$a->type|escape:"htmlall"}{/if}</td>

@@ -1,6 +1,6 @@
 <div class="card card-body">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/group-list"><i class="fa fa-arrow-left"></i> Go
+	<a class="btn btn-success" href="{{url("/admin/group-list")}}"><i class="fa fa-arrow-left"></i> Go
 		back</a>
 	<form action="group-edit?action=submit" method="POST">
 		{{csrf_field()}}

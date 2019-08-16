@@ -1,14 +1,14 @@
 {if not $modal}
 	<h1>{$title}</h1>
 	<h2>For
-		<a href="{$smarty.const.WWW_TOP}/details/{$rel.guid}">{$rel.searchname|escape:'htmlall'}</a>
+		<a href="{{url("/details/{$rel.guid}")}}">{$rel.searchname|escape:'htmlall'}</a>
 	</h2>
 {/if}
 {if $movie.backdrop == 1}
-	<div id="backdrop"><img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-backdrop.jpg" alt=""/></div>{/if}
+	<div id="backdrop"><img src="{{url("/covers/movies/{$movie.imdbid}-backdrop.jpg")}}" alt=""/></div>{/if}
 <div id="movieinfo">
 	<h1>{$movie.title|stripslashes} {if $movie.year != ''}({$movie.year}){/if}</h1>
-	<h2>{if $movie.cover == 1}<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" class="cover"
+	<h2>{if $movie.cover == 1}<img src="{{url("/covers/movies/{$movie.imdbid}-cover.jpg")}}" class="cover"
 								   alt="{$movie.title|stripslashes}" align="left" />{/if}
 		{if $movie.tagline != ''}<b>{$movie.tagline|stripslashes}</b>{/if}</h2>
 	{if $movie.plot != ''}

@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var importcss = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -113,19 +112,23 @@ var importcss = (function () {
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -133,8 +136,10 @@ var importcss = (function () {
         return typeOf(value) === type;
       };
     };
+    var isArray = isType('array');
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var map = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
@@ -148,8 +153,9 @@ var importcss = (function () {
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
-        if (!Array.prototype.isPrototypeOf(xs[i]))
+        if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        }
         push.apply(r, xs[i]);
       }
       return r;
@@ -158,7 +164,6 @@ var importcss = (function () {
       var output = map(xs, f);
       return flatten(output);
     };
-    var slice = Array.prototype.slice;
     var from = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -401,14 +406,13 @@ var importcss = (function () {
     };
     var Api = { get: get };
 
-    global.add('importcss', function (editor) {
-      ImportCss.setup(editor);
-      return Api.get(editor);
-    });
     function Plugin () {
+      global.add('importcss', function (editor) {
+        ImportCss.setup(editor);
+        return Api.get(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

@@ -4,17 +4,22 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var print = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
+    var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
+
     var register = function (editor) {
       editor.addCommand('mcePrint', function () {
-        editor.getWin().print();
+        if (global$1.ie && global$1.ie <= 11) {
+          editor.getDoc().execCommand('print', false, null);
+        } else {
+          editor.getWin().print();
+        }
       });
     };
     var Commands = { register: register };
@@ -37,15 +42,14 @@ var print = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('print', function (editor) {
-      Commands.register(editor);
-      Buttons.register(editor);
-      editor.addShortcut('Meta+P', '', 'mcePrint');
-    });
     function Plugin () {
+      global.add('print', function (editor) {
+        Commands.register(editor);
+        Buttons.register(editor);
+        editor.addShortcut('Meta+P', '', 'mcePrint');
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

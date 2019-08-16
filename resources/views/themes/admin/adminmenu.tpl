@@ -1,10 +1,10 @@
 <div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
     <ul class="list-group">
         <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <a title="Home" href="{$smarty.const.WWW_TOP}/..{$site->home_link}"><small>HOME</small></a>
+            <a title="Home" href="{{url("{$site->home_link}")}}"><small>HOME</small></a>
         </li>
         <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <a title="Admin Home" href="{$smarty.const.WWW_TOP}/admin/index"><small>ADMIN HOME</small></a>
+            <a title="Admin Home" href="{{url("/admin/index")}}"><small>ADMIN HOME</small></a>
         </li>
         <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
             <small>ADMIN FUNCTIONS</small>
@@ -17,7 +17,7 @@
             </div>
         </a>
         <div id='submenu1' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/site-edit" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/site-edit")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Edit Site</span>
             </a>
         </div>
@@ -29,10 +29,10 @@
             </div>
         </a>
         <div id='submenu2' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/content-add?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/content-add?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Content</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/content-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/content-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
             <span class="menu-collapsed">Edit Content</span>
             </a>
         </div>
@@ -44,7 +44,7 @@
             </div>
         </a>
         <div id='submenu3' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/category-list?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/category-list?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Edit Categories</span>
             </a>
         </div>
@@ -56,13 +56,13 @@
             </div>
         </a>
         <div id='submenu4' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/group-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("admin/group-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
             <span class="menu-collapsed">View Groups</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/group-edit" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/group-edit")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Groups</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/group-bulk" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/group-bulk")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Bulk Add Groups</span>
             </a>
         </div>
@@ -74,28 +74,28 @@
             </div>
         </a>
         <div id='submenu5' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/category_regexes-edit?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/category_regexes-edit?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Category Regexes</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/category_regexes-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/category_regexes-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Category Regexes</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/collection_regexes-edit?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/collection_regexes-edit?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Collection Regexes</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/collection_regexes-test?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/collection_regexes-test?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Test Collection Regexes</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/collection_regexes-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/collection_regexes-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Collection Regexes</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-edit?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/release_naming_regexes-edit?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Release Naming Regexes</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-test?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/release_naming_regexes-test?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Test Release Naming Regexes</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/release_naming_regexes-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Release Naming Regexes</span>
             </a>
         </div>
@@ -107,10 +107,10 @@
             </div>
         </a>
         <div id='submenu6' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/binaryblacklist-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Blacklist</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-edit" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/binaryblacklist-edit")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Blacklist</span>
             </a>
         </div>
@@ -122,34 +122,34 @@
             </div>
         </a>
         <div id='submenu7' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/release-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/release-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Releases</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/failrel-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/failrel-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Failed Releases</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/show-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/show-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Shows List</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/movie-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/movie-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Movie List</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/movie-add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/movie-add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Movie</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/anidb-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/anidb-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View AniDB List</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/game-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/game-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Games List</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/music-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/music-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Music List</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/console-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/console-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Console List</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/book-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/book-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Book List</span>
             </a>
         </div>
@@ -161,10 +161,10 @@
             </div>
         </a>
         <div id='submenu9' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/nzb-import" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/nzb-import")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Import NZBs</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/nzb-export" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/nzb-export")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Export NZBs</span>
             </a>
         </div>
@@ -176,7 +176,7 @@
             </div>
         </a>
         <div id='submenu10' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/site-stats" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/site-stats")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Site Stats</span>
             </a>
         </div>
@@ -188,10 +188,10 @@
             </div>
         </a>
         <div id='submenu11' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/comments-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/comments-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Comments</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/sharing" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/sharing")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Comment Sharing Settings</span>
             </a>
         </div>
@@ -203,16 +203,16 @@
             </div>
         </a>
         <div id='submenu12' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/user-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/user-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Users</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/user-edit?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/user-edit?action=add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Users</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/role-list" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/role-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View User Roles</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/role-add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/role-add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add User Roles</span>
             </a>
         </div>
@@ -224,7 +224,7 @@
             </div>
         </a>
         <div id='submenu13' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/tmux-edit" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/tmux-edit")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Tmux Settings</span>
             </a>
         </div>
@@ -236,7 +236,7 @@
             </div>
         </a>
         <div id='submenu14' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/predb" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("/admin/predb")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Pre Database</span>
             </a>
         </div>
@@ -248,7 +248,7 @@
             </div>
         </a>
         <div id='submenu15' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/telescope" class="list-group-item list-group-item-action bg-dark text-white" target="_blank">
+            <a href="{{url("/telescope")}}" class="list-group-item list-group-item-action bg-dark text-white" target="_blank">
                 <span class="menu-collapsed">View Telescope Monitoring tool</span>
             </a>
         </div>
@@ -260,7 +260,7 @@
             </div>
         </a>
         <div id='submenu16' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/horizon" class="list-group-item list-group-item-action bg-dark text-white" target="_blank">
+            <a href="{{url("/horizon")}}"class="list-group-item list-group-item-action bg-dark text-white" target="_blank">
                 <span class="menu-collapsed">View Horizon Redis Queue Monitoring tool</span>
             </a>
         </div>

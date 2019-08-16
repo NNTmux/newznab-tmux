@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
-(function () {
-var spellchecker = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -42,6 +41,23 @@ var spellchecker = (function (domGlobals) {
     };
     var DetectProPlugin = { hasProPlugin: hasProPlugin };
 
+    var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
+    var global$2 = tinymce.util.Tools.resolve('tinymce.util.URI');
+
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+
+    var fireSpellcheckStart = function (editor) {
+      return editor.fire('SpellcheckStart');
+    };
+    var fireSpellcheckEnd = function (editor) {
+      return editor.fire('SpellcheckEnd');
+    };
+    var Events = {
+      fireSpellcheckStart: fireSpellcheckStart,
+      fireSpellcheckEnd: fireSpellcheckEnd
+    };
+
     var getLanguages = function (editor) {
       var defaultLanguages = 'English=en,Danish=da,Dutch=nl,Finnish=fi,French=fr_FR,German=de,Italian=it,Polish=pl,Portuguese=pt_BR,Spanish=es,Swedish=sv';
       return editor.getParam('spellchecker_languages', defaultLanguages);
@@ -66,23 +82,6 @@ var spellchecker = (function (domGlobals) {
       getRpcUrl: getRpcUrl,
       getSpellcheckerCallback: getSpellcheckerCallback,
       getSpellcheckerWordcharPattern: getSpellcheckerWordcharPattern
-    };
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.URI');
-
-    var global$3 = tinymce.util.Tools.resolve('tinymce.util.XHR');
-
-    var fireSpellcheckStart = function (editor) {
-      return editor.fire('SpellcheckStart');
-    };
-    var fireSpellcheckEnd = function (editor) {
-      return editor.fire('SpellcheckEnd');
-    };
-    var Events = {
-      fireSpellcheckStart: fireSpellcheckStart,
-      fireSpellcheckEnd: fireSpellcheckEnd
     };
 
     function isContentEditableFalse(node) {
@@ -587,29 +586,18 @@ var spellchecker = (function (domGlobals) {
     };
     var Commands = { register: register };
 
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
-    var shallow = function (old, nu) {
-      return nu;
-    };
-    var baseMerge = function (merger) {
-      return function () {
-        var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++)
-          objects[i] = arguments[i];
-        if (objects.length === 0)
-          throw new Error('Can\'t merge zero objects');
-        var ret = {};
-        for (var j = 0; j < objects.length; j++) {
-          var curObject = objects[j];
-          for (var key in curObject)
-            if (hasOwnProperty.call(curObject, key)) {
-              ret[key] = merger(ret[key], curObject[key]);
-            }
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
         }
-        return ret;
+        return t;
       };
+      return __assign.apply(this, arguments);
     };
-    var merge = baseMerge(shallow);
 
     var spellcheckerEvents = 'SpellcheckStart SpellcheckEnd';
     var buildMenuItems = function (listName, languageValues) {
@@ -651,29 +639,30 @@ var spellchecker = (function (domGlobals) {
           };
         }
       };
-      var getSplitButtonArgs = function () {
-        return {
-          type: 'splitbutton',
-          menu: languageMenuItems,
-          select: function (value) {
-            return value === currentLanguageState.get();
-          },
-          fetch: function (callback) {
-            var items = global$1.map(languageMenuItems, function (languageItem) {
-              return {
-                type: 'choiceitem',
-                value: languageItem.data,
-                text: languageItem.text
-              };
-            });
-            callback(items);
-          },
-          onItemAction: function (splitButtonApi, value) {
-            currentLanguageState.set(value);
-          }
-        };
-      };
-      editor.ui.registry.addButton('spellchecker', merge(buttonArgs, languageMenuItems.length > 1 ? getSplitButtonArgs() : { type: 'togglebutton' }));
+      var splitButtonArgs = __assign({}, buttonArgs, {
+        type: 'splitbutton',
+        select: function (value) {
+          return value === currentLanguageState.get();
+        },
+        fetch: function (callback) {
+          var items = global$1.map(languageMenuItems, function (languageItem) {
+            return {
+              type: 'choiceitem',
+              value: languageItem.data,
+              text: languageItem.text
+            };
+          });
+          callback(items);
+        },
+        onItemAction: function (splitButtonApi, value) {
+          currentLanguageState.set(value);
+        }
+      });
+      if (languageMenuItems.length > 1) {
+        editor.ui.registry.addSplitButton('spellchecker', splitButtonArgs);
+      } else {
+        editor.ui.registry.addToggleButton('spellchecker', buttonArgs);
+      }
       editor.ui.registry.addToggleMenuItem('spellchecker', {
         text: 'Spellcheck',
         onSetup: function (menuApi) {
@@ -693,7 +682,8 @@ var spellchecker = (function (domGlobals) {
 
     var ignoreAll = true;
     var getSuggestions = function (editor, pluginUrl, lastSuggestionsState, startedState, textMatcherState, currentLanguageState, word, spans) {
-      var items = [], suggestions = lastSuggestionsState.get().suggestions[word];
+      var items = [];
+      var suggestions = lastSuggestionsState.get().suggestions[word];
       global$1.each(suggestions, function (suggestion) {
         items.push({
           text: suggestion,
@@ -751,22 +741,21 @@ var spellchecker = (function (domGlobals) {
     };
     var SuggestionsMenu = { setup: setup };
 
-    global.add('spellchecker', function (editor, pluginUrl) {
-      if (DetectProPlugin.hasProPlugin(editor) === false) {
-        var startedState = Cell(false);
-        var currentLanguageState = Cell(Settings.getLanguage(editor));
-        var textMatcherState = Cell(null);
-        var lastSuggestionsState = Cell(null);
-        Buttons.register(editor, pluginUrl, startedState, textMatcherState, currentLanguageState, lastSuggestionsState);
-        SuggestionsMenu.setup(editor, pluginUrl, lastSuggestionsState, startedState, textMatcherState, currentLanguageState);
-        Commands.register(editor, pluginUrl, startedState, textMatcherState, lastSuggestionsState, currentLanguageState);
-        return Api.get(editor, startedState, lastSuggestionsState, textMatcherState, currentLanguageState, pluginUrl);
-      }
-    });
     function Plugin () {
+      global.add('spellchecker', function (editor, pluginUrl) {
+        if (DetectProPlugin.hasProPlugin(editor) === false) {
+          var startedState = Cell(false);
+          var currentLanguageState = Cell(Settings.getLanguage(editor));
+          var textMatcherState = Cell(null);
+          var lastSuggestionsState = Cell(null);
+          Buttons.register(editor, pluginUrl, startedState, textMatcherState, currentLanguageState, lastSuggestionsState);
+          SuggestionsMenu.setup(editor, pluginUrl, lastSuggestionsState, startedState, textMatcherState, currentLanguageState);
+          Commands.register(editor, pluginUrl, startedState, textMatcherState, lastSuggestionsState, currentLanguageState);
+          return Api.get(editor, startedState, lastSuggestionsState, textMatcherState, currentLanguageState, pluginUrl);
+        }
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

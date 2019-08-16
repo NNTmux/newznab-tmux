@@ -2,7 +2,7 @@
 	<h2>NZB > <strong>Details</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+			<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 			/ NZB
 		</ol>
 	</div>
@@ -18,12 +18,12 @@
 						{$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 				{if $isadmin == true || $ismod == true}
 					<a class="badge badge-warning"
-					   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}"
+					   href="{{url("/admin/release-edit?id={$release.guid}")}}"
 					   title="Edit release">Edit</a>
                 {/if}
                 {if isset($isadmin)}
 					<a class="badge badge-danger"
-					   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$release.guid}"
+					   href="{{url("/admin/release-delete/{$release.guid}")}}"
 					   title="Delete release">Delete</a>
 				{/if}
 				{if $movie && $release.videos_id <= 0 }
@@ -42,28 +42,28 @@
 						   title="View at TMDb">TMDb</a>
 					{/if}
 					{if $movie.imdbid > 0}
-						<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}"
+						<a class="badge badge-info" href="{{url("/Movies?imdb={$movie.imdbid}")}}"
 						   title="View all versions">Movie View</a>
 					{/if}
 				{/if}
 				{if $anidb && $release.anidbid > 0}
-					<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/anime?id={$release.anidbid}"
+					<a class="badge badge-info" href="{{url("/anime?id={$release.anidbid}")}}"
 					   title="View all releases from this anime">View all episodes</a>
 					<a class="badge badge-info"
 					   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
 					   title="View at AniDB" target="_blank">AniDB</a>
 					<a class="badge badge-info"
-					   href="{$smarty.const.WWW_TOP}/rss/full-feed?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">Anime
+					   href="{{url("/rss/full-feed?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">Anime
 						RSS Feed</a>
 				{/if}
 				{if $show && $release.videos_id > 0}
-					<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$release.videos_id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
+					<a href="{{url("/myshows?action=add&id={$release.videos_id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
 					   class="badge badge-success">Add to My Shows</a>
-					<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/series/{$release.videos_id}"
+					<a class="badge badge-info" href="{{url("/series/{$release.videos_id}")}}"
 					   title="View all releases for this series">View all episodes</a>
 					{if $show.tvdb > 0}
 						<a class="badge badge-info" target="_blank"
-						   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
+						   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}")}}"
 						   title="View at TheTVDB">TheTVDB</a>
 					{/if}
 					{if $show.tvmaze > 0}
@@ -176,59 +176,59 @@
 								<div class="row small-gutter-left">
 									<div class="col-md-3 small-gutter-left">
 										{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
-											<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
+											<img src="{{url("/covers/movies/{$movie.imdbid}-cover.jpg")}}"
 												 width="185"
 												 alt="{$movie.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $show && $release.videos_id > 0 && $show.image != "0"}
-											<img src="{$smarty.const.WWW_TOP}/covers/tvshows/{$release.videos_id}.jpg"
+											<img src="{{url("/covers/tvshows/{$release.videos_id}.jpg")}}"
 												 width="185"
 												 alt="{$show.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}
-											<img src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg"
+											<img src="{{url("/covers/anime/{$anidb.anidbid}.jpg")}}"
 												 width="185"
 												 alt="{$anidb.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $con && $con.cover == 1}
-											<img src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg"
+											<img src="{{url("/covers/console/{$con.id}.jpg")}}"
 												 width="185"
 												 alt="{$con.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $game && $game.cover == 1}
-											<img src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg"
+											<img src="{{url("/covers/games/{$game.id}.jpg")}}"
 												 width="185"
 												 alt="{$con.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $music && $music.cover == 1}
-											<img src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg"
+											<img src="{{url("/covers/music/{$music.id}.jpg")}}"
 												 width="185"
 												 alt="{$music.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $book && $book.cover == 1}
-											<img src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg"
+											<img src="{{url("/covers/book/{$book.id}.jpg")}}"
 												 width="185"
 												 alt="{$book.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $xxx && $xxx.cover == 1}
-											<a href="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
+											<a href="{{url("/covers/xxx/{$xxx.id}-cover.jpg")}}"
 											   class="modal-image"><img
 														class="modal-image"
-														src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
+														src="{{url("/covers/xxx/{$xxx.id}-cover.jpg")}}"
 														width="185"
 														alt="{$xxx.title|escape:"htmlall"}"
 														data-toggle="modal"
@@ -237,7 +237,7 @@
 										<br/><br/>
 										<div class="btn-group btn-group-vertical">
 											<a class="btn btn-light btn-sm btn-success btn-transparent"
-											   href="{$smarty.const.WWW_TOP}/getnzb?id={$release.guid}"><i
+											   href="{{url("/getnzb?id={$release.guid}")}}"><i
 														class="fa fa-cloud-download"></i> Download</a>
 											<button type="button"
 													class="btn btn-success btn-sm btn-info btn-transparent cartadd">
@@ -478,14 +478,14 @@
 																<td>
 																	{foreach $groupname as $grp}
 																		<a title="Browse {$grp}"
-																		   href="{$smarty.const.WWW_TOP}/browse/group?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
+																		   href="{{url("/browse/group?g={$grp}")}}">{$grp|replace:"alt.binaries":"a.b"}</a>
 																		<br/>
 																	{/foreach}
 																</td>
 															{else}
 																<td>
 																	<a title="Browse {$release.group_name}"
-																	   href="{$smarty.const.WWW_TOP}/browse/group?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
+																	   href="{{url("/browse/group?g={$release.group_name}")}}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
 																</td>
 															{/if}
 														</tr>
@@ -519,7 +519,7 @@
 															<th width="140">Category</th>
 															<td>
 																<a title="Browse {$release.category_name}"
-																   href="{$smarty.const.WWW_TOP}/browse/{$release.parent_category}/{$release.sub_category}"> {$release.category_name}</a>
+																   href="{{url("/browse/{$release.parent_category}/{$release.sub_category}")}}"> {$release.category_name}</a>
 															</td>
 														</tr>
                                                         {if !empty($release->tagSlugs())}
@@ -528,7 +528,7 @@
                                                                 <td>
                                                                     {foreach $release->tagNames() as $tag}
                                                                         <a title="Browse {$tag}"
-                                                                           href="{$smarty.const.WWW_TOP}/browse/tags?tags={$tag}"> {$tag}</a>
+                                                                           href="{{url("/browse/tags?tags={$tag}")}}"> {$tag}</a>
                                                                     {/foreach}
                                                                 </td>
 
@@ -538,7 +538,7 @@
 															<th width="140">Files</th>
 															<td>
 																<a title="View file list"
-																   href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}">{$release.totalpart}
+																   href="{{url("/filelist/{$release.guid}")}}">{$release.totalpart}
 																	file{if $release.totalpart == 1}{else}s{/if}</a>
 															</td>
 														</tr>
@@ -566,7 +566,7 @@
 														<tr>
 															<th width="140">Poster</th>
 															<td><a title="Find releases by this poster"
-																   href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject=&searchadvposter={$release.fromname|escape:"htmlall"}&searchadvfilename=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv">{$release.fromname|escape:"htmlall"}</a>
+																   href="{{url("/search?searchadvr=&searchadvsubject=&searchadvposter={$release.fromname|escape:"htmlall"}&searchadvfilename=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv")}}">{$release.fromname|escape:"htmlall"}</a>
 															</td>
 														</tr>
 														<tr>
@@ -594,7 +594,7 @@
                                                                     {if !empty($downloadedby) && count($downloadedby)>0} Release downloaded by following users:
                                                                         {foreach $downloadedby as $user}
                                                                             <br>
-                                                                            <a href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user->user->id}">{$user->user->username}</a>
+                                                                            <a href="{{url("/admin/user-edit?id={$user->user->id}")}}">{$user->user->username}</a>
                                                                         {/foreach}
                                                                     {/if}
 																</td>
@@ -631,14 +631,14 @@
 										{foreach $similars as $similar}
 											<li>
 												<a title="View similar NZB details"
-												   href="{$smarty.const.WWW_TOP}/details/{$similar.guid}">{$similar.searchname|escape:"htmlall"}</a>
+												   href="{{url("/details/{$similar.guid}")}}">{$similar.searchname|escape:"htmlall"}</a>
 												<br/>
 											</li>
 										{/foreach}
 									</ul>
 									<br/>
 									<a title="Search for similar Nzbs"
-									   href="{$smarty.const.WWW_TOP}/search?id={$searchname|escape:"htmlall"}">Search for
+									   href="{{url("/search?id={$searchname|escape:"htmlall"}")}}">Search for
 										similar NZBs...</a>
 									<br/>
 									</td>
@@ -657,7 +657,7 @@
 											<td class="less" title="{$comment.created_at}">
 												{if !$privateprofiles || isset($isadmin) || isset($ismod)}
 													<a title="View {$comment.username}'s profile"
-													   href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
+													   href="{{url("/profile?name={$comment.username}")}}">{$comment.username}</a>
 												{else}
 													{$comment.username}
 												{/if}
@@ -684,7 +684,7 @@
 							</div>
 							{if $release.jpgstatus == 1 && $userdata->can('preview') == true}
 								<div id="pane6" class="tab-pane">
-									<img src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg"
+									<img src="{{url("/covers/sample/{$release.guid}_thumb.jpg")}}"
 										 alt="{$release.searchname|escape:"htmlall"}"
 										 data-toggle="modal"
 										 data-target="#modal-image"/>
@@ -692,7 +692,7 @@
 							{/if}
 							{if ($release.haspreview == 1 && $userdata->can('preview') == true) || ($release.haspreview == 2 && $userdata->can('preview') == true)}
 								<div id="pane7" class="tab-pane">
-									<img src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg"
+									<img src="{{url("/covers/preview/{$release.guid}_thumb.jpg")}}"
 										 alt="{$release.searchname|escape:"htmlall"}"
 										 data-toggle="modal"
 										 data-target="#modal-image"/>
@@ -846,7 +846,7 @@
 							{/if}
 							{if isset($xxx.backdrop) && $xxx.backdrop == 1}
 								<div id="pane9" class="tab-pane">
-									<img src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
+									<img src="{{url("/covers/xxx/{$xxx.id}-backdrop.jpg")}}"
 										 alt="{$xxx.title|escape:"htmlall"}"
 										 data-toggle="modal"
 										 data-target="#modal-image"/>
@@ -855,7 +855,7 @@
 							{if isset($game.backdrop) && $game.backdrop == 1}
 								<div id="pane10" class="tab-pane">
 									<img class="img-responsive"
-										 src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
+										 src="{{url("/covers/games/{$game.id}-backdrop.jpg")}}"
 										 width="500" border="0"
 										 alt="{$game.title|escape:"htmlall"}"
 										 data-toggle="modal"
@@ -880,38 +880,38 @@
 			</div>
 			<div class="modal-body">
 				{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
-					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
+					<img src="{{url("/covers/movies/{$movie.imdbid}-cover.jpg")}}"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
 				{if $show && $release.videos_id > 0 && $show.image != "0"}
-					<img src="{$smarty.const.WWW_TOP}/covers/tvshows/{$release.videos_id}.jpg"
+					<img src="{{url("/covers/tvshows/{$release.videos_id}.jpg")}}"
 						 alt="{$show.title|escape:"htmlall"}"/>
 				{/if}
 				{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}
-					<img src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg"
+					<img src="{{url("/covers/anime/{$anidb.anidbid}.jpg")}}"
 						 alt="{$anidb.title|escape:"htmlall"}"/>
 				{/if}
 				{if $con && $con.cover == 1}
-					<img src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg"
+					<img src="{{url("/covers/console/{$con.id}.jpg")}}"
 						 alt="{$con.title|escape:"htmlall"}"/>
 				{/if}
 				{if $music && $music.cover == 1}
-					<img src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg"
+					<img src="{{url("/covers/music/{$music.id}.jpg")}}"
 						 alt="{$music.title|escape:"htmlall"}"/>
 				{/if}
 				{if $book && $book.cover == 1}
-					<img src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg"
+					<img src="{{url("/covers/book/{$book.id}.jpg")}}"
 						 alt="{$book.title|escape:"htmlall"}"/>
 				{/if}
 				{if $xxx && $xxx.backdrop == 1}
-					<a href="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
+					<a href="{{url("/covers/xxx/{$xxx.id}-backdrop.jpg")}}"
 					   class="modal-image_back"><img class="modal-image_back"
-													 src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
+													 src="{{url("/covers/xxx/{$xxx.id}-backdrop.jpg")}}"
 													 alt="{$xxx.title|escape:"htmlall"}"/></a>
 				{elseif $xxx && $xxx.cover == 1}
-					<a href="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
+					<a href="{{url("/covers/xxx/{$xxx.id}-cover.jpg")}}"
 					   class="modal-image"><img class="modal-image"
-												src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
+												src="{{url("/covers/xxx/{$xxx.id}-cover.jpg")}}"
 												alt="{$xxx.title|escape:"htmlall"}"/></a>
 				{/if}
 			</div>

@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 <div class="card card-body">
-	<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/admin/predb" id="custom-search-form"
+	<form name="presearch" method="get" action="{{URL("/admin/predb")}}" id="custom-search-form"
 		  class="form-inline form-horizontal col-4 col-lg-4 float-right">
 		{{csrf_field()}}
 		<div id="search" class="input-group col-12 col-lg-12">
@@ -33,7 +33,7 @@
 					{if isset($result.guid)}
 						<a style="font-style:italic;text-decoration:underline;color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};"
 						   class="title" title="View details"
-						   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
+						   href="{{URL("/details/{$result.guid}")}}">
 							<span title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"}</span>
 						</a>
 					{else}
@@ -46,9 +46,9 @@
 						<a
 								class="requestid"
 								title="{$result.requestid}"
-								href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject={$result.requestid}
+								href="{{URL("/search?searchadvr=&searchadvsubject={$result.requestid}
 															&searchadvposter=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1
-															&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv"
+															&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv")}}"
 						>
 							{$result.requestid}
 						</a>
@@ -81,7 +81,7 @@
 							href="{$site->dereferrer_link}http://nzbindex.com/search/?q={$result.title}"
 							target="_blank"
 					>
-						<img src="{$smarty.const.WWW_ASSETS}/images/icons/nzbindex.png"/>
+						<img src="{{asset("/assets/images/icons/nzbindex.png")}}"/>
 						&nbsp;
 					</a>
 				</td>
@@ -92,7 +92,7 @@
 							href="{$site->dereferrer_link}http://binsearch.info/?q={$result.title}"
 							target="_blank"
 					>
-						<img src="{$smarty.const.WWW_ASSETS}/images/icons/binsearch.png"/>
+						<img src="{{asset("/assets/images/icons/binsearch.png")}}"/>
 						&nbsp;
 					</a>
 				</td>

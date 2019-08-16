@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var autoresize = (function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -33,6 +32,11 @@ var autoresize = (function () {
     var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+
+    var fireResizeEditor = function (editor) {
+      return editor.fire('ResizeEditor');
+    };
+    var Events = { fireResizeEditor: fireResizeEditor };
 
     var getAutoResizeMinHeight = function (editor) {
       return editor.getParam('min_height', editor.getElement().offsetHeight, 'number');
@@ -120,6 +124,7 @@ var autoresize = (function () {
         deltaSize = resizeHeight - oldSize.get();
         dom.setStyle(editor.getContainer(), 'height', resizeHeight + 'px');
         oldSize.set(resizeHeight);
+        Events.fireResizeEditor(editor);
         if (global$1.webkit && deltaSize < 0) {
           resize(editor, oldSize);
         }
@@ -158,20 +163,19 @@ var autoresize = (function () {
     };
     var Commands = { register: register };
 
-    global.add('autoresize', function (editor) {
-      if (!editor.settings.hasOwnProperty('resize')) {
-        editor.settings.resize = false;
-      }
-      if (!editor.inline) {
-        var oldSize = Cell(0);
-        Commands.register(editor, oldSize);
-        Resize.setup(editor, oldSize);
-      }
-    });
     function Plugin () {
+      global.add('autoresize', function (editor) {
+        if (!editor.settings.hasOwnProperty('resize')) {
+          editor.settings.resize = false;
+        }
+        if (!editor.inline) {
+          var oldSize = Cell(0);
+          Commands.register(editor, oldSize);
+          Resize.setup(editor, oldSize);
+        }
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

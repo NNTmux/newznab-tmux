@@ -3,7 +3,7 @@
 		<h2> Series > <strong>List</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
-				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+				<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 				/ TV Series List
 			</ol>
 		</div>
@@ -11,15 +11,15 @@
 	<p>
 		<b>Jump to</b>:
 		&nbsp;[ {if $seriesletter == '0-9'}<b><u>{/if}<a
-						href="{$smarty.const.WWW_TOP}/series/0-9">0-9</a>{if $seriesletter == '0-9'}</u></b>{/if}
+						href="{{url("/series/0-9")}}">0-9</a>{if $seriesletter == '0-9'}</u></b>{/if}
 		{foreach $seriesrange as $range}
 		{if $range == $seriesletter}<b><u>{/if}<a
-		href="{$smarty.const.WWW_TOP}/series/{$range}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
+		href="{{url("/series/{$range}")}}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
 		{/foreach}]
 	</p>
 	<div class="btn-group">
-		<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
-		<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my
+		<a class="btn btn-success" href="{{route('myshows')}}" title="List my watched shows">My shows</a>
+		<a class="btn btn-success" href="{{url("/myshows/browse")}}" title="browse your shows">Find all my
 			shows</a>
 	</div>
 	{$site->adbrowse}
@@ -68,28 +68,28 @@
 				{foreach $series as $s}
 					<tr>
 						<td><a class="title" title="View series"
-							   href="{$smarty.const.WWW_TOP}/series/{$s.id}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}
+							   href="{{url("/series/{$s.id}")}}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}
 						<br/><span class="badge badge-info">Last: {$s.previnfo|escape:"htmlall"}
 							aired {$s.prevdate|date_format}</span>{/if}</td>
 						<td>{$s.publisher|escape:"htmlall"}</td>
 						<td>{$s.countries_id|escape:"htmlall"}</td>
 						<td class="mid">
 							{if $s.userseriesid != null}
-								<a href="{$smarty.const.WWW_TOP}/myshows?action=edit&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{{url("/myshows?action=edit&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
 								   class="myshows btn btn-sm btn-warning" rel="edit" name="series{$s.id}"
 								   title="Edit">Edit</a>
 								<br/>
-								<a href="{$smarty.const.WWW_TOP}/myshows?action=delete&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{{url("/myshows?action=delete&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
 								   class="myshows btn btn-sm btn-danger" rel="remove" name="series{$s.id}"
 								   title="Remove from My Shows">Remove</a>
 							{else}
-								<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{{url("/myshows?action=add&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
 								   class="myshows btn btn-sm btn-success" rel="add" name="series{$s.id}"
 								   title="Add to My Shows">Add</a>
 							{/if}
 						</td>
 						<td class="mid">
-							<a title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.id}">Series</a><br/>
+							<a title="View series" href="{{url("/series/{$s.id}")}}">Series</a><br/>
 							{if $s.id > 0}
 								{if $s.tvdb > 0}
 									<a title="View at TVDB" target="_blank"
@@ -112,7 +112,7 @@
 									   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$s.tmdb}">TMDB</a>
 								{/if}
 								<a title="RSS Feed for {$s.title|escape:"htmlall"}"
-								   href="{$smarty.const.WWW_TOP}/rss/full-feed?show={$s.id}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}"><i
+								   href="{{url("/rss/full-feed?show={$s.id}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}"><i
 											class="fa fa-rss"></i></a>
 							{/if}
 						</td>

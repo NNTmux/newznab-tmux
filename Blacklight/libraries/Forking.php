@@ -295,12 +295,9 @@ class Forking
     private function processEndWork()
     {
         switch ($this->workType) {
+            case 'update_per_group':
             case 'releases':
 
-                $this->_executeCommand($this->dnr_path.'releases  '.\count($this->work).'_"');
-
-                break;
-            case 'update_per_group':
                 $this->_executeCommand($this->dnr_path.'releases  '.\count($this->work).'_"');
 
                 break;
@@ -330,7 +327,7 @@ class Forking
             })->then(function () use ($group, $maxWork) {
                 $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
-                // Handle exception
+                echo $exception->getMessage();
             });
             $maxWork--;
         }
@@ -370,8 +367,7 @@ class Forking
 
         $backfilldays = '';
         if ($backfill_days === 1) {
-            $days = 'backfill_target';
-            $backfilldays = now()->diffInDays(Carbon::createFromDate($days));
+            $backfilldays = 'g.backfill_target';
         } elseif ($backfill_days === 2) {
             $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate')));
         }
@@ -423,7 +419,7 @@ class Forking
                 })->then(function () use ($data) {
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
-                    // Handle exception
+                    echo $exception->getMessage();
                 });
             }
             $pool->wait();
@@ -524,7 +520,7 @@ class Forking
                         $this->colorCli->primary('Updated group '.$match[0]);
                     }
                 })->catch(function (\Throwable $exception) {
-                    // Handle exception
+                    echo $exception->getMessage();
                 });
             }
 
@@ -591,7 +587,7 @@ class Forking
             })->then(function () use ($maxWork) {
                 $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
-                // Handle exception
+                echo $exception->getMessage();
             });
             $maxWork--;
         }
@@ -634,7 +630,7 @@ class Forking
             })->then(function () use ($maxWork) {
                 $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
             })->catch(function (\Throwable $exception) {
-                // Handle exception
+                echo $exception->getMessage();
             });
             $maxWork--;
         }
@@ -679,7 +675,7 @@ class Forking
                 })->then(function () use ($desc, $count) {
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
-                    // Handle exception
+                    echo $exception->getMessage();
                 })->timeout(function () use ($count) {
                     $this->colorCli->notice('Task #'.$count.': Timeout occurred.');
                 });
@@ -933,7 +929,7 @@ class Forking
                 $name = UsenetGroup::getNameByID($group->id);
                 $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
             })->catch(function (\Throwable $exception) {
-                // Handle exception
+                echo $exception->getMessage();
             });
         }
 

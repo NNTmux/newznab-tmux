@@ -1,5 +1,5 @@
 <div id="musicinfo">
-	<img src="{$smarty.const.WWW_TOP}/covers/book/{if $book.cover == 1}{$book.id}{else}no-cover{/if}.jpg" class="cover"
+	<img src="{{url("/covers/book/{if $book.cover == 1}{$book.id}{else}no-cover{/if}.jpg")}}" class="cover"
 		 alt="{$book.title|ss}"/>
 	<h1>{$book.author} - {$book.title}</h1>
 	{if $book.publisher != ""}<h3>Publisher: {$book.publisher}</h3>{/if}

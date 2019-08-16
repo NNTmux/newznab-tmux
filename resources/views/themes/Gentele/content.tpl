@@ -9,7 +9,7 @@
 				<h2>Help > <strong>{$c->title}</strong></h2>
 				<div class="breadcrumb-wrapper">
 					<ol class="breadcrumb">
-						<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+						<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 						/ {$c->title}
 					</ol>
 				</div>
@@ -24,7 +24,7 @@
 				<h2>Help > <strong>{$c->title}</strong></h2>
 				<div class="breadcrumb-wrapper">
 					<ol class="breadcrumb">
-						<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+						<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 						/ {$c->title}
 					</ol>
 				</div>

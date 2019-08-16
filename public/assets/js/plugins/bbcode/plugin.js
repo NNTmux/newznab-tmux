@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var bbcode = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -83,27 +82,22 @@ var bbcode = (function () {
       bbcode2html: bbcode2html
     };
 
-    global.add('bbcode', function () {
-      return {
-        init: function (editor) {
-          editor.on('BeforeSetContent', function (e) {
-            e.content = Convert.bbcode2html(e.content);
-          });
-          editor.on('PostProcess', function (e) {
-            if (e.set) {
-              e.content = Convert.bbcode2html(e.content);
-            }
-            if (e.get) {
-              e.content = Convert.html2bbcode(e.content);
-            }
-          });
-        }
-      };
-    });
     function Plugin () {
+      global.add('bbcode', function (editor) {
+        editor.on('BeforeSetContent', function (e) {
+          e.content = Convert.bbcode2html(e.content);
+        });
+        editor.on('PostProcess', function (e) {
+          if (e.set) {
+            e.content = Convert.bbcode2html(e.content);
+          }
+          if (e.get) {
+            e.content = Convert.html2bbcode(e.content);
+          }
+        });
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

@@ -2,7 +2,7 @@
 <div class="header">
     <div class="breadcrumb-wrapper">
         <ol class="breadcrumb">
-            <li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+            <li><a href="{{url("{$site->home_link}")}}">Home</a></li>
             / TV Series
         </ol>
     </div>
@@ -16,7 +16,7 @@
 <div class="header">
     <div class="breadcrumb-wrapper">
         <ol class="breadcrumb">
-            <li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+            <li><a href="{{url("{$site->home_link}")}}">Home</a></li>
             / TV Series
         </ol>
     </div>
@@ -29,7 +29,7 @@
         {if $show.image != 0}
             <div style="text-align: center;">
                 <img class="shadow img img-polaroid" style="max-height:300px;" alt="{$seriestitles} Logo"
-                     src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg"/>
+                     src="{{url("/covers/tvshows/{$show.id}.jpg")}}"/>
             </div>
             <br/>
         {/if}
@@ -40,7 +40,7 @@
 </div>
 <div class="btn-group">
     <a class="btn btn-sm btn-success"
-       href="{$smarty.const.WWW_TOP}/rss/full-feed?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">RSS
+       href="{{url("/rss/full-feed?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">RSS
         for TV Show <i class="fa fa-rss"></i></a>
     {if $show.tvdb > 0}
         <a class="btn btn-sm btn-info" target="_blank"
@@ -103,25 +103,25 @@
     </div>
     {{Form::close()}}
     <div>
-        <a title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a> :
+        <a title="Manage your shows" href="{{route('myshows')}}">My Shows</a> :
         <div class="btn-group">
             {if $myshows.id != ''}
                 <a class="myshows btn btn-sm btn-warning" data-toggle="tooltip" data-placement="top" title
                    data-original-title="Edit Categories for this show"
-                   href="{$smarty.const.WWW_TOP}/myshows?action=edit&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
+                   href="{{url("/myshows?action=edit&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="edit" name="series{$show.id}">
                     <i class="fa fa-pencil"></i>
                 </a>
                 <a class="myshows btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title
                    data-original-title="Remove from My Shows"
-                   href="{$smarty.const.WWW_TOP}/myshows?action=delete&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
+                   href="{{url("/myshows?action=delete&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="remove" name="series{$show.id}">
                     <i class="fa fa-minus"></i>
                 </a>
             {else}
                 <a class="myshows btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title
                    data-original-title="Add to My Shows"
-                   href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
+                   href="{{url("/myshows?action=add&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="add" name="series{$show.id}">
                     <i class="fa fa-plus"></i>
                 </a>
@@ -171,16 +171,16 @@
                                             {/if}
                                             <td>
                                                 <a title="View details"
-                                                   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>
+                                                   href="{{url("/details/{$result->guid}")}}">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>
 
                                                 <div>
                                                     {if $result->nfoid > 0}<span>
-                                                        <a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
+                                                        <a href="{{url("/nfo/{$result->guid}")}}"
                                                            class="modal_nfo badge badge-info text-muted">NFO</a>
                                                         </span>{/if}
                                                     {if $result->image == 1 && $userdata->can('preview') == true}
                                                     <a
-                                                        href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+                                                        href="{{url("/covers/preview/{$result->guid}_thumb.jpg")}}"
                                                         name="name{$result->guid}"
                                                         data-fancybox
                                                         title="View Screenshot"
@@ -211,13 +211,13 @@
                                                 {$result->size|filesize}
                                             </td>
                                             <td>
-                                                <a href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"
+                                                <a href="{{url("/getnzb?id={$result->guid}")}}"
                                                    class="icon_nzb text-muted"><i
                                                         class="fa fa-cloud-download text-muted"
                                                         data-toggle="tooltip" data-placement="top"
                                                         title
                                                         data-original-title="Download NZB"></i></a>
-                                                <a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
+                                                <a href="{{url("/details/{$result->guid}/#comments")}}"><i
                                                         class="fa fa-comments-o text-muted"
                                                         data-toggle="tooltip" data-placement="top"
                                                         title

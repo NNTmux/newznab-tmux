@@ -14,7 +14,7 @@
 				<tr class="{cycle values=",alt"}">
 					<td>
 						{if $comment.users_id > 0}
-							<a href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$comment.users_id}">{$comment.username}</a>
+							<a href="{{url("/admin/user-edit?id={$comment.users_id}")}}">{$comment.username}</a>
 						{else}
 							{$comment.username}
 						{/if}
@@ -27,9 +27,9 @@
 					{/if}
 					<td>{$comment.host}</td>
 					<td>
-						{if $comment.guid}<a href="{$smarty.const.WWW_TOP}/details/{$comment.guid}#comments">
+						{if $comment.guid}<a href="{{url("/details/{$comment.guid}#comments")}}">
 								view</a> |{/if}
-						<a href="{$smarty.const.WWW_TOP}/admin/comments-delete?id={$comment.id}">delete</a>
+						<a href="{{url("/admin/comments-delete?id={$comment.id}")}}">delete</a>
 					</td>
 				</tr>
 			{/foreach}

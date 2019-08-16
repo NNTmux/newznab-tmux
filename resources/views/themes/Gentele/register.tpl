@@ -27,13 +27,13 @@
 							   class="form-control"
 							   placeholder="Email"/>
 						<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-                        <div class="hint">Type your email address</div>
+                        <div class="hint">Type your email address. Email has to be real and accessible or you will not be able to verify it and your account will be deleted after 3 days.</div>
 					</div>
 					<div class="form-group has-feedback">
 						<input id="password" autocomplete="off" name="password" value="{$password}" type="password"
 							   class="form-control" placeholder="Password"/>
 						<span class="glyphicon glyphicon-lock form-control-feedback"></span>
-						<div class="hint">Your password must be more than 8 characters long, should contain at-least 1 Uppercase, 1 Lowercase, 1 Numeric and 1 special character..</div>
+						<div class="hint">Your password must be more than 8 characters long, should contain at-least 1 Uppercase, 1 Lowercase, 1 Numeric and 1 special character.</div>
 					</div>
 					<div class="form-group has-feedback">
 						<input autocomplete="off" id="password_confirmation" name="password_confirmation"
@@ -52,8 +52,7 @@
 							</div>
 						</div><!-- /.col -->
 						<div class="col-4">
-							<button type="submit" value="Register" class="btn btn-success btn-block btn-flat">Register
-							</button>
+							{{Form::submit('Register', ['class' => "btn btn-success btn-block btn-flat"])}}
 						</div><!-- /.col -->
 						<hr>
 						<div style="text-align: center;">

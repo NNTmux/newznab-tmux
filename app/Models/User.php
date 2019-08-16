@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -11,13 +12,17 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\SendAccountExpiredEmail;
 use Spatie\Permission\Traits\HasRoles;
+use Junaidnasir\Larainvite\InviteTrait;
+use App\Jobs\SendAccountWillExpireEmail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Junaidnasir\Larainvite\Facades\Invite;
 use Jrean\UserVerification\Traits\UserVerification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
+ * App\Models\User.
  * App\Models\User.
  *
  * @property int $id
@@ -114,7 +119,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use Notifiable, UserVerification, HasRoles;
+    use Notifiable, UserVerification, HasRoles, InviteTrait;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -385,21 +390,27 @@ class User extends Authenticatable
         }
     }
 
-    /**
-     * @return int
-     */
-    public static function updateExpiredRoles(): int
+    public static function updateExpiredRoles(): void
     {
-        $data = self::query()->whereDate('rolechangedate', '<', now())->get();
+        $now = CarbonImmutable::now();
+        $period = [
+            'day' => $now->addDay(),
+            'week' => $now->addWeek(),
+            'month' => $now->addMonth(),
+        ];
 
-        foreach ($data as $u) {
-            $user = self::find($u['id']);
-            $user->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
-            $user->syncRoles('User');
-            SendAccountExpiredEmail::dispatch($user);
+        foreach ($period as $value) {
+            $users = self::query()->whereDate('rolechangedate', '=', $value)->get();
+            $days = $now->diffInDays($value);
+            foreach ($users as $user) {
+                SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails');
+            }
         }
-
-        return self::SUCCESS;
+        foreach (self::query()->whereDate('rolechangedate', '<', $now)->get() as $expired) {
+            $expired->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            $expired->syncRoles('User');
+            SendAccountExpiredEmail::dispatch($expired)->onQueue('emails');
+        }
     }
 
     /**
@@ -872,11 +883,12 @@ class User extends Authenticatable
      */
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
-        $token = \Token::randomString(40);
-        $url = $serverUrl.'register?invitecode='.$token;
+        $user = self::find($uid);
+        $token = Invite::invite($emailTo, $user->id);
+        $url = $serverUrl.'/register?invitecode='.$token;
 
         Invitation::addInvite($uid, $token);
-        SendInviteEmail::dispatch($emailTo, $uid, $url);
+        SendInviteEmail::dispatch($emailTo, $user, $url)->onQueue('emails');
 
         return $url;
     }
@@ -888,6 +900,7 @@ class User extends Authenticatable
      * limits to apply.
      *
      * @param int $days
+     * @throws \Exception
      */
     public static function pruneRequestHistory($days = 0): void
     {

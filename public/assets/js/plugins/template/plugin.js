@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var template = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -261,8 +260,9 @@ var template = (function () {
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
@@ -337,13 +337,16 @@ var template = (function () {
     };
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -353,6 +356,7 @@ var template = (function () {
     };
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var map = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
@@ -371,7 +375,6 @@ var template = (function () {
       }
       return Option.none();
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -583,15 +586,14 @@ var template = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('template', function (editor) {
-      Buttons.register(editor);
-      Commands.register(editor);
-      FilterContent.setup(editor);
-    });
     function Plugin () {
+      global.add('template', function (editor) {
+        Buttons.register(editor);
+        Commands.register(editor);
+        FilterContent.setup(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

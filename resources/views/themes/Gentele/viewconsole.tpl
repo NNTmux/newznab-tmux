@@ -1,5 +1,5 @@
 <div id="musicinfo">
-	<img src="{$smarty.const.WWW_TOP}/covers/console/{if $console.cover == 1}{$console.id}{else}no-cover{/if}.jpg"
+	<img src="{{url("/covers/console/{if $console.cover == 1}{$console.id}{else}no-cover{/if}.jpg")}}"
 		 class="cover" alt="{$console.title|ss}"/>
 	<h1>{$console.title} {if $console.year != ""}({$console.year}){/if}</h1>
 	{if $console.genres != ""}<h3>Genre: {$console.genres}</h3>{/if}

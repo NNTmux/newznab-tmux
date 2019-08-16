@@ -4,19 +4,14 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
-(function () {
-var image = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
-    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
+    var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var constant = function (value) {
       return function () {
@@ -88,8 +83,9 @@ var image = (function (domGlobals) {
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
@@ -164,13 +160,16 @@ var image = (function (domGlobals) {
     };
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -180,35 +179,28 @@ var image = (function (domGlobals) {
     };
     var isString = isType('string');
     var isObject = isType('object');
+    var isArray = isType('array');
+    var isBoolean = isType('boolean');
     var isFunction = isType('function');
-    var isNumber = isType('number');
 
+    var slice = Array.prototype.slice;
     var each = function (xs, f) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
         f(x, i, xs);
       }
     };
-    var find = function (xs, pred) {
-      for (var i = 0, len = xs.length; i < len; i++) {
-        var x = xs[i];
-        if (pred(x, i, xs)) {
-          return Option.some(x);
-        }
-      }
-      return Option.none();
-    };
     var push = Array.prototype.push;
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
-        if (!Array.prototype.isPrototypeOf(xs[i]))
+        if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        }
         push.apply(r, xs[i]);
       }
       return r;
     };
-    var slice = Array.prototype.slice;
     var head = function (xs) {
       return xs.length === 0 ? Option.none() : Option.some(xs[0]);
     };
@@ -229,6 +221,503 @@ var image = (function (domGlobals) {
       return __assign.apply(this, arguments);
     };
 
+    var exports$1 = {}, module = { exports: exports$1 };
+    (function (define, exports, module, require) {
+      (function (f) {
+        if (typeof exports === 'object' && typeof module !== 'undefined') {
+          module.exports = f();
+        } else if (typeof define === 'function' && define.amd) {
+          define([], f);
+        } else {
+          var g;
+          if (typeof window !== 'undefined') {
+            g = window;
+          } else if (typeof global !== 'undefined') {
+            g = global;
+          } else if (typeof self !== 'undefined') {
+            g = self;
+          } else {
+            g = this;
+          }
+          g.EphoxContactWrapper = f();
+        }
+      }(function () {
+        return function () {
+          function r(e, n, t) {
+            function o(i, f) {
+              if (!n[i]) {
+                if (!e[i]) {
+                  var c = 'function' == typeof require && require;
+                  if (!f && c)
+                    return c(i, !0);
+                  if (u)
+                    return u(i, !0);
+                  var a = new Error('Cannot find module \'' + i + '\'');
+                  throw a.code = 'MODULE_NOT_FOUND', a;
+                }
+                var p = n[i] = { exports: {} };
+                e[i][0].call(p.exports, function (r) {
+                  var n = e[i][1][r];
+                  return o(n || r);
+                }, p, p.exports, r, e, n, t);
+              }
+              return n[i].exports;
+            }
+            for (var u = 'function' == typeof require && require, i = 0; i < t.length; i++)
+              o(t[i]);
+            return o;
+          }
+          return r;
+        }()({
+          1: [
+            function (require, module, exports) {
+              var process = module.exports = {};
+              var cachedSetTimeout;
+              var cachedClearTimeout;
+              function defaultSetTimout() {
+                throw new Error('setTimeout has not been defined');
+              }
+              function defaultClearTimeout() {
+                throw new Error('clearTimeout has not been defined');
+              }
+              (function () {
+                try {
+                  if (typeof setTimeout === 'function') {
+                    cachedSetTimeout = setTimeout;
+                  } else {
+                    cachedSetTimeout = defaultSetTimout;
+                  }
+                } catch (e) {
+                  cachedSetTimeout = defaultSetTimout;
+                }
+                try {
+                  if (typeof clearTimeout === 'function') {
+                    cachedClearTimeout = clearTimeout;
+                  } else {
+                    cachedClearTimeout = defaultClearTimeout;
+                  }
+                } catch (e) {
+                  cachedClearTimeout = defaultClearTimeout;
+                }
+              }());
+              function runTimeout(fun) {
+                if (cachedSetTimeout === setTimeout) {
+                  return setTimeout(fun, 0);
+                }
+                if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+                  cachedSetTimeout = setTimeout;
+                  return setTimeout(fun, 0);
+                }
+                try {
+                  return cachedSetTimeout(fun, 0);
+                } catch (e) {
+                  try {
+                    return cachedSetTimeout.call(null, fun, 0);
+                  } catch (e) {
+                    return cachedSetTimeout.call(this, fun, 0);
+                  }
+                }
+              }
+              function runClearTimeout(marker) {
+                if (cachedClearTimeout === clearTimeout) {
+                  return clearTimeout(marker);
+                }
+                if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+                  cachedClearTimeout = clearTimeout;
+                  return clearTimeout(marker);
+                }
+                try {
+                  return cachedClearTimeout(marker);
+                } catch (e) {
+                  try {
+                    return cachedClearTimeout.call(null, marker);
+                  } catch (e) {
+                    return cachedClearTimeout.call(this, marker);
+                  }
+                }
+              }
+              var queue = [];
+              var draining = false;
+              var currentQueue;
+              var queueIndex = -1;
+              function cleanUpNextTick() {
+                if (!draining || !currentQueue) {
+                  return;
+                }
+                draining = false;
+                if (currentQueue.length) {
+                  queue = currentQueue.concat(queue);
+                } else {
+                  queueIndex = -1;
+                }
+                if (queue.length) {
+                  drainQueue();
+                }
+              }
+              function drainQueue() {
+                if (draining) {
+                  return;
+                }
+                var timeout = runTimeout(cleanUpNextTick);
+                draining = true;
+                var len = queue.length;
+                while (len) {
+                  currentQueue = queue;
+                  queue = [];
+                  while (++queueIndex < len) {
+                    if (currentQueue) {
+                      currentQueue[queueIndex].run();
+                    }
+                  }
+                  queueIndex = -1;
+                  len = queue.length;
+                }
+                currentQueue = null;
+                draining = false;
+                runClearTimeout(timeout);
+              }
+              process.nextTick = function (fun) {
+                var args = new Array(arguments.length - 1);
+                if (arguments.length > 1) {
+                  for (var i = 1; i < arguments.length; i++) {
+                    args[i - 1] = arguments[i];
+                  }
+                }
+                queue.push(new Item(fun, args));
+                if (queue.length === 1 && !draining) {
+                  runTimeout(drainQueue);
+                }
+              };
+              function Item(fun, array) {
+                this.fun = fun;
+                this.array = array;
+              }
+              Item.prototype.run = function () {
+                this.fun.apply(null, this.array);
+              };
+              process.title = 'browser';
+              process.browser = true;
+              process.env = {};
+              process.argv = [];
+              process.version = '';
+              process.versions = {};
+              function noop() {
+              }
+              process.on = noop;
+              process.addListener = noop;
+              process.once = noop;
+              process.off = noop;
+              process.removeListener = noop;
+              process.removeAllListeners = noop;
+              process.emit = noop;
+              process.prependListener = noop;
+              process.prependOnceListener = noop;
+              process.listeners = function (name) {
+                return [];
+              };
+              process.binding = function (name) {
+                throw new Error('process.binding is not supported');
+              };
+              process.cwd = function () {
+                return '/';
+              };
+              process.chdir = function (dir) {
+                throw new Error('process.chdir is not supported');
+              };
+              process.umask = function () {
+                return 0;
+              };
+            },
+            {}
+          ],
+          2: [
+            function (require, module, exports) {
+              (function (setImmediate) {
+                (function (root) {
+                  var setTimeoutFunc = setTimeout;
+                  function noop() {
+                  }
+                  function bind(fn, thisArg) {
+                    return function () {
+                      fn.apply(thisArg, arguments);
+                    };
+                  }
+                  function Promise(fn) {
+                    if (typeof this !== 'object')
+                      throw new TypeError('Promises must be constructed via new');
+                    if (typeof fn !== 'function')
+                      throw new TypeError('not a function');
+                    this._state = 0;
+                    this._handled = false;
+                    this._value = undefined;
+                    this._deferreds = [];
+                    doResolve(fn, this);
+                  }
+                  function handle(self, deferred) {
+                    while (self._state === 3) {
+                      self = self._value;
+                    }
+                    if (self._state === 0) {
+                      self._deferreds.push(deferred);
+                      return;
+                    }
+                    self._handled = true;
+                    Promise._immediateFn(function () {
+                      var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+                      if (cb === null) {
+                        (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+                        return;
+                      }
+                      var ret;
+                      try {
+                        ret = cb(self._value);
+                      } catch (e) {
+                        reject(deferred.promise, e);
+                        return;
+                      }
+                      resolve(deferred.promise, ret);
+                    });
+                  }
+                  function resolve(self, newValue) {
+                    try {
+                      if (newValue === self)
+                        throw new TypeError('A promise cannot be resolved with itself.');
+                      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+                        var then = newValue.then;
+                        if (newValue instanceof Promise) {
+                          self._state = 3;
+                          self._value = newValue;
+                          finale(self);
+                          return;
+                        } else if (typeof then === 'function') {
+                          doResolve(bind(then, newValue), self);
+                          return;
+                        }
+                      }
+                      self._state = 1;
+                      self._value = newValue;
+                      finale(self);
+                    } catch (e) {
+                      reject(self, e);
+                    }
+                  }
+                  function reject(self, newValue) {
+                    self._state = 2;
+                    self._value = newValue;
+                    finale(self);
+                  }
+                  function finale(self) {
+                    if (self._state === 2 && self._deferreds.length === 0) {
+                      Promise._immediateFn(function () {
+                        if (!self._handled) {
+                          Promise._unhandledRejectionFn(self._value);
+                        }
+                      });
+                    }
+                    for (var i = 0, len = self._deferreds.length; i < len; i++) {
+                      handle(self, self._deferreds[i]);
+                    }
+                    self._deferreds = null;
+                  }
+                  function Handler(onFulfilled, onRejected, promise) {
+                    this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+                    this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+                    this.promise = promise;
+                  }
+                  function doResolve(fn, self) {
+                    var done = false;
+                    try {
+                      fn(function (value) {
+                        if (done)
+                          return;
+                        done = true;
+                        resolve(self, value);
+                      }, function (reason) {
+                        if (done)
+                          return;
+                        done = true;
+                        reject(self, reason);
+                      });
+                    } catch (ex) {
+                      if (done)
+                        return;
+                      done = true;
+                      reject(self, ex);
+                    }
+                  }
+                  Promise.prototype['catch'] = function (onRejected) {
+                    return this.then(null, onRejected);
+                  };
+                  Promise.prototype.then = function (onFulfilled, onRejected) {
+                    var prom = new this.constructor(noop);
+                    handle(this, new Handler(onFulfilled, onRejected, prom));
+                    return prom;
+                  };
+                  Promise.all = function (arr) {
+                    var args = Array.prototype.slice.call(arr);
+                    return new Promise(function (resolve, reject) {
+                      if (args.length === 0)
+                        return resolve([]);
+                      var remaining = args.length;
+                      function res(i, val) {
+                        try {
+                          if (val && (typeof val === 'object' || typeof val === 'function')) {
+                            var then = val.then;
+                            if (typeof then === 'function') {
+                              then.call(val, function (val) {
+                                res(i, val);
+                              }, reject);
+                              return;
+                            }
+                          }
+                          args[i] = val;
+                          if (--remaining === 0) {
+                            resolve(args);
+                          }
+                        } catch (ex) {
+                          reject(ex);
+                        }
+                      }
+                      for (var i = 0; i < args.length; i++) {
+                        res(i, args[i]);
+                      }
+                    });
+                  };
+                  Promise.resolve = function (value) {
+                    if (value && typeof value === 'object' && value.constructor === Promise) {
+                      return value;
+                    }
+                    return new Promise(function (resolve) {
+                      resolve(value);
+                    });
+                  };
+                  Promise.reject = function (value) {
+                    return new Promise(function (resolve, reject) {
+                      reject(value);
+                    });
+                  };
+                  Promise.race = function (values) {
+                    return new Promise(function (resolve, reject) {
+                      for (var i = 0, len = values.length; i < len; i++) {
+                        values[i].then(resolve, reject);
+                      }
+                    });
+                  };
+                  Promise._immediateFn = typeof setImmediate === 'function' ? function (fn) {
+                    setImmediate(fn);
+                  } : function (fn) {
+                    setTimeoutFunc(fn, 0);
+                  };
+                  Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+                    if (typeof console !== 'undefined' && console) {
+                      console.warn('Possible Unhandled Promise Rejection:', err);
+                    }
+                  };
+                  Promise._setImmediateFn = function _setImmediateFn(fn) {
+                    Promise._immediateFn = fn;
+                  };
+                  Promise._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
+                    Promise._unhandledRejectionFn = fn;
+                  };
+                  if (typeof module !== 'undefined' && module.exports) {
+                    module.exports = Promise;
+                  } else if (!root.Promise) {
+                    root.Promise = Promise;
+                  }
+                }(this));
+              }.call(this, require('timers').setImmediate));
+            },
+            { 'timers': 3 }
+          ],
+          3: [
+            function (require, module, exports) {
+              (function (setImmediate, clearImmediate) {
+                var nextTick = require('process/browser.js').nextTick;
+                var apply = Function.prototype.apply;
+                var slice = Array.prototype.slice;
+                var immediateIds = {};
+                var nextImmediateId = 0;
+                exports.setTimeout = function () {
+                  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+                };
+                exports.setInterval = function () {
+                  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+                };
+                exports.clearTimeout = exports.clearInterval = function (timeout) {
+                  timeout.close();
+                };
+                function Timeout(id, clearFn) {
+                  this._id = id;
+                  this._clearFn = clearFn;
+                }
+                Timeout.prototype.unref = Timeout.prototype.ref = function () {
+                };
+                Timeout.prototype.close = function () {
+                  this._clearFn.call(window, this._id);
+                };
+                exports.enroll = function (item, msecs) {
+                  clearTimeout(item._idleTimeoutId);
+                  item._idleTimeout = msecs;
+                };
+                exports.unenroll = function (item) {
+                  clearTimeout(item._idleTimeoutId);
+                  item._idleTimeout = -1;
+                };
+                exports._unrefActive = exports.active = function (item) {
+                  clearTimeout(item._idleTimeoutId);
+                  var msecs = item._idleTimeout;
+                  if (msecs >= 0) {
+                    item._idleTimeoutId = setTimeout(function onTimeout() {
+                      if (item._onTimeout)
+                        item._onTimeout();
+                    }, msecs);
+                  }
+                };
+                exports.setImmediate = typeof setImmediate === 'function' ? setImmediate : function (fn) {
+                  var id = nextImmediateId++;
+                  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+                  immediateIds[id] = true;
+                  nextTick(function onNextTick() {
+                    if (immediateIds[id]) {
+                      if (args) {
+                        fn.apply(null, args);
+                      } else {
+                        fn.call(null);
+                      }
+                      exports.clearImmediate(id);
+                    }
+                  });
+                  return id;
+                };
+                exports.clearImmediate = typeof clearImmediate === 'function' ? clearImmediate : function (id) {
+                  delete immediateIds[id];
+                };
+              }.call(this, require('timers').setImmediate, require('timers').clearImmediate));
+            },
+            {
+              'process/browser.js': 1,
+              'timers': 3
+            }
+          ],
+          4: [
+            function (require, module, exports) {
+              var promisePolyfill = require('promise-polyfill');
+              var Global = function () {
+                if (typeof window !== 'undefined') {
+                  return window;
+                } else {
+                  return Function('return this;')();
+                }
+              }();
+              module.exports = { boltExport: Global.Promise || promisePolyfill };
+            },
+            { 'promise-polyfill': 2 }
+          ]
+        }, {}, [4])(4);
+      }));
+    }(undefined, exports$1, module, undefined));
+    var Promise = module.exports.boltExport;
+
     var nu = function (baseFn) {
       var data = Option.none();
       var callbacks = [];
@@ -240,10 +729,11 @@ var image = (function (domGlobals) {
         });
       };
       var get = function (nCallback) {
-        if (isReady())
+        if (isReady()) {
           call(nCallback);
-        else
+        } else {
           callbacks.push(nCallback);
+        }
       };
       var set = function (x) {
         data = Option.some(x);
@@ -280,42 +770,31 @@ var image = (function (domGlobals) {
       pure: pure
     };
 
-    var bounce = function (f) {
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        var me = this;
-        domGlobals.setTimeout(function () {
-          f.apply(me, args);
-        }, 0);
-      };
+    var errorReporter = function (err) {
+      domGlobals.setTimeout(function () {
+        throw err;
+      }, 0);
     };
-
-    var nu$1 = function (baseFn) {
+    var make = function (run) {
       var get = function (callback) {
-        baseFn(bounce(callback));
+        run().then(callback, errorReporter);
       };
       var map = function (fab) {
-        return nu$1(function (callback) {
-          get(function (a) {
-            var value = fab(a);
-            callback(value);
-          });
+        return make(function () {
+          return run().then(fab);
         });
       };
       var bind = function (aFutureB) {
-        return nu$1(function (callback) {
-          get(function (a) {
-            aFutureB(a).get(callback);
+        return make(function () {
+          return run().then(function (v) {
+            return aFutureB(v).toPromise();
           });
         });
       };
       var anonBind = function (futureB) {
-        return nu$1(function (callback) {
-          get(function (a) {
-            futureB.get(callback);
+        return make(function () {
+          return run().then(function () {
+            return futureB.toPromise();
           });
         });
       };
@@ -324,25 +803,32 @@ var image = (function (domGlobals) {
       };
       var toCached = function () {
         var cache = null;
-        return nu$1(function (callback) {
+        return make(function () {
           if (cache === null) {
-            cache = toLazy();
+            cache = run();
           }
-          cache.get(callback);
+          return cache;
         });
       };
+      var toPromise = run;
       return {
         map: map,
         bind: bind,
         anonBind: anonBind,
         toLazy: toLazy,
         toCached: toCached,
+        toPromise: toPromise,
         get: get
       };
     };
+    var nu$1 = function (baseFn) {
+      return make(function () {
+        return new Promise(baseFn);
+      });
+    };
     var pure$1 = function (a) {
-      return nu$1(function (callback) {
-        callback(a);
+      return make(function () {
+        return Promise.resolve(a);
       });
     };
     var Future = {
@@ -562,61 +1048,26 @@ var image = (function (domGlobals) {
     var baseMerge = function (merger) {
       return function () {
         var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++)
+        for (var i = 0; i < objects.length; i++) {
           objects[i] = arguments[i];
-        if (objects.length === 0)
+        }
+        if (objects.length === 0) {
           throw new Error('Can\'t merge zero objects');
+        }
         var ret = {};
         for (var j = 0; j < objects.length; j++) {
           var curObject = objects[j];
-          for (var key in curObject)
+          for (var key in curObject) {
             if (hasOwnProperty.call(curObject, key)) {
               ret[key] = merger(ret[key], curObject[key]);
             }
+          }
         }
         return ret;
       };
     };
     var deepMerge = baseMerge(deep);
     var merge = baseMerge(shallow);
-
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
-
-    var path = function (parts, scope) {
-      var o = scope !== undefined && scope !== null ? scope : Global;
-      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i)
-        o = o[parts[i]];
-      return o;
-    };
-    var resolve = function (p, scope) {
-      var parts = p.split('.');
-      return path(parts, scope);
-    };
-
-    var unsafe = function (name, scope) {
-      return resolve(name, scope);
-    };
-    var getOrDie = function (name, scope) {
-      var actual = unsafe(name, scope);
-      if (actual === undefined || actual === null)
-        throw name + ' not available on this browser';
-      return actual;
-    };
-    var Global$1 = { getOrDie: getOrDie };
-
-    var url = function () {
-      return Global$1.getOrDie('URL');
-    };
-    var createObjectURL = function (blob) {
-      return url().createObjectURL(blob);
-    };
-    var revokeObjectURL = function (u) {
-      url().revokeObjectURL(u);
-    };
-    var URL = {
-      createObjectURL: createObjectURL,
-      revokeObjectURL: revokeObjectURL
-    };
 
     var makeItems = function (info) {
       var imageUrl = {
@@ -683,6 +1134,7 @@ var image = (function (domGlobals) {
     var makeTab = function (info) {
       return {
         title: 'General',
+        name: 'general',
         items: makeItems(info)
       };
     };
@@ -691,61 +1143,60 @@ var image = (function (domGlobals) {
       makeItems: makeItems
     };
 
-    function FileReader () {
-      var f = Global$1.getOrDie('FileReader');
-      return new f();
-    }
+    var global$2 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-    var global$1 = tinymce.util.Tools.resolve('tinymce.util.Promise');
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    var global$3 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+    var global$4 = tinymce.util.Tools.resolve('tinymce.util.XHR');
 
     var hasDimensions = function (editor) {
-      return editor.settings.image_dimensions === false ? false : true;
+      return editor.getParam('image_dimensions', true, 'boolean');
     };
     var hasAdvTab = function (editor) {
-      return editor.settings.image_advtab === true ? true : false;
+      return editor.getParam('image_advtab', false, 'boolean');
+    };
+    var hasUploadTab = function (editor) {
+      return editor.getParam('image_uploadtab', true, 'boolean');
     };
     var getPrependUrl = function (editor) {
-      return editor.getParam('image_prepend_url', '');
+      return editor.getParam('image_prepend_url', '', 'string');
     };
     var getClassList = function (editor) {
       return editor.getParam('image_class_list');
     };
     var hasDescription = function (editor) {
-      return editor.settings.image_description === false ? false : true;
+      return editor.getParam('image_description', true, 'boolean');
     };
     var hasImageTitle = function (editor) {
-      return editor.settings.image_title === true ? true : false;
+      return editor.getParam('image_title', false, 'boolean');
     };
     var hasImageCaption = function (editor) {
-      return editor.settings.image_caption === true ? true : false;
+      return editor.getParam('image_caption', false, 'boolean');
     };
     var getImageList = function (editor) {
       return editor.getParam('image_list', false);
     };
     var hasUploadUrl = function (editor) {
-      return !!editor.getParam('images_upload_url', false);
+      return !!getUploadUrl(editor);
     };
     var hasUploadHandler = function (editor) {
-      return !!editor.getParam('images_upload_handler', false);
+      return !!getUploadHandler(editor);
     };
     var getUploadUrl = function (editor) {
-      return editor.getParam('images_upload_url');
+      return editor.getParam('images_upload_url', '', 'string');
     };
     var getUploadHandler = function (editor) {
-      return editor.getParam('images_upload_handler');
+      return editor.getParam('images_upload_handler', undefined, 'function');
     };
     var getUploadBasePath = function (editor) {
-      return editor.getParam('images_upload_base_path');
+      return editor.getParam('images_upload_base_path', undefined, 'string');
     };
     var getUploadCredentials = function (editor) {
-      return editor.getParam('images_upload_credentials');
+      return editor.getParam('images_upload_credentials', false, 'boolean');
     };
     var Settings = {
       hasDimensions: hasDimensions,
+      hasUploadTab: hasUploadTab,
       hasAdvTab: hasAdvTab,
       getPrependUrl: getPrependUrl,
       getClassList: getClassList,
@@ -766,12 +1217,12 @@ var image = (function (domGlobals) {
     };
     var getImageSize = function (url, callback) {
       var img = domGlobals.document.createElement('img');
-      function done(dimensions) {
+      var done = function (dimensions) {
         if (img.parentNode) {
           img.parentNode.removeChild(img);
         }
         callback(dimensions);
-      }
+      };
       img.onload = function () {
         var width = parseIntAndGetMax(img.width, img.clientWidth);
         var height = parseIntAndGetMax(img.height, img.clientHeight);
@@ -782,7 +1233,7 @@ var image = (function (domGlobals) {
         done(Result.value(dimensions));
       };
       img.onerror = function () {
-        done(Result.error(undefined));
+        done(Result.error('Failed to get image dimensions for: ' + url));
       };
       var style = img.style;
       style.visibility = 'hidden';
@@ -791,23 +1242,6 @@ var image = (function (domGlobals) {
       style.width = style.height = 'auto';
       domGlobals.document.body.appendChild(img);
       img.src = url;
-    };
-    var buildListItems = function (inputList, itemCallback, startItems) {
-      function appendItems(values, output) {
-        output = output || [];
-        global$2.each(values, function (item) {
-          var menuItem = { text: item.text || item.title };
-          if (item.menu) {
-            menuItem.menu = appendItems(item.menu);
-          } else {
-            menuItem.value = item.value;
-            itemCallback(menuItem);
-          }
-          output.push(menuItem);
-        });
-        return output;
-      }
-      return appendItems(inputList, startItems || []);
     };
     var removePixelSuffix = function (value) {
       if (value) {
@@ -856,7 +1290,7 @@ var image = (function (domGlobals) {
     var createImageList = function (editor, callback) {
       var imageList = Settings.getImageList(editor);
       if (typeof imageList === 'string') {
-        global$3.send({
+        global$4.send({
           url: imageList,
           success: function (text) {
             callback(JSON.parse(text));
@@ -869,18 +1303,18 @@ var image = (function (domGlobals) {
       }
     };
     var waitLoadImage = function (editor, data, imgElm) {
-      function selectImage() {
+      var selectImage = function () {
         imgElm.onload = imgElm.onerror = null;
         if (editor.selection) {
           editor.selection.select(imgElm);
           editor.nodeChanged();
         }
-      }
+      };
       imgElm.onload = function () {
         if (!data.width && !data.height && Settings.hasDimensions(editor)) {
           editor.dom.setAttribs(imgElm, {
-            width: imgElm.clientWidth,
-            height: imgElm.clientHeight
+            width: String(imgElm.clientWidth),
+            height: String(imgElm.clientHeight)
           });
         }
         selectImage();
@@ -888,8 +1322,8 @@ var image = (function (domGlobals) {
       imgElm.onerror = selectImage;
     };
     var blobToDataUri = function (blob) {
-      return new global$1(function (resolve, reject) {
-        var reader = FileReader();
+      return new global$3(function (resolve, reject) {
+        var reader = new domGlobals.FileReader();
         reader.onload = function () {
           resolve(reader.result);
         };
@@ -904,7 +1338,6 @@ var image = (function (domGlobals) {
     };
     var Utils = {
       getImageSize: getImageSize,
-      buildListItems: buildListItems,
       removePixelSuffix: removePixelSuffix,
       addPixelSuffix: addPixelSuffix,
       mergeMargins: mergeMargins,
@@ -914,9 +1347,7 @@ var image = (function (domGlobals) {
       isPlaceholderImage: isPlaceholderImage
     };
 
-    var global$4 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-
-    var DOM = global$4.DOM;
+    var DOM = global$2.DOM;
     var getHspace = function (image) {
       if (image.style.marginLeft && image.style.marginRight && image.style.marginLeft === image.style.marginRight) {
         return Utils.removePixelSuffix(image.style.marginLeft);
@@ -1223,12 +1654,14 @@ var image = (function (domGlobals) {
       return Option.none();
     };
 
+    var global$5 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
     var getValue = function (item) {
       return isString(item.value) ? item.value : '';
     };
     var sanitizeList = function (list, extractValue) {
       var out = [];
-      global$2.each(list, function (item) {
+      global$5.each(list, function (item) {
         var text = isString(item.text) ? item.text : isString(item.title) ? item.title : '';
         if (item.menu !== undefined) {
           var items = sanitizeList(item.menu, extractValue);
@@ -1288,13 +1721,6 @@ var image = (function (domGlobals) {
       findEntry: findEntry
     };
 
-    function XMLHttpRequest () {
-      var f = Global$1.getOrDie('XMLHttpRequest');
-      return new f();
-    }
-
-    var noop$1 = function () {
-    };
     var pathJoin = function (path1, path2) {
       if (path1) {
         return path1.replace(/\/$/, '') + '/' + path2.replace(/^\//, '');
@@ -1304,7 +1730,7 @@ var image = (function (domGlobals) {
     function Uploader (settings) {
       var defaultHandler = function (blobInfo, success, failure, progress) {
         var xhr, formData;
-        xhr = XMLHttpRequest();
+        xhr = new domGlobals.XMLHttpRequest();
         xhr.open('POST', settings.url);
         xhr.withCredentials = settings.credentials;
         xhr.upload.onprogress = function (e) {
@@ -1331,9 +1757,9 @@ var image = (function (domGlobals) {
         xhr.send(formData);
       };
       var uploadBlob = function (blobInfo, handler) {
-        return new global$1(function (resolve, reject) {
+        return new global$3(function (resolve, reject) {
           try {
-            handler(blobInfo, resolve, reject, noop$1);
+            handler(blobInfo, resolve, reject, noop);
           } catch (ex) {
             reject(ex.message);
           }
@@ -1343,9 +1769,9 @@ var image = (function (domGlobals) {
         return handler === defaultHandler;
       };
       var upload = function (blobInfo) {
-        return !settings.url && isDefaultHandler(settings.handler) ? global$1.reject('Upload url missing from the settings.') : uploadBlob(blobInfo, settings.handler);
+        return !settings.url && isDefaultHandler(settings.handler) ? global$3.reject('Upload url missing from the settings.') : uploadBlob(blobInfo, settings.handler);
       };
-      settings = global$2.extend({
+      settings = global$5.extend({
         credentials: false,
         handler: defaultHandler
       }, settings);
@@ -1355,6 +1781,7 @@ var image = (function (domGlobals) {
     var makeTab$1 = function (info) {
       return {
         title: 'Advanced',
+        name: 'advanced',
         items: [
           {
             type: 'input',
@@ -1457,6 +1884,7 @@ var image = (function (domGlobals) {
       });
       var classList = ListUtils.sanitize(Settings.getClassList(editor));
       var hasAdvTab = Settings.hasAdvTab(editor);
+      var hasUploadTab = Settings.hasUploadTab(editor);
       var hasUploadUrl = Settings.hasUploadUrl(editor);
       var hasUploadHandler = Settings.hasUploadHandler(editor);
       var image = readImageDataFromSelection(editor);
@@ -1477,6 +1905,7 @@ var image = (function (domGlobals) {
           imageList: imageList,
           classList: classList,
           hasAdvTab: hasAdvTab,
+          hasUploadTab: hasUploadTab,
           hasUploadUrl: hasUploadUrl,
           hasUploadHandler: hasUploadHandler,
           hasDescription: hasDescription,
@@ -1499,6 +1928,7 @@ var image = (function (domGlobals) {
         }];
       return {
         title: 'Upload',
+        name: 'upload',
         items: items
       };
     };
@@ -1572,51 +2002,54 @@ var image = (function (domGlobals) {
         });
       });
     };
-    var formFillFromMeta2 = function (info, data) {
-      var meta = data.src.meta;
-      if (meta !== undefined) {
-        var dataCopy_1 = deepMerge({}, data);
-        if (info.hasDescription && isString(meta.alt)) {
-          dataCopy_1.alt = meta.alt;
-        }
-        if (info.hasImageTitle && isString(meta.title)) {
-          dataCopy_1.title = meta.title;
-        }
-        if (info.hasDimensions) {
-          if (isString(meta.width)) {
-            dataCopy_1.dimensions.width = meta.width;
-          }
-          if (isString(meta.height)) {
-            dataCopy_1.dimensions.height = meta.height;
-          }
-        }
-        if (isString(meta.class)) {
-          ListUtils.findEntry(info.classList, meta.class).each(function (entry) {
-            dataCopy_1.classes = entry.value;
-          });
-        }
-        if (info.hasAdvTab) {
-          if (isString(meta.vspace)) {
-            dataCopy_1.vspace = meta.vspace;
-          }
-          if (isString(meta.border)) {
-            dataCopy_1.border = meta.border;
-          }
-          if (isString(meta.hspace)) {
-            dataCopy_1.hspace = meta.hspace;
-          }
-          if (isString(meta.borderstyle)) {
-            dataCopy_1.borderstyle = meta.borderstyle;
-          }
-        }
-        return Option.some(dataCopy_1);
+    var formFillFromMeta2 = function (info, data, meta) {
+      if (info.hasDescription && isString(meta.alt)) {
+        data.alt = meta.alt;
       }
-      return Option.none();
+      if (info.hasImageTitle && isString(meta.title)) {
+        data.title = meta.title;
+      }
+      if (info.hasDimensions) {
+        if (isString(meta.width)) {
+          data.dimensions.width = meta.width;
+        }
+        if (isString(meta.height)) {
+          data.dimensions.height = meta.height;
+        }
+      }
+      if (isString(meta.class)) {
+        ListUtils.findEntry(info.classList, meta.class).each(function (entry) {
+          data.classes = entry.value;
+        });
+      }
+      if (info.hasImageCaption) {
+        if (isBoolean(meta.caption)) {
+          data.caption = meta.caption;
+        }
+      }
+      if (info.hasAdvTab) {
+        if (isString(meta.vspace)) {
+          data.vspace = meta.vspace;
+        }
+        if (isString(meta.border)) {
+          data.border = meta.border;
+        }
+        if (isString(meta.hspace)) {
+          data.hspace = meta.hspace;
+        }
+        if (isString(meta.borderstyle)) {
+          data.borderstyle = meta.borderstyle;
+        }
+      }
     };
     var formFillFromMeta = function (info, api) {
-      formFillFromMeta2(info, api.getData()).each(function (data) {
-        return api.setData(data);
-      });
+      var data = api.getData();
+      var meta = data.src.meta;
+      if (meta !== undefined) {
+        var newData = deepMerge({}, data);
+        formFillFromMeta2(info, newData, meta);
+        api.setData(newData);
+      }
     };
     var calculateImageSize = function (helpers, info, state, api) {
       var data = api.getData();
@@ -1717,7 +2150,7 @@ var image = (function (domGlobals) {
       head(data.fileinput).fold(function () {
         api.unblock();
       }, function (file) {
-        var blobUri = URL.createObjectURL(file);
+        var blobUri = domGlobals.URL.createObjectURL(file);
         var uploader = Uploader({
           url: info.url,
           basePath: info.basePath,
@@ -1726,7 +2159,7 @@ var image = (function (domGlobals) {
         });
         var finalize = function () {
           api.unblock();
-          URL.revokeObjectURL(blobUri);
+          domGlobals.URL.revokeObjectURL(blobUri);
         };
         Utils.blobToDataUri(file).then(function (dataUrl) {
           var blobInfo = helpers.createBlobCache(file, blobUri, dataUrl);
@@ -1737,7 +2170,7 @@ var image = (function (domGlobals) {
                 meta: {}
               }
             });
-            api.showTab('General');
+            api.showTab('general');
             changeSrc(helpers, info, state, api);
             finalize();
           }).catch(function (err) {
@@ -1776,7 +2209,7 @@ var image = (function (domGlobals) {
           tabs: flatten([
             [MainTab.makeTab(info)],
             info.hasAdvTab ? [AdvTab.makeTab(info)] : [],
-            info.hasUploadUrl || info.hasUploadHandler ? [UploadTab.makeTab(info)] : []
+            info.hasUploadTab && (info.hasUploadUrl || info.hasUploadHandler) ? [UploadTab.makeTab(info)] : []
           ])
         };
         return tabPanel;
@@ -1831,11 +2264,11 @@ var image = (function (domGlobals) {
       return function (url) {
         return FutureResult.nu(function (completer) {
           Utils.getImageSize(editor.documentBaseURI.toAbsolute(url), function (data) {
-            var result = data.bind(function (dimensions) {
-              return (isString(dimensions.width) || isNumber(dimensions.width)) && (isString(dimensions.height) || isNumber(dimensions.height)) ? Result.value({
+            var result = data.map(function (dimensions) {
+              return {
                 width: String(dimensions.width),
                 height: String(dimensions.height)
-              }) : Result.error(undefined);
+              };
             });
             completer(result);
           });
@@ -1901,15 +2334,15 @@ var image = (function (domGlobals) {
     };
     var toggleContentEditableState = function (state) {
       return function (nodes) {
-        var i = nodes.length, node;
+        var i = nodes.length;
         var toggleContentEditable = function (node) {
           node.attr('contenteditable', state ? 'true' : null);
         };
         while (i--) {
-          node = nodes[i];
+          var node = nodes[i];
           if (hasImageClass(node)) {
             node.attr('contenteditable', state ? 'false' : null);
-            global$2.each(node.getAll('figcaption'), toggleContentEditable);
+            global$5.each(node.getAll('figcaption'), toggleContentEditable);
           }
         }
       };
@@ -1922,460 +2355,7 @@ var image = (function (domGlobals) {
     };
     var FilterContent = { setup: setup };
 
-    var fromHtml = function (html, scope) {
-      var doc = scope || domGlobals.document;
-      var div = doc.createElement('div');
-      div.innerHTML = html;
-      if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        domGlobals.console.error('HTML does not have a single root node', html);
-        throw new Error('HTML must have a single root node');
-      }
-      return fromDom(div.childNodes[0]);
-    };
-    var fromTag = function (tag, scope) {
-      var doc = scope || domGlobals.document;
-      var node = doc.createElement(tag);
-      return fromDom(node);
-    };
-    var fromText = function (text, scope) {
-      var doc = scope || domGlobals.document;
-      var node = doc.createTextNode(text);
-      return fromDom(node);
-    };
-    var fromDom = function (node) {
-      if (node === null || node === undefined) {
-        throw new Error('Node cannot be null or undefined');
-      }
-      return { dom: constant(node) };
-    };
-    var fromPoint = function (docElm, x, y) {
-      var doc = docElm.dom();
-      return Option.from(doc.elementFromPoint(x, y)).map(fromDom);
-    };
-    var Element = {
-      fromHtml: fromHtml,
-      fromTag: fromTag,
-      fromText: fromText,
-      fromDom: fromDom,
-      fromPoint: fromPoint
-    };
-
-    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
-    var COMMENT = domGlobals.Node.COMMENT_NODE;
-    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
-    var TEXT = domGlobals.Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = domGlobals.Node.ENTITY_NODE;
-    var NOTATION = domGlobals.Node.NOTATION_NODE;
-
-    var name = function (element) {
-      var r = element.dom().nodeName;
-      return r.toLowerCase();
-    };
-
-    var Immutable = function () {
-      var fields = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        fields[_i] = arguments[_i];
-      }
-      return function () {
-        var values = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          values[_i] = arguments[_i];
-        }
-        if (fields.length !== values.length) {
-          throw new Error('Wrong number of arguments to struct. Expected "[' + fields.length + ']", got ' + values.length + ' arguments');
-        }
-        var struct = {};
-        each(fields, function (name, i) {
-          struct[name] = constant(values[i]);
-        });
-        return struct;
-      };
-    };
-
-    var node = function () {
-      var f = Global$1.getOrDie('Node');
-      return f;
-    };
-    var compareDocumentPosition = function (a, b, match) {
-      return (a.compareDocumentPosition(b) & match) !== 0;
-    };
-    var documentPositionPreceding = function (a, b) {
-      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_PRECEDING);
-    };
-    var documentPositionContainedBy = function (a, b) {
-      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
-    };
-    var Node = {
-      documentPositionPreceding: documentPositionPreceding,
-      documentPositionContainedBy: documentPositionContainedBy
-    };
-
-    var cached = function (f) {
-      var called = false;
-      var r;
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        if (!called) {
-          called = true;
-          r = f.apply(null, args);
-        }
-        return r;
-      };
-    };
-
-    var firstMatch = function (regexes, s) {
-      for (var i = 0; i < regexes.length; i++) {
-        var x = regexes[i];
-        if (x.test(s))
-          return x;
-      }
-      return undefined;
-    };
-    var find$1 = function (regexes, agent) {
-      var r = firstMatch(regexes, agent);
-      if (!r)
-        return {
-          major: 0,
-          minor: 0
-        };
-      var group = function (i) {
-        return Number(agent.replace(r, '$' + i));
-      };
-      return nu$3(group(1), group(2));
-    };
-    var detect = function (versionRegexes, agent) {
-      var cleanedAgent = String(agent).toLowerCase();
-      if (versionRegexes.length === 0)
-        return unknown();
-      return find$1(versionRegexes, cleanedAgent);
-    };
-    var unknown = function () {
-      return nu$3(0, 0);
-    };
-    var nu$3 = function (major, minor) {
-      return {
-        major: major,
-        minor: minor
-      };
-    };
-    var Version = {
-      nu: nu$3,
-      detect: detect,
-      unknown: unknown
-    };
-
-    var edge = 'Edge';
-    var chrome = 'Chrome';
-    var ie = 'IE';
-    var opera = 'Opera';
-    var firefox = 'Firefox';
-    var safari = 'Safari';
-    var isBrowser = function (name, current) {
-      return function () {
-        return current === name;
-      };
-    };
-    var unknown$1 = function () {
-      return nu$4({
-        current: undefined,
-        version: Version.unknown()
-      });
-    };
-    var nu$4 = function (info) {
-      var current = info.current;
-      var version = info.version;
-      return {
-        current: current,
-        version: version,
-        isEdge: isBrowser(edge, current),
-        isChrome: isBrowser(chrome, current),
-        isIE: isBrowser(ie, current),
-        isOpera: isBrowser(opera, current),
-        isFirefox: isBrowser(firefox, current),
-        isSafari: isBrowser(safari, current)
-      };
-    };
-    var Browser = {
-      unknown: unknown$1,
-      nu: nu$4,
-      edge: constant(edge),
-      chrome: constant(chrome),
-      ie: constant(ie),
-      opera: constant(opera),
-      firefox: constant(firefox),
-      safari: constant(safari)
-    };
-
-    var windows = 'Windows';
-    var ios = 'iOS';
-    var android = 'Android';
-    var linux = 'Linux';
-    var osx = 'OSX';
-    var solaris = 'Solaris';
-    var freebsd = 'FreeBSD';
-    var isOS = function (name, current) {
-      return function () {
-        return current === name;
-      };
-    };
-    var unknown$2 = function () {
-      return nu$5({
-        current: undefined,
-        version: Version.unknown()
-      });
-    };
-    var nu$5 = function (info) {
-      var current = info.current;
-      var version = info.version;
-      return {
-        current: current,
-        version: version,
-        isWindows: isOS(windows, current),
-        isiOS: isOS(ios, current),
-        isAndroid: isOS(android, current),
-        isOSX: isOS(osx, current),
-        isLinux: isOS(linux, current),
-        isSolaris: isOS(solaris, current),
-        isFreeBSD: isOS(freebsd, current)
-      };
-    };
-    var OperatingSystem = {
-      unknown: unknown$2,
-      nu: nu$5,
-      windows: constant(windows),
-      ios: constant(ios),
-      android: constant(android),
-      linux: constant(linux),
-      osx: constant(osx),
-      solaris: constant(solaris),
-      freebsd: constant(freebsd)
-    };
-
-    var DeviceType = function (os, browser, userAgent) {
-      var isiPad = os.isiOS() && /ipad/i.test(userAgent) === true;
-      var isiPhone = os.isiOS() && !isiPad;
-      var isAndroid3 = os.isAndroid() && os.version.major === 3;
-      var isAndroid4 = os.isAndroid() && os.version.major === 4;
-      var isTablet = isiPad || isAndroid3 || isAndroid4 && /mobile/i.test(userAgent) === true;
-      var isTouch = os.isiOS() || os.isAndroid();
-      var isPhone = isTouch && !isTablet;
-      var iOSwebview = browser.isSafari() && os.isiOS() && /safari/i.test(userAgent) === false;
-      return {
-        isiPad: constant(isiPad),
-        isiPhone: constant(isiPhone),
-        isTablet: constant(isTablet),
-        isPhone: constant(isPhone),
-        isTouch: constant(isTouch),
-        isAndroid: os.isAndroid,
-        isiOS: os.isiOS,
-        isWebView: constant(iOSwebview)
-      };
-    };
-
-    var detect$1 = function (candidates, userAgent) {
-      var agent = String(userAgent).toLowerCase();
-      return find(candidates, function (candidate) {
-        return candidate.search(agent);
-      });
-    };
-    var detectBrowser = function (browsers, userAgent) {
-      return detect$1(browsers, userAgent).map(function (browser) {
-        var version = Version.detect(browser.versionRegexes, userAgent);
-        return {
-          current: browser.name,
-          version: version
-        };
-      });
-    };
-    var detectOs = function (oses, userAgent) {
-      return detect$1(oses, userAgent).map(function (os) {
-        var version = Version.detect(os.versionRegexes, userAgent);
-        return {
-          current: os.name,
-          version: version
-        };
-      });
-    };
-    var UaString = {
-      detectBrowser: detectBrowser,
-      detectOs: detectOs
-    };
-
-    var contains = function (str, substr) {
-      return str.indexOf(substr) !== -1;
-    };
-
-    var normalVersionRegex = /.*?version\/\ ?([0-9]+)\.([0-9]+).*/;
-    var checkContains = function (target) {
-      return function (uastring) {
-        return contains(uastring, target);
-      };
-    };
-    var browsers = [
-      {
-        name: 'Edge',
-        versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
-        search: function (uastring) {
-          var monstrosity = contains(uastring, 'edge/') && contains(uastring, 'chrome') && contains(uastring, 'safari') && contains(uastring, 'applewebkit');
-          return monstrosity;
-        }
-      },
-      {
-        name: 'Chrome',
-        versionRegexes: [
-          /.*?chrome\/([0-9]+)\.([0-9]+).*/,
-          normalVersionRegex
-        ],
-        search: function (uastring) {
-          return contains(uastring, 'chrome') && !contains(uastring, 'chromeframe');
-        }
-      },
-      {
-        name: 'IE',
-        versionRegexes: [
-          /.*?msie\ ?([0-9]+)\.([0-9]+).*/,
-          /.*?rv:([0-9]+)\.([0-9]+).*/
-        ],
-        search: function (uastring) {
-          return contains(uastring, 'msie') || contains(uastring, 'trident');
-        }
-      },
-      {
-        name: 'Opera',
-        versionRegexes: [
-          normalVersionRegex,
-          /.*?opera\/([0-9]+)\.([0-9]+).*/
-        ],
-        search: checkContains('opera')
-      },
-      {
-        name: 'Firefox',
-        versionRegexes: [/.*?firefox\/\ ?([0-9]+)\.([0-9]+).*/],
-        search: checkContains('firefox')
-      },
-      {
-        name: 'Safari',
-        versionRegexes: [
-          normalVersionRegex,
-          /.*?cpu os ([0-9]+)_([0-9]+).*/
-        ],
-        search: function (uastring) {
-          return (contains(uastring, 'safari') || contains(uastring, 'mobile/')) && contains(uastring, 'applewebkit');
-        }
-      }
-    ];
-    var oses = [
-      {
-        name: 'Windows',
-        search: checkContains('win'),
-        versionRegexes: [/.*?windows\ nt\ ?([0-9]+)\.([0-9]+).*/]
-      },
-      {
-        name: 'iOS',
-        search: function (uastring) {
-          return contains(uastring, 'iphone') || contains(uastring, 'ipad');
-        },
-        versionRegexes: [
-          /.*?version\/\ ?([0-9]+)\.([0-9]+).*/,
-          /.*cpu os ([0-9]+)_([0-9]+).*/,
-          /.*cpu iphone os ([0-9]+)_([0-9]+).*/
-        ]
-      },
-      {
-        name: 'Android',
-        search: checkContains('android'),
-        versionRegexes: [/.*?android\ ?([0-9]+)\.([0-9]+).*/]
-      },
-      {
-        name: 'OSX',
-        search: checkContains('os x'),
-        versionRegexes: [/.*?os\ x\ ?([0-9]+)_([0-9]+).*/]
-      },
-      {
-        name: 'Linux',
-        search: checkContains('linux'),
-        versionRegexes: []
-      },
-      {
-        name: 'Solaris',
-        search: checkContains('sunos'),
-        versionRegexes: []
-      },
-      {
-        name: 'FreeBSD',
-        search: checkContains('freebsd'),
-        versionRegexes: []
-      }
-    ];
-    var PlatformInfo = {
-      browsers: constant(browsers),
-      oses: constant(oses)
-    };
-
-    var detect$2 = function (userAgent) {
-      var browsers = PlatformInfo.browsers();
-      var oses = PlatformInfo.oses();
-      var browser = UaString.detectBrowser(browsers, userAgent).fold(Browser.unknown, Browser.nu);
-      var os = UaString.detectOs(oses, userAgent).fold(OperatingSystem.unknown, OperatingSystem.nu);
-      var deviceType = DeviceType(os, browser, userAgent);
-      return {
-        browser: browser,
-        os: os,
-        deviceType: deviceType
-      };
-    };
-    var PlatformDetection = { detect: detect$2 };
-
-    var detect$3 = cached(function () {
-      var userAgent = domGlobals.navigator.userAgent;
-      return PlatformDetection.detect(userAgent);
-    });
-    var PlatformDetection$1 = { detect: detect$3 };
-
-    var regularContains = function (e1, e2) {
-      var d1 = e1.dom();
-      var d2 = e2.dom();
-      return d1 === d2 ? false : d1.contains(d2);
-    };
-    var ieContains = function (e1, e2) {
-      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
-    };
-    var browser = PlatformDetection$1.detect().browser;
-    var contains$1 = browser.isIE() ? ieContains : regularContains;
-
-    var parent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element.fromDom);
-    };
-    var spot = Immutable('element', 'offset');
-
-    var getRootElement = function (elm) {
-      return parent(elm).filter(function (parentElm) {
-        return name(parentElm) === 'figure';
-      }).getOr(elm);
-    };
     var register$1 = function (editor) {
-      var makeContextMenuItem = function (node) {
-        return {
-          text: 'Image',
-          icon: 'image',
-          onAction: function () {
-            var rootElm = getRootElement(Element.fromDom(node));
-            editor.selection.select(rootElm.dom());
-            Dialog(editor).open();
-          }
-        };
-      };
       editor.ui.registry.addToggleButton('image', {
         icon: 'image',
         tooltip: 'Insert/edit image',
@@ -2391,21 +2371,20 @@ var image = (function (domGlobals) {
       });
       editor.ui.registry.addContextMenu('image', {
         update: function (element) {
-          return isFigure(element) || isImage(element) && !Utils.isPlaceholderImage(element) ? [makeContextMenuItem(element)] : [];
+          return isFigure(element) || isImage(element) && !Utils.isPlaceholderImage(element) ? ['image'] : [];
         }
       });
     };
     var Buttons = { register: register$1 };
 
-    global.add('image', function (editor) {
-      FilterContent.setup(editor);
-      Buttons.register(editor);
-      Commands.register(editor);
-    });
     function Plugin () {
+      global$1.add('image', function (editor) {
+        FilterContent.setup(editor);
+        Buttons.register(editor);
+        Commands.register(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

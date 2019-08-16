@@ -300,6 +300,8 @@ class BasePageController extends Controller
         }
         $header_menu = $this->smarty->fetch('headermenu.tpl');
         $this->smarty->assign('header_menu', $header_menu);
+        $notification = $this->smarty->fetch('notification.tpl');
+        $this->smarty->assign('notification', $notification);
     }
 
     /**
@@ -342,15 +344,6 @@ class BasePageController extends Controller
         $this->page_template = 'baseadminpage.tpl';
 
         $this->render();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function basePage(): void
-    {
-        $this->setPrefs();
-        $this->pagerender();
     }
 
     /**

@@ -2,7 +2,7 @@
     <h2>Edit Profile > <strong>{$user.username|escape:"htmlall"}</strong></h2>
     <div class="breadcrumb-wrapper">
         <ol class="breadcrumb">
-            <li><a href="{$smarty.const.WWW_TOP}">Home</a></li>
+            <li><a href="{{url("{$site->home_link}")}}">Home</a></li>
             / Profile / {$user.username|escape:"htmlall"}
         </ol>
     </div>

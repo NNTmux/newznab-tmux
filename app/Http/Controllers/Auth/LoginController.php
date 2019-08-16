@@ -86,7 +86,7 @@ class LoginController extends Controller
 
                     Auth::logoutOtherDevices($request->input('password'));
 
-                    return redirect()->intended($this->redirectPath());
+                    return redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
                 }
 
                 $error = 'Username/email and password combination used does not match our records!';
@@ -131,6 +131,6 @@ class LoginController extends Controller
         $request->session()->flush();
         $request->session()->regenerate();
 
-        return redirect('/login');
+        return redirect('/login')->with('info', 'You have been logged out successfully');
     }
 }

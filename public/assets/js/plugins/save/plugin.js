@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
-var save = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -120,14 +119,13 @@ var save = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('save', function (editor) {
-      Buttons.register(editor);
-      Commands.register(editor);
-    });
     function Plugin () {
+      global.add('save', function (editor) {
+        Buttons.register(editor);
+        Commands.register(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

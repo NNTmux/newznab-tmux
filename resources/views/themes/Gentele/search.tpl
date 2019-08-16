@@ -6,7 +6,7 @@
 		<h2>{$site->title} > <strong>Search</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
-				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+				<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 				/ Search
 			</ol>
 		</div>
@@ -140,18 +140,18 @@
 							<div class="col-md-4">
 								{if isset($shows)}
 									<p>
-										<a href="{$smarty.const.WWW_TOP}/series"
+										<a href="{{route('series')}}"
 										   title="View available TV series">Series List</a> |
 										<a title="Manage your shows"
-										   href="{$smarty.const.WWW_TOP}/myshows">Manage My Shows</a> |
+										   href="{{route("myshows")}}">Manage My Shows</a> |
 										<a title="All releases in your shows as an RSS feed"
-										   href="{$smarty.const.WWW_TOP}/rss/myshows?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">Rss
+										   href="{{url("/rss/myshows?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">Rss
 											Feed</a>
 									</p>
 								{/if}
 								<div class="nzb_multi_operations">
 									{if isset($section) && $section != ''}View:
-										<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+										<a href="{{url("/{$section}?t={$category}")}}">Covers</a>
 										|
 										<b>List</b>
 										<br/>
@@ -225,7 +225,7 @@
 									<td class="item">
 										<label for="chk{$result->guid|substr:0:7}">
 											<a class="title" title="View details"
-											   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result->failed)}
+											   href="{{url("/details/{$result->guid}")}}">{$result->searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result->failed)}
 											<i class="fa fa-exclamation-circle" style="color: red"
 											   title="This release has failed to download for some users"></i>{/if}
 										</label value="Searchname">
@@ -234,28 +234,28 @@
 												{release_flag($result->searchname, browse)}
 												{if $result->passwordstatus == 1}
 													<img title="RAR/ZIP Possibly Passworded."
-														 src="{$smarty.const.WWW_ASSETS}/images/icons/lock2.png"
+														 src="{{asset("/assets/images/icons/lock2.png")}}"
 														 alt="RAR/ZIP Possibly Passworded.">
 												{elseif $result->passwordstatus == 2}
 													<img title="RAR/ZIP Possibly Damaged."
-														 src="{$smarty.const.WWW_ASSETS}/images/icons/broken.png"
+														 src="{{asset("/assets/images/icons/broken.png")}}"
 														 alt="RAR/ZIP Possibly Damaged.">
 												{elseif $result->passwordstatus == 10}
 													<img title="RAR/ZIP is Passworded."
-														 src="{$smarty.const.WWW_ASSETS}/images/icons/lock.gif"
+														 src="{{asset("/assets/images/icons/lock.gif")}}"
 														 alt="RAR/ZIP is Passworded.">
 												{/if}
 												{if $result->videostatus > 0}
 													<a
 															class="model_prev badge badge-info"
-															href="{$smarty.const.WWW_TOP}/details/{$result->guid}"
+															href="{{url("/details/{$result->guid}")}}"
 															title="This release has a video preview."
 															rel="preview"
 													><i class="icon-youtube-play"></i>
 													</a>
 												{/if}
 												{if $result->nfoid > 0}
-													<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
+													<a href="{{url("/nfo/{$result->guid}")}}"
 													   title="View Nfo"
 													   class="modal_nfo badge badge-info" rel="nfo">Nfo</a>
 												{/if}
@@ -264,13 +264,13 @@
 													   class="modal_imdb badge badge-info" rel="movie">Cover</a>
 												{/if}
 												{if $result->haspreview == 1 && $userdata->can('preview') == true}
-												<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+												<a href="{{url("/covers/preview/{$result->guid}_thumb.jpg")}}"
 												   name="name{$result->guid}"
 												   data-fancybox
 												   title="Screenshot of {$result->searchname|escape:"htmlall"}"
 												   class="badge badge-info" rel="preview">Preview</a>{/if}
 												{if $result->jpgstatus == 1 && $userdata->can('preview') == true}
-												<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
+												<a href="{{url("/covers/sample/{$result->guid}_thumb.jpg")}}"
 												   name="name{$result->guid}"
 												   data-fancybox
 												   title="Sample of {$result->searchname|escape:"htmlall"}"
@@ -287,13 +287,13 @@
 												{/if}
 												{if $result->videos_id > 0}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/series/{$result->videos_id}"
+													   href="{{url("/series/{$result->videos_id}")}}"
 													   title="View all episodes">View
 														Series</a>
 												{/if}
 												{if $result->anidbid > 0}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/anime?id={$result->anidbid}"
+													   href="{{url("/anime?id={$result->anidbid}")}}"
 													   title="View all episodes">View
 														Anime</a>
 												{/if}
@@ -303,7 +303,7 @@
 												{/if}
 												{if $result->group_name != ""}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name|escape:"htmlall"}"
+													   href="{{url("/browse/group?g={$result->group_name|escape:"htmlall"}")}}"
 													   title="Browse {$result->group_name}">{$result->group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 												{/if}
 												{if !empty($result->failed)}<span class="badge badge-info">
@@ -318,7 +318,7 @@
 									</td>
 									<td class="category">
 										<a title="Browse {$result->category_name}"
-										   href="{$smarty.const.WWW_TOP}/browse/{$result->parent_category}/{$result->sub_category}"> {$result->category_name}</a>
+										   href="{{url("/browse/{$result->parent_category}/{$result->sub_category}")}}"> {$result->category_name}</a>
 									</td>
 									<td class="posted" title="{$result->postdate}">
 										{$result->postdate|timeago}
@@ -336,27 +336,27 @@
 									</td>
 									<td class="files">
 										<a title="View file list"
-										   href="{$smarty.const.WWW_TOP}/filelist/{$result->guid}">{$result->totalpart}</a>
+										   href="{{url("/filelist/{$result->guid}")}}">{$result->totalpart}</a>
 										{if $result->rarinnerfilecount > 0}
 											<div class="rarfilelist">
-												<img src="{$smarty.const.WWW_ASSETS}/images/icons/magnifier.png"
+												<img src="{{asset("/assets/images/icons/magnifier.png")}}"
 													 alt="{$result->guid}">
 											</div>
 										{/if}
 									</td>
 									<td class="stats">
 										<a title="View comments"
-										   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments">{$result->comments}
+										   href="{{url("/details/{$result->guid}/#comments")}}">{$result->comments}
 											cmt{if $result->comments != 1}s{/if}</a>
 										<br>{$result->grabs} grab{if $result->grabs != 1}s{/if}
 									</td>
 									<td>
-										<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"
+										<a href="{{url("/getnzb?id={$result->guid}")}}"
 										   class="icon_nzb text-muted"><i
 													class="fa fa-cloud-download text-muted"
 													data-toggle="tooltip" data-placement="top" title
 													data-original-title="Download NZB"></i></a>
-										<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
+										<a href="{{url("/details/{$result->guid}/#comments")}}"><i
 													class="fa fa-comments-o text-muted"
 													data-toggle="tooltip" data-placement="top" title
 													data-original-title="Comments"></i></a>

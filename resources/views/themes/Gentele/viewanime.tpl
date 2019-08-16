@@ -9,7 +9,7 @@
 		<h2>View > <strong>Anime</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
-				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+				<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 				/ Anime
 			</ol>
 		</div>
@@ -18,13 +18,13 @@
 		<h1>{$animeTitle}
 			{if isset($isadmin)}
 				<a class="btn btn-xs btn-warning" title="Edit AniDB data"
-				   href="{$smarty.const.WWW_TOP}/admin/anidb-edit/{$animeAnidbid}">Edit</a>
+				   href="{{(url(")/admin/anidb-edit/{$animeAnidbid}")}}">Edit</a>
 			{/if}
 		</h1>
 		{if animePicture != ''}
 			<div style="text-align: center;">
 				<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
-					 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbid}.jpg"/>
+					 src="{{url("/covers/anime/{$animeAnidbid}.jpg")}}"/>
 			</div>
 			<br/>
 		{/if}
@@ -58,7 +58,7 @@
 				   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbid}"
 				   title="View AniDB">View AniDB</a>
 				<a class="btn btn-sm btn-success"
-				   href="{$smarty.const.WWW_TOP}/rss/full-feed?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">RSS
+				   href="{{url("/rss/full-feed?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">RSS
 					feed for this Anime <i class="fa fa-rss"></i></a>
 			</div>
 		</div>
@@ -116,15 +116,15 @@
 												   value="{$result->guid}"/></td>
 										<td>
 											<a title="View details"
-											   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>
+											   href="{{url("/details/{$result->guid}")}}">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>
 											<div>
 												<div>
 													{if $result->nfoid > 0}<span><a
-																href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
+																href="{{url("/nfo/{$result->guid}")}}"
 																class="modal_nfo badge badge-info text-muted">NFO</a>
 														</span>{/if}
 													{if $result->haspreview == 1 && $userdata->can('preview') == true}<a
-														href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+														href="{{url("/covers/preview/{$result->guid}_thumb.jpg")}}"
 														name="name{$result->guid}"
 														title="Screenshot of {$result->searchname|escape:"htmlall"}"
 														class="badge badge-info" rel="preview">Preview</a>{/if}
@@ -139,11 +139,11 @@
 										<td width="40" title="{$result->postdate}">{$result->postdate|timeago}</td>
 										<td>{$result->size|filesize}</td>
 										<td class="icon_nzb"><a
-													href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
+													href="{{url("/getnzb?id={$result->guid}")}}"><i
 														class="fa fa-cloud-download text-muted" data-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Download NZB"></i></a>
-											<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
+											<a href="{{url("/details/{$result->guid}/#comments")}}"><i
 														class="fa fa-comments-o text-muted" data-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Comments"></i></a>

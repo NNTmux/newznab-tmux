@@ -12,9 +12,9 @@ class BooksTest extends TestCase
      */
     public function testFetchItunesBookProperties()
     {
-        $book = (new \Blacklight\Books())->fetchItunesBookProperties('One man Army');
+        $book = (new \Blacklight\Books())->fetchItunesBookProperties('The Volunteer');
 
         $this->assertArrayHasKey('author', $book);
-        $this->assertEquals('Donna Michaels', $book['author']);
+        $this->assertEquals('Jack Fairweather', $book['author']);
     }
 }

@@ -37,11 +37,11 @@ class UserServiceObserver
             ]
         );
         if (! empty(Settings::settingValue('site.main.email') && File::isFile(base_path().'/_install/install.lock'))) {
-            SendNewRegisteredAccountMail::dispatch($user);
-            SendWelcomeEmail::dispatch($user);
+            SendNewRegisteredAccountMail::dispatch($user)->onQueue('newreg');
+            SendWelcomeEmail::dispatch($user)->onQueue('welcomeemails');
             UserVerification::generate($user);
 
-            UserVerification::send($user, 'User email verification required');
+            UserVerification::send($user, 'User email verification required', Settings::settingValue('site.main.email'));
         }
     }
 
@@ -50,6 +50,6 @@ class UserServiceObserver
      */
     public function deleting(User $user)
     {
-        SendAccountDeletedEmail::dispatch($user);
+        SendAccountDeletedEmail::dispatch($user)->onQueue('deleted');
     }
 }

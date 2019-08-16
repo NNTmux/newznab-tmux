@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
-(function () {
-var quickbars = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -65,40 +64,11 @@ var quickbars = (function (domGlobals) {
       insertBlob: insertBlob
     };
 
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
-
-    var path = function (parts, scope) {
-      var o = scope !== undefined && scope !== null ? scope : Global;
-      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i)
-        o = o[parts[i]];
-      return o;
-    };
-    var resolve = function (p, scope) {
-      var parts = p.split('.');
-      return path(parts, scope);
-    };
-
-    var unsafe = function (name, scope) {
-      return resolve(name, scope);
-    };
-    var getOrDie = function (name, scope) {
-      var actual = unsafe(name, scope);
-      if (actual === undefined || actual === null)
-        throw name + ' not available on this browser';
-      return actual;
-    };
-    var Global$1 = { getOrDie: getOrDie };
-
-    function FileReader () {
-      var f = Global$1.getOrDie('FileReader');
-      return new f();
-    }
-
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
     var blobToBase64 = function (blob) {
       return new global$1(function (resolve) {
-        var reader = FileReader();
+        var reader = new domGlobals.FileReader();
         reader.onloadend = function () {
           resolve(reader.result.split(',')[1]);
         };
@@ -211,8 +181,9 @@ var quickbars = (function (domGlobals) {
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
@@ -343,13 +314,16 @@ var quickbars = (function (domGlobals) {
     };
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -364,6 +338,7 @@ var quickbars = (function (domGlobals) {
     var isUndefined = isType('undefined');
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var find = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
@@ -373,7 +348,6 @@ var quickbars = (function (domGlobals) {
       }
       return Option.none();
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -382,18 +356,14 @@ var quickbars = (function (domGlobals) {
       return is(scope, a) ? Option.some(scope) : isFunction(isRoot) && isRoot(scope) ? Option.none() : ancestor(scope, a, isRoot);
     }
 
-    var node = function () {
-      var f = Global$1.getOrDie('Node');
-      return f;
-    };
     var compareDocumentPosition = function (a, b, match) {
       return (a.compareDocumentPosition(b) & match) !== 0;
     };
     var documentPositionPreceding = function (a, b) {
-      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_PRECEDING);
+      return compareDocumentPosition(a, b, domGlobals.Node.DOCUMENT_POSITION_PRECEDING);
     };
     var documentPositionContainedBy = function (a, b) {
-      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
+      return compareDocumentPosition(a, b, domGlobals.Node.DOCUMENT_POSITION_CONTAINED_BY);
     };
     var Node = {
       documentPositionPreceding: documentPositionPreceding,
@@ -419,18 +389,20 @@ var quickbars = (function (domGlobals) {
     var firstMatch = function (regexes, s) {
       for (var i = 0; i < regexes.length; i++) {
         var x = regexes[i];
-        if (x.test(s))
+        if (x.test(s)) {
           return x;
+        }
       }
       return undefined;
     };
     var find$1 = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
-      if (!r)
+      if (!r) {
         return {
           major: 0,
           minor: 0
         };
+      }
       var group = function (i) {
         return Number(agent.replace(r, '$' + i));
       };
@@ -438,8 +410,9 @@ var quickbars = (function (domGlobals) {
     };
     var detect = function (versionRegexes, agent) {
       var cleanedAgent = String(agent).toLowerCase();
-      if (versionRegexes.length === 0)
+      if (versionRegexes.length === 0) {
         return unknown();
+      }
       return find$1(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
@@ -609,8 +582,7 @@ var quickbars = (function (domGlobals) {
         name: 'Edge',
         versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
         search: function (uastring) {
-          var monstrosity = contains(uastring, 'edge/') && contains(uastring, 'chrome') && contains(uastring, 'safari') && contains(uastring, 'applewebkit');
-          return monstrosity;
+          return contains(uastring, 'edge/') && contains(uastring, 'chrome') && contains(uastring, 'safari') && contains(uastring, 'applewebkit');
         }
       },
       {
@@ -869,15 +841,14 @@ var quickbars = (function (domGlobals) {
     };
     var SelectionToolbars = { addToEditor: addToEditor$1 };
 
-    global.add('quickbars', function (editor) {
-      InsertButtons.setupButtons(editor);
-      InsertToolbars.addToEditor(editor);
-      SelectionToolbars.addToEditor(editor);
-    });
     function Plugin () {
+      global.add('quickbars', function (editor) {
+        InsertButtons.setupButtons(editor);
+        InsertToolbars.addToEditor(editor);
+        SelectionToolbars.addToEditor(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

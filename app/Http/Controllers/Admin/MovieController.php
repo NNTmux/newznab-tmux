@@ -48,7 +48,7 @@ class MovieController extends BasePageController
 
         $id = $request->input('id');
 
-        if ($request->has('id') && \strlen($id) === 7) {
+        if ($request->has('id') && is_numeric($request->input('id'))) {
             $movCheck = $movie->getMovieInfo($id);
             $movieInfo = $movie->updateMovieInfo($id);
             if ($movieInfo && ($movCheck === null || ($request->has('update') && (int) $request->input('update') === 1))) {

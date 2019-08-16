@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.13 (2019-08-06)
  */
-(function () {
-var charmap = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -98,8 +97,9 @@ var charmap = (function (domGlobals) {
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
@@ -174,13 +174,16 @@ var charmap = (function (domGlobals) {
     };
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -188,8 +191,10 @@ var charmap = (function (domGlobals) {
         return typeOf(value) === type;
       };
     };
+    var isArray = isType('array');
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var map = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
@@ -218,8 +223,9 @@ var charmap = (function (domGlobals) {
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
-        if (!Array.prototype.isPrototypeOf(xs[i]))
+        if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        }
         push.apply(r, xs[i]);
       }
       return r;
@@ -228,12 +234,11 @@ var charmap = (function (domGlobals) {
       var output = map(xs, f);
       return flatten(output);
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
 
-    var isArray = global$1.isArray;
+    var isArray$1 = global$1.isArray;
     var UserDefined = 'User Defined';
     var getDefaultCharMap = function () {
       return [
@@ -1428,11 +1433,11 @@ var charmap = (function (domGlobals) {
     };
     var charmapFilter = function (charmap) {
       return global$1.grep(charmap, function (item) {
-        return isArray(item) && item.length === 2;
+        return isArray$1(item) && item.length === 2;
       });
     };
     var getCharsFromSetting = function (settingValue) {
-      if (isArray(settingValue)) {
+      if (isArray$1(settingValue)) {
         return [].concat(charmapFilter(settingValue));
       }
       if (typeof settingValue === 'function') {
@@ -1520,8 +1525,9 @@ var charmap = (function (domGlobals) {
         for (var _i = 0; _i < arguments.length; _i++) {
           args[_i] = arguments[_i];
         }
-        if (timer !== null)
+        if (timer !== null) {
           domGlobals.clearTimeout(timer);
+        }
         timer = domGlobals.setTimeout(function () {
           fn.apply(null, args);
           timer = null;
@@ -1581,11 +1587,11 @@ var charmap = (function (domGlobals) {
         return map(charMap, function (charGroup) {
           return {
             title: charGroup.name,
+            name: charGroup.name,
             items: makeGroupItems()
           };
         });
       };
-      var currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell('All');
       var makePanel = function () {
         return {
           type: 'panel',
@@ -1598,6 +1604,7 @@ var charmap = (function (domGlobals) {
           tabs: makeTabs()
         };
       };
+      var currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell('All');
       var scanAndSet = function (dialogApi, pattern) {
         find(charMap, function (group) {
           return group.name === currentTab.get();
@@ -1633,8 +1640,8 @@ var charmap = (function (domGlobals) {
             api.close();
           }
         },
-        onTabChange: function (dialogApi, title) {
-          currentTab.set(title);
+        onTabChange: function (dialogApi, details) {
+          currentTab.set(details.newTabName);
           updateFilter.throttle(dialogApi);
         },
         onChange: function (dialogApi, changeData) {
@@ -1692,17 +1699,16 @@ var charmap = (function (domGlobals) {
     };
     var Buttons = { register: register$1 };
 
-    global.add('charmap', function (editor) {
-      var charMap = CharMap.getCharMap(editor);
-      Commands.register(editor, charMap);
-      Buttons.register(editor);
-      init(editor, charMap[0]);
-      return Api.get(editor);
-    });
     function Plugin () {
+      global.add('charmap', function (editor) {
+        var charMap = CharMap.getCharMap(editor);
+        Commands.register(editor, charMap);
+        Buttons.register(editor);
+        init(editor, charMap[0]);
+        return Api.get(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

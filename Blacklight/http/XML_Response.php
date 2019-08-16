@@ -21,6 +21,7 @@
 
 namespace Blacklight\http;
 
+use App\Models\Release;
 use App\Models\Category;
 use Illuminate\Support\Carbon;
 
@@ -178,6 +179,7 @@ class XML_Response
         $this->includeMetaInfo();
         $this->includeImage();
         $this->includeTotalRows();
+        $this->includeLimits();
         $this->includeReleases();
         $this->xml->endElement(); // End channel
         $this->xml->endElement(); // End RSS
@@ -347,13 +349,37 @@ class XML_Response
         $this->xml->endElement();
     }
 
+    public function includeLimits(): void
+    {
+        $this->xml->startElement($this->namespace.':apilimits');
+        $this->xml->writeAttribute('apicurrent', $this->parameters['requests']);
+        $this->xml->writeAttribute('apimax', $this->parameters['apilimit']);
+        $this->xml->writeAttribute('grabcurrent', $this->parameters['grabs']);
+        $this->xml->writeAttribute('grabmax', $this->parameters['downloadlimit']);
+        if (! empty($this->parameters['oldestapi'])) {
+            $this->xml->writeAttribute('apioldesttime', $this->parameters['oldestapi']);
+        }
+        if (! empty($this->parameters['oldestgrab'])) {
+            $this->xml->writeAttribute('graboldesttime', $this->parameters['oldestgrab']);
+        }
+        $this->xml->endElement();
+    }
+
     /**
      * Loop through the releases and add their info to the XML stream.
      */
     public function includeReleases(): void
     {
         if (! empty($this->releases)) {
-            foreach ($this->releases as $this->release) {
+            if (! $this->releases instanceof Release) {
+                foreach ($this->releases as $this->release) {
+                    $this->xml->startElement('item');
+                    $this->includeReleaseMain();
+                    $this->setZedAttributes();
+                    $this->xml->endElement();
+                }
+            } elseif ($this->releases instanceof Release) {
+                $this->release = $this->releases;
                 $this->xml->startElement('item');
                 $this->includeReleaseMain();
                 $this->setZedAttributes();

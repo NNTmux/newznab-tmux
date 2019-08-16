@@ -19,7 +19,7 @@
 			{foreach from=$booklist item=book}
 				<tr class="{cycle values=",alt"}">
 					<td class="less">{$book.id}</td>
-					<td><a title="Edit" href="{$smarty.const.WWW_TOP}/admin/book-edit?id={$book.id}">{$book.title}</a>
+					<td><a title="Edit" href="{{url("/admin/book-edit?id={$book.id}")}}">{$book.title}</a>
 					</td>
 					<td>{$book.author}</td>
 					<td class="mid">{$book.created_at|date_format}</td>

@@ -1,16 +1,16 @@
 <div class="header">
 	<div class="breadcrumb-wrapper">
 		<ul class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+			<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 			/
-			<a href="{$smarty.const.WWW_TOP}/{if preg_match('/^alt\.binaries|a\.b|dk\./i', $parentcat)}browse/group?g={else}browse/{/if}{if ($parentcat == 'music')}Audio{else}{$parentcat}{/if}">{$parentcat}</a>
+			<a href="{{url("/{if preg_match('/^alt\.binaries|a\.b|dk\./i', $parentcat)}browse/group?g={else}browse/{/if}{if ($parentcat == 'music')}Audio{else}{$parentcat}{/if}")}}">{$parentcat}</a>
 			/ {if ($catname != '' && $catname != 'all')} <a
-				href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
+				href="{url("/browse/{$parentcat}/{$catname}")}}">{$catname}</a>{/if}
 		</ul>
 	</div>
 </div>
 {$site->adbrowse}
-{if $results|@count > 0}
+{if count($results) > 0}
 	{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 		<div class="box-body">
 			<div class="row">
@@ -21,18 +21,18 @@
 								<div class="col-md-4">
 									{if isset($shows)}
 										<p>
-											<a href="{$smarty.const.WWW_TOP}/series"
+											<a href="{{route('series')}}"
 											   title="View available TV series">Series List</a> |
-											<a title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">Manage
+											<a title="Manage your shows" href="{{route('myshows')}}">Manage
 												My Shows</a> |
 											<a title="All releases in your shows as an RSS feed"
-											   href="{$smarty.const.WWW_TOP}/rss/myshows?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">Rss
+											   href="{{url("/rss/myshows?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">Rss
 												Feed</a>
 										</p>
 									{/if}
 									<div class="nzb_multi_operations">
 										{if isset($covgroup) && $covgroup != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers
+											<a href="{{url("/{$covgroup}/{$category}")}}">Covers
 											</a>
 											|
 											<b>List</b>
@@ -69,11 +69,9 @@
 										</div>
 									</div>
 								</div>
-								{if    count($results) > 0}
-									<div class="col-md-8">
-										{$results->onEachSide(5)->links()}
-									</div>
-								{/if}
+                                <div class="col-md-8">
+                                    {$results->onEachSide(5)->links()}
+                                </div>
 							</div>
 							<hr>
 							<div class="container">
@@ -104,7 +102,7 @@
 													   type="checkbox" name="table_records" class="flat"
 													   value="{$result->guid}"/></td>
 											<td>
-												<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}"
+												<a href="{{url("/details/{$result->guid}")}}"
 												   class="title">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result->failed)}
 												<i class="fa fa-exclamation-circle" style="color: red"
 												   title="This release has failed to download for some users"></i>{/if}
@@ -112,30 +110,30 @@
 												<span class="badge badge-info">{$result->grabs}
 													Grab{if $result->grabs != 1}s{/if}</span>
 												{if $result->nfoid > 0}<span><a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
+															href="{{url("/nfo/{$result->guid}")}}"
 															class="modal_nfo badge badge-info" rel="nfo">NFO</a>
 													</span>{/if}
 												{if $result->jpgstatus == 1 && $userdata->can('preview') == true}<span><a
-															href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
+															href="{{url("/covers/sample/{$result->guid}_thumb.jpg")}}"
 															name="name{$result->guid}"
 															data-fancybox
 															class="badge badge-info"
 															rel="preview">Sample</a></span>{/if}
 												{if $result->haspreview == 1 && $userdata->can('preview') == true}<span><a
-															href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+															href="{{url("/covers/preview/{$result->guid}_thumb.jpg")}}"
 															name="name{$result->guid}"
 															data-fancybox
 															class="badge badge-info"
 															rel="preview">Preview</a></span>{/if}
 												{if $result->videos_id > 0}<span><a
-															href="{$smarty.const.WWW_TOP}/series/{$result->videos_id}"
+															href="{{url("/series/{$result->videos_id}")}}"
 															class="badge badge-info" rel="series">View TV</a>
 													</span>{/if}
 												{if !empty($result->firstaired)}<span
 													class="seriesinfo badge badge-info" title="{$result->guid}">
 													Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
 												{if $result->anidbid > 0}<span><a class="badge badge-info"
-																				 href="{$smarty.const.WWW_TOP}/anime?id={$result->anidbid}">View
+																				 href="{{url("/anime?id={$result->anidbid}")}}">View
 												Anime</a></span>{/if}
 												{if !empty($result->failed)}<span class="badge badge-info">
 													<i class="fa fa-thumbs-o-up"></i>
@@ -154,12 +152,12 @@
 											<td>{$result->postdate|timeago}</td>
 											<td>{$result->size|filesize}</td>
 											<td>
-												<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"
+												<a href="{{url("/getnzb?id={$result->guid}")}}"
 												   class="icon_nzb text-muted"><i
 															class="fa fa-cloud-download text-muted"
 															data-toggle="tooltip" data-placement="top" title
 															data-original-title="Download NZB"></i></a>
-												<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
+												<a href="{{url("/details/{$result->guid}/#comments")}}"><i
 															class="fa fa-comments-o text-muted"
 															data-toggle="tooltip" data-placement="top" title
 															data-original-title="Comments"></i></a>
@@ -196,7 +194,7 @@
 								<div class="col-md-4">
 									<div class="nzb_multi_operations">
 										{if isset($covgroup) && $covgroup != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers</a>
+											<a href="{{url("/{$covgroup}/{$category}")}}">Covers</a>
 											|
 											<b>List</b>
 											<br/>
@@ -232,11 +230,9 @@
 										</div>
 									</div>
 								</div>
-								{if    count($results) > 0}
 									<div class="col-md-8">
 										{$results->onEachSide(5)->links()}
 									</div>
-								{/if}
 							</div>
 						</div>
 					</div>
@@ -244,4 +240,6 @@
 			</div>
 		</div>
 	{{Form::close()}}
+{else}
+    No releases indexed yet!
 {/if}
