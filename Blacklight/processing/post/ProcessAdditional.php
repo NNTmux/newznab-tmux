@@ -2300,7 +2300,7 @@ class ProcessAdditional
         $this->_foundSample = $this->_processThumbnails ? false : true;
         $this->_foundPAR2Info = false;
 
-        $this->_passwordStatus = Releases::PASSWD_NONE;
+        $this->_passwordStatus[] = Releases::PASSWD_NONE;
         $this->_releaseHasPassword = false;
 
         $this->_releaseGroupName = UsenetGroup::getNameByID($this->_release->groups_id);
