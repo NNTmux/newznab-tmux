@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Release;
+use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use App\Models\ReleaseFile;
 
@@ -8,12 +9,17 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $passFiles = ReleaseFile::query()->where('passworded', '=', 1)->select(['releases_id'])->groupBy('releases_id')->get();
 
-$count = 0;
-
+$count1 = $count2 = 0;
 if ($passFiles->isNotEmpty()) {
-    foreach ($passFiles as $passFile) {
-        Release::query()->where('id', $passFile->releases_id)->update(['passwordstatus' => Releases::PASSWD_RAR]);
-        $count++;
+    $count1 = $passFiles->count();
+    if ($count1 > 0) {
+        foreach ($passFiles as $passFile) {
+            $release = Release::query()->where('id', $passFile->releases_id)->where('passwordstatus', '=', 0)->update(['passwordstatus' => Releases::PASSWD_RAR]);
+            if ($release !== 0) {
+                $count2++;
+            }
+            echo '.';
+        }
     }
 }
-(new \Blacklight\ColorCLI())->info($count.' releases marked as passworded');
+(new ColorCLI())->info($count2.' releases marked as passworded');
