@@ -318,7 +318,7 @@ class ProcessAdditional
 
     /**
      * Password status of the current release.
-     * @var string
+     * @var array
      */
     protected $_passwordStatus;
 
@@ -1087,7 +1087,7 @@ class ProcessAdditional
                 $this->_debug('ArchiveInfo: Compressed file has a password.');
             }
             $this->_releaseHasPassword = true;
-            $this->_passwordStatus = Releases::PASSWD_RAR;
+            $this->_passwordStatus[] = Releases::PASSWD_RAR;
 
             return false;
         }
@@ -1154,13 +1154,13 @@ class ProcessAdditional
 
                 if (isset($file['pass']) && $file['pass'] === true) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = Releases::PASSWD_RAR;
+                    $this->_passwordStatus[] = Releases::PASSWD_RAR;
                     break;
                 }
 
                 if ($this->_innerFileBlacklist !== false && preg_match($this->_innerFileBlacklist, $file['name'])) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = Releases::PASSWD_POTENTIAL;
+                    $this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
                     break;
                 }
 
@@ -1216,7 +1216,7 @@ class ProcessAdditional
                 if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $file['date'], $file['pass'], '', $file['crc32'] ?? '')) {
                     $this->_addedFileInfo++;
                     if ((int) $file['pass'] === 1) {
-                        $this->_passwordStatus = Releases::PASSWD_RAR;
+                        $this->_passwordStatus[] = Releases::PASSWD_RAR;
                     }
 
                     if ($this->_echoCLI) {
@@ -1231,7 +1231,7 @@ class ProcessAdditional
                             $this->_debug('Codec spam found, setting release to potentially passworded.');
                         }
                         $this->_releaseHasPassword = true;
-                        $this->_passwordStatus = Releases::PASSWD_POTENTIAL;
+                        $this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
                     } //Run a PreDB filename check on insert to try and match the release
                     elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
                         $this->_release['filename'] = $file['name'];
