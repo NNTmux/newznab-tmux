@@ -18,7 +18,7 @@
 			{foreach $results as $result}
 				<tr class="{cycle values=",alt"}" id="guid{$result.id}">
 					<td style="cursor:pointer;" class="item"
-						onclick="document.location='{{url("/forumpost/{$result.id}';")}}>
+						onclick="document.location='{{url("/forumpost/{$result.id}")}}';">
 						<a title="View post" class="title"
 						   href="{{url("/forumpost/{$result.id}")}}">{$result.subject|escape:"htmlall"|truncate:100:'...':true:true}</a>
 						<div class="hint">
