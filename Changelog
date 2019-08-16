@@ -1,4 +1,5 @@
 2019-08-16 DariusIII
+	* Chg: Update tinyMCE config
 	* Fix: Fix opening existing forum posts
 	* Fix: Fix bad order of variables in PostProcess class
 2019-08-15 DariusIII
