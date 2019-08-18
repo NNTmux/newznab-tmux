@@ -1213,9 +1213,11 @@ class ProcessAdditional
              */
             if ($this->_addedFileInfo < 11 && ReleaseFile::query()->where(['releases_id' => $this->_release->id, 'name' => $file['name'], 'size' => $file
                 ['size'], ])->first() === null) {
-                if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $file['date'], $file['pass'], '', $file['crc32'] ?? '')) {
+                $addReleaseFiles = ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $file['date'], $file['pass'], '', $file['crc32'] ?? '');
+                if (! empty($addReleaseFiles)) {
                     $this->_addedFileInfo++;
-                    if ((int) $file['pass'] === 1) {
+                    if ($file['pass'] === true) {
+                        $this->_releaseHasPassword = true;
                         $this->_passwordStatus = [Releases::PASSWD_RAR];
                     }
 
