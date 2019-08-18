@@ -509,10 +509,7 @@ class ProcessAdditional
         $this->_processJPGSample = (int) Settings::settingValue('..processjpg') !== 0;
         $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') !== '';
         $this->_processAudioInfo = $this->_processMediaInfo;
-        $this->_processPasswords = (
-            ((int) Settings::settingValue('..checkpasswordedrar') !== 0) &&
-            Settings::settingValue('apps..unrarpath') !== ''
-        );
+        $this->_processPasswords = ! empty(Settings::settingValue('..checkpasswordedrar')) && ! empty(Settings::settingValue('apps..unrarpath'));
 
         $this->_audioSavePath = NN_COVERS.'audiosample'.DS;
 
@@ -1267,18 +1264,16 @@ class ProcessAdditional
             // Get all the compressed files in the temp folder.
             $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1)($|[^a-z0-9])/i');
 
-            if ($files instanceof \Traversable) {
-                foreach ($files as $file) {
+            foreach ($files as $file) {
 
-                    // Check if the file exists.
-                    if (File::isFile($file[0])) {
-                        $rarData = @File::get($file[0]);
-                        if ($rarData !== false) {
-                            $this->_processCompressedData($rarData);
-                            $foundCompressedFile = true;
-                        }
-                        File::delete($file[0]);
+                // Check if the file exists.
+                if (File::isFile($file[0])) {
+                    $rarData = @File::get($file[0]);
+                    if ($rarData !== false) {
+                        $this->_processCompressedData($rarData);
+                        $foundCompressedFile = true;
                     }
+                    File::delete($file[0]);
                 }
             }
 
