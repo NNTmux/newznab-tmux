@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Blacklight\SphinxSearch;
+use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ReleaseFile extends Model
 {
+    use InsertOnDuplicateKey;
     /**
      * @var bool
      */
@@ -116,14 +118,14 @@ class ReleaseFile extends Model
 
         if ($duplicateCheck === null && $releaseCheck !== null) {
             try {
-                $insert = self::create([
+                $insert = self::insertOnDuplicateKey([
                         'releases_id' => $id,
                         'name' => utf8_encode($name),
                         'size' => $size,
                         'created_at' => $createdTime,
                         'passworded' => $hasPassword,
                         'crc32' => $crc,
-                    ])->id;
+                    ], ['updated_at' => now()]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());
             }
