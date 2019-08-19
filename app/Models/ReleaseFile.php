@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Blacklight\SphinxSearch;
+use Illuminate\Support\Carbon;
 use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
@@ -116,16 +117,27 @@ class ReleaseFile extends Model
         // Check if the release exists in releases table to prevent foreign key error
         $releaseCheck = Release::query()->where('id', $id)->first();
 
+        if (is_int($createdTime)) {
+            if ($createdTime === 0) {
+                $adjustedCreatedTime = now()->format('Y-m-d H:i:s');
+            } else {
+                $adjustedCreatedTime = Carbon::createFromTimestamp($createdTime)->format('Y-m-d H:i:s');
+            }
+        } else {
+            $adjustedCreatedTime = $createdTime;
+        }
+
         if ($duplicateCheck === null && $releaseCheck !== null) {
             try {
                 $insert = self::insertOnDuplicateKey([
                         'releases_id' => $id,
-                        'name' => utf8_encode($name),
+                        'name' => escapeString(utf8_encode($name)),
                         'size' => $size,
-                        'created_at' => $createdTime,
+                        'created_at' => $adjustedCreatedTime,
+                        'updated_at' => now()->timestamp,
                         'passworded' => $hasPassword,
-                        'crc32' => $crc,
-                    ], ['updated_at' => now()]);
+                        'crc32' => escapeString($crc),
+                    ], ['updated_at' => now()->timestamp]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());
             }
