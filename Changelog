@@ -1,3 +1,5 @@
+2019-08-19 DariusIII
+	* Chg: Use insertOnDuplicateKey trait in ReleaseFile class
 2019-08-16 DariusIII
 	* Chg: Add misc/testing/DB/mark_as_passworded.php script
 	* Chg: Set release as passworded if files inside archives are passworded
