@@ -131,12 +131,12 @@ class ReleaseFile extends Model
             try {
                 $insert = self::insertOnDuplicateKey([
                         'releases_id' => $id,
-                        'name' => escapeString($name),
+                        'name' => $name,
                         'size' => $size,
                         'created_at' => $adjustedCreatedTime,
                         'updated_at' => now()->timestamp,
                         'passworded' => $hasPassword,
-                        'crc32' => escapeString($crc),
+                        'crc32' => $crc,
                     ], ['updated_at' => now()->timestamp]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());
