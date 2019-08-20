@@ -107,12 +107,10 @@ class SiteController extends BasePageController
         $this->smarty->assign('registerstatus_ids', [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_INVITE, Settings::REGISTER_STATUS_CLOSED]);
         $this->smarty->assign('registerstatus_names', ['Open', 'Invite', 'Closed']);
 
-        $this->smarty->assign('passworded_ids', [0, 1, 2]);
+        $this->smarty->assign('passworded_ids', [0, 1]);
         $this->smarty->assign('passworded_names', [
-            'Hide passworded or potentially passworded (*yes)',
-            'Hide passworded or potentially passworded (*no)',
-            'Show non-passworded and potentially passworded (*no)',
-            'Show everything (*no)',
+            'Hide passworded',
+            'Show everything',
         ]);
 
         $this->smarty->assign('lookuplanguage_iso', ['en', 'de', 'es', 'fr', 'it', 'nl', 'pt', 'sv']);
