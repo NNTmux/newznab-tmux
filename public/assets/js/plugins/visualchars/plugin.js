@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.13 (2019-08-06)
+ * Version: 5.0.14 (2019-08-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -245,6 +245,8 @@
     var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
     var ENTITY = domGlobals.Node.ENTITY_NODE;
     var NOTATION = domGlobals.Node.NOTATION_NODE;
+
+    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
 
     var type = function (element) {
       return element.dom().nodeType;

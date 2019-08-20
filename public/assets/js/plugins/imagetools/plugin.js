@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.13 (2019-08-06)
+ * Version: 5.0.14 (2019-08-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -31,15 +31,6 @@
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
-    var compose = function (fa, fb) {
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        return fa(fb.apply(null, args));
-      };
-    };
     var constant = function (value) {
       return function () {
         return value;
@@ -1294,19 +1285,22 @@
 
     var ELEMENT$1 = ELEMENT;
     var is = function (element, selector) {
-      var elem = element.dom();
-      if (elem.nodeType !== ELEMENT$1) {
+      var dom = element.dom();
+      if (dom.nodeType !== ELEMENT$1) {
         return false;
-      } else if (elem.matches !== undefined) {
-        return elem.matches(selector);
-      } else if (elem.msMatchesSelector !== undefined) {
-        return elem.msMatchesSelector(selector);
-      } else if (elem.webkitMatchesSelector !== undefined) {
-        return elem.webkitMatchesSelector(selector);
-      } else if (elem.mozMatchesSelector !== undefined) {
-        return elem.mozMatchesSelector(selector);
       } else {
-        throw new Error('Browser lacks native selectors');
+        var elem = dom;
+        if (elem.matches !== undefined) {
+          return elem.matches(selector);
+        } else if (elem.msMatchesSelector !== undefined) {
+          return elem.msMatchesSelector(selector);
+        } else if (elem.webkitMatchesSelector !== undefined) {
+          return elem.webkitMatchesSelector(selector);
+        } else if (elem.mozMatchesSelector !== undefined) {
+          return elem.mozMatchesSelector(selector);
+        } else {
+          throw new Error('Browser lacks native selectors');
+        }
       }
     };
 
@@ -1321,8 +1315,13 @@
     var browser = PlatformDetection$1.detect().browser;
     var contains$1 = browser.isIE() ? ieContains : regularContains;
 
+    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+
     var child = function (scope, predicate) {
-      var result = find(scope.dom().childNodes, compose(predicate, Element.fromDom));
+      var pred = function (node) {
+        return predicate(Element.fromDom(node));
+      };
+      var result = find(scope.dom().childNodes, pred);
       return result.map(Element.fromDom);
     };
 

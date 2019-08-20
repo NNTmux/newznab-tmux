@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.13 (2019-08-06)
+ * Version: 5.0.14 (2019-08-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -830,7 +830,7 @@
       return values.length === 0 ? Result.value(base) : Result.value(deepMerge(base, merge.apply(undefined, values)));
     };
     var mergeErrors = function (errors) {
-      return compose(Result.error, flatten)(errors);
+      return Result.error(flatten(errors));
     };
     var consolidate = function (objs, base) {
       var partitions = partition$1(objs);
@@ -1890,19 +1890,22 @@
     var ELEMENT$1 = ELEMENT;
     var DOCUMENT$1 = DOCUMENT;
     var is = function (element, selector) {
-      var elem = element.dom();
-      if (elem.nodeType !== ELEMENT$1) {
+      var dom = element.dom();
+      if (dom.nodeType !== ELEMENT$1) {
         return false;
-      } else if (elem.matches !== undefined) {
-        return elem.matches(selector);
-      } else if (elem.msMatchesSelector !== undefined) {
-        return elem.msMatchesSelector(selector);
-      } else if (elem.webkitMatchesSelector !== undefined) {
-        return elem.webkitMatchesSelector(selector);
-      } else if (elem.mozMatchesSelector !== undefined) {
-        return elem.mozMatchesSelector(selector);
       } else {
-        throw new Error('Browser lacks native selectors');
+        var elem = dom;
+        if (elem.matches !== undefined) {
+          return elem.matches(selector);
+        } else if (elem.msMatchesSelector !== undefined) {
+          return elem.msMatchesSelector(selector);
+        } else if (elem.webkitMatchesSelector !== undefined) {
+          return elem.webkitMatchesSelector(selector);
+        } else if (elem.mozMatchesSelector !== undefined) {
+          return elem.mozMatchesSelector(selector);
+        } else {
+          throw new Error('Browser lacks native selectors');
+        }
       }
     };
     var bypassSelector = function (dom) {
@@ -2064,6 +2067,8 @@
       return is(scope, a) ? Option.some(scope) : isFunction(isRoot) && isRoot(scope) ? Option.none() : ancestor(scope, a, isRoot);
     }
 
+    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+
     var name = function (element) {
       var r = element.dom().nodeName;
       return r.toLowerCase();
@@ -2078,7 +2083,6 @@
     };
     var isElement = isType$1(ELEMENT);
     var isText = isType$1(TEXT);
-    var isDocument = isType$1(DOCUMENT);
 
     var inBody = function (element) {
       var dom = isText(element) ? element.dom().parentNode : element.dom();
@@ -2110,16 +2114,17 @@
       return Option.none();
     };
     var closest = function (scope, predicate, isRoot) {
-      var is = function (s) {
-        return predicate(s);
+      var is = function (s, test) {
+        return test(s);
       };
       return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
     };
     var descendant = function (scope, predicate) {
       var descend = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
-          if (predicate(Element.fromDom(node.childNodes[i]))) {
-            return Option.some(Element.fromDom(node.childNodes[i]));
+          var child_1 = Element.fromDom(node.childNodes[i]);
+          if (predicate(child_1)) {
+            return Option.some(child_1);
           }
           var res = descend(node.childNodes[i]);
           if (res.isSome()) {
@@ -2328,25 +2333,19 @@
       return Element.fromDom(element.dom().ownerDocument);
     };
     var defaultView = function (element) {
-      var el = element.dom();
-      var defView = el.ownerDocument.defaultView;
-      return Element.fromDom(defView);
+      return Element.fromDom(element.dom().ownerDocument.defaultView);
     };
     var parent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element.fromDom);
+      return Option.from(element.dom().parentNode).map(Element.fromDom);
     };
     var offsetParent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.offsetParent).map(Element.fromDom);
+      return Option.from(element.dom().offsetParent).map(Element.fromDom);
     };
     var nextSibling = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.nextSibling).map(Element.fromDom);
+      return Option.from(element.dom().nextSibling).map(Element.fromDom);
     };
     var children = function (element) {
-      var dom = element.dom();
-      return map(dom.childNodes, Element.fromDom);
+      return map(element.dom().childNodes, Element.fromDom);
     };
     var child = function (element, index) {
       var cs = element.dom().childNodes;
@@ -3705,18 +3704,6 @@
         exhibit: exhibit
     });
 
-    var attached = function (element, scope) {
-      var doc = scope || Element.fromDom(domGlobals.document.documentElement);
-      return ancestor(element, curry(eq, doc)).isSome();
-    };
-    var windowOf = function (element) {
-      var dom = element.dom();
-      if (dom === dom.window && element instanceof domGlobals.Window) {
-        return element;
-      }
-      return isDocument(element) ? dom.defaultView || dom.parentWindow : null;
-    };
-
     var r = function (left, top) {
       var translate = function (x, y) {
         return r(left + x, top + y);
@@ -3739,7 +3726,7 @@
     var absolute = function (element) {
       var doc = element.dom().ownerDocument;
       var body = doc.body;
-      var win = windowOf(Element.fromDom(doc));
+      var win = doc.defaultView;
       var html = doc.documentElement;
       var scrollTop = firstDefinedOrZero(win.pageYOffset, html.scrollTop);
       var scrollLeft = firstDefinedOrZero(win.pageXOffset, html.scrollLeft);
@@ -3751,11 +3738,10 @@
       var dom = element.dom();
       var doc = dom.ownerDocument;
       var body = doc.body;
-      var html = Element.fromDom(doc.documentElement);
       if (body === dom) {
         return Position(body.offsetLeft, body.offsetTop);
       }
-      if (!attached(element, html)) {
+      if (!inBody(element)) {
         return Position(0, 0);
       }
       return boxPosition(dom);
@@ -4564,18 +4550,9 @@
         }
         return getOption(element).getOr('');
       };
-      var getOptionIE10 = function (element) {
-        try {
-          return getOptionSafe(element);
-        } catch (e) {
-          return Option.none();
-        }
-      };
-      var getOptionSafe = function (element) {
+      var getOption = function (element) {
         return is(element) ? Option.from(element.dom().nodeValue) : Option.none();
       };
-      var browser = PlatformDetection$1.detect().browser;
-      var getOption = browser.isIE() && browser.version.major === 10 ? getOptionIE10 : getOptionSafe;
       var set = function (element, value) {
         if (!is(element)) {
           throw new Error('Can only set raw ' + name + ' value of a ' + name + ' node');
@@ -4633,8 +4610,7 @@
       });
     };
     var locateNode = function (doc, node, x, y) {
-      var locator = isText(node) ? locate : searchInChildren;
-      return locator(doc, node, x, y);
+      return isText(node) ? locate(doc, node, x, y) : searchInChildren(doc, node, x, y);
     };
     var locate$1 = function (doc, node, x, y) {
       var r = doc.dom().createRange();
@@ -5882,7 +5858,7 @@
         getPartsOrDie: getPartsOrDie
     });
 
-    var base = function (label, partSchemas, partUidsSchemas, spec) {
+    var base = function (partSchemas, partUidsSchemas) {
       var ps = partSchemas.length > 0 ? [strictObjOf('parts', partSchemas)] : [];
       return ps.concat([
         strict$1('uid'),
@@ -5893,7 +5869,7 @@
       ]).concat(partUidsSchemas);
     };
     var asRawOrDie$1 = function (label, schema, spec, partSchemas, partUidsSchemas) {
-      var baseS = base(label, partSchemas, partUidsSchemas);
+      var baseS = base(partSchemas, partUidsSchemas);
       return asRawOrDie(label + ' [SpecSchema]', objOfOnly(baseS.concat(schema)), spec);
     };
 
@@ -6234,8 +6210,8 @@
       var doc = owner(element).dom();
       return element.dom() === doc.activeElement;
     };
-    var active = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+    var active = function (_doc) {
+      var doc = _doc !== undefined ? _doc.dom() : domGlobals.document;
       return Option.from(doc.activeElement).map(Element.fromDom);
     };
     var search$1 = function (element) {
@@ -8837,7 +8813,7 @@
           fireDismissalEventInstead: {}
         }));
         uiMothership.add(notificationWrapper);
-        if (settings.timeout) {
+        if (settings.timeout > 0) {
           global$2.setTimeout(function () {
             close();
           }, settings.timeout);
@@ -9142,7 +9118,10 @@
         return lookupWithContext(editor, getDatabase, context);
       });
     };
-    var lookupWithContext = function (editor, getDatabase, context) {
+    var lookupWithContext = function (editor, getDatabase, context, fetchOptions) {
+      if (fetchOptions === void 0) {
+        fetchOptions = {};
+      }
       var database = getDatabase();
       var rng = editor.selection.getRng();
       var startText = rng.startContainer.nodeValue;
@@ -9155,7 +9134,7 @@
         return Option.none();
       }
       var lookupData = global$4.all(map(autocompleters, function (ac) {
-        var fetchResult = ac.fetch(context.text, ac.maxResults);
+        var fetchResult = ac.fetch(context.text, ac.maxResults, fetchOptions);
         return fetchResult.then(function (results) {
           return {
             matchText: context.text,
@@ -9169,6 +9148,14 @@
         lookupData: lookupData,
         context: context
       });
+    };
+
+    var separatorMenuItemSchema = objOf([
+      strictString('type'),
+      optionString('text')
+    ]);
+    var createSeparatorMenuItem = function (spec) {
+      return asRaw('separatormenuitem', separatorMenuItemSchema, spec);
     };
 
     var autocompleterItemSchema = objOf([
@@ -9196,6 +9183,9 @@
       strictFunction('fetch'),
       strictFunction('onAction')
     ]);
+    var createSeparatorItem = function (spec) {
+      return asRaw('Autocompleter.Separator', separatorMenuItemSchema, spec);
+    };
     var createAutocompleterItem = function (spec) {
       return asRaw('Autocompleter.Item', autocompleterItemSchema, spec);
     };
@@ -9289,14 +9279,6 @@
     ].concat(commonMenuItemFields));
     var createChoiceMenuItem = function (spec) {
       return asRaw('choicemenuitem', choiceMenuItemSchema, spec);
-    };
-
-    var separatorMenuItemSchema = objOf([
-      strictString('type'),
-      optionString('text')
-    ]);
-    var createSeparatorMenuItem = function (spec) {
-      return asRaw('separatormenuitem', separatorMenuItemSchema, spec);
     };
 
     var fancyTypes = [
@@ -11354,9 +11336,15 @@
       var renderText = columns === 1;
       var renderIcons = !renderText || menuHasIcons$1(items);
       return cat(map(items, function (item) {
-        return createAutocompleterItem(item).fold(handleError, function (d) {
-          return Option.some(autocomplete(d, matchText, renderText, 'normal', onItemValueHandler, itemResponse, sharedBackstage, renderIcons));
-        });
+        if (item.type === 'separator') {
+          return createSeparatorItem(item).fold(handleError, function (d) {
+            return Option.some(separator(d));
+          });
+        } else {
+          return createAutocompleterItem(item).fold(handleError, function (d) {
+            return Option.some(autocomplete(d, matchText, renderText, 'normal', onItemValueHandler, itemResponse, sharedBackstage, renderIcons));
+          });
+        }
       }));
     };
     var createPartialMenu = function (value, items, itemResponse, backstage) {
@@ -11451,7 +11439,13 @@
               return domGlobals.console.error('Lost context. Cursor probably moved');
             }, function (_a) {
               var range = _a.range;
-              var autocompleterApi = { hide: cancelIfNecessary };
+              var autocompleterApi = {
+                hide: cancelIfNecessary,
+                reload: function (fetchOptions) {
+                  hideIfNecessary();
+                  load(fetchOptions);
+                }
+              };
               match.onAction(autocompleterApi, range, itemValue, itemMeta);
             });
           }, columns, ItemResponse$1.BUBBLE_TO_SANDBOX, sharedBackstage);
@@ -11479,20 +11473,17 @@
         }, Menu.sketch(createMenuFrom(createPartialMenuWithAlloyItems('autocompleter-value', true, items, columns, 'normal'), columns, FocusMode.ContentFocus, 'normal')));
         InlineView.getContent(autocompleter).each(Highlighting.highlightFirst);
       };
-      var doLookup = function () {
+      var doLookup = function (fetchOptions) {
         return activeAutocompleter.get().map(function (ac) {
           return getContext(editor.dom, editor.selection.getRng(), ac.triggerChar).bind(function (newContext) {
-            return lookupWithContext(editor, getAutocompleters, newContext);
+            return lookupWithContext(editor, getAutocompleters, newContext, fetchOptions);
           });
         }).getOrThunk(function () {
           return lookup(editor, getAutocompleters);
         });
       };
-      var onKeypress = last$2(function (e) {
-        if (e.which === 27) {
-          return;
-        }
-        doLookup().fold(cancelIfNecessary, function (lookupInfo) {
+      var load = function (fetchOptions) {
+        doLookup(fetchOptions).fold(cancelIfNecessary, function (lookupInfo) {
           commenceIfNecessary(lookupInfo.context);
           lookupInfo.lookupData.then(function (lookupData) {
             activeAutocompleter.get().map(function (ac) {
@@ -11510,6 +11501,12 @@
             });
           });
         });
+      };
+      var onKeypress = last$2(function (e) {
+        if (e.which === 27) {
+          return;
+        }
+        load();
       }, 50);
       var autocompleterUiApi = {
         onKeypress: onKeypress,
@@ -26236,7 +26233,7 @@
 
     var initialAttribute = 'data-initial-z-index';
     var resetZIndex = function (blocker) {
-      parent(blocker.element()).each(function (root) {
+      parent(blocker.element()).filter(isElement).each(function (root) {
         var initZIndex = get$2(root, initialAttribute);
         if (has$1(root, initialAttribute)) {
           set$2(root, 'z-index', initZIndex);
@@ -26247,7 +26244,7 @@
       });
     };
     var changeZIndex = function (blocker) {
-      parent(blocker.element()).each(function (root) {
+      parent(blocker.element()).filter(isElement).each(function (root) {
         getRaw(root, 'z-index').each(function (zindex) {
           set$1(root, initialAttribute, zindex);
         });
@@ -28453,10 +28450,23 @@
         fireApiEvent(formChangeEvent, function (api, spec, event) {
           spec.onChange(api, { name: event.name() });
         }),
-        fireApiEvent(formActionEvent, function (api, spec, event) {
+        fireApiEvent(formActionEvent, function (api, spec, event, component) {
+          var focusIn = function () {
+            return Keying.focusIn(component);
+          };
+          var current = active();
           spec.onAction(api, {
             name: event.name(),
             value: event.value()
+          });
+          active().fold(function () {
+            focusIn();
+          }, function (focused) {
+            if (!contains$2(component.element(), focused) || has$1(focused, 'disabled')) {
+              focusIn();
+            } else if (contains$2(focused, current.getOrNull()) && has$1(current.getOrDie(), 'disabled')) {
+              focusIn();
+            }
           });
         }),
         fireApiEvent(formTabChangeEvent, function (api, spec, event) {
@@ -29109,7 +29119,10 @@
             updateState: updateState,
             initialData: dialogInit
           }),
-          config('execute-on-form', dialogEvents),
+          Focusing.config({}),
+          config('execute-on-form', dialogEvents.concat([runOnSource(focusin(), function (comp, se) {
+              Keying.focusIn(comp);
+            })])),
           RepresentingConfigs.memory({})
         ]),
         components: [

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.13 (2019-08-06)
+ * Version: 5.0.14 (2019-08-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -865,6 +865,8 @@
     var ENTITY = domGlobals.Node.ENTITY_NODE;
     var NOTATION = domGlobals.Node.NOTATION_NODE;
 
+    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+
     var name = function (element) {
       var r = element.dom().nodeName;
       return r.toLowerCase();
@@ -995,19 +997,22 @@
     var ELEMENT$1 = ELEMENT;
     var DOCUMENT$1 = DOCUMENT;
     var is = function (element, selector) {
-      var elem = element.dom();
-      if (elem.nodeType !== ELEMENT$1) {
+      var dom = element.dom();
+      if (dom.nodeType !== ELEMENT$1) {
         return false;
-      } else if (elem.matches !== undefined) {
-        return elem.matches(selector);
-      } else if (elem.msMatchesSelector !== undefined) {
-        return elem.msMatchesSelector(selector);
-      } else if (elem.webkitMatchesSelector !== undefined) {
-        return elem.webkitMatchesSelector(selector);
-      } else if (elem.mozMatchesSelector !== undefined) {
-        return elem.mozMatchesSelector(selector);
       } else {
-        throw new Error('Browser lacks native selectors');
+        var elem = dom;
+        if (elem.matches !== undefined) {
+          return elem.matches(selector);
+        } else if (elem.msMatchesSelector !== undefined) {
+          return elem.msMatchesSelector(selector);
+        } else if (elem.webkitMatchesSelector !== undefined) {
+          return elem.webkitMatchesSelector(selector);
+        } else if (elem.mozMatchesSelector !== undefined) {
+          return elem.mozMatchesSelector(selector);
+        } else {
+          throw new Error('Browser lacks native selectors');
+        }
       }
     };
     var bypassSelector = function (dom) {
@@ -1040,16 +1045,13 @@
       return Element.fromDom(element.dom().ownerDocument);
     };
     var defaultView = function (element) {
-      var el = element.dom();
-      var defView = el.ownerDocument.defaultView;
-      return Element.fromDom(defView);
+      return Element.fromDom(element.dom().ownerDocument.defaultView);
     };
     var parent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element.fromDom);
+      return Option.from(element.dom().parentNode).map(Element.fromDom);
     };
     var parents = function (element, isRoot) {
-      var stop = isFunction(isRoot) ? isRoot : constant(false);
+      var stop = isFunction(isRoot) ? isRoot : never;
       var dom = element.dom();
       var ret = [];
       while (dom.parentNode !== null && dom.parentNode !== undefined) {
@@ -1073,12 +1075,10 @@
       return parent(element).map(children).map(filterSelf).getOr([]);
     };
     var nextSibling = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.nextSibling).map(Element.fromDom);
+      return Option.from(element.dom().nextSibling).map(Element.fromDom);
     };
     var children = function (element) {
-      var dom = element.dom();
-      return map$1(dom.childNodes, Element.fromDom);
+      return map$1(element.dom().childNodes, Element.fromDom);
     };
     var child = function (element, index) {
       var cs = element.dom().childNodes;
@@ -1534,7 +1534,7 @@
       return values.length === 0 ? Result.value(base) : Result.value(deepMerge(base, merge.apply(undefined, values)));
     };
     var mergeErrors = function (errors) {
-      return compose(Result.error, flatten)(errors);
+      return Result.error(flatten(errors));
     };
     var consolidate = function (objs, base) {
       var partitions = partition(objs);
@@ -2141,16 +2141,17 @@
       return Option.none();
     };
     var closest = function (scope, predicate, isRoot) {
-      var is = function (s) {
-        return predicate(s);
+      var is = function (s, test) {
+        return test(s);
       };
       return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
     };
     var descendant = function (scope, predicate) {
       var descend = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
-          if (predicate(Element.fromDom(node.childNodes[i]))) {
-            return Option.some(Element.fromDom(node.childNodes[i]));
+          var child_1 = Element.fromDom(node.childNodes[i]);
+          if (predicate(child_1)) {
+            return Option.some(child_1);
           }
           var res = descend(node.childNodes[i]);
           if (res.isSome()) {
@@ -2607,8 +2608,8 @@
       var doc = owner(element).dom();
       return element.dom() === doc.activeElement;
     };
-    var active = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+    var active = function (_doc) {
+      var doc = _doc !== undefined ? _doc.dom() : domGlobals.document;
       return Option.from(doc.activeElement).map(Element.fromDom);
     };
     var search = function (element) {
@@ -4698,7 +4699,7 @@
       return generate$1(prefix);
     };
 
-    var base = function (label, partSchemas, partUidsSchemas, spec) {
+    var base = function (partSchemas, partUidsSchemas) {
       var ps = partSchemas.length > 0 ? [strictObjOf('parts', partSchemas)] : [];
       return ps.concat([
         strict$1('uid'),
@@ -4709,7 +4710,7 @@
       ]).concat(partUidsSchemas);
     };
     var asRawOrDie$1 = function (label, schema, spec, partSchemas, partUidsSchemas) {
-      var baseS = base(label, partSchemas, partUidsSchemas);
+      var baseS = base(partSchemas, partUidsSchemas);
       return asRawOrDie(label + ' [SpecSchema]', objOfOnly(baseS.concat(schema)), spec);
     };
 
@@ -6287,7 +6288,7 @@
       });
     };
     var getRawOrComputed = function (isRoot, rawStart) {
-      var optStart = isElement(rawStart) ? Option.some(rawStart) : parent(rawStart);
+      var optStart = isElement(rawStart) ? Option.some(rawStart) : parent(rawStart).filter(isElement);
       return optStart.map(function (start) {
         var inline = closest(start, function (elem) {
           return getRaw(elem, 'font-size').isSome();
@@ -9877,18 +9878,9 @@
         }
         return getOption(element).getOr('');
       };
-      var getOptionIE10 = function (element) {
-        try {
-          return getOptionSafe(element);
-        } catch (e) {
-          return Option.none();
-        }
-      };
-      var getOptionSafe = function (element) {
+      var getOption = function (element) {
         return is(element) ? Option.from(element.dom().nodeValue) : Option.none();
       };
-      var browser = PlatformDetection$1.detect().browser;
-      var getOption = browser.isIE() && browser.version.major === 10 ? getOptionIE10 : getOptionSafe;
       var set = function (element, value) {
         if (!is(element)) {
           throw new Error('Can only set raw ' + name + ' value of a ' + name + ' node');
@@ -10206,8 +10198,7 @@
       });
     };
     var locateNode = function (doc, node, x, y) {
-      var locator = isText(node) ? locate$1 : searchInChildren;
-      return locator(doc, node, x, y);
+      return isText(node) ? locate$1(doc, node, x, y) : searchInChildren(doc, node, x, y);
     };
     var locate$2 = function (doc, node, x, y) {
       var r = doc.dom().createRange();
