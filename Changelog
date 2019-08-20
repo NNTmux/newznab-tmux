@@ -1,4 +1,5 @@
 2019-08-20 DariusIII
+	* Chg: Change used passwordstatus for releases
 	* Chg: Update tinyMCE to latest version
 2019-08-19 DariusIII
 	* Chg: Use insertOnDuplicateKey trait in ReleaseFile class

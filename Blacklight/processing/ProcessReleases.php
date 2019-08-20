@@ -915,15 +915,6 @@ class ProcessReleases
             }
         }
 
-        // Possibly passworded releases.
-        if ((int) Settings::settingValue('..deletepossiblerelease') === 1) {
-            $releases = Release::query()->where('passwordstatus', '=', Releases::PASSWD_POTENTIAL)->select(['id', 'guid'])->get();
-            foreach ($releases as $release) {
-                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
-                $passwordDeleted++;
-            }
-        }
-
         if ((int) $this->crossPostTime !== 0) {
             // Cross posted releases.
             $releases = Release::query()->where('adddate', '>', now()->subHours($this->crossPostTime))->havingRaw('COUNT(name) > 1')->groupBy('name')->select(['id', 'guid'])->get();

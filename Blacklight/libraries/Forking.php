@@ -702,7 +702,7 @@ class Forking
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
-					AND r.passwordstatus BETWEEN -6 AND -1
+					AND r.passwordstatus = -1
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s

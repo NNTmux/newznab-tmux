@@ -19,9 +19,7 @@ class Releases extends Release
 {
     // RAR/ZIP Passworded indicator.
     public const PASSWD_NONE = 0; // No password.
-    public const PASSWD_POTENTIAL = 1; // Might have a password.
-    public const BAD_FILE = 2; // Possibly broken RAR/ZIP.
-    public const PASSWD_RAR = 10; // Definitely passworded.
+    public const PASSWD_RAR = 1; // Definitely passworded.
 
     /**
      * @var \Blacklight\SphinxSearch
@@ -171,17 +169,13 @@ class Releases extends Release
     public function showPasswords(): ?string
     {
         $show = (int) Settings::settingValue('..showpasswordedrelease');
-        $setting = $show ?? 10;
+        $setting = $show ?? 1;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
                     return '= '.self::PASSWD_NONE;
-            case 1: // Show releases with no password or a potential password (Show unprocessed releases).
 
-                    return '<= '.self::PASSWD_POTENTIAL;
-            case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
-                    return '<= '.self::PASSWD_NONE;
-            case 10: // Shows everything.
+            case 1: // Shows everything.
             default:
                     return '<= '.self::PASSWD_RAR;
         }

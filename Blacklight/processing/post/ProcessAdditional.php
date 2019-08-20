@@ -626,7 +626,7 @@ class ProcessAdditional
     {
         $releasesQuery = Release::query()
             ->where('releases.nzbstatus', '=', 1)
-            ->whereBetween('releases.passwordstatus', [-6, -1])
+            ->where('releases.passwordstatus', '=', -1)
             ->where('releases.haspreview', '=', -1)
             ->where('categories.disablepreview', '=', 0);
         if ($this->_maxSize > 0) {
@@ -774,7 +774,9 @@ class ProcessAdditional
     /**
      * Create a temporary storage folder for the current release.
      *
+     *
      * @return bool
+     * @throws \Exception
      */
     protected function _createTempFolder(): bool
     {
@@ -784,7 +786,7 @@ class ProcessAdditional
             if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
 
-                return $this->_decrementPasswordStatus();
+                return $this->_deleteRelease();
             }
         }
 
@@ -803,14 +805,14 @@ class ProcessAdditional
         if ($nzbPath === false) {
             $this->_echo('NZB not found for GUID: '.$this->_release->guid, 'warning');
 
-            $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
 
         $nzbContents = Utility::unzipGzipFile($nzbPath);
         if (! $nzbContents) {
             $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid, 'warning');
 
-            $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
 
         // Get a list of files in the nzb.
@@ -818,24 +820,12 @@ class ProcessAdditional
         if (\count($this->_nzbContents) === 0) {
             $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid, 'warning');
 
-            $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
         // Sort keys.
         ksort($this->_nzbContents, SORT_NATURAL);
 
         return true;
-    }
-
-    /**
-     * Decrement password status for the current release.
-     *
-     * @return false
-     */
-    protected function _decrementPasswordStatus(): bool
-    {
-        Release::whereId($this->_release->id)->decrement('passwordstatus');
-
-        return false;
     }
 
     /**
@@ -1157,7 +1147,7 @@ class ProcessAdditional
 
                 if ($this->_innerFileBlacklist !== false && preg_match($this->_innerFileBlacklist, $file['name'])) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = [Releases::PASSWD_POTENTIAL];
+                    $this->_passwordStatus = [Releases::PASSWD_RAR];
                     break;
                 }
 
@@ -1230,7 +1220,7 @@ class ProcessAdditional
                             $this->_debug('Codec spam found, setting release to potentially passworded.');
                         }
                         $this->_releaseHasPassword = true;
-                        $this->_passwordStatus = [Releases::PASSWD_POTENTIAL];
+                        $this->_passwordStatus = [Releases::PASSWD_RAR];
                     } //Run a PreDB filename check on insert to try and match the release
                     elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
                         $this->_release['filename'] = $file['name'];
