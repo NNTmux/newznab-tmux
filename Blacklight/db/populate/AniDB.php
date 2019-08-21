@@ -261,7 +261,7 @@ class AniDB
         $check = $this->checkDuplicateDbEntry($id, $type, $lang, $title);
 
         if ($check === false) {
-            AnidbTitle::insertIgnore(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title]);
+            AnidbTitle::insertOrIgnore(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title]);
         } else {
             $this->colorCli->warning("Duplicate: $id");
         }
@@ -310,7 +310,7 @@ class AniDB
     {
         if (! empty($episodeArr)) {
             foreach ($episodeArr as $episode) {
-                AnidbEpisode::insertIgnore(
+                AnidbEpisode::insertOrIgnore(
                     [
                         'anidbid' => $anidbId,
                         'episodeid' => $episode['episode_id'],

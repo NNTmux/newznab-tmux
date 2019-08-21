@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Blacklight\SphinxSearch;
 use Illuminate\Support\Carbon;
-use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,7 +29,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ReleaseFile extends Model
 {
-    use InsertOnDuplicateKey;
     /**
      * @var bool
      */
@@ -129,7 +127,7 @@ class ReleaseFile extends Model
 
         if ($duplicateCheck === null && $releaseCheck !== null) {
             try {
-                $insert = self::insertOnDuplicateKey([
+                $insert = self::insertOrIgnore([
                         'releases_id' => $id,
                         'name' => $name,
                         'size' => $size,
@@ -137,13 +135,13 @@ class ReleaseFile extends Model
                         'updated_at' => now()->timestamp,
                         'passworded' => $hasPassword,
                         'crc32' => $crc,
-                    ], ['updated_at' => now()->timestamp]);
+                    ]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());
             }
 
             if (\strlen($hash) === 32) {
-                ParHash::insertIgnore(['releases_id' => $id, 'hash' => $hash]);
+                ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
             (new SphinxSearch())->updateRelease($id);
         }

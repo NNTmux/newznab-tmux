@@ -540,7 +540,7 @@ class ProcessReleases
                     }, 10);
 
                     // Add the id of regex that matched the collection and release name to release_regexes table
-                    ReleaseRegex::insertIgnore([
+                    ReleaseRegex::insertOrIgnore([
                         'releases_id'            => $releaseID,
                         'collection_regex_id'    => $collection->collection_regexes_id,
                         'naming_regex_id'        => $cleanedName['id'] ?? 0,
