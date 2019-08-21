@@ -1,4 +1,5 @@
 2019-08-21 DariusIII
+	* Chg: Update barryvdh/laravel-debugbar (v3.2.4 => v3.2.5)
 	* Chg: Handle bad releases and update passworded in PPA class
 	* Chg: Remove yadakhov/insertonduplicatekey library
 	* Chg: Use the new insertOrIgnore function in place of insertIgnore from yadakhov/InsertOnDuplicateKey library
