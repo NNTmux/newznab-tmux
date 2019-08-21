@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0bd9521e4ebcd3b3d9969024ea5941f7",
+    "content-hash": "1127b534cc1c776700ab90f48266c870",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -8476,51 +8476,6 @@
             "time": "2019-03-16T05:53:42+00:00"
         },
         {
-            "name": "yadakhov/insert-on-duplicate-key",
-            "version": "v1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/yadakhov/insert-on-duplicate-key.git",
-                "reference": "13962f769aed9887138bc7e78fd4aac97a7ebf9c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/yadakhov/insert-on-duplicate-key/zipball/13962f769aed9887138bc7e78fd4aac97a7ebf9c",
-                "reference": "13962f769aed9887138bc7e78fd4aac97a7ebf9c",
-                "shasum": ""
-            },
-            "require-dev": {
-                "illuminate/database": "^5.1",
-                "phpunit/dbunit": "^2.0",
-                "phpunit/phpunit": "~5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Yadakhov\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Yada Khov",
-                    "email": "yada.khov@gmail.com",
-                    "homepage": "https://github.com/yadakhov"
-                }
-            ],
-            "description": "A trait for MySQL INSERT ON DUPLICATE KEY UPDATE.",
-            "homepage": "https://github.com/yadakhov/insert-on-duplicate-key",
-            "keywords": [
-                "database",
-                "eloquent",
-                "mysql"
-            ],
-            "time": "2017-04-27T16:19:41+00:00"
-        },
-        {
             "name": "ytake/laravel-smarty",
             "version": "2.5.0",
             "source": {
@@ -11635,16 +11590,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.14",
+            "version": "7.5.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "2834789aeb9ac182ad69bfdf9ae91856a59945ff"
+                "reference": "d79c053d972856b8b941bb233e39dc521a5093f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2834789aeb9ac182ad69bfdf9ae91856a59945ff",
-                "reference": "2834789aeb9ac182ad69bfdf9ae91856a59945ff",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d79c053d972856b8b941bb233e39dc521a5093f0",
+                "reference": "d79c053d972856b8b941bb233e39dc521a5093f0",
                 "shasum": ""
             },
             "require": {
@@ -11704,8 +11659,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
-                    "role": "lead"
+                    "role": "lead",
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "The PHP Unit Testing framework.",
@@ -11715,7 +11670,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-07-15T06:24:08+00:00"
+            "time": "2019-08-21T07:05:16+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

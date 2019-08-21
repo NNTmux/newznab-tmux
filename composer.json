@@ -153,7 +153,6 @@
     "watson/rememberable": "^2.0",
     "wildbit/swiftmailer-postmark": "^3.0",
     "yab/laravel-scout-mysql-driver": "^2.1",
-    "yadakhov/insert-on-duplicate-key": "^1.2",
     "ytake/laravel-smarty": "^2.5"
   },
 
