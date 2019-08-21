@@ -2336,11 +2336,11 @@ class ProcessAdditional
 
     protected function _removeBadReleases(): void
     {
-       $releases = Release::query()->where('passwordstatus', '=', -2)->get();
+        $releases = Release::query()->where('passwordstatus', '=', -2)->get();
 
         foreach ($releases as $release) {
             $release->delete();
-       }
+        }
     }
 
     protected function _updatePassworded(): void
@@ -2349,7 +2349,6 @@ class ProcessAdditional
 
         foreach ($passReleases as $passRelease) {
             Release::whereId($passRelease->releases_id)->update(['passwordstatus' => 1]);
-
         }
     }
 }
