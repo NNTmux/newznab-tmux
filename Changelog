@@ -1,3 +1,5 @@
+2019-08-21 DariusIII
+	* Chg: Update laravel/framework and laravel/horizon to latest versions
 2019-08-20 DariusIII
 	* Chg: Adjust site settings for passwordstatus changes
 	* Chg: Change used passwordstatus for releases
