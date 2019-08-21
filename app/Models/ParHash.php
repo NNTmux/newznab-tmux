@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ParHash extends Model
 {
-
     /**
      * @var bool
      */

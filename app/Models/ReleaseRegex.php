@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ReleaseRegex extends Model
 {
-
     /**
      * @var bool
      */

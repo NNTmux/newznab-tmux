@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class AnidbTitle extends Model
 {
-
     /**
      * @var string
      */

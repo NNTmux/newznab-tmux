@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class VideoAlias extends Model
 {
-
     protected $table = 'videos_aliases';
     /**
      * @var bool
