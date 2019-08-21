@@ -46,6 +46,5 @@ class NntmuxRemoveBadReleases extends Command
         foreach ($passReleases as $passRelease) {
             Release::whereId($passRelease->releases_id)->update(['passwordstatus' => 1]);
         }
-
     }
 }
