@@ -1226,7 +1226,6 @@ class ProcessAdditional
                 }
             }
         }
-        $this->_updatePassworded();
     }
 
     /**
@@ -1621,7 +1620,6 @@ class ProcessAdditional
         }
 
         Release::fromQuery($query);
-        $this->_removeBadReleases();
     }
 
     /**
@@ -2332,23 +2330,5 @@ class ProcessAdditional
     protected function _debug($string): void
     {
         $this->_echo('DEBUG: '.$string, 'debug');
-    }
-
-    protected function _removeBadReleases(): void
-    {
-        $releases = Release::query()->where('passwordstatus', '=', -2)->get();
-
-        foreach ($releases as $release) {
-            $release->delete();
-        }
-    }
-
-    protected function _updatePassworded(): void
-    {
-        $passReleases = ReleaseFile::query()->where('passworded', '=', 1)->groupBy('releases_id')->get();
-
-        foreach ($passReleases as $passRelease) {
-            Release::whereId($passRelease->releases_id)->update(['passwordstatus' => 1]);
-        }
     }
 }
