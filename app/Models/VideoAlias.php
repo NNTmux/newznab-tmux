@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class VideoAlias extends Model
 {
-    use InsertOnDuplicateKey;
 
     protected $table = 'videos_aliases';
     /**
