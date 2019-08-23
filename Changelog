@@ -1,3 +1,5 @@
+2019-08-23 DariusIII
+	* Chg: Update barryvdh/laravel-debugbar (v3.2.5 => v3.2.6)
 2019-08-22 DariusIII
 	* Chg: Use config values in Tmux classes
 2019-08-21 DariusIII
