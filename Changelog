@@ -1,3 +1,5 @@
+2019-08-24 DariusIII
+	* Chg: Update used components
 2019-08-23 DariusIII
 	* Chg: Update font-awesome to latest version
 	* Chg: Update barryvdh/laravel-debugbar (v3.2.5 => v3.2.6)
