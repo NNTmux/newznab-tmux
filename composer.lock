@@ -8162,16 +8162,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.6.1",
+            "version": "4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "afc52b7ab6646744b370d3d45bbc5d622829c02f"
+                "reference": "c3f5ad78b200de18393cf90215e7c2751bf78706"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/afc52b7ab6646744b370d3d45bbc5d622829c02f",
-                "reference": "afc52b7ab6646744b370d3d45bbc5d622829c02f",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/c3f5ad78b200de18393cf90215e7c2751bf78706",
+                "reference": "c3f5ad78b200de18393cf90215e7c2751bf78706",
                 "shasum": ""
             },
             "require": {
@@ -8199,15 +8199,15 @@
             ],
             "authors": [
                 {
-                    "name": "Lars Moelleken",
-                    "homepage": "http://www.moelleken.org/",
-                    "role": "Developer"
+                    "name": "dimabdc",
+                    "role": "Developer",
+                    "email": "support@titor.ru",
+                    "homepage": "http://github.com/dimabdc"
                 },
                 {
-                    "name": "dimabdc",
-                    "email": "support@titor.ru",
-                    "homepage": "http://github.com/dimabdc",
-                    "role": "Developer"
+                    "name": "Lars Moelleken",
+                    "role": "Developer",
+                    "homepage": "http://www.moelleken.org/"
                 }
             ],
             "description": "Simple HTML DOM package.",
@@ -8217,7 +8217,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-07-19T00:06:42+00:00"
+            "time": "2019-08-27T00:07:55+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
