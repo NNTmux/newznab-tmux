@@ -5,8 +5,8 @@ namespace App\Models;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Conner\Tagging\Taggable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -129,7 +129,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Release extends Model
 {
-    use Rememberable, Taggable;
+    use Taggable;
 
     /**
      * @var bool
@@ -382,8 +382,12 @@ class Release extends Model
      */
     public static function getTopDownloads()
     {
-        return self::query()
-            ->remember(config('nntmux.cache_expiry_long'))
+       $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+       $releases = Cache::get(md5('topDownloads'));
+       if ($releases !== null) {
+           return $releases;
+       }
+        $releases = self::query()
             ->where('grabs', '>', 0)
             ->select(['id', 'searchname', 'guid', 'adddate'])
             ->selectRaw('SUM(grabs) as grabs')
@@ -392,6 +396,10 @@ class Release extends Model
             ->orderBy('grabs', 'desc')
             ->limit(10)
             ->get();
+
+       Cache::put(md5('topDownloads'), $releases, $expiresAt);
+
+       return $releases;
     }
 
     /**
@@ -399,8 +407,12 @@ class Release extends Model
      */
     public static function getTopComments()
     {
-        return self::query()
-            ->remember(config('nntmux.cache_expiry_long'))
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $releases = Cache::get(md5('topComments'));
+        if ($releases !== null) {
+            return $releases;
+        }
+        $releases = self::query()
             ->where('comments', '>', 0)
             ->select(['id', 'guid', 'searchname'])
             ->selectRaw('SUM(comments) AS comments')
@@ -409,20 +421,34 @@ class Release extends Model
             ->orderBy('comments', 'desc')
             ->limit(10)
             ->get();
+
+        Cache::put(md5('topComments'), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
      * @return array
      */
-    public static function getReleases(): array
+    public static function getReleases()
     {
-        return self::query()
-            ->remember(config('nntmux.cache_expiry_long'))
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $releases = Cache::get(md5('releases'));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases =  self::query()
+
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
+
+        Cache::put(md5('releases'), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -433,8 +459,13 @@ class Release extends Model
      */
     public static function getReleasesRange()
     {
-        return self::query()
-           ->remember(config('nntmux.cache_expiry_medium'))
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $releases = Cache::get(md5('releasesRange'));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = self::query()
            ->where('nzbstatus', '=', NZB::NZB_ADDED)
            ->select(
                 [
@@ -456,6 +487,10 @@ class Release extends Model
             ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->orderByDesc('releases.postdate')
             ->paginate(config('nntmux.items_per_page'));
+
+        Cache::put(md5('releasesRange'), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**

@@ -6,8 +6,8 @@ use Blacklight\ColorCLI;
 use Illuminate\Support\Arr;
 use Blacklight\ConsoleTools;
 use Blacklight\SphinxSearch;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Scout\Searchable;
-use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -48,7 +48,6 @@ use Illuminate\Database\Eloquent\Model;
 class Predb extends Model
 {
     use Searchable;
-    use Rememberable;
 
     // Nuke status.
     public const PRE_NONUKE = 0; // Pre is not nuked.
@@ -181,14 +180,21 @@ class Predb extends Model
      */
     public static function getAll($search = '')
     {
-        $sql = self::query()->remember(config('nntmux.cache_expiry_medium'))->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $predb = Cache::get(md5($search));
+        if ($predb !== null) {
+            return $predb;
+        }
+        $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if (! empty($search)) {
             $sphinx = new SphinxSearch();
             $ids = Arr::pluck($sphinx->searchIndexes('predb_rt', $search, ['title']), 'id');
             $sql->whereIn('predb.id', $ids);
         }
 
-        return $sql->paginate(config('nntmux.items_per_page'));
+        $predb = $sql->paginate(config('nntmux.items_per_page'));
+        Cache::put(md5($search), $predb, $expiresAt);
+        return $predb;
     }
 
     /**
