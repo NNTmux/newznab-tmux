@@ -23,7 +23,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * App\Models\User.
- * 
+ *
  * App\Models\User.
  *
  * @property int $id

@@ -6,7 +6,7 @@ use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\RootCategory
+ * App\Models\RootCategory.
  *
  * @property int $id
  * @property string $title
