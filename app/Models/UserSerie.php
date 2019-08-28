@@ -21,6 +21,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUsersId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereVideosId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie query()
  */
 class UserSerie extends Model
 {

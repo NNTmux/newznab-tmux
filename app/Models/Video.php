@@ -37,6 +37,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvrage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereType($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video query()
  */
 class Video extends Model
 {

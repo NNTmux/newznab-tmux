@@ -34,6 +34,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing whereStartPosition($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing whereUsername($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing query()
  */
 class Sharing extends Model
 {

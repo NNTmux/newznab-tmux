@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereUsersId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload query()
  */
 class UserDownload extends Model
 {

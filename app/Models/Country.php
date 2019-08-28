@@ -44,6 +44,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Country whereRegionCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Country whereSubRegionCode($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Country newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Country newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Country query()
  */
 class Country extends Model
 {

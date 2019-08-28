@@ -22,6 +22,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite whereSiteGuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite whereSiteName($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite query()
  */
 class SharingSite extends Model
 {

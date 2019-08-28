@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereNfo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereReleasesId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo query()
  */
 class ReleaseNfo extends Model
 {

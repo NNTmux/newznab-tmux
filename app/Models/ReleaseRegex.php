@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseRegex whereNamingRegexId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseRegex whereReleasesId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseRegex newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseRegex newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseRegex query()
  */
 class ReleaseRegex extends Model
 {

@@ -26,6 +26,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string $crc32
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereCrc32($value)
  */
 class ReleaseFile extends Model
 {

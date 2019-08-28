@@ -44,6 +44,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereTitle($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb query()
  */
 class Predb extends Model
 {

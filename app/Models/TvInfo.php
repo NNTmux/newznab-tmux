@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereSummary($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereVideosId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo query()
  */
 class TvInfo extends Model
 {

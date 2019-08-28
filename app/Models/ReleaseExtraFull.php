@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull whereMediainfo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull whereReleasesId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull query()
  */
 class ReleaseExtraFull extends Model
 {

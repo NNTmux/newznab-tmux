@@ -37,6 +37,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo whereUrl($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo query()
  */
 class ConsoleInfo extends Model
 {

@@ -40,6 +40,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereYear($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo query()
  */
 class MusicInfo extends Model
 {

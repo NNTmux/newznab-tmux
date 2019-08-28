@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereType($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle query()
  */
 class AnidbTitle extends Model
 {

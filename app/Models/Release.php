@@ -126,6 +126,19 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideostatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereXxxinfoId($value)
  * @mixin \Eloquent
+ * @property int|null $movieinfo_id FK to movieinfo.id
+ * @property int $proc_crc32 Has the release been crc32 processed
+ * @property mixed $tag_names
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Tagged[] $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Conner\Tagging\Model\Tagged[] $tagged
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereMovieinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcCrc32($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release withAllTags($tagNames)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release withAnyTag($tagNames)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release withoutTags($tagNames)
  */
 class Release extends Model
 {

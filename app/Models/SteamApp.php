@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp whereAppid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp whereName($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp query()
  */
 class SteamApp extends Model
 {

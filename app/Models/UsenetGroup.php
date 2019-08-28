@@ -41,6 +41,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinsizetoformrelease($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereName($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup query()
  */
 class UsenetGroup extends Model
 {

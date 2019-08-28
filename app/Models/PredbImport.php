@@ -36,6 +36,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereTitle($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport query()
  */
 class PredbImport extends Model
 {

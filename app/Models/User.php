@@ -23,6 +23,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * App\Models\User.
+ * 
  * App\Models\User.
  *
  * @property int $id
@@ -116,6 +117,27 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerified($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiToken($value)
  * @mixin \Eloquent
+ * @property int $roles_id FK to roles.id
+ * @property string $api_token
+ * @property int $rate_limit
+ * @property string|null $email_verified_at
+ * @property int $verified
+ * @property string|null $verification_token
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationPending
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationSuccess
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitations
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions
+ * @property-read \Spatie\Permission\Models\Role $role
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User permission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User role($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRateLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRolesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerificationToken($value)
  */
 class User extends Authenticatable
 {

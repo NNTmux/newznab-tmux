@@ -29,6 +29,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereTitle($value)
  * @mixin \Eloquent
+ * @property int|null $root_categories_id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereRootCategoriesId($value)
  */
 class Category extends Model
 {

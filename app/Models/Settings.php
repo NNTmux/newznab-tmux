@@ -40,6 +40,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSubsection($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereValue($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings query()
  */
 class Settings extends Model
 {
