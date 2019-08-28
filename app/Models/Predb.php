@@ -6,8 +6,8 @@ use Blacklight\ColorCLI;
 use Illuminate\Support\Arr;
 use Blacklight\ConsoleTools;
 use Blacklight\SphinxSearch;
-use Illuminate\Support\Facades\Cache;
 use Laravel\Scout\Searchable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -194,6 +194,7 @@ class Predb extends Model
 
         $predb = $sql->paginate(config('nntmux.items_per_page'));
         Cache::put(md5($search), $predb, $expiresAt);
+
         return $predb;
     }
 

@@ -5,8 +5,8 @@ namespace App\Models;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Conner\Tagging\Taggable;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -382,11 +382,11 @@ class Release extends Model
      */
     public static function getTopDownloads()
     {
-       $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-       $releases = Cache::get(md5('topDownloads'));
-       if ($releases !== null) {
-           return $releases;
-       }
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $releases = Cache::get(md5('topDownloads'));
+        if ($releases !== null) {
+            return $releases;
+        }
         $releases = self::query()
             ->where('grabs', '>', 0)
             ->select(['id', 'searchname', 'guid', 'adddate'])
@@ -397,9 +397,9 @@ class Release extends Model
             ->limit(10)
             ->get();
 
-       Cache::put(md5('topDownloads'), $releases, $expiresAt);
+        Cache::put(md5('topDownloads'), $releases, $expiresAt);
 
-       return $releases;
+        return $releases;
     }
 
     /**
@@ -438,7 +438,7 @@ class Release extends Model
             return $releases;
         }
 
-        $releases =  self::query()
+        $releases = self::query()
 
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
