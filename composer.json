@@ -106,7 +106,7 @@
     "dborsatto/php-giantbomb": "^1.0",
     "dirape/token": "^2.1",
     "doctrine/dbal": "^2.7",
-    "fideloper/proxy": "~4.0",
+    "fideloper/proxy": "^4.2",
     "foolz/sphinxql-query-builder": "^2.0",
     "genealabs/laravel-caffeine": "^0.8.1",
     "geoip2/geoip2": "^2.9",
