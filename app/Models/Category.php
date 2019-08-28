@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -32,7 +32,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Category extends Model
 {
-
     /**
      * Category constants.
      * Do NOT use the values, as they may change, always use the constant - that's what it's for.
