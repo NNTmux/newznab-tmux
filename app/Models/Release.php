@@ -459,18 +459,6 @@ class Release extends Model
     }
 
     /**
-     * Get count for admin release list page.
-     *
-     * @return int
-     */
-    public static function getReleasesCount(): int
-    {
-        $res = self::query()->remember(config('nntmux.cache_expiry_medium'))->count(['id']);
-
-        return $res ?? 0;
-    }
-
-    /**
      * @param $guid
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection|null|static|static[]
      */
