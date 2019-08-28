@@ -428,7 +428,7 @@ class Release extends Model
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
      */
     public static function getReleases()
     {
