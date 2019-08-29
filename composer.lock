@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "767fd6ea2394f1dba6da85260d06a62d",
+    "content-hash": "29f1fcd6dbeb997aa1485459d135e039",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -50,16 +50,16 @@
         },
         {
             "name": "alchemy/binary-driver",
-            "version": "v2.0.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alchemy-fr/BinaryDriver.git",
-                "reference": "6ccde0e19e81e54da77b08da1a176d43e089f3a3"
+                "reference": "ae5abc1d51683f30494db76b688754683da87774"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alchemy-fr/BinaryDriver/zipball/6ccde0e19e81e54da77b08da1a176d43e089f3a3",
-                "reference": "6ccde0e19e81e54da77b08da1a176d43e089f3a3",
+                "url": "https://api.github.com/repos/alchemy-fr/BinaryDriver/zipball/ae5abc1d51683f30494db76b688754683da87774",
+                "reference": "ae5abc1d51683f30494db76b688754683da87774",
                 "shasum": ""
             },
             "require": {
@@ -99,9 +99,9 @@
                 },
                 {
                     "name": "Jens Hausdorf",
+                    "role": "Maintainer",
                     "email": "mail@jens-hausdorf.de",
-                    "homepage": "https://jens-hausdorf.de",
-                    "role": "Maintainer"
+                    "homepage": "https://jens-hausdorf.de"
                 }
             ],
             "description": "A set of tools to build binary drivers",
@@ -109,7 +109,7 @@
                 "binary",
                 "driver"
             ],
-            "time": "2018-08-06T10:18:33+00:00"
+            "time": "2019-05-19T08:43:30+00:00"
         },
         {
             "name": "anhskohbo/no-captcha",
@@ -4400,22 +4400,22 @@
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",
-            "version": "v0.13",
+            "version": "v0.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-FFMpeg/PHP-FFMpeg.git",
-                "reference": "c11b79ab5b0174aa1a56c54c67491169e78a4c17"
+                "reference": "f9cc3d0c429fade5a144db674272eb8b48db8dce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-FFMpeg/PHP-FFMpeg/zipball/c11b79ab5b0174aa1a56c54c67491169e78a4c17",
-                "reference": "c11b79ab5b0174aa1a56c54c67491169e78a4c17",
+                "url": "https://api.github.com/repos/PHP-FFMpeg/PHP-FFMpeg/zipball/f9cc3d0c429fade5a144db674272eb8b48db8dce",
+                "reference": "f9cc3d0c429fade5a144db674272eb8b48db8dce",
                 "shasum": ""
             },
             "require": {
-                "alchemy/binary-driver": "^1.5 || ~2.0.0",
+                "alchemy/binary-driver": "^1.5 || ~2.0.0 || ^5.0",
                 "doctrine/cache": "^1.0",
-                "evenement/evenement": "^2.0 || ^1.0",
+                "evenement/evenement": "^3.0 || ^2.0 || ^1.0",
                 "neutron/temporary-filesystem": "^2.1.1",
                 "php": "^5.3.9 || ^7.0"
             },
@@ -4480,7 +4480,7 @@
                 "video",
                 "video processing"
             ],
-            "time": "2018-08-06T20:02:43+00:00"
+            "time": "2019-02-26T17:04:09+00:00"
         },
         {
             "name": "php-http/guzzle6-adapter",
