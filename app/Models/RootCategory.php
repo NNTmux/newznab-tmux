@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -28,7 +27,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class RootCategory extends Model
 {
-    use Rememberable;
 
     protected $guarded = [];
 

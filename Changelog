@@ -1,4 +1,5 @@
 2019-08-29 DariusIII
+	* Chg: Remove watson/rememberable from composer.json
 	* Chg: Remove getConcatenatedCategoryIDs function
 	* Chg: Remove rest of the rememberable trait usages
 2019-08-28 DariusIII

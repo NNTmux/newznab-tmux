@@ -150,7 +150,6 @@
     "vlucas/phpdotenv": "^3.3",
     "voku/simple_html_dom": "^4.3",
     "wandersonwhcr/illuminate-romans": "^1.0",
-    "watson/rememberable": "^2.0",
     "wildbit/swiftmailer-postmark": "^3.0",
     "yab/laravel-scout-mysql-driver": "^2.1",
     "ytake/laravel-smarty": "^2.5"
