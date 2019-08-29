@@ -27,7 +27,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class RootCategory extends Model
 {
-
     protected $guarded = [];
 
     /**
