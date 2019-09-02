@@ -476,16 +476,16 @@
         },
         {
             "name": "composer/ca-bundle",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/ca-bundle.git",
-                "reference": "f26a67e397be0e5c00d7c52ec7b5010098e15ce5"
+                "reference": "10bb96592168a0f8e8f6dcde3532d9fa50b0b527"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/f26a67e397be0e5c00d7c52ec7b5010098e15ce5",
-                "reference": "f26a67e397be0e5c00d7c52ec7b5010098e15ce5",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/10bb96592168a0f8e8f6dcde3532d9fa50b0b527",
+                "reference": "10bb96592168a0f8e8f6dcde3532d9fa50b0b527",
                 "shasum": ""
             },
             "require": {
@@ -528,7 +528,7 @@
                 "ssl",
                 "tls"
             ],
-            "time": "2019-08-02T09:05:43+00:00"
+            "time": "2019-08-30T08:44:50+00:00"
         },
         {
             "name": "czproject/git-php",
@@ -3788,16 +3788,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.23.1",
+            "version": "2.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "767617a047e5b8b8b3b0b6023a2650847ed7df02"
+                "reference": "934459c5ac0658bc765ad1e53512c7c77adcac29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/767617a047e5b8b8b3b0b6023a2650847ed7df02",
-                "reference": "767617a047e5b8b8b3b0b6023a2650847ed7df02",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/934459c5ac0658bc765ad1e53512c7c77adcac29",
+                "reference": "934459c5ac0658bc765ad1e53512c7c77adcac29",
                 "shasum": ""
             },
             "require": {
@@ -3851,7 +3851,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-08-17T13:57:34+00:00"
+            "time": "2019-08-31T16:37:55+00:00"
         },
         {
             "name": "neutron/temporary-filesystem",
@@ -3895,16 +3895,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.2.3",
+            "version": "v4.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "e612609022e935f3d0337c1295176505b41188c8"
+                "reference": "97e59c7a16464196a8b9c77c47df68e4a39a45c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/e612609022e935f3d0337c1295176505b41188c8",
-                "reference": "e612609022e935f3d0337c1295176505b41188c8",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/97e59c7a16464196a8b9c77c47df68e4a39a45c4",
+                "reference": "97e59c7a16464196a8b9c77c47df68e4a39a45c4",
                 "shasum": ""
             },
             "require": {
@@ -3942,7 +3942,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2019-08-12T20:17:41+00:00"
+            "time": "2019-09-01T07:51:21+00:00"
         },
         {
             "name": "opis/closure",
@@ -5973,16 +5973,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.37.0",
+            "version": "2.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "81dbe9d372d70c255b66a2727a235076509f8d45"
+                "reference": "674ad54a0ba95d8ad26990aa250b5c9d9b165e15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/81dbe9d372d70c255b66a2727a235076509f8d45",
-                "reference": "81dbe9d372d70c255b66a2727a235076509f8d45",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/674ad54a0ba95d8ad26990aa250b5c9d9b165e15",
+                "reference": "674ad54a0ba95d8ad26990aa250b5c9d9b165e15",
                 "shasum": ""
             },
             "require": {
@@ -6025,16 +6025,19 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Permission handling for Laravel 5.4 and up",
+            "description": "Permission handling for Laravel 5.4 to 5.8",
             "homepage": "https://github.com/spatie/laravel-permission",
             "keywords": [
                 "acl",
                 "laravel",
                 "permission",
+                "permissions",
+                "rbac",
+                "roles",
                 "security",
                 "spatie"
             ],
-            "time": "2019-04-09T12:45:17+00:00"
+            "time": "2019-09-02T17:12:21+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -8167,16 +8170,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.0",
+            "version": "4.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "c3f5ad78b200de18393cf90215e7c2751bf78706"
+                "reference": "236b5094cd3989ff4fb7f8ff167ba1617635762e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/c3f5ad78b200de18393cf90215e7c2751bf78706",
-                "reference": "c3f5ad78b200de18393cf90215e7c2751bf78706",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/236b5094cd3989ff4fb7f8ff167ba1617635762e",
+                "reference": "236b5094cd3989ff4fb7f8ff167ba1617635762e",
                 "shasum": ""
             },
             "require": {
@@ -8205,14 +8208,14 @@
             "authors": [
                 {
                     "name": "dimabdc",
-                    "role": "Developer",
                     "email": "support@titor.ru",
-                    "homepage": "http://github.com/dimabdc"
+                    "homepage": "http://github.com/dimabdc",
+                    "role": "Developer"
                 },
                 {
                     "name": "Lars Moelleken",
-                    "role": "Developer",
-                    "homepage": "http://www.moelleken.org/"
+                    "homepage": "http://www.moelleken.org/",
+                    "role": "Developer"
                 }
             ],
             "description": "Simple HTML DOM package.",
@@ -8222,7 +8225,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-08-27T00:07:55+00:00"
+            "time": "2019-08-30T21:49:01+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
@@ -9315,16 +9318,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.15.2",
+            "version": "v2.15.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "c9d30fddfa3feb8b82663104864224f2ce7a3675"
+                "reference": "705490b0f282f21017d73561e9498d2b622ee34c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/c9d30fddfa3feb8b82663104864224f2ce7a3675",
-                "reference": "c9d30fddfa3feb8b82663104864224f2ce7a3675",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/705490b0f282f21017d73561e9498d2b622ee34c",
+                "reference": "705490b0f282f21017d73561e9498d2b622ee34c",
                 "shasum": ""
             },
             "require": {
@@ -9354,9 +9357,10 @@
                 "php-cs-fixer/accessible-object": "^1.0",
                 "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.1",
                 "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.1",
-                "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1",
+                "phpunit/phpunit": "^5.7.27 || ^6.5.14 || ^7.1",
                 "phpunitgoodpractices/traits": "^1.8",
-                "symfony/phpunit-bridge": "^4.3"
+                "symfony/phpunit-bridge": "^4.3",
+                "symfony/yaml": "^3.0 || ^4.0"
             },
             "suggest": {
                 "ext-mbstring": "For handling non-UTF8 characters in cache signature.",
@@ -9399,7 +9403,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2019-08-27T16:03:01+00:00"
+            "time": "2019-08-31T12:51:54+00:00"
         },
         {
             "name": "fzaninotto/faker",
