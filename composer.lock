@@ -5065,25 +5065,25 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.0.5",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "6f0dcd2978764efb0c149674ba56c98be8a03b0c"
+                "reference": "c36aa998d55bc2001535cb5bd3c33267af94ab71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/6f0dcd2978764efb0c149674ba56c98be8a03b0c",
-                "reference": "6f0dcd2978764efb0c149674ba56c98be8a03b0c",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/c36aa998d55bc2001535cb5bd3c33267af94ab71",
+                "reference": "c36aa998d55bc2001535cb5bd3c33267af94ab71",
                 "shasum": ""
             },
             "require": {
-                "illuminate/cache": ">=5.0,<5.9",
-                "illuminate/config": ">=5.0,<5.9",
-                "illuminate/console": ">=5.0,<5.9",
-                "illuminate/contracts": ">=5.0,<5.9",
-                "illuminate/support": ">=5.0,<5.9",
-                "illuminate/validation": ">=5.0,<5.9",
+                "illuminate/cache": "^5.5|^6.0",
+                "illuminate/config": "^5.5|^6.0",
+                "illuminate/console": "^5.5|^6.0",
+                "illuminate/contracts": "^5.5|^6.0",
+                "illuminate/support": "^5.5|^6.0",
+                "illuminate/validation": "^5.5|^6.0",
                 "php": ">=7.1"
             },
             "require-dev": {
@@ -5125,7 +5125,7 @@
                 "throwaway",
                 "validator"
             ],
-            "time": "2019-03-26T19:03:34+00:00"
+            "time": "2019-09-04T19:12:55+00:00"
         },
         {
             "name": "psr/container",
@@ -5842,26 +5842,26 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "1253427a9c65d18d1f4b3380f502761fce5548d7"
+                "reference": "120b9d78ed94f71963f78da461581669b5085ff3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/1253427a9c65d18d1f4b3380f502761fce5548d7",
-                "reference": "1253427a9c65d18d1f4b3380f502761fce5548d7",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/120b9d78ed94f71963f78da461581669b5085ff3",
+                "reference": "120b9d78ed94f71963f78da461581669b5085ff3",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "~5.8.0",
+                "illuminate/support": "~5.8.0|^6.0",
                 "nesbot/carbon": "^1.0|^2.0",
                 "php": "^7.2"
             },
             "require-dev": {
                 "mockery/mockery": "^1.1",
-                "orchestra/testbench": "~3.8.0",
+                "orchestra/testbench": "~3.8.0|^4.0",
                 "phpunit/phpunit": "^8.0"
             },
             "type": "library",
@@ -5901,7 +5901,7 @@
                 "laravel-directory-cleanup",
                 "spatie"
             ],
-            "time": "2019-02-27T22:24:38+00:00"
+            "time": "2019-09-04T19:00:48+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
