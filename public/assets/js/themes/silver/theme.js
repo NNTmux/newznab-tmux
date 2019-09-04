@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.14 (2019-08-19)
+ * Version: 5.0.15 (2019-09-02)
  */
 (function (domGlobals) {
     'use strict';
@@ -2847,8 +2847,8 @@
         var combined = tuples.length === 1 ? Result.value(tuples[0].handler()) : fuse$1(tuples, eventOrder, eventName);
         return combined.map(function (handler) {
           var assembled = assemble(handler);
-          var purpose = tuples.length > 1 ? filter(eventOrder, function (o) {
-            return contains(tuples, function (t) {
+          var purpose = tuples.length > 1 ? filter(eventOrder[eventName], function (o) {
+            return exists(tuples, function (t) {
               return t.name() === o;
             });
           }).join(' > ') : tuples[0].name();
@@ -5804,9 +5804,9 @@
       var uids = detail.partUids;
       var system = component.getSystem();
       each(partKeys, function (pk) {
-        r[pk] = system.getByUid(uids[pk]);
+        r[pk] = constant(system.getByUid(uids[pk]));
       });
-      return map$1(r, constant);
+      return r;
     };
     var getAllParts = function (component, detail) {
       var system = component.getSystem();
@@ -5822,9 +5822,9 @@
       var uids = detail.partUids;
       var system = component.getSystem();
       each(partKeys, function (pk) {
-        r[pk] = system.getByUid(uids[pk]).getOrDie();
+        r[pk] = constant(system.getByUid(uids[pk]).getOrDie());
       });
-      return map$1(r, constant);
+      return r;
     };
     var defaultUids = function (baseUid, partTypes) {
       var partNames = names(partTypes);
@@ -14400,6 +14400,7 @@
               memColorButton.getOpt(comp).each(function (colorButton) {
                 set$2(colorButton.element(), 'background-color', se.event().color());
               });
+              emitWith(comp, formChangeEvent, { name: spec.name });
             }),
             run(colorSwatchChangeEvent, function (comp, se) {
               FormField.getField(comp).each(function (field) {
@@ -21044,8 +21045,10 @@
       });
     };
     var getValidationHandler = function (editor) {
-      var validatorHandler = editor.settings.filepicker_validator_handler;
-      return isFunction(validatorHandler) ? Option.some(validatorHandler) : Option.none();
+      var optValidator = Option.from(editor.settings.file_picker_validator_handler).filter(isFunction);
+      return optValidator.orThunk(function () {
+        return Option.from(editor.settings.filepicker_validator_handler).filter(isFunction);
+      });
     };
     var UrlInputBackstage = function (editor) {
       return {
@@ -22217,7 +22220,11 @@
         return cell.get();
       };
       var readState = function () {
-        return cell.get().getOr('none');
+        return cell.get().fold(function () {
+          return 'none';
+        }, function (x) {
+          return x;
+        });
       };
       return {
         readState: readState,
@@ -23901,7 +23908,7 @@
       };
       var getViewportTop = function () {
         var isToolbarDocked = get$4(Element.fromDom(editor.getContainer()), 'position') === 'fixed';
-        return toolbarOrMenubarEnabled && isToolbarDocked ? editor.getContainer().getBoundingClientRect().bottom : 0;
+        return editor.inline && toolbarOrMenubarEnabled && isToolbarDocked ? editor.getContainer().getBoundingClientRect().bottom : 0;
       };
       var shouldContextToolbarHide = function () {
         var nodeBounds = lastElement.get().map(function (ele) {

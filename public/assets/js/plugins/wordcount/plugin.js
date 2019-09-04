@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.14 (2019-08-19)
+ * Version: 5.0.15 (2019-09-02)
  */
 (function () {
     'use strict';
@@ -417,10 +417,10 @@
     var updateCount = function (editor, api) {
       fireWordCountUpdate(editor, api);
     };
-    var setup = function (editor, api) {
+    var setup = function (editor, api, delay) {
       var debouncedUpdate = global$2.debounce(function () {
         return updateCount(editor, api);
-      }, 300);
+      }, delay);
       editor.on('init', function () {
         updateCount(editor, api);
         global$2.setEditorTimeout(editor, function () {
@@ -486,11 +486,14 @@
       });
     };
 
-    function Plugin () {
+    function Plugin (delay) {
+      if (delay === void 0) {
+        delay = 300;
+      }
       global.add('wordcount', function (editor) {
         var api = get(editor);
         register(editor, api);
-        setup(editor, api);
+        setup(editor, api, delay);
         return api;
       });
     }

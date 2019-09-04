@@ -12,7 +12,7 @@
     },
     "devDependencies": {
         "axios": "^0.19",
-        "cross-env": "^5.2.0",
+        "cross-env": "^5.2.1",
         "jquery": "^3.4.1",
         "laravel-mix": "^4.1.2",
         "laravel-mix-purgecss": "^4.1.0",
@@ -44,6 +44,6 @@
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0",
-        "tinymce": "^5.0.14"
+        "tinymce": "^5.0.15"
     }
 }

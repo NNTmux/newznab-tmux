@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.14 (2019-08-19)
+ * Version: 5.0.15 (2019-09-02)
  */
 (function (domGlobals) {
     'use strict';
@@ -449,7 +449,7 @@
           return global$3.resolve(true);
         } else {
           return new global$3(function (resolve, reject) {
-            var numRetries = 3;
+            var numRetries = 15;
             var interval = global$2.setInterval(function () {
               if (hasLoaded()) {
                 global$2.clearInterval(interval);
@@ -462,7 +462,7 @@
                   reject(false);
                 }
               }
-            }, 500);
+            }, 100);
           });
         }
       };

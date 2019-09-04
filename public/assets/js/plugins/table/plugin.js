@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.14 (2019-08-19)
+ * Version: 5.0.15 (2019-09-02)
  */
 (function (domGlobals) {
     'use strict';
@@ -73,9 +73,6 @@
       return function () {
         throw new Error(msg);
       };
-    };
-    var apply = function (f) {
-      return f();
     };
     var never = constant(false);
     var always = constant(true);
@@ -8491,6 +8488,18 @@
       isNavigation: isNavigation
     };
 
+    var toRaw = function (sr) {
+      return {
+        left: sr.left(),
+        top: sr.top(),
+        right: sr.right(),
+        bottom: sr.bottom(),
+        width: sr.width(),
+        height: sr.height()
+      };
+    };
+    var Rect = { toRaw: toRaw };
+
     var isSafari = PlatformDetection$1.detect().browser.isSafari();
     var get$b = function (_DOC) {
       var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
@@ -8513,9 +8522,7 @@
       };
       var getRangedRect = function (start, soffset, finish, foffset) {
         var sel = Selection.exact(start, soffset, finish, foffset);
-        return getFirstRect$1(win, sel).map(function (structRect) {
-          return map$1(structRect, apply);
-        });
+        return getFirstRect$1(win, sel).map(Rect.toRaw);
       };
       var getSelection = function () {
         return get$a(win).map(function (exactAdt) {
