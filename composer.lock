@@ -113,21 +113,21 @@
         },
         {
             "name": "anhskohbo/no-captcha",
-            "version": "3.0.4",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/anhskohbo/no-captcha.git",
-                "reference": "fd08c84bd0e05f4a048a9bba800ab64ada9fadfc"
+                "reference": "e76c17b64fdbcf9d32b58b1db12175a5966bae2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/fd08c84bd0e05f4a048a9bba800ab64ada9fadfc",
-                "reference": "fd08c84bd0e05f4a048a9bba800ab64ada9fadfc",
+                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/e76c17b64fdbcf9d32b58b1db12175a5966bae2d",
+                "reference": "e76c17b64fdbcf9d32b58b1db12175a5966bae2d",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
-                "illuminate/support": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*",
+                "illuminate/support": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*|6.0.*",
                 "php": ">=5.5.5"
             },
             "require-dev": {
@@ -165,10 +165,11 @@
                 "laravel",
                 "laravel4",
                 "laravel5",
+                "laravel6",
                 "no-captcha",
                 "recaptcha"
             ],
-            "time": "2019-02-25T10:51:21+00:00"
+            "time": "2019-08-27T02:13:31+00:00"
         },
         {
             "name": "b3rs3rk/steamfront",
@@ -2274,26 +2275,25 @@
         },
         {
             "name": "jenssegers/model",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/model.git",
-                "reference": "eedaeedc1977bb78f69dbb1c5893d0c994958790"
+                "reference": "b69c870e4f0728bd1b2a69fc9198648cd76b70f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jenssegers/model/zipball/eedaeedc1977bb78f69dbb1c5893d0c994958790",
-                "reference": "eedaeedc1977bb78f69dbb1c5893d0c994958790",
+                "url": "https://api.github.com/repos/jenssegers/model/zipball/b69c870e4f0728bd1b2a69fc9198648cd76b70f0",
+                "reference": "b69c870e4f0728bd1b2a69fc9198648cd76b70f0",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "^5.0",
-                "illuminate/support": "^4.0|^5.0",
-                "php": ">=5.4.0"
+                "illuminate/contracts": "5.0 - 6.0",
+                "illuminate/support": "4.0 - 6.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.0|^5.0",
-                "satooshi/php-coveralls": "^0.6"
+                "php-coveralls/php-coveralls": "*",
+                "phpunit/phpunit": "^4.0|^5.0"
             },
             "type": "library",
             "autoload": {
@@ -2318,7 +2318,7 @@
                 "laravel",
                 "model"
             ],
-            "time": "2018-07-21T14:41:19+00:00"
+            "time": "2019-09-05T04:39:23+00:00"
         },
         {
             "name": "jeremeamia/SuperClosure",
