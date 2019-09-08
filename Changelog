@@ -1,3 +1,5 @@
+2019-09-08 DariusIII
+	* Chg: Update used libraries to their latest versions
 2019-09-05 DariusIII
 	* Chg: Update laravelcollective/html
 	* Fix: Fix file icons in filelist

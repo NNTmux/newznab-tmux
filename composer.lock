@@ -3662,16 +3662,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.24.0",
+            "version": "1.25.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266"
+                "reference": "70e65a5470a42cfec1a7da00d30edb6e617e8dcf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
-                "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/70e65a5470a42cfec1a7da00d30edb6e617e8dcf",
+                "reference": "70e65a5470a42cfec1a7da00d30edb6e617e8dcf",
                 "shasum": ""
             },
             "require": {
@@ -3736,7 +3736,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2018-11-05T09:00:11+00:00"
+            "time": "2019-09-06T13:49:17+00:00"
         },
         {
             "name": "moontoast/math",
@@ -8386,16 +8386,16 @@
         },
         {
             "name": "yab/laravel-scout-mysql-driver",
-            "version": "v2.3.0",
+            "version": "v2.40",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yabhq/laravel-scout-mysql-driver.git",
-                "reference": "9212a5068e8e6be4d741e6fb7e2191eac632a3be"
+                "reference": "b64f3bc3bb4f50e3d35ccb262b9be9d7a9016a6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yabhq/laravel-scout-mysql-driver/zipball/9212a5068e8e6be4d741e6fb7e2191eac632a3be",
-                "reference": "9212a5068e8e6be4d741e6fb7e2191eac632a3be",
+                "url": "https://api.github.com/repos/yabhq/laravel-scout-mysql-driver/zipball/b64f3bc3bb4f50e3d35ccb262b9be9d7a9016a6a",
+                "reference": "b64f3bc3bb4f50e3d35ccb262b9be9d7a9016a6a",
                 "shasum": ""
             },
             "require": {
@@ -8424,16 +8424,16 @@
             ],
             "authors": [
                 {
-                    "name": "Matt Lantz",
-                    "email": "matt@yabhq.com"
-                },
-                {
                     "name": "Damian Crisafulli",
                     "email": "damian.crisafulli@troyweb.com"
+                },
+                {
+                    "name": "Matt Lantz",
+                    "email": "matt@yabhq.com"
                 }
             ],
             "description": "MySQL driver for Laravel Scout.",
-            "time": "2019-03-16T05:53:42+00:00"
+            "time": "2019-09-06T17:14:32+00:00"
         },
         {
             "name": "ytake/laravel-smarty",
@@ -8583,37 +8583,34 @@
         },
         {
             "name": "barryvdh/laravel-ide-helper",
-            "version": "v2.6.4",
+            "version": "v2.6.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-ide-helper.git",
-                "reference": "16eb4f65ee0d51b1f1182d56ae28ee00a70ce75a"
+                "reference": "8740a9a158d3dd5cfc706a9d4cc1bf7a518f99f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/16eb4f65ee0d51b1f1182d56ae28ee00a70ce75a",
-                "reference": "16eb4f65ee0d51b1f1182d56ae28ee00a70ce75a",
+                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/8740a9a158d3dd5cfc706a9d4cc1bf7a518f99f3",
+                "reference": "8740a9a158d3dd5cfc706a9d4cc1bf7a518f99f3",
                 "shasum": ""
             },
             "require": {
                 "barryvdh/reflection-docblock": "^2.0.6",
                 "composer/composer": "^1.6",
+                "doctrine/dbal": "~2.3",
                 "illuminate/console": "^5.5|^6",
                 "illuminate/filesystem": "^5.5|^6",
                 "illuminate/support": "^5.5|^6",
                 "php": ">=7"
             },
             "require-dev": {
-                "doctrine/dbal": "~2.3",
                 "illuminate/config": "^5.5|^6",
                 "illuminate/view": "^5.5|^6",
                 "phpro/grumphp": "^0.14",
                 "phpunit/phpunit": "4.*",
                 "scrutinizer/ocular": "~1.1",
                 "squizlabs/php_codesniffer": "^3"
-            },
-            "suggest": {
-                "doctrine/dbal": "Load information from the database about models for phpdocs (~2.3)"
             },
             "type": "library",
             "extra": {
@@ -8653,7 +8650,7 @@
                 "phpstorm",
                 "sublime"
             ],
-            "time": "2019-09-03T17:51:13+00:00"
+            "time": "2019-09-08T09:56:38+00:00"
         },
         {
             "name": "barryvdh/reflection-docblock",

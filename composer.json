@@ -187,7 +187,8 @@
     ],
     "post-update-cmd": [
       "Blacklight\\build\\ComposerScripts::postUpdate",
-      "@php artisan ide-helper:generate --ansi"
+      "@php artisan ide-helper:generate --ansi",
+      "@php artisan ide-helper:meta --ansi"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
