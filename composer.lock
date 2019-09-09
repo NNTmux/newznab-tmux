@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "175c8c2c81a56b9682b9529de6e1b2e7",
+    "content-hash": "6c550ec5afdcdc1320694e7e4032a8af",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2476,22 +2476,22 @@
         },
         {
             "name": "junaidnasir/larainvite",
-            "version": "v2.0.1",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/junaidnasir/larainvite.git",
-                "reference": "6d079f6cc598bd2057e8c5974f8026b622fa6329"
+                "reference": "7612f2ee0d8a9a36cf346f774804562d735d8373"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/6d079f6cc598bd2057e8c5974f8026b622fa6329",
-                "reference": "6d079f6cc598bd2057e8c5974f8026b622fa6329",
+                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/7612f2ee0d8a9a36cf346f774804562d735d8373",
+                "reference": "7612f2ee0d8a9a36cf346f774804562d735d8373",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^5.1",
-                "illuminate/events": "^5.1",
-                "illuminate/support": "^5.1",
+                "illuminate/database": "^5.8|^6.0",
+                "illuminate/events": "^5.8|^6.0",
+                "illuminate/support": "^5.8|^6.0",
                 "php": ">=5.5.9"
             },
             "require-dev": {
@@ -2530,7 +2530,7 @@
                 "invitations",
                 "laravel"
             ],
-            "time": "2019-04-24T11:57:28+00:00"
+            "time": "2019-09-09T18:59:05+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",
@@ -12301,16 +12301,16 @@
         },
         {
             "name": "sebastianfeldmann/git",
-            "version": "2.2.2",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/git.git",
-                "reference": "cc6190a13827b14307d2ba8595e720d6df883486"
+                "reference": "6e3bd3a4dbed2b5d7c8b84a61d29d06e55bd4419"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/cc6190a13827b14307d2ba8595e720d6df883486",
-                "reference": "cc6190a13827b14307d2ba8595e720d6df883486",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/6e3bd3a4dbed2b5d7c8b84a61d29d06e55bd4419",
+                "reference": "6e3bd3a4dbed2b5d7c8b84a61d29d06e55bd4419",
                 "shasum": ""
             },
             "require": {
@@ -12347,7 +12347,7 @@
             "keywords": [
                 "git"
             ],
-            "time": "2019-06-12T23:35:18+00:00"
+            "time": "2019-09-09T10:12:07+00:00"
         },
         {
             "name": "seld/jsonlint",
