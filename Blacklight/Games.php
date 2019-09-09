@@ -12,9 +12,9 @@ use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use MarcReichel\IGDBLaravel\Models\Game;
 use GuzzleHttp\Exception\ClientException;
 use MarcReichel\IGDBLaravel\Models\Company;
-use MarcReichel\IGDBLaravel\Models\Game;
 
 /**
  * Class Games.
@@ -570,7 +570,6 @@ class Games
             }
         }
 
-
         if (config('services.igdb.key') !== '') {
             try {
                 if ($steamGameID === false || $this->_gameResults === false) {
@@ -625,7 +624,7 @@ class Games
                                 'releasedate' => $releaseDate,
                                 'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating).'%' : 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',
-                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'. str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]->url) : '',
+                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]->url) : '',
                                 'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             ];
                         } else {
