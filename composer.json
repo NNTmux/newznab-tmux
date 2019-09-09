@@ -127,8 +127,8 @@
     "laravel/tinker": "~1.0",
     "laravelcollective/html": "^5.7",
     "league/climate": "^3.4",
+    "marcreichel/igdb-laravel": "^0.9.0",
     "mayconbordin/l5-fixtures": "dev-master",
-    "messerli90/igdb": "^1.0",
     "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",
     "nesbot/carbon": "^2.14",
@@ -187,8 +187,7 @@
     ],
     "post-update-cmd": [
       "Blacklight\\build\\ComposerScripts::postUpdate",
-      "@php artisan ide-helper:generate --ansi",
-      "@php artisan ide-helper:meta --ansi"
+      "@php artisan ide-helper:generate --ansi"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

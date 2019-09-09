@@ -164,7 +164,6 @@ return [
         App\Providers\TelescopeServiceProvider::class,
         Jrean\UserVerification\UserVerificationServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Messerli90\IGDB\IGDBServiceProvider::class,
         App\Providers\UserServiceProvider::class,
 
     ],
