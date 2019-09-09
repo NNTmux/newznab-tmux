@@ -595,7 +595,7 @@ class Games
                             if (! empty($this->_gameResults->involved_companies)) {
                                 foreach ($this->_gameResults->involved_companies as $publisher) {
                                     if ($publisher->publisher === true) {
-                                        $company = Company::find($publisher);
+                                        $company = Company::find($publisher->company);
                                         $publishers[] = $company->name;
                                     }
                                 }
