@@ -575,7 +575,7 @@ class Games
                 if ($steamGameID === false || $this->_gameResults === false) {
                     $bestMatch = false;
                     $this->_classUsed = 'IGDB';
-                    $result = Game::search($gameInfo['title']);
+                    $result = Game::where('name', $gameInfo['title'])->get();
                     if (! empty($result)) {
                         foreach ($result as $res) {
                             similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent);
