@@ -5,7 +5,7 @@ use Blacklight\NZB;
 use Blacklight\XXX;
 use GuzzleHttp\Client;
 use App\Models\Release;
-use Chumper\Zipper\Zipper;
+use DariusIII\Zipper\Zipper;
 use Tuna\CloudflareMiddleware;
 use Blacklight\utility\Utility;
 use GuzzleHttp\Cookie\CookieJar;
