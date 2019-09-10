@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3ab9c416d3e8dd4004dcd0cd124786f",
+    "content-hash": "f44f87851cb5a5ccf2ee706627c78bb7",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -362,66 +362,6 @@
             ],
             "description": "PHP implementation for the 2nd version of the TheTVDb API.",
             "time": "2019-02-24T20:49:53+00:00"
-        },
-        {
-            "name": "chumper/zipper",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Chumper/Zipper.git",
-                "reference": "6a1733c34d67c3952b8439afb36ad4ea5c3ceacb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Chumper/Zipper/zipball/6a1733c34d67c3952b8439afb36ad4ea5c3ceacb",
-                "reference": "6a1733c34d67c3952b8439afb36ad4ea5c3ceacb",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/filesystem": "^5.0",
-                "illuminate/support": "^5.0",
-                "php": ">=5.6.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^0.9.4",
-                "phpunit/phpunit": "^5.7"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Chumper\\Zipper\\ZipperServiceProvider"
-                    ],
-                    "aliases": {
-                        "Zipper": "Chumper\\Zipper\\Zipper"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Chumper\\Zipper\\": "src/Chumper/Zipper"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache2"
-            ],
-            "authors": [
-                {
-                    "name": "Nils Plaschke",
-                    "email": "github@nilsplaschke.de",
-                    "homepage": "http://nilsplaschke.de",
-                    "role": "Developer"
-                }
-            ],
-            "description": "This is a little neat helper for the ZipArchive methods with handy functions",
-            "homepage": "http://github.com/Chumper/zipper",
-            "keywords": [
-                "archive",
-                "laravel",
-                "zip"
-            ],
-            "time": "2017-07-17T08:05:10+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -810,6 +750,67 @@
                 "wrapper"
             ],
             "time": "2019-09-10T11:44:58+00:00"
+        },
+        {
+            "name": "dariusiii/zipper",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/Zipper.git",
+                "reference": "f08582ad0871a885a74c38e6e0876c755e4871a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/Zipper/zipball/f08582ad0871a885a74c38e6e0876c755e4871a0",
+                "reference": "f08582ad0871a885a74c38e6e0876c755e4871a0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-zip": "*",
+                "illuminate/filesystem": "^5.8|^6.0",
+                "illuminate/support": "^5.8|^6.0",
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.2",
+                "phpunit/phpunit": "^7.0|^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "DariusIII\\Zipper\\ZipperServiceProvider"
+                    ],
+                    "aliases": {
+                        "Zipper": "DariusIII\\Zipper\\Facades\\Zipper"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DariusIII\\Zipper\\": "src/DariusIII/Zipper"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Plaschke",
+                    "email": "github@nilsplaschke.de",
+                    "homepage": "http://nilsplaschke.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is a little neat helper for the ZipArchive methods with handy functions",
+            "homepage": "http://github.com/DariusIII/zipper",
+            "keywords": [
+                "archive",
+                "laravel",
+                "zip"
+            ],
+            "time": "2019-09-10T10:37:10+00:00"
         },
         {
             "name": "dborsatto/php-giantbomb",
