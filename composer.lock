@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "45e2f0e156608d00ab456609ffc5426b",
+    "content-hash": "94c456229387a3982f6ba0da389d8a81",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -9730,25 +9730,25 @@
         },
         {
             "name": "matt-allan/laravel-code-style",
-            "version": "0.2.0",
+            "version": "0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matt-allan/laravel-code-style.git",
-                "reference": "10d262e1c9aeb90b8c945f8d80b77e3f069c623f"
+                "reference": "ac5dcc39c41f7a12665dda8aafb7a40e2bc2e7a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/10d262e1c9aeb90b8c945f8d80b77e3f069c623f",
-                "reference": "10d262e1c9aeb90b8c945f8d80b77e3f069c623f",
+                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/ac5dcc39c41f7a12665dda8aafb7a40e2bc2e7a0",
+                "reference": "ac5dcc39c41f7a12665dda8aafb7a40e2bc2e7a0",
                 "shasum": ""
             },
             "require": {
                 "friendsofphp/php-cs-fixer": "^2.14",
-                "illuminate/support": "5.8.x",
-                "php": ">=7.1"
+                "illuminate/support": "5.7.x|5.8.x|^6.0",
+                "php": ">=7.2"
             },
             "require-dev": {
-                "laravel/framework": "^5.8.14",
+                "laravel/framework": "^6.0",
                 "phpunit/phpunit": "^7.0"
             },
             "type": "library",
@@ -9785,7 +9785,7 @@
                 "laravel",
                 "php-cs-fixer"
             ],
-            "time": "2019-04-29T13:47:40+00:00"
+            "time": "2019-09-05T13:41:48+00:00"
         },
         {
             "name": "maximebf/debugbar",
