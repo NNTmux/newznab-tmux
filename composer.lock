@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f44f87851cb5a5ccf2ee706627c78bb7",
+    "content-hash": "87c13fb2ae05881a3115fe095cf7bbaf",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -515,21 +515,21 @@
         },
         {
             "name": "dariusiii/laravel-database-trigger",
-            "version": "dev-master",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/laravel-database-trigger.git",
-                "reference": "90dd8be1619ff999c2eb3c681ca08a107280908c"
+                "reference": "528fd1f900b6ed8e45103425c17d3d47efa99d86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel-database-trigger/zipball/90dd8be1619ff999c2eb3c681ca08a107280908c",
-                "reference": "90dd8be1619ff999c2eb3c681ca08a107280908c",
+                "url": "https://api.github.com/repos/DariusIII/laravel-database-trigger/zipball/528fd1f900b6ed8e45103425c17d3d47efa99d86",
+                "reference": "528fd1f900b6ed8e45103425c17d3d47efa99d86",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|^6.0",
-                "php": "^7.1"
+                "laravel/framework": "^5.8.|^6.0",
+                "php": "^7.2"
             },
             "require-dev": {
                 "mockery/mockery": "^1.0",
@@ -539,25 +539,16 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "NtimYeboah\\LaravelDatabaseTrigger\\TriggerServiceProvider"
+                        "DariusIII\\LaravelDatabaseTrigger\\TriggerServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "NtimYeboah\\LaravelDatabaseTrigger\\": "src"
+                    "DariusIII\\LaravelDatabaseTrigger\\": "src"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "NtimYeboah\\LaravelDatabaseTrigger\\Test\\": "tests"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "vendor/bin/phpunit"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -570,15 +561,13 @@
             ],
             "description": "A package to add database trigger to laravel migrations",
             "keywords": [
+                "DariusIII",
                 "NtimYeboah",
                 "database",
                 "laravel-database-trigger",
                 "trigger"
             ],
-            "support": {
-                "source": "https://github.com/DariusIII/laravel-database-trigger/tree/master"
-            },
-            "time": "2019-09-03T20:22:19+00:00"
+            "time": "2019-09-10T13:10:35+00:00"
         },
         {
             "name": "dariusiii/php-itunes-api",
@@ -12538,7 +12527,6 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
-        "dariusiii/laravel-database-trigger": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "mayconbordin/l5-fixtures": 20
     },

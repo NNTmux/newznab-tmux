@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use NtimYeboah\LaravelDatabaseTrigger\TriggerFacade as Schema;
+use DariusIII\LaravelDatabaseTrigger\TriggerFacade as Schema;
 
 class CreateCheckInsertTrigger extends Migration
 {

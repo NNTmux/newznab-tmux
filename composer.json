@@ -56,10 +56,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/pear/Net_NNTP"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/laravel-database-trigger"
         }
     ],
   "require": {
@@ -96,7 +92,7 @@
     "dariusiii/zipper": "^2.0",
     "czproject/git-php": "^3.14",
     "dariusiii/tmdb-laravel": "^2.0",
-    "dariusiii/laravel-database-trigger": "dev-master",
+    "dariusiii/laravel-database-trigger": "^2.0",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "^1.0",
