@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7a0114c4cf9790fd2ad97eb55f93f77",
+    "content-hash": "45e2f0e156608d00ab456609ffc5426b",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -9625,16 +9625,16 @@
         },
         {
             "name": "laracasts/generators",
-            "version": "dev-master",
+            "version": "1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laracasts/Laravel-5-Generators-Extended.git",
-                "reference": "25a7094a37922fc42cc4cfa52e257bdbd2303958"
+                "reference": "a71d2b705f1e4d0e6b97aa1ba3746907b5bc1f1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laracasts/Laravel-5-Generators-Extended/zipball/25a7094a37922fc42cc4cfa52e257bdbd2303958",
-                "reference": "25a7094a37922fc42cc4cfa52e257bdbd2303958",
+                "url": "https://api.github.com/repos/laracasts/Laravel-5-Generators-Extended/zipball/a71d2b705f1e4d0e6b97aa1ba3746907b5bc1f1b",
+                "reference": "a71d2b705f1e4d0e6b97aa1ba3746907b5bc1f1b",
                 "shasum": ""
             },
             "require": {
@@ -9673,7 +9673,7 @@
                 "generators",
                 "laravel"
             ],
-            "time": "2019-09-04T07:42:46+00:00"
+            "time": "2019-09-04T04:55:05+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -12542,8 +12542,7 @@
         "dariusiii/laravel": 20,
         "dariusiii/laravel-database-trigger": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "mayconbordin/l5-fixtures": 20,
-        "laracasts/generators": 20
+        "mayconbordin/l5-fixtures": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
