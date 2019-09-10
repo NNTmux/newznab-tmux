@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f847d9d3a55128296f6cc77e662c86da",
+    "content-hash": "a3ab9c416d3e8dd4004dcd0cd124786f",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -574,79 +574,6 @@
             "time": "2019-02-09T13:11:36+00:00"
         },
         {
-            "name": "dariusiii/laravel",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/laravel.git",
-                "reference": "c6d7277b1da023b8b7c955bdcd77a1e2459090dc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel/zipball/c6d7277b1da023b8b7c955bdcd77a1e2459090dc",
-                "reference": "c6d7277b1da023b8b7c955bdcd77a1e2459090dc",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "~5.0 || ~4.0",
-                "php": ">=5.4.0",
-                "php-tmdb/api": "~2.0"
-            },
-            "require-dev": {
-                "doctrine/cache": ">=1.3.0",
-                "illuminate/events": "~5.0",
-                "monolog/monolog": ">=1.7.0",
-                "phpunit/phpunit": "~4.5|~7.0",
-                "psr/event-dispatcher": "~1.0",
-                "symfony/event-dispatcher": "~2.8|~3.0|~4.0"
-            },
-            "suggest": {
-                "doctrine/cache": "Required if you want to make use of caching features.",
-                "monolog/monolog": "Required if you want to make use of logging features."
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Tmdb\\Laravel\\TmdbServiceProvider"
-                    ],
-                    "aliases": {
-                        "Tmdb": "Tmdb\\Laravel\\Facades\\Tmdb"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Tmdb\\Laravel\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Mark Redeman",
-                    "email": "markredeman@gmail.com"
-                }
-            ],
-            "description": "Laravel Package for TMDB ( The Movie Database ) API. Provides easy access to the wtfzdotnet/php-tmdb-api library.",
-            "keywords": [
-                "Laravel",
-                "api",
-                "movie",
-                "php",
-                "tmdb",
-                "tv",
-                "tv show",
-                "tvdb",
-                "wrapper"
-            ],
-            "support": {
-                "source": "https://github.com/DariusIII/laravel/tree/master"
-            },
-            "time": "2019-06-06T07:52:01+00:00"
-        },
-        {
             "name": "dariusiii/laravel-database-trigger",
             "version": "dev-master",
             "source": {
@@ -812,6 +739,77 @@
             ],
             "description": "PHP archive reader helper class",
             "time": "2019-03-20T11:22:25+00:00"
+        },
+        {
+            "name": "dariusiii/tmdb-laravel",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/tmdb-laravel.git",
+                "reference": "81939e1b34abc1d3cefe8119ba217be301a1499d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/81939e1b34abc1d3cefe8119ba217be301a1499d",
+                "reference": "81939e1b34abc1d3cefe8119ba217be301a1499d",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^5.8|^6.0",
+                "php": ">=7.2.0",
+                "php-tmdb/api": "^2.1"
+            },
+            "require-dev": {
+                "doctrine/cache": ">=1.3.0",
+                "illuminate/events": "^5.8|^6.0",
+                "monolog/monolog": ">=1.7.0",
+                "phpunit/phpunit": "~4.5|~7.0",
+                "psr/event-dispatcher": "~1.0",
+                "symfony/event-dispatcher": "~2.8|~3.0|~4.0"
+            },
+            "suggest": {
+                "doctrine/cache": "Required if you want to make use of caching features.",
+                "monolog/monolog": "Required if you want to make use of logging features."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Tmdb\\Laravel\\TmdbServiceProvider"
+                    ],
+                    "aliases": {
+                        "Tmdb": "Tmdb\\Laravel\\Facades\\Tmdb"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Tmdb\\Laravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mark Redeman",
+                    "email": "markredeman@gmail.com"
+                }
+            ],
+            "description": "Laravel Package for TMDB ( The Movie Database ) API. Provides easy access to the wtfzdotnet/php-tmdb-api library.",
+            "keywords": [
+                "api",
+                "laravel",
+                "movie",
+                "php",
+                "tmdb",
+                "tv",
+                "tv show",
+                "tvdb",
+                "wrapper"
+            ],
+            "time": "2019-09-10T11:44:58+00:00"
         },
         {
             "name": "dborsatto/php-giantbomb",
@@ -12539,7 +12537,6 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
-        "dariusiii/laravel": 20,
         "dariusiii/laravel-database-trigger": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "mayconbordin/l5-fixtures": 20

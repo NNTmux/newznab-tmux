@@ -1,5 +1,6 @@
 2019-09-09 DariusIII
 	* Chg: Update used libraries
+	* Chg: Update used libraries
 	* Chg: Use marcreichel/igdb-laravel for igdb lookups
 2019-09-08 DariusIII
 	* Chg: Update used libraries to their latest versions

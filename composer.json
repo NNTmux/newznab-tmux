@@ -60,10 +60,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/laravel-database-trigger"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/laravel"
         }
     ],
   "require": {
@@ -99,7 +95,7 @@
     "canihavesomecoffee/thetvdbapi": "^1.0",
     "chumper/zipper": "^1.0",
     "czproject/git-php": "^3.14",
-    "dariusiii/laravel": "dev-master",
+    "dariusiii/tmdb-laravel": "^2.0",
     "dariusiii/laravel-database-trigger": "dev-master",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
