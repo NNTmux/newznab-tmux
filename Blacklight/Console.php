@@ -7,14 +7,12 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
-use Illuminate\Support\Carbon;
-use MarcReichel\IGDBLaravel\Models\Company;
-use MarcReichel\IGDBLaravel\Models\Game;
-use MarcReichel\IGDBLaravel\Models\Platform;
-use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use MarcReichel\IGDBLaravel\Models\Game;
 use GuzzleHttp\Exception\ClientException;
+use MarcReichel\IGDBLaravel\Models\Company;
+use MarcReichel\IGDBLaravel\Models\Platform;
 
 /**
  * Class Console.

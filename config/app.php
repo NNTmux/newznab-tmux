@@ -217,7 +217,6 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'UserVerification' => Jrean\UserVerification\Facades\UserVerification::class,
-        'IGDB' => \Messerli90\IGDB\Facades\IGDB::class,
     ],
 
 ];
