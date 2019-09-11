@@ -56,6 +56,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/pear/Net_NNTP"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/firewall"
         }
     ],
   "require": {
@@ -100,7 +104,7 @@
     "doctrine/dbal": "^2.7",
     "fideloper/proxy": "^4.2",
     "foolz/sphinxql-query-builder": "^2.0",
-    "genealabs/laravel-caffeine": "^0.8",
+    "genealabs/laravel-caffeine": "^1.0",
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "^1.2",
     "guzzlehttp/guzzle": "^6.3",
@@ -109,18 +113,18 @@
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
-    "jrean/laravel-user-verification": "^7.0",
+    "jrean/laravel-user-verification": "dev-master",
     "junaidnasir/larainvite": "^3.0",
     "kevinlebrun/colors.php": "^1.0",
-    "laravel/framework": "5.8.*",
+    "laravel/framework": "^6.0",
     "laravel/horizon": "^3.0",
     "laravel/scout": "^7.0",
     "laravel/telescope": "^2.0",
     "laravel/tinker": "~1.0",
-    "laravelcollective/html": "^5.7",
+    "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
-    "marcreichel/igdb-laravel": "^0.9.0",
-    "mayconbordin/l5-fixtures": "dev-master",
+    "marcreichel/igdb-laravel": "dev-master",
+    "dariusiii/l5-fixtures": "^2.0.0",
     "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",
     "nesbot/carbon": "^2.14",
@@ -128,7 +132,7 @@
     "php-ffmpeg/php-ffmpeg": "^0.14",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
-    "pragmarx/firewall": "^2.2",
+    "dariusiii/firewall": "dev-master",
     "predis/predis": "^1.1",
     "propaganistas/laravel-disposable-email": "^2.0",
     "ramsey/uuid": "^3.7",
@@ -144,7 +148,7 @@
     "wandersonwhcr/illuminate-romans": "^1.0",
     "wildbit/swiftmailer-postmark": "^3.0",
     "yab/laravel-scout-mysql-driver": "^2.1",
-    "ytake/laravel-smarty": "^2.5"
+    "ytake/laravel-smarty": "^3.0"
   },
 
   "require-dev": {

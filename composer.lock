@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4eff752cd87b8843be374c796c3b4fa7",
+    "content-hash": "f2d08ffc204817cde0dc0f7adb9563ec",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -459,6 +459,142 @@
                 "git"
             ],
             "time": "2019-02-09T13:11:36+00:00"
+        },
+        {
+            "name": "dariusiii/firewall",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/firewall.git",
+                "reference": "1af2649f97c37b874683b811c54d76882f1adb1f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/firewall/zipball/1af2649f97c37b874683b811c54d76882f1adb1f",
+                "reference": "1af2649f97c37b874683b811c54d76882f1adb1f",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">=5.3",
+                "php": ">=5.6",
+                "pragmarx/support": "^0.9"
+            },
+            "require-dev": {
+                "geoip2/geoip2": "~2.0",
+                "guzzlehttp/guzzle": "^6.2",
+                "orchestra/testbench": "3.4.*|3.5.*|3.6.*|3.7.*|3.8.*|4.0.x",
+                "phpunit/phpunit": "~7|~8"
+            },
+            "suggest": {
+                "geoip/geoip": "~1.14",
+                "geoip2/geoip2": "~2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.5.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "PragmaRX\\Firewall\\Vendor\\Laravel\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "Firewall": "PragmaRX\\Firewall\\Vendor\\Laravel\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PragmaRX\\Firewall\\": "src/",
+                    "PragmaRX\\Firewall\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Antonio Carlos Ribeiro",
+                    "email": "acr@antoniocarlosribeiro.com",
+                    "role": "Creator"
+                }
+            ],
+            "description": "A Laravel IP whitelisting and blacklisting",
+            "keywords": [
+                "blacklist",
+                "firewall",
+                "laravel",
+                "whitelist"
+            ],
+            "support": {
+                "source": "https://github.com/DariusIII/firewall/tree/master"
+            },
+            "time": "2019-09-11T10:00:53+00:00"
+        },
+        {
+            "name": "dariusiii/l5-fixtures",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/l5-fixtures.git",
+                "reference": "aea388035819c91d94af56c16b381e3911e7e2b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/l5-fixtures/zipball/aea388035819c91d94af56c16b381e3911e7e2b0",
+                "reference": "aea388035819c91d94af56c16b381e3911e7e2b0",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^5.8|^6.0",
+                "illuminate/database": "^5.8|^6.0",
+                "illuminate/support": "^5.8|^6.0",
+                "league/csv": "~8.0.0",
+                "league/flysystem": "~1.0.16",
+                "php": ">=7.2.0",
+                "symfony/yaml": ">=2.8.2"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.2",
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "DariusIII\\L5Fixtures\\FixturesServiceProvider"
+                    ],
+                    "aliases": {
+                        "Fixtures": "DariusIII\\L5Fixtures\\FixturesFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DariusIII\\L5Fixtures\\": "src/DariusIII/L5Fixtures/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maycon Viana Bordin",
+                    "email": "mayconbordin@gmail.com"
+                }
+            ],
+            "description": "A fixtures package for Laravel 5",
+            "homepage": "https://github.com/dariusiii/l5-fixtures",
+            "keywords": [
+                "csv",
+                "fixtures",
+                "json",
+                "laravel",
+                "laravel 5",
+                "yaml"
+            ],
+            "time": "2019-09-11T09:01:57+00:00"
         },
         {
             "name": "dariusiii/laravel-countries",
@@ -1605,32 +1741,32 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "0.8.3",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
-                "reference": "31183ccac6b8f021580a226a0b8ec4a40aa0ddd9"
+                "reference": "2c85135d839af775d859ee643cb2fd297435aaf8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/31183ccac6b8f021580a226a0b8ec4a40aa0ddd9",
-                "reference": "31183ccac6b8f021580a226a0b8ec4a40aa0ddd9",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/2c85135d839af775d859ee643cb2fd297435aaf8",
+                "reference": "2c85135d839af775d859ee643cb2fd297435aaf8",
                 "shasum": ""
             },
             "require": {
-                "illuminate/routing": "5.3 - 5.8",
-                "illuminate/support": "5.3 - 5.8",
-                "jenssegers/model": "*",
-                "php": ">=7.1.3"
+                "illuminate/routing": "^6.0",
+                "illuminate/support": "^6.0",
+                "jenssegers/model": "^1.2.1"
             },
             "require-dev": {
                 "codedungeon/phpunit-result-printer": "*",
-                "mockery/mockery": "*",
-                "orchestra/testbench": "3.8.*",
-                "orchestra/testbench-browser-kit": "3.8.*",
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "^3.9",
+                "orchestra/testbench-browser-kit": "^3.9",
+                "orchestra/testbench-dusk": "^3.9",
                 "php-coveralls/php-coveralls": "*",
                 "phpmd/phpmd": "*",
-                "phpunit/phpunit": "*",
+                "phpunit/phpunit": "^8.0",
                 "sebastian/phpcpd": "*"
             },
             "type": "library",
@@ -1657,7 +1793,7 @@
                 }
             ],
             "description": "Keeping Your Laravel Forms Awake",
-            "time": "2019-07-01T00:32:46+00:00"
+            "time": "2019-09-09T12:27:17+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -2401,27 +2537,27 @@
         },
         {
             "name": "jrean/laravel-user-verification",
-            "version": "v7.0.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jrean/laravel-user-verification.git",
-                "reference": "e0eb3a4e4442365bce26c5e16b4277cd7f6616d5"
+                "reference": "77aaf4b10cf6b7e385aa385cdfdbdcc1ffc6ef32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/e0eb3a4e4442365bce26c5e16b4277cd7f6616d5",
-                "reference": "e0eb3a4e4442365bce26c5e16b4277cd7f6616d5",
+                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/77aaf4b10cf6b7e385aa385cdfdbdcc1ffc6ef32",
+                "reference": "77aaf4b10cf6b7e385aa385cdfdbdcc1ffc6ef32",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "5.8.*",
-                "php": ">=7.1.3"
+                "illuminate/support": "^6.0",
+                "php": ">=7.2.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^1.12",
                 "fzaninotto/faker": "^1.6",
                 "mockery/mockery": "^0.9.5",
-                "phpunit/phpunit": "^5.5",
+                "phpunit/phpunit": "^7.0",
                 "satooshi/php-coveralls": "^1.0",
                 "sllh/php-cs-fixer-styleci-bridge": "^2.1"
             },
@@ -2460,7 +2596,7 @@
                 "user activation",
                 "user verification"
             ],
-            "time": "2019-03-01T04:24:17+00:00"
+            "time": "2019-09-11T08:01:04+00:00"
         },
         {
             "name": "junaidnasir/larainvite",
@@ -2648,43 +2784,43 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.8.35",
+            "version": "v6.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "5a9e4d241a8b815e16c9d2151e908992c38db197"
+                "reference": "56789e9dec750e0fbe8e9e6ae90a01a4e6887902"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/5a9e4d241a8b815e16c9d2151e908992c38db197",
-                "reference": "5a9e4d241a8b815e16c9d2151e908992c38db197",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/56789e9dec750e0fbe8e9e6ae90a01a4e6887902",
+                "reference": "56789e9dec750e0fbe8e9e6ae90a01a4e6887902",
                 "shasum": ""
             },
             "require": {
                 "doctrine/inflector": "^1.1",
                 "dragonmantank/cron-expression": "^2.0",
-                "egulias/email-validator": "^2.0",
+                "egulias/email-validator": "^2.1.10",
                 "erusev/parsedown": "^1.7",
                 "ext-json": "*",
                 "ext-mbstring": "*",
                 "ext-openssl": "*",
                 "league/flysystem": "^1.0.8",
-                "monolog/monolog": "^1.12",
-                "nesbot/carbon": "^1.26.3 || ^2.0",
+                "monolog/monolog": "^1.12|^2.0",
+                "nesbot/carbon": "^2.0",
                 "opis/closure": "^3.1",
-                "php": "^7.1.3",
+                "php": "^7.2",
                 "psr/container": "^1.0",
                 "psr/simple-cache": "^1.0",
                 "ramsey/uuid": "^3.7",
                 "swiftmailer/swiftmailer": "^6.0",
-                "symfony/console": "^4.2",
-                "symfony/debug": "^4.2",
-                "symfony/finder": "^4.2",
-                "symfony/http-foundation": "^4.2",
-                "symfony/http-kernel": "^4.2",
-                "symfony/process": "^4.2",
-                "symfony/routing": "^4.2",
-                "symfony/var-dumper": "^4.2",
+                "symfony/console": "^4.3.4",
+                "symfony/debug": "^4.3.4",
+                "symfony/finder": "^4.3.4",
+                "symfony/http-foundation": "^4.3.4",
+                "symfony/http-kernel": "^4.3.4",
+                "symfony/process": "^4.3.4",
+                "symfony/routing": "^4.3.4",
+                "symfony/var-dumper": "^4.3.4",
                 "tijsverkoyen/css-to-inline-styles": "^2.2.1",
                 "vlucas/phpdotenv": "^3.3"
             },
@@ -2724,47 +2860,44 @@
             "require-dev": {
                 "aws/aws-sdk-php": "^3.0",
                 "doctrine/dbal": "^2.6",
-                "filp/whoops": "^2.1.4",
+                "filp/whoops": "^2.4",
                 "guzzlehttp/guzzle": "^6.3",
                 "league/flysystem-cached-adapter": "^1.0",
-                "mockery/mockery": "^1.0",
+                "mockery/mockery": "^1.2.3",
                 "moontoast/math": "^1.1",
-                "orchestra/testbench-core": "3.8.*",
+                "orchestra/testbench-core": "^4.0",
                 "pda/pheanstalk": "^4.0",
-                "phpunit/phpunit": "^7.5|^8.0",
+                "phpunit/phpunit": "^8.3",
                 "predis/predis": "^1.1.1",
-                "symfony/css-selector": "^4.2",
-                "symfony/dom-crawler": "^4.2",
+                "symfony/cache": "^4.3",
                 "true/punycode": "^2.1"
             },
             "suggest": {
-                "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (^3.0).",
+                "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage and SES mail driver (^3.0).",
                 "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
                 "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
+                "ext-memcached": "Required to use the memcache cache driver.",
                 "ext-pcntl": "Required to use all features of the queue worker.",
                 "ext-posix": "Required to use all features of the queue worker.",
-                "filp/whoops": "Required for friendly error pages in development (^2.1.4).",
+                "ext-redis": "Required to use the Redis cache and queue drivers.",
+                "filp/whoops": "Required for friendly error pages in development (^2.4).",
                 "fzaninotto/faker": "Required to use the eloquent factory builder (^1.4).",
-                "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (^6.0).",
+                "guzzlehttp/guzzle": "Required to use the Mailgun mail driver and the ping methods on schedules (^6.0).",
                 "laravel/tinker": "Required to use the tinker console command (^1.0).",
                 "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^1.0).",
                 "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
-                "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (^1.0).",
                 "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
                 "moontoast/math": "Required to use ordered UUIDs (^1.1).",
-                "nexmo/client": "Required to use the Nexmo transport (^1.0).",
                 "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-                "predis/predis": "Required to use the redis cache and queue drivers (^1.0).",
                 "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^3.0).",
-                "symfony/css-selector": "Required to use some of the crawler integration testing tools (^4.2).",
-                "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (^4.2).",
-                "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^1.1).",
+                "symfony/cache": "Required to PSR-6 cache bridge (^4.3.4).",
+                "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^1.2).",
                 "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.8-dev"
+                    "dev-master": "6.x-dev"
                 }
             },
             "autoload": {
@@ -2792,7 +2925,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-09-03T16:44:30+00:00"
+            "time": "2019-09-10T18:46:24+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -3055,35 +3188,35 @@
         },
         {
             "name": "laravelcollective/html",
-            "version": "v5.8.1",
+            "version": "v6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LaravelCollective/html.git",
-                "reference": "3a1c9974ea629eed96e101a24e3852ced382eb29"
+                "reference": "4aecb0bb71013d1218c70ee02b011944840dcb60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/3a1c9974ea629eed96e101a24e3852ced382eb29",
-                "reference": "3a1c9974ea629eed96e101a24e3852ced382eb29",
+                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/4aecb0bb71013d1218c70ee02b011944840dcb60",
+                "reference": "4aecb0bb71013d1218c70ee02b011944840dcb60",
                 "shasum": ""
             },
             "require": {
-                "illuminate/http": "5.8.*",
-                "illuminate/routing": "5.8.*",
-                "illuminate/session": "5.8.*",
-                "illuminate/support": "5.8.*",
-                "illuminate/view": "5.8.*",
-                "php": ">=7.1.3"
+                "illuminate/http": "6.0.*",
+                "illuminate/routing": "6.0.*",
+                "illuminate/session": "6.0.*",
+                "illuminate/support": "6.0.*",
+                "illuminate/view": "6.0.*",
+                "php": ">=7.2"
             },
             "require-dev": {
-                "illuminate/database": "5.8.*",
+                "illuminate/database": "6.0.*",
                 "mockery/mockery": "~1.0",
                 "phpunit/phpunit": "~7.1"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.8-dev"
+                    "dev-master": "6.0-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -3119,7 +3252,7 @@
             ],
             "description": "HTML and Form Builders for the Laravel Framework",
             "homepage": "https://laravelcollective.com",
-            "time": "2019-09-05T12:32:25+00:00"
+            "time": "2019-09-05T12:33:18+00:00"
         },
         {
             "name": "league/climate",
@@ -3389,23 +3522,23 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "v0.9.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "8b69c544305bb0cc3725f52ecbbc1ffd1e6f7b52"
+                "reference": "e37d12c6093342738e698f84a7b07dc531eaad99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/8b69c544305bb0cc3725f52ecbbc1ffd1e6f7b52",
-                "reference": "8b69c544305bb0cc3725f52ecbbc1ffd1e6f7b52",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/e37d12c6093342738e698f84a7b07dc531eaad99",
+                "reference": "e37d12c6093342738e698f84a7b07dc531eaad99",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "~6.0",
-                "laravel/framework": "5.8.*",
-                "php": "^7.1.3"
+                "laravel/framework": "5.8.*|^6.0",
+                "php": "^7.2"
             },
             "type": "library",
             "extra": {
@@ -3439,7 +3572,7 @@
                 "laravel",
                 "wrapper"
             ],
-            "time": "2019-07-10T11:15:38+00:00"
+            "time": "2019-09-06T16:16:51+00:00"
         },
         {
             "name": "maxmind-db/reader",
@@ -3542,71 +3675,6 @@
             "description": "Internal MaxMind Web Service API",
             "homepage": "https://github.com/maxmind/web-service-common-php",
             "time": "2018-02-12T22:31:54+00:00"
-        },
-        {
-            "name": "mayconbordin/l5-fixtures",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mayconbordin/l5-fixtures.git",
-                "reference": "767b37f20be0ebdab41b3e7def56fdd65bf2b863"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mayconbordin/l5-fixtures/zipball/767b37f20be0ebdab41b3e7def56fdd65bf2b863",
-                "reference": "767b37f20be0ebdab41b3e7def56fdd65bf2b863",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/console": "5.x",
-                "illuminate/database": "5.x",
-                "illuminate/support": "5.x",
-                "league/csv": "~8.0.0",
-                "league/flysystem": "~1.0.16",
-                "php": ">=5.5.0",
-                "symfony/yaml": ">=2.8.2"
-            },
-            "require-dev": {
-                "mockery/mockery": "~0.9.4",
-                "phpunit/phpunit": "~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Mayconbordin\\L5Fixtures\\FixturesServiceProvider"
-                    ],
-                    "aliases": {
-                        "Fixtures": "Mayconbordin\\L5Fixtures\\FixturesFacade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Mayconbordin\\L5Fixtures\\": "src/Mayconbordin/L5Fixtures/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Maycon Viana Bordin",
-                    "email": "mayconbordin@gmail.com"
-                }
-            ],
-            "description": "A fixtures package for Laravel 5",
-            "homepage": "https://github.com/mayconbordin/l5-fixtures",
-            "keywords": [
-                "csv",
-                "fixtures",
-                "json",
-                "laravel",
-                "laravel 5",
-                "yaml"
-            ],
-            "time": "2018-09-18T11:11:44+00:00"
         },
         {
             "name": "mhor/php-mediainfo",
@@ -4884,90 +4952,21 @@
             "time": "2015-07-25T16:39:46+00:00"
         },
         {
-            "name": "pragmarx/firewall",
-            "version": "v2.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/antonioribeiro/firewall.git",
-                "reference": "5fc2041321fb29ac29e43222219ec2e4776339d0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/antonioribeiro/firewall/zipball/5fc2041321fb29ac29e43222219ec2e4776339d0",
-                "reference": "5fc2041321fb29ac29e43222219ec2e4776339d0",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": ">=5.3",
-                "php": ">=5.6",
-                "pragmarx/support": "~0.8.0"
-            },
-            "require-dev": {
-                "geoip2/geoip2": "~2.0",
-                "guzzlehttp/guzzle": "^6.2",
-                "orchestra/testbench": "~3.6",
-                "phpunit/phpunit": "~7"
-            },
-            "suggest": {
-                "geoip/geoip": "~1.14",
-                "geoip2/geoip2": "~2.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.5.x-dev"
-                },
-                "laravel": {
-                    "providers": [
-                        "PragmaRX\\Firewall\\Vendor\\Laravel\\ServiceProvider"
-                    ],
-                    "aliases": {
-                        "Firewall": "PragmaRX\\Firewall\\Vendor\\Laravel\\Facade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PragmaRX\\Firewall\\": "src/",
-                    "PragmaRX\\Firewall\\Tests\\": "tests/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Antonio Carlos Ribeiro",
-                    "email": "acr@antoniocarlosribeiro.com",
-                    "role": "Creator"
-                }
-            ],
-            "description": "A Laravel IP whitelisting and blacklisting",
-            "keywords": [
-                "blacklist",
-                "firewall",
-                "laravel",
-                "whitelist"
-            ],
-            "time": "2019-03-18T18:38:45+00:00"
-        },
-        {
             "name": "pragmarx/support",
-            "version": "v0.8.8",
+            "version": "v0.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/antonioribeiro/support.git",
-                "reference": "ba6e3a245f50c5a00b3ee99fae542af00585f77c"
+                "reference": "97d12bc8d29c35a509973f8f898f3d4d1eaf3777"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/antonioribeiro/support/zipball/ba6e3a245f50c5a00b3ee99fae542af00585f77c",
-                "reference": "ba6e3a245f50c5a00b3ee99fae542af00585f77c",
+                "url": "https://api.github.com/repos/antonioribeiro/support/zipball/97d12bc8d29c35a509973f8f898f3d4d1eaf3777",
+                "reference": "97d12bc8d29c35a509973f8f898f3d4d1eaf3777",
                 "shasum": ""
             },
             "require": {
-                "illuminate/filesystem": "~4.0|~5.0",
+                "illuminate/filesystem": "~4.0|~5.0|~6.0",
                 "php": ">=5.4.0",
                 "symfony/var-dumper": "~2.6|~3.0|~4.0"
             },
@@ -4984,10 +4983,7 @@
             "autoload": {
                 "psr-4": {
                     "PragmaRX\\Support\\": "src/"
-                },
-                "files": [
-                    "src/helpers.php"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5005,7 +5001,7 @@
                 "laravel",
                 "pragmarx"
             ],
-            "time": "2018-02-10T15:05:53+00:00"
+            "time": "2019-09-10T21:17:26+00:00"
         },
         {
             "name": "predis/predis",
@@ -8223,27 +8219,27 @@
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
-            "version": "v1.0.2",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wandersonwhcr/illuminate-romans.git",
-                "reference": "7025e39c633cb30a10eff27c7cfa756ce91026a6"
+                "reference": "e3bf1263844b2249155e65c5e099d00a61be4365"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wandersonwhcr/illuminate-romans/zipball/7025e39c633cb30a10eff27c7cfa756ce91026a6",
-                "reference": "7025e39c633cb30a10eff27c7cfa756ce91026a6",
+                "url": "https://api.github.com/repos/wandersonwhcr/illuminate-romans/zipball/e3bf1263844b2249155e65c5e099d00a61be4365",
+                "reference": "e3bf1263844b2249155e65c5e099d00a61be4365",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^5.5",
-                "php": ">=7.0",
+                "illuminate/support": "^6.0",
+                "php": ">=7.2",
                 "wandersonwhcr/romans": "^1.0"
             },
             "require-dev": {
                 "doctrine/instantiator": "^1.0",
-                "illuminate/container": "^5.5",
-                "illuminate/contracts": "^5.5",
+                "illuminate/container": "^6.0",
+                "illuminate/contracts": "^6.0",
                 "jakub-onderka/php-parallel-lint": "^0.9",
                 "phpmd/phpmd": "^2.6",
                 "phpunit/phpunit": "^6.3",
@@ -8252,6 +8248,9 @@
             },
             "type": "library",
             "extra": {
+                "branch-alias": {
+                    "dev-develop": "1.0.x-dev"
+                },
                 "laravel": {
                     "providers": [
                         "Illuminate\\Romans\\Providers\\RomansProvider"
@@ -8285,7 +8284,7 @@
                 "roman-numeral",
                 "validator"
             ],
-            "time": "2018-01-30T11:37:50+00:00"
+            "time": "2019-09-09T22:20:53+00:00"
         },
         {
             "name": "wandersonwhcr/romans",
@@ -8431,40 +8430,40 @@
         },
         {
             "name": "ytake/laravel-smarty",
-            "version": "2.5.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ytake/Laravel.Smarty.git",
-                "reference": "65c84f2b4e62687ba4af678664644fd5e435384f"
+                "reference": "bcea49bbb5be471ab41cbe4aa4cd8ce70621ba61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/65c84f2b4e62687ba4af678664644fd5e435384f",
-                "reference": "65c84f2b4e62687ba4af678664644fd5e435384f",
+                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/bcea49bbb5be471ab41cbe4aa4cd8ce70621ba61",
+                "reference": "bcea49bbb5be471ab41cbe4aa4cd8ce70621ba61",
                 "shasum": ""
             },
             "require": {
-                "illuminate/config": "5.5.*|5.6.*|5.7.*|5.8.*",
-                "illuminate/console": "5.5.*|5.6.*|5.7.*|5.8.*",
-                "illuminate/events": "5.5.*|5.6.*|5.7.*|5.8.*",
-                "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*",
-                "illuminate/view": "5.5.*|5.6.*|5.7.*|5.8.*",
+                "illuminate/config": "^5.5|^6.0",
+                "illuminate/console": "^5.5|^6.0",
+                "illuminate/events": "^5.5|^6.0",
+                "illuminate/support": "^5.5|^6.0",
+                "illuminate/view": "^5.5|^6.0",
                 "php": ">=7.0.0",
-                "smarty/smarty": "^3.1.31"
+                "smarty/smarty": "^3.1.33"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^1.11.6",
-                "pdepend/pdepend": "^2.2.4",
+                "friendsofphp/php-cs-fixer": "^2.15.3",
+                "pdepend/pdepend": "^2.5.2",
                 "phploc/phploc": "*",
                 "phpmd/phpmd": "@stable",
-                "phpunit/phpunit": "^5.0",
-                "predis/predis": "~1.0",
+                "phpunit/phpunit": "^6.0|^7.0",
+                "predis/predis": "^1.0",
                 "satooshi/php-coveralls": "*",
                 "sebastian/phpcpd": "*",
-                "sensiolabs/security-checker": "^4.0.0",
-                "squizlabs/php_codesniffer": "~2.7",
-                "symfony/console": "^3.0",
-                "symfony/framework-bundle": "^3.0"
+                "sensiolabs/security-checker": "^5.0|^6.0",
+                "squizlabs/php_codesniffer": "^3.4.2",
+                "symfony/console": "^3.0|^4.0",
+                "symfony/framework-bundle": "^3.0|^4.0"
             },
             "suggest": {
                 "ext-memcached": "memcached Template Cache Driver",
@@ -8503,7 +8502,7 @@
                 "template",
                 "view"
             ],
-            "time": "2019-03-02T14:25:49+00:00"
+            "time": "2019-09-07T15:22:37+00:00"
         }
     ],
     "packages-dev": [
@@ -12528,7 +12527,9 @@
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "mayconbordin/l5-fixtures": 20
+        "jrean/laravel-user-verification": 20,
+        "marcreichel/igdb-laravel": 20,
+        "dariusiii/firewall": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
