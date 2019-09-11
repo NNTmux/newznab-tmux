@@ -96,7 +96,7 @@
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "^1.0",
-    "dirape/token": "^2.1",
+    "dariusiii/token": "^3.0",
     "doctrine/dbal": "^2.7",
     "fideloper/proxy": "^4.2",
     "foolz/sphinxql-query-builder": "^2.0",
