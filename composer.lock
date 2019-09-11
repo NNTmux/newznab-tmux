@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "87c13fb2ae05881a3115fe095cf7bbaf",
+    "content-hash": "49e9fdd6b16fb8c31f596826e156ac9e",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -208,59 +208,6 @@
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
             "time": "2017-08-27T15:14:06+00:00"
-        },
-        {
-            "name": "bhuvidya/laravel-countries",
-            "version": "v1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bhuvidya/laravel-countries.git",
-                "reference": "8e45bac5a255119878568afd302886c9b3eff8cb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/8e45bac5a255119878568afd302886c9b3eff8cb",
-                "reference": "8e45bac5a255119878568afd302886c9b3eff8cb",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/database": "^5.5.0",
-                "illuminate/support": "^5.5.0",
-                "php": ">=7.0.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Bhuvidya\\Countries\\CountriesServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Bhuvidya\\Countries\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "bhu Boue vidya",
-                    "email": "bhuvidya@gmail.com",
-                    "role": "developer"
-                }
-            ],
-            "description": "Laravel Countries is a bundle for Laravel, providing Almost ISO 3166_2, 3166_3, currency, Capital and more for all countries. Bug kudos to Christoph Kempen, on whose work this package is heavily based (webpatser/laravel-countries).",
-            "homepage": "https://github.com/bhuvidya/laravel-countries",
-            "keywords": [
-                "countries",
-                "iso_3166_2",
-                "iso_3166_3",
-                "laravel"
-            ],
-            "time": "2018-09-15T03:26:27+00:00"
         },
         {
             "name": "cakephp/chronos",
@@ -512,6 +459,59 @@
                 "git"
             ],
             "time": "2019-02-09T13:11:36+00:00"
+        },
+        {
+            "name": "dariusiii/laravel-countries",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/laravel-countries.git",
+                "reference": "a80faccffb756eeb9057a11c8672da05a71cf6c0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/laravel-countries/zipball/a80faccffb756eeb9057a11c8672da05a71cf6c0",
+                "reference": "a80faccffb756eeb9057a11c8672da05a71cf6c0",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^5.8|^6.0",
+                "illuminate/support": "^5.8|^6.0",
+                "php": ">=7.2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "DariusIII\\Countries\\CountriesServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DariusIII\\Countries\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "bhu Boue vidya",
+                    "email": "bhuvidya@gmail.com",
+                    "role": "developer"
+                }
+            ],
+            "description": "Laravel Countries is a bundle for Laravel, providing Almost ISO 3166_2, 3166_3, currency, Capital and more for all countries. Bug kudos to Christoph Kempen, on whose work this package is heavily based (webpatser/laravel-countries).",
+            "homepage": "https://github.com/dariusiii/laravel-countries",
+            "keywords": [
+                "countries",
+                "iso_3166_2",
+                "iso_3166_3",
+                "laravel"
+            ],
+            "time": "2019-09-11T07:01:59+00:00"
         },
         {
             "name": "dariusiii/laravel-database-trigger",
