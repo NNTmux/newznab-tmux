@@ -744,11 +744,13 @@ class Console
 
                         if (! empty($game->platforms)) {
                             foreach ($game->platforms as $platforms) {
-                                $platforms = Platform::where('id', $platforms->platform)->get();
-                                similar_text($platforms->name, $gamePlatform, $percent);
-                                if ($percent >= 85) {
-                                    $platform = $platforms->name;
-                                    break;
+                                $gamePlatforms = Platform::where('id', $platforms)->get();
+                                foreach ($gamePlatforms as $gamePlat) {
+                                    similar_text($gamePlat->name, $gamePlatform, $percent);
+                                    if ($percent >= 85) {
+                                        $platform = $gamePlat->name;
+                                        break;
+                                    }
                                 }
                             }
                         }
