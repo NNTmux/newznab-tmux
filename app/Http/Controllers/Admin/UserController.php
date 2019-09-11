@@ -23,8 +23,9 @@ class UserController extends BasePageController
         $meta_title = $title = 'User List';
 
         $roles = [];
-        foreach (Role::all()->toArray() as $userRole) {
-            $roles[$userRole['id']] = $userRole['name'];
+        $userRoles = Role::cursor();
+        foreach ($userRoles as $userRole) {
+            $roles[$userRole->id] = $userRole->name;
         }
 
         $ordering = getUserBrowseOrdering();
@@ -99,15 +100,15 @@ class UserController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         //get the user roles
-        $userRoles = Role::all()->toArray();
+        $userRoles = Role::cursor();
         $roles = [];
         $defaultRole = 'User';
         $defaultInvites = Invitation::DEFAULT_INVITES;
         foreach ($userRoles as $r) {
-            $roles[$r['id']] = $r['name'];
-            if ($r['isdefault'] === 1) {
-                $defaultRole = $r['id'];
-                $defaultInvites = $r['defaultinvites'];
+            $roles[$r->id] = $r->name;
+            if ($r->isdefault === 1) {
+                $defaultRole = $r->id;
+                $defaultInvites = $r->defaultinvites;
             }
         }
 
