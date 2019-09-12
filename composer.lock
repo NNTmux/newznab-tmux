@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2d08ffc204817cde0dc0f7adb9563ec",
+    "content-hash": "0e6e4cd7677d566da65213eb61064024",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2537,16 +2537,16 @@
         },
         {
             "name": "jrean/laravel-user-verification",
-            "version": "dev-master",
+            "version": "V8.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jrean/laravel-user-verification.git",
-                "reference": "77aaf4b10cf6b7e385aa385cdfdbdcc1ffc6ef32"
+                "reference": "1e8d5eb210d45e2b2064f02a6def501e20d01b1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/77aaf4b10cf6b7e385aa385cdfdbdcc1ffc6ef32",
-                "reference": "77aaf4b10cf6b7e385aa385cdfdbdcc1ffc6ef32",
+                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/1e8d5eb210d45e2b2064f02a6def501e20d01b1f",
+                "reference": "1e8d5eb210d45e2b2064f02a6def501e20d01b1f",
                 "shasum": ""
             },
             "require": {
@@ -2596,7 +2596,7 @@
                 "user activation",
                 "user verification"
             ],
-            "time": "2019-09-11T08:01:04+00:00"
+            "time": "2019-09-12T03:21:24+00:00"
         },
         {
             "name": "junaidnasir/larainvite",
@@ -12527,7 +12527,6 @@
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "jrean/laravel-user-verification": 20,
         "marcreichel/igdb-laravel": 20,
         "dariusiii/firewall": 20
     },
