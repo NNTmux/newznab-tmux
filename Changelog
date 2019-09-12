@@ -1,4 +1,6 @@
 2019-09-11 DariusIII
+	* Chg: Use LazyCollections where possible to reduce memory usage of queries
+	* Chg: Use facade/ignition in place of filp/whoops package
 	* Fix: Fix fixtures package name
 	* Chg: Update laravel/framework to version 6.0.2 and related packages to their latest versions
 2019-09-10 DariusIII

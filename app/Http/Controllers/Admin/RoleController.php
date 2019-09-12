@@ -18,7 +18,7 @@ class RoleController extends BasePageController
         $meta_title = $title = 'User Role List';
 
         //get the user roles
-        $userroles = Role::all();
+        $userroles = Role::cursor();
 
         $this->smarty->assign('userroles', $userroles);
 
@@ -126,10 +126,10 @@ class RoleController extends BasePageController
         $meta_title = $title = 'User Roles';
 
         // Get the user roles.
-        $userRoles = Role::all();
+        $userRoles = Role::cursor();
         $roles = [];
         foreach ($userRoles as $userRole) {
-            $roles[$userRole['id']] = $userRole['name'];
+            $roles[$userRole->id] = $userRole->name;
         }
 
         switch ($request->input('action') ?? 'view') {
