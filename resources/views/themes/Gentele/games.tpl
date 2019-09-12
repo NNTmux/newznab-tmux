@@ -20,7 +20,7 @@
 							<div class="col-md-4">
 								<div class="nzb_multi_operations">
 									View: <strong>Covers</strong> | <a
-											href="{{url("/browse/Games/{$categorytitle}")}}">List</a><br/>
+											href="{{url("/browse/Pc/Games/{$categorytitle}")}}">List</a><br/>
 									With Selected:
 									<div class="btn-group">
 										<input type="button"
@@ -226,7 +226,7 @@
 							<div class="col-md-4">
 								<div class="nzb_multi_operations">
 									View: <strong>Covers</strong> | <a
-											href="{{url("/browse/Games/{$categorytitle}")}}">List</a><br/>
+											href="{{url("/browse/Pc/Games/{$categorytitle}")}}">List</a><br/>
 									Check all: <input type="checkbox" class="square-all"/>
 									<br/>
 									With Selected:
