@@ -1,3 +1,5 @@
+2019-09-12 DariusIII
+	* Chg: Update dariusiii/tmdb-laravel and facade/ignition to latest versions
 2019-09-11 DariusIII
 	* Chg: Use LazyCollections where possible to reduce memory usage of queries
 	* Chg: Use facade/ignition in place of filp/whoops package

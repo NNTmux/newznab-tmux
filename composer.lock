@@ -807,16 +807,16 @@
         },
         {
             "name": "dariusiii/tmdb-laravel",
-            "version": "v2.0.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/tmdb-laravel.git",
-                "reference": "81939e1b34abc1d3cefe8119ba217be301a1499d"
+                "reference": "dfb351bfeba2cef84987f8988c56fe3888b66858"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/81939e1b34abc1d3cefe8119ba217be301a1499d",
-                "reference": "81939e1b34abc1d3cefe8119ba217be301a1499d",
+                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/dfb351bfeba2cef84987f8988c56fe3888b66858",
+                "reference": "dfb351bfeba2cef84987f8988c56fe3888b66858",
                 "shasum": ""
             },
             "require": {
@@ -825,12 +825,12 @@
                 "php-tmdb/api": "^2.1"
             },
             "require-dev": {
-                "doctrine/cache": ">=1.3.0",
+                "doctrine/cache": "^1.8",
                 "illuminate/events": "^5.8|^6.0",
-                "monolog/monolog": ">=1.7.0",
-                "phpunit/phpunit": "~4.5|~7.0",
-                "psr/event-dispatcher": "~1.0",
-                "symfony/event-dispatcher": "~2.8|~3.0|~4.0"
+                "monolog/monolog": "^2.0",
+                "phpunit/phpunit": "^7.0|^8.0",
+                "psr/event-dispatcher": "^1.0",
+                "symfony/event-dispatcher": "^4.0"
             },
             "suggest": {
                 "doctrine/cache": "Required if you want to make use of caching features.",
@@ -874,7 +874,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2019-09-10T11:44:58+00:00"
+            "time": "2019-09-12T09:20:42+00:00"
         },
         {
             "name": "dariusiii/token",
@@ -9233,22 +9233,22 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.6.0",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "36a1e4ca0973ac8e5c8289ee31956bbaf8e6bb67"
+                "reference": "6d0f5a2ef475bee5851f9919d1b5665368550128"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/36a1e4ca0973ac8e5c8289ee31956bbaf8e6bb67",
-                "reference": "36a1e4ca0973ac8e5c8289ee31956bbaf8e6bb67",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/6d0f5a2ef475bee5851f9919d1b5665368550128",
+                "reference": "6d0f5a2ef475bee5851f9919d1b5665368550128",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "facade/flare-client-php": "^1.0",
+                "facade/flare-client-php": "^1.0.4",
                 "facade/ignition-contracts": "^1.0",
                 "filp/whoops": "^2.4",
                 "illuminate/support": "~5.5.0 || ~5.6.0 || ~5.7.0 || ~5.8.0 || ^6.0",
@@ -9297,7 +9297,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2019-09-09T14:06:15+00:00"
+            "time": "2019-09-12T09:25:07+00:00"
         },
         {
             "name": "facade/ignition-contracts",
