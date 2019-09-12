@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f4b9545daedf6b74dc39ade71efe4c9c",
+    "content-hash": "d72ff02ade7dba814444fa52ad184d6d",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -459,77 +459,6 @@
                 "git"
             ],
             "time": "2019-02-09T13:11:36+00:00"
-        },
-        {
-            "name": "dariusiii/firewall",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/firewall.git",
-                "reference": "1af2649f97c37b874683b811c54d76882f1adb1f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/firewall/zipball/1af2649f97c37b874683b811c54d76882f1adb1f",
-                "reference": "1af2649f97c37b874683b811c54d76882f1adb1f",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": ">=5.3",
-                "php": ">=5.6",
-                "pragmarx/support": "^0.9"
-            },
-            "require-dev": {
-                "geoip2/geoip2": "~2.0",
-                "guzzlehttp/guzzle": "^6.2",
-                "orchestra/testbench": "3.4.*|3.5.*|3.6.*|3.7.*|3.8.*|4.0.x",
-                "phpunit/phpunit": "~7|~8"
-            },
-            "suggest": {
-                "geoip/geoip": "~1.14",
-                "geoip2/geoip2": "~2.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.5.x-dev"
-                },
-                "laravel": {
-                    "providers": [
-                        "PragmaRX\\Firewall\\Vendor\\Laravel\\ServiceProvider"
-                    ],
-                    "aliases": {
-                        "Firewall": "PragmaRX\\Firewall\\Vendor\\Laravel\\Facade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PragmaRX\\Firewall\\": "src/",
-                    "PragmaRX\\Firewall\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Antonio Carlos Ribeiro",
-                    "email": "acr@antoniocarlosribeiro.com",
-                    "role": "Creator"
-                }
-            ],
-            "description": "A Laravel IP whitelisting and blacklisting",
-            "keywords": [
-                "blacklist",
-                "firewall",
-                "laravel",
-                "whitelist"
-            ],
-            "support": {
-                "source": "https://github.com/DariusIII/firewall/tree/master"
-            },
-            "time": "2019-09-11T10:00:53+00:00"
         },
         {
             "name": "dariusiii/l5-fixtures",
@@ -4950,6 +4879,75 @@
                 "type"
             ],
             "time": "2015-07-25T16:39:46+00:00"
+        },
+        {
+            "name": "pragmarx/firewall",
+            "version": "v2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/antonioribeiro/firewall.git",
+                "reference": "a631c8de757599053bf1ed6d9452a74bf9518be0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/antonioribeiro/firewall/zipball/a631c8de757599053bf1ed6d9452a74bf9518be0",
+                "reference": "a631c8de757599053bf1ed6d9452a74bf9518be0",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": ">=5.3",
+                "php": ">=5.6",
+                "pragmarx/support": ">=0.8.0"
+            },
+            "require-dev": {
+                "geoip2/geoip2": "~2.0",
+                "guzzlehttp/guzzle": "^6.2",
+                "orchestra/testbench": "3.4.*|3.5.*|3.6.*|3.7.*|3.8.*|4.*",
+                "phpunit/phpunit": "~7|~8"
+            },
+            "suggest": {
+                "geoip/geoip": "~1.14",
+                "geoip2/geoip2": "~2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.5.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "PragmaRX\\Firewall\\Vendor\\Laravel\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "Firewall": "PragmaRX\\Firewall\\Vendor\\Laravel\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PragmaRX\\Firewall\\": "src/",
+                    "PragmaRX\\Firewall\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Antonio Carlos Ribeiro",
+                    "email": "acr@antoniocarlosribeiro.com",
+                    "role": "Creator"
+                }
+            ],
+            "description": "A Laravel IP whitelisting and blacklisting",
+            "keywords": [
+                "blacklist",
+                "firewall",
+                "laravel",
+                "whitelist"
+            ],
+            "time": "2019-09-11T17:32:48+00:00"
         },
         {
             "name": "pragmarx/support",
@@ -12631,8 +12629,7 @@
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "marcreichel/igdb-laravel": 20,
-        "dariusiii/firewall": 20
+        "marcreichel/igdb-laravel": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
