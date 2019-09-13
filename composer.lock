@@ -462,26 +462,26 @@
         },
         {
             "name": "dariusiii/l5-fixtures",
-            "version": "v2.0.0",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/l5-fixtures.git",
-                "reference": "aea388035819c91d94af56c16b381e3911e7e2b0"
+                "reference": "ecaec8209e132a3f43ac456299dd680bc7031c0a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/l5-fixtures/zipball/aea388035819c91d94af56c16b381e3911e7e2b0",
-                "reference": "aea388035819c91d94af56c16b381e3911e7e2b0",
+                "url": "https://api.github.com/repos/DariusIII/l5-fixtures/zipball/ecaec8209e132a3f43ac456299dd680bc7031c0a",
+                "reference": "ecaec8209e132a3f43ac456299dd680bc7031c0a",
                 "shasum": ""
             },
             "require": {
                 "illuminate/console": "^5.8|^6.0",
                 "illuminate/database": "^5.8|^6.0",
                 "illuminate/support": "^5.8|^6.0",
-                "league/csv": "~8.0.0",
+                "league/csv": "^9.0",
                 "league/flysystem": "~1.0.16",
                 "php": ">=7.2.0",
-                "symfony/yaml": ">=2.8.2"
+                "symfony/yaml": "^4.3"
             },
             "require-dev": {
                 "mockery/mockery": "^1.2",
@@ -523,7 +523,7 @@
                 "laravel 5",
                 "yaml"
             ],
-            "time": "2019-09-11T09:01:57+00:00"
+            "time": "2019-09-13T11:05:02+00:00"
         },
         {
             "name": "dariusiii/laravel-countries",
@@ -3246,36 +3246,48 @@
         },
         {
             "name": "league/csv",
-            "version": "8.0.0",
+            "version": "9.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/csv.git",
-                "reference": "0a1b535df48507f58ed3c7ab44e72272b11163ac"
+                "reference": "d16f85d1f958a765844db4bc7174017edf2dd637"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/csv/zipball/0a1b535df48507f58ed3c7ab44e72272b11163ac",
-                "reference": "0a1b535df48507f58ed3c7ab44e72272b11163ac",
+                "url": "https://api.github.com/repos/thephpleague/csv/zipball/d16f85d1f958a765844db4bc7174017edf2dd637",
+                "reference": "d16f85d1f958a765844db4bc7174017edf2dd637",
                 "shasum": ""
             },
             "require": {
+                "ext-dom": "*",
+                "ext-json": "*",
                 "ext-mbstring": "*",
-                "php": ">=5.5.0"
+                "php": ">=7.0.10"
             },
             "require-dev": {
-                "fabpot/php-cs-fixer": "^1.9",
-                "phpunit/phpunit": "^4.0"
+                "ext-curl": "*",
+                "friendsofphp/php-cs-fixer": "^2.12",
+                "phpstan/phpstan": "^0.9.2",
+                "phpstan/phpstan-phpunit": "^0.9.4",
+                "phpstan/phpstan-strict-rules": "^0.9.0",
+                "phpunit/phpunit": "^6.0"
+            },
+            "suggest": {
+                "ext-iconv": "Needed to ease transcoding CSV using iconv stream filters"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "8.0-dev"
+                    "dev-master": "9.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
                     "League\\Csv\\": "src"
-                }
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -3299,7 +3311,7 @@
                 "read",
                 "write"
             ],
-            "time": "2015-12-11T09:28:14+00:00"
+            "time": "2019-07-30T14:39:11+00:00"
         },
         {
             "name": "league/flysystem",
@@ -9231,16 +9243,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.6.3",
+            "version": "1.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "69d7687cb9a4b43978c532b46f05dcdd80be812c"
+                "reference": "43b825a2f77805d1d5495c64eecd272b05ab0e33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/69d7687cb9a4b43978c532b46f05dcdd80be812c",
-                "reference": "69d7687cb9a4b43978c532b46f05dcdd80be812c",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/43b825a2f77805d1d5495c64eecd272b05ab0e33",
+                "reference": "43b825a2f77805d1d5495c64eecd272b05ab0e33",
                 "shasum": ""
             },
             "require": {
@@ -9295,7 +9307,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2019-09-12T12:36:31+00:00"
+            "time": "2019-09-13T07:41:17+00:00"
         },
         {
             "name": "facade/ignition-contracts",
