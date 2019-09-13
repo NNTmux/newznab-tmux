@@ -9243,16 +9243,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.6.4",
+            "version": "1.6.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "43b825a2f77805d1d5495c64eecd272b05ab0e33"
+                "reference": "97244f6d511332f3574acab8242c09ddcfda892b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/43b825a2f77805d1d5495c64eecd272b05ab0e33",
-                "reference": "43b825a2f77805d1d5495c64eecd272b05ab0e33",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/97244f6d511332f3574acab8242c09ddcfda892b",
+                "reference": "97244f6d511332f3574acab8242c09ddcfda892b",
                 "shasum": ""
             },
             "require": {
@@ -9307,7 +9307,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2019-09-13T07:41:17+00:00"
+            "time": "2019-09-13T13:38:04+00:00"
         },
         {
             "name": "facade/ignition-contracts",
@@ -10143,16 +10143,16 @@
         },
         {
             "name": "nette/finder",
-            "version": "v2.5.0",
+            "version": "v2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/finder.git",
-                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2"
+                "reference": "14164e1ddd69e9c5f627ff82a10874b3f5bba5fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/finder/zipball/6be1b83ea68ac558aff189d640abe242e0306fe2",
-                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2",
+                "url": "https://api.github.com/repos/nette/finder/zipball/14164e1ddd69e9c5f627ff82a10874b3f5bba5fe",
+                "reference": "14164e1ddd69e9c5f627ff82a10874b3f5bba5fe",
                 "shasum": ""
             },
             "require": {
@@ -10201,7 +10201,7 @@
                 "iterator",
                 "nette"
             ],
-            "time": "2019-02-28T18:13:25+00:00"
+            "time": "2019-07-11T18:02:17+00:00"
         },
         {
             "name": "nette/neon",
