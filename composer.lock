@@ -8158,16 +8158,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.1",
+            "version": "4.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "236b5094cd3989ff4fb7f8ff167ba1617635762e"
+                "reference": "8ede3c578e13d6c10d788335e8ee64b1cf49be24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/236b5094cd3989ff4fb7f8ff167ba1617635762e",
-                "reference": "236b5094cd3989ff4fb7f8ff167ba1617635762e",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/8ede3c578e13d6c10d788335e8ee64b1cf49be24",
+                "reference": "8ede3c578e13d6c10d788335e8ee64b1cf49be24",
                 "shasum": ""
             },
             "require": {
@@ -8175,7 +8175,7 @@
                 "ext-libxml": "*",
                 "ext-simplexml": "*",
                 "php": ">=7.0.0",
-                "symfony/css-selector": "~3.0|~4.0"
+                "symfony/css-selector": "~3.0 || ~4.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "~6.0 || ~7.0"
@@ -8213,7 +8213,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-08-30T21:49:01+00:00"
+            "time": "2019-09-12T23:32:36+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
