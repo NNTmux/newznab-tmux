@@ -1670,16 +1670,16 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
-                "reference": "2c85135d839af775d859ee643cb2fd297435aaf8"
+                "reference": "a0ff8a14a66f3119867fa4f47143582013a77f43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/2c85135d839af775d859ee643cb2fd297435aaf8",
-                "reference": "2c85135d839af775d859ee643cb2fd297435aaf8",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/a0ff8a14a66f3119867fa4f47143582013a77f43",
+                "reference": "a0ff8a14a66f3119867fa4f47143582013a77f43",
                 "shasum": ""
             },
             "require": {
@@ -1722,7 +1722,7 @@
                 }
             ],
             "description": "Keeping Your Laravel Forms Awake",
-            "time": "2019-09-09T12:27:17+00:00"
+            "time": "2019-09-14T21:59:41+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -2012,16 +2012,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.2.2",
+            "version": "v6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "1cf649303c6cd12bf080487190a0d0d0fa340254"
+                "reference": "b45c4c1c9e9d6e84c0083e00f9c34ed6f8364275"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/1cf649303c6cd12bf080487190a0d0d0fa340254",
-                "reference": "1cf649303c6cd12bf080487190a0d0d0fa340254",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/b45c4c1c9e9d6e84c0083e00f9c34ed6f8364275",
+                "reference": "b45c4c1c9e9d6e84c0083e00f9c34ed6f8364275",
                 "shasum": ""
             },
             "require": {
@@ -2049,7 +2049,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2019-06-02T11:05:00+00:00"
+            "time": "2019-09-13T17:38:18+00:00"
         },
         {
             "name": "intervention/image",
@@ -11528,16 +11528,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.15",
+            "version": "7.5.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "d79c053d972856b8b941bb233e39dc521a5093f0"
+                "reference": "316afa6888d2562e04aeb67ea7f2017a0eb41661"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d79c053d972856b8b941bb233e39dc521a5093f0",
-                "reference": "d79c053d972856b8b941bb233e39dc521a5093f0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/316afa6888d2562e04aeb67ea7f2017a0eb41661",
+                "reference": "316afa6888d2562e04aeb67ea7f2017a0eb41661",
                 "shasum": ""
             },
             "require": {
@@ -11597,8 +11597,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "role": "lead",
-                    "email": "sebastian@phpunit.de"
+                    "email": "sebastian@phpunit.de",
+                    "role": "lead"
                 }
             ],
             "description": "The PHP Unit Testing framework.",
@@ -11608,7 +11608,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-08-21T07:05:16+00:00"
+            "time": "2019-09-14T09:08:39+00:00"
         },
         {
             "name": "scrivo/highlight.php",
@@ -11897,16 +11897,16 @@
         },
         {
             "name": "sebastian/exporter",
-            "version": "3.1.1",
+            "version": "3.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "06a9a5947f47b3029d76118eb5c22802e5869687"
+                "reference": "68609e1261d215ea5b21b7987539cbfbe156ec3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/06a9a5947f47b3029d76118eb5c22802e5869687",
-                "reference": "06a9a5947f47b3029d76118eb5c22802e5869687",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/68609e1261d215ea5b21b7987539cbfbe156ec3e",
+                "reference": "68609e1261d215ea5b21b7987539cbfbe156ec3e",
                 "shasum": ""
             },
             "require": {
@@ -11960,7 +11960,7 @@
                 "export",
                 "exporter"
             ],
-            "time": "2019-08-11T12:43:14+00:00"
+            "time": "2019-09-14T09:02:43+00:00"
         },
         {
             "name": "sebastian/global-state",
