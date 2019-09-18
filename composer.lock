@@ -8170,16 +8170,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.3",
+            "version": "4.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "8ede3c578e13d6c10d788335e8ee64b1cf49be24"
+                "reference": "056c4c1546cffa689436306bfb8251dfdd525c15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/8ede3c578e13d6c10d788335e8ee64b1cf49be24",
-                "reference": "8ede3c578e13d6c10d788335e8ee64b1cf49be24",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/056c4c1546cffa689436306bfb8251dfdd525c15",
+                "reference": "056c4c1546cffa689436306bfb8251dfdd525c15",
                 "shasum": ""
             },
             "require": {
@@ -8225,7 +8225,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-09-12T23:32:36+00:00"
+            "time": "2019-09-17T14:13:41+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
@@ -9243,16 +9243,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.6.6",
+            "version": "1.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "8fe0ab9850e92aa5e4492c44145b28bc5b83051a"
+                "reference": "bd3e6616b413ffb894f4af5243d4dadd79c964d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/8fe0ab9850e92aa5e4492c44145b28bc5b83051a",
-                "reference": "8fe0ab9850e92aa5e4492c44145b28bc5b83051a",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/bd3e6616b413ffb894f4af5243d4dadd79c964d8",
+                "reference": "bd3e6616b413ffb894f4af5243d4dadd79c964d8",
                 "shasum": ""
             },
             "require": {
@@ -9307,7 +9307,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2019-09-16T19:55:14+00:00"
+            "time": "2019-09-18T08:11:06+00:00"
         },
         {
             "name": "facade/ignition-contracts",
@@ -11201,16 +11201,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.11.15",
+            "version": "0.11.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "1be5b3a706db16ac472a4c40ec03cf4c810b118d"
+                "reference": "635cf20f3b92ce34ee94a8d2f282d62eb9dc6e1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/1be5b3a706db16ac472a4c40ec03cf4c810b118d",
-                "reference": "1be5b3a706db16ac472a4c40ec03cf4c810b118d",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/635cf20f3b92ce34ee94a8d2f282d62eb9dc6e1b",
+                "reference": "635cf20f3b92ce34ee94a8d2f282d62eb9dc6e1b",
                 "shasum": ""
             },
             "require": {
@@ -11262,8 +11262,7 @@
             "autoload": {
                 "psr-4": {
                     "PHPStan\\": [
-                        "src/",
-                        "build/PHPStan"
+                        "src/"
                     ]
                 }
             },
@@ -11272,7 +11271,7 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2019-08-18T20:51:53+00:00"
+            "time": "2019-09-17T11:19:51+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
