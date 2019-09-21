@@ -116,7 +116,7 @@
     "laravel/tinker": "~1.0",
     "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
-    "marcreichel/igdb-laravel": "dev-master",
+    "marcreichel/igdb-laravel": "^0.10.0",
     "dariusiii/l5-fixtures": "^2.0.0",
     "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",

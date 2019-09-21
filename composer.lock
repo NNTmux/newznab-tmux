@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d72ff02ade7dba814444fa52ad184d6d",
+    "content-hash": "b7352b5724f40596e0b221f99aedb2d7",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3463,7 +3463,7 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "dev-master",
+            "version": "v0.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
@@ -12637,8 +12637,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
-        "joshpinkney/tv-maze-php-api": 20,
-        "marcreichel/igdb-laravel": 20
+        "joshpinkney/tv-maze-php-api": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
