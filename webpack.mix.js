@@ -1,5 +1,4 @@
 const mix = require('laravel-mix');
-require('laravel-mix-purgecss');
 
 /*
  |--------------------------------------------------------------------------
@@ -31,10 +30,8 @@ mix
             'node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css',
             'node_modules/pnotify/dist/PNotifyBrightTheme.css',
             'node_modules/flexboxgrid2/flexboxgrid2.min.css',
-            'node_modules/multiselect/css/multi-select.css',
             'resources/assets/css/custom.css'
     ], 'public/assets/css/all-css.css')
-    .purgeCss()
     .scripts(
         [
             'node_modules/jquery/dist/jquery.min.js',
@@ -48,7 +45,6 @@ mix
             'node_modules/autosize/dist/autosize.min.js',
             'node_modules/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js',
             'node_modules/bootstrap-progressbar/bootstrap-progressbar.min.js',
-            'node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js',
             'node_modules/pnotify/dist/umd/PNotify.js',
             'node_modules/pnotify/dist/umd/PNotifyAnimate.js',
             'node_modules/pnotify/dist/umd/PNotifyButtons.js',
@@ -61,10 +57,7 @@ mix
             'node_modules/pnotify/dist/umd/PNotifyReference.js',
             'node_modules/tinymce/tinymce.min.js',
             'node_modules/jquery-colorbox/jquery.colorbox-min.js',
-            'node_modules/jquery-multifile/jquery.MultiFile.min.js',
-            'node_modules/multiselect/js/jquery.multi-select.js',
             'node_modules/pace-js/pace.min.js',
-            'node_modules/jquery-slimscroll/jquery.slimscroll.min.js',
             'node_modules/icheck/icheck.min.js',
             'node_modules/jquery-goup/dist/jquery.goup.min.js',
             'resources/assets/js/utils-admin.js',

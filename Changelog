@@ -1,3 +1,5 @@
+2019-09-23 DariusIII
+	* Chg: Remove unused .js and .css scripts that are not used
 2019-09-12 DariusIII
 	* Fix: Fix link to browse game releases in list mode
 	* Chg: Update dariusiii/tmdb-laravel and facade/ignition to latest versions
