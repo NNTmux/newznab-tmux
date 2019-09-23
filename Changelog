@@ -1,4 +1,5 @@
 2019-09-23 DariusIII
+	* Chg: Add dariusiii/laravel-cloudflare package for cloudflare users
 	* Chg: Remove unused .js and .css scripts that are not used
 2019-09-12 DariusIII
 	* Fix: Fix link to browse game releases in list mode

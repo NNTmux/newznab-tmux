@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7352b5724f40596e0b221f99aedb2d7",
+    "content-hash": "46c2cfd7678ac84d327f05a623765e5f",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -524,6 +524,75 @@
                 "yaml"
             ],
             "time": "2019-09-13T11:05:02+00:00"
+        },
+        {
+            "name": "dariusiii/laravel-cloudflare",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/laravel-cloudflare.git",
+                "reference": "0d7dbd0fb9929966b704df8a2b986447bbe342e2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/laravel-cloudflare/zipball/0d7dbd0fb9929966b704df8a2b986447bbe342e2",
+                "reference": "0d7dbd0fb9929966b704df8a2b986447bbe342e2",
+                "shasum": ""
+            },
+            "require": {
+                "fideloper/proxy": "^4.2",
+                "guzzlehttp/guzzle": "^6.3",
+                "illuminate/console": "^5.5|^6.0",
+                "illuminate/http": "^5.5|^6.0",
+                "illuminate/support": "^5.5|^6.0",
+                "php": ">= 7.1.0"
+            },
+            "require-dev": {
+                "laravel/framework": "^6.0",
+                "mockery/mockery": "^1.2",
+                "orchestra/testbench": "^3.8",
+                "phpunit/phpunit": "^7.4 || ^8.0",
+                "vimeo/psalm": "^2.0 || ^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Monicahq\\Cloudflare\\TrustedProxyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Monicahq\\Cloudflare\\": "src"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Monicahq\\Cloudflare\\Tests\\": "tests"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexis Saettler",
+                    "email": "alexis@saettler.org"
+                }
+            ],
+            "description": "Add Cloudflare ip addresses to trusted proxies for Laravel.",
+            "keywords": [
+                "cloudflare",
+                "laravel",
+                "php",
+                "proxies"
+            ],
+            "support": {
+                "issues": "https://github.com/monicahq/laravel-cloudflare/issues",
+                "source": "https://github.com/monicahq/laravel-cloudflare"
+            },
+            "time": "2019-09-23T18:44:31+00:00"
         },
         {
             "name": "dariusiii/laravel-countries",
@@ -4776,16 +4845,16 @@
         },
         {
             "name": "php-tmdb/api",
-            "version": "2.1.16",
+            "version": "2.1.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/api.git",
-                "reference": "53925e50c0541b20a24f4cfc89b253b251a236c7"
+                "reference": "09fa8dcc37dd65a7bbe1bd35320d764e2490e511"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/api/zipball/53925e50c0541b20a24f4cfc89b253b251a236c7",
-                "reference": "53925e50c0541b20a24f4cfc89b253b251a236c7",
+                "url": "https://api.github.com/repos/php-tmdb/api/zipball/09fa8dcc37dd65a7bbe1bd35320d764e2490e511",
+                "reference": "09fa8dcc37dd65a7bbe1bd35320d764e2490e511",
                 "shasum": ""
             },
             "require": {
@@ -4840,7 +4909,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2018-11-28T20:35:27+00:00"
+            "time": "2019-09-04T16:21:08+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -12637,6 +12706,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
+        "dariusiii/laravel-cloudflare": 20,
         "joshpinkney/tv-maze-php-api": 20
     },
     "prefer-stable": false,
