@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.15 (2019-09-02)
+ * Version: 5.0.16 (2019-09-24)
  */
 (function (domGlobals) {
     'use strict';
@@ -90,9 +90,15 @@
         }
       return t;
     }
+    function __spreadArrays() {
+      for (var s = 0, i = 0, il = arguments.length; i < il; i++)
+        s += arguments[i].length;
+      for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+          r[k] = a[j];
+      return r;
+    }
 
-    var never$1 = never;
-    var always$1 = always;
     var none = function () {
       return NONE;
     };
@@ -106,37 +112,27 @@
       var id = function (n) {
         return n;
       };
-      var noop = function () {
-      };
-      var nul = function () {
-        return null;
-      };
-      var undef = function () {
-        return undefined;
-      };
       var me = {
         fold: function (n, s) {
           return n();
         },
-        is: never$1,
-        isSome: never$1,
-        isNone: always$1,
+        is: never,
+        isSome: never,
+        isNone: always,
         getOr: id,
         getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
-        getOrNull: nul,
-        getOrUndefined: undef,
+        getOrNull: constant(null),
+        getOrUndefined: constant(undefined),
         or: id,
         orThunk: call,
         map: none,
-        ap: none,
         each: noop,
         bind: none,
-        flatten: none,
-        exists: never$1,
-        forall: always$1,
+        exists: never,
+        forall: always,
         filter: none,
         equals: eq,
         equals_: eq,
@@ -151,14 +147,9 @@
       return me;
     }();
     var some = function (a) {
-      var constant_a = function () {
-        return a;
-      };
+      var constant_a = constant(a);
       var self = function () {
         return me;
-      };
-      var map = function (f) {
-        return some(f(a));
       };
       var bind = function (f) {
         return f(a);
@@ -170,8 +161,8 @@
         is: function (v) {
           return a === v;
         },
-        isSome: always$1,
-        isNone: never$1,
+        isSome: always,
+        isNone: never,
         getOr: constant_a,
         getOrThunk: constant_a,
         getOrDie: constant_a,
@@ -179,35 +170,31 @@
         getOrUndefined: constant_a,
         or: self,
         orThunk: self,
-        map: map,
-        ap: function (optfab) {
-          return optfab.fold(none, function (fab) {
-            return some(fab(a));
-          });
+        map: function (f) {
+          return some(f(a));
         },
         each: function (f) {
           f(a);
         },
         bind: bind,
-        flatten: constant_a,
         exists: bind,
         forall: bind,
         filter: function (f) {
           return f(a) ? me : NONE;
-        },
-        equals: function (o) {
-          return o.is(a);
-        },
-        equals_: function (o, elementEq) {
-          return o.fold(never$1, function (b) {
-            return elementEq(a, b);
-          });
         },
         toArray: function () {
           return [a];
         },
         toString: function () {
           return 'some(' + a + ')';
+        },
+        equals: function (o) {
+          return o.is(a);
+        },
+        equals_: function (o, elementEq) {
+          return o.fold(never, function (b) {
+            return elementEq(a, b);
+          });
         }
       };
       return me;
@@ -365,17 +352,12 @@
       return false;
     };
 
-    var slice = Array.prototype.slice;
-    var rawIndexOf = function () {
-      var pIndexOf = Array.prototype.indexOf;
-      var fastIndex = function (xs, x) {
-        return pIndexOf.call(xs, x);
-      };
-      var slowIndex = function (xs, x) {
-        return slowIndexOf(xs, x);
-      };
-      return pIndexOf === undefined ? slowIndex : fastIndex;
-    }();
+    var nativeSlice = Array.prototype.slice;
+    var nativeIndexOf = Array.prototype.indexOf;
+    var nativePush = Array.prototype.push;
+    var rawIndexOf = function (ts, t) {
+      return nativeIndexOf.call(ts, t);
+    };
     var indexOf = function (xs, x) {
       var r = rawIndexOf(xs, x);
       return r === -1 ? Option.none() : Option.some(r);
@@ -384,7 +366,13 @@
       return rawIndexOf(xs, x) > -1;
     };
     var exists = function (xs, pred) {
-      return findIndex(xs, pred).isSome();
+      for (var i = 0, len = xs.length; i < len; i++) {
+        var x = xs[i];
+        if (pred(x, i)) {
+          return true;
+        }
+      }
+      return false;
     };
     var range = function (num, f) {
       var r = [];
@@ -396,7 +384,7 @@
     var chunk = function (array, size) {
       var r = [];
       for (var i = 0; i < array.length; i += size) {
-        var s = slice.call(array, i, i + size);
+        var s = nativeSlice.call(array, i, i + size);
         r.push(s);
       }
       return r;
@@ -406,20 +394,20 @@
       var r = new Array(len);
       for (var i = 0; i < len; i++) {
         var x = xs[i];
-        r[i] = f(x, i, xs);
+        r[i] = f(x, i);
       }
       return r;
     };
     var each = function (xs, f) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        f(x, i, xs);
+        f(x, i);
       }
     };
     var eachr = function (xs, f) {
       for (var i = xs.length - 1; i >= 0; i--) {
         var x = xs[i];
-        f(x, i, xs);
+        f(x, i);
       }
     };
     var partition = function (xs, pred) {
@@ -427,7 +415,7 @@
       var fail = [];
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        var arr = pred(x, i, xs) ? pass : fail;
+        var arr = pred(x, i) ? pass : fail;
         arr.push(x);
       }
       return {
@@ -439,7 +427,7 @@
       var r = [];
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           r.push(x);
         }
       }
@@ -460,7 +448,7 @@
     var find = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           return Option.some(x);
         }
       }
@@ -469,28 +457,19 @@
     var findIndex = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           return Option.some(i);
         }
       }
       return Option.none();
     };
-    var slowIndexOf = function (xs, x) {
-      for (var i = 0, len = xs.length; i < len; ++i) {
-        if (xs[i] === x) {
-          return i;
-        }
-      }
-      return -1;
-    };
-    var push = Array.prototype.push;
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
         if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
         }
-        push.apply(r, xs[i]);
+        nativePush.apply(r, xs[i]);
       }
       return r;
     };
@@ -501,14 +480,14 @@
     var forall = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; ++i) {
         var x = xs[i];
-        if (pred(x, i, xs) !== true) {
+        if (pred(x, i) !== true) {
           return false;
         }
       }
       return true;
     };
     var reverse = function (xs) {
-      var r = slice.call(xs, 0);
+      var r = nativeSlice.call(xs, 0);
       r.reverse();
       return r;
     };
@@ -521,7 +500,7 @@
       return [x];
     };
     var sort = function (xs, comparator) {
-      var copy = slice.call(xs, 0);
+      var copy = nativeSlice.call(xs, 0);
       copy.sort(comparator);
       return copy;
     };
@@ -532,7 +511,7 @@
       return xs.length === 0 ? Option.none() : Option.some(xs[xs.length - 1]);
     };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
-      return slice.call(x);
+      return nativeSlice.call(x);
     };
 
     var keys = Object.keys;
@@ -542,21 +521,21 @@
       for (var k = 0, len = props.length; k < len; k++) {
         var i = props[k];
         var x = obj[i];
-        f(x, i, obj);
+        f(x, i);
       }
     };
     var map$1 = function (obj, f) {
-      return tupleMap(obj, function (x, i, obj) {
+      return tupleMap(obj, function (x, i) {
         return {
           k: i,
-          v: f(x, i, obj)
+          v: f(x, i)
         };
       });
     };
     var tupleMap = function (obj, f) {
       var r = {};
       each$1(obj, function (x, i) {
-        var tuple = f(x, i, obj);
+        var tuple = f(x, i);
         r[tuple.k] = tuple.v;
       });
       return r;
@@ -2702,9 +2681,9 @@
       };
     };
     var merge$1 = function (defnA, mod) {
-      return __assign({}, defnA, {
-        attributes: __assign({}, defnA.attributes, mod.attributes),
-        styles: __assign({}, defnA.styles, mod.styles),
+      return __assign(__assign({}, defnA), {
+        attributes: __assign(__assign({}, defnA.attributes), mod.attributes),
+        styles: __assign(__assign({}, defnA.styles), mod.styles),
         classes: defnA.classes.concat(mod.classes)
       });
     };
@@ -2723,7 +2702,7 @@
       var byAspect = byInnerKey(modsByBehaviour, nameAndMod);
       var combineObjects = function (objects) {
         return foldr(objects, function (b, a) {
-          return __assign({}, a.modification, b);
+          return __assign(__assign({}, a.modification), b);
         }, {});
       };
       var combinedClasses = foldr(byAspect.classes, function (b, a) {
@@ -2799,7 +2778,7 @@
       return r;
     };
     var groupByEvents = function (info, behaviours, base) {
-      var behaviourEvents = __assign({}, base, nameToHandlers(behaviours, info));
+      var behaviourEvents = __assign(__assign({}, base), nameToHandlers(behaviours, info));
       return byInnerKey(behaviourEvents, behaviourTuple);
     };
     var combine$1 = function (info, eventOrder, behaviours, base) {
@@ -2916,7 +2895,7 @@
       ]), spec);
     };
     var toDefinition = function (detail) {
-      return __assign({}, detail.dom, {
+      return __assign(__assign({}, detail.dom), {
         uid: detail.uid,
         domChildren: map(detail.components, function (comp) {
           return comp.element();
@@ -3206,8 +3185,8 @@
     var buildFromSpec = function (userSpec) {
       var _a = make(userSpec), specEvents = _a.events, spec = __rest(_a, ['events']);
       var components = buildSubcomponents(spec);
-      var completeSpec = __assign({}, spec, {
-        events: __assign({}, DefaultEvents, specEvents),
+      var completeSpec = __assign(__assign({}, spec), {
+        events: __assign(__assign({}, DefaultEvents), specEvents),
         components: components
       });
       return Result.value(build(completeSpec));
@@ -3337,17 +3316,8 @@
       }
       return Option.none();
     };
-    var liftN = function (arr, f) {
-      var r = [];
-      for (var i = 0; i < arr.length; i++) {
-        var x = arr[i];
-        if (x.isSome()) {
-          r.push(x.getOrDie());
-        } else {
-          return Option.none();
-        }
-      }
-      return Option.some(f.apply(null, r));
+    var lift2 = function (oa, ob, f) {
+      return oa.isSome() && ob.isSome() ? Option.some(f(oa.getOrDie(), ob.getOrDie())) : Option.none();
     };
 
     var unknown$3 = 'unknown';
@@ -3587,7 +3557,7 @@
       var wrappedExtra = map$1(extra, function (extraF, extraName) {
         return markAsExtraApi(extraF, extraName);
       });
-      var me = __assign({}, wrappedExtra, wrappedApis, {
+      var me = __assign(__assign(__assign({}, wrappedExtra), wrappedApis), {
         revoke: curry(revokeBehaviour, name),
         config: function (spec) {
           var prepared = asRawOrDie(name + '-config', configSchema, spec);
@@ -5225,8 +5195,7 @@
       simple(anchor, placee.element(), anchoring.bubble, anchoring.layouts, getBounds, anchoring.overrides);
     };
     var position$1 = function (component, posConfig, posState, anchor, placee) {
-      var boxElement = Option.none();
-      positionWithin(component, posConfig, posState, anchor, placee, boxElement);
+      positionWithin(component, posConfig, posState, anchor, placee, Option.none());
     };
     var positionWithin = function (component, posConfig, posState, anchor, placee, boxElement) {
       var boundsBox = boxElement.map(box);
@@ -5304,7 +5273,7 @@
     };
     var detach = function (component) {
       var parent$1 = parent(component.element()).bind(function (p) {
-        return component.getSystem().getByDom(p).fold(Option.none, Option.some);
+        return component.getSystem().getByDom(p).toOption();
       });
       doDetach(component);
       parent$1.each(function (p) {
@@ -5523,7 +5492,7 @@
       return data.dump;
     };
     var augment = function (data, original) {
-      return __assign({}, data.dump, derive$1(original));
+      return __assign(__assign({}, data.dump), derive$1(original));
     };
     var SketchBehaviours = {
       field: field$1,
@@ -5573,7 +5542,7 @@
         var substituted = bind(childSpecs, function (c) {
           return substitute(owner, detail, c, placeholders);
         });
-        return [__assign({}, value, { components: substituted })];
+        return [__assign(__assign({}, value), { components: substituted })];
       }, function (req, valuesThunk) {
         var values = valuesThunk(detail, compSpec.config, compSpec.validated);
         var preprocessor = compSpec.validated.preprocess.getOr(identity);
@@ -5751,7 +5720,7 @@
           var g = doGenerateOne(owner, np.pname);
           r[np.name] = function (config) {
             var validated = asRawOrDie('Part: ' + np.name + ' in ' + owner, objOf(np.schema), config);
-            return __assign({}, g, {
+            return __assign(__assign({}, g), {
               config: config,
               validated: validated
             });
@@ -5888,7 +5857,7 @@
       return factory(detail, components$1, specWithUid, subs.externals());
     };
     var supplyUid = function (spec) {
-      return spec.hasOwnProperty('uid') ? spec : __assign({}, spec, { uid: generate$2('uid') });
+      return spec.hasOwnProperty('uid') ? spec : __assign(__assign({}, spec), { uid: generate$2('uid') });
     };
 
     function isSketchSpec(spec) {
@@ -5918,12 +5887,12 @@
       var extraApis = map$1(config.extraApis, function (f, k) {
         return markAsExtraApi(f, k);
       });
-      return __assign({
+      return __assign(__assign({
         name: constant(config.name),
         partFields: constant([]),
         configFields: constant(config.configFields),
         sketch: sketch
-      }, apis, extraApis);
+      }, apis), extraApis);
     };
     var composite$1 = function (rawConfig) {
       var config = asRawOrDie('Sketcher for ' + rawConfig.name, compositeSchema, rawConfig);
@@ -5935,13 +5904,13 @@
       var extraApis = map$1(config.extraApis, function (f, k) {
         return markAsExtraApi(f, k);
       });
-      return __assign({
+      return __assign(__assign({
         name: constant(config.name),
         partFields: constant(config.partFields),
         configFields: constant(config.configFields),
         sketch: sketch,
         parts: constant(parts)
-      }, apis, extraApis);
+      }, apis), extraApis);
     };
 
     var inside = function (target) {
@@ -7208,8 +7177,8 @@
             });
           });
         });
-        dataByValue.set(__assign({}, currentDataByValue, newDataByValue));
-        dataByText.set(__assign({}, currentDataByText, newDataByText));
+        dataByValue.set(__assign(__assign({}, currentDataByValue), newDataByValue));
+        dataByText.set(__assign(__assign({}, currentDataByText), newDataByText));
       };
       return nu$5({
         readState: readState,
@@ -7565,7 +7534,7 @@
     var builder = function (detail) {
       return {
         dom: detail.dom,
-        domModification: __assign({}, detail.domModification, { attributes: __assign({ 'role': detail.toggling.isSome() ? 'menuitemcheckbox' : 'menuitem' }, detail.domModification.attributes, { 'aria-haspopup': detail.hasSubmenu }, detail.hasSubmenu ? { 'aria-expanded': false } : {}) }),
+        domModification: __assign(__assign({}, detail.domModification), { attributes: __assign(__assign(__assign({ 'role': detail.toggling.isSome() ? 'menuitemcheckbox' : 'menuitem' }, detail.domModification.attributes), { 'aria-haspopup': detail.hasSubmenu }), detail.hasSubmenu ? { 'aria-expanded': false } : {}) }),
         behaviours: SketchBehaviours.augment(detail.itemBehaviours, [
           detail.toggling.fold(Toggling.revoke, function (tConfig) {
             return Toggling.config(__assign({ aria: { mode: 'checked' } }, tConfig));
@@ -7781,7 +7750,7 @@
         name: 'items',
         unit: 'item',
         defaults: function (detail, u) {
-          return u.hasOwnProperty('uid') ? u : __assign({}, u, { uid: generate$2('item') });
+          return u.hasOwnProperty('uid') ? u : __assign(__assign({}, u), { uid: generate$2('item') });
         },
         overrides: function (detail, u) {
           return {
@@ -7928,7 +7897,7 @@
       };
       var setMenuBuilt = function (menuName, built) {
         var _a;
-        menus.set(__assign({}, menus.get(), (_a = {}, _a[menuName] = {
+        menus.set(__assign(__assign({}, menus.get()), (_a = {}, _a[menuName] = {
           type: 'prepared',
           menu: built
         }, _a)));
@@ -7993,7 +7962,7 @@
       var buildMenus = function (container, primaryName, menus) {
         return map$1(menus, function (spec, name) {
           var makeSketch = function () {
-            return Menu.sketch(__assign({ dom: spec.dom }, spec, {
+            return Menu.sketch(__assign(__assign({ dom: spec.dom }, spec), {
               value: name,
               items: spec.items,
               markers: detail.markers,
@@ -8371,8 +8340,7 @@
         Sandboxing.open(sandbox, thing);
       };
       var showAt = function (sandbox, anchor, thing) {
-        var getBounds = Option.none();
-        showWithin(sandbox, anchor, thing, getBounds);
+        showWithin(sandbox, anchor, thing, Option.none());
       };
       var showWithin = function (sandbox, anchor, thing, boxElement) {
         var sink = detail.lazySink(sandbox).getOrDie();
@@ -8558,10 +8526,10 @@
         return anyInSystem.getSystem().getByUid(uid).getOrDie();
       };
       var getOpt = function (anyInSystem) {
-        return anyInSystem.getSystem().getByUid(uid).fold(Option.none, Option.some);
+        return anyInSystem.getSystem().getByUid(uid).toOption();
       };
       var asSpec = function () {
-        return __assign({}, spec, { uid: uid });
+        return __assign(__assign({}, spec), { uid: uid });
       };
       return {
         get: get,
@@ -9519,7 +9487,7 @@
         if (attr.name === 'class') {
           return b;
         } else {
-          return __assign({}, b, (_a = {}, _a[attr.name] = attr.value, _a));
+          return __assign(__assign({}, b), (_a = {}, _a[attr.name] = attr.value, _a));
         }
       }, {});
     };
@@ -11118,7 +11086,7 @@
       }, columns, presets, ItemResponse$1.CLOSE_ON_EXECUTE, function () {
         return false;
       }, backstage.shared.providers);
-      var widgetSpec = deepMerge(__assign({}, menuSpec, {
+      var widgetSpec = deepMerge(__assign(__assign({}, menuSpec), {
         markers: markers$1(presets),
         movement: deriveMenuMovement(columns, presets)
       }));
@@ -13248,7 +13216,7 @@
       var getLazySink = getSink(component, detail);
       return futureData.map(function (tdata) {
         return tdata.bind(function (data) {
-          return Option.from(tieredMenu.sketch(__assign({}, externals.menu(), {
+          return Option.from(tieredMenu.sketch(__assign(__assign({}, externals.menu()), {
             uid: generate$2(''),
             data: data,
             highlightImmediately: highlightOnOpen === HighlightOnOpen.HighlightFirst,
@@ -13447,7 +13415,7 @@
         })]);
     };
     var behaviours = function (detail) {
-      return __assign({}, focusBehaviours(detail), augment(detail.inputBehaviours, [Representing.config({
+      return __assign(__assign({}, focusBehaviours(detail)), augment(detail.inputBehaviours, [Representing.config({
           store: {
             mode: 'manual',
             initialValue: detail.data.getOr(undefined),
@@ -13659,7 +13627,7 @@
             'aria-haspopup': 'true'
           }
         })),
-        behaviours: __assign({}, focusBehaviours$1, augment(detail.typeaheadBehaviours, behaviours)),
+        behaviours: __assign(__assign({}, focusBehaviours$1), augment(detail.typeaheadBehaviours, behaviours)),
         eventOrder: detail.eventOrder
       };
     };
@@ -14202,18 +14170,18 @@
           Focusing.config({})
         ]),
         events: events$7(Option.some(action)),
-        eventOrder: __assign({}, detail.eventOrder, (_a = {}, _a[execute()] = [
+        eventOrder: __assign(__assign({}, detail.eventOrder), (_a = {}, _a[execute()] = [
           'disabling',
           'toggling',
           'alloy.base.behaviour'
         ], _a)),
         apis: apis,
         domModification: {
-          attributes: __assign({ 'aria-haspopup': 'true' }, detail.role.fold(function () {
+          attributes: __assign(__assign({ 'aria-haspopup': 'true' }, detail.role.fold(function () {
             return {};
           }, function (role) {
             return { role: role };
-          }), detail.dom.tag === 'button' ? { type: lookupAttr('type').getOr('button') } : {})
+          })), detail.dom.tag === 'button' ? { type: lookupAttr('type').getOr('button') } : {})
         }
       };
     };
@@ -16320,9 +16288,9 @@
     };
     var renderIFrame = function (spec, providersBackstage) {
       var isSandbox = platformNeedsSandboxing && spec.sandboxed;
-      var attributes = __assign({}, spec.label.map(function (title) {
+      var attributes = __assign(__assign({}, spec.label.map(function (title) {
         return { title: title };
-      }).getOr({}), isSandbox ? { sandbox: 'allow-scripts allow-same-origin' } : {});
+      }).getOr({})), isSandbox ? { sandbox: 'allow-scripts allow-same-origin' } : {});
       var sourcing = getDynamicSource(isSandbox);
       var pLabel = spec.label.map(function (label) {
         return renderLabel(label, providersBackstage);
@@ -17332,7 +17300,7 @@
           'aria-label': translatedTooltip
         };
       });
-      var memDropdown = record(Dropdown.sketch(__assign({}, role, {
+      var memDropdown = record(Dropdown.sketch(__assign(__assign({}, role), {
         dom: {
           tag: 'button',
           classes: [
@@ -17360,7 +17328,7 @@
         ]),
         matchWidth: true,
         useMinWidth: true,
-        dropdownBehaviours: derive$1(spec.dropdownBehaviours.concat([
+        dropdownBehaviours: derive$1(__spreadArrays(spec.dropdownBehaviours, [
           DisablingConfigs.button(spec.disabled),
           Unselecting.config({}),
           Replacing.config({}),
@@ -17450,6 +17418,42 @@
         dropdownBehaviours: [Tabstopping.config({})]
       }, prefix, backstage.shared);
     };
+    var getFetch$1 = function (items, getButton, backstage) {
+      var getMenuItemAction = function (item) {
+        return function (api) {
+          backstage.shared.getSink().each(function (sink) {
+            getButton().getOpt(sink).each(function (orig) {
+              focus$1(orig.element());
+              emitWith(orig, formActionEvent, {
+                name: item.name,
+                value: item.storage.get()
+              });
+            });
+          });
+          var newValue = !api.isActive();
+          api.setActive(newValue);
+          item.storage.set(newValue);
+        };
+      };
+      var getMenuItemSetup = function (item) {
+        return function (api) {
+          api.setActive(item.storage.get());
+        };
+      };
+      return function (success) {
+        success(map(items, function (item) {
+          var text = item.text.fold(function () {
+            return {};
+          }, function (text) {
+            return { text: text };
+          });
+          return __assign(__assign({ type: item.type }, text), {
+            onAction: getMenuItemAction(item),
+            onSetup: getMenuItemSetup(item)
+          });
+        }));
+      };
+    };
 
     var renderCommonSpec = function (spec, actionOpt, extraBehaviours, dom, components) {
       if (extraBehaviours === void 0) {
@@ -17524,14 +17528,14 @@
       }) : Option.none();
       var components = icon.isSome() ? componentRenderPipeline([icon]) : [];
       var innerHtml = icon.isSome() ? {} : { innerHtml: translatedText };
-      var classes = (!spec.primary && !spec.borderless ? [
+      var classes = __spreadArrays(!spec.primary && !spec.borderless ? [
         'tox-button',
         'tox-button--secondary'
-      ] : ['tox-button']).concat(icon.isSome() ? ['tox-button--icon'] : [], spec.borderless ? ['tox-button--naked'] : [], extraClasses);
-      var dom = __assign({
+      ] : ['tox-button'], icon.isSome() ? ['tox-button--icon'] : [], spec.borderless ? ['tox-button--naked'] : [], extraClasses);
+      var dom = __assign(__assign({
         tag: 'button',
         classes: classes
-      }, innerHtml, { attributes: { title: translatedText } });
+      }, innerHtml), { attributes: { title: translatedText } });
       return renderCommonSpec(spec, action, extraBehaviours, dom, components);
     };
     var renderButton = function (spec, action, providersBackstage, extraBehaviours, extraClasses) {
@@ -17568,10 +17572,16 @@
     };
     var renderFooterButton = function (spec, buttonType, backstage) {
       if (isMenuFooterButtonSpec(spec, buttonType)) {
-        return renderMenuButton(spec, 'tox-tbtn', backstage, Option.none());
+        var getButton = function () {
+          return memButton_1;
+        };
+        var menuButtonSpec = spec;
+        var fixedSpec = __assign(__assign({}, spec), { fetch: getFetch$1(menuButtonSpec.items, getButton, backstage) });
+        var memButton_1 = record(renderMenuButton(fixedSpec, 'tox-tbtn', backstage, Option.none()));
+        return memButton_1.asSpec();
       } else if (isNormalFooterButtonSpec(spec, buttonType)) {
         var action = getAction(spec.name, buttonType);
-        var buttonSpec = __assign({}, spec, { borderless: false });
+        var buttonSpec = __assign(__assign({}, spec), { borderless: false });
         return renderButton(buttonSpec, action, backstage.shared.providers, []);
       } else {
         domGlobals.console.error('Unknown footer button type: ', buttonType);
@@ -17780,10 +17790,7 @@
     var makeRatioConverter = function (currentFieldText, otherFieldText) {
       var cValue = parseSize(currentFieldText).toOption();
       var oValue = parseSize(otherFieldText).toOption();
-      return liftN([
-        cValue,
-        oValue
-      ], function (cSize, oSize) {
+      return lift2(cValue, oValue, function (cSize, oSize) {
         return convertUnit(cSize, oSize.unit).map(function (val) {
           return oSize.value / val;
         }).map(function (r) {
@@ -18008,7 +18015,6 @@
           'tox-image-tools-edit-panel'
         ]
       };
-      var none = Option.none();
       var noop$1 = noop;
       var emit$1 = function (comp, event, data) {
         emitWith(comp, event, data);
@@ -18094,7 +18100,7 @@
       });
       var memSize = record(renderSizeInput({
         name: 'size',
-        label: none,
+        label: Option.none(),
         constrain: true,
         disabled: false
       }, providersBackstage));
@@ -18335,14 +18341,14 @@
       var sharpenTransform = Option.some(sharpen$1);
       var invertTransform = Option.some(invert$1);
       var buttonPanelComponents = [
-        createIconButton('crop', 'Crop', getTransformPanelEvent(CropPanel, none, cropPanelUpdate), false),
-        createIconButton('resize', 'Resize', getTransformPanelEvent(ResizePanel, none, resizePanelUpdate), false),
-        createIconButton('orientation', 'Orientation', getTransformPanelEvent(FlipRotatePanel, none, noop$1), false),
-        createIconButton('brightness', 'Brightness', getTransformPanelEvent(BrightnessPanel, none, noop$1), false),
+        createIconButton('crop', 'Crop', getTransformPanelEvent(CropPanel, Option.none(), cropPanelUpdate), false),
+        createIconButton('resize', 'Resize', getTransformPanelEvent(ResizePanel, Option.none(), resizePanelUpdate), false),
+        createIconButton('orientation', 'Orientation', getTransformPanelEvent(FlipRotatePanel, Option.none(), noop$1), false),
+        createIconButton('brightness', 'Brightness', getTransformPanelEvent(BrightnessPanel, Option.none(), noop$1), false),
         createIconButton('sharpen', 'Sharpen', getTransformPanelEvent(FilterPanel, sharpenTransform, noop$1), false),
-        createIconButton('contrast', 'Contrast', getTransformPanelEvent(ContrastPanel, none, noop$1), false),
-        createIconButton('color-levels', 'Color levels', getTransformPanelEvent(ColorizePanel, none, noop$1), false),
-        createIconButton('gamma', 'Gamma', getTransformPanelEvent(GammaPanel, none, noop$1), false),
+        createIconButton('contrast', 'Contrast', getTransformPanelEvent(ContrastPanel, Option.none(), noop$1), false),
+        createIconButton('color-levels', 'Color levels', getTransformPanelEvent(ColorizePanel, Option.none(), noop$1), false),
+        createIconButton('gamma', 'Gamma', getTransformPanelEvent(GammaPanel, Option.none(), noop$1), false),
         createIconButton('invert', 'Invert', getTransformPanelEvent(FilterPanel, invertTransform, noop$1), false)
       ];
       var ButtonPanel = Container.sketch({
@@ -18464,14 +18470,13 @@
     }
 
     var count = 0;
-    function CropRect (currentRect, viewPortRect, clampRect, containerElm, action) {
+    var create$7 = function (currentRect, viewPortRect, clampRect, containerElm, action) {
       var instance;
-      var handles;
       var dragHelpers;
       var blockers;
       var prefix = 'tox-';
       var id = prefix + 'crid-' + count++;
-      handles = [
+      var handles = [
         {
           name: 'move',
           xMul: 0,
@@ -18529,25 +18534,25 @@
         'bottom',
         'left'
       ];
-      function getAbsoluteRect(outerRect, relativeRect) {
+      var getAbsoluteRect = function (outerRect, relativeRect) {
         return {
           x: relativeRect.x + outerRect.x,
           y: relativeRect.y + outerRect.y,
           w: relativeRect.w,
           h: relativeRect.h
         };
-      }
-      function getRelativeRect(outerRect, innerRect) {
+      };
+      var getRelativeRect = function (outerRect, innerRect) {
         return {
           x: innerRect.x - outerRect.x,
           y: innerRect.y - outerRect.y,
           w: innerRect.w,
           h: innerRect.h
         };
-      }
-      function getInnerRect() {
+      };
+      var getInnerRect = function () {
         return getRelativeRect(clampRect, currentRect);
-      }
+      };
       function moveRect(handle, startRect, deltaX, deltaY) {
         var x, y, w, h, rect;
         x = startRect.x;
@@ -18726,7 +18731,8 @@
         destroy: destroy
       }, global$d);
       return instance;
-    }
+    };
+    var CropRect = { create: create$7 };
 
     var loadImage = function (image) {
       return new global$4(function (resolve) {
@@ -18885,7 +18891,7 @@
             behaviours: derive$1([config('image-panel-crop-events', [runOnAttached(function (comp) {
                   memContainer.getOpt(comp).each(function (container) {
                     var el = container.element().dom();
-                    var cRect = CropRect({
+                    var cRect = CropRect.create({
                       x: 10,
                       y: 10,
                       w: 100,
@@ -19465,12 +19471,13 @@
           }
         });
       }).toArray();
+      var placeholder = spec.placeholder.fold(constant({}), function (p) {
+        return { placeholder: providersBackstage.translate(p) };
+      });
+      var inputAttributes = __assign({}, placeholder);
       var pField = FormField.parts().field({
         tag: spec.multiline === true ? 'textarea' : 'input',
-        inputAttributes: spec.placeholder.fold(function () {
-        }, function (placeholder) {
-          return { placeholder: providersBackstage.translate(placeholder) };
-        }),
+        inputAttributes: inputAttributes,
         inputClasses: [spec.classname],
         inputBehaviours: derive$1(flatten([
           baseInputBehaviours,
@@ -19567,7 +19574,7 @@
           });
         }));
       };
-      return __assign({}, delegate, {
+      return __assign(__assign({}, delegate), {
         toCached: toCached,
         bindFuture: bindFuture,
         bindResult: bindResult,
@@ -19749,7 +19756,13 @@
                       type: spec.filetype,
                       url: urlEntry.value
                     }, function (validation) {
-                      completer((validation.status === 'invalid' ? Result.error : Result.value)(validation.message));
+                      if (validation.status === 'invalid') {
+                        var err = Result.error(validation.message);
+                        completer(err);
+                      } else {
+                        var val = Result.value(validation.message);
+                        completer(val);
+                      }
                     });
                   });
                 },
@@ -20490,7 +20503,7 @@
       return {
         toolbar: getToolbarAnchor(bodyElement, lazyAnchorbar, useFixedToolbarContainer),
         toolbarOverflow: getToolbarOverflowAnchor(lazyMoreButton),
-        banner: getBannerAnchor(bodyElement, lazyAnchorbar, lazyMoreButton),
+        banner: getBannerAnchor(bodyElement, lazyAnchorbar, useFixedToolbarContainer),
         cursor: getCursorAnchor(editor, bodyElement),
         node: getNodeAnchor(bodyElement)
       };
@@ -20681,7 +20694,7 @@
               }])
           };
         } else {
-          return __assign({}, acc, { formats: acc.formats.concat(fmt) });
+          return __assign(__assign({}, acc), { formats: acc.formats.concat(fmt) });
         }
       }, {
         customFormats: [],
@@ -20837,7 +20850,7 @@
     };
     var isContentEditableTrue = hasContentEditableState('true');
     var isContentEditableFalse = hasContentEditableState('false');
-    var create$7 = function (type, title, url, level, attach) {
+    var create$8 = function (type, title, url, level, attach) {
       return {
         type: type,
         title: title,
@@ -20889,12 +20902,12 @@
       var attach = function () {
         elm.id = headerId;
       };
-      return create$7('header', getElementText(elm), '#' + headerId, getLevel(elm), attach);
+      return create$8('header', getElementText(elm), '#' + headerId, getLevel(elm), attach);
     };
     var anchorTarget = function (elm) {
       var anchorId = elm.id || elm.name;
       var anchorText = getElementText(elm);
-      return create$7('anchor', anchorText ? anchorText : '#' + anchorId, '#' + anchorId, 0, noop);
+      return create$8('anchor', anchorText ? anchorText : '#' + anchorId, '#' + anchorId, 0, noop);
     };
     var getHeaderTargets = function (elms) {
       return map(filter(elms, isValidHeader), headerTarget);
@@ -21343,10 +21356,10 @@
         components: components,
         behaviours: augment(detail.splitToolbarBehaviours, [
           Coupling.config({
-            others: __assign({}, extras.coupling, {
+            others: __assign(__assign({}, extras.coupling), {
               overflowGroup: function (toolbar) {
-                return ToolbarGroup.sketch(__assign({}, externals['overflow-group'](), {
-                  items: [Button.sketch(__assign({}, externals['overflow-button'](), {
+                return ToolbarGroup.sketch(__assign(__assign({}, externals['overflow-group']()), {
+                  items: [Button.sketch(__assign(__assign({}, externals['overflow-button']()), {
                       action: function (_button) {
                         emit(toolbar, toolbarToggleEvent);
                       }
@@ -21990,12 +22003,12 @@
           classes: ['tox-toolbar__primary']
         }
       });
-      return SplitFloatingToolbar.sketch(__assign({}, baseSpec, {
+      return SplitFloatingToolbar.sketch(__assign(__assign({}, baseSpec), {
         lazySink: toolbarSpec.getSink,
         getAnchor: function () {
           return toolbarSpec.backstage.shared.anchors.toolbarOverflow();
         },
-        parts: __assign({}, baseSpec.parts, {
+        parts: __assign(__assign({}, baseSpec.parts), {
           overflow: {
             dom: {
               tag: 'div',
@@ -22021,7 +22034,7 @@
         }
       });
       var baseSpec = renderMoreToolbarCommon(toolbarSpec, SplitSlidingToolbar.getOverflow);
-      return SplitSlidingToolbar.sketch(__assign({}, baseSpec, {
+      return SplitSlidingToolbar.sketch(__assign(__assign({}, baseSpec), {
         components: [
           primary,
           overflow
@@ -22075,7 +22088,7 @@
       })
     ];
 
-    var MenuButtonSchema = objOf([strictString('type')].concat(baseMenuButtonFields));
+    var MenuButtonSchema = objOf(__spreadArrays([strictString('type')], baseMenuButtonFields));
     var createMenuButton = function (spec) {
       return asRaw('menubutton', MenuButtonSchema, spec);
     };
@@ -22388,7 +22401,7 @@
         uid: detail.uid,
         dom: detail.dom,
         components: components,
-        eventOrder: __assign({}, detail.eventOrder, {
+        eventOrder: __assign(__assign({}, detail.eventOrder), {
           'alloy.execute': [
             'disabling',
             'toggling',
@@ -22714,7 +22727,7 @@
     };
     var renderContextButton = function (memInput, button, extras) {
       var _a = button.original, primary = _a.primary, rest = __rest(_a, ['primary']);
-      var bridged = getOrDie(createToolbarButton(__assign({}, rest, {
+      var bridged = getOrDie(createToolbarButton(__assign(__assign({}, rest), {
         type: 'button',
         onAction: function () {
         }
@@ -22723,7 +22736,7 @@
     };
     var renderContextToggleButton = function (memInput, button, extras) {
       var _a = button.original, primary = _a.primary, rest = __rest(_a, ['primary']);
-      var bridged = getOrDie(createToggleButton(__assign({}, rest, {
+      var bridged = getOrDie(createToggleButton(__assign(__assign({}, rest), {
         type: 'togglebutton',
         onAction: function () {
         }
@@ -22995,7 +23008,7 @@
         var contextForm = getOrDie(createContextForm(toolbarApi));
         forms[key] = contextForm;
         contextForm.launch.map(function (launch) {
-          formNavigators['form:' + key + ''] = __assign({}, toolbarApi.launch, {
+          formNavigators['form:' + key + ''] = __assign(__assign({}, toolbarApi.launch), {
             type: launch.type === 'contextformtogglebutton' ? 'togglebutton' : 'button',
             onAction: function () {
               navigate(contextForm);
@@ -23065,7 +23078,7 @@
       };
     };
 
-    var generateSelectItems = function (editor, backstage, spec) {
+    var generateSelectItems = function (_editor, backstage, spec) {
       var generateItem = function (rawItem, response, disabled, value) {
         var translatedText = backstage.shared.providers.translate(rawItem.title);
         if (rawItem.type === 'separator') {
@@ -23133,7 +23146,8 @@
         getFetch: getFetch
       };
     };
-    var createMenuItems = function (editor, backstage, dataset, spec) {
+    var createMenuItems = function (editor, backstage, spec) {
+      var dataset = spec.dataset;
       var getStyleItems = dataset.type === 'basic' ? function () {
         return map(dataset.data, function (d) {
           return processBasic(d, spec.isSelectedFor, spec.getPreviewFor);
@@ -23144,8 +23158,8 @@
         getStyleItems: getStyleItems
       };
     };
-    var createSelectButton = function (editor, backstage, dataset, spec) {
-      var _a = createMenuItems(editor, backstage, dataset, spec), items = _a.items, getStyleItems = _a.getStyleItems;
+    var createSelectButton = function (editor, backstage, spec) {
+      var _a = createMenuItems(editor, backstage, spec), items = _a.items, getStyleItems = _a.getStyleItems;
       var getApi = function (comp) {
         return {
           getComponent: function () {
@@ -23254,7 +23268,7 @@
           return editor.formatter.match(format);
         };
       };
-      var getPreviewFor = function (format) {
+      var getPreviewFor = function (_format) {
         return function () {
           return Option.none();
         };
@@ -23294,12 +23308,10 @@
       };
     };
     var createAlignSelect = function (editor, backstage) {
-      var spec = getSpec(editor);
-      return createSelectButton(editor, backstage, spec.dataset, spec);
+      return createSelectButton(editor, backstage, getSpec(editor));
     };
     var alignSelectMenu = function (editor, backstage) {
-      var spec = getSpec(editor);
-      var menuItems = createMenuItems(editor, backstage, spec.dataset, spec);
+      var menuItems = createMenuItems(editor, backstage, getSpec(editor));
       editor.ui.registry.addNestedMenuItem('align', {
         text: backstage.shared.providers.translate('Align'),
         getSubmenuItems: function () {
@@ -23419,12 +23431,10 @@
       };
     };
     var createFontSelect = function (editor, backstage) {
-      var spec = getSpec$1(editor);
-      return createSelectButton(editor, backstage, spec.dataset, spec);
+      return createSelectButton(editor, backstage, getSpec$1(editor));
     };
     var fontSelectMenu = function (editor, backstage) {
-      var spec = getSpec$1(editor);
-      var menuItems = createMenuItems(editor, backstage, spec.dataset, spec);
+      var menuItems = createMenuItems(editor, backstage, getSpec$1(editor));
       editor.ui.registry.addNestedMenuItem('fontformats', {
         text: backstage.shared.providers.translate('Fonts'),
         getSubmenuItems: function () {
@@ -23489,9 +23499,7 @@
         var matchOpt = getMatchingValue().matchOpt;
         return matchOpt;
       };
-      var getPreviewFor = function () {
-        return constant(Option.none());
-      };
+      var getPreviewFor = constant(constant(Option.none()));
       var onAction = function (rawItem) {
         return function () {
           editor.undoManager.transact(function () {
@@ -23535,12 +23543,10 @@
       };
     };
     var createFontsizeSelect = function (editor, backstage) {
-      var spec = getSpec$2(editor);
-      return createSelectButton(editor, backstage, spec.dataset, spec);
+      return createSelectButton(editor, backstage, getSpec$2(editor));
     };
     var fontsizeSelectMenu = function (editor, backstage) {
-      var spec = getSpec$2(editor);
-      var menuItems = createMenuItems(editor, backstage, spec.dataset, spec);
+      var menuItems = createMenuItems(editor, backstage, getSpec$2(editor));
       editor.ui.registry.addNestedMenuItem('fontsizes', {
         text: 'Font sizes',
         getSubmenuItems: function () {
@@ -23629,12 +23635,10 @@
       };
     };
     var createFormatSelect = function (editor, backstage) {
-      var spec = getSpec$3(editor);
-      return createSelectButton(editor, backstage, spec.dataset, spec);
+      return createSelectButton(editor, backstage, getSpec$3(editor));
     };
     var formatSelectMenu = function (editor, backstage) {
-      var spec = getSpec$3(editor);
-      var menuItems = createMenuItems(editor, backstage, spec.dataset, spec);
+      var menuItems = createMenuItems(editor, backstage, getSpec$3(editor));
       editor.ui.registry.addNestedMenuItem('blockformats', {
         text: 'Blocks',
         getSubmenuItems: function () {
@@ -23643,7 +23647,7 @@
       });
     };
 
-    var getSpec$4 = function (editor) {
+    var getSpec$4 = function (editor, dataset) {
       var isSelectedFor = function (format) {
         return function () {
           return editor.formatter.match(format);
@@ -23698,16 +23702,17 @@
         shouldHide: editor.getParam('style_formats_autohide', false, 'boolean'),
         isInvalid: function (item) {
           return !editor.formatter.canApply(item.format);
-        }
+        },
+        dataset: dataset
       };
     };
     var createStyleSelect = function (editor, backstage) {
-      var data = backstage.styleselect;
-      return createSelectButton(editor, backstage, data, getSpec$4(editor));
+      var dataset = __assign({ type: 'advanced' }, backstage.styleselect);
+      return createSelectButton(editor, backstage, getSpec$4(editor, dataset));
     };
     var styleSelectMenu = function (editor, backstage) {
-      var data = backstage.styleselect;
-      var menuItems = createMenuItems(editor, backstage, data, getSpec$4(editor));
+      var dataset = __assign({ type: 'advanced' }, backstage.styleselect);
+      var menuItems = createMenuItems(editor, backstage, getSpec$4(editor, dataset));
       editor.ui.registry.addNestedMenuItem('formats', {
         text: 'Formats',
         getSubmenuItems: function () {
@@ -24065,8 +24070,7 @@
       };
       var getAnchor = function (position, element) {
         var anchorage = position === 'node' ? extras.backstage.shared.anchors.node(element) : extras.backstage.shared.anchors.cursor();
-        var anchor = deepMerge(anchorage, position === 'line' ? lineAnchorSpec : anchorSpec);
-        return anchor;
+        return deepMerge(anchorage, position === 'line' ? lineAnchorSpec : anchorSpec);
       };
       var launchContext = function (toolbarApi, elem) {
         clearTimer();
@@ -24505,7 +24509,7 @@
         return apis.showSlot(c, key);
       }
     }, makeApi);
-    var SlotContainer = __assign({}, slotApis, { sketch: sketch$2 });
+    var SlotContainer = __assign(__assign({}, slotApis), { sketch: sketch$2 });
 
     var sidebarSchema = objOf([
       optionString('icon'),
@@ -26339,8 +26343,8 @@
     var clampCoords = function (component, coords, scroll, origin, startData) {
       var bounds = startData.bounds;
       var absoluteCoord = asAbsolute(coords, scroll, origin);
-      var newX = cap(absoluteCoord.left(), bounds.x(), bounds.width() - startData.width);
-      var newY = cap(absoluteCoord.top(), bounds.y(), bounds.height() - startData.height);
+      var newX = cap(absoluteCoord.left(), bounds.x(), bounds.x() + bounds.width() - startData.width);
+      var newY = cap(absoluteCoord.top(), bounds.y(), bounds.y() + bounds.height() - startData.height);
       var newCoords = absolute$2(newX, newY);
       return coords.fold(function () {
         var offset$1 = asOffset(newCoords, scroll, origin);
@@ -27015,7 +27019,8 @@
         },
         backstage: backstage
       });
-      var statusbar = editor.getParam('statusbar', true, 'boolean') && !isInline ? Option.some(renderStatusbar(editor, backstage.shared.providers)) : Option.none();
+      var sb = editor.getParam('statusbar', true, 'boolean');
+      var statusbar = sb && !isInline ? Option.some(renderStatusbar(editor, backstage.shared.providers)) : Option.none();
       var socketSidebarContainer = {
         dom: {
           tag: 'div',
@@ -27061,7 +27066,7 @@
         [partThrobber]
       ]);
       var isHidden = isInline && !hasMenubar && !hasToolbar && !hasMultipleToolbar;
-      var attributes = __assign({ role: 'application' }, global$5.isRtl() ? { dir: 'rtl' } : {}, isHidden ? { 'aria-hidden': 'true' } : {});
+      var attributes = __assign(__assign({ role: 'application' }, global$5.isRtl() ? { dir: 'rtl' } : {}), isHidden ? { 'aria-hidden': 'true' } : {});
       var outerContainer = build$1(OuterContainer.sketch({
         dom: {
           tag: 'div',
@@ -27242,7 +27247,7 @@
       external$1({
         factory: {
           sketch: function (spec, detail) {
-            return __assign({}, spec, {
+            return __assign(__assign({}, spec), {
               dom: detail.dom,
               components: detail.components
             });
@@ -27284,7 +27289,7 @@
         var sink = detail.lazySink(dialog).getOrDie();
         var busyComp = Cell(Option.none());
         var externalBlocker = externals.blocker();
-        var blocker = sink.getSystem().build(__assign({}, externalBlocker, {
+        var blocker = sink.getSystem().build(__assign(__assign({}, externalBlocker), {
           components: externalBlocker.components.concat([premade$1(dialog)]),
           behaviours: derive$1([config('dialog-blocker-events', [
               run(dialogIdleEvent, function (blocker, se) {
@@ -27334,7 +27339,7 @@
         emit(dialog, dialogIdleEvent);
       };
       var modalEventsId = generate$1('modal-events');
-      var eventOrder = __assign({}, detail.eventOrder, { 'alloy.system.attached': [modalEventsId].concat(detail.eventOrder['alloy.system.attached'] || []) });
+      var eventOrder = __assign(__assign({}, detail.eventOrder), { 'alloy.system.attached': [modalEventsId].concat(detail.eventOrder['alloy.system.attached'] || []) });
       return {
         uid: detail.uid,
         dom: detail.dom,
@@ -27630,6 +27635,13 @@
     ];
     var tabPanelSchema = objOf(tabPanelFields);
 
+    var dialogToggleMenuItemSchema = objOf([
+      strictString('type'),
+      strictString('name'),
+      defaultedBoolean('active', false)
+    ].concat(commonMenuItemFields));
+    var dialogToggleMenuItemDataProcessor = boolean;
+
     var baseButtonFields = [
       field('name', 'name', defaultedThunk(function () {
         return generate$1('button-name');
@@ -27642,19 +27654,31 @@
       defaultedBoolean('primary', false),
       defaultedBoolean('disabled', false)
     ];
-    var dialogButtonFields = baseButtonFields.concat([strictString('text')]);
-    var normalButtonFields = [strictStringEnum('type', [
+    var dialogButtonFields = __spreadArrays(baseButtonFields, [strictString('text')]);
+    var normalButtonFields = __spreadArrays([strictStringEnum('type', [
         'submit',
         'cancel',
         'custom'
-      ])].concat(dialogButtonFields);
-    var menuButtonFields = [strictStringEnum('type', ['menu'])].concat(baseButtonFields, baseMenuButtonFields);
+      ])], dialogButtonFields);
+    var menuButtonFields = __spreadArrays([
+      strictStringEnum('type', ['menu']),
+      optionString('text'),
+      optionString('tooltip'),
+      optionString('icon'),
+      strictArrayOf('items', dialogToggleMenuItemSchema),
+      defaultedFunction('onSetup', function () {
+        return noop;
+      })
+    ], baseButtonFields);
     var dialogButtonSchema = choose$1('type', {
       submit: normalButtonFields,
       cancel: normalButtonFields,
       custom: normalButtonFields,
       menu: menuButtonFields
     });
+
+    var dialogButtonFields$1 = dialogButtonFields;
+    var dialogButtonSchema$1 = dialogButtonSchema;
     var dialogSchema = objOf([
       strictString('title'),
       strictOf('body', chooseProcessor('type', {
@@ -27662,7 +27686,7 @@
         tabpanel: tabPanelSchema
       })),
       defaultedString('size', 'normal'),
-      strictArrayOf('buttons', dialogButtonSchema),
+      strictArrayOf('buttons', dialogButtonSchema$1),
       defaulted$1('initialData', {}),
       defaultedFunction('onAction', noop),
       defaultedFunction('onChange', noop),
@@ -27701,7 +27725,8 @@
       textarea: textAreaDataProcessor,
       urlinput: urlInputDataProcessor,
       customeditor: customEditorDataProcessor,
-      collection: collectionDataProcessor
+      collection: collectionDataProcessor,
+      togglemenuitem: dialogToggleMenuItemDataProcessor
     };
     var getDataProcessor = function (item) {
       return Option.from(dataProcessors[item.type]);
@@ -27711,7 +27736,8 @@
     };
 
     var createDataValidator = function (structure) {
-      var fields = bind(getNamedItems(structure), function (item) {
+      var namedItems = getNamedItems(structure);
+      var fields = bind(namedItems, function (item) {
         return getDataProcessor(item).fold(function () {
           return [];
         }, function (schema) {
@@ -27721,10 +27747,10 @@
       return objOf(fields);
     };
 
-    var urlDialogButtonSchema = objOf([strictStringEnum('type', [
+    var urlDialogButtonSchema = objOf(__spreadArrays([strictStringEnum('type', [
         'cancel',
         'custom'
-      ])].concat(dialogButtonFields));
+      ])], dialogButtonFields$1));
     var urlDialogSchema = objOf([
       strictString('title'),
       strictString('url'),
@@ -28348,9 +28374,9 @@
         dom: {
           tag: 'div',
           classes: ['tox-dialog__content-js'],
-          attributes: __assign({}, id.map(function (x) {
+          attributes: __assign(__assign({}, id.map(function (x) {
             return { id: x };
-          }).getOr({}), ariaAttrs ? ariaAttributes : {})
+          }).getOr({})), ariaAttrs ? ariaAttributes : {})
         },
         components: [],
         behaviours: derive$1([
@@ -28433,7 +28459,7 @@
           f(currentDialog, c);
         });
       };
-      return initCommonEvents(fireApiEvent, extras).concat([fireApiEvent(formActionEvent, function (api, spec, event) {
+      return __spreadArrays(initCommonEvents(fireApiEvent, extras), [fireApiEvent(formActionEvent, function (api, spec, event) {
           spec.onAction(api, { name: event.name() });
         })]);
     };
@@ -28450,7 +28476,7 @@
           f(currentDialogInit.internalDialog, c);
         });
       };
-      return initCommonEvents(fireApiEvent, extras).concat([
+      return __spreadArrays(initCommonEvents(fireApiEvent, extras), [
         fireApiEvent(formSubmitEvent, function (api, spec) {
           return spec.onSubmit(api);
         }),
@@ -28587,7 +28613,7 @@
         return getOrDie(asRaw('data', dialogState.dataValidator, data));
       }).getOr(data);
     };
-    var getDialogApi = function (access, doRedial) {
+    var getDialogApi = function (access, doRedial, menuItemStates) {
       var withRoot = function (f) {
         var root = access.getRoot();
         if (root.getSystem().isConnected()) {
@@ -28597,7 +28623,11 @@
       var getData = function () {
         var root = access.getRoot();
         var valueComp = root.getSystem().isConnected() ? access.getFormWrapper() : root;
-        return Representing.getValue(valueComp);
+        var representedValues = Representing.getValue(valueComp);
+        var menuItemCurrentState = map$1(menuItemStates, function (cell) {
+          return cell.get();
+        });
+        return __assign(__assign({}, representedValues), menuItemCurrentState);
       };
       var setData = function (newData) {
         withRoot(function (_) {
@@ -28606,6 +28636,11 @@
           var newInternalData = validateData(access, mergedData);
           var form = access.getFormWrapper();
           Representing.setValue(form, newInternalData);
+          each$1(menuItemStates, function (v, k) {
+            if (has(mergedData, k)) {
+              v.set(mergedData[k]);
+            }
+          });
         });
       };
       var disable = function (name) {
@@ -28807,7 +28842,7 @@
         useTabstopAt: function (elem) {
           return !NavigableObject.isPseudoStop(elem);
         },
-        modalBehaviours: derive$1([
+        modalBehaviours: derive$1(__spreadArrays([
           Reflecting.config({
             channel: dialogChannel,
             updateState: updateState,
@@ -28826,7 +28861,7 @@
               remove$4(body(), 'tox-dialog__disable-scroll');
             })
           ])
-        ].concat(spec.extraBehaviours)),
+        ], spec.extraBehaviours)),
         eventOrder: (_a = {}, _a[execute()] = ['execute-on-form'], _a[receive()] = [
           'reflecting',
           'receiving'
@@ -28848,10 +28883,10 @@
           classes: ['tox-dialog'].concat(spec.extraClasses),
           styles: __assign({ position: 'relative' }, spec.extraStyles)
         },
-        components: [
+        components: __spreadArrays([
           spec.header,
           spec.body
-        ].concat(spec.footer.toArray()),
+        ], spec.footer.toArray()),
         dragBlockClass: 'tox-dialog-wrap',
         parts: {
           blocker: {
@@ -28866,11 +28901,40 @@
         }
       }));
     };
+    var mapMenuButtons = function (buttons) {
+      var mapItems = function (button) {
+        var items = map(button.items, function (item) {
+          var cell = Cell(false);
+          return __assign(__assign({}, item), { storage: cell });
+        });
+        return __assign(__assign({}, button), { items: items });
+      };
+      return map(buttons, function (button) {
+        if (button.type === 'menu') {
+          return mapItems(button);
+        }
+        return button;
+      });
+    };
+    var extractCellsToObject = function (buttons) {
+      return foldl(buttons, function (acc, button) {
+        if (button.type === 'menu') {
+          var menuButton = button;
+          return foldl(menuButton.items, function (innerAcc, item) {
+            innerAcc[item.name] = item.storage;
+            return innerAcc;
+          }, acc);
+        }
+        return acc;
+      }, {});
+    };
 
     var renderDialog = function (dialogInit, extra, backstage) {
       var header = getHeader(dialogInit.internalDialog.title, backstage);
       var body = renderModalBody({ body: dialogInit.internalDialog.body }, backstage);
-      var footer = renderModalFooter({ buttons: dialogInit.internalDialog.buttons }, backstage);
+      var storagedMenuButtons = mapMenuButtons(dialogInit.internalDialog.buttons);
+      var objOfCells = extractCellsToObject(storagedMenuButtons);
+      var footer = renderModalFooter({ buttons: storagedMenuButtons }, backstage);
       var dialogEvents = SilverDialogEvents.initDialog(function () {
         return instanceApi;
       }, getEventExtras(function () {
@@ -28904,7 +28968,7 @@
           getFormWrapper: getForm
         };
       }();
-      var instanceApi = getDialogApi(modalAccess, extra.redial);
+      var instanceApi = getDialogApi(modalAccess, extra.redial, objOfCells);
       return {
         dialog: dialog,
         instanceApi: instanceApi
@@ -29003,14 +29067,14 @@
       }, getEventExtras(function () {
         return dialog;
       }, extra));
-      var styles = __assign({}, internalDialog.height.fold(function () {
+      var styles = __assign(__assign({}, internalDialog.height.fold(function () {
         return {};
       }, function (height) {
         return {
           'height': height + 'px',
           'max-height': height + 'px'
         };
-      }), internalDialog.width.fold(function () {
+      })), internalDialog.width.fold(function () {
         return {};
       }, function (width) {
         return {
@@ -29082,7 +29146,9 @@
         draggable: true
       }, dialogLabelId, backstage.shared.providers));
       var memBody = record(renderInlineBody({ body: dialogInit.internalDialog.body }, dialogContentId, backstage, ariaAttrs));
-      var memFooter = record(renderInlineFooter({ buttons: dialogInit.internalDialog.buttons }, backstage));
+      var storagedMenuButtons = mapMenuButtons(dialogInit.internalDialog.buttons);
+      var objOfCells = extractCellsToObject(storagedMenuButtons);
+      var memFooter = record(renderInlineFooter({ buttons: storagedMenuButtons }, backstage));
       var dialogEvents = SilverDialogEvents.initDialog(function () {
         return instanceApi;
       }, {
@@ -29152,7 +29218,7 @@
           var body = memBody.get(dialog);
           return Composing.getCurrent(body).getOr(body);
         }
-      }, extra.redial);
+      }, extra.redial, objOfCells);
       return {
         dialog: dialog,
         instanceApi: instanceApi
