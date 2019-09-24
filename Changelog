@@ -1,3 +1,5 @@
+2019-09-24 DariusIII
+	* Chg: Disable per group regex lookup, use generic regexes only
 2019-09-23 DariusIII
 	* Chg: Add dariusiii/laravel-cloudflare package for cloudflare users
 	* Chg: Remove unused .js and .css scripts that are not used
