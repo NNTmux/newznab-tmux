@@ -912,7 +912,7 @@ class Movie
                             'title' => $title,
                             'tagline' => $result->tagline(),
                             'plot' => Arr::get($result->plot_split(), '0.plot'),
-                            'rating' => !empty($result->rating()) ? $result->rating() : '',
+                            'rating' => ! empty($result->rating()) ? $result->rating() : '',
                             'year' => $result->year(),
                             'cover' => $result->photo(),
                             'genre' => $result->genre(),
@@ -921,7 +921,7 @@ class Movie
                         ];
 
                         if ($this->echooutput && Utility::isCLI()) {
-                            $this->colorCli->headerOver('IMDb Found ') . $this->colorCli->primaryOver($title) . PHP_EOL;
+                            $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($title).PHP_EOL;
                         }
 
                         return $ret;
@@ -937,7 +937,7 @@ class Movie
                 'title' => $title,
                 'tagline' => $result->tagline(),
                 'plot' => Arr::get($result->plot_split(), '0.plot'),
-                'rating' => !empty($result->rating()) ? $result->rating() : '',
+                'rating' => ! empty($result->rating()) ? $result->rating() : '',
                 'year' => $result->year(),
                 'cover' => $result->photo(),
                 'genre' => $result->genre(),
