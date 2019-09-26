@@ -61,11 +61,15 @@ class MovieController extends BasePageController
                         }
                     }
                 }
+                if (($request->has('update') && (int) $request->input('update') === 1)) {
+                    return back()->withInput();
+                }
 
-                return redirect('admin/movie-list');
+                return redirect('/admin/movie-list');
+
             }
 
-            return redirect('admin/movie-list');
+            return redirect('/admin/movie-list');
         }
 
         $content = $this->smarty->fetch('movie-add.tpl');

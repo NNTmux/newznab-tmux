@@ -7,7 +7,7 @@
 
 			<tr>
 				<td></td>
-				<td>Enter the full 7 digit IMDB id into the box below and click Add.</td>
+				<td>Enter the full numerical part of IMDB id into the box below and click Add.</td>
 			</tr>
 
 			<tr>
