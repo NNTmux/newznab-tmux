@@ -3532,16 +3532,16 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "v0.10.0",
+            "version": "v0.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "e37d12c6093342738e698f84a7b07dc531eaad99"
+                "reference": "848f3625ebed9e888fbdf2cd28a53b256cbd8f30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/e37d12c6093342738e698f84a7b07dc531eaad99",
-                "reference": "e37d12c6093342738e698f84a7b07dc531eaad99",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/848f3625ebed9e888fbdf2cd28a53b256cbd8f30",
+                "reference": "848f3625ebed9e888fbdf2cd28a53b256cbd8f30",
                 "shasum": ""
             },
             "require": {
@@ -3582,7 +3582,7 @@
                 "laravel",
                 "wrapper"
             ],
-            "time": "2019-09-06T16:16:51+00:00"
+            "time": "2019-09-26T08:50:52+00:00"
         },
         {
             "name": "maxmind-db/reader",
