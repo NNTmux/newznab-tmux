@@ -16,7 +16,7 @@ use GuzzleHttp\Cookie\FileCookieJar;
 use Symfony\Component\Process\Process;
 use GuzzleHttp\Exception\RequestException;
 
-if (! function_exists('getRawHtml')) {
+if (!function_exists('getRawHtml')) {
 
     /**
      * @param      $url
@@ -34,7 +34,7 @@ if (! function_exists('getRawHtml')) {
         }
         try {
             $response = $client->get($url)->getBody()->getContents();
-            $jsonResponse = json_decode($response, true);
+            $jsonResponse = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $response = $jsonResponse;
             }
@@ -54,7 +54,7 @@ if (! function_exists('getRawHtml')) {
     }
 }
 
-if (! function_exists('getRawHtmlThroughCF')) {
+if (!function_exists('getRawHtmlThroughCF')) {
 
     /**
      * @param $url
@@ -68,7 +68,7 @@ if (! function_exists('getRawHtmlThroughCF')) {
 
         try {
             $response = $client->get($url)->getBody()->getContents();
-            $jsonResponse = json_decode($response, true);
+            $jsonResponse = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $response = $jsonResponse;
             }
@@ -88,7 +88,7 @@ if (! function_exists('getRawHtmlThroughCF')) {
     }
 }
 
-if (! function_exists('makeFieldLinks')) {
+if (!function_exists('makeFieldLinks')) {
 
     /**
      * @param $data
@@ -114,282 +114,279 @@ if (! function_exists('makeFieldLinks')) {
             if ($i > 7) {
                 break;
             }
-            $newArr[] = '<a href="'.WWW_TOP.'/'.ucfirst($type).'?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
+            $newArr[] = '<a href="' . WWW_TOP . '/' . ucfirst($type) . '?' . $field . '=' . urlencode($ta) . '" title="' . $ta . '">' . $ta . '</a>';
             $i++;
         }
 
         return implode(', ', $newArr);
     }
+}
 
-    if (! function_exists('getUserBrowseOrder')) {
-        /**
-         * @param string $orderBy
-         *
-         * @return array
-         */
-        function getUserBrowseOrder($orderBy): array
-        {
-            $order = ($orderBy === '' ? 'username_desc' : $orderBy);
-            $orderArr = explode('_', $order);
-            switch ($orderArr[0]) {
-                case 'username':
-                    $orderField = 'username';
-                    break;
-                case 'email':
-                    $orderField = 'email';
-                    break;
-                case 'host':
-                    $orderField = 'host';
-                    break;
-                case 'createdat':
-                    $orderField = 'created_at';
-                    break;
-                case 'lastlogin':
-                    $orderField = 'lastlogin';
-                    break;
-                case 'apiaccess':
-                    $orderField = 'apiaccess';
-                    break;
-                case 'apirequests':
-                    $orderField = 'apirequests';
-                    break;
-                case 'grabs':
-                    $orderField = 'grabs';
-                    break;
-                case 'roles_id':
-                    $orderField = 'users_role_id';
-                    break;
-                case 'rolechangedate':
-                    $orderField = 'rolechangedate';
-                    break;
-                default:
-                    $orderField = 'username';
-                    break;
-            }
-            $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
-
-            return [$orderField, $orderSort];
+if (!function_exists('getUserBrowseOrder')) {
+    /**
+     * @param string $orderBy
+     *
+     * @return array
+     */
+    function getUserBrowseOrder($orderBy): array
+    {
+        $order = ($orderBy === '' ? 'username_desc' : $orderBy);
+        $orderArr = explode('_', $order);
+        switch ($orderArr[0]) {
+            case 'email':
+                $orderField = 'email';
+                break;
+            case 'host':
+                $orderField = 'host';
+                break;
+            case 'createdat':
+                $orderField = 'created_at';
+                break;
+            case 'lastlogin':
+                $orderField = 'lastlogin';
+                break;
+            case 'apiaccess':
+                $orderField = 'apiaccess';
+                break;
+            case 'apirequests':
+                $orderField = 'apirequests';
+                break;
+            case 'grabs':
+                $orderField = 'grabs';
+                break;
+            case 'roles_id':
+                $orderField = 'users_role_id';
+                break;
+            case 'rolechangedate':
+                $orderField = 'rolechangedate';
+                break;
+            default:
+                $orderField = 'username';
+                break;
         }
+        $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+
+        return [$orderField, $orderSort];
     }
+}
 
-    if (! function_exists('getUserBrowseOrdering')) {
+if (!function_exists('getUserBrowseOrdering')) {
 
-        /**
-         * @return array
-         */
-        function getUserBrowseOrdering(): array
-        {
-            return [
-                'username_asc',
-                'username_desc',
-                'email_asc',
-                'email_desc',
-                'host_asc',
-                'host_desc',
-                'createdat_asc',
-                'createdat_desc',
-                'lastlogin_asc',
-                'lastlogin_desc',
-                'apiaccess_asc',
-                'apiaccess_desc',
-                'apirequests_asc',
-                'apirequests_desc',
-                'grabs_asc',
-                'grabs_desc',
-                'role_asc',
-                'role_desc',
-                'rolechangedate_asc',
-                'rolechangedate_desc',
-                'verification_asc',
-                'verification_desc',
-            ];
+    /**
+     * @return array
+     */
+    function getUserBrowseOrdering(): array
+    {
+        return [
+            'username_asc',
+            'username_desc',
+            'email_asc',
+            'email_desc',
+            'host_asc',
+            'host_desc',
+            'createdat_asc',
+            'createdat_desc',
+            'lastlogin_asc',
+            'lastlogin_desc',
+            'apiaccess_asc',
+            'apiaccess_desc',
+            'apirequests_asc',
+            'apirequests_desc',
+            'grabs_asc',
+            'grabs_desc',
+            'role_asc',
+            'role_desc',
+            'rolechangedate_asc',
+            'rolechangedate_desc',
+            'verification_asc',
+            'verification_desc',
+        ];
+    }
+}
+
+if (!function_exists('createGUID')) {
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    function createGUID(): string
+    {
+        $data = random_bytes(16);
+        $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40);    // set version to 0100
+        $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(sodium_bin2hex($data), 4));
+    }
+}
+
+if (!function_exists('getSimilarName')) {
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    function getSimilarName($name): string
+    {
+        return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
+    }
+}
+
+if (!function_exists('color')) {
+    /**
+     * @param string $string
+     *
+     * @return \Colors\Color
+     */
+    function color($string = ''): Color
+    {
+        return new Color($string);
+    }
+}
+
+if (!function_exists('human_filesize')) {
+
+    /**
+     * @param     $bytes
+     * @param int $decimals
+     *
+     * @return string
+     */
+    function human_filesize($bytes, $decimals = 0): string
+    {
+        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $factor = floor((\strlen($bytes) - 1) / 3);
+
+        return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals) . @$size[$factor];
+    }
+}
+
+if (!function_exists('bcdechex')) {
+
+    /**
+     * @param $dec
+     *
+     * @return string
+     */
+    function bcdechex($dec)
+    {
+        $hex = '';
+        do {
+            $last = bcmod($dec, 16);
+            $hex = dechex($last) . $hex;
+            $dec = bcdiv(bcsub($dec, $last), 16);
+        } while ($dec > 0);
+
+        return $hex;
+    }
+}
+
+if (!function_exists('runCmd')) {
+    /**
+     * Run CLI command.
+     *
+     *
+     * @param string $command
+     * @param bool $debug
+     *
+     * @return string
+     */
+    function runCmd($command, $debug = false)
+    {
+        if ($debug) {
+            echo '-Running Command: ' . PHP_EOL . '   ' . $command . PHP_EOL;
         }
-    }
 
-    if (! function_exists('createGUID')) {
-        /**
-         * @return string
-         * @throws \Exception
-         */
-        function createGUID(): string
-        {
-            $data = random_bytes(16);
-            $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40);    // set version to 0100
-            $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
+        $process = new Process($command);
+        $process->run();
+        $output = $process->getOutput();
 
-            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(sodium_bin2hex($data), 4));
+        if ($debug) {
+            echo '-Command Output: ' . PHP_EOL . '   ' . $output . PHP_EOL;
         }
-    }
 
-    if (! function_exists('getSimilarName')) {
-        /**
-         * @param string $name
-         *
-         * @return string
-         */
-        function getSimilarName($name): string
-        {
-            return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
+        return $output;
+    }
+}
+
+if (!function_exists('escapeString')) {
+
+    /**
+     * @param $string
+     *
+     * @return string
+     */
+    function escapeString($string)
+    {
+        return DB::connection()->getPdo()->quote($string);
+    }
+}
+
+if (!function_exists('realDuration')) {
+
+    /**
+     * @param $milliseconds
+     *
+     * @return string
+     */
+    function realDuration($milliseconds)
+    {
+        $time = round($milliseconds / 1000);
+
+        return sprintf('%02dh:%02dm:%02ds', $time / 3600, $time / 60 % 60, $time % 60);
+    }
+}
+
+if (!function_exists('is_it_json')) {
+
+    /**
+     * @param array|string $isIt
+     * @return bool
+     */
+    function is_it_json($isIt)
+    {
+        if (is_array($isIt)) {
+            return false;
         }
+        json_decode($isIt);
+
+        return json_last_error() === JSON_ERROR_NONE;
     }
+}
 
-    if (! function_exists('color')) {
-        /**
-         * @param string $string
-         *
-         * @return \Colors\Color
-         */
-        function color($string = ''): Color
-        {
-            return new Color($string);
-        }
-    }
+if (!function_exists('getZipped')) {
 
-    if (! function_exists('human_filesize')) {
+    /**
+     * @param array $guids
+     *
+     * @return string
+     * @throws \Exception
+     */
+    function getZipped(array $guids = []): string
+    {
+        $nzb = new NZB();
+        $zipped = new Zipper();
+        $zippedFileName = now()->format('Ymdhis') . '.nzb.zip';
+        $zippedFilePath = resource_path() . '/tmp/' . $zippedFileName;
 
-        /**
-         * @param     $bytes
-         * @param int $decimals
-         *
-         * @return string
-         */
-        function human_filesize($bytes, $decimals = 0): string
-        {
-            $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            $factor = floor((\strlen($bytes) - 1) / 3);
+        foreach ($guids as $guid) {
+            $nzbPath = $nzb->NZBPath($guid);
 
-            return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals).@$size[$factor];
-        }
-    }
+            if ($nzbPath) {
+                $nzbContents = Utility::unzipGzipFile($nzbPath);
 
-    if (! function_exists('bcdechex')) {
-
-        /**
-         * @param $dec
-         *
-         * @return string
-         */
-        function bcdechex($dec)
-        {
-            $hex = '';
-            do {
-                $last = bcmod($dec, 16);
-                $hex = dechex($last).$hex;
-                $dec = bcdiv(bcsub($dec, $last), 16);
-            } while ($dec > 0);
-
-            return $hex;
-        }
-    }
-
-    if (! function_exists('runCmd')) {
-        /**
-         * Run CLI command.
-         *
-         *
-         * @param string $command
-         * @param bool $debug
-         *
-         * @return string
-         */
-        function runCmd($command, $debug = false)
-        {
-            if ($debug) {
-                echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
-            }
-
-            $process = new Process($command);
-            $process->run();
-            $output = $process->getOutput();
-
-            if ($debug) {
-                echo '-Command Output: '.PHP_EOL.'   '.$output.PHP_EOL;
-            }
-
-            return $output;
-        }
-    }
-
-    if (! function_exists('escapeString')) {
-
-        /**
-         * @param $string
-         *
-         * @return string
-         */
-        function escapeString($string)
-        {
-            return DB::connection()->getPdo()->quote($string);
-        }
-    }
-
-    if (! function_exists('realDuration')) {
-
-        /**
-         * @param $milliseconds
-         *
-         * @return string
-         */
-        function realDuration($milliseconds)
-        {
-            $time = round($milliseconds / 1000);
-
-            return sprintf('%02dh:%02dm:%02ds', $time / 3600, $time / 60 % 60, $time % 60);
-        }
-    }
-
-    if (! function_exists('is_it_json')) {
-
-        /**
-         * @param array|string $isIt
-         * @return bool
-         */
-        function is_it_json($isIt)
-        {
-            if (is_array($isIt)) {
-                return false;
-            }
-            json_decode($isIt);
-
-            return json_last_error() === JSON_ERROR_NONE;
-        }
-    }
-
-    if (! function_exists('getZipped')) {
-
-        /**
-         * @param array $guids
-         *
-         * @return string
-         * @throws \Exception
-         */
-        function getZipped(array $guids = []): string
-        {
-            $nzb = new NZB();
-            $zipped = new Zipper();
-            $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
-            $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
-
-            foreach ($guids as $guid) {
-                $nzbPath = $nzb->NZBPath($guid);
-
-                if ($nzbPath) {
-                    $nzbContents = Utility::unzipGzipFile($nzbPath);
-
-                    if ($nzbContents) {
-                        $filename = $guid;
-                        $r = Release::getByGuid($guid);
-                        if ($r) {
-                            $filename = $r['searchname'];
-                        }
-                        $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
+                if ($nzbContents) {
+                    $filename = $guid;
+                    $r = Release::getByGuid($guid);
+                    if ($r) {
+                        $filename = $r['searchname'];
                     }
+                    $zipped->make($zippedFilePath)->addString($filename . '.nzb', $nzbContents);
                 }
             }
-
-            $zipped->close();
-
-            return File::isFile($zippedFilePath) ? $zippedFilePath : '';
         }
+
+        $zipped->close();
+
+        return File::isFile($zippedFilePath) ? $zippedFilePath : '';
     }
 }
