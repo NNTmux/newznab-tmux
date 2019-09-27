@@ -16,7 +16,7 @@ use GuzzleHttp\Cookie\FileCookieJar;
 use Symfony\Component\Process\Process;
 use GuzzleHttp\Exception\RequestException;
 
-if (!function_exists('getRawHtml')) {
+if (! function_exists('getRawHtml')) {
 
     /**
      * @param      $url
@@ -54,7 +54,7 @@ if (!function_exists('getRawHtml')) {
     }
 }
 
-if (!function_exists('getRawHtmlThroughCF')) {
+if (! function_exists('getRawHtmlThroughCF')) {
 
     /**
      * @param $url
@@ -88,7 +88,7 @@ if (!function_exists('getRawHtmlThroughCF')) {
     }
 }
 
-if (!function_exists('makeFieldLinks')) {
+if (! function_exists('makeFieldLinks')) {
 
     /**
      * @param $data
@@ -114,7 +114,7 @@ if (!function_exists('makeFieldLinks')) {
             if ($i > 7) {
                 break;
             }
-            $newArr[] = '<a href="' . WWW_TOP . '/' . ucfirst($type) . '?' . $field . '=' . urlencode($ta) . '" title="' . $ta . '">' . $ta . '</a>';
+            $newArr[] = '<a href="'.WWW_TOP.'/'.ucfirst($type).'?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
             $i++;
         }
 
@@ -122,7 +122,7 @@ if (!function_exists('makeFieldLinks')) {
     }
 }
 
-if (!function_exists('getUserBrowseOrder')) {
+if (! function_exists('getUserBrowseOrder')) {
     /**
      * @param string $orderBy
      *
@@ -170,7 +170,7 @@ if (!function_exists('getUserBrowseOrder')) {
     }
 }
 
-if (!function_exists('getUserBrowseOrdering')) {
+if (! function_exists('getUserBrowseOrdering')) {
 
     /**
      * @return array
@@ -204,7 +204,7 @@ if (!function_exists('getUserBrowseOrdering')) {
     }
 }
 
-if (!function_exists('createGUID')) {
+if (! function_exists('createGUID')) {
     /**
      * @return string
      * @throws \Exception
@@ -219,7 +219,7 @@ if (!function_exists('createGUID')) {
     }
 }
 
-if (!function_exists('getSimilarName')) {
+if (! function_exists('getSimilarName')) {
     /**
      * @param string $name
      *
@@ -231,7 +231,7 @@ if (!function_exists('getSimilarName')) {
     }
 }
 
-if (!function_exists('color')) {
+if (! function_exists('color')) {
     /**
      * @param string $string
      *
@@ -243,7 +243,7 @@ if (!function_exists('color')) {
     }
 }
 
-if (!function_exists('human_filesize')) {
+if (! function_exists('human_filesize')) {
 
     /**
      * @param     $bytes
@@ -256,11 +256,11 @@ if (!function_exists('human_filesize')) {
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((\strlen($bytes) - 1) / 3);
 
-        return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals) . @$size[$factor];
+        return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals).@$size[$factor];
     }
 }
 
-if (!function_exists('bcdechex')) {
+if (! function_exists('bcdechex')) {
 
     /**
      * @param $dec
@@ -272,7 +272,7 @@ if (!function_exists('bcdechex')) {
         $hex = '';
         do {
             $last = bcmod($dec, 16);
-            $hex = dechex($last) . $hex;
+            $hex = dechex($last).$hex;
             $dec = bcdiv(bcsub($dec, $last), 16);
         } while ($dec > 0);
 
@@ -280,7 +280,7 @@ if (!function_exists('bcdechex')) {
     }
 }
 
-if (!function_exists('runCmd')) {
+if (! function_exists('runCmd')) {
     /**
      * Run CLI command.
      *
@@ -293,7 +293,7 @@ if (!function_exists('runCmd')) {
     function runCmd($command, $debug = false)
     {
         if ($debug) {
-            echo '-Running Command: ' . PHP_EOL . '   ' . $command . PHP_EOL;
+            echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
         }
 
         $process = new Process($command);
@@ -301,14 +301,14 @@ if (!function_exists('runCmd')) {
         $output = $process->getOutput();
 
         if ($debug) {
-            echo '-Command Output: ' . PHP_EOL . '   ' . $output . PHP_EOL;
+            echo '-Command Output: '.PHP_EOL.'   '.$output.PHP_EOL;
         }
 
         return $output;
     }
 }
 
-if (!function_exists('escapeString')) {
+if (! function_exists('escapeString')) {
 
     /**
      * @param $string
@@ -321,7 +321,7 @@ if (!function_exists('escapeString')) {
     }
 }
 
-if (!function_exists('realDuration')) {
+if (! function_exists('realDuration')) {
 
     /**
      * @param $milliseconds
@@ -336,7 +336,7 @@ if (!function_exists('realDuration')) {
     }
 }
 
-if (!function_exists('is_it_json')) {
+if (! function_exists('is_it_json')) {
 
     /**
      * @param array|string $isIt
@@ -353,7 +353,7 @@ if (!function_exists('is_it_json')) {
     }
 }
 
-if (!function_exists('getZipped')) {
+if (! function_exists('getZipped')) {
 
     /**
      * @param array $guids
@@ -365,8 +365,8 @@ if (!function_exists('getZipped')) {
     {
         $nzb = new NZB();
         $zipped = new Zipper();
-        $zippedFileName = now()->format('Ymdhis') . '.nzb.zip';
-        $zippedFilePath = resource_path() . '/tmp/' . $zippedFileName;
+        $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
+        $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
 
         foreach ($guids as $guid) {
             $nzbPath = $nzb->NZBPath($guid);
@@ -380,7 +380,7 @@ if (!function_exists('getZipped')) {
                     if ($r) {
                         $filename = $r['searchname'];
                     }
-                    $zipped->make($zippedFilePath)->addString($filename . '.nzb', $nzbContents);
+                    $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
                 }
             }
         }
