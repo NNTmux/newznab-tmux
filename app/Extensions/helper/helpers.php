@@ -6,13 +6,11 @@ use Blacklight\XXX;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use DariusIII\Zipper\Zipper;
-use Tuna\CloudflareMiddleware;
 use Blacklight\utility\Utility;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use GuzzleHttp\Cookie\FileCookieJar;
 use Symfony\Component\Process\Process;
 use GuzzleHttp\Exception\RequestException;
 
