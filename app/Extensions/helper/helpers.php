@@ -54,40 +54,6 @@ if (! function_exists('getRawHtml')) {
     }
 }
 
-if (! function_exists('getRawHtmlThroughCF')) {
-
-    /**
-     * @param $url
-     *
-     * @return bool|mixed|string
-     */
-    function getRawHtmlThroughCF($url)
-    {
-        $client = new Client(['cookies' => new FileCookieJar('cookies.txt'), 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
-        $client->getConfig('handler')->push(CloudflareMiddleware::create());
-
-        try {
-            $response = $client->get($url)->getBody()->getContents();
-            $jsonResponse = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $response = $jsonResponse;
-            }
-        } catch (RequestException $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getMessage());
-            }
-            $response = false;
-        } catch (\RuntimeException $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getMessage());
-            }
-            $response = false;
-        }
-
-        return $response;
-    }
-}
-
 if (! function_exists('makeFieldLinks')) {
 
     /**
@@ -347,7 +313,7 @@ if (! function_exists('is_it_json')) {
         if (is_array($isIt)) {
             return false;
         }
-        json_decode($isIt);
+        json_decode($isIt, true, 512, JSON_THROW_ON_ERROR);
 
         return json_last_error() === JSON_ERROR_NONE;
     }

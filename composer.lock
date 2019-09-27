@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "46c2cfd7678ac84d327f05a623765e5f",
+    "content-hash": "383df6c4c5140bd8e3873605539ba2af",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -8137,48 +8137,6 @@
             "description": "CssToInlineStyles is a class that enables you to convert HTML-pages/files into HTML-pages/files with inline styles. This is very useful when you're sending emails.",
             "homepage": "https://github.com/tijsverkoyen/CssToInlineStyles",
             "time": "2017-11-27T11:13:29+00:00"
-        },
-        {
-            "name": "tunaabutbul/cloudflare-middleware",
-            "version": "v1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tunaabutbul/cloudflare-middleware.git",
-                "reference": "05a88cf070f041d501a2d8fc3c01bb66ffc63b15"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tunaabutbul/cloudflare-middleware/zipball/05a88cf070f041d501a2d8fc3c01bb66ffc63b15",
-                "reference": "05a88cf070f041d501a2d8fc3c01bb66ffc63b15",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "6.3.*",
-                "php": ">=5.6"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Tuna\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Tuna Abutbul",
-                    "email": "tuna.abutbul+github@gmail.com"
-                }
-            ],
-            "description": "Cloudflare Middleware For Guzzle",
-            "keywords": [
-                "Guzzle",
-                "cloudflare",
-                "middleware"
-            ],
-            "time": "2018-02-07T09:18:26+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
