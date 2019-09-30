@@ -32,7 +32,7 @@ if (! function_exists('getRawHtml')) {
         }
         try {
             $response = $client->get($url)->getBody()->getContents();
-            $jsonResponse = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+            $jsonResponse = json_decode($response, true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $response = $jsonResponse;
             }
@@ -311,7 +311,7 @@ if (! function_exists('is_it_json')) {
         if (is_array($isIt)) {
             return false;
         }
-        json_decode($isIt, true, 512, JSON_THROW_ON_ERROR);
+        json_decode($isIt, true);
 
         return json_last_error() === JSON_ERROR_NONE;
     }
