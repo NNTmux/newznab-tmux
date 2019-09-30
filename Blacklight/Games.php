@@ -548,7 +548,7 @@ class Games
                             $game['esrb'] = 'Not Rated';
                         }
 
-                        if ($this->_gameResults->original_release_date !== '' && ! preg_match('/(TBA|TBD)/i', $this->_gameResults->original_release_date)) {
+                        if ($this->_gameResults->original_release_date !== '' && strtotime($this->_gameResults->original_release_date !== false)) {
                             $dateReleased = $this->_gameResults->original_release_date;
                             $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : now();
                             $game['releasedate'] = (string) $date->format('Y-m-d');
@@ -612,7 +612,7 @@ class Games
                             $genreName = $this->_matchGenre(implode(',', $genres));
 
                             $releaseDate = now()->format('Y-m-d');
-                            if (isset($this->_gameResults->first_release_date) && ! preg_match('/(TBA|TBD)/i', $this->_gameResults->first_release_date)) {
+                            if (isset($this->_gameResults->first_release_date) && strtotime($this->_gameResults->first_release_date) !== false) {
                                 $releaseDate = $this->_gameResults->first_release_date->format('Y-m-d');
                             }
 
