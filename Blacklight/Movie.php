@@ -1266,7 +1266,7 @@ class Movie
                     $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
                     if (($data['total_results'] > 0) && ! empty($data['results'])) {
                         foreach ($data['results'] as $result) {
-                            if (! empty($result['id'])) {
+                            if (! empty($result['id']) && ! empty($result['release_date'])) {
                                 similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
                                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                                     $ret = $this->fetchTMDBProperties($result['id'], true);
