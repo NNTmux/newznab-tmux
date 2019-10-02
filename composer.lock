@@ -3186,28 +3186,28 @@
         },
         {
             "name": "laravelcollective/html",
-            "version": "v6.0.2",
+            "version": "v6.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LaravelCollective/html.git",
-                "reference": "2f181aba73390eec13d398bf57877b1cc3bc2588"
+                "reference": "bcc317d21a7e04eebcc81c4109fa84feaab63590"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/2f181aba73390eec13d398bf57877b1cc3bc2588",
-                "reference": "2f181aba73390eec13d398bf57877b1cc3bc2588",
+                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/bcc317d21a7e04eebcc81c4109fa84feaab63590",
+                "reference": "bcc317d21a7e04eebcc81c4109fa84feaab63590",
                 "shasum": ""
             },
             "require": {
-                "illuminate/http": "6.0.*",
-                "illuminate/routing": "6.0.*",
-                "illuminate/session": "6.0.*",
-                "illuminate/support": "6.0.*",
-                "illuminate/view": "6.0.*",
+                "illuminate/http": "^6.0",
+                "illuminate/routing": "^6.0",
+                "illuminate/session": "^6.0",
+                "illuminate/support": "^6.0",
+                "illuminate/view": "^6.0",
                 "php": ">=7.2"
             },
             "require-dev": {
-                "illuminate/database": "6.0.*",
+                "illuminate/database": "^6.0",
                 "mockery/mockery": "~1.0",
                 "phpunit/phpunit": "~7.1"
             },
@@ -3250,7 +3250,7 @@
             ],
             "description": "HTML and Form Builders for the Laravel Framework",
             "homepage": "https://laravelcollective.com",
-            "time": "2019-09-23T06:16:50+00:00"
+            "time": "2019-10-02T00:37:39+00:00"
         },
         {
             "name": "league/climate",
@@ -3315,16 +3315,16 @@
         },
         {
             "name": "league/csv",
-            "version": "9.3.0",
+            "version": "9.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/csv.git",
-                "reference": "d16f85d1f958a765844db4bc7174017edf2dd637"
+                "reference": "e7225b6cc853942caef1c9c4d8889b716c34bc04"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/csv/zipball/d16f85d1f958a765844db4bc7174017edf2dd637",
-                "reference": "d16f85d1f958a765844db4bc7174017edf2dd637",
+                "url": "https://api.github.com/repos/thephpleague/csv/zipball/e7225b6cc853942caef1c9c4d8889b716c34bc04",
+                "reference": "e7225b6cc853942caef1c9c4d8889b716c34bc04",
                 "shasum": ""
             },
             "require": {
@@ -3380,7 +3380,7 @@
                 "read",
                 "write"
             ],
-            "time": "2019-07-30T14:39:11+00:00"
+            "time": "2019-10-02T18:32:54+00:00"
         },
         {
             "name": "league/flysystem",
