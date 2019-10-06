@@ -849,11 +849,9 @@ class Movie
                 $ret['plot'] = '';
             }
             $tagline = $tmdbLookup['tagline'];
-            if (! empty($tagline)) {
-                $ret['tagline'] = $tagline;
-            } else {
-                $ret['tagline'] = '';
-            }
+
+            $ret['tagline'] = $tagline ?? '';
+
             $released = $tmdbLookup['release_date'];
             if (! empty($released)) {
                 $ret['year'] = Carbon::parse($released)->year;
@@ -974,6 +972,7 @@ class Movie
                         }
 
                         $ret['overview'] = $resp['overview'] ?? '';
+                        $ret['tagline'] = $resp['tagline'] ?? '';
 
                         if (isset($resp['title'])) {
                             $ret['title'] = $resp['title'];
