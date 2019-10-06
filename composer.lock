@@ -3862,16 +3862,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.25.0",
+            "version": "2.25.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "b70da677101cca7b584c7489770d2677c2733593"
+                "reference": "d59c6cea9c4a3547bb6c0dfec451319abdaa4fb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/b70da677101cca7b584c7489770d2677c2733593",
-                "reference": "b70da677101cca7b584c7489770d2677c2733593",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/d59c6cea9c4a3547bb6c0dfec451319abdaa4fb1",
+                "reference": "d59c6cea9c4a3547bb6c0dfec451319abdaa4fb1",
                 "shasum": ""
             },
             "require": {
@@ -3925,7 +3925,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-09-30T16:22:22+00:00"
+            "time": "2019-10-05T15:52:23+00:00"
         },
         {
             "name": "neutron/temporary-filesystem",
@@ -5135,16 +5135,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.0.6",
+            "version": "2.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "c36aa998d55bc2001535cb5bd3c33267af94ab71"
+                "reference": "7398b9878bdb1840d45c150028d07d5fa6a987f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/c36aa998d55bc2001535cb5bd3c33267af94ab71",
-                "reference": "c36aa998d55bc2001535cb5bd3c33267af94ab71",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/7398b9878bdb1840d45c150028d07d5fa6a987f9",
+                "reference": "7398b9878bdb1840d45c150028d07d5fa6a987f9",
                 "shasum": ""
             },
             "require": {
@@ -5195,7 +5195,7 @@
                 "throwaway",
                 "validator"
             ],
-            "time": "2019-09-04T19:12:55+00:00"
+            "time": "2019-10-06T11:23:22+00:00"
         },
         {
             "name": "psr/container",
