@@ -497,9 +497,6 @@ class User extends Authenticatable
         $order = (empty($orderBy) ? 'username_desc' : $orderBy);
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
-            case 'username':
-                $orderField = 'username';
-                break;
             case 'email':
                 $orderField = 'email';
                 break;
