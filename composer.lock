@@ -2397,21 +2397,21 @@
         },
         {
             "name": "jenssegers/model",
-            "version": "v1.2.1",
+            "version": "v1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/model.git",
-                "reference": "b69c870e4f0728bd1b2a69fc9198648cd76b70f0"
+                "reference": "44fb64d4dae0daee89eb62a4fcc40ef6cf7da370"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jenssegers/model/zipball/b69c870e4f0728bd1b2a69fc9198648cd76b70f0",
-                "reference": "b69c870e4f0728bd1b2a69fc9198648cd76b70f0",
+                "url": "https://api.github.com/repos/jenssegers/model/zipball/44fb64d4dae0daee89eb62a4fcc40ef6cf7da370",
+                "reference": "44fb64d4dae0daee89eb62a4fcc40ef6cf7da370",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "5.0 - 6.0",
-                "illuminate/support": "4.0 - 6.0"
+                "illuminate/contracts": "^5.0|^6.0",
+                "illuminate/support": "^4.0|^5.0|^6.0"
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "*",
@@ -2440,7 +2440,7 @@
                 "laravel",
                 "model"
             ],
-            "time": "2019-09-05T04:39:23+00:00"
+            "time": "2019-10-04T10:46:28+00:00"
         },
         {
             "name": "jeremeamia/SuperClosure",
