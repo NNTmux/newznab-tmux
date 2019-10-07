@@ -1,4 +1,5 @@
 2019-10-07 DariusIII
+	* Chg: Update redis config to use phpredis
 	* Chg: Update user role assignment on registration
 2019-10-06 DariusIII
 	* Chg: Update movie tagline handling

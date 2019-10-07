@@ -123,9 +123,9 @@ return [
     */
 
     'redis' => [
-        'client' => 'predis',
+        'client' => 'phpredis',
         'options' => [
-            'cluster' => env('REDIS_CLUSTER', 'predis'),
+            'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => Str::slug(env('APP_NAME', 'laravel'), '_').'_database_',
         ],
         'default' => [
