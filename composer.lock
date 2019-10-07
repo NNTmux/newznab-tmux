@@ -10615,16 +10615,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.4.0",
+            "version": "v0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "205986fa7c8c86c05e70b0324a64c722c95bd712"
+                "reference": "f5a9522ac158976daba4c2323d7018017220b9cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/205986fa7c8c86c05e70b0324a64c722c95bd712",
-                "reference": "205986fa7c8c86c05e70b0324a64c722c95bd712",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/f5a9522ac158976daba4c2323d7018017220b9cb",
+                "reference": "f5a9522ac158976daba4c2323d7018017220b9cb",
                 "shasum": ""
             },
             "require": {
@@ -10647,11 +10647,16 @@
             "suggest": {
                 "orchestra/testbench": "^3.6"
             },
-            "type": "library",
+            "type": "phpstan-extension",
             "extra": {
                 "laravel": {
                     "providers": [
                         "NunoMaduro\\Larastan\\LarastanServiceProvider"
+                    ]
+                },
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
                     ]
                 }
             },
@@ -10681,7 +10686,7 @@
                 "php",
                 "static analysis"
             ],
-            "time": "2019-08-28T08:22:36+00:00"
+            "time": "2019-10-07T07:01:51+00:00"
         },
         {
             "name": "ocramius/package-versions",
