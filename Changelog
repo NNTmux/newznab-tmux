@@ -1,4 +1,5 @@
 2019-10-08 DariusIII
+	* Chg: Rename Redis alias to RedisManager for phpredis usage
 	* Chg: Capabilities request will always return XML
 	* Chg: Use bhuvidya/laravel-countries again
 	* Chg: Use monicahq/laravel-cloudflare once more
