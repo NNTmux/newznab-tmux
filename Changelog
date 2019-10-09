@@ -1,3 +1,5 @@
+2019-10-09 DariusIII
+	* Chg: Add laravel-lodash package and enable igbinary support for redis
 2019-10-08 DariusIII
 	* Chg: Add league/omnipay and inkedcurtis/omnipay-coinpayments for future usage
 	* Chg: Rename Redis alias to RedisManager for phpredis usage

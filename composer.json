@@ -56,7 +56,7 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/DariusIII/laravel-cloudflare"
+            "url": "https://github.com/DariusIII/laravel-lodash"
         }
     ],
   "require": {
@@ -76,6 +76,7 @@
     "ext-mysqlnd": "*",
     "ext-openssl": "*",
     "ext-pcre": "*",
+    "ext-redis": "*",
     "ext-pdo": "*",
     "ext-pdo_mysql": "*",
     "ext-session": "*",
@@ -93,6 +94,7 @@
     "czproject/git-php": "^3.14",
     "dariusiii/l5-fixtures": "^2.0.0",
     "dariusiii/laravel-database-trigger": "^2.0",
+    "dariusiii/laravel-lodash": "dev-master",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
     "dariusiii/tmdb-laravel": "^2.0",
