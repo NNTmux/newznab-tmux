@@ -1,4 +1,5 @@
 2019-10-09 DariusIII
+	* Chg: Update laravel/framework and anhskohbo/no-captcha to latest versions
 	* Chg: Add laravel-lodash package and enable igbinary support for redis
 2019-10-08 DariusIII
 	* Chg: Add league/omnipay and inkedcurtis/omnipay-coinpayments for future usage
