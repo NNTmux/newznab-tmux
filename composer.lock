@@ -1670,22 +1670,22 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "1.0.2",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
-                "reference": "a0ff8a14a66f3119867fa4f47143582013a77f43"
+                "reference": "f892381e10e279e3408acd0df8454972fcc17ff9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/a0ff8a14a66f3119867fa4f47143582013a77f43",
-                "reference": "a0ff8a14a66f3119867fa4f47143582013a77f43",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/f892381e10e279e3408acd0df8454972fcc17ff9",
+                "reference": "f892381e10e279e3408acd0df8454972fcc17ff9",
                 "shasum": ""
             },
             "require": {
                 "illuminate/routing": "^6.0",
                 "illuminate/support": "^6.0",
-                "jenssegers/model": "^1.2.1"
+                "jenssegers/model": "^1.2"
             },
             "require-dev": {
                 "codedungeon/phpunit-result-printer": "*",
@@ -1722,7 +1722,7 @@
                 }
             ],
             "description": "Keeping Your Laravel Forms Awake",
-            "time": "2019-09-14T21:59:41+00:00"
+            "time": "2019-10-08T17:40:35+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -2908,16 +2908,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.4.0",
+            "version": "v3.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "26d2f35a990107eefd09f6baa4db250f54e5c470"
+                "reference": "6279319c0cc35aa9a87490f58ac59e4ca78d4112"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/26d2f35a990107eefd09f6baa4db250f54e5c470",
-                "reference": "26d2f35a990107eefd09f6baa4db250f54e5c470",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/6279319c0cc35aa9a87490f58ac59e4ca78d4112",
+                "reference": "6279319c0cc35aa9a87490f58ac59e4ca78d4112",
                 "shasum": ""
             },
             "require": {
@@ -2973,7 +2973,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-10-01T17:38:43+00:00"
+            "time": "2019-10-08T16:18:52+00:00"
         },
         {
             "name": "laravel/scout",
