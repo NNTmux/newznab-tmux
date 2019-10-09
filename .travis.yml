@@ -33,6 +33,7 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y libsodium-dev
     - pecl install libsodium
+    - sudo apt-get install php-redis
     - mysql_upgrade -u root
     - composer validate
 
