@@ -129,6 +129,7 @@
     "monicahq/laravel-cloudflare": "^1.3",
     "monolog/monolog": "^1.22",
     "nesbot/carbon": "^2.14",
+    "omnipay/paypal": "^3.0",
     "pear/net_nntp": "^1.5",
     "php-ffmpeg/php-ffmpeg": "^0.14",
     "php-http/guzzle6-adapter": "^1.1",
