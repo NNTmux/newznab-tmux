@@ -76,7 +76,6 @@
     "ext-mysqlnd": "*",
     "ext-openssl": "*",
     "ext-pcre": "*",
-    "ext-redis": "*",
     "ext-pdo": "*",
     "ext-pdo_mysql": "*",
     "ext-session": "*",

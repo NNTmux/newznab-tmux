@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71ff35c7c5de367329a6907671a0e690",
+    "content-hash": "256c55755fb8b0bfc1704b981052de57",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -13118,7 +13118,6 @@
         "ext-mysqlnd": "*",
         "ext-openssl": "*",
         "ext-pcre": "*",
-        "ext-redis": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
         "ext-session": "*",

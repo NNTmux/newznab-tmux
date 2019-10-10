@@ -27,7 +27,6 @@ addons:
   apt:
       packages:
       - curl
-      - php-redis
 
 before_install:
     - sudo add-apt-repository ppa:ondrej/php -y
