@@ -335,10 +335,10 @@ if (! function_exists('getZipped')) {
         foreach ($guids as $guid) {
             $nzbPath = $nzb->NZBPath($guid);
 
-            if ($nzbPath) {
+            if ($nzbPath !== false) {
                 $nzbContents = Utility::unzipGzipFile($nzbPath);
 
-                if ($nzbContents) {
+                if ($nzbContents !== false) {
                     $filename = $guid;
                     $r = Release::getByGuid($guid);
                     if ($r) {

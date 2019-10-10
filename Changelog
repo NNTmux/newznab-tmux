@@ -1,3 +1,5 @@
+2019-10-10 DariusIII
+	* Chg: Check for false in getZipped function
 2019-10-09 DariusIII
 	* Chg: Update laravel/framework and anhskohbo/no-captcha to latest versions
 	* Chg: Add laravel-lodash package and enable igbinary support for redis
