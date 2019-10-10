@@ -1,4 +1,5 @@
 2019-10-10 DariusIII
+	* Fix: Fix download of zipped nzbs
 	* Chg: Check for false in getZipped function
 2019-10-09 DariusIII
 	* Chg: Update laravel/framework and anhskohbo/no-captcha to latest versions

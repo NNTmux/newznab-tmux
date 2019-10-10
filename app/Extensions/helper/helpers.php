@@ -331,7 +331,7 @@ if (! function_exists('getZipped')) {
         $zipped = new Zipper();
         $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
         $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
-
+        $archive = $zipped->make($zippedFilePath);
         foreach ($guids as $guid) {
             $nzbPath = $nzb->NZBPath($guid);
 
@@ -344,12 +344,12 @@ if (! function_exists('getZipped')) {
                     if ($r) {
                         $filename = $r['searchname'];
                     }
-                    $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
+                    $archive->addString($filename.'.nzb', $nzbContents);
                 }
             }
         }
 
-        $zipped->close();
+        $archive->close();
 
         return File::isFile($zippedFilePath) ? $zippedFilePath : '';
     }
