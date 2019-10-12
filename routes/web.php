@@ -172,6 +172,22 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
 
     Route::post('btc_payment_callback', 'BtcPaymentController@callback')->name('btc_payment_callback');
 
+    Route::get('pay_by_paypal', 'BtcPaymentController@showPaypal')->name('pay_by_paypal');
+
+    Route::post('pay_by_paypal', 'BtcPaymentController@showpaypal')->name('pay_by_paypal');
+
+    Route::get('paypal', 'BtcPaymentController@paypal')->name('paypal');
+
+    Route::post('paypal', 'BtcPaymentController@paypal')->name('paypal');
+
+    Route::get('thankyou', 'BtcPaymentController@paypalCallback')->name('thankyou');
+
+    Route::post('thankyou', 'BtcPaymentController@paypalCallback')->name('thankyou');
+
+    Route::get('payment_failed', 'BtcPaymentController@paypalFailed')->name('payment_failed');
+
+    Route::post('payment_failed', 'BtcPaymentController@paypalFailed')->name('payment_failed');
+
     Route::get('queue', 'QueueController@index')->name('queue');
 
     Route::post('queue', 'QueueController@index')->name('queue');

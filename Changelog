@@ -1,3 +1,5 @@
+2019-10-12 DariusIII
+	* Chg: Add PayPal support
 2019-10-10 DariusIII
 	* Chg: Add omnipay/paypal for future usage
 	* Fix: Fix download of zipped nzbs
