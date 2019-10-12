@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PaypalPayment;
-use App\Models\Settings;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Blacklight\libraries\Geary;
 use Omnipay\Omnipay;
+use App\Models\Settings;
+use Illuminate\Http\Request;
+use App\Models\PaypalPayment;
+use Blacklight\libraries\Geary;
 use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController
@@ -41,7 +41,7 @@ class BtcPaymentController extends BasePageController
 
                 if ($order->payment_id) {
                     // Redirect to a payment gateway
-                    $url = 'https://gateway.gear.mycelium.com/pay/' . $order->payment_id;
+                    $url = 'https://gateway.gear.mycelium.com/pay/'.$order->payment_id;
 
                     return redirect($url);
                 }
@@ -80,7 +80,7 @@ class BtcPaymentController extends BasePageController
             $amount = $callback_data['price'];
             $addYear = $callback_data['addyears'];
             // If order was paid in full (2) or overpaid (4)
-            if ((int)$order['status'] === 2 || (int)$order['status'] === 4) {
+            if ((int) $order['status'] === 2 || (int) $order['status'] === 4) {
                 User::updateUserRole($callback_data['user_id'], $newRole);
                 User::updateUserRoleChangeDate($callback_data['user_id'], null, $addYear);
             }
@@ -99,14 +99,13 @@ class BtcPaymentController extends BasePageController
         $gateway->initialize(['clientId' => env('PAYPAL_CLIENTID'), 'secret' => env('PAYPAL_SECRET'), 'testMode' => true]);
         $amount = $request->input('amount');
 
-
-// Do a purchase transaction on the gateway
+        // Do a purchase transaction on the gateway
         try {
             $transaction = $gateway->purchase([
                 'amount' => $amount,
                 'currency' => 'USD',
                 'description' => $this->userdata->id,
-                'returnUrl' => 'http://homestead.test/thankyou?id=' . $this->userdata->id . '&amount=' . $amount,
+                'returnUrl' => 'http://homestead.test/thankyou?id='.$this->userdata->id.'&amount='.$amount,
                 'cancelUrl' => 'http://homestead.test/payment_failed',
             ]);
             $response = $transaction->send();
@@ -118,8 +117,8 @@ class BtcPaymentController extends BasePageController
             }
         } catch (\Exception $e) {
             echo "Exception caught while attempting authorize.\n";
-            echo 'Exception type == ' . get_class($e) . "\n";
-            echo 'Message == ' . $e->getMessage() . "\n";
+            echo 'Exception type == '.get_class($e)."\n";
+            echo 'Message == '.$e->getMessage()."\n";
         }
     }
 
@@ -152,7 +151,6 @@ class BtcPaymentController extends BasePageController
 
         $role = Role::query()->where('donation', $amount)->first();
 
-
         $gateway = Omnipay::create('PayPal_Rest');
         $gateway->initialize(['clientId' => env('PAYPAL_CLIENTID'), 'secret' => env('PAYPAL_SECRET'), 'testMode' => true]);
 
@@ -172,7 +170,7 @@ class BtcPaymentController extends BasePageController
                 User::updateUserRoleChangeDate($userId, null, $role->addyears);
                 PaypalPayment::query()->insert(['users_id' => $userId, 'transaction_id' => $request->input('paymentId'), 'created_at' => now(), 'updated_at' => now()]);
                 $title = 'Cheers!';
-                $meta_title = Settings::settingValue('site.main.title') . ' - Payment Complete';
+                $meta_title = Settings::settingValue('site.main.title').' - Payment Complete';
                 $meta_description = 'Payment Complete';
                 $content = $this->smarty->fetch('thankyou.tpl');
                 $this->smarty->assign(compact('content', 'meta_title', 'title', 'meta_description'));

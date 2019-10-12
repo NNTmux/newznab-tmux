@@ -392,7 +392,6 @@ class User extends Authenticatable
      */
     public static function updateUserRole(int $uid, int $role)
     {
-
         $roleQuery = Role::query()->where('id', $role)->first();
         $roleName = $roleQuery->name;
 
