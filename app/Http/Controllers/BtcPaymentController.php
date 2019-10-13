@@ -96,7 +96,7 @@ class BtcPaymentController extends BasePageController
     {
         $this->setPrefs();
         $gateway = Omnipay::create('PayPal_Rest');
-        $gateway->initialize(['clientId' => env('PAYPAL_CLIENTID'), 'secret' => env('PAYPAL_SECRET'), 'testMode' => true]);
+        $gateway->initialize(['clientId' => env('PAYPAL_CLIENTID'), 'secret' => env('PAYPAL_SECRET'), 'testMode' => env('PAYPAL_TEST_MODE')]);
         $amount = $request->input('amount');
 
         // Do a purchase transaction on the gateway
@@ -152,7 +152,7 @@ class BtcPaymentController extends BasePageController
         $role = Role::query()->where('donation', $amount)->first();
 
         $gateway = Omnipay::create('PayPal_Rest');
-        $gateway->initialize(['clientId' => env('PAYPAL_CLIENTID'), 'secret' => env('PAYPAL_SECRET'), 'testMode' => true]);
+        $gateway->initialize(['clientId' => env('PAYPAL_CLIENTID'), 'secret' => env('PAYPAL_SECRET'), 'testMode' => env('PAYPAL_TEST_MODE')]);
 
         $response = $gateway->completePurchase(
             [
