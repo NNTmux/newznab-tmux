@@ -105,8 +105,8 @@ class BtcPaymentController extends BasePageController
                 'amount' => $amount,
                 'currency' => 'USD',
                 'description' => $this->userdata->id,
-                'returnUrl' => 'http://homestead.test/thankyou?id='.$this->userdata->id.'&amount='.$amount,
-                'cancelUrl' => 'http://homestead.test/payment_failed',
+                'returnUrl' => url('/').'/thankyou?id='.$this->userdata->id.'&amount='.$amount,
+                'cancelUrl' => url('/').'/payment_failed',
             ]);
             $response = $transaction->send();
 
@@ -180,12 +180,7 @@ class BtcPaymentController extends BasePageController
                 echo 'Transaction already exists!';
             }
         } else {
-            return redirect('payment_failed');
+            echo $response->getMessage();
         }
-    }
-
-    public function paypalFailed()
-    {
-        echo 'Shit happens';
     }
 }
