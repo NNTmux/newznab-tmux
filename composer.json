@@ -135,7 +135,6 @@
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
     "pragmarx/firewall": "^2.3",
-    "predis/predis": "^1.1",
     "propaganistas/laravel-disposable-email": "^2.0",
     "ramsey/uuid": "^3.7",
     "rtconner/laravel-tagging": "^3.0",
