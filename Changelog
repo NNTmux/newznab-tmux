@@ -1,4 +1,5 @@
 2019-10-14 DariusIII
+	* Chg: Update handling of movie search returned data
 	* Fix: Fix adding new content
 	* Chg: Remove lodash package
 	* Chg: Update horizon config

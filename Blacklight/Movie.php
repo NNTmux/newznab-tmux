@@ -908,14 +908,14 @@ class Movie
                     if ($percent >= self::YEAR_MATCH_PERCENT) {
                         $ret = [
                             'title' => $title,
-                            'tagline' => $result->tagline(),
+                            'tagline' => $result->tagline() ?? '',
                             'plot' => Arr::get($result->plot_split(), '0.plot'),
                             'rating' => ! empty($result->rating()) ? $result->rating() : '',
-                            'year' => $result->year(),
-                            'cover' => $result->photo(),
-                            'genre' => $result->genre(),
-                            'language' => $result->language(),
-                            'type' => $result->movietype(),
+                            'year' => $result->year() ?? '',
+                            'cover' => $result->photo() ?? '',
+                            'genre' => $result->genre() ?? '',
+                            'language' => $result->language() ?? '',
+                            'type' => $result->movietype() ?? '',
                         ];
 
                         if ($this->echooutput && Utility::isCLI()) {
@@ -933,14 +933,14 @@ class Movie
 
             $ret = [
                 'title' => $title,
-                'tagline' => $result->tagline(),
+                'tagline' => $result->tagline() ?? '',
                 'plot' => Arr::get($result->plot_split(), '0.plot'),
                 'rating' => ! empty($result->rating()) ? $result->rating() : '',
-                'year' => $result->year(),
-                'cover' => $result->photo(),
-                'genre' => $result->genre(),
-                'language' => $result->language(),
-                'type' => $result->movietype(),
+                'year' => $result->year() ?? '',
+                'cover' => $result->photo() ?? '',
+                'genre' => $result->genre() ?? '',
+                'language' => $result->language() ?? '',
+                'type' => $result->movietype() ?? '',
             ];
 
             return $ret;
@@ -1077,7 +1077,7 @@ class Movie
                     'cover' => str_replace('100x100', '800x800', $iTunesMovie->getCover()),
                     'genre' => $iTunesMovie->getGenre() ?? '',
                     'plot' => $iTunesMovie->getDescription() ?? '',
-                    'year' => $iTunesMovie->getReleaseDate()->format('Y'),
+                    'year' => $iTunesMovie->getReleaseDate() ? $iTunesMovie->getReleaseDate()->format('Y') : '',
                 ];
             } else {
                 $movie = false;
