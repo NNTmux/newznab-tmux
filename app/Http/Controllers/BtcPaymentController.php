@@ -140,7 +140,6 @@ class BtcPaymentController extends BasePageController
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function paypalCallback(Request $request)
