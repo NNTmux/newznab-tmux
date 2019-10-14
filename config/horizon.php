@@ -148,7 +148,7 @@ return [
             ],
             'supervisor-5' => [
                 'connection' => 'redis',
-                'queue' => ['contactemail',],
+                'queue' => ['contactemail'],
                 'balance' => 'auto',
                 'minProcesses' => 3,
                 'maxProcesses' => 8,
@@ -195,7 +195,7 @@ return [
             ],
             'supervisor-5' => [
                 'connection' => 'redis',
-                'queue' => ['contactemail',],
+                'queue' => ['contactemail'],
                 'balance' => 'auto',
                 'processes' => 3,
                 'tries' => 3,
