@@ -86,7 +86,7 @@ return [
     |
     */
 
-    'fast_termination' => false,
+    'fast_termination' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -116,9 +116,50 @@ return [
         'production' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'queue' => ['default', 'emails', 'newreg', 'welcomeemails', 'contactemail', 'deleted'],
+                'queue' => ['default'],
                 'balance' => 'auto',
-                'processes' => 10,
+                'minProcesses' => 3,
+                'maxProcesses' => 8,
+                'tries' => 3,
+            ],
+            'supervisor-2' => [
+                'connection' => 'redis',
+                'queue' => ['emails'],
+                'balance' => 'auto',
+                'minProcesses' => 3,
+                'maxProcesses' => 8,
+                'tries' => 3,
+            ],
+            'supervisor-3' => [
+                'connection' => 'redis',
+                'queue' => ['newreg'],
+                'balance' => 'auto',
+                'minProcesses' => 3,
+                'maxProcesses' => 8,
+                'tries' => 3,
+            ],
+            'supervisor-4' => [
+                'connection' => 'redis',
+                'queue' => ['welcomeemails'],
+                'balance' => 'auto',
+                'minProcesses' => 3,
+                'maxProcesses' => 8,
+                'tries' => 3,
+            ],
+            'supervisor-5' => [
+                'connection' => 'redis',
+                'queue' => ['contactemail',],
+                'balance' => 'auto',
+                'minProcesses' => 3,
+                'maxProcesses' => 8,
+                'tries' => 3,
+            ],
+            'supervisor-6' => [
+                'connection' => 'redis',
+                'queue' => ['deleted'],
+                'balance' => 'auto',
+                'minProcesses' => 3,
+                'maxProcesses' => 8,
                 'tries' => 3,
             ],
         ],
@@ -126,7 +167,42 @@ return [
         'local' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'queue' => ['default', 'emails', 'newreg', 'welcomeemails', 'contactemail', 'deleted'],
+                'queue' => ['default'],
+                'balance' => 'auto',
+                'processes' => 3,
+                'tries' => 3,
+            ],
+            'supervisor-2' => [
+                'connection' => 'redis',
+                'queue' => ['emails'],
+                'balance' => 'auto',
+                'processes' => 3,
+                'tries' => 3,
+            ],
+            'supervisor-3' => [
+                'connection' => 'redis',
+                'queue' => ['newreg'],
+                'balance' => 'auto',
+                'processes' => 3,
+                'tries' => 3,
+            ],
+            'supervisor-4' => [
+                'connection' => 'redis',
+                'queue' => ['welcomeemails'],
+                'balance' => 'auto',
+                'processes' => 3,
+                'tries' => 3,
+            ],
+            'supervisor-5' => [
+                'connection' => 'redis',
+                'queue' => ['contactemail',],
+                'balance' => 'auto',
+                'processes' => 3,
+                'tries' => 3,
+            ],
+            'supervisor-6' => [
+                'connection' => 'redis',
+                'queue' => ['deleted'],
                 'balance' => 'auto',
                 'processes' => 3,
                 'tries' => 3,
