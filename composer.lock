@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6a2995da03ff2e7ca655ce76c17358fb",
+    "content-hash": "a53e969c125bf15d8a70a913fdb10b7f",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -633,105 +633,6 @@
                 "trigger"
             ],
             "time": "2019-09-10T13:10:35+00:00"
-        },
-        {
-            "name": "dariusiii/laravel-lodash",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/laravel-lodash.git",
-                "reference": "ce0240a14ff7691ff2e83413ca7c5ce8a819ae85"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel-lodash/zipball/ce0240a14ff7691ff2e83413ca7c5ce8a819ae85",
-                "reference": "ce0240a14ff7691ff2e83413ca7c5ce8a819ae85",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^5.8|^6.0",
-                "php": ">=7.1.3"
-            },
-            "require-dev": {
-                "aws/aws-sdk-php": "^3.90",
-                "beyondcode/laravel-self-diagnosis": "^1.2",
-                "elasticsearch/elasticsearch": "^6.1",
-                "longman/php-code-style": "dev-master",
-                "mockery/mockery": "~1.2",
-                "orchestra/testbench": "^3.8|^4.0",
-                "phpunit/phpunit": "~8.0",
-                "predis/predis": "^1.1"
-            },
-            "suggest": {
-                "aws/aws-sdk-php": "Use AWS SQS >=3",
-                "barryvdh/laravel-debugbar": "Allow print compiled queries via function get_db_queries()",
-                "beyondcode/laravel-self-diagnosis": "Run system diagnosis with many custom checks",
-                "elasticsearch/elasticsearch": "Use Elasticsearch service in the laravel",
-                "ext-igbinary": "Needed for speed up Redis/Memcached data serialization and reduce serialized data size",
-                "ext-redis": "Needed for using phpredis",
-                "longman/laravel-multilang": "Adds multilanguage functional to Laravel >=5.5",
-                "ramsey/uuid": "Use UUID identifiers in the eloquent models"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Longman\\LaravelLodash\\": "src/Lodash"
-                },
-                "files": [
-                    "src/helpers.php"
-                ]
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "phpcs": [
-                    "./vendor/bin/phpcs --standard=phpcs.xml -spn --encoding=utf-8 src/ tests/ --report-width=150"
-                ],
-                "phpcbf": [
-                    "./vendor/bin/phpcbf --standard=phpcs.xml -spn --encoding=utf-8 src/ tests/ --report-width=150"
-                ],
-                "test": [
-                    "./vendor/bin/phpunit -c phpunit.xml.dist"
-                ],
-                "coverage-clover": [
-                    "./vendor/bin/phpunit --stop-on-failure --coverage-clover build/logs/clover.xml"
-                ],
-                "coverage-html": [
-                    "./vendor/bin/phpunit --stop-on-failure --coverage-html build/coverage"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Avtandil Kikabidze aka LONGMAN",
-                    "email": "akalongman@gmail.com",
-                    "homepage": "http://longman.me",
-                    "role": "Maintainer, Developer"
-                }
-            ],
-            "description": "Add more functional to Laravel >=5.5",
-            "homepage": "https://github.com/akalongman/laravel-lodash",
-            "keywords": [
-                "aws",
-                "igbinary",
-                "laravel",
-                "lodash",
-                "phpredis",
-                "redis",
-                "sqs",
-                "tools",
-                "utilities"
-            ],
-            "support": {
-                "issues": "https://github.com/akalongman/laravel-lodash/issues",
-                "source": "https://github.com/akalongman/laravel-lodash"
-            },
-            "time": "2019-10-09T08:50:43+00:00"
         },
         {
             "name": "dariusiii/php-itunes-api",
@@ -13156,7 +13057,6 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
-        "dariusiii/laravel-lodash": 20,
         "joshpinkney/tv-maze-php-api": 20
     },
     "prefer-stable": false,

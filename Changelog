@@ -1,4 +1,5 @@
 2019-10-14 DariusIII
+	* Chg: Remove lodash package
 	* Chg: Update horizon config
 2019-10-12 DariusIII
 	* Chg: Add PayPal support
