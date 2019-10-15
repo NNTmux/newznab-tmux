@@ -102,7 +102,9 @@ function categorizeRelease($where, $update = true, $echoOutput = false)
                         )
                     );
                     $release = Release::find($rowRel->id);
-                    $release->retag($catId['tags']);
+                    if (! empty($release)) {
+                        $release->retag($catId['tags']);
+                    }
                 }
                 $chgCount++;
             }
