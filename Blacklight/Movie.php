@@ -973,6 +973,7 @@ class Movie
 
                         $ret['overview'] = $resp['overview'] ?? '';
                         $ret['tagline'] = $resp['tagline'] ?? '';
+                        $ret['year'] = $resp['year'] ?? '';
 
                         if (isset($resp['title'])) {
                             $ret['title'] = $resp['title'];
