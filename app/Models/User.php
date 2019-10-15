@@ -409,12 +409,12 @@ class User extends Authenticatable
     public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0): void
     {
         $user = self::find($uid);
-        $currRoleExp = $user::select(['rolechangedate'])->first();
+        $currRoleExp = $user->rolechangedate ?? now()->toDateTimeString();
         if (! empty($date)) {
             $user->update(['rolechangedate' => $date]);
         }
         if (empty($date) && ! empty($addYear)) {
-            $user->update(['rolechangedate' => Carbon::createFromDate($currRoleExp['rolechangedate'])->addYears($addYear)]);
+            $user->update(['rolechangedate' => Carbon::createFromDate($currRoleExp)->addYears($addYear)]);
         }
     }
 
