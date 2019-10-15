@@ -396,7 +396,7 @@ class User extends Authenticatable
         $roleName = $roleQuery->name;
 
         $user = self::find($uid);
-        $user->assignRole($roleName);
+        $user->syncRoles([$roleName]);
 
         return self::find($uid)->update(['roles_id' => $role]);
     }
@@ -436,7 +436,7 @@ class User extends Authenticatable
         }
         foreach (self::query()->whereDate('rolechangedate', '<', $now)->get() as $expired) {
             $expired->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
-            $expired->syncRoles('User');
+            $expired->syncRoles(['User']);
             SendAccountExpiredEmail::dispatch($expired)->onQueue('emails');
         }
     }

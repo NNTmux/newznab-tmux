@@ -28,7 +28,7 @@ class UserServiceObserver
         $roleData = Role::query()->where('id', $user->roles_id);
         $rateLimit = $roleData->value('rate_limit');
         $roleName = $roleData->value('name');
-        $user->assignRole($roleName);
+        $user->syncRoles([$roleName]);
         $user->update(
             [
                 'api_token' => md5(Password::getRepository()->createNewToken()),

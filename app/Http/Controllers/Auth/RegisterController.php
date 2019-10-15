@@ -79,7 +79,7 @@ class RegisterController extends Controller
         $role = Role::query()->where('id', '=', $data['roles_id'])->first();
 
         if ($role !== null) {
-            $user->assignRole($role->name);
+            $user->syncRoles([$role->name]);
             if ($user->can('view console')) {
                 $user->givePermissionTo('view console');
             }
