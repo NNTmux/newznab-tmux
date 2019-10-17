@@ -1,3 +1,5 @@
+2019-10-17 DariusIII
+	* Chg: Use only local videos_id for getPoster function
 2019-10-15 DariusIII
 	* Chg: Update updateUserRoleChangeDate function
 2019-10-14 DariusIII

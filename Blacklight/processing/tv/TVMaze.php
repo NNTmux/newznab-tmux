@@ -136,7 +136,7 @@ class TVMaze extends TV
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvMazeId) && $tvMazeId > 0) {
                         // Now that we have valid video and tvmaze ids, try to get the poster
-                        $this->getPoster($videoId, $tvMazeId);
+                        $this->getPoster($videoId);
 
                         $seasonNo = preg_replace('/^S0*/i', '', $release['season']);
                         $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
@@ -310,11 +310,10 @@ class TVMaze extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param int $videoId -- the local Video ID
-     * @param int $showId  -- the TVMaze ID
      *
      * @return int
      */
-    public function getPoster($videoId, $showId = 0): int
+    public function getPoster($videoId): int
     {
         $ri = new ReleaseImage();
 

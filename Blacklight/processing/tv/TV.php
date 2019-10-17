@@ -105,11 +105,10 @@ abstract class TV extends Videos
      * Retrieve poster image for TV episode from site using its API.
      *
      * @param int $videoId ID from videos table.
-     * @param int $siteId  ID that this site uses for the programme.
      *
      * @return int
      */
-    abstract protected function getPoster($videoId, $siteId): int;
+    abstract protected function getPoster($videoId): int;
 
     /**
      * Retrieve info of TV programme from site using it's API.

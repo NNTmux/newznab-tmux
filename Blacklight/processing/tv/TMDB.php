@@ -164,7 +164,7 @@ class TMDB extends TV
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($tmdbid) && $tmdbid > 0) {
                         // Now that we have valid video and tmdb ids, try to get the poster
-                        $this->getPoster($videoId, $tmdbid);
+                        $this->getPoster($videoId);
 
                         $seasonNo = preg_replace('/^S0*/i', '', $release['season']);
                         $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
@@ -308,11 +308,10 @@ class TMDB extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param int $videoId -- the local Video ID
-     * @param int $showId  -- the TMDB ID
      *
      * @return int
      */
-    public function getPoster($videoId, $showId = 0): int
+    public function getPoster($videoId): int
     {
         $ri = new ReleaseImage();
 
