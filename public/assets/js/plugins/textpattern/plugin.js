@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -761,6 +761,16 @@
       });
       return createPatternSet(normalized.values);
     };
+    var getForcedRootBlock = function (editor) {
+      var block = editor.getParam('forced_root_block', 'p');
+      if (block === false) {
+        return '';
+      } else if (block === true) {
+        return 'p';
+      } else {
+        return block;
+      }
+    };
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Delay');
 
@@ -774,9 +784,6 @@
 
     var global$4 = tinymce.util.Tools.resolve('tinymce.dom.TreeWalker');
 
-    var isElement = function (node) {
-      return node.nodeType === domGlobals.Node.ELEMENT_NODE;
-    };
     var isText = function (node) {
       return node.nodeType === domGlobals.Node.TEXT_NODE;
     };
@@ -829,6 +836,16 @@
         }
         return true;
       });
+    };
+    var getParentBlock = function (editor, rng) {
+      var parentBlockOpt = Option.from(editor.dom.getParent(rng.startContainer, editor.dom.isBlock));
+      if (getForcedRootBlock(editor) === '') {
+        return parentBlockOpt.orThunk(function () {
+          return Option.some(editor.getBody());
+        });
+      } else {
+        return parentBlockOpt;
+      }
     };
 
     var point = function (element, offset) {
@@ -899,6 +916,14 @@
         });
       }
     };
+    var isBoundary = function (dom, node) {
+      return dom.isBlock(node) || contains([
+        'BR',
+        'IMG',
+        'HR',
+        'INPUT'
+      ], node.nodeName) || dom.getContentEditable(node) === 'false';
+    };
     var outcome = Adt.generate([
       { aborted: [] },
       { edge: ['element'] },
@@ -921,7 +946,7 @@
           return terminate();
         }
       };
-      if (dom.isBlock(node)) {
+      if (isBoundary(dom, node)) {
         return terminate();
       } else if (!isText(node)) {
         return recurse();
@@ -1017,39 +1042,42 @@
       var dom = editor.dom;
       var pattern = match.pattern;
       var rng = resolvePathRange(dom.getRoot(), match.range).getOrDie('Unable to resolve path range');
-      var block = dom.getParent(rng.startContainer, dom.isBlock);
-      if (pattern.type === 'block-format') {
-        if (isBlockFormatName(pattern.format, editor.formatter)) {
+      getParentBlock(editor, rng).each(function (block) {
+        if (pattern.type === 'block-format') {
+          if (isBlockFormatName(pattern.format, editor.formatter)) {
+            editor.undoManager.transact(function () {
+              stripPattern(editor.dom, block, pattern);
+              editor.formatter.apply(pattern.format);
+            });
+          }
+        } else if (pattern.type === 'block-command') {
           editor.undoManager.transact(function () {
             stripPattern(editor.dom, block, pattern);
-            editor.formatter.apply(pattern.format);
+            editor.execCommand(pattern.cmd, false, pattern.value);
           });
         }
-      } else if (pattern.type === 'block-command') {
-        editor.undoManager.transact(function () {
-          stripPattern(editor.dom, block, pattern);
-          editor.execCommand(pattern.cmd, false, pattern.value);
-        });
-      }
+      });
       return true;
     };
     var findPatterns = function (editor, patterns) {
       var dom = editor.dom;
       var rng = editor.selection.getRng();
-      var block = dom.getParent(rng.startContainer, dom.isBlock);
-      if (!(dom.is(block, 'p') && isElement(block))) {
-        return [];
-      }
-      var blockText = block.textContent;
-      var matchedPattern = findPattern(patterns, blockText);
-      return matchedPattern.map(function (pattern) {
-        if (global$3.trim(blockText).length === pattern.start.length) {
-          return [];
-        }
-        return [{
-            pattern: pattern,
-            range: generatePathRange(dom.getRoot(), block, 0, block, 0)
-          }];
+      return getParentBlock(editor, rng).filter(function (block) {
+        var forcedRootBlock = getForcedRootBlock(editor);
+        var matchesForcedRootBlock = forcedRootBlock === '' && dom.is(block, 'body') || dom.is(block, forcedRootBlock);
+        return block !== null && matchesForcedRootBlock;
+      }).bind(function (block) {
+        var blockText = block.textContent;
+        var matchedPattern = findPattern(patterns, blockText);
+        return matchedPattern.map(function (pattern) {
+          if (global$3.trim(blockText).length === pattern.start.length) {
+            return [];
+          }
+          return [{
+              pattern: pattern,
+              range: generatePathRange(dom.getRoot(), block, 0, block, 0)
+            }];
+        });
       }).getOr([]);
     };
     var applyMatches = function (editor, matches) {
@@ -1282,10 +1310,10 @@
       if (rng.collapsed === false) {
         return [];
       }
-      var block = editor.dom.getParent(rng.startContainer, editor.dom.isBlock);
-      var offset = rng.startOffset - (space ? 1 : 0);
-      var resultOpt = findPatternsRec(editor, patterns, rng.startContainer, offset, block);
-      return resultOpt.fold(function () {
+      return getParentBlock(editor, rng).bind(function (block) {
+        var offset = rng.startOffset - (space ? 1 : 0);
+        return findPatternsRec(editor, patterns, rng.startContainer, offset, block);
+      }).fold(function () {
         return [];
       }, function (result) {
         return result.matches;

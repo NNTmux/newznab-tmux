@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -539,7 +539,7 @@
     var register$1 = function (editor, toggleState) {
       editor.ui.registry.addToggleButton('visualchars', {
         tooltip: 'Show invisible characters',
-        icon: 'paragraph',
+        icon: 'visualchars',
         onAction: function () {
           return editor.execCommand('mceVisualChars');
         },

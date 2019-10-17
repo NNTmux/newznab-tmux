@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -85,34 +85,19 @@
       useQuickLink: useQuickLink
     };
 
-    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-
-    var global$4 = tinymce.util.Tools.resolve('tinymce.Env');
-
     var appendClickRemove = function (link, evt) {
       domGlobals.document.body.appendChild(link);
       link.dispatchEvent(evt);
       domGlobals.document.body.removeChild(link);
     };
     var open = function (url) {
-      if (!global$4.ie || global$4.ie > 10) {
-        var link = domGlobals.document.createElement('a');
-        link.target = '_blank';
-        link.href = url;
-        link.rel = 'noreferrer noopener';
-        var evt = domGlobals.document.createEvent('MouseEvents');
-        evt.initMouseEvent('click', true, true, domGlobals.window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        appendClickRemove(link, evt);
-      } else {
-        var win = domGlobals.window.open('', '_blank');
-        if (win) {
-          win.opener = null;
-          var doc = win.document;
-          doc.open();
-          doc.write('<meta http-equiv="refresh" content="0; url=' + global$3.DOM.encode(url) + '">');
-          doc.close();
-        }
-      }
+      var link = domGlobals.document.createElement('a');
+      link.target = '_blank';
+      link.href = url;
+      link.rel = 'noreferrer noopener';
+      var evt = domGlobals.document.createEvent('MouseEvents');
+      evt.initMouseEvent('click', true, true, domGlobals.window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+      appendClickRemove(link, evt);
     };
     var OpenUrl = { open: open };
 
@@ -283,7 +268,7 @@
       return nativeSlice.call(x);
     };
 
-    var global$5 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
     var hasProtocol = function (url) {
       return /^\w+:/i.test(url);
@@ -296,7 +281,7 @@
       var rules = ['noopener'];
       var rels = rel ? rel.split(/\s+/) : [];
       var toString = function (rels) {
-        return global$5.trim(rels.sort().join(' '));
+        return global$3.trim(rels.sort().join(' '));
       };
       var addTargetRules = function (rels) {
         rels = removeTargetRules(rels);
@@ -304,7 +289,7 @@
       };
       var removeTargetRules = function (rels) {
         return rels.filter(function (val) {
-          return global$5.inArray(rules, val) === -1;
+          return global$3.inArray(rules, val) === -1;
         });
       };
       var newRels = isUnsafe ? addTargetRules(rels) : removeTargetRules(rels);
@@ -329,7 +314,7 @@
       return elm && elm.nodeName === 'A' && !!elm.href;
     };
     var hasLinks = function (elements) {
-      return global$5.grep(elements, isLink).length > 0;
+      return global$3.grep(elements, isLink).length > 0;
     };
     var isOnlyTextSelected = function (html) {
       if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') === -1)) {
@@ -475,7 +460,7 @@
     };
     var sanitizeList = function (list, extractValue) {
       var out = [];
-      global$5.each(list, function (item) {
+      global$3.each(list, function (item) {
         var text = isString(item.text) ? item.text : isString(item.title) ? item.title : '';
         if (item.menu !== undefined) ; else {
           var value = extractValue(item);
@@ -1231,11 +1216,11 @@
       pure: pure$1
     };
 
-    var global$6 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+    var global$4 = tinymce.util.Tools.resolve('tinymce.util.Delay');
 
     var delayedConfirm = function (editor, message, callback) {
       var rng = editor.selection.getRng();
-      global$6.setEditorTimeout(editor, function () {
+      global$4.setEditorTimeout(editor, function () {
         editor.windowManager.confirm(message, function (state) {
           editor.selection.setRng(rng);
           callback(state);
@@ -1307,7 +1292,7 @@
     };
     var ClassListOptions = { getClasses: getClasses };
 
-    var global$7 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+    var global$5 = tinymce.util.Tools.resolve('tinymce.util.XHR');
 
     var parseJson = function (text) {
       try {
@@ -1323,7 +1308,7 @@
       var linkList = Settings.getLinkList(editor);
       return Future.nu(function (callback) {
         if (isString(linkList)) {
-          global$7.send({
+          global$5.send({
             url: linkList,
             success: function (text) {
               return callback(parseJson(text));
@@ -1726,8 +1711,8 @@
       });
     };
     var setupContextMenu = function (editor) {
-      var noLink = 'link';
       var inLink = 'link unlink openlink';
+      var noLink = 'link';
       editor.ui.registry.addContextMenu('link', {
         update: function (element) {
           return Utils.hasLinks(editor.dom.getParents(element, 'a')) ? inLink : noLink;

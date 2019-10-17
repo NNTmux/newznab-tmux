@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -229,6 +229,22 @@
       });
       return r;
     };
+    var find = function (obj, pred) {
+      var props = keys(obj);
+      for (var k = 0, len = props.length; k < len; k++) {
+        var i = props[k];
+        var x = obj[i];
+        if (pred(x, i, obj)) {
+          return Option.some(x);
+        }
+      }
+      return Option.none();
+    };
+    var values = function (obj) {
+      return mapToArray(obj, function (v) {
+        return v;
+      });
+    };
     var has = function (obj, key) {
       return hasOwnProperty.call(obj, key);
     };
@@ -248,19 +264,21 @@
     var transitionend = constant('transitionend');
     var selectstart = constant('selectstart');
 
-    var cached = function (f) {
-      var called = false;
-      var r;
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        if (!called) {
-          called = true;
-          r = f.apply(null, args);
-        }
-        return r;
+    var Cell = function (initial) {
+      var value = initial;
+      var get = function () {
+        return value;
+      };
+      var set = function (v) {
+        value = v;
+      };
+      var clone = function () {
+        return Cell(get());
+      };
+      return {
+        get: get,
+        set: set,
+        clone: clone
       };
     };
 
@@ -273,7 +291,7 @@
       }
       return undefined;
     };
-    var find = function (regexes, agent) {
+    var find$1 = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
       if (!r) {
         return {
@@ -291,7 +309,7 @@
       if (versionRegexes.length === 0) {
         return unknown();
       }
-      return find(versionRegexes, cleanedAgent);
+      return find$1(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
       return nu(0, 0);
@@ -395,15 +413,15 @@
       freebsd: constant(freebsd)
     };
 
-    var DeviceType = function (os, browser, userAgent) {
+    var DeviceType = function (os, browser, userAgent, mediaMatch) {
       var isiPad = os.isiOS() && /ipad/i.test(userAgent) === true;
       var isiPhone = os.isiOS() && !isiPad;
-      var isAndroid3 = os.isAndroid() && os.version.major === 3;
-      var isAndroid4 = os.isAndroid() && os.version.major === 4;
-      var isTablet = isiPad || isAndroid3 || isAndroid4 && /mobile/i.test(userAgent) === true;
-      var isTouch = os.isiOS() || os.isAndroid();
-      var isPhone = isTouch && !isTablet;
+      var isMobile = os.isiOS() || os.isAndroid();
+      var isTouch = isMobile || mediaMatch('(pointer:coarse)');
+      var isTablet = isiPad || !isiPhone && isMobile && mediaMatch('(min-device-width:768px)');
+      var isPhone = isiPhone || isMobile && !isTablet;
       var iOSwebview = browser.isSafari() && os.isiOS() && /safari/i.test(userAgent) === false;
+      var isDesktop = !isPhone && !isTablet && !iOSwebview;
       return {
         isiPad: constant(isiPad),
         isiPhone: constant(isiPhone),
@@ -412,7 +430,8 @@
         isTouch: constant(isTouch),
         isAndroid: os.isAndroid,
         isiOS: os.isiOS,
-        isWebView: constant(iOSwebview)
+        isWebView: constant(iOSwebview),
+        isDesktop: constant(isDesktop)
       };
     };
 
@@ -502,7 +521,7 @@
       });
       return acc;
     };
-    var find$1 = function (xs, pred) {
+    var find$2 = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
         if (pred(x, i)) {
@@ -562,7 +581,7 @@
 
     var detect$1 = function (candidates, userAgent) {
       var agent = String(userAgent).toLowerCase();
-      return find$1(candidates, function (candidate) {
+      return find$2(candidates, function (candidate) {
         return candidate.search(agent);
       });
     };
@@ -725,12 +744,12 @@
       oses: constant(oses)
     };
 
-    var detect$2 = function (userAgent) {
+    var detect$2 = function (userAgent, mediaMatch) {
       var browsers = PlatformInfo.browsers();
       var oses = PlatformInfo.oses();
       var browser = UaString.detectBrowser(browsers, userAgent).fold(Browser.unknown, Browser.nu);
       var os = UaString.detectOs(oses, userAgent).fold(OperatingSystem.unknown, OperatingSystem.nu);
-      var deviceType = DeviceType(os, browser, userAgent);
+      var deviceType = DeviceType(os, browser, userAgent, mediaMatch);
       return {
         browser: browser,
         os: os,
@@ -739,11 +758,13 @@
     };
     var PlatformDetection = { detect: detect$2 };
 
-    var detect$3 = cached(function () {
-      var userAgent = domGlobals.navigator.userAgent;
-      return PlatformDetection.detect(userAgent);
-    });
-    var PlatformDetection$1 = { detect: detect$3 };
+    var mediaMatch = function (query) {
+      return domGlobals.window.matchMedia(query).matches;
+    };
+    var platform = Cell(PlatformDetection.detect(domGlobals.navigator.userAgent, mediaMatch));
+    var detect$3 = function () {
+      return platform.get();
+    };
 
     var alloy = { tap: constant('alloy.tap') };
     var focus = constant('alloy.focus');
@@ -753,7 +774,7 @@
     var execute = constant('alloy.execute');
     var focusItem = constant('alloy.focus.item');
     var tap = alloy.tap;
-    var tapOrClick = PlatformDetection$1.detect().deviceType.isTouch() ? alloy.tap : click;
+    var tapOrClick = detect$3().deviceType.isTouch() ? alloy.tap : click;
     var longpress = constant('alloy.longpress');
     var systemInit = constant('alloy.system.init');
     var attachedToDom = constant('alloy.system.attached');
@@ -783,6 +804,22 @@
     };
     var dispatchFocus = function (component, target) {
       component.getSystem().triggerFocus(target, component.element());
+    };
+
+    var cached = function (f) {
+      var called = false;
+      var r;
+      return function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+        }
+        if (!called) {
+          called = true;
+          r = f.apply(null, args);
+        }
+        return r;
+      };
     };
 
     var fromHtml = function (html, scope) {
@@ -910,7 +947,7 @@
     };
     var checkDupes = function (everything) {
       var sorted = sort(everything);
-      var dupe = find$1(sorted, function (s, i) {
+      var dupe = find$2(sorted, function (s, i) {
         return i < sorted.length - 1 && s === sorted[i + 1];
       });
       dupe.each(function (d) {
@@ -1009,7 +1046,7 @@
     var ieContains = function (e1, e2) {
       return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
-    var browser = PlatformDetection$1.detect().browser;
+    var browser = detect$3().browser;
     var contains$2 = browser.isIE() ? ieContains : regularContains;
 
     var owner = function (element) {
@@ -1126,6 +1163,38 @@
       emit(component, attachedToDom());
     };
     var attach = function (parent, child) {
+      append(parent.element(), child.element());
+    };
+    var detachChildren = function (component) {
+      each$1(component.components(), function (childComp) {
+        return remove(childComp.element());
+      });
+      empty(component.element());
+      component.syncComponents();
+    };
+    var replaceChildren = function (component, newChildren) {
+      var subs = component.components();
+      detachChildren(component);
+      var deleted = difference(subs, newChildren);
+      each$1(deleted, function (comp) {
+        fireDetaching(comp);
+        component.getSystem().removeFromWorld(comp);
+      });
+      each$1(newChildren, function (childComp) {
+        if (!childComp.getSystem().isConnected()) {
+          component.getSystem().addToWorld(childComp);
+          attach(component, childComp);
+          if (inBody(component.element())) {
+            fireAttaching(childComp);
+          }
+        } else {
+          attach(component, childComp);
+        }
+        component.syncComponents();
+      });
+    };
+
+    var attach$1 = function (parent, child) {
       attachWith(parent, child, append);
     };
     var attachWith = function (parent, child, insertion) {
@@ -1150,16 +1219,10 @@
         p.syncComponents();
       });
     };
-    var detachChildren = function (component) {
-      var subs = component.components();
-      each$1(subs, doDetach);
-      empty(component.element());
-      component.syncComponents();
-    };
     var attachSystemAfter = function (element, guiSystem) {
-      attachSystemInternal(element, guiSystem, after);
+      attachSystemWith(element, guiSystem, after);
     };
-    var attachSystemInternal = function (element, guiSystem, inserter) {
+    var attachSystemWith = function (element, guiSystem, inserter) {
       inserter(element, guiSystem.element());
       var children$1 = children(guiSystem.element());
       each$1(children$1, function (child) {
@@ -2551,24 +2614,6 @@
       apis: SwapApis
     });
 
-    var Cell = function (initial) {
-      var value = initial;
-      var get = function () {
-        return value;
-      };
-      var set = function (v) {
-        value = v;
-      };
-      var clone = function () {
-        return Cell(get());
-      };
-      return {
-        get: get,
-        set: set,
-        clone: clone
-      };
-    };
-
     var focus$1 = function (element) {
       element.dom().focus();
     };
@@ -2697,6 +2742,18 @@
       }
       return r;
     };
+    var sequence = function (arr) {
+      var r = [];
+      for (var i = 0; i < arr.length; i++) {
+        var x = arr[i];
+        if (x.isSome()) {
+          r.push(x.getOrDie());
+        } else {
+          return Option.none();
+        }
+      }
+      return Option.some(r);
+    };
     var findMap = function (arr, f) {
       for (var i = 0; i < arr.length; i++) {
         var r = f(arr[i], i);
@@ -2813,7 +2870,7 @@
       var err = new Error();
       if (err.stack !== undefined) {
         var lines = err.stack.split('\n');
-        return find$1(lines, function (line) {
+        return find$2(lines, function (line) {
           return line.indexOf('alloy') > 0 && !exists(path, function (p) {
             return line.indexOf(p) > -1;
           });
@@ -3079,7 +3136,7 @@
       var onMousedown = function (component, simulatedEvent) {
         simulatedEvent.cut();
       };
-      var pointerEvents = PlatformDetection$1.detect().deviceType.isTouch() ? [run(tap(), onClick)] : [
+      var pointerEvents = detect$3().deviceType.isTouch() ? [run(tap(), onClick)] : [
         run(click(), onClick),
         run(mousedown(), onMousedown)
       ];
@@ -3315,20 +3372,20 @@
     var cyclePrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
       var after = reverse(values.slice(index + 1));
-      return find$1(before.concat(after), predicate);
+      return find$2(before.concat(after), predicate);
     };
     var tryPrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
-      return find$1(before, predicate);
+      return find$2(before, predicate);
     };
     var cycleNext = function (values, index, predicate) {
       var before = values.slice(0, index);
       var after = values.slice(index + 1);
-      return find$1(after.concat(before), predicate);
+      return find$2(after.concat(before), predicate);
     };
     var tryNext = function (values, index, predicate) {
       var after = values.slice(index + 1);
-      return find$1(after, predicate);
+      return find$2(after, predicate);
     };
 
     var inSet = function (keys) {
@@ -3361,7 +3418,7 @@
       };
     };
     var choose$2 = function (transitions, event) {
-      var transition = find$1(transitions, function (t) {
+      var transition = find$2(transitions, function (t) {
         return t.matches(event);
       });
       return transition.map(function (t) {
@@ -3436,7 +3493,7 @@
     };
     var highlightBy = function (component, hConfig, hState, predicate) {
       var candidates = getCandidates(component, hConfig);
-      var targetComp = find$1(candidates, predicate);
+      var targetComp = find$2(candidates, predicate);
       targetComp.each(function (c) {
         highlight$1(component, hConfig, hState, c);
       });
@@ -4927,8 +4984,8 @@
       getToolbarIconButton: getToolbarIconButton
     };
 
-    var platform = PlatformDetection$1.detect();
-    var isTouch = platform.deviceType.isTouch();
+    var platform$1 = detect$3();
+    var isTouch = platform$1.deviceType.isTouch();
     var labelPart = optional({
       schema: [strict$1('dom')],
       name: 'label'
@@ -5298,7 +5355,7 @@
     };
     var Position = r;
 
-    var isTouch$1 = PlatformDetection$1.detect().deviceType.isTouch();
+    var isTouch$1 = detect$3().deviceType.isTouch();
     var _sliderChangeEvent = 'slider.change.value';
     var sliderChangeEvent = constant(_sliderChangeEvent);
     var getEventSource = function (simulatedEvent) {
@@ -5888,7 +5945,7 @@
         edgeActions: edgeActions$2
     });
 
-    var isTouch$2 = PlatformDetection$1.detect().deviceType.isTouch();
+    var isTouch$2 = detect$3().deviceType.isTouch();
     var SliderSchema = [
       defaulted$1('stepSize', 1),
       defaulted$1('onChange', noop),
@@ -5941,7 +5998,7 @@
         return Cell(false);
       })] : []);
 
-    var isTouch$3 = PlatformDetection$1.detect().deviceType.isTouch();
+    var isTouch$3 = detect$3().deviceType.isTouch();
     var sketch = function (detail, components, _spec, _externals) {
       var getThumb = function (component) {
         return getPartOrDie(component, detail, 'thumb');
@@ -6028,13 +6085,20 @@
               channels: {
                 'mouse.released': {
                   onReceive: function (slider, se) {
-                    var wasDown = detail.mouseIsDown.get();
-                    detail.mouseIsDown.set(false);
-                    if (wasDown) {
+                    var fireOnChoose = function () {
                       getPart(slider, detail, 'thumb').each(function (thumb) {
                         var value = modelDetail.value.get();
                         detail.onChoose(slider, thumb, value);
                       });
+                    };
+                    if (isTouch$3) {
+                      fireOnChoose();
+                    } else {
+                      var wasDown = detail.mouseIsDown.get();
+                      detail.mouseIsDown.set(false);
+                      if (wasDown) {
+                        fireOnChoose();
+                      }
                     }
                   }
                 }
@@ -6282,7 +6346,7 @@
         return eq(root, e);
       };
       var elemSize = getRawOrComputed(isRoot, elem);
-      return find$1(candidates, function (size) {
+      return find$2(candidates, function (size) {
         return elemSize === size;
       }).getOr(defaultSize);
     };
@@ -6698,14 +6762,14 @@
       query: query
     };
 
-    var platform$1 = PlatformDetection$1.detect();
+    var platform$2 = detect$3();
     var preserve = function (f, editor) {
       var rng = editor.selection.getRng();
       f();
       editor.selection.setRng(rng);
     };
     var forAndroid = function (editor, f) {
-      var wrapper = platform$1.os.isAndroid() ? preserve : apply;
+      var wrapper = platform$2.os.isAndroid() ? preserve : apply;
       wrapper(f, editor);
     };
     var RangePreserver = { forAndroid: forAndroid };
@@ -8418,12 +8482,9 @@
     };
 
     var set$8 = function (component, replaceConfig, replaceState, data) {
-      detachChildren(component);
       preserve$1(function () {
-        var children = map$1(data, component.getSystem().build);
-        each$1(children, function (l) {
-          attach(component, l);
-        });
+        var newChildren = map$1(data, component.getSystem().build);
+        replaceChildren(component, newChildren);
       }, component.element());
     };
     var insert = function (component, replaceConfig, insertion, childSpec) {
@@ -8438,7 +8499,7 @@
     };
     var remove$7 = function (component, replaceConfig, replaceState, removee) {
       var children = contents(component);
-      var foundChild = find$1(children, function (child) {
+      var foundChild = find$2(children, function (child) {
         return eq(removee.element(), child.element());
       });
       foundChild.each(detach);
@@ -8544,6 +8605,40 @@
         var sPaths = generate$5(dir, sExpansions);
         paths.set(sPaths);
       };
+      var getTriggeringItem = function (menuValue) {
+        return find(expansions.get(), function (v, k) {
+          return v === menuValue;
+        });
+      };
+      var getTriggerData = function (menuValue, getItemByValue, path) {
+        return getPreparedMenu(menuValue).bind(function (menu) {
+          return getTriggeringItem(menuValue).bind(function (triggeringItemValue) {
+            return getItemByValue(triggeringItemValue).map(function (triggeredItem) {
+              return {
+                triggeredMenu: menu,
+                triggeringItem: triggeredItem,
+                triggeringPath: path
+              };
+            });
+          });
+        });
+      };
+      var getTriggeringPath = function (itemValue, getItemByValue) {
+        var extraPath = filter(lookupItem(itemValue).toArray(), function (menuValue) {
+          return getPreparedMenu(menuValue).isSome();
+        });
+        return readOptFrom$1(paths.get(), itemValue).bind(function (path) {
+          var revPath = reverse(extraPath.concat(path));
+          var triggers = bind(revPath, function (menuValue, menuIndex) {
+            return getTriggerData(menuValue, getItemByValue, revPath.slice(0, menuIndex + 1)).fold(function () {
+              return primary.get().is(menuValue) ? [] : [Option.none()];
+            }, function (data) {
+              return [Option.some(data)];
+            });
+          });
+          return sequence(triggers);
+        });
+      };
       var expand = function (itemValue) {
         return readOptFrom$1(expansions.get(), itemValue).map(function (menu) {
           var current = readOptFrom$1(paths.get(), itemValue).getOr([]);
@@ -8558,19 +8653,21 @@
       var refresh = function (itemValue) {
         return readOptFrom$1(paths.get(), itemValue);
       };
+      var getPreparedMenu = function (menuValue) {
+        return lookupMenu(menuValue).bind(extractPreparedMenu);
+      };
       var lookupMenu = function (menuValue) {
         return readOptFrom$1(menus.get(), menuValue);
+      };
+      var lookupItem = function (itemValue) {
+        return readOptFrom$1(expansions.get(), itemValue);
       };
       var otherMenus = function (path) {
         var menuValues = directory.get();
         return difference(keys(menuValues), path);
       };
       var getPrimary = function () {
-        return primary.get().bind(function (primaryName) {
-          return lookupMenu(primaryName).bind(function (prep) {
-            return prep.type === 'prepared' ? Option.some(prep.menu) : Option.none();
-          });
-        });
+        return primary.get().bind(getPreparedMenu);
       };
       var getMenus = function () {
         return menus.get();
@@ -8582,14 +8679,22 @@
         refresh: refresh,
         collapse: collapse,
         lookupMenu: lookupMenu,
+        lookupItem: lookupItem,
         otherMenus: otherMenus,
         getPrimary: getPrimary,
         getMenus: getMenus,
         clear: clear,
-        isClear: isClear
+        isClear: isClear,
+        getTriggeringPath: getTriggeringPath
       };
     };
-    var LayeredState = { init: init$3 };
+    var extractPreparedMenu = function (prep) {
+      return prep.type === 'prepared' ? Option.some(prep.menu) : Option.none();
+    };
+    var LayeredState = {
+      init: init$3,
+      extractPreparedMenu: extractPreparedMenu
+    };
 
     var make$3 = function (detail, rawUiSpec) {
       var submenuParentItems = Cell(Option.none());
@@ -8623,6 +8728,17 @@
       };
       var getItemValue = function (item) {
         return Representing.getValue(item).value;
+      };
+      var getItemByValue = function (container, menus, itemValue) {
+        return findMap(menus, function (menu) {
+          if (!menu.getSystem().isConnected()) {
+            return Option.none();
+          }
+          var candidates = Highlighting.getCandidates(menu);
+          return find$2(candidates, function (c) {
+            return getItemValue(c) === itemValue;
+          });
+        });
       };
       var toDirectory = function (container) {
         return map(detail.data.menus, function (data, menuName) {
@@ -8728,7 +8844,7 @@
               if (!inBody(activeMenu.element())) {
                 Replacing.append(container, premade$1(activeMenu));
               }
-              detail.onOpenSubmenu(container, item, activeMenu);
+              detail.onOpenSubmenu(container, item, activeMenu, reverse(path));
               if (decision === ExpandHighlightDecision.HighlightSubmenu) {
                 Highlighting.highlightFirst(activeMenu);
                 return updateMenuPath(container, layeredState, path);
@@ -8783,11 +8899,14 @@
       };
       var events = derive([
         run(focus$4(), function (sandbox, simulatedEvent) {
-          var menu = simulatedEvent.event().menu();
-          Highlighting.highlight(sandbox, menu);
-          var value = getItemValue(simulatedEvent.event().item());
-          layeredState.refresh(value).each(function (path) {
-            return closeOthers(sandbox, layeredState, path);
+          var item = simulatedEvent.event().item();
+          layeredState.lookupItem(getItemValue(item)).each(function () {
+            var menu = simulatedEvent.event().menu();
+            Highlighting.highlight(sandbox, menu);
+            var value = getItemValue(simulatedEvent.event().item());
+            layeredState.refresh(value).each(function (path) {
+              return closeOthers(sandbox, layeredState, path);
+            });
           });
         }),
         runOnExecute(function (component, simulatedEvent) {
@@ -8818,11 +8937,12 @@
           expandRight(sandbox, item, ExpandHighlightDecision.HighlightParent);
           detail.onHover(sandbox, item);
         })] : []));
+      var getActiveItem = function (container) {
+        return Highlighting.getHighlighted(container).bind(Highlighting.getHighlighted);
+      };
       var collapseMenuApi = function (container) {
-        Highlighting.getHighlighted(container).each(function (currentMenu) {
-          Highlighting.getHighlighted(currentMenu).each(function (currentItem) {
-            collapseLeft(container, currentItem);
-          });
+        getActiveItem(container).each(function (currentItem) {
+          collapseLeft(container, currentItem);
         });
       };
       var highlightPrimary = function (container) {
@@ -8830,9 +8950,40 @@
           setActiveMenu(container, primary);
         });
       };
+      var extractMenuFromContainer = function (container) {
+        return Option.from(container.components()[0]).filter(function (comp) {
+          return get(comp.element(), 'role') === 'menu';
+        });
+      };
+      var repositionMenus = function (container) {
+        var maybeActivePrimary = layeredState.getPrimary().bind(function (primary) {
+          return getActiveItem(container).bind(function (currentItem) {
+            var itemValue = getItemValue(currentItem);
+            var allMenus = values(layeredState.getMenus());
+            var preparedMenus = cat(map$1(allMenus, LayeredState.extractPreparedMenu));
+            return layeredState.getTriggeringPath(itemValue, function (v) {
+              return getItemByValue(container, preparedMenus, v);
+            });
+          }).map(function (triggeringPath) {
+            return {
+              primary: primary,
+              triggeringPath: triggeringPath
+            };
+          });
+        });
+        maybeActivePrimary.fold(function () {
+          extractMenuFromContainer(container).each(function (primaryMenu) {
+            detail.onRepositionMenu(container, primaryMenu, []);
+          });
+        }, function (_a) {
+          var primary = _a.primary, triggeringPath = _a.triggeringPath;
+          detail.onRepositionMenu(container, primary, triggeringPath);
+        });
+      };
       var apis = {
         collapseMenu: collapseMenuApi,
-        highlightPrimary: highlightPrimary
+        highlightPrimary: highlightPrimary,
+        repositionMenus: repositionMenus
       };
       return {
         uid: detail.uid,
@@ -8895,6 +9046,7 @@
         onStrictKeyboardHandler('onEscape'),
         onStrictHandler('onOpenMenu'),
         onStrictHandler('onOpenSubmenu'),
+        onStrictHandler('onRepositionMenu'),
         onHandler('onCollapseMenu'),
         defaulted$1('highlightImmediately', true),
         strictObjOf('data', [
@@ -8923,6 +9075,9 @@
         },
         highlightPrimary: function (apis, tmenu) {
           apis.highlightPrimary(tmenu);
+        },
+        repositionMenus: function (apis, tmenu) {
+          apis.repositionMenus(tmenu);
         }
       },
       factory: make$3,
@@ -9560,21 +9715,23 @@
         raw: constant(raw)
       };
     };
+    var fromRawEvent = function (rawEvent) {
+      var target = Element.fromDom(rawEvent.target);
+      var stop = function () {
+        rawEvent.stopPropagation();
+      };
+      var prevent = function () {
+        rawEvent.preventDefault();
+      };
+      var kill = compose(prevent, stop);
+      return mkEvent(target, rawEvent.clientX, rawEvent.clientY, stop, prevent, kill, rawEvent);
+    };
     var handle = function (filter, handler) {
       return function (rawEvent) {
         if (!filter(rawEvent)) {
           return;
         }
-        var target = Element.fromDom(rawEvent.target);
-        var stop = function () {
-          rawEvent.stopPropagation();
-        };
-        var prevent = function () {
-          rawEvent.preventDefault();
-        };
-        var kill = compose(prevent, stop);
-        var evt = mkEvent(target, rawEvent.clientX, rawEvent.clientY, stop, prevent, kill, rawEvent);
-        handler(evt);
+        handler(fromRawEvent(rawEvent));
       };
     };
     var binder = function (element, event, filter, handler, useCapture) {
@@ -9609,7 +9766,7 @@
       return { isPortrait: constant(isPortrait) };
     };
     var getActualWidth = function (outerWindow) {
-      var isIos = PlatformDetection$1.detect().os.isiOS();
+      var isIos = detect$3().os.isiOS();
       var isPortrait = get$a(outerWindow).isPortrait();
       return isIos && !isPortrait ? outerWindow.screen.height : outerWindow.screen.width;
     };
@@ -9694,9 +9851,10 @@
     };
     var monitor = function (settings) {
       var startData = Cell(Option.none());
+      var longpressFired = Cell(false);
       var longpress$1 = DelayedFunction(function (event) {
-        startData.set(Option.none());
         settings.triggerEvent(longpress(), event);
+        longpressFired.set(true);
       }, LONGPRESS_DELAY);
       var handleTouchstart = function (event) {
         getTouch(event).each(function (touch) {
@@ -9707,6 +9865,7 @@
             target: event.target
           };
           longpress$1.schedule(event);
+          longpressFired.set(false);
           startData.set(Option.some(data));
         });
         return Option.none();
@@ -9728,7 +9887,12 @@
           return eq(data.target(), event.target());
         };
         return startData.get().filter(isSame).map(function (data) {
-          return settings.triggerEvent(tap(), event);
+          if (longpressFired.get()) {
+            event.prevent();
+            return false;
+          } else {
+            return settings.triggerEvent(tap(), event);
+          }
         });
       };
       var handlers = wrapAll$1([
@@ -9780,7 +9944,7 @@
     };
     var TappingEvent = { monitor: monitor$1 };
 
-    var isAndroid6 = PlatformDetection$1.detect().os.version.major >= 6;
+    var isAndroid6 = detect$3().os.version.major >= 6;
     var initEvents = function (editorApi, toolstrip, alloy) {
       var tapping = TappingEvent.monitor(editorApi);
       var outerDoc = owner(toolstrip);
@@ -10610,7 +10774,7 @@
     var ancestorPosition = 'position:absolute!important;';
     var ancestorStyles = 'top:0!important;left:0!important;margin:0!important;padding:0!important;width:100%!important;height:100%!important;overflow:visible!important;';
     var bgFallback = 'background-color:rgb(255,255,255)!important;';
-    var isAndroid = PlatformDetection$1.detect().os.isAndroid();
+    var isAndroid = detect$3().os.isAndroid();
     var matchColor = function (editorBody) {
       var color = get$3(editorBody, 'background-color');
       return color !== undefined && color !== '' ? 'background-color:' + color + '!important' : bgFallback;
@@ -11381,7 +11545,7 @@
         'textarea'
       ], name(event.target())) && !closest$3(event.target(), '[contenteditable="true"]');
     };
-    var isFirefox = PlatformDetection$1.detect().browser.isFirefox();
+    var isFirefox = detect$3().browser.isFirefox();
     var settingsSchema = objOfOnly([
       strictFunction('triggerEvent'),
       defaulted$1('stopBackspace', true)
@@ -11402,7 +11566,7 @@
     };
     var setup$2 = function (container, rawSettings) {
       var settings = asRawOrDie('Getting GUI events settings', settingsSchema, rawSettings);
-      var pointerEvents = PlatformDetection$1.detect().deviceType.isTouch() ? [
+      var pointerEvents = detect$3().deviceType.isTouch() ? [
         'touchstart',
         'touchmove',
         'touchend',
@@ -11797,7 +11961,7 @@
         component.disconnect();
       };
       var add = function (component) {
-        attach(root, component);
+        attach$1(root, component);
       };
       var remove$1 = function (component) {
         detach(component);
@@ -13641,7 +13805,7 @@
         var doScrollIntoView = function () {
           editor.fire('ScrollIntoView');
         };
-        var realm = PlatformDetection$1.detect().os.isAndroid() ? AndroidRealm(doScrollIntoView) : IosRealm(doScrollIntoView);
+        var realm = detect$3().os.isAndroid() ? AndroidRealm(doScrollIntoView) : IosRealm(doScrollIntoView);
         var original = Element.fromDom(targetNode);
         attachSystemAfter(original, realm.system());
         var findFocusIn = function (elem) {
@@ -13815,7 +13979,11 @@
             open: constant({
               progressBar: { value: noop },
               close: noop,
-              text: noop
+              text: noop,
+              getEl: constant(null),
+              moveTo: noop,
+              moveRel: noop,
+              settings: {}
             }),
             close: noop,
             reposition: noop,

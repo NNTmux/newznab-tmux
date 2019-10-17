@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -1774,17 +1774,20 @@
               {
                 type: 'input',
                 label: 'Vertical space',
-                name: 'vspace'
+                name: 'vspace',
+                inputMode: 'numeric'
               },
               {
                 type: 'input',
                 label: 'Horizontal space',
-                name: 'hspace'
+                name: 'hspace',
+                inputMode: 'numeric'
               },
               {
                 type: 'input',
                 label: 'Border width',
-                name: 'border'
+                name: 'border',
+                inputMode: 'numeric'
               },
               {
                 type: 'selectbox',

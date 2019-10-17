@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -271,19 +271,21 @@
       documentPositionContainedBy: documentPositionContainedBy
     };
 
-    var cached = function (f) {
-      var called = false;
-      var r;
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        if (!called) {
-          called = true;
-          r = f.apply(null, args);
-        }
-        return r;
+    var Cell = function (initial) {
+      var value = initial;
+      var get = function () {
+        return value;
+      };
+      var set = function (v) {
+        value = v;
+      };
+      var clone = function () {
+        return Cell(get());
+      };
+      return {
+        get: get,
+        set: set,
+        clone: clone
       };
     };
 
@@ -418,15 +420,15 @@
       freebsd: constant(freebsd)
     };
 
-    var DeviceType = function (os, browser, userAgent) {
+    var DeviceType = function (os, browser, userAgent, mediaMatch) {
       var isiPad = os.isiOS() && /ipad/i.test(userAgent) === true;
       var isiPhone = os.isiOS() && !isiPad;
-      var isAndroid3 = os.isAndroid() && os.version.major === 3;
-      var isAndroid4 = os.isAndroid() && os.version.major === 4;
-      var isTablet = isiPad || isAndroid3 || isAndroid4 && /mobile/i.test(userAgent) === true;
-      var isTouch = os.isiOS() || os.isAndroid();
-      var isPhone = isTouch && !isTablet;
+      var isMobile = os.isiOS() || os.isAndroid();
+      var isTouch = isMobile || mediaMatch('(pointer:coarse)');
+      var isTablet = isiPad || !isiPhone && isMobile && mediaMatch('(min-device-width:768px)');
+      var isPhone = isiPhone || isMobile && !isTablet;
       var iOSwebview = browser.isSafari() && os.isiOS() && /safari/i.test(userAgent) === false;
+      var isDesktop = !isPhone && !isTablet && !iOSwebview;
       return {
         isiPad: constant(isiPad),
         isiPhone: constant(isiPhone),
@@ -435,7 +437,8 @@
         isTouch: constant(isTouch),
         isAndroid: os.isAndroid,
         isiOS: os.isiOS,
-        isWebView: constant(iOSwebview)
+        isWebView: constant(iOSwebview),
+        isDesktop: constant(isDesktop)
       };
     };
 
@@ -578,12 +581,12 @@
       oses: constant(oses)
     };
 
-    var detect$2 = function (userAgent) {
+    var detect$2 = function (userAgent, mediaMatch) {
       var browsers = PlatformInfo.browsers();
       var oses = PlatformInfo.oses();
       var browser = UaString.detectBrowser(browsers, userAgent).fold(Browser.unknown, Browser.nu);
       var os = UaString.detectOs(oses, userAgent).fold(OperatingSystem.unknown, OperatingSystem.nu);
-      var deviceType = DeviceType(os, browser, userAgent);
+      var deviceType = DeviceType(os, browser, userAgent, mediaMatch);
       return {
         browser: browser,
         os: os,
@@ -592,11 +595,13 @@
     };
     var PlatformDetection = { detect: detect$2 };
 
-    var detect$3 = cached(function () {
-      var userAgent = domGlobals.navigator.userAgent;
-      return PlatformDetection.detect(userAgent);
-    });
-    var PlatformDetection$1 = { detect: detect$3 };
+    var mediaMatch = function (query) {
+      return domGlobals.window.matchMedia(query).matches;
+    };
+    var platform = Cell(PlatformDetection.detect(domGlobals.navigator.userAgent, mediaMatch));
+    var detect$3 = function () {
+      return platform.get();
+    };
 
     var fromHtml = function (html, scope) {
       var doc = scope || domGlobals.document;
@@ -681,7 +686,7 @@
     var ieContains = function (e1, e2) {
       return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
-    var browser = PlatformDetection$1.detect().browser;
+    var browser = detect$3().browser;
     var contains$1 = browser.isIE() ? ieContains : regularContains;
     var is$1 = is;
 
@@ -973,8 +978,6 @@
       getSelectedListRoots: getSelectedListRoots
     };
 
-    var global$6 = tinymce.util.Tools.resolve('tinymce.Env');
-
     var createTextBlock = function (editor, contentNode) {
       var dom = editor.dom;
       var blockElements = editor.schema.getBlockElements();
@@ -1017,7 +1020,7 @@
       if (!editor.settings.forced_root_block) {
         fragment.appendChild(dom.create('br'));
       } else {
-        if (!hasContentNode && (!global$6.ie || global$6.ie > 10)) {
+        if (!hasContentNode) {
           textBlock.appendChild(dom.create('br', { 'data-mce-bogus': '1' }));
         }
       }
@@ -1273,24 +1276,6 @@
       });
     };
 
-    var Cell = function (initial) {
-      var value = initial;
-      var get = function () {
-        return value;
-      };
-      var set = function (v) {
-        value = v;
-      };
-      var clone = function () {
-        return Cell(get());
-      };
-      return {
-        get: get,
-        set: set,
-        clone: clone
-      };
-    };
-
     var parseItem = function (depth, itemSelection, selectionState, item) {
       return firstChild(item).filter(isList$1).fold(function () {
         itemSelection.each(function (selection) {
@@ -1373,9 +1358,9 @@
       });
     };
 
-    var global$7 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+    var global$6 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-    var DOM = global$7.DOM;
+    var DOM = global$6.DOM;
     var splitList = function (editor, ul, li) {
       var tmpRng, fragment, bookmarks, node, newBlock;
       var removeAndKeepBookmarks = function (targetNode) {
@@ -1501,9 +1486,9 @@
       return selectionIndentation(editor, 'Flatten');
     };
 
-    var global$8 = tinymce.util.Tools.resolve('tinymce.dom.BookmarkManager');
+    var global$7 = tinymce.util.Tools.resolve('tinymce.dom.BookmarkManager');
 
-    var DOM$1 = global$7.DOM;
+    var DOM$1 = global$6.DOM;
     var createBookmark = function (rng) {
       var bookmark = {};
       var setupEndPoint = function (start) {
@@ -1667,7 +1652,7 @@
           return;
         }
         var nextSibling = node.nextSibling;
-        if (global$8.isBookmarkNode(node)) {
+        if (global$7.isBookmarkNode(node)) {
           if (NodeType.isTextBlock(editor, nextSibling) || !nextSibling && node.parentNode === root) {
             block = null;
             return;
@@ -1825,7 +1810,7 @@
       mergeWithAdjacentLists: mergeWithAdjacentLists
     };
 
-    var DOM$2 = global$7.DOM;
+    var DOM$2 = global$6.DOM;
     var normalizeList = function (dom, ul) {
       var sibling;
       var parentNode = ul.parentNode;

@@ -1,4 +1,5 @@
 2019-10-17 DariusIII
+	* Chg: Update tinyMCE to version 5.1.0
 	* Chg: Use only local videos_id for getPoster function
 2019-10-15 DariusIII
 	* Chg: Update updateUserRoleChangeDate function

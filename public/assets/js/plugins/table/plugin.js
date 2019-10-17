@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -679,6 +679,19 @@
       documentPositionContainedBy: documentPositionContainedBy
     };
 
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
+        }
+        return t;
+      };
+      return __assign.apply(this, arguments);
+    };
+
     var firstMatch = function (regexes, s) {
       for (var i = 0; i < regexes.length; i++) {
         var x = regexes[i];
@@ -810,15 +823,15 @@
       freebsd: constant(freebsd)
     };
 
-    var DeviceType = function (os, browser, userAgent) {
+    var DeviceType = function (os, browser, userAgent, mediaMatch) {
       var isiPad = os.isiOS() && /ipad/i.test(userAgent) === true;
       var isiPhone = os.isiOS() && !isiPad;
-      var isAndroid3 = os.isAndroid() && os.version.major === 3;
-      var isAndroid4 = os.isAndroid() && os.version.major === 4;
-      var isTablet = isiPad || isAndroid3 || isAndroid4 && /mobile/i.test(userAgent) === true;
-      var isTouch = os.isiOS() || os.isAndroid();
-      var isPhone = isTouch && !isTablet;
+      var isMobile = os.isiOS() || os.isAndroid();
+      var isTouch = isMobile || mediaMatch('(pointer:coarse)');
+      var isTablet = isiPad || !isiPhone && isMobile && mediaMatch('(min-device-width:768px)');
+      var isPhone = isiPhone || isMobile && !isTablet;
       var iOSwebview = browser.isSafari() && os.isiOS() && /safari/i.test(userAgent) === false;
+      var isDesktop = !isPhone && !isTablet && !iOSwebview;
       return {
         isiPad: constant(isiPad),
         isiPhone: constant(isiPhone),
@@ -827,7 +840,8 @@
         isTouch: constant(isTouch),
         isAndroid: os.isAndroid,
         isiOS: os.isiOS,
-        isWebView: constant(iOSwebview)
+        isWebView: constant(iOSwebview),
+        isDesktop: constant(isDesktop)
       };
     };
 
@@ -966,12 +980,12 @@
       oses: constant(oses)
     };
 
-    var detect$2 = function (userAgent) {
+    var detect$2 = function (userAgent, mediaMatch) {
       var browsers = PlatformInfo.browsers();
       var oses = PlatformInfo.oses();
       var browser = UaString.detectBrowser(browsers, userAgent).fold(Browser.unknown, Browser.nu);
       var os = UaString.detectOs(oses, userAgent).fold(OperatingSystem.unknown, OperatingSystem.nu);
-      var deviceType = DeviceType(os, browser, userAgent);
+      var deviceType = DeviceType(os, browser, userAgent, mediaMatch);
       return {
         browser: browser,
         os: os,
@@ -980,11 +994,13 @@
     };
     var PlatformDetection = { detect: detect$2 };
 
-    var detect$3 = cached(function () {
-      var userAgent = domGlobals.navigator.userAgent;
-      return PlatformDetection.detect(userAgent);
-    });
-    var PlatformDetection$1 = { detect: detect$3 };
+    var mediaMatch = function (query) {
+      return domGlobals.window.matchMedia(query).matches;
+    };
+    var platform = Cell(PlatformDetection.detect(domGlobals.navigator.userAgent, mediaMatch));
+    var detect$3 = function () {
+      return platform.get();
+    };
 
     var ELEMENT$1 = ELEMENT;
     var DOCUMENT$1 = DOCUMENT;
@@ -1030,7 +1046,7 @@
     var ieContains = function (e1, e2) {
       return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
-    var browser = PlatformDetection$1.detect().browser;
+    var browser = detect$3().browser;
     var contains$2 = browser.isIE() ? ieContains : regularContains;
     var is$1 = is;
 
@@ -2580,9 +2596,9 @@
       return api$2.getOuter(element);
     };
 
-    var platform = PlatformDetection$1.detect();
+    var platform$1 = detect$3();
     var needManualCalc = function () {
-      return platform.browser.isIE() || platform.browser.isEdge();
+      return platform$1.browser.isIE() || platform$1.browser.isEdge();
     };
     var toNumber = function (px, fallback) {
       var num = parseFloat(px);
@@ -2776,6 +2792,9 @@
       var body = doc.body;
       var win = doc.defaultView;
       var html = doc.documentElement;
+      if (body === element.dom()) {
+        return Position(body.offsetLeft, body.offsetTop);
+      }
       var scrollTop = firstDefinedOrZero(win.pageYOffset, html.scrollTop);
       var scrollLeft = firstDefinedOrZero(win.pageXOffset, html.scrollLeft);
       var clientTop = firstDefinedOrZero(html.clientTop, body.clientTop);
@@ -2894,19 +2913,6 @@
       return warehouse.grid();
     };
     var TableGridSize = { getGridSize: getGridSize };
-
-    var __assign = function () {
-      __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-          s = arguments[i];
-          for (var p in s)
-            if (Object.prototype.hasOwnProperty.call(s, p))
-              t[p] = s[p];
-        }
-        return t;
-      };
-      return __assign.apply(this, arguments);
-    };
 
     var cat = function (arr) {
       var r = [];
@@ -4961,6 +4967,17 @@
         height: height
       });
     };
+    var fireTableSelectionChange = function (editor, cells, start, finish, otherCells) {
+      editor.fire('tableselectionchange', {
+        cells: cells,
+        start: start,
+        finish: finish,
+        otherCells: otherCells
+      });
+    };
+    var fireTableSelectionClear = function (editor) {
+      editor.fire('tableselectionclear');
+    };
 
     var TableActions = function (editor, lazyWire) {
       var isTableBody = function (editor) {
@@ -5108,10 +5125,12 @@
       var rgbToHex = function (value) {
         return startsWith(value, 'rgb') ? dom.toHex(value) : value;
       };
+      var borderWidth = getRaw(Element.fromDom(elm), 'border-width').getOr('');
       var borderStyle = getRaw(Element.fromDom(elm), 'border-style').getOr('');
       var borderColor = getRaw(Element.fromDom(elm), 'border-color').map(rgbToHex).getOr('');
       var bgColor = getRaw(Element.fromDom(elm), 'background-color').map(rgbToHex).getOr('');
       return {
+        borderwidth: borderWidth,
         borderstyle: borderStyle,
         bordercolor: borderColor,
         backgroundcolor: bgColor
@@ -5135,8 +5154,8 @@
       });
       return baseData;
     };
-    var getAdvancedTab = function () {
-      var items = [
+    var getAdvancedTab = function (dialogName) {
+      var advTabItems = [
         {
           name: 'borderstyle',
           type: 'selectbox',
@@ -5199,6 +5218,12 @@
           label: 'Background color'
         }
       ];
+      var borderWidth = {
+        name: 'borderwidth',
+        type: 'input',
+        label: 'Border width'
+      };
+      var items = dialogName === 'cell' ? [borderWidth].concat(advTabItems) : advTabItems;
       return {
         title: 'Advanced',
         name: 'advanced',
@@ -5501,6 +5526,7 @@
       modifiers.setStyle('background-color', data.backgroundcolor);
       modifiers.setStyle('border-color', data.bordercolor);
       modifiers.setStyle('border-style', data.borderstyle);
+      modifiers.setStyle('border-width', addSizeSuffix(data.borderwidth));
     };
     var applyToSingle = function (editor, cells, data) {
       var dom = editor.dom;
@@ -5570,7 +5596,7 @@
             name: 'general',
             items: CellDialogGeneralTab.getItems(editor)
           },
-          Helpers.getAdvancedTab()
+          Helpers.getAdvancedTab('cell')
         ]
       };
       var dialogPanel = {
@@ -5768,7 +5794,7 @@
             name: 'general',
             items: RowDialogGeneralTab.getItems(editor)
           },
-          Helpers.getAdvancedTab()
+          Helpers.getAdvancedTab('row')
         ]
       };
       var dialogPanel = {
@@ -5942,12 +5968,14 @@
         {
           type: 'input',
           name: 'cols',
-          label: 'Cols'
+          label: 'Cols',
+          inputMode: 'numeric'
         },
         {
           type: 'input',
           name: 'rows',
-          label: 'Rows'
+          label: 'Rows',
+          inputMode: 'numeric'
         }
       ];
       var alwaysItems = [
@@ -5966,12 +5994,14 @@
         {
           type: 'input',
           name: 'cellspacing',
-          label: 'Cell spacing'
+          label: 'Cell spacing',
+          inputMode: 'numeric'
         },
         {
           type: 'input',
           name: 'cellpadding',
-          label: 'Cell padding'
+          label: 'Cell padding',
+          inputMode: 'numeric'
         },
         {
           type: 'input',
@@ -6166,7 +6196,7 @@
               name: 'general',
               items: [generalPanel]
             },
-            Helpers.getAdvancedTab()
+            Helpers.getAdvancedTab('table')
           ]
         };
       };
@@ -6434,21 +6464,23 @@
         raw: constant(raw)
       };
     };
+    var fromRawEvent = function (rawEvent) {
+      var target = Element.fromDom(rawEvent.target);
+      var stop = function () {
+        rawEvent.stopPropagation();
+      };
+      var prevent = function () {
+        rawEvent.preventDefault();
+      };
+      var kill = compose(prevent, stop);
+      return mkEvent(target, rawEvent.clientX, rawEvent.clientY, stop, prevent, kill, rawEvent);
+    };
     var handle = function (filter, handler) {
       return function (rawEvent) {
         if (!filter(rawEvent)) {
           return;
         }
-        var target = Element.fromDom(rawEvent.target);
-        var stop = function () {
-          rawEvent.stopPropagation();
-        };
-        var prevent = function () {
-          rawEvent.preventDefault();
-        };
-        var kill = compose(prevent, stop);
-        var evt = mkEvent(target, rawEvent.clientX, rawEvent.clientY, stop, prevent, kill, rawEvent);
-        handler(evt);
+        handler(fromRawEvent(rawEvent));
       };
     };
     var binder = function (element, event, filter, handler, useCapture) {
@@ -7744,7 +7776,7 @@
     };
     var update = function (rows, columns, container, selected, annotations) {
       var updateSelection = function (newSels) {
-        annotations.clear(container);
+        annotations.clearBeforeUpdate(container);
         annotations.selectRange(container, newSels.boxes(), newSels.start(), newSels.finish());
         return newSels.boxes();
       };
@@ -8232,7 +8264,7 @@
     };
 
     var MAX_RETRIES = 20;
-    var platform$1 = PlatformDetection$1.detect();
+    var platform$2 = detect$3();
     var findSpot = function (bridge, isRoot, direction) {
       return bridge.getSelection().bind(function (sel) {
         return BrTags.tryBr(isRoot, sel.finish(), sel.foffset(), direction).fold(function () {
@@ -8276,9 +8308,9 @@
       });
     };
     var tryAt = function (bridge, direction, box) {
-      if (platform$1.browser.isChrome() || platform$1.browser.isSafari() || platform$1.browser.isFirefox() || platform$1.browser.isEdge()) {
+      if (platform$2.browser.isChrome() || platform$2.browser.isSafari() || platform$2.browser.isFirefox() || platform$2.browser.isEdge()) {
         return direction.otherRetry(bridge, box);
-      } else if (platform$1.browser.isIE()) {
+      } else if (platform$2.browser.isIE()) {
         return direction.ieRetry(bridge, box);
       } else {
         return Option.none();
@@ -8296,7 +8328,7 @@
     };
     var TableKeys = { handle: handle$2 };
 
-    var detection = PlatformDetection$1.detect();
+    var detection = detect$3();
     var inSameTable = function (elem, table) {
       return ancestor$2(elem, function (e) {
         return parent(e).exists(function (p) {
@@ -8393,7 +8425,7 @@
       };
       var mouseover = function (event) {
         cursor.each(function (start) {
-          annotations.clear(container);
+          annotations.clearBeforeUpdate(container);
           findCell(event.target(), isRoot).each(function (finish) {
             CellSelection.identify(start, finish, isRoot).each(function (cellSel) {
               var boxes = cellSel.boxes().getOr([]);
@@ -8472,7 +8504,7 @@
     };
     var Rect = { toRaw: toRaw };
 
-    var isSafari = PlatformDetection$1.detect().browser.isSafari();
+    var isSafari = detect$3().browser.isSafari();
     var get$b = function (_DOC) {
       var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
       var x = doc.body.scrollLeft || doc.documentElement.scrollLeft;
@@ -8641,9 +8673,26 @@
         keyup: keyup
       };
     };
+    var platform$3 = detect$3();
+    var external = function (win, container, isRoot, annotations) {
+      var bridge = WindowBridge(win);
+      return function (start, finish) {
+        annotations.clearBeforeUpdate(container);
+        CellSelection.identify(start, finish, isRoot).each(function (cellSel) {
+          var boxes = cellSel.boxes().getOr([]);
+          annotations.selectRange(container, boxes, cellSel.start(), cellSel.finish());
+          if (platform$3.deviceType.isTouch()) {
+            bridge.clearSelection();
+          } else {
+            bridge.selectContents(finish);
+          }
+        });
+      };
+    };
     var InputHandlers = {
       mouse: mouse,
-      keyboard: keyboard
+      keyboard: keyboard,
+      external: external
     };
 
     var remove$7 = function (element, classes) {
@@ -8681,6 +8730,7 @@
         add$2(finish, ephemera.lastSelected());
       };
       return {
+        clearBeforeUpdate: clear,
         clear: clear,
         selectRange: selectRange,
         selectedSelector: ephemera.selectedSelector,
@@ -8688,7 +8738,7 @@
         lastSelectedSelector: ephemera.lastSelectedSelector
       };
     };
-    var byAttr = function (ephemera) {
+    var byAttr = function (ephemera, onSelection, onClear) {
       var removeSelectionAttributes = function (element) {
         remove(element, ephemera.selected());
         remove(element, ephemera.firstSelected());
@@ -8698,6 +8748,10 @@
         set(element, ephemera.selected(), '1');
       };
       var clear = function (container) {
+        clearBeforeUpdate(container);
+        onClear();
+      };
+      var clearBeforeUpdate = function (container) {
         var sels = descendants$1(container, ephemera.selectedSelector());
         each(sels, removeSelectionAttributes);
       };
@@ -8706,8 +8760,10 @@
         each(cells, addSelectionAttribute);
         set(start, ephemera.firstSelected(), '1');
         set(finish, ephemera.lastSelected(), '1');
+        onSelection(cells, start, finish);
       };
       return {
+        clearBeforeUpdate: clearBeforeUpdate,
         clear: clear,
         selectRange: selectRange,
         selectedSelector: ephemera.selectedSelector,
@@ -8720,10 +8776,46 @@
       byAttr: byAttr
     };
 
+    var getUpOrLeftCells = function (grid, selectedCells, generators) {
+      var upGrid = grid.slice(0, selectedCells[selectedCells.length - 1].row() + 1);
+      var upDetails = toDetailList(upGrid, generators);
+      return bind(upDetails, function (detail) {
+        var slicedCells = detail.cells().slice(0, selectedCells[selectedCells.length - 1].column() + 1);
+        return map(slicedCells, function (cell) {
+          return cell.element();
+        });
+      });
+    };
+    var getDownOrRightCells = function (grid, selectedCells, generators) {
+      var downGrid = grid.slice(selectedCells[0].row() + selectedCells[0].rowspan() - 1, grid.length);
+      var downDetails = toDetailList(downGrid, generators);
+      return bind(downDetails, function (detail) {
+        var slicedCells = detail.cells().slice(selectedCells[0].column() + selectedCells[0].colspan() - 1, +detail.cells().length);
+        return map(slicedCells, function (cell) {
+          return cell.element();
+        });
+      });
+    };
+    var getOtherCells = function (table, target, generators) {
+      var list = DetailsList.fromTable(table);
+      var house = Warehouse.generate(list);
+      var details = onCells(house, target);
+      return details.map(function (selectedCells) {
+        var grid = Transitions.toGrid(house, generators, false);
+        var upOrLeftCells = getUpOrLeftCells(grid, selectedCells, generators);
+        var downOrRightCells = getDownOrRightCells(grid, selectedCells, generators);
+        return {
+          upOrLeftCells: upOrLeftCells,
+          downOrRightCells: downOrRightCells
+        };
+      });
+    };
+    var OtherCells = { getOtherCells: getOtherCells };
+
     var hasInternalTarget = function (e) {
       return has$2(Element.fromDom(e.target), 'ephox-snooker-resizer-bar') === false;
     };
-    function CellSelection$1 (editor, lazyResize) {
+    function CellSelection$1 (editor, lazyResize, selectionTargets) {
       var handlerStruct = MixedBag([
         'mousedown',
         'mouseover',
@@ -8732,7 +8824,22 @@
         'keydown'
       ], []);
       var handlers = Option.none();
-      var annotations = SelectionAnnotation.byAttr(Ephemera);
+      var cloneFormats = getCloneElements(editor);
+      var onSelection = function (cells, start, finish) {
+        selectionTargets.targets().each(function (targets) {
+          var tableOpt = TableLookup.table(start);
+          tableOpt.each(function (table) {
+            var doc = Element.fromDom(editor.getDoc());
+            var generators = TableFill.cellOperations(noop, doc, cloneFormats);
+            var otherCells = OtherCells.getOtherCells(table, targets, generators);
+            fireTableSelectionChange(editor, cells, start, finish, otherCells);
+          });
+        });
+      };
+      var onClear = function () {
+        fireTableSelectionClear(editor);
+      };
+      var annotations = SelectionAnnotation.byAttr(Ephemera, onSelection, onClear);
       editor.on('init', function (e) {
         var win = editor.getWin();
         var body = getBody$1(editor);
@@ -8751,9 +8858,13 @@
         };
         var mouseHandlers = InputHandlers.mouse(win, body, isRoot, annotations);
         var keyHandlers = InputHandlers.keyboard(win, body, isRoot, annotations);
+        var external = InputHandlers.external(win, body, isRoot, annotations);
         var hasShiftKey = function (event) {
           return event.raw().shiftKey === true;
         };
+        editor.on('tableselectorchange', function (e) {
+          external(e.start, e.finish);
+        });
         var handleResponse = function (event, response) {
           if (!hasShiftKey(event)) {
             return;
@@ -8841,9 +8952,29 @@
             mouseHandlers.mouseup(wrapEvent(e));
           }
         };
+        var getDoubleTap = function () {
+          var lastTarget = Cell(Element.fromDom(body));
+          var lastTimeStamp = Cell(0);
+          var touchEnd = function (t) {
+            var target = Element.fromDom(t.target);
+            if (name(target) === 'td' || name(target) === 'th') {
+              var lT = lastTarget.get();
+              var lTS = lastTimeStamp.get();
+              if (eq(lT, target) && t.timeStamp - lTS < 300) {
+                t.preventDefault();
+                external(target, target);
+              }
+            }
+            lastTarget.set(target);
+            lastTimeStamp.set(t.timeStamp);
+          };
+          return { touchEnd: touchEnd };
+        };
+        var doubleTap = getDoubleTap();
         editor.on('mousedown', mouseDown);
         editor.on('mouseover', mouseOver);
         editor.on('mouseup', mouseUp);
+        editor.on('touchend', doubleTap.touchEnd);
         editor.on('keyup', keyup);
         editor.on('keydown', keydown);
         editor.on('NodeChange', syncSelection);
@@ -9313,11 +9444,11 @@
     };
 
     function Plugin(editor) {
-      var resizeHandler = getResizeHandler(editor);
-      var cellSelection = CellSelection$1(editor, resizeHandler.lazyResize);
-      var actions = TableActions(editor, resizeHandler.lazyWire);
       var selections = Selections(editor);
       var selectionTargets = getSelectionTargets(editor, selections);
+      var resizeHandler = getResizeHandler(editor);
+      var cellSelection = CellSelection$1(editor, resizeHandler.lazyResize, selectionTargets);
+      var actions = TableActions(editor, resizeHandler.lazyWire);
       var clipboardRows = Cell(Option.none());
       Commands.registerCommands(editor, actions, cellSelection, selections, clipboardRows);
       Clipboard.registerEvents(editor, selections, actions, cellSelection);

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.16 (2019-09-24)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function () {
     'use strict';
@@ -125,6 +125,13 @@
         dom.setStyle(editor.getContainer(), 'height', resizeHeight + 'px');
         oldSize.set(resizeHeight);
         Events.fireResizeEditor(editor);
+        if (global$1.browser.isSafari() && global$1.mac) {
+          var win = editor.getWin();
+          win.scrollTo(win.pageXOffset, win.pageYOffset);
+        }
+        if (editor.hasFocus()) {
+          editor.selection.scrollIntoView(editor.selection.getNode());
+        }
         if (global$1.webkit && deltaSize < 0) {
           resize(editor, oldSize);
         }
@@ -140,7 +147,7 @@
           'min-height': 0
         });
       });
-      editor.on('NodeChange SetContent keyup FullscreenStateChanged ResizeContent', function (e) {
+      editor.on('NodeChange SetContent keyup FullscreenStateChanged ResizeContent', function () {
         resize(editor, oldSize);
       });
       if (Settings.shouldAutoResizeOnInit(editor)) {

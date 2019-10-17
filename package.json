@@ -16,7 +16,7 @@
         "jquery": "^3.4.1",
         "laravel-mix": "^5.0.0",
         "lodash": "^4.17.15",
-        "popper.js": "^1.15.0",
+        "popper.js": "^1.16.0",
         "prettier": "^1.18.2",
         "vue": "^2.6.10"
     },
@@ -39,6 +39,6 @@
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0",
-        "tinymce": "^5.0.16"
+        "tinymce": "^5.1.0"
     }
 }
