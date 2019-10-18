@@ -91,8 +91,6 @@ class TVDB extends TV
         foreach ($res as $row) {
             $tvDbId = false;
 
-            $this->posterUrl = '';
-
             // Clean the show name for better match probability
             $release = $this->parseInfo($row['searchname']);
             if (\is_array($release) && $release['name'] !== '') {

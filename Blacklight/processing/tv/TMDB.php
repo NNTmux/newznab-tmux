@@ -105,7 +105,6 @@ class TMDB extends TV
             $this->titleCache = [];
 
             foreach ($res as $row) {
-                $this->posterUrl = '';
                 $tmdbid = false;
 
                 // Clean the show name for better match probability
@@ -315,12 +314,16 @@ class TMDB extends TV
     {
         $ri = new ReleaseImage();
 
-        // Try to get the Poster
-        $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+        $hascover = 0;
 
-        // Mark it retrieved if we saved an image
-        if ($hascover === 1) {
-            $this->setCoverFound($videoId);
+        // Try to get the Poster
+        if (! empty($this->posterUrl)) {
+            $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+
+            // Mark it retrieved if we saved an image
+            if ($hascover === 1) {
+                $this->setCoverFound($videoId);
+            }
         }
 
         return $hascover;
