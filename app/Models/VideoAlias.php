@@ -20,15 +20,6 @@ use Illuminate\Database\Eloquent\Model;
 class VideoAlias extends Model
 {
     protected $table = 'videos_aliases';
-    /**
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * @var bool
-     */
-    protected $dateFormat = false;
 
     /**
      * @var bool

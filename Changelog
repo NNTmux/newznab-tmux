@@ -1,3 +1,5 @@
+2019-10-18 DariusIII
+	* Chg: Add timestamps to videos_aliases table
 2019-10-17 DariusIII
 	* Chg: Update tinyMCE to version 5.1.0
 	* Chg: Use only local videos_id for getPoster function
