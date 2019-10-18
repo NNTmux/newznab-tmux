@@ -319,7 +319,7 @@ class TVMaze extends TV
         $hasCover = 0;
 
         // Try to get the Poster
-        if (!empty($this->posterUrl)) {
+        if (! empty($this->posterUrl)) {
             $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
 
             // Mark it retrieved if we saved an image
