@@ -148,14 +148,6 @@ class TVDB extends TV
                 }
 
                 if ((int) $videoId > 0 && (int) $tvDbId > 0) {
-                    // Now that we have valid video and tvdb ids, try to get the poster
-                    if (! empty($tvdbShow['poster'])) {
-                        $this->posterUrl = self::TVDB_IMAGES_URL.'/'.$tvdbShow['poster'];
-                    }
-
-                    if (! empty($tvdbShow['fanart'])) {
-                        $this->fanartUrl = self::TVDB_IMAGES_URL.'/'.$tvdbShow['fanart'];
-                    }
 
                     if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
                         $this->getPoster($videoId);
@@ -390,12 +382,14 @@ class TVDB extends TV
     {
         try {
             $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
+            $this->posterUrl = $poster[0]->thumbnail ?? '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
             $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
+            $this->fanartUrl = $fanart[0]->thumbnail ?? '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
