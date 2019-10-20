@@ -20,7 +20,7 @@ class TMDB extends TV
     /**
      * @var ApiToken
      */
-    private $token;
+    public $token;
     /**
      * @var Client
      */
@@ -28,15 +28,15 @@ class TMDB extends TV
     /**
      * @var ConfigurationRepository
      */
-    private $configRepository;
+    public $configRepository;
     /**
      * @var \Tmdb\Model\Configuration
      */
-    private $config;
+    public $config;
     /**
      * @var ImageHelper
      */
-    private $helper;
+    public $helper;
 
     /**
      * Construct. Instantiate TMDB Class.
