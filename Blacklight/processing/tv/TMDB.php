@@ -5,6 +5,7 @@ namespace Blacklight\processing\tv;
 use Tmdb\Client;
 use Tmdb\ApiToken;
 use Blacklight\ReleaseImage;
+use Tmdb\Exception\TmdbApiException;
 use Tmdb\Helper\ImageHelper;
 use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
 use Tmdb\Repository\ConfigurationRepository;
@@ -225,7 +226,11 @@ class TMDB extends TV
     {
         $return = $response = false;
 
-        $response = TmdbClient::getSearchApi()->searchTv($cleanName);
+        try {
+            $response = TmdbClient::getSearchApi()->searchTv($cleanName);
+        } catch (TmdbApiException $e) {
+            return false;
+        }
 
         sleep(1);
 
@@ -266,8 +271,16 @@ class TMDB extends TV
             }
         }
         if (! empty($highest)) {
-            $showAlternativeTitles = TmdbClient::getTvApi()->getAlternativeTitles($highest['id']);
-            $showExternalIds = TmdbClient::getTvApi()->getExternalIds($highest['id']);
+            try {
+                $showAlternativeTitles = TmdbClient::getTvApi()->getAlternativeTitles($highest['id']);
+            } catch (TmdbApiException $e) {
+                return false;
+            }
+            try {
+                $showExternalIds = TmdbClient::getTvApi()->getExternalIds($highest['id']);
+            } catch (TmdbApiException $e) {
+                return false;
+            }
 
             if ($showAlternativeTitles !== null && \is_array($showAlternativeTitles)) {
                 foreach ($showAlternativeTitles['results'] as $aka) {
