@@ -5,8 +5,8 @@ namespace Blacklight\processing\tv;
 use Tmdb\Client;
 use Tmdb\ApiToken;
 use Blacklight\ReleaseImage;
-use Tmdb\Exception\TmdbApiException;
 use Tmdb\Helper\ImageHelper;
+use Tmdb\Exception\TmdbApiException;
 use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
 use Tmdb\Repository\ConfigurationRepository;
 
