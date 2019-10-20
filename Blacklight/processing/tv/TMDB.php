@@ -2,13 +2,8 @@
 
 namespace Blacklight\processing\tv;
 
-use Tmdb\Client;
-use Tmdb\ApiToken;
-use App\Models\Settings;
 use Blacklight\ReleaseImage;
-use Tmdb\Helper\ImageHelper;
-use Tmdb\Exception\TmdbApiException;
-use Tmdb\Repository\ConfigurationRepository;
+use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
 
 class TMDB extends TV
 {
@@ -20,31 +15,6 @@ class TMDB extends TV
     public $posterUrl;
 
     /**
-     * @var ApiToken
-     */
-    public $token;
-
-    /**
-     * @var Client
-     */
-    public $client;
-
-    /**
-     * @var ImageHelper
-     */
-    public $helper;
-
-    /**
-     * @var ConfigurationRepository
-     */
-    public $configRepository;
-
-    /**
-     * @var \Tmdb\Model\Configuration
-     */
-    public $config;
-
-    /**
      * Construct. Instantiate TMDB Class.
      *
      * @param array $options Class instances.
@@ -54,18 +24,6 @@ class TMDB extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->token = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
-        $this->client = new Client(
-            $this->token,
-            [
-            'cache' => [
-                'enabled' => false,
-            ],
-        ]
-        );
-        $this->configRepository = new ConfigurationRepository($this->client);
-        $this->config = $this->configRepository->load();
-        $this->helper = new ImageHelper($this->config);
     }
 
     /**
@@ -233,11 +191,7 @@ class TMDB extends TV
     {
         $return = $response = false;
 
-        try {
-            $response = $this->client->getTvApi()->getTvshow($cleanName);
-        } catch (TmdbApiException $e) {
-            return false;
-        }
+        $response = TmdbClient::getSearchApi()->searchTv($cleanName);
 
         sleep(1);
 
@@ -278,17 +232,9 @@ class TMDB extends TV
             }
         }
         if (! empty($highest)) {
-            try {
-                $showAlternativeTitles = $this->client->getTvApi()->getAlternativeTitles($highest['id']);
-            } catch (TmdbApiException $e) {
-                return false;
-            }
+            $showAlternativeTitles = TmdbClient::getTvApi()->getAlternativeTitles($highest['id']);
+            $showExternalIds = TmdbClient::getTvApi()->getExternalIds($highest['id']);
 
-            try {
-                $showExternalIds = $this->client->getTvApi()->getExternalIds($highest['id']);
-            } catch (TmdbApiException $e) {
-                return false;
-            }
 
             if ($showAlternativeTitles !== null && \is_array($showAlternativeTitles)) {
                 foreach ($showAlternativeTitles as $aka) {
@@ -346,7 +292,7 @@ class TMDB extends TV
         $return = false;
 
         try {
-            $response = $this->client->getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
+            $response = TmdbClient::getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
         } catch (TmdbApiException $e) {
             return false;
         }

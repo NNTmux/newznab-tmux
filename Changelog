@@ -1,3 +1,5 @@
+2019-10-20 DariusIII
+	* Fix: Fix TMDB TV lookups
 2019-10-18 DariusIII
 	* Chg: Add timestamps to videos_aliases table
 2019-10-17 DariusIII
