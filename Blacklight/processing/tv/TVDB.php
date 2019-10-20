@@ -148,7 +148,6 @@ class TVDB extends TV
                 }
 
                 if ((int) $videoId > 0 && (int) $tvDbId > 0) {
-
                     if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
                         $this->getPoster($videoId);
                     }
