@@ -269,7 +269,6 @@ class TMDB extends TV
             $showAlternativeTitles = TmdbClient::getTvApi()->getAlternativeTitles($highest['id']);
             $showExternalIds = TmdbClient::getTvApi()->getExternalIds($highest['id']);
 
-
             if ($showAlternativeTitles !== null && \is_array($showAlternativeTitles)) {
                 foreach ($showAlternativeTitles['results'] as $aka) {
                     $highest['alternative_titles'][] = $aka['title'];
