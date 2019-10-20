@@ -2,9 +2,9 @@
 
 namespace Blacklight\processing\tv;
 
-use Blacklight\ReleaseImage;
-use Tmdb\ApiToken;
 use Tmdb\Client;
+use Tmdb\ApiToken;
+use Blacklight\ReleaseImage;
 use Tmdb\Helper\ImageHelper;
 use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
 use Tmdb\Repository\ConfigurationRepository;
@@ -51,8 +51,8 @@ class TMDB extends TV
         $this->token = new ApiToken(config('tmdb.api_key'));
         $this->client = new Client($this->token, [
                 'cache' => [
-                    'enabled' => false
-                ]
+                    'enabled' => false,
+                ],
             ]
         );
         $this->configRepository = new ConfigurationRepository($this->client);
