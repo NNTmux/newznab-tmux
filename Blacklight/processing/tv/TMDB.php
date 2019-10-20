@@ -3,7 +3,11 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
+use Tmdb\ApiToken;
+use Tmdb\Client;
+use Tmdb\Helper\ImageHelper;
 use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
+use Tmdb\Repository\ConfigurationRepository;
 
 class TMDB extends TV
 {
@@ -13,6 +17,26 @@ class TMDB extends TV
      * @var string The URL for the image for poster
      */
     public $posterUrl;
+    /**
+     * @var ApiToken
+     */
+    private $token;
+    /**
+     * @var Client
+     */
+    public $client;
+    /**
+     * @var ConfigurationRepository
+     */
+    private $configRepository;
+    /**
+     * @var \Tmdb\Model\Configuration
+     */
+    private $config;
+    /**
+     * @var ImageHelper
+     */
+    private $helper;
 
     /**
      * Construct. Instantiate TMDB Class.
@@ -24,6 +48,16 @@ class TMDB extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
+        $this->token = new ApiToken(config('tmdb.api_key'));
+        $this->client = new Client($this->token, [
+                'cache' => [
+                    'enabled' => false
+                ]
+            ]
+        );
+        $this->configRepository = new ConfigurationRepository($this->client);
+        $this->config = $this->configRepository->load();
+        $this->helper = new ImageHelper($this->config);
     }
 
     /**
@@ -237,7 +271,7 @@ class TMDB extends TV
 
 
             if ($showAlternativeTitles !== null && \is_array($showAlternativeTitles)) {
-                foreach ($showAlternativeTitles as $aka) {
+                foreach ($showAlternativeTitles['results'] as $aka) {
                     $highest['alternative_titles'][] = $aka['title'];
                 }
                 $highest['network'] = $show['networks'][0]['name'] ?? '';
