@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
@@ -15,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\SendAccountDeletedEmail;
 use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Facades\UserVerification;
 
