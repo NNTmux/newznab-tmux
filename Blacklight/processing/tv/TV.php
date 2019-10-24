@@ -469,7 +469,7 @@ abstract class TV extends Videos
             $showInfo['country'] = $this->parseCountry($showInfo['name']);
 
             // Clean show name.
-            $showInfo['cleanname'] = preg_replace('/ - \d{1,}$/i', '', $this->cleanName($showInfo['name']));
+            $showInfo['cleanname'] = preg_replace('/ - \d+$/i', '', $this->cleanName($showInfo['name']));
 
             // Get the Season/Episode/Airdate
             $showInfo += $this->parseSeasonEp($relname);
