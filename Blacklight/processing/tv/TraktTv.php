@@ -240,11 +240,10 @@ class TraktTv extends TV
      * Retrieve poster image for TV episode from site using its API.
      *
      * @param int $videoId ID from videos table.
-     * @param int $siteId  ID that this site uses for the programme.
      *
      * @return int
      */
-    public function getPoster($videoId, $siteId): int
+    public function getPoster($videoId): int
     {
         $hascover = 0;
         $ri = new ReleaseImage();

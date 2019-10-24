@@ -30,6 +30,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData whereVideolibrary($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData whereVideowidth($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData query()
  */
 class VideoData extends Model
 {

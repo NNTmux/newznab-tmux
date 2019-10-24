@@ -105,11 +105,10 @@ abstract class TV extends Videos
      * Retrieve poster image for TV episode from site using its API.
      *
      * @param int $videoId ID from videos table.
-     * @param int $siteId  ID that this site uses for the programme.
      *
      * @return int
      */
-    abstract protected function getPoster($videoId, $siteId): int;
+    abstract protected function getPoster($videoId): int;
 
     /**
      * Retrieve info of TV programme from site using it's API.
@@ -470,7 +469,7 @@ abstract class TV extends Videos
             $showInfo['country'] = $this->parseCountry($showInfo['name']);
 
             // Clean show name.
-            $showInfo['cleanname'] = preg_replace('/ - \d{1,}$/i', '', $this->cleanName($showInfo['name']));
+            $showInfo['cleanname'] = preg_replace('/ - \d+$/i', '', $this->cleanName($showInfo['name']));
 
             // Get the Season/Episode/Airdate
             $showInfo += $this->parseSeasonEp($relname);

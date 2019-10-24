@@ -80,8 +80,7 @@ class RSS extends Capabilities
 					mug.title AS mu_genre, co.title AS co_title, co.url AS co_url,
 					co.publisher AS co_publisher, co.releasedate AS co_releasedate,
 					co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre,
-					bo.cover AS bo_cover,
-					%s AS category_ids
+					bo.cover AS bo_cover
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
 				INNER JOIN root_categories cp ON cp.id = c.root_categories_id
@@ -97,7 +96,6 @@ class RSS extends Capabilities
 				AND r.nzbstatus = %d
 				%s %s %s %s
 				ORDER BY postdate DESC %s",
-                $this->releases->getConcatenatedCategoryIDs(),
                 $cartSearch,
                 $this->releases->showPasswords(),
                 NZB::NZB_ADDED,
@@ -135,7 +133,6 @@ class RSS extends Capabilities
             "
 				SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
-					%s AS category_ids,
 					COALESCE(cp.id,0) AS parentid
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
@@ -148,7 +145,6 @@ class RSS extends Capabilities
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-            $this->releases->getConcatenatedCategoryIDs(),
             $this->releases->uSQL(
                 UserSerie::fromQuery(
                     sprintf(
@@ -199,7 +195,6 @@ class RSS extends Capabilities
             "
 				SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
-					%s AS category_ids,
 					COALESCE(cp.id,0) AS parentid
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
@@ -211,7 +206,6 @@ class RSS extends Capabilities
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-            $this->releases->getConcatenatedCategoryIDs(),
             $this->releases->uSQL(
                 UserMovie::fromQuery(
                     sprintf(

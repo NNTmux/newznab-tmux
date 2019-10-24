@@ -540,7 +540,7 @@ class ProcessReleases
                     }, 10);
 
                     // Add the id of regex that matched the collection and release name to release_regexes table
-                    ReleaseRegex::insertIgnore([
+                    ReleaseRegex::insertOrIgnore([
                         'releases_id'            => $releaseID,
                         'collection_regex_id'    => $collection->collection_regexes_id,
                         'naming_regex_id'        => $cleanedName['id'] ?? 0,
@@ -909,15 +909,6 @@ class ProcessReleases
         // Passworded releases.
         if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
             $releases = Release::query()->where('passwordstatus', '=', Releases::PASSWD_RAR)->select(['id', 'guid'])->get();
-            foreach ($releases as $release) {
-                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
-                $passwordDeleted++;
-            }
-        }
-
-        // Possibly passworded releases.
-        if ((int) Settings::settingValue('..deletepossiblerelease') === 1) {
-            $releases = Release::query()->where('passwordstatus', '=', Releases::PASSWD_POTENTIAL)->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $passwordDeleted++;

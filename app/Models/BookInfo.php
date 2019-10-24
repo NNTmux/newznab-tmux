@@ -41,6 +41,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereUrl($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo query()
  */
 class BookInfo extends Model
 {

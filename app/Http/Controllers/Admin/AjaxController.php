@@ -20,7 +20,7 @@ class AjaxController extends BasePageController
      */
     public function ajaxAction(Request $request)
     {
-        if (! $request->has('action')) {
+        if ($request->missing('action')) {
             exit();
         }
 

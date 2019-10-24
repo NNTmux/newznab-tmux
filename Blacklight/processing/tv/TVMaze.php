@@ -75,7 +75,6 @@ class TVMaze extends TV
             $this->titleCache = [];
 
             foreach ($res as $row) {
-                $this->posterUrl = '';
                 $tvMazeId = false;
 
                 // Clean the show name for better match probability
@@ -136,7 +135,7 @@ class TVMaze extends TV
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvMazeId) && $tvMazeId > 0) {
                         // Now that we have valid video and tvmaze ids, try to get the poster
-                        $this->getPoster($videoId, $tvMazeId);
+                        $this->getPoster($videoId);
 
                         $seasonNo = preg_replace('/^S0*/i', '', $release['season']);
                         $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
@@ -310,20 +309,23 @@ class TVMaze extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param int $videoId -- the local Video ID
-     * @param int $showId  -- the TVMaze ID
      *
      * @return int
      */
-    public function getPoster($videoId, $showId = 0): int
+    public function getPoster($videoId): int
     {
         $ri = new ReleaseImage();
 
-        // Try to get the Poster
-        $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+        $hasCover = 0;
 
-        // Mark it retrieved if we saved an image
-        if ($hasCover === 1) {
-            $this->setCoverFound($videoId);
+        // Try to get the Poster
+        if (! empty($this->posterUrl)) {
+            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+
+            // Mark it retrieved if we saved an image
+            if ($hasCover === 1) {
+                $this->setCoverFound($videoId);
+            }
         }
 
         return $hasCover;

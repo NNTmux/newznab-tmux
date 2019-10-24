@@ -4,10 +4,10 @@ namespace Blacklight\processing\tv;
 
 use Tmdb\Client;
 use Tmdb\ApiToken;
-use App\Models\Settings;
 use Blacklight\ReleaseImage;
 use Tmdb\Helper\ImageHelper;
 use Tmdb\Exception\TmdbApiException;
+use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
 use Tmdb\Repository\ConfigurationRepository;
 
 class TMDB extends TV
@@ -18,31 +18,26 @@ class TMDB extends TV
      * @var string The URL for the image for poster
      */
     public $posterUrl;
-
     /**
      * @var ApiToken
      */
     public $token;
-
     /**
      * @var Client
      */
     public $client;
-
-    /**
-     * @var ImageHelper
-     */
-    public $helper;
-
     /**
      * @var ConfigurationRepository
      */
     public $configRepository;
-
     /**
      * @var \Tmdb\Model\Configuration
      */
     public $config;
+    /**
+     * @var ImageHelper
+     */
+    public $helper;
 
     /**
      * Construct. Instantiate TMDB Class.
@@ -54,14 +49,12 @@ class TMDB extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->token = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
-        $this->client = new Client(
-            $this->token,
-            [
-            'cache' => [
-                'enabled' => false,
-            ],
-        ]
+        $this->token = new ApiToken(config('tmdb.api_key'));
+        $this->client = new Client($this->token, [
+                'cache' => [
+                    'enabled' => false,
+                ],
+            ]
         );
         $this->configRepository = new ConfigurationRepository($this->client);
         $this->config = $this->configRepository->load();
@@ -105,7 +98,6 @@ class TMDB extends TV
             $this->titleCache = [];
 
             foreach ($res as $row) {
-                $this->posterUrl = '';
                 $tmdbid = false;
 
                 // Clean the show name for better match probability
@@ -164,7 +156,7 @@ class TMDB extends TV
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($tmdbid) && $tmdbid > 0) {
                         // Now that we have valid video and tmdb ids, try to get the poster
-                        $this->getPoster($videoId, $tmdbid);
+                        $this->getPoster($videoId);
 
                         $seasonNo = preg_replace('/^S0*/i', '', $release['season']);
                         $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
@@ -235,7 +227,7 @@ class TMDB extends TV
         $return = $response = false;
 
         try {
-            $response = $this->client->getTvApi()->getTvshow($cleanName);
+            $response = TmdbClient::getSearchApi()->searchTv($cleanName);
         } catch (TmdbApiException $e) {
             return false;
         }
@@ -280,19 +272,18 @@ class TMDB extends TV
         }
         if (! empty($highest)) {
             try {
-                $showAlternativeTitles = $this->client->getTvApi()->getAlternativeTitles($highest['id']);
+                $showAlternativeTitles = TmdbClient::getTvApi()->getAlternativeTitles($highest['id']);
             } catch (TmdbApiException $e) {
                 return false;
             }
-
             try {
-                $showExternalIds = $this->client->getTvApi()->getExternalIds($highest['id']);
+                $showExternalIds = TmdbClient::getTvApi()->getExternalIds($highest['id']);
             } catch (TmdbApiException $e) {
                 return false;
             }
 
             if ($showAlternativeTitles !== null && \is_array($showAlternativeTitles)) {
-                foreach ($showAlternativeTitles as $aka) {
+                foreach ($showAlternativeTitles['results'] as $aka) {
                     $highest['alternative_titles'][] = $aka['title'];
                 }
                 $highest['network'] = $show['networks'][0]['name'] ?? '';
@@ -308,20 +299,23 @@ class TMDB extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param int $videoId -- the local Video ID
-     * @param int $showId  -- the TMDB ID
      *
      * @return int
      */
-    public function getPoster($videoId, $showId = 0): int
+    public function getPoster($videoId): int
     {
         $ri = new ReleaseImage();
 
-        // Try to get the Poster
-        $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+        $hascover = 0;
 
-        // Mark it retrieved if we saved an image
-        if ($hascover === 1) {
-            $this->setCoverFound($videoId);
+        // Try to get the Poster
+        if (! empty($this->posterUrl)) {
+            $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+
+            // Mark it retrieved if we saved an image
+            if ($hascover === 1) {
+                $this->setCoverFound($videoId);
+            }
         }
 
         return $hascover;
@@ -344,7 +338,7 @@ class TMDB extends TV
         $return = false;
 
         try {
-            $response = $this->client->getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
+            $response = TmdbClient::getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
         } catch (TmdbApiException $e) {
             return false;
         }

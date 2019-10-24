@@ -18,24 +18,25 @@ class ContentController extends BasePageController
         $contentList = (new Contents())->getAll();
         $this->smarty->assign('contentlist', $contentList);
 
-        $meta_title = $title = 'Content List';
+        $meta_title = 'Content List';
 
         $content = $this->smarty->fetch('content-list.tpl');
 
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
+        $this->smarty->assign(compact('meta_title', 'content'));
 
         $this->adminrender();
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function create(Request $request)
     {
         $this->setAdminPrefs();
         $contents = new Contents();
+        $meta_title = 'Content Add';
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';
@@ -57,7 +58,7 @@ class ContentController extends BasePageController
 
         switch ($action) {
             case 'add':
-                $title = 'Content Add';
+                $meta_title = 'Content Add';
                 $content['showinmenu'] = '1';
                 $content['status'] = '1';
                 $content['contenttype'] = '2';
@@ -65,7 +66,7 @@ class ContentController extends BasePageController
 
             case 'submit':
                 // Validate and add or update.
-                if (! $request->has('id')) {
+                if ($request->missing('id') || empty($request->input('id'))) {
                     $returnid = $contents->add($request->all());
                 } else {
                     $content = $contents->update($request->all());
@@ -78,7 +79,7 @@ class ContentController extends BasePageController
             case 'view':
             default:
                 if ($request->has('id')) {
-                    $meta_title = $title = 'Content Edit';
+                    $meta_title = 'Content Edit';
                     $id = $request->input('id');
 
                     $content = $contents->getByID($id, User::ROLE_ADMIN);
@@ -102,7 +103,7 @@ class ContentController extends BasePageController
 
         $content = $this->smarty->fetch('content-add.tpl');
 
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
+        $this->smarty->assign(compact('meta_title', 'content'));
 
         $this->adminrender();
     }

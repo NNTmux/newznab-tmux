@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.13 (2019-08-06)
+ * Version: 5.1.0 (2019-10-17)
  */
 (function (domGlobals) {
     'use strict';
@@ -87,8 +87,6 @@
     var never = constant(false);
     var always = constant(true);
 
-    var never$1 = never;
-    var always$1 = always;
     var none = function () {
       return NONE;
     };
@@ -102,37 +100,27 @@
       var id = function (n) {
         return n;
       };
-      var noop = function () {
-      };
-      var nul = function () {
-        return null;
-      };
-      var undef = function () {
-        return undefined;
-      };
       var me = {
         fold: function (n, s) {
           return n();
         },
-        is: never$1,
-        isSome: never$1,
-        isNone: always$1,
+        is: never,
+        isSome: never,
+        isNone: always,
         getOr: id,
         getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
-        getOrNull: nul,
-        getOrUndefined: undef,
+        getOrNull: constant(null),
+        getOrUndefined: constant(undefined),
         or: id,
         orThunk: call,
         map: none,
-        ap: none,
         each: noop,
         bind: none,
-        flatten: none,
-        exists: never$1,
-        forall: always$1,
+        exists: never,
+        forall: always,
         filter: none,
         equals: eq,
         equals_: eq,
@@ -147,14 +135,9 @@
       return me;
     }();
     var some = function (a) {
-      var constant_a = function () {
-        return a;
-      };
+      var constant_a = constant(a);
       var self = function () {
         return me;
-      };
-      var map = function (f) {
-        return some(f(a));
       };
       var bind = function (f) {
         return f(a);
@@ -166,8 +149,8 @@
         is: function (v) {
           return a === v;
         },
-        isSome: always$1,
-        isNone: never$1,
+        isSome: always,
+        isNone: never,
         getOr: constant_a,
         getOrThunk: constant_a,
         getOrDie: constant_a,
@@ -175,35 +158,31 @@
         getOrUndefined: constant_a,
         or: self,
         orThunk: self,
-        map: map,
-        ap: function (optfab) {
-          return optfab.fold(none, function (fab) {
-            return some(fab(a));
-          });
+        map: function (f) {
+          return some(f(a));
         },
         each: function (f) {
           f(a);
         },
         bind: bind,
-        flatten: constant_a,
         exists: bind,
         forall: bind,
         filter: function (f) {
           return f(a) ? me : NONE;
-        },
-        equals: function (o) {
-          return o.is(a);
-        },
-        equals_: function (o, elementEq) {
-          return o.fold(never$1, function (b) {
-            return elementEq(a, b);
-          });
         },
         toArray: function () {
           return [a];
         },
         toString: function () {
           return 'some(' + a + ')';
+        },
+        equals: function (o) {
+          return o.is(a);
+        },
+        equals_: function (o, elementEq) {
+          return o.fold(never, function (b) {
+            return elementEq(a, b);
+          });
         }
       };
       return me;
@@ -224,21 +203,21 @@
       for (var k = 0, len = props.length; k < len; k++) {
         var i = props[k];
         var x = obj[i];
-        f(x, i, obj);
+        f(x, i);
       }
     };
     var map = function (obj, f) {
-      return tupleMap(obj, function (x, i, obj) {
+      return tupleMap(obj, function (x, i) {
         return {
           k: i,
-          v: f(x, i, obj)
+          v: f(x, i)
         };
       });
     };
     var tupleMap = function (obj, f) {
       var r = {};
       each(obj, function (x, i) {
-        var tuple = f(x, i, obj);
+        var tuple = f(x, i);
         r[tuple.k] = tuple.v;
       });
       return r;
@@ -249,6 +228,22 @@
         r.push(f(value, name));
       });
       return r;
+    };
+    var find = function (obj, pred) {
+      var props = keys(obj);
+      for (var k = 0, len = props.length; k < len; k++) {
+        var i = props[k];
+        var x = obj[i];
+        if (pred(x, i, obj)) {
+          return Option.some(x);
+        }
+      }
+      return Option.none();
+    };
+    var values = function (obj) {
+      return mapToArray(obj, function (v) {
+        return v;
+      });
     };
     var has = function (obj, key) {
       return hasOwnProperty.call(obj, key);
@@ -269,19 +264,21 @@
     var transitionend = constant('transitionend');
     var selectstart = constant('selectstart');
 
-    var cached = function (f) {
-      var called = false;
-      var r;
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        if (!called) {
-          called = true;
-          r = f.apply(null, args);
-        }
-        return r;
+    var Cell = function (initial) {
+      var value = initial;
+      var get = function () {
+        return value;
+      };
+      var set = function (v) {
+        value = v;
+      };
+      var clone = function () {
+        return Cell(get());
+      };
+      return {
+        get: get,
+        set: set,
+        clone: clone
       };
     };
 
@@ -294,7 +291,7 @@
       }
       return undefined;
     };
-    var find = function (regexes, agent) {
+    var find$1 = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
       if (!r) {
         return {
@@ -312,7 +309,7 @@
       if (versionRegexes.length === 0) {
         return unknown();
       }
-      return find(versionRegexes, cleanedAgent);
+      return find$1(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
       return nu(0, 0);
@@ -416,15 +413,15 @@
       freebsd: constant(freebsd)
     };
 
-    var DeviceType = function (os, browser, userAgent) {
+    var DeviceType = function (os, browser, userAgent, mediaMatch) {
       var isiPad = os.isiOS() && /ipad/i.test(userAgent) === true;
       var isiPhone = os.isiOS() && !isiPad;
-      var isAndroid3 = os.isAndroid() && os.version.major === 3;
-      var isAndroid4 = os.isAndroid() && os.version.major === 4;
-      var isTablet = isiPad || isAndroid3 || isAndroid4 && /mobile/i.test(userAgent) === true;
-      var isTouch = os.isiOS() || os.isAndroid();
-      var isPhone = isTouch && !isTablet;
+      var isMobile = os.isiOS() || os.isAndroid();
+      var isTouch = isMobile || mediaMatch('(pointer:coarse)');
+      var isTablet = isiPad || !isiPhone && isMobile && mediaMatch('(min-device-width:768px)');
+      var isPhone = isiPhone || isMobile && !isTablet;
       var iOSwebview = browser.isSafari() && os.isiOS() && /safari/i.test(userAgent) === false;
+      var isDesktop = !isPhone && !isTablet && !iOSwebview;
       return {
         isiPad: constant(isiPad),
         isiPhone: constant(isiPhone),
@@ -433,7 +430,8 @@
         isTouch: constant(isTouch),
         isAndroid: os.isAndroid,
         isiOS: os.isiOS,
-        isWebView: constant(iOSwebview)
+        isWebView: constant(iOSwebview),
+        isDesktop: constant(isDesktop)
       };
     };
 
@@ -462,49 +460,50 @@
     var isFunction = isType('function');
     var isNumber = isType('number');
 
-    var slice = Array.prototype.slice;
-    var rawIndexOf = function () {
-      var pIndexOf = Array.prototype.indexOf;
-      var fastIndex = function (xs, x) {
-        return pIndexOf.call(xs, x);
-      };
-      var slowIndex = function (xs, x) {
-        return slowIndexOf(xs, x);
-      };
-      return pIndexOf === undefined ? slowIndex : fastIndex;
-    }();
+    var nativeSlice = Array.prototype.slice;
+    var nativeIndexOf = Array.prototype.indexOf;
+    var nativePush = Array.prototype.push;
+    var rawIndexOf = function (ts, t) {
+      return nativeIndexOf.call(ts, t);
+    };
     var contains = function (xs, x) {
       return rawIndexOf(xs, x) > -1;
     };
     var exists = function (xs, pred) {
-      return findIndex(xs, pred).isSome();
+      for (var i = 0, len = xs.length; i < len; i++) {
+        var x = xs[i];
+        if (pred(x, i)) {
+          return true;
+        }
+      }
+      return false;
     };
     var map$1 = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
       for (var i = 0; i < len; i++) {
         var x = xs[i];
-        r[i] = f(x, i, xs);
+        r[i] = f(x, i);
       }
       return r;
     };
     var each$1 = function (xs, f) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        f(x, i, xs);
+        f(x, i);
       }
     };
     var eachr = function (xs, f) {
       for (var i = xs.length - 1; i >= 0; i--) {
         var x = xs[i];
-        f(x, i, xs);
+        f(x, i);
       }
     };
     var filter = function (xs, pred) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           r.push(x);
         }
       }
@@ -522,10 +521,10 @@
       });
       return acc;
     };
-    var find$1 = function (xs, pred) {
+    var find$2 = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           return Option.some(x);
         }
       }
@@ -534,28 +533,19 @@
     var findIndex = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           return Option.some(i);
         }
       }
       return Option.none();
     };
-    var slowIndexOf = function (xs, x) {
-      for (var i = 0, len = xs.length; i < len; ++i) {
-        if (xs[i] === x) {
-          return i;
-        }
-      }
-      return -1;
-    };
-    var push = Array.prototype.push;
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
         if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
         }
-        push.apply(r, xs[i]);
+        nativePush.apply(r, xs[i]);
       }
       return r;
     };
@@ -566,14 +556,14 @@
     var forall = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; ++i) {
         var x = xs[i];
-        if (pred(x, i, xs) !== true) {
+        if (pred(x, i) !== true) {
           return false;
         }
       }
       return true;
     };
     var reverse = function (xs) {
-      var r = slice.call(xs, 0);
+      var r = nativeSlice.call(xs, 0);
       r.reverse();
       return r;
     };
@@ -586,12 +576,12 @@
       return [x];
     };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
-      return slice.call(x);
+      return nativeSlice.call(x);
     };
 
     var detect$1 = function (candidates, userAgent) {
       var agent = String(userAgent).toLowerCase();
-      return find$1(candidates, function (candidate) {
+      return find$2(candidates, function (candidate) {
         return candidate.search(agent);
       });
     };
@@ -754,12 +744,12 @@
       oses: constant(oses)
     };
 
-    var detect$2 = function (userAgent) {
+    var detect$2 = function (userAgent, mediaMatch) {
       var browsers = PlatformInfo.browsers();
       var oses = PlatformInfo.oses();
       var browser = UaString.detectBrowser(browsers, userAgent).fold(Browser.unknown, Browser.nu);
       var os = UaString.detectOs(oses, userAgent).fold(OperatingSystem.unknown, OperatingSystem.nu);
-      var deviceType = DeviceType(os, browser, userAgent);
+      var deviceType = DeviceType(os, browser, userAgent, mediaMatch);
       return {
         browser: browser,
         os: os,
@@ -768,11 +758,13 @@
     };
     var PlatformDetection = { detect: detect$2 };
 
-    var detect$3 = cached(function () {
-      var userAgent = domGlobals.navigator.userAgent;
-      return PlatformDetection.detect(userAgent);
-    });
-    var PlatformDetection$1 = { detect: detect$3 };
+    var mediaMatch = function (query) {
+      return domGlobals.window.matchMedia(query).matches;
+    };
+    var platform = Cell(PlatformDetection.detect(domGlobals.navigator.userAgent, mediaMatch));
+    var detect$3 = function () {
+      return platform.get();
+    };
 
     var alloy = { tap: constant('alloy.tap') };
     var focus = constant('alloy.focus');
@@ -782,7 +774,7 @@
     var execute = constant('alloy.execute');
     var focusItem = constant('alloy.focus.item');
     var tap = alloy.tap;
-    var tapOrClick = PlatformDetection$1.detect().deviceType.isTouch() ? alloy.tap : click;
+    var tapOrClick = detect$3().deviceType.isTouch() ? alloy.tap : click;
     var longpress = constant('alloy.longpress');
     var systemInit = constant('alloy.system.init');
     var attachedToDom = constant('alloy.system.attached');
@@ -812,6 +804,22 @@
     };
     var dispatchFocus = function (component, target) {
       component.getSystem().triggerFocus(target, component.element());
+    };
+
+    var cached = function (f) {
+      var called = false;
+      var r;
+      return function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+        }
+        if (!called) {
+          called = true;
+          r = f.apply(null, args);
+        }
+        return r;
+      };
     };
 
     var fromHtml = function (html, scope) {
@@ -864,6 +872,8 @@
     var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
     var ENTITY = domGlobals.Node.ENTITY_NODE;
     var NOTATION = domGlobals.Node.NOTATION_NODE;
+
+    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
 
     var name = function (element) {
       var r = element.dom().nodeName;
@@ -937,7 +947,7 @@
     };
     var checkDupes = function (everything) {
       var sorted = sort(everything);
-      var dupe = find$1(sorted, function (s, i) {
+      var dupe = find$2(sorted, function (s, i) {
         return i < sorted.length - 1 && s === sorted[i + 1];
       });
       dupe.each(function (d) {
@@ -995,19 +1005,22 @@
     var ELEMENT$1 = ELEMENT;
     var DOCUMENT$1 = DOCUMENT;
     var is = function (element, selector) {
-      var elem = element.dom();
-      if (elem.nodeType !== ELEMENT$1) {
+      var dom = element.dom();
+      if (dom.nodeType !== ELEMENT$1) {
         return false;
-      } else if (elem.matches !== undefined) {
-        return elem.matches(selector);
-      } else if (elem.msMatchesSelector !== undefined) {
-        return elem.msMatchesSelector(selector);
-      } else if (elem.webkitMatchesSelector !== undefined) {
-        return elem.webkitMatchesSelector(selector);
-      } else if (elem.mozMatchesSelector !== undefined) {
-        return elem.mozMatchesSelector(selector);
       } else {
-        throw new Error('Browser lacks native selectors');
+        var elem = dom;
+        if (elem.matches !== undefined) {
+          return elem.matches(selector);
+        } else if (elem.msMatchesSelector !== undefined) {
+          return elem.msMatchesSelector(selector);
+        } else if (elem.webkitMatchesSelector !== undefined) {
+          return elem.webkitMatchesSelector(selector);
+        } else if (elem.mozMatchesSelector !== undefined) {
+          return elem.mozMatchesSelector(selector);
+        } else {
+          throw new Error('Browser lacks native selectors');
+        }
       }
     };
     var bypassSelector = function (dom) {
@@ -1033,23 +1046,20 @@
     var ieContains = function (e1, e2) {
       return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
-    var browser = PlatformDetection$1.detect().browser;
+    var browser = detect$3().browser;
     var contains$2 = browser.isIE() ? ieContains : regularContains;
 
     var owner = function (element) {
       return Element.fromDom(element.dom().ownerDocument);
     };
     var defaultView = function (element) {
-      var el = element.dom();
-      var defView = el.ownerDocument.defaultView;
-      return Element.fromDom(defView);
+      return Element.fromDom(element.dom().ownerDocument.defaultView);
     };
     var parent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element.fromDom);
+      return Option.from(element.dom().parentNode).map(Element.fromDom);
     };
     var parents = function (element, isRoot) {
-      var stop = isFunction(isRoot) ? isRoot : constant(false);
+      var stop = isFunction(isRoot) ? isRoot : never;
       var dom = element.dom();
       var ret = [];
       while (dom.parentNode !== null && dom.parentNode !== undefined) {
@@ -1073,12 +1083,10 @@
       return parent(element).map(children).map(filterSelf).getOr([]);
     };
     var nextSibling = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.nextSibling).map(Element.fromDom);
+      return Option.from(element.dom().nextSibling).map(Element.fromDom);
     };
     var children = function (element) {
-      var dom = element.dom();
-      return map$1(dom.childNodes, Element.fromDom);
+      return map$1(element.dom().childNodes, Element.fromDom);
     };
     var child = function (element, index) {
       var cs = element.dom().childNodes;
@@ -1155,6 +1163,38 @@
       emit(component, attachedToDom());
     };
     var attach = function (parent, child) {
+      append(parent.element(), child.element());
+    };
+    var detachChildren = function (component) {
+      each$1(component.components(), function (childComp) {
+        return remove(childComp.element());
+      });
+      empty(component.element());
+      component.syncComponents();
+    };
+    var replaceChildren = function (component, newChildren) {
+      var subs = component.components();
+      detachChildren(component);
+      var deleted = difference(subs, newChildren);
+      each$1(deleted, function (comp) {
+        fireDetaching(comp);
+        component.getSystem().removeFromWorld(comp);
+      });
+      each$1(newChildren, function (childComp) {
+        if (!childComp.getSystem().isConnected()) {
+          component.getSystem().addToWorld(childComp);
+          attach(component, childComp);
+          if (inBody(component.element())) {
+            fireAttaching(childComp);
+          }
+        } else {
+          attach(component, childComp);
+        }
+        component.syncComponents();
+      });
+    };
+
+    var attach$1 = function (parent, child) {
       attachWith(parent, child, append);
     };
     var attachWith = function (parent, child, insertion) {
@@ -1172,23 +1212,17 @@
     };
     var detach = function (component) {
       var parent$1 = parent(component.element()).bind(function (p) {
-        return component.getSystem().getByDom(p).fold(Option.none, Option.some);
+        return component.getSystem().getByDom(p).toOption();
       });
       doDetach(component);
       parent$1.each(function (p) {
         p.syncComponents();
       });
     };
-    var detachChildren = function (component) {
-      var subs = component.components();
-      each$1(subs, doDetach);
-      empty(component.element());
-      component.syncComponents();
-    };
     var attachSystemAfter = function (element, guiSystem) {
-      attachSystemInternal(element, guiSystem, after);
+      attachSystemWith(element, guiSystem, after);
     };
-    var attachSystemInternal = function (element, guiSystem, inserter) {
+    var attachSystemWith = function (element, guiSystem, inserter) {
       inserter(element, guiSystem.element());
       var children$1 = children(guiSystem.element());
       each$1(children$1, function (child) {
@@ -1534,7 +1568,7 @@
       return values.length === 0 ? Result.value(base) : Result.value(deepMerge(base, merge.apply(undefined, values)));
     };
     var mergeErrors = function (errors) {
-      return compose(Result.error, flatten)(errors);
+      return Result.error(flatten(errors));
     };
     var consolidate = function (objs, base) {
       var partitions = partition(objs);
@@ -2141,16 +2175,17 @@
       return Option.none();
     };
     var closest = function (scope, predicate, isRoot) {
-      var is = function (s) {
-        return predicate(s);
+      var is = function (s, test) {
+        return test(s);
       };
       return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
     };
     var descendant = function (scope, predicate) {
       var descend = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
-          if (predicate(Element.fromDom(node.childNodes[i]))) {
-            return Option.some(Element.fromDom(node.childNodes[i]));
+          var child_1 = Element.fromDom(node.childNodes[i]);
+          if (predicate(child_1)) {
+            return Option.some(child_1);
           }
           var res = descend(node.childNodes[i]);
           if (res.isSome()) {
@@ -2301,9 +2336,9 @@
       };
     };
     var merge$1 = function (defnA, mod) {
-      return __assign({}, defnA, {
-        attributes: __assign({}, defnA.attributes, mod.attributes),
-        styles: __assign({}, defnA.styles, mod.styles),
+      return __assign(__assign({}, defnA), {
+        attributes: __assign(__assign({}, defnA.attributes), mod.attributes),
+        styles: __assign(__assign({}, defnA.styles), mod.styles),
         classes: defnA.classes.concat(mod.classes)
       });
     };
@@ -2364,7 +2399,7 @@
       var wrappedExtra = map(extra, function (extraF, extraName) {
         return markAsExtraApi(extraF, extraName);
       });
-      var me = __assign({}, wrappedExtra, wrappedApis, {
+      var me = __assign(__assign(__assign({}, wrappedExtra), wrappedApis), {
         revoke: curry(revokeBehaviour, name),
         config: function (spec) {
           var prepared = asRawOrDie(name + '-config', configSchema, spec);
@@ -2579,24 +2614,6 @@
       apis: SwapApis
     });
 
-    var Cell = function (initial) {
-      var value = initial;
-      var get = function () {
-        return value;
-      };
-      var set = function (v) {
-        value = v;
-      };
-      var clone = function () {
-        return Cell(get());
-      };
-      return {
-        get: get,
-        set: set,
-        clone: clone
-      };
-    };
-
     var focus$1 = function (element) {
       element.dom().focus();
     };
@@ -2607,8 +2624,8 @@
       var doc = owner(element).dom();
       return element.dom() === doc.activeElement;
     };
-    var active = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+    var active = function (_doc) {
+      var doc = _doc !== undefined ? _doc.dom() : domGlobals.document;
       return Option.from(doc.activeElement).map(Element.fromDom);
     };
     var search = function (element) {
@@ -2725,6 +2742,18 @@
       }
       return r;
     };
+    var sequence = function (arr) {
+      var r = [];
+      for (var i = 0; i < arr.length; i++) {
+        var x = arr[i];
+        if (x.isSome()) {
+          r.push(x.getOrDie());
+        } else {
+          return Option.none();
+        }
+      }
+      return Option.some(r);
+    };
     var findMap = function (arr, f) {
       for (var i = 0; i < arr.length; i++) {
         var r = f(arr[i], i);
@@ -2733,6 +2762,9 @@
         }
       }
       return Option.none();
+    };
+    var someIf = function (b, a) {
+      return b ? Option.some(a) : Option.none();
     };
 
     var unknown$3 = 'unknown';
@@ -2838,7 +2870,7 @@
       var err = new Error();
       if (err.stack !== undefined) {
         var lines = err.stack.split('\n');
-        return find$1(lines, function (line) {
+        return find$2(lines, function (line) {
           return line.indexOf('alloy') > 0 && !exists(path, function (p) {
             return line.indexOf(p) > -1;
           });
@@ -3104,7 +3136,7 @@
       var onMousedown = function (component, simulatedEvent) {
         simulatedEvent.cut();
       };
-      var pointerEvents = PlatformDetection$1.detect().deviceType.isTouch() ? [run(tap(), onClick)] : [
+      var pointerEvents = detect$3().deviceType.isTouch() ? [run(tap(), onClick)] : [
         run(click(), onClick),
         run(mousedown(), onMousedown)
       ];
@@ -3340,20 +3372,20 @@
     var cyclePrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
       var after = reverse(values.slice(index + 1));
-      return find$1(before.concat(after), predicate);
+      return find$2(before.concat(after), predicate);
     };
     var tryPrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
-      return find$1(before, predicate);
+      return find$2(before, predicate);
     };
     var cycleNext = function (values, index, predicate) {
       var before = values.slice(0, index);
       var after = values.slice(index + 1);
-      return find$1(after.concat(before), predicate);
+      return find$2(after.concat(before), predicate);
     };
     var tryNext = function (values, index, predicate) {
       var after = values.slice(index + 1);
-      return find$1(after, predicate);
+      return find$2(after, predicate);
     };
 
     var inSet = function (keys) {
@@ -3386,7 +3418,7 @@
       };
     };
     var choose$2 = function (transitions, event) {
-      var transition = find$1(transitions, function (t) {
+      var transition = find$2(transitions, function (t) {
         return t.matches(event);
       });
       return transition.map(function (t) {
@@ -3461,7 +3493,7 @@
     };
     var highlightBy = function (component, hConfig, hState, predicate) {
       var candidates = getCandidates(component, hConfig);
-      var targetComp = find$1(candidates, predicate);
+      var targetComp = find$2(candidates, predicate);
       targetComp.each(function (c) {
         highlight$1(component, hConfig, hState, c);
       });
@@ -4373,7 +4405,7 @@
       return data.dump;
     };
     var augment = function (data, original) {
-      return __assign({}, data.dump, derive$1(original));
+      return __assign(__assign({}, data.dump), derive$1(original));
     };
     var SketchBehaviours = {
       field: field$1,
@@ -4423,7 +4455,7 @@
         var substituted = bind(childSpecs, function (c) {
           return substitute(owner, detail, c, placeholders);
         });
-        return [__assign({}, value, { components: substituted })];
+        return [__assign(__assign({}, value), { components: substituted })];
       }, function (req, valuesThunk) {
         var values = valuesThunk(detail, compSpec.config, compSpec.validated);
         var preprocessor = compSpec.validated.preprocess.getOr(identity);
@@ -4588,7 +4620,7 @@
           var g = doGenerateOne(owner, np.pname);
           r[np.name] = function (config) {
             var validated = asRawOrDie('Part: ' + np.name + ' in ' + owner, objOf(np.schema), config);
-            return __assign({}, g, {
+            return __assign(__assign({}, g), {
               config: config,
               validated: validated
             });
@@ -4698,7 +4730,7 @@
       return generate$1(prefix);
     };
 
-    var base = function (label, partSchemas, partUidsSchemas, spec) {
+    var base = function (partSchemas, partUidsSchemas) {
       var ps = partSchemas.length > 0 ? [strictObjOf('parts', partSchemas)] : [];
       return ps.concat([
         strict$1('uid'),
@@ -4709,7 +4741,7 @@
       ]).concat(partUidsSchemas);
     };
     var asRawOrDie$1 = function (label, schema, spec, partSchemas, partUidsSchemas) {
-      var baseS = base(label, partSchemas, partUidsSchemas);
+      var baseS = base(partSchemas, partUidsSchemas);
       return asRawOrDie(label + ' [SpecSchema]', objOfOnly(baseS.concat(schema)), spec);
     };
 
@@ -4728,7 +4760,7 @@
       return factory(detail, components$1, specWithUid, subs.externals());
     };
     var supplyUid = function (spec) {
-      return spec.hasOwnProperty('uid') ? spec : __assign({}, spec, { uid: generate$3('uid') });
+      return spec.hasOwnProperty('uid') ? spec : __assign(__assign({}, spec), { uid: generate$3('uid') });
     };
 
     function isSketchSpec(spec) {
@@ -4758,12 +4790,12 @@
       var extraApis = map(config.extraApis, function (f, k) {
         return markAsExtraApi(f, k);
       });
-      return __assign({
+      return __assign(__assign({
         name: constant(config.name),
         partFields: constant([]),
         configFields: constant(config.configFields),
         sketch: sketch
-      }, apis, extraApis);
+      }, apis), extraApis);
     };
     var composite$1 = function (rawConfig) {
       var config = asRawOrDie('Sketcher for ' + rawConfig.name, compositeSchema, rawConfig);
@@ -4775,13 +4807,13 @@
       var extraApis = map(config.extraApis, function (f, k) {
         return markAsExtraApi(f, k);
       });
-      return __assign({
+      return __assign(__assign({
         name: constant(config.name),
         partFields: constant(config.partFields),
         configFields: constant(config.configFields),
         sketch: sketch,
         parts: constant(parts)
-      }, apis, extraApis);
+      }, apis), extraApis);
     };
 
     var factory = function (detail) {
@@ -4871,7 +4903,7 @@
         if (attr.name === 'class') {
           return b;
         } else {
-          return __assign({}, b, (_a = {}, _a[attr.name] = attr.value, _a));
+          return __assign(__assign({}, b), (_a = {}, _a[attr.name] = attr.value, _a));
         }
       }, {});
     };
@@ -4952,8 +4984,8 @@
       getToolbarIconButton: getToolbarIconButton
     };
 
-    var platform = PlatformDetection$1.detect();
-    var isTouch = platform.deviceType.isTouch();
+    var platform$1 = detect$3();
+    var isTouch = platform$1.deviceType.isTouch();
     var labelPart = optional({
       schema: [strict$1('dom')],
       name: 'label'
@@ -5165,8 +5197,8 @@
             });
           });
         });
-        dataByValue.set(__assign({}, currentDataByValue, newDataByValue));
-        dataByText.set(__assign({}, currentDataByText, newDataByText));
+        dataByValue.set(__assign(__assign({}, currentDataByValue), newDataByValue));
+        dataByText.set(__assign(__assign({}, currentDataByText), newDataByText));
       };
       return nu$6({
         readState: readState,
@@ -5323,7 +5355,7 @@
     };
     var Position = r;
 
-    var isTouch$1 = PlatformDetection$1.detect().deviceType.isTouch();
+    var isTouch$1 = detect$3().deviceType.isTouch();
     var _sliderChangeEvent = 'slider.change.value';
     var sliderChangeEvent = constant(_sliderChangeEvent);
     var getEventSource = function (simulatedEvent) {
@@ -5913,7 +5945,7 @@
         edgeActions: edgeActions$2
     });
 
-    var isTouch$2 = PlatformDetection$1.detect().deviceType.isTouch();
+    var isTouch$2 = detect$3().deviceType.isTouch();
     var SliderSchema = [
       defaulted$1('stepSize', 1),
       defaulted$1('onChange', noop),
@@ -5966,7 +5998,7 @@
         return Cell(false);
       })] : []);
 
-    var isTouch$3 = PlatformDetection$1.detect().deviceType.isTouch();
+    var isTouch$3 = detect$3().deviceType.isTouch();
     var sketch = function (detail, components, _spec, _externals) {
       var getThumb = function (component) {
         return getPartOrDie(component, detail, 'thumb');
@@ -6053,13 +6085,20 @@
               channels: {
                 'mouse.released': {
                   onReceive: function (slider, se) {
-                    var wasDown = detail.mouseIsDown.get();
-                    detail.mouseIsDown.set(false);
-                    if (wasDown) {
+                    var fireOnChoose = function () {
                       getPart(slider, detail, 'thumb').each(function (thumb) {
                         var value = modelDetail.value.get();
                         detail.onChoose(slider, thumb, value);
                       });
+                    };
+                    if (isTouch$3) {
+                      fireOnChoose();
+                    } else {
+                      var wasDown = detail.mouseIsDown.get();
+                      detail.mouseIsDown.set(false);
+                      if (wasDown) {
+                        fireOnChoose();
+                      }
                     }
                   }
                 }
@@ -6287,7 +6326,7 @@
       });
     };
     var getRawOrComputed = function (isRoot, rawStart) {
-      var optStart = isElement(rawStart) ? Option.some(rawStart) : parent(rawStart);
+      var optStart = isElement(rawStart) ? Option.some(rawStart) : parent(rawStart).filter(isElement);
       return optStart.map(function (start) {
         var inline = closest(start, function (elem) {
           return getRaw(elem, 'font-size').isSome();
@@ -6307,7 +6346,7 @@
         return eq(root, e);
       };
       var elemSize = getRawOrComputed(isRoot, elem);
-      return find$1(candidates, function (size) {
+      return find$2(candidates, function (size) {
         return elemSize === size;
       }).getOr(defaultSize);
     };
@@ -6368,10 +6407,10 @@
         return anyInSystem.getSystem().getByUid(uid).getOrDie();
       };
       var getOpt = function (anyInSystem) {
-        return anyInSystem.getSystem().getByUid(uid).fold(Option.none, Option.some);
+        return anyInSystem.getSystem().getByUid(uid).toOption();
       };
       var asSpec = function () {
-        return __assign({}, spec, { uid: uid });
+        return __assign(__assign({}, spec), { uid: uid });
       };
       return {
         get: get,
@@ -6723,14 +6762,14 @@
       query: query
     };
 
-    var platform$1 = PlatformDetection$1.detect();
+    var platform$2 = detect$3();
     var preserve = function (f, editor) {
       var rng = editor.selection.getRng();
       f();
       editor.selection.setRng(rng);
     };
     var forAndroid = function (editor, f) {
-      var wrapper = platform$1.os.isAndroid() ? preserve : apply;
+      var wrapper = platform$2.os.isAndroid() ? preserve : apply;
       wrapper(f, editor);
     };
     var RangePreserver = { forAndroid: forAndroid };
@@ -6867,7 +6906,7 @@
         })]);
     };
     var behaviours = function (detail) {
-      return __assign({}, focusBehaviours(detail), augment(detail.inputBehaviours, [Representing.config({
+      return __assign(__assign({}, focusBehaviours(detail)), augment(detail.inputBehaviours, [Representing.config({
           store: {
             mode: 'manual',
             initialValue: detail.data.getOr(undefined),
@@ -7695,7 +7734,7 @@
       var byAspect = byInnerKey(modsByBehaviour, nameAndMod);
       var combineObjects = function (objects) {
         return foldr(objects, function (b, a) {
-          return __assign({}, a.modification, b);
+          return __assign(__assign({}, a.modification), b);
         }, {});
       };
       var combinedClasses = foldr(byAspect.classes, function (b, a) {
@@ -7771,7 +7810,7 @@
       return r;
     };
     var groupByEvents = function (info, behaviours, base) {
-      var behaviourEvents = __assign({}, base, nameToHandlers(behaviours, info));
+      var behaviourEvents = __assign(__assign({}, base), nameToHandlers(behaviours, info));
       return byInnerKey(behaviourEvents, behaviourTuple);
     };
     var combine$2 = function (info, eventOrder, behaviours, base) {
@@ -7819,8 +7858,8 @@
         var combined = tuples.length === 1 ? Result.value(tuples[0].handler()) : fuse$1(tuples, eventOrder, eventName);
         return combined.map(function (handler) {
           var assembled = assemble(handler);
-          var purpose = tuples.length > 1 ? filter(eventOrder, function (o) {
-            return contains(tuples, function (t) {
+          var purpose = tuples.length > 1 ? filter(eventOrder[eventName], function (o) {
+            return exists(tuples, function (t) {
               return t.name() === o;
             });
           }).join(' > ') : tuples[0].name();
@@ -7888,7 +7927,7 @@
       ]), spec);
     };
     var toDefinition = function (detail) {
-      return __assign({}, detail.dom, {
+      return __assign(__assign({}, detail.dom), {
         uid: detail.uid,
         domChildren: map$1(detail.components, function (comp) {
           return comp.element();
@@ -8035,8 +8074,8 @@
     var buildFromSpec = function (userSpec) {
       var _a = make$1(userSpec), specEvents = _a.events, spec = __rest(_a, ['events']);
       var components = buildSubcomponents(spec);
-      var completeSpec = __assign({}, spec, {
-        events: __assign({}, DefaultEvents, specEvents),
+      var completeSpec = __assign(__assign({}, spec), {
+        events: __assign(__assign({}, DefaultEvents), specEvents),
         components: components
       });
       return Result.value(build(completeSpec));
@@ -8110,7 +8149,7 @@
     var builder = function (detail) {
       return {
         dom: detail.dom,
-        domModification: __assign({}, detail.domModification, { attributes: __assign({ 'role': detail.toggling.isSome() ? 'menuitemcheckbox' : 'menuitem' }, detail.domModification.attributes, { 'aria-haspopup': detail.hasSubmenu }, detail.hasSubmenu ? { 'aria-expanded': false } : {}) }),
+        domModification: __assign(__assign({}, detail.domModification), { attributes: __assign(__assign(__assign({ 'role': detail.toggling.isSome() ? 'menuitemcheckbox' : 'menuitem' }, detail.domModification.attributes), { 'aria-haspopup': detail.hasSubmenu }), detail.hasSubmenu ? { 'aria-expanded': false } : {}) }),
         behaviours: SketchBehaviours.augment(detail.itemBehaviours, [
           detail.toggling.fold(Toggling.revoke, function (tConfig) {
             return Toggling.config(__assign({ aria: { mode: 'checked' } }, tConfig));
@@ -8326,7 +8365,7 @@
         name: 'items',
         unit: 'item',
         defaults: function (detail, u) {
-          return u.hasOwnProperty('uid') ? u : __assign({}, u, { uid: generate$3('item') });
+          return u.hasOwnProperty('uid') ? u : __assign(__assign({}, u), { uid: generate$3('item') });
         },
         overrides: function (detail, u) {
           return {
@@ -8443,12 +8482,9 @@
     };
 
     var set$8 = function (component, replaceConfig, replaceState, data) {
-      detachChildren(component);
       preserve$1(function () {
-        var children = map$1(data, component.getSystem().build);
-        each$1(children, function (l) {
-          attach(component, l);
-        });
+        var newChildren = map$1(data, component.getSystem().build);
+        replaceChildren(component, newChildren);
       }, component.element());
     };
     var insert = function (component, replaceConfig, insertion, childSpec) {
@@ -8463,7 +8499,7 @@
     };
     var remove$7 = function (component, replaceConfig, replaceState, removee) {
       var children = contents(component);
-      var foundChild = find$1(children, function (child) {
+      var foundChild = find$2(children, function (child) {
         return eq(removee.element(), child.element());
       });
       foundChild.each(detach);
@@ -8556,7 +8592,7 @@
       };
       var setMenuBuilt = function (menuName, built) {
         var _a;
-        menus.set(__assign({}, menus.get(), (_a = {}, _a[menuName] = {
+        menus.set(__assign(__assign({}, menus.get()), (_a = {}, _a[menuName] = {
           type: 'prepared',
           menu: built
         }, _a)));
@@ -8568,6 +8604,40 @@
         directory.set(dir);
         var sPaths = generate$5(dir, sExpansions);
         paths.set(sPaths);
+      };
+      var getTriggeringItem = function (menuValue) {
+        return find(expansions.get(), function (v, k) {
+          return v === menuValue;
+        });
+      };
+      var getTriggerData = function (menuValue, getItemByValue, path) {
+        return getPreparedMenu(menuValue).bind(function (menu) {
+          return getTriggeringItem(menuValue).bind(function (triggeringItemValue) {
+            return getItemByValue(triggeringItemValue).map(function (triggeredItem) {
+              return {
+                triggeredMenu: menu,
+                triggeringItem: triggeredItem,
+                triggeringPath: path
+              };
+            });
+          });
+        });
+      };
+      var getTriggeringPath = function (itemValue, getItemByValue) {
+        var extraPath = filter(lookupItem(itemValue).toArray(), function (menuValue) {
+          return getPreparedMenu(menuValue).isSome();
+        });
+        return readOptFrom$1(paths.get(), itemValue).bind(function (path) {
+          var revPath = reverse(extraPath.concat(path));
+          var triggers = bind(revPath, function (menuValue, menuIndex) {
+            return getTriggerData(menuValue, getItemByValue, revPath.slice(0, menuIndex + 1)).fold(function () {
+              return primary.get().is(menuValue) ? [] : [Option.none()];
+            }, function (data) {
+              return [Option.some(data)];
+            });
+          });
+          return sequence(triggers);
+        });
       };
       var expand = function (itemValue) {
         return readOptFrom$1(expansions.get(), itemValue).map(function (menu) {
@@ -8583,19 +8653,21 @@
       var refresh = function (itemValue) {
         return readOptFrom$1(paths.get(), itemValue);
       };
+      var getPreparedMenu = function (menuValue) {
+        return lookupMenu(menuValue).bind(extractPreparedMenu);
+      };
       var lookupMenu = function (menuValue) {
         return readOptFrom$1(menus.get(), menuValue);
+      };
+      var lookupItem = function (itemValue) {
+        return readOptFrom$1(expansions.get(), itemValue);
       };
       var otherMenus = function (path) {
         var menuValues = directory.get();
         return difference(keys(menuValues), path);
       };
       var getPrimary = function () {
-        return primary.get().bind(function (primaryName) {
-          return lookupMenu(primaryName).bind(function (prep) {
-            return prep.type === 'prepared' ? Option.some(prep.menu) : Option.none();
-          });
-        });
+        return primary.get().bind(getPreparedMenu);
       };
       var getMenus = function () {
         return menus.get();
@@ -8607,21 +8679,29 @@
         refresh: refresh,
         collapse: collapse,
         lookupMenu: lookupMenu,
+        lookupItem: lookupItem,
         otherMenus: otherMenus,
         getPrimary: getPrimary,
         getMenus: getMenus,
         clear: clear,
-        isClear: isClear
+        isClear: isClear,
+        getTriggeringPath: getTriggeringPath
       };
     };
-    var LayeredState = { init: init$3 };
+    var extractPreparedMenu = function (prep) {
+      return prep.type === 'prepared' ? Option.some(prep.menu) : Option.none();
+    };
+    var LayeredState = {
+      init: init$3,
+      extractPreparedMenu: extractPreparedMenu
+    };
 
     var make$3 = function (detail, rawUiSpec) {
       var submenuParentItems = Cell(Option.none());
       var buildMenus = function (container, primaryName, menus) {
         return map(menus, function (spec, name) {
           var makeSketch = function () {
-            return Menu.sketch(__assign({ dom: spec.dom }, spec, {
+            return Menu.sketch(__assign(__assign({ dom: spec.dom }, spec), {
               value: name,
               items: spec.items,
               markers: detail.markers,
@@ -8648,6 +8728,17 @@
       };
       var getItemValue = function (item) {
         return Representing.getValue(item).value;
+      };
+      var getItemByValue = function (container, menus, itemValue) {
+        return findMap(menus, function (menu) {
+          if (!menu.getSystem().isConnected()) {
+            return Option.none();
+          }
+          var candidates = Highlighting.getCandidates(menu);
+          return find$2(candidates, function (c) {
+            return getItemValue(c) === itemValue;
+          });
+        });
       };
       var toDirectory = function (container) {
         return map(detail.data.menus, function (data, menuName) {
@@ -8753,7 +8844,7 @@
               if (!inBody(activeMenu.element())) {
                 Replacing.append(container, premade$1(activeMenu));
               }
-              detail.onOpenSubmenu(container, item, activeMenu);
+              detail.onOpenSubmenu(container, item, activeMenu, reverse(path));
               if (decision === ExpandHighlightDecision.HighlightSubmenu) {
                 Highlighting.highlightFirst(activeMenu);
                 return updateMenuPath(container, layeredState, path);
@@ -8808,11 +8899,14 @@
       };
       var events = derive([
         run(focus$4(), function (sandbox, simulatedEvent) {
-          var menu = simulatedEvent.event().menu();
-          Highlighting.highlight(sandbox, menu);
-          var value = getItemValue(simulatedEvent.event().item());
-          layeredState.refresh(value).each(function (path) {
-            return closeOthers(sandbox, layeredState, path);
+          var item = simulatedEvent.event().item();
+          layeredState.lookupItem(getItemValue(item)).each(function () {
+            var menu = simulatedEvent.event().menu();
+            Highlighting.highlight(sandbox, menu);
+            var value = getItemValue(simulatedEvent.event().item());
+            layeredState.refresh(value).each(function (path) {
+              return closeOthers(sandbox, layeredState, path);
+            });
           });
         }),
         runOnExecute(function (component, simulatedEvent) {
@@ -8843,11 +8937,12 @@
           expandRight(sandbox, item, ExpandHighlightDecision.HighlightParent);
           detail.onHover(sandbox, item);
         })] : []));
+      var getActiveItem = function (container) {
+        return Highlighting.getHighlighted(container).bind(Highlighting.getHighlighted);
+      };
       var collapseMenuApi = function (container) {
-        Highlighting.getHighlighted(container).each(function (currentMenu) {
-          Highlighting.getHighlighted(currentMenu).each(function (currentItem) {
-            collapseLeft(container, currentItem);
-          });
+        getActiveItem(container).each(function (currentItem) {
+          collapseLeft(container, currentItem);
         });
       };
       var highlightPrimary = function (container) {
@@ -8855,9 +8950,40 @@
           setActiveMenu(container, primary);
         });
       };
+      var extractMenuFromContainer = function (container) {
+        return Option.from(container.components()[0]).filter(function (comp) {
+          return get(comp.element(), 'role') === 'menu';
+        });
+      };
+      var repositionMenus = function (container) {
+        var maybeActivePrimary = layeredState.getPrimary().bind(function (primary) {
+          return getActiveItem(container).bind(function (currentItem) {
+            var itemValue = getItemValue(currentItem);
+            var allMenus = values(layeredState.getMenus());
+            var preparedMenus = cat(map$1(allMenus, LayeredState.extractPreparedMenu));
+            return layeredState.getTriggeringPath(itemValue, function (v) {
+              return getItemByValue(container, preparedMenus, v);
+            });
+          }).map(function (triggeringPath) {
+            return {
+              primary: primary,
+              triggeringPath: triggeringPath
+            };
+          });
+        });
+        maybeActivePrimary.fold(function () {
+          extractMenuFromContainer(container).each(function (primaryMenu) {
+            detail.onRepositionMenu(container, primaryMenu, []);
+          });
+        }, function (_a) {
+          var primary = _a.primary, triggeringPath = _a.triggeringPath;
+          detail.onRepositionMenu(container, primary, triggeringPath);
+        });
+      };
       var apis = {
         collapseMenu: collapseMenuApi,
-        highlightPrimary: highlightPrimary
+        highlightPrimary: highlightPrimary,
+        repositionMenus: repositionMenus
       };
       return {
         uid: detail.uid,
@@ -8920,6 +9046,7 @@
         onStrictKeyboardHandler('onEscape'),
         onStrictHandler('onOpenMenu'),
         onStrictHandler('onOpenSubmenu'),
+        onStrictHandler('onRepositionMenu'),
         onHandler('onCollapseMenu'),
         defaulted$1('highlightImmediately', true),
         strictObjOf('data', [
@@ -8948,6 +9075,9 @@
         },
         highlightPrimary: function (apis, tmenu) {
           apis.highlightPrimary(tmenu);
+        },
+        repositionMenus: function (apis, tmenu) {
+          apis.repositionMenus(tmenu);
         }
       },
       factory: make$3,
@@ -9585,21 +9715,23 @@
         raw: constant(raw)
       };
     };
+    var fromRawEvent = function (rawEvent) {
+      var target = Element.fromDom(rawEvent.target);
+      var stop = function () {
+        rawEvent.stopPropagation();
+      };
+      var prevent = function () {
+        rawEvent.preventDefault();
+      };
+      var kill = compose(prevent, stop);
+      return mkEvent(target, rawEvent.clientX, rawEvent.clientY, stop, prevent, kill, rawEvent);
+    };
     var handle = function (filter, handler) {
       return function (rawEvent) {
         if (!filter(rawEvent)) {
           return;
         }
-        var target = Element.fromDom(rawEvent.target);
-        var stop = function () {
-          rawEvent.stopPropagation();
-        };
-        var prevent = function () {
-          rawEvent.preventDefault();
-        };
-        var kill = compose(prevent, stop);
-        var evt = mkEvent(target, rawEvent.clientX, rawEvent.clientY, stop, prevent, kill, rawEvent);
-        handler(evt);
+        handler(fromRawEvent(rawEvent));
       };
     };
     var binder = function (element, event, filter, handler, useCapture) {
@@ -9634,7 +9766,7 @@
       return { isPortrait: constant(isPortrait) };
     };
     var getActualWidth = function (outerWindow) {
-      var isIos = PlatformDetection$1.detect().os.isiOS();
+      var isIos = detect$3().os.isiOS();
       var isPortrait = get$a(outerWindow).isPortrait();
       return isIos && !isPortrait ? outerWindow.screen.height : outerWindow.screen.width;
     };
@@ -9719,9 +9851,10 @@
     };
     var monitor = function (settings) {
       var startData = Cell(Option.none());
+      var longpressFired = Cell(false);
       var longpress$1 = DelayedFunction(function (event) {
-        startData.set(Option.none());
         settings.triggerEvent(longpress(), event);
+        longpressFired.set(true);
       }, LONGPRESS_DELAY);
       var handleTouchstart = function (event) {
         getTouch(event).each(function (touch) {
@@ -9732,6 +9865,7 @@
             target: event.target
           };
           longpress$1.schedule(event);
+          longpressFired.set(false);
           startData.set(Option.some(data));
         });
         return Option.none();
@@ -9753,7 +9887,12 @@
           return eq(data.target(), event.target());
         };
         return startData.get().filter(isSame).map(function (data) {
-          return settings.triggerEvent(tap(), event);
+          if (longpressFired.get()) {
+            event.prevent();
+            return false;
+          } else {
+            return settings.triggerEvent(tap(), event);
+          }
         });
       };
       var handlers = wrapAll$1([
@@ -9805,7 +9944,7 @@
     };
     var TappingEvent = { monitor: monitor$1 };
 
-    var isAndroid6 = PlatformDetection$1.detect().os.version.major >= 6;
+    var isAndroid6 = detect$3().os.version.major >= 6;
     var initEvents = function (editorApi, toolstrip, alloy) {
       var tapping = TappingEvent.monitor(editorApi);
       var outerDoc = owner(toolstrip);
@@ -9877,18 +10016,9 @@
         }
         return getOption(element).getOr('');
       };
-      var getOptionIE10 = function (element) {
-        try {
-          return getOptionSafe(element);
-        } catch (e) {
-          return Option.none();
-        }
-      };
-      var getOptionSafe = function (element) {
+      var getOption = function (element) {
         return is(element) ? Option.from(element.dom().nodeValue) : Option.none();
       };
-      var browser = PlatformDetection$1.detect().browser;
-      var getOption = browser.isIE() && browser.version.major === 10 ? getOptionIE10 : getOptionSafe;
       var set = function (element, value) {
         if (!is(element)) {
           throw new Error('Can only set raw ' + name + ' value of a ' + name + ' node');
@@ -10206,8 +10336,7 @@
       });
     };
     var locateNode = function (doc, node, x, y) {
-      var locator = isText(node) ? locate$1 : searchInChildren;
-      return locator(doc, node, x, y);
+      return isText(node) ? locate$1(doc, node, x, y) : searchInChildren(doc, node, x, y);
     };
     var locate$2 = function (doc, node, x, y) {
       var r = doc.dom().createRange();
@@ -10645,7 +10774,7 @@
     var ancestorPosition = 'position:absolute!important;';
     var ancestorStyles = 'top:0!important;left:0!important;margin:0!important;padding:0!important;width:100%!important;height:100%!important;overflow:visible!important;';
     var bgFallback = 'background-color:rgb(255,255,255)!important;';
-    var isAndroid = PlatformDetection$1.detect().os.isAndroid();
+    var isAndroid = detect$3().os.isAndroid();
     var matchColor = function (editorBody) {
       var color = get$3(editorBody, 'background-color');
       return color !== undefined && color !== '' ? 'background-color:' + color + '!important' : bgFallback;
@@ -11416,7 +11545,7 @@
         'textarea'
       ], name(event.target())) && !closest$3(event.target(), '[contenteditable="true"]');
     };
-    var isFirefox = PlatformDetection$1.detect().browser.isFirefox();
+    var isFirefox = detect$3().browser.isFirefox();
     var settingsSchema = objOfOnly([
       strictFunction('triggerEvent'),
       defaulted$1('stopBackspace', true)
@@ -11437,7 +11566,7 @@
     };
     var setup$2 = function (container, rawSettings) {
       var settings = asRawOrDie('Getting GUI events settings', settingsSchema, rawSettings);
-      var pointerEvents = PlatformDetection$1.detect().deviceType.isTouch() ? [
+      var pointerEvents = detect$3().deviceType.isTouch() ? [
         'touchstart',
         'touchmove',
         'touchend',
@@ -11832,7 +11961,7 @@
         component.disconnect();
       };
       var add = function (component) {
-        attach(root, component);
+        attach$1(root, component);
       };
       var remove$1 = function (component) {
         detach(component);
@@ -12936,16 +13065,15 @@
         }
       ];
       return findMap(devices, function (device) {
-        return deviceWidth <= device.width && deviceHeight <= device.height ? Option.some(device.keyboard) : Option.none();
+        return someIf(deviceWidth <= device.width && deviceHeight <= device.height, device.keyboard);
       }).getOr({
         portrait: deviceHeight / 5,
         landscape: deviceWidth / 4
       });
     };
-    var Devices = { findDevice: findDevice };
 
     var softKeyboardLimits = function (outerWindow) {
-      return Devices.findDevice(outerWindow.screen.width, outerWindow.screen.height);
+      return findDevice(outerWindow.screen.width, outerWindow.screen.height);
     };
     var accountableKeyboardHeight = function (outerWindow) {
       var portrait = Orientation.get(outerWindow).isPortrait();
@@ -13677,7 +13805,7 @@
         var doScrollIntoView = function () {
           editor.fire('ScrollIntoView');
         };
-        var realm = PlatformDetection$1.detect().os.isAndroid() ? AndroidRealm(doScrollIntoView) : IosRealm(doScrollIntoView);
+        var realm = detect$3().os.isAndroid() ? AndroidRealm(doScrollIntoView) : IosRealm(doScrollIntoView);
         var original = Element.fromDom(targetNode);
         attachSystemAfter(original, realm.system());
         var findFocusIn = function (elem) {
@@ -13851,7 +13979,11 @@
             open: constant({
               progressBar: { value: noop },
               close: noop,
-              text: noop
+              text: noop,
+              getEl: constant(null),
+              moveTo: noop,
+              moveRel: noop,
+              settings: {}
             }),
             close: noop,
             reposition: noop,

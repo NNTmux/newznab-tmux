@@ -16,7 +16,7 @@ class FailedReleasesController extends BasePageController
      */
     public function failed(Request $request)
     {
-        if (! $request->has('api_token')) {
+        if ($request->missing('api_token')) {
             return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
         }
 

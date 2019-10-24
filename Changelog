@@ -1,3 +1,118 @@
+2019-10-24 DariusIII
+	* Chg: Replace ! $request->has with new $request->missing
+	* Chg: Update regex in TV class
+2019-10-23 DariusIII
+	* Chg: Update laravel/framework (v6.3.0 => v6.4.0)
+2019-10-20 DariusIII
+	* Fix: Fix TMDB TV lookups
+2019-10-18 DariusIII
+	* Chg: Add timestamps to videos_aliases table
+2019-10-17 DariusIII
+	* Chg: Update tinyMCE to version 5.1.0
+	* Chg: Use only local videos_id for getPoster function
+2019-10-15 DariusIII
+	* Chg: Update updateUserRoleChangeDate function
+2019-10-14 DariusIII
+	* Chg: Update handling of movie search returned data
+	* Fix: Fix adding new content
+	* Chg: Remove lodash package
+	* Chg: Update horizon config
+2019-10-12 DariusIII
+	* Chg: Add PayPal support
+2019-10-10 DariusIII
+	* Chg: Add omnipay/paypal for future usage
+	* Fix: Fix download of zipped nzbs
+	* Chg: Check for false in getZipped function
+2019-10-09 DariusIII
+	* Chg: Update laravel/framework and anhskohbo/no-captcha to latest versions
+	* Chg: Add laravel-lodash package and enable igbinary support for redis
+2019-10-08 DariusIII
+	* Chg: Add league/omnipay and inkedcurtis/omnipay-coinpayments for future usage
+	* Chg: Rename Redis alias to RedisManager for phpredis usage
+	* Chg: Capabilities request will always return XML
+	* Chg: Use bhuvidya/laravel-countries again
+	* Chg: Use monicahq/laravel-cloudflare once more
+2019-10-07 DariusIII
+	* Chg: Update redis config to use phpredis
+	* Chg: Update user role assignment on registration
+2019-10-06 DariusIII
+	* Chg: Update movie tagline handling
+2019-09-30 DariusIII
+	* Chg: Check if game release date is not a text
+	* Chg: Increase output length of forked scripts
+2019-09-27 DariusIII
+	* Chg: Update used packages
+2019-09-26 DariusIII
+	* Fix: Fix fetching imdb info
+2019-09-25 DariusIII
+	* Chg: Update laravel/framework (v6.0.3 => v6.0.4) and laravel/scout (v7.1.3 => v7.2.1)
+2019-09-24 DariusIII
+	* Chg: Update font-awesome and tinyMCE to latest versions
+	* Chg: Disable per group regex lookup, use generic regexes only
+2019-09-23 DariusIII
+	* Chg: Add dariusiii/laravel-cloudflare package for cloudflare users
+	* Chg: Remove unused .js and .css scripts that are not used
+2019-09-12 DariusIII
+	* Fix: Fix link to browse game releases in list mode
+	* Chg: Update dariusiii/tmdb-laravel and facade/ignition to latest versions
+2019-09-11 DariusIII
+	* Chg: Use LazyCollections where possible to reduce memory usage of queries
+	* Chg: Use facade/ignition in place of filp/whoops package
+	* Fix: Fix fixtures package name
+	* Chg: Update laravel/framework to version 6.0.2 and related packages to their latest versions
+2019-09-10 DariusIII
+	* Chg: Replace Chumper namespace with DariusIII
+2019-09-09 DariusIII
+	* Chg: Update used libraries
+	* Chg: Update used libraries
+	* Chg: Use marcreichel/igdb-laravel for igdb lookups
+2019-09-08 DariusIII
+	* Chg: Update used libraries to their latest versions
+2019-09-05 DariusIII
+	* Chg: Update laravelcollective/html
+	* Fix: Fix file icons in filelist
+2019-09-04 DariusIII
+	* Chg: Add message and retry header when doing site code updates
+	* Chg: Update tinyMCE to latest version
+	* Chg: Update used libraries to their latest versions
+2019-09-03 DariusIII
+	* Chg: Update used libraries to their latest versions
+2019-09-02 DariusIII
+	* Chg: Update spatie/laravel-permission (2.38.0 => 3.0)
+	* Chg: Update used libraries to their latest versions
+2019-08-29 DariusIII
+	* Chg: Update php-ffmpeg/php-ffmpeg (v0.13 => v0.14)
+	* Chg: Remove watson/rememberable from composer.json
+	* Chg: Remove getConcatenatedCategoryIDs function
+	* Chg: Remove rest of the rememberable trait usages
+2019-08-28 DariusIII
+	* Chg: Start removing watson/rememberable usage
+	* Chg: Update fideloper/proxy to version 4.2
+	* Chg: Update laravel/framework (v5.8.33 => v5.8.34)
+2019-08-27 DariusIII
+	* Chg: Update voku/simple_html_dom (4.6.1 => 4.7.0)
+2019-08-26 DariusIII
+	* Chg: Update symfony components
+2019-08-24 DariusIII
+	* Chg: Update used components
+2019-08-23 DariusIII
+	* Chg: Update font-awesome to latest version
+	* Chg: Update barryvdh/laravel-debugbar (v3.2.5 => v3.2.6)
+2019-08-22 DariusIII
+	* Chg: Use config values in Tmux classes
+2019-08-21 DariusIII
+	* Chg: Update barryvdh/laravel-debugbar (v3.2.4 => v3.2.5)
+	* Chg: Handle bad releases and update passworded in PPA class
+	* Chg: Remove yadakhov/insertonduplicatekey library
+	* Chg: Use the new insertOrIgnore function in place of insertIgnore from yadakhov/InsertOnDuplicateKey library
+	* Chg: Update laravel/framework and laravel/horizon to latest versions
+2019-08-20 DariusIII
+	* Chg: Adjust site settings for passwordstatus changes
+	* Chg: Change used passwordstatus for releases
+	* Chg: Update tinyMCE to latest version
+2019-08-19 DariusIII
+	* Chg: Use insertOnDuplicateKey trait in ReleaseFile class
+	* Chg: Update nunomaduro/larastan to latest version
 2019-08-16 DariusIII
 	* Chg: Add misc/testing/DB/mark_as_passworded.php script
 	* Chg: Set release as passworded if files inside archives are passworded

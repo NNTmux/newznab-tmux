@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereUsersId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest query()
  */
 class UserRequest extends Model
 {

@@ -172,7 +172,7 @@ class RssController extends BasePageController
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
-        if (! $request->has('id')) {
+        if ($request->missing('id')) {
             return response()->json(['error' => 'Category ID is missing'], '403');
         }
 
@@ -202,7 +202,7 @@ class RssController extends BasePageController
      */
     private function userCheck(Request $request)
     {
-        if (! $request->has('api_token')) {
+        if ($request->missing('api_token')) {
             return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);
         }
 

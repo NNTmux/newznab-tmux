@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUsersId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie query()
  */
 class UserMovie extends Model
 {

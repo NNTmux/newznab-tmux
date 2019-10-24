@@ -19,9 +19,7 @@ class Releases extends Release
 {
     // RAR/ZIP Passworded indicator.
     public const PASSWD_NONE = 0; // No password.
-    public const PASSWD_POTENTIAL = 1; // Might have a password.
-    public const BAD_FILE = 2; // Possibly broken RAR/ZIP.
-    public const PASSWD_RAR = 10; // Definitely passworded.
+    public const PASSWD_RAR = 1; // Definitely passworded.
 
     /**
      * @var \Blacklight\SphinxSearch
@@ -171,17 +169,13 @@ class Releases extends Release
     public function showPasswords(): ?string
     {
         $show = (int) Settings::settingValue('..showpasswordedrelease');
-        $setting = $show ?? 10;
+        $setting = $show ?? 1;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
                     return '= '.self::PASSWD_NONE;
-            case 1: // Show releases with no password or a potential password (Show unprocessed releases).
 
-                    return '<= '.self::PASSWD_POTENTIAL;
-            case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
-                    return '<= '.self::PASSWD_NONE;
-            case 10: // Shows everything.
+            case 1: // Shows everything.
             default:
                     return '<= '.self::PASSWD_RAR;
         }
@@ -340,35 +334,6 @@ class Releases extends Release
     }
 
     /**
-     * Cache of concatenated category ID's used in queries.
-     * @var null|array
-     */
-    private $concatenatedCategoryIDsCache = null;
-
-    /**
-     * Gets / sets a string of concatenated category ID's used in queries.
-     *
-     * @return array|null|string
-     */
-    public function getConcatenatedCategoryIDs()
-    {
-        if ($this->concatenatedCategoryIDsCache === null) {
-            $result = Category::query()
-                ->remember(config('nntmux.cache_expiry_long'))
-                ->whereNotNull('categories.root_categories_id')
-                ->whereNotNull('cp.id')
-                ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
-                ->leftJoin('root_categories as cp', 'cp.id', '=', 'categories.root_categories_id')
-                ->get();
-            if (isset($result[0]['category_ids'])) {
-                $this->concatenatedCategoryIDsCache = $result[0]['category_ids'];
-            }
-        }
-
-        return $this->concatenatedCategoryIDsCache;
-    }
-
-    /**
      * Get TV for My Shows page.
      *
      *
@@ -386,7 +351,6 @@ class Releases extends Release
         $sql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
 					CONCAT(cp.title, '-', c.title) AS category_name,
-					%s AS category_ids,
 					g.name AS group_name,
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
@@ -406,7 +370,6 @@ class Releases extends Release
 				%s
 				GROUP BY r.id
 				ORDER BY %s %s %s",
-            $this->getConcatenatedCategoryIDs(),
             $this->uSQL($userShows, 'videos_id'),
             (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             NZB::NZB_ADDED,
@@ -642,7 +605,6 @@ class Releases extends Release
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
 				df.failed AS failed,
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
@@ -660,7 +622,6 @@ class Releases extends Release
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			%s %s",
-            $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
@@ -729,7 +690,6 @@ class Releases extends Release
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
 				g.name AS group_name,
 				cp.id AS categoryparentid,
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
@@ -742,7 +702,6 @@ class Releases extends Release
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			%s %s",
-            $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
@@ -879,7 +838,6 @@ class Releases extends Release
 				tvi.summary, tvi.publisher, tvi.image,
 				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid
@@ -893,7 +851,6 @@ class Releases extends Release
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
-            $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
@@ -1022,7 +979,6 @@ class Releases extends Release
 				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
 				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
 				g.name AS group_name
 			FROM releases r
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
@@ -1032,7 +988,6 @@ class Releases extends Release
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			%s %s",
-            $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
@@ -1095,7 +1050,6 @@ class Releases extends Release
         $baseSql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid
@@ -1106,7 +1060,6 @@ class Releases extends Release
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
 			%s",
-            $this->getConcatenatedCategoryIDs(),
             $whereSql
         );
         $sql = sprintf(
@@ -1174,7 +1127,6 @@ class Releases extends Release
         $baseSql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				concat(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid
 			FROM releases r
@@ -1184,7 +1136,6 @@ class Releases extends Release
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
-            $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );

@@ -10,10 +10,11 @@ use App\Models\GamesInfo;
 use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
-use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use MarcReichel\IGDBLaravel\Models\Game;
 use GuzzleHttp\Exception\ClientException;
+use MarcReichel\IGDBLaravel\Models\Company;
 
 /**
  * Class Games.
@@ -486,8 +487,8 @@ class Games
                 }
 
                 if (! empty($this->_gameResults['releasedate'])) {
-                    $dateReleased = preg_match('/(TBA|TBD)/i', $this->_gameResults['releasedate']) ? '' : $this->_gameResults['releasedate'];
-                    $game['releasedate'] = $this->_gameResults['releasedate'] === '' ? null : Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
+                    $dateReleased = strtotime($this->_gameResults['releasedate']) === false ? '' : $this->_gameResults['releasedate'];
+                    $game['releasedate'] = ($this->_gameResults['releasedate'] === '' || strtotime($this->_gameResults['releasedate']) === false) ? null : Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
                 }
 
                 if (! empty($this->_gameResults['description'])) {
@@ -547,7 +548,7 @@ class Games
                             $game['esrb'] = 'Not Rated';
                         }
 
-                        if ($this->_gameResults->original_release_date !== '' && ! preg_match('/(TBA|TBD)/i', $this->_gameResults->original_release_date)) {
+                        if ($this->_gameResults->original_release_date !== '' && strtotime($this->_gameResults->original_release_date !== false)) {
                             $dateReleased = $this->_gameResults->original_release_date;
                             $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : now();
                             $game['releasedate'] = (string) $date->format('Y-m-d');
@@ -569,15 +570,12 @@ class Games
             }
         }
 
-        if (now() > $this->igdbSleep) {
-            $this->igdbSleep = null;
-        }
-        if ($this->igdbSleep === null && config('services.igdb.key') !== '') {
+        if (config('services.igdb.key') !== '') {
             try {
                 if ($steamGameID === false || $this->_gameResults === false) {
                     $bestMatch = false;
                     $this->_classUsed = 'IGDB';
-                    $result = IGDB::searchGames($gameInfo['title']);
+                    $result = Game::where('name', $gameInfo['title'])->get();
                     if (! empty($result)) {
                         foreach ($result as $res) {
                             similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent);
@@ -586,23 +584,20 @@ class Games
                             }
                         }
                         if ($bestMatch !== false) {
-                            $this->_gameResults = IGDB::getGame($bestMatch, [
-                                'id',
-                                'name',
-                                'first_release_date',
-                                'aggregated_rating',
-                                'summary',
-                                'cover',
-                                'url',
-                                'screenshots',
-                                'publishers',
+                            $this->_gameResults = Game::with([
+                                'cover' => ['url'],
+                                'screenshots' => ['url'],
+                                'involved_companies' => ['company', 'publisher'],
                                 'themes',
-                            ]);
+                            ])->where('id', $bestMatch)->first();
 
                             $publishers = [];
-                            if (! empty($this->_gameResults->publishers)) {
-                                foreach ($this->_gameResults->publishers as $publisher) {
-                                    $publishers[] = IGDB::getCompany($publisher)->name;
+                            if (! empty($this->_gameResults->involved_companies)) {
+                                foreach ($this->_gameResults->involved_companies as $publisher) {
+                                    if ($publisher->publisher === true) {
+                                        $company = Company::find($publisher->company);
+                                        $publishers[] = $company->name;
+                                    }
                                 }
                             }
 
@@ -610,15 +605,15 @@ class Games
 
                             if (! empty($this->_gameResults->themes)) {
                                 foreach ($this->_gameResults->themes as $theme) {
-                                    $genres[] = IGDB::getTheme($theme)->name;
+                                    $genres[] = $theme->name;
                                 }
                             }
 
                             $genreName = $this->_matchGenre(implode(',', $genres));
 
                             $releaseDate = now()->format('Y-m-d');
-                            if (isset($this->_gameResults->first_release_date) && ! preg_match('/(TBA|TBD)/i', $this->_gameResults->first_release_date)) {
-                                $releaseDate = Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d');
+                            if (isset($this->_gameResults->first_release_date) && strtotime($this->_gameResults->first_release_date) !== false) {
+                                $releaseDate = $this->_gameResults->first_release_date->format('Y-m-d');
                             }
 
                             $game = [
@@ -629,7 +624,7 @@ class Games
                                 'releasedate' => $releaseDate,
                                 'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating).'%' : 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',
-                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.$this->_gameResults->screenshots[0]->url : '',
+                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]->url) : '',
                                 'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             ];
                         } else {

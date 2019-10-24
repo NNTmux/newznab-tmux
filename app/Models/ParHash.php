@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,11 +12,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash whereHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash whereReleasesId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash query()
  */
 class ParHash extends Model
 {
-    use InsertOnDuplicateKey;
-
     /**
      * @var bool
      */

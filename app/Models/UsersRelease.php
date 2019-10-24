@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUsersId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease query()
  */
 class UsersRelease extends Model
 {

@@ -41,7 +41,7 @@ class SearchController extends BasePageController
             ]
         );
 
-        if ($searchType === 'basic' && ! $request->has('searchadvr') && ($request->has('id') || $request->has('subject'))) {
+        if ($searchType === 'basic' && $request->missing('searchadvr') && ($request->has('id') || $request->has('subject'))) {
             $searchString = [];
             switch (true) {
                 case $request->has('subject'):
@@ -125,7 +125,7 @@ class SearchController extends BasePageController
             $this->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
         }
 
-        if ($searchType !== 'basic' && ! $request->has('id') && $request->has('searchadvr') && ! $request->has('subject')) {
+        if ($searchType !== 'basic' && $request->missing('id') && $request->has('searchadvr') && $request->missing('subject')) {
             $orderByString = '';
             foreach ($searchVars as $searchVarKey => $searchVar) {
                 $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);

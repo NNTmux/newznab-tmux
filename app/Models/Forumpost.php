@@ -30,6 +30,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUsersId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost query()
  */
 class Forumpost extends Model
 {

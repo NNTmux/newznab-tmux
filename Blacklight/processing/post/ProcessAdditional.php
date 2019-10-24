@@ -318,9 +318,9 @@ class ProcessAdditional
 
     /**
      * Password status of the current release.
-     * @var string
+     * @var array
      */
-    protected $_passwordStatus;
+    protected $_passwordStatus = [];
 
     /**
      * Does the current release have a password?
@@ -509,10 +509,7 @@ class ProcessAdditional
         $this->_processJPGSample = (int) Settings::settingValue('..processjpg') !== 0;
         $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') !== '';
         $this->_processAudioInfo = $this->_processMediaInfo;
-        $this->_processPasswords = (
-            ((int) Settings::settingValue('..checkpasswordedrar') !== 0) &&
-            Settings::settingValue('apps..unrarpath') !== ''
-        );
+        $this->_processPasswords = ! empty(Settings::settingValue('..checkpasswordedrar')) && ! empty(Settings::settingValue('apps..unrarpath'));
 
         $this->_audioSavePath = NN_COVERS.'audiosample'.DS;
 
@@ -629,7 +626,7 @@ class ProcessAdditional
     {
         $releasesQuery = Release::query()
             ->where('releases.nzbstatus', '=', 1)
-            ->whereBetween('releases.passwordstatus', [-6, -1])
+            ->where('releases.passwordstatus', '=', -1)
             ->where('releases.haspreview', '=', -1)
             ->where('categories.disablepreview', '=', 0);
         if ($this->_maxSize > 0) {
@@ -777,7 +774,9 @@ class ProcessAdditional
     /**
      * Create a temporary storage folder for the current release.
      *
+     *
      * @return bool
+     * @throws \Exception
      */
     protected function _createTempFolder(): bool
     {
@@ -787,7 +786,7 @@ class ProcessAdditional
             if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
 
-                return $this->_decrementPasswordStatus();
+                return $this->_deleteRelease();
             }
         }
 
@@ -806,14 +805,14 @@ class ProcessAdditional
         if ($nzbPath === false) {
             $this->_echo('NZB not found for GUID: '.$this->_release->guid, 'warning');
 
-            $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
 
         $nzbContents = Utility::unzipGzipFile($nzbPath);
         if (! $nzbContents) {
             $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid, 'warning');
 
-            $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
 
         // Get a list of files in the nzb.
@@ -821,24 +820,12 @@ class ProcessAdditional
         if (\count($this->_nzbContents) === 0) {
             $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid, 'warning');
 
-            $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
         // Sort keys.
         ksort($this->_nzbContents, SORT_NATURAL);
 
         return true;
-    }
-
-    /**
-     * Decrement password status for the current release.
-     *
-     * @return false
-     */
-    protected function _decrementPasswordStatus(): bool
-    {
-        Release::whereId($this->_release->id)->decrement('passwordstatus');
-
-        return false;
     }
 
     /**
@@ -1087,7 +1074,7 @@ class ProcessAdditional
                 $this->_debug('ArchiveInfo: Compressed file has a password.');
             }
             $this->_releaseHasPassword = true;
-            $this->_passwordStatus = Releases::PASSWD_RAR;
+            $this->_passwordStatus = [Releases::PASSWD_RAR];
 
             return false;
         }
@@ -1154,13 +1141,13 @@ class ProcessAdditional
 
                 if (isset($file['pass']) && $file['pass'] === true) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = Releases::PASSWD_RAR;
+                    $this->_passwordStatus = [Releases::PASSWD_RAR];
                     break;
                 }
 
                 if ($this->_innerFileBlacklist !== false && preg_match($this->_innerFileBlacklist, $file['name'])) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = Releases::PASSWD_POTENTIAL;
+                    $this->_passwordStatus = [Releases::PASSWD_RAR];
                     break;
                 }
 
@@ -1213,11 +1200,9 @@ class ProcessAdditional
              */
             if ($this->_addedFileInfo < 11 && ReleaseFile::query()->where(['releases_id' => $this->_release->id, 'name' => $file['name'], 'size' => $file
                 ['size'], ])->first() === null) {
-                if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $file['date'], $file['pass'], '', $file['crc32'] ?? '')) {
+                $addReleaseFiles = ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $file['date'], $file['pass'], '', $file['crc32'] ?? '');
+                if (! empty($addReleaseFiles)) {
                     $this->_addedFileInfo++;
-                    if ((int) $file['pass'] === 1) {
-                        $this->_passwordStatus = Releases::PASSWD_RAR;
-                    }
 
                     if ($this->_echoCLI) {
                         $this->_echo('^', 'primaryOver');
@@ -1231,7 +1216,7 @@ class ProcessAdditional
                             $this->_debug('Codec spam found, setting release to potentially passworded.');
                         }
                         $this->_releaseHasPassword = true;
-                        $this->_passwordStatus = Releases::PASSWD_POTENTIAL;
+                        $this->_passwordStatus = [Releases::PASSWD_RAR];
                     } //Run a PreDB filename check on insert to try and match the release
                     elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
                         $this->_release['filename'] = $file['name'];
@@ -1265,18 +1250,16 @@ class ProcessAdditional
             // Get all the compressed files in the temp folder.
             $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1)($|[^a-z0-9])/i');
 
-            if ($files instanceof \Traversable) {
-                foreach ($files as $file) {
+            foreach ($files as $file) {
 
-                    // Check if the file exists.
-                    if (File::isFile($file[0])) {
-                        $rarData = @File::get($file[0]);
-                        if ($rarData !== false) {
-                            $this->_processCompressedData($rarData);
-                            $foundCompressedFile = true;
-                        }
-                        File::delete($file[0]);
+                // Check if the file exists.
+                if (File::isFile($file[0])) {
+                    $rarData = @File::get($file[0]);
+                    if ($rarData !== false) {
+                        $this->_processCompressedData($rarData);
+                        $foundCompressedFile = true;
                     }
+                    File::delete($file[0]);
                 }
             }
 
@@ -2300,7 +2283,7 @@ class ProcessAdditional
         $this->_foundSample = $this->_processThumbnails ? false : true;
         $this->_foundPAR2Info = false;
 
-        $this->_passwordStatus = Releases::PASSWD_NONE;
+        $this->_passwordStatus = [Releases::PASSWD_NONE];
         $this->_releaseHasPassword = false;
 
         $this->_releaseGroupName = UsenetGroup::getNameByID($this->_release->groups_id);

@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash whereHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash wherePredbId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash query()
  */
 class PredbHash extends Model
 {

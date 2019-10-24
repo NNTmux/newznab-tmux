@@ -459,6 +459,11 @@ body {
     margin: 10px 0;
 }
 
+.dropdown, .dropleft, .dropright, .dropup {
+    position: relative;
+    display: flex;
+}
+
 .fixed_height_320 {
     height: 320px;
 }

@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MissedPart whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MissedPart whereNumberid($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MissedPart newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MissedPart newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MissedPart query()
  */
 class MissedPart extends Model
 {

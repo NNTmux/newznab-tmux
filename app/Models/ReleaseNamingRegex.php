@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereStatus($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex query()
  */
 class ReleaseNamingRegex extends Model
 {

@@ -7,11 +7,12 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
-use Illuminate\Support\Carbon;
-use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use MarcReichel\IGDBLaravel\Models\Game;
 use GuzzleHttp\Exception\ClientException;
+use MarcReichel\IGDBLaravel\Models\Company;
+use MarcReichel\IGDBLaravel\Models\Platform;
 
 /**
  * Class Console.
@@ -701,12 +702,9 @@ class Console
         $bestMatch = false;
 
         $gamePlatform = $this->_replacePlatform($gamePlatform);
-        if (now() > $this->igdbSleep) {
-            $this->igdbSleep = null;
-        }
-        if ($this->igdbSleep === null && config('services.igdb.key') !== '') {
+        if (config('services.igdb.key') !== '') {
             try {
-                $result = IGDB::searchGames($gameInfo);
+                $result = Game::where('name', $gameInfo)->get();
                 if (! empty($result)) {
                     foreach ($result as $res) {
                         similar_text(strtolower($gameInfo), strtolower($res->name), $percent);
@@ -715,24 +713,20 @@ class Console
                         }
                     }
                     if ($bestMatch !== false) {
-                        $game = IGDB::getGame($bestMatch, [
-                            'id',
-                            'name',
-                            'first_release_date',
-                            'aggregated_rating',
-                            'summary',
-                            'cover',
-                            'url',
-                            'screenshots',
-                            'publishers.name',
-                            'themes.name',
-                            'platforms.name',
-                        ]);
+                        $game = Game::with([
+                            'cover' => ['url'],
+                            'screenshots' => ['url'],
+                            'involved_companies' => ['company', 'publisher'],
+                            'themes',
+                        ])->where('id', $bestMatch)->first();
 
                         $publishers = [];
-                        if (! empty($game->publishers)) {
-                            foreach ($game->publishers as $publisher) {
-                                $publishers[] = IGDB::getCompany($publisher)->name;
+                        if (! empty($game->involved_companies)) {
+                            foreach ($game->involved_companies as $publisher) {
+                                if ($publisher->publisher === true) {
+                                    $company = Company::find($publisher->company);
+                                    $publishers[] = $company->name;
+                                }
                             }
                         }
 
@@ -740,7 +734,7 @@ class Console
 
                         if (! empty($game->themes)) {
                             foreach ($game->themes as $theme) {
-                                $genres[] = IGDB::getTheme($theme)->name;
+                                $genres[] = $theme->name;
                             }
                         }
 
@@ -750,11 +744,13 @@ class Console
 
                         if (! empty($game->platforms)) {
                             foreach ($game->platforms as $platforms) {
-                                $platforms = IGDB::getPlatform($platforms);
-                                similar_text($platforms->name, $gamePlatform, $percent);
-                                if ($percent >= 85) {
-                                    $platform = $platforms->name;
-                                    break;
+                                $gamePlatforms = Platform::where('id', $platforms)->get();
+                                foreach ($gamePlatforms as $gamePlat) {
+                                    similar_text($gamePlat->name, $gamePlatform, $percent);
+                                    if ($percent >= 85) {
+                                        $platform = $gamePlat->name;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -764,7 +760,7 @@ class Console
                             'asin' => $game->id,
                             'review' => $game->summary ?? '',
                             'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
-                            'releasedate' => ! empty($game->first_release_date) ? Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
+                            'releasedate' => ! empty($game->first_release_date) ? $game->first_release_date->format('Y-m-d') : now()->format('Y-m-d'),
                             'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
                             'url' => $game->url ?? '',
                             'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',

@@ -119,7 +119,7 @@
 									<span class="fa fa-searchengin"></span>
 									<span class="menu-collapsed">Search</span>
 								</a>
-                                <a href="{{url('search?search_type=adv')}}'" class="list-group-item list-group-item-action bg-dark text-white">
+                                <a href="{{url('search?search_type=adv')}}" class="list-group-item list-group-item-action bg-dark text-white">
                                     <span class="fa fa-searchengin"></span>
                                     <span class="menu-collapsed">Advanced Search</span>
                                 </a>

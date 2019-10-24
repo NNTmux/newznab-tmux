@@ -51,7 +51,7 @@ class ResetPasswordController extends Controller
         $error = '';
         $confirmed = '';
         $onscreen = '';
-        if (! $request->has('guid')) {
+        if ($request->missing('guid')) {
             $error = 'No reset code provided.';
         }
 

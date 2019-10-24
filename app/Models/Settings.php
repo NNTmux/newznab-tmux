@@ -22,7 +22,6 @@ namespace App\Models;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -41,11 +40,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSubsection($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereValue($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings query()
  */
 class Settings extends Model
 {
-    use InsertOnDuplicateKey;
-
     public const REGISTER_STATUS_OPEN = 0;
 
     public const REGISTER_STATUS_INVITE = 1;
@@ -142,7 +142,7 @@ class Settings extends Model
      */
     public static function toTree($excludeUnsectioned = true): array
     {
-        $results = self::all();
+        $results = self::cursor();
 
         $tree = [];
         if (! empty($results)) {

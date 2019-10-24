@@ -18,6 +18,16 @@ class AccountDeleted extends Mailable
     private $user;
 
     /**
+     * @var mixed
+     */
+    private $siteEmail;
+
+    /**
+     * @var mixed
+     */
+    private $siteTitle;
+
+    /**
      * Create a new message instance.
      *
      * @param $user
@@ -25,6 +35,8 @@ class AccountDeleted extends Mailable
     public function __construct($user)
     {
         $this->user = $user;
+        $this->siteEmail = Settings::settingValue('site.main.email');
+        $this->siteTitle = Settings::settingValue('site.main.title');
     }
 
     /**
@@ -33,6 +45,6 @@ class AccountDeleted extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('User Account Deleted')->view('emails.accountDelete')->with(['username' => $this->user->username, 'site' => Settings::settingValue('site.main.title')]);
+        return $this->from($this->siteEmail)->subject('User Account Deleted')->view('emails.accountDelete')->with(['username' => $this->user->username, 'site' => $this->siteTitle]);
     }
 }

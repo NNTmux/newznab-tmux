@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre whereType($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre query()
  */
 class Genre extends Model
 {

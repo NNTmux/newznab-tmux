@@ -41,6 +41,7 @@ class TmuxOutput extends Tmux
 
     /**
      * @param $runVar
+     * @throws \Cz\Git\GitException
      */
     public function updateMonitorPane(&$runVar): void
     {

@@ -12,6 +12,8 @@ class AccountExpired extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+    private $siteEmail;
+    private $siteTitle;
 
     /**
      * Create a new message instance.
@@ -21,6 +23,8 @@ class AccountExpired extends Mailable
     public function __construct($user)
     {
         $this->user = $user;
+        $this->siteEmail = Settings::settingValue('site.main.email');
+        $this->siteTitle = Settings::settingValue('site.main.title');
     }
 
     /**
@@ -31,6 +35,6 @@ class AccountExpired extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('Account expired')->view('emails.accountExpired')->with(['account' => $this->user->role->name, 'username' => $this->user->username, 'site' => Settings::settingValue('site.main.title')]);
+        return $this->from($this->siteEmail)->subject('Account expired')->view('emails.accountExpired')->with(['account' => $this->user->role->name, 'username' => $this->user->username, 'site' => $this->siteTitle]);
     }
 }

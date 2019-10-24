@@ -19,6 +19,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUsersId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation query()
  */
 class Invitation extends Model
 {
@@ -28,7 +31,7 @@ class Invitation extends Model
     /**
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * @var bool

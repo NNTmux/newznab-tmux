@@ -23,6 +23,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * App\Models\User.
+ *
  * App\Models\User.
  *
  * @property int $id
@@ -116,6 +117,27 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerified($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiToken($value)
  * @mixin \Eloquent
+ * @property int $roles_id FK to roles.id
+ * @property string $api_token
+ * @property int $rate_limit
+ * @property string|null $email_verified_at
+ * @property int $verified
+ * @property string|null $verification_token
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationPending
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationSuccess
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitations
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions
+ * @property-read \Spatie\Permission\Models\Role $role
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User permission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User role($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRateLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRolesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerificationToken($value)
  */
 class User extends Authenticatable
 {
@@ -370,6 +392,12 @@ class User extends Authenticatable
      */
     public static function updateUserRole(int $uid, int $role)
     {
+        $roleQuery = Role::query()->where('id', $role)->first();
+        $roleName = $roleQuery->name;
+
+        $user = self::find($uid);
+        $user->syncRoles([$roleName]);
+
         return self::find($uid)->update(['roles_id' => $role]);
     }
 
@@ -381,12 +409,12 @@ class User extends Authenticatable
     public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0): void
     {
         $user = self::find($uid);
-        $currRoleExp = $user::select(['rolechangedate'])->first();
+        $currRoleExp = $user->rolechangedate ?? now()->toDateTimeString();
         if (! empty($date)) {
             $user->update(['rolechangedate' => $date]);
         }
         if (empty($date) && ! empty($addYear)) {
-            $user->update(['rolechangedate' => Carbon::createFromDate($currRoleExp['rolechangedate'])->addYears($addYear)]);
+            $user->update(['rolechangedate' => Carbon::createFromDate($currRoleExp)->addYears($addYear)]);
         }
     }
 
@@ -408,7 +436,7 @@ class User extends Authenticatable
         }
         foreach (self::query()->whereDate('rolechangedate', '<', $now)->get() as $expired) {
             $expired->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
-            $expired->syncRoles('User');
+            $expired->syncRoles(['User']);
             SendAccountExpiredEmail::dispatch($expired)->onQueue('emails');
         }
     }
@@ -475,9 +503,6 @@ class User extends Authenticatable
         $order = (empty($orderBy) ? 'username_desc' : $orderBy);
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
-            case 'username':
-                $orderField = 'username';
-                break;
             case 'email':
                 $orderField = 'email';
                 break;

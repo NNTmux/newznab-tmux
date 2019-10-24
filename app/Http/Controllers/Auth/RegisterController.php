@@ -76,6 +76,43 @@ class RegisterController extends Controller
             'userseed' => md5(Str::uuid()->toString()),
         ]);
 
+        $role = Role::query()->where('id', '=', $data['roles_id'])->first();
+
+        if ($role !== null) {
+            $user->syncRoles([$role->name]);
+            if ($user->can('view console')) {
+                $user->givePermissionTo('view console');
+            }
+
+            if ($user->can('view movies')) {
+                $user->givePermissionTo('view movies');
+            }
+
+            if ($user->can('view audio')) {
+                $user->givePermissionTo('view audio');
+            }
+
+            if ($user->can('view pc')) {
+                $user->givePermissionTo('view pc');
+            }
+
+            if ($user->can('view tv')) {
+                $user->givePermissionTo('view tv');
+            }
+
+            if ($user->can('view adult')) {
+                $user->givePermissionTo('view adult');
+            }
+
+            if ($user->can('view books')) {
+                $user->givePermissionTo('view books');
+            }
+
+            if ($user->can('view other')) {
+                $user->givePermissionTo('view other');
+            }
+        }
+
         return $user;
     }
 

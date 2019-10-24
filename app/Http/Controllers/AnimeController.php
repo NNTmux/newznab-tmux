@@ -94,7 +94,7 @@ class AnimeController extends BasePageController
 
         $animeTitle = ($request->has('title') && ! empty($request->input('title'))) ? $request->input('title') : '';
 
-        if ($animeTitle !== '' && ! $request->has('id')) {
+        if ($animeTitle !== '' && $request->missing('id')) {
             $letter = '';
         }
 

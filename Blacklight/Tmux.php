@@ -43,12 +43,12 @@ class Tmux
     public function getConnectionsInfo($constants)
     {
         $runVar['connections']['port_a'] = $runVar['connections']['host_a'] = $runVar['connections']['ip_a'] = false;
-        $runVar['connections']['port'] = env('NNTP_PORT');
-        $runVar['connections']['host'] = env('NNTP_SERVER');
+        $runVar['connections']['port'] = config('nntmux_nntp.port');
+        $runVar['connections']['host'] = config('nntmux_nntp.server');
         $runVar['connections']['ip'] = gethostbyname($runVar['connections']['host']);
         if ($constants['alternate_nntp'] === '1') {
-            $runVar['connections']['port_a'] = env('NNTP_PORT_A');
-            $runVar['connections']['host_a'] = env('NNTP_SERVER_A');
+            $runVar['connections']['port_a'] = config('nntmux_nntp.alternate_server_port');
+            $runVar['connections']['host_a'] = config('nntmux_nntp.alternate_server');
             $runVar['connections']['ip_a'] = gethostbyname($runVar['connections']['host_a']);
         }
 
@@ -104,13 +104,6 @@ class Tmux
         $panes = ['zero' => '', 'one' => '', 'two' => ''];
         switch ($constants['sequential']) {
             case 0:
-                $panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
-                $panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
-                $panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
-                $panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
-                $panes_win_3 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:2 -F '#{pane_title}'`");
-                $panes['two'] = str_replace("\n", '', explode(' ', $panes_win_3));
-                break;
             case 1:
                 $panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
                 $panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
@@ -396,7 +389,7 @@ class Tmux
 					SUM(IF(nzbstatus = %1$d AND categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
 					SUM(IF(nzbstatus = %1$d AND isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
-						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_uid = %d OR proc_hash16k = %d OR proc_srr = %d OR proc_par2 = %d
+						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_par2 = %d
 							OR (ishashed = 1 AND dehashstatus BETWEEN -6 AND 0)) AND categories_id IN (%s),1,0)) AS processrenames,
 					SUM(IF(isrenamed = %d,1,0)) AS renamed,
 					SUM(IF(nzbstatus = %1$d AND nfostatus = %20$d,1,0)) AS nfo,
@@ -425,9 +418,6 @@ class Tmux
                     Nfo::NFO_FOUND,
                     NameFixer::PROC_NFO_NONE,
                     NameFixer::PROC_FILES_NONE,
-                    NameFixer::PROC_UID_NONE,
-                    NameFixer::PROC_HASH16K_NONE,
-                    NameFixer::PROC_SRR_NONE,
                     NameFixer::PROC_PAR2_NONE,
                     Category::getCategoryOthersGroup(),
                     NameFixer::IS_RENAMED_DONE
@@ -448,7 +438,7 @@ class Tmux
 					(SELECT COUNT(r.id) FROM releases r
 						LEFT JOIN categories c ON c.id = r.categories_id
 						WHERE r.nzbstatus = 1
-						AND r.passwordstatus BETWEEN -6 AND -1
+						AND r.passwordstatus = -1
 						AND r.haspreview = -1
 						{$ppminString}
 						{$ppmaxString}

@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Part wherePartnumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Part whereSize($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Part newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Part newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Part query()
  */
 class Part extends Model
 {

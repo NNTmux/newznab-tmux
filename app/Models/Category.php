@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
-use Watson\Rememberable\Rememberable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -29,11 +29,14 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereTitle($value)
  * @mixin \Eloquent
+ * @property int|null $root_categories_id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereRootCategoriesId($value)
  */
 class Category extends Model
 {
-    use Rememberable;
-
     /**
      * Category constants.
      * Do NOT use the values, as they may change, always use the constant - that's what it's for.
@@ -273,15 +276,24 @@ class Category extends Model
      */
     public static function getRecentlyAdded()
     {
-        return self::query()
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $result = Cache::get(md5('RecentlyAdded'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = self::query()
             ->with('parent')
-            ->remember(config('nntmux.cache_expiry_long'))
             ->where('r.adddate', '>', now()->subWeek())
             ->select(['root_categories_id', DB::raw('COUNT(r.id) as count'), 'title'])
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
             ->groupBy('title')
             ->orderBy('count', 'desc')
             ->get();
+
+        Cache::put(md5('RecentlyAdded'), $result, $expiresAt);
+
+        return $result;
     }
 
     /**
@@ -385,7 +397,16 @@ class Category extends Model
      */
     public static function getChildren($categoryId)
     {
-        return RootCategory::remember(config('nntmux.cache_expiry_long'))->find($categoryId)->categories;
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $result = Cache::get(md5($categoryId));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = RootCategory::find($categoryId)->categories;
+        Cache::put(md5($categoryId), $result, $expiresAt);
+
+        return $result;
     }
 
     /**
@@ -421,7 +442,16 @@ class Category extends Model
     public static function getByIds($ids)
     {
         if (\count($ids) > 0) {
-            return self::query()->remember(config('nntmux.cache_expiry_long'))->whereIn('id', $ids)->get();
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+            $result = Cache::get(md5(implode(',', $ids)));
+            if ($result !== null) {
+                return $result;
+            }
+            $result = self::query()->whereIn('id', $ids)->get();
+
+            Cache::put(md5(md5(implode(',', $ids))), $result, $expiresAt);
+
+            return $result;
         }
 
         return false;
@@ -508,7 +538,17 @@ class Category extends Model
      */
     public static function getForApi()
     {
-        return RootCategory::query()->remember(config('nntmux.cache_expiry_long'))->select(['id', 'title'])->where('status', '=', self::STATUS_ACTIVE)->get();
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $result = Cache::get(md5('ForApi'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = RootCategory::query()->select(['id', 'title'])->where('status', '=', self::STATUS_ACTIVE)->get();
+
+        Cache::put(md5('ForApi'), $result, $expiresAt);
+
+        return $result;
     }
 
     /**

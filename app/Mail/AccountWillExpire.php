@@ -16,6 +16,16 @@ class AccountWillExpire extends Mailable
     private $user;
 
     /**
+     * @var mixed
+     */
+    private $siteEmail;
+
+    /**
+     * @var mixed
+     */
+    private $siteTitle;
+
+    /**
      * Create a new message instance.
      *
      * @return void
@@ -24,6 +34,8 @@ class AccountWillExpire extends Mailable
     {
         $this->user = $user;
         $this->days = $days;
+        $this->siteEmail = Settings::settingValue('site.main.email');
+        $this->siteTitle = Settings::settingValue('site.main.title');
     }
 
     /**
@@ -33,6 +45,6 @@ class AccountWillExpire extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('Account about to expire')->view('emails.accountAboutToExpire')->with(['account' => $this->user->role->name, 'username' => $this->user->username, 'site' => Settings::settingValue('site.main.title'), 'days' => $this->days]);
+        return $this->from($this->siteEmail)->subject('Account about to expire')->view('emails.accountAboutToExpire')->with(['account' => $this->user->role->name, 'username' => $this->user->username, 'site' => $this->siteTitle, 'days' => $this->days]);
     }
 }

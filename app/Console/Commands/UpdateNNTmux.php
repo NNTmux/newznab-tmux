@@ -91,7 +91,7 @@ class UpdateNNTmux extends Command
     private function appDown(): bool
     {
         if (App::isDownForMaintenance() === false) {
-            $this->call('down');
+            $this->call('down', ['--message' => 'Doing site backend and frontend updates, we will be back shortly', '--retry' => 120]);
 
             return true;
         }

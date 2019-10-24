@@ -849,11 +849,9 @@ class Movie
                 $ret['plot'] = '';
             }
             $tagline = $tmdbLookup['tagline'];
-            if (! empty($tagline)) {
-                $ret['tagline'] = $tagline;
-            } else {
-                $ret['tagline'] = '';
-            }
+
+            $ret['tagline'] = $tagline ?? '';
+
             $released = $tmdbLookup['release_date'];
             if (! empty($released)) {
                 $ret['year'] = Carbon::parse($released)->year;
@@ -899,39 +897,53 @@ class Movie
      */
     public function fetchIMDBProperties($imdbId)
     {
-        $resultQuery = (new Title($imdbId, $this->config))->real_id();
-        if (! empty($resultQuery)) {
-            $imdbId = 'tt'.$resultQuery;
-        }
-        $result = new Title($imdbId, $this->config);
-        if (! empty($result->orig_title())) {
-            similar_text($this->currentTitle, $result->orig_title(), $percent);
-            if ($percent >= self::MATCH_PERCENT) {
-                similar_text($this->currentYear, $result->year(), $percent);
-                if ($percent >= self::YEAR_MATCH_PERCENT) {
-                    $ret = [
-                            'title' => $result->orig_title(),
-                            'tagline' => $result->tagline(),
+        $realId = (new Title($imdbId, $this->config))->real_id();
+        $result = new Title($realId, $this->config);
+        $title = ! empty($result->orig_title()) ? $result->orig_title() : $result->title();
+        if (! empty($title)) {
+            if (! empty($this->currentTitle)) {
+                similar_text($this->currentTitle, $title, $percent);
+                if ($percent >= self::MATCH_PERCENT) {
+                    similar_text($this->currentYear, $result->year(), $percent);
+                    if ($percent >= self::YEAR_MATCH_PERCENT) {
+                        $ret = [
+                            'title' => $title,
+                            'tagline' => $result->tagline() ?? '',
                             'plot' => Arr::get($result->plot_split(), '0.plot'),
                             'rating' => ! empty($result->rating()) ? $result->rating() : '',
-                            'year' => $result->year(),
-                            'cover' => $result->photo(),
-                            'genre' => $result->genre(),
-                            'language' => $result->language(),
-                            'type' => $result->movietype(),
+                            'year' => $result->year() ?? '',
+                            'cover' => $result->photo() ?? '',
+                            'genre' => $result->genre() ?? '',
+                            'language' => $result->language() ?? '',
+                            'type' => $result->movietype() ?? '',
                         ];
 
-                    if ($this->echooutput && Utility::isCLI()) {
-                        $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($result->orig_title()).PHP_EOL;
+                        if ($this->echooutput && Utility::isCLI()) {
+                            $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($title).PHP_EOL;
+                        }
+
+                        return $ret;
                     }
 
-                    return $ret;
+                    return false;
                 }
 
                 return false;
             }
 
-            return false;
+            $ret = [
+                'title' => $title,
+                'tagline' => $result->tagline() ?? '',
+                'plot' => Arr::get($result->plot_split(), '0.plot'),
+                'rating' => ! empty($result->rating()) ? $result->rating() : '',
+                'year' => $result->year() ?? '',
+                'cover' => $result->photo() ?? '',
+                'genre' => $result->genre() ?? '',
+                'language' => $result->language() ?? '',
+                'type' => $result->movietype() ?? '',
+            ];
+
+            return $ret;
         }
 
         return false;
@@ -960,6 +972,8 @@ class Movie
                         }
 
                         $ret['overview'] = $resp['overview'] ?? '';
+                        $ret['tagline'] = $resp['tagline'] ?? '';
+                        $ret['year'] = $resp['year'] ?? '';
 
                         if (isset($resp['title'])) {
                             $ret['title'] = $resp['title'];
@@ -1064,7 +1078,7 @@ class Movie
                     'cover' => str_replace('100x100', '800x800', $iTunesMovie->getCover()),
                     'genre' => $iTunesMovie->getGenre() ?? '',
                     'plot' => $iTunesMovie->getDescription() ?? '',
-                    'year' => $iTunesMovie->getReleaseDate()->format('Y'),
+                    'year' => $iTunesMovie->getReleaseDate() ? $iTunesMovie->getReleaseDate()->format('Y') : '',
                 ];
             } else {
                 $movie = false;
@@ -1252,7 +1266,7 @@ class Movie
                     $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
                     if (($data['total_results'] > 0) && ! empty($data['results'])) {
                         foreach ($data['results'] as $result) {
-                            if (! empty($result['id'])) {
+                            if (! empty($result['id']) && ! empty($result['release_date'])) {
                                 similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
                                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                                     $ret = $this->fetchTMDBProperties($result['id'], true);

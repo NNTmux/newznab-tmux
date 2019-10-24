@@ -16,6 +16,16 @@ class ForgottenPassword extends Mailable
     public $resetLink;
 
     /**
+     * @var mixed
+     */
+    private $siteEmail;
+
+    /**
+     * @var mixed
+     */
+    private $siteTitle;
+
+    /**
      * Create a new message instance.
      *
      * @param $resetLink
@@ -23,6 +33,8 @@ class ForgottenPassword extends Mailable
     public function __construct($resetLink)
     {
         $this->resetLink = $resetLink;
+        $this->siteEmail = Settings::settingValue('site.main.email');
+        $this->siteTitle = Settings::settingValue('site.main.title');
     }
 
     /**
@@ -33,6 +45,6 @@ class ForgottenPassword extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('Forgotten password reset')->view('emails.forgottenPassword')->with(['resetLink' => $this->resetLink, 'site' => Settings::settingValue('site.main.title')]);
+        return $this->from($this->siteEmail)->subject('Forgotten password reset')->view('emails.forgottenPassword')->with(['resetLink' => $this->resetLink, 'site' => $this->siteTitle]);
     }
 }

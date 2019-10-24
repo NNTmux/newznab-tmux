@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use App\Jobs\SendWelcomeEmail;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\File;
-use App\Jobs\SendAccountDeletedEmail;
 use Illuminate\Support\Facades\Password;
 use App\Jobs\SendNewRegisteredAccountMail;
 use Jrean\UserVerification\Facades\UserVerification;
@@ -28,7 +27,7 @@ class UserServiceObserver
         $roleData = Role::query()->where('id', $user->roles_id);
         $rateLimit = $roleData->value('rate_limit');
         $roleName = $roleData->value('name');
-        $user->assignRole($roleName);
+        $user->syncRoles([$roleName]);
         $user->update(
             [
                 'api_token' => md5(Password::getRepository()->createNewToken()),
@@ -43,13 +42,5 @@ class UserServiceObserver
 
             UserVerification::send($user, 'User email verification required', Settings::settingValue('site.main.email'));
         }
-    }
-
-    /**
-     * @param \App\Models\User $user
-     */
-    public function deleting(User $user)
-    {
-        SendAccountDeletedEmail::dispatch($user)->onQueue('deleted');
     }
 }

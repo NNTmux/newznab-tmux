@@ -104,13 +104,13 @@ class CollectionsCleaning
         $this->groupName = $groupName;
 
         // Try DB regex first.
-        $potentialString = $this->_regexes->tryRegex($subject, $groupName);
+        /*$potentialString = $this->_regexes->tryRegex($subject, $groupName);
         if ($potentialString) {
             return [
                 'id'   => $this->_regexes->matchedRegex,
                 'name' => $potentialString,
             ];
-        }
+        }*/
 
         return $this->generic();
     }

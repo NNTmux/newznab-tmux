@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Blacklight\SphinxSearch;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,6 +26,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string $crc32
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereCrc32($value)
  */
 class ReleaseFile extends Model
 {
@@ -109,27 +115,38 @@ class ReleaseFile extends Model
     public static function addReleaseFiles($id, $name, $size, $createdTime, $hasPassword, $hash = '', $crc = ''): int
     {
         // Check if we already have this data in table
-        $duplicateCheck = self::query()->where('releases_id', $id)->where('name', utf8_encode($name))->first();
+        $duplicateCheck = self::query()->where('releases_id', $id)->where('name', $name)->first();
 
         // Check if the release exists in releases table to prevent foreign key error
         $releaseCheck = Release::query()->where('id', $id)->first();
 
+        if (is_int($createdTime)) {
+            if ($createdTime === 0) {
+                $adjustedCreatedTime = now()->format('Y-m-d H:i:s');
+            } else {
+                $adjustedCreatedTime = Carbon::createFromTimestamp($createdTime)->format('Y-m-d H:i:s');
+            }
+        } else {
+            $adjustedCreatedTime = $createdTime;
+        }
+
         if ($duplicateCheck === null && $releaseCheck !== null) {
             try {
-                $insert = self::create([
+                $insert = self::insertOrIgnore([
                         'releases_id' => $id,
-                        'name' => utf8_encode($name),
+                        'name' => $name,
                         'size' => $size,
-                        'created_at' => $createdTime,
+                        'created_at' => $adjustedCreatedTime,
+                        'updated_at' => now()->timestamp,
                         'passworded' => $hasPassword,
                         'crc32' => $crc,
-                    ])->id;
+                    ]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());
             }
 
             if (\strlen($hash) === 32) {
-                ParHash::insertIgnore(['releases_id' => $id, 'hash' => $hash]);
+                ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
             (new SphinxSearch())->updateRelease($id);
         }

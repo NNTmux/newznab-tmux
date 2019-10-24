@@ -289,7 +289,7 @@ class ApiV2Controller extends BasePageController
      */
     public function details(Request $request): \Illuminate\Http\JsonResponse
     {
-        if (! $request->has('id')) {
+        if ($request->missing('id')) {
             Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
         }
 

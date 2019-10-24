@@ -30,6 +30,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups whereGroupsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups whereReleasesId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups query()
  */
 class ReleasesGroups extends Model
 {

@@ -724,25 +724,14 @@
 							passworded.<br/></div>
 					</td>
 				</tr>
-				<tr>
-					<td style="width:180px;"><label for="deletepossiblerelease">Delete Possibly Passworded
-							Releases:</label></td>
-					<td>
-						{html_radios id="deletepossiblerelease" name='deletepossiblerelease' values=$yesno_ids output=$yesno_names selected=$site->deletepossiblerelease separator='<br />'}
-						<div class="hint">Whether to delete releases which are potentially passworded. This applies to
-							your post process additional inner file blacklist.<br/></div>
-					</td>
-				</tr>
 
 				<tr>
 					<td><label for="showpasswordedrelease">Show Passworded Releases</label>:</td>
 					<td>
 						{html_options id="showpasswordedrelease" name='showpasswordedrelease' values=$passworded_ids output=$passworded_names selected=$site->showpasswordedrelease}
-						<div class="hint">Whether to show passworded or potentially passworded releases in browse,
+						<div class="hint">Whether to show passworded releases in browse,
 							search, api and rss
-							feeds. Potentially passworded means releases which contain .cab or .ace files which are
-							typically password protected. (*yes): Unprocessed releases are hidden. (*no): Unprocessed
-							releases are displayed.
+							feeds.
 						</div>
 					</td>
 				</tr>

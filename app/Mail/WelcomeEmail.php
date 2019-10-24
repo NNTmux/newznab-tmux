@@ -17,6 +17,16 @@ class WelcomeEmail extends Mailable
     private $user;
 
     /**
+     * @var mixed
+     */
+    private $siteEmail;
+
+    /**
+     * @var mixed
+     */
+    private $siteTitle;
+
+    /**
      * Create a new message instance.
      *
      * @param \App\Models\User $user
@@ -24,6 +34,8 @@ class WelcomeEmail extends Mailable
     public function __construct($user)
     {
         $this->user = $user;
+        $this->siteEmail = Settings::settingValue('site.main.email');
+        $this->siteTitle = Settings::settingValue('site.main.title');
     }
 
     /**
@@ -33,6 +45,6 @@ class WelcomeEmail extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('Welcome to '.Settings::settingValue('site.main.title'))->view('emails.welcome')->with(['username' => $this->user->username, 'site' => Settings::settingValue('site.main.title')]);
+        return $this->from($this->siteEmail)->subject('Welcome to '.$this->siteTitle)->view('emails.welcome')->with(['username' => $this->user->username, 'site' => $this->siteTitle]);
     }
 }

@@ -29,12 +29,12 @@ class TVDB extends TV
     /**
      * @string URL for show poster art
      */
-    public $posterUrl;
+    public $posterUrl = '';
 
     /**
      * @var string URL for show fanart
      */
-    public $fanartUrl;
+    public $fanartUrl = '';
 
     /**
      * @bool Do a local lookup only if server is down
@@ -90,8 +90,6 @@ class TVDB extends TV
 
         foreach ($res as $row) {
             $tvDbId = false;
-
-            $this->posterUrl = '';
 
             // Clean the show name for better match probability
             $release = $this->parseInfo($row['searchname']);
@@ -149,18 +147,9 @@ class TVDB extends TV
                             $this->colorCli->primary(' found in local db, attempting episode match.', true);
                 }
 
-                if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvDbId) && $tvDbId > 0) {
-                    // Now that we have valid video and tvdb ids, try to get the poster
-                    if (! empty($tvdbShow['poster'])) {
-                        $this->posterUrl = self::TVDB_IMAGES_URL.'/'.$tvdbShow['poster'];
-                    }
-
-                    if (! empty($tvdbShow['fanart'])) {
-                        $this->fanartUrl = self::TVDB_IMAGES_URL.'/'.$tvdbShow['fanart'];
-                    }
-
+                if ((int) $videoId > 0 && (int) $tvDbId > 0) {
                     if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
-                        $this->getPoster($videoId, $tvDbId);
+                        $this->getPoster($videoId);
                     }
 
                     $seasonNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', $release['season']) : '');
@@ -305,11 +294,10 @@ class TVDB extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param int $videoId -- the local Video ID
-     * @param int $showId  -- the TVDB ID
      *
      * @return int
      */
-    public function getPoster($videoId, $showId): int
+    public function getPoster($videoId): int
     {
         $ri = new ReleaseImage();
 
@@ -393,12 +381,14 @@ class TVDB extends TV
     {
         try {
             $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
+            $this->posterUrl = $poster[0]->thumbnail ?? '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
             $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
+            $this->fanartUrl = $fanart[0]->thumbnail ?? '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }

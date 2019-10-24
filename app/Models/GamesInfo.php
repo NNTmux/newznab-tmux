@@ -39,6 +39,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereUrl($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo query()
  */
 class GamesInfo extends Model
 {

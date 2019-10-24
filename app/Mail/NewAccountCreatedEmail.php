@@ -17,6 +17,16 @@ class NewAccountCreatedEmail extends Mailable
     private $user;
 
     /**
+     * @var mixed
+     */
+    private $siteEmail;
+
+    /**
+     * @var mixed
+     */
+    private $siteTitle;
+
+    /**
      * Create a new message instance.
      *
      * @return void
@@ -24,6 +34,8 @@ class NewAccountCreatedEmail extends Mailable
     public function __construct($user)
     {
         $this->user = $user;
+        $this->siteEmail = Settings::settingValue('site.main.email');
+        $this->siteTitle = Settings::settingValue('site.main.title');
     }
 
     /**
@@ -33,6 +45,6 @@ class NewAccountCreatedEmail extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('New account registered')->view('emails.newAccountCreated')->with(['username' => $this->user->username, 'site' => Settings::settingValue('site.main.title')]);
+        return $this->from($this->siteEmail)->subject('New account registered')->view('emails.newAccountCreated')->with(['username' => $this->user->username, 'site' => $this->siteTitle]);
     }
 }

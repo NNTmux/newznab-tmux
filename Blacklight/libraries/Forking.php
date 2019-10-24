@@ -324,7 +324,7 @@ class Forking
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
-            })->then(function () use ($group, $maxWork) {
+            }, 100000)->then(function () use ($group, $maxWork) {
                 $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -416,7 +416,7 @@ class Forking
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
-                })->then(function () use ($data) {
+                }, 100000)->then(function () use ($data) {
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
@@ -449,7 +449,7 @@ class Forking
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
-            })->then(function () use ($group, $maxWork) {
+            }, 100000)->then(function () use ($group, $maxWork) {
                 $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -515,7 +515,7 @@ class Forking
                 preg_match('/alt\..+/i', $queue, $match);
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
-                })->then(function () use ($match) {
+                }, 100000)->then(function () use ($match) {
                     if (! empty($match)) {
                         $this->colorCli->primary('Updated group '.$match[0]);
                     }
@@ -584,7 +584,7 @@ class Forking
         foreach ($this->work as $queue) {
             $pool->add(function () use ($queue) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
-            })->then(function () use ($maxWork) {
+            }, 100000)->then(function () use ($maxWork) {
                 $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -627,7 +627,7 @@ class Forking
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
-            })->then(function () use ($maxWork) {
+            }, 100000)->then(function () use ($maxWork) {
                 $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -672,7 +672,7 @@ class Forking
             if ($type !== '') {
                 $pool->add(function () use ($release, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$release->id.(isset($release->renamed) ? ('  '.$release->renamed) : '').'"');
-                })->then(function () use ($desc, $count) {
+                }, 100000)->then(function () use ($desc, $count) {
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
@@ -702,7 +702,7 @@ class Forking
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
-					AND r.passwordstatus BETWEEN -6 AND -1
+					AND r.passwordstatus = -1
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
@@ -925,7 +925,7 @@ class Forking
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
-            })->then(function () use ($group) {
+            }, 100000)->then(function () use ($group) {
                 $name = UsenetGroup::getNameByID($group->id);
                 $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
             })->catch(function (\Throwable $exception) {

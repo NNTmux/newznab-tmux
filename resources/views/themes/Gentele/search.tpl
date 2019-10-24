@@ -233,14 +233,6 @@
 											<div class="btns" style="float:right">
 												{release_flag($result->searchname, browse)}
 												{if $result->passwordstatus == 1}
-													<img title="RAR/ZIP Possibly Passworded."
-														 src="{{asset("/assets/images/icons/lock2.png")}}"
-														 alt="RAR/ZIP Possibly Passworded.">
-												{elseif $result->passwordstatus == 2}
-													<img title="RAR/ZIP Possibly Damaged."
-														 src="{{asset("/assets/images/icons/broken.png")}}"
-														 alt="RAR/ZIP Possibly Damaged.">
-												{elseif $result->passwordstatus == 10}
 													<img title="RAR/ZIP is Passworded."
 														 src="{{asset("/assets/images/icons/lock.gif")}}"
 														 alt="RAR/ZIP is Passworded.">
