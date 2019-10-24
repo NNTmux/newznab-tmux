@@ -44,12 +44,4 @@ class UserServiceObserver
             UserVerification::send($user, 'User email verification required', Settings::settingValue('site.main.email'));
         }
     }
-
-    /**
-     * @param \App\Models\User $user
-     */
-    public function deleting(User $user)
-    {
-        SendAccountDeletedEmail::dispatch($user)->onQueue('deleted');
-    }
 }

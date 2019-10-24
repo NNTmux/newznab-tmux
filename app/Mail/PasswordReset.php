@@ -22,6 +22,16 @@ class PasswordReset extends Mailable
     private $newPass;
 
     /**
+     * @var mixed
+     */
+    private $siteEmail;
+
+    /**
+     * @var mixed
+     */
+    private $siteTitle;
+
+    /**
      * PasswordReset constructor.
      *
      * @param \App\Models\User $user
@@ -31,6 +41,8 @@ class PasswordReset extends Mailable
     {
         $this->user = $user;
         $this->newPass = $newPass;
+        $this->siteEmail = Settings::settingValue('site.main.email');
+        $this->siteTitle = Settings::settingValue('site.main.title');
     }
 
     /**
@@ -41,6 +53,6 @@ class PasswordReset extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('Password reset')->view('emails.passwordReset')->with(['newPass' => $this->newPass, 'userName' => $this->user->username, 'site' => Settings::settingValue('site.main.title')]);
+        return $this->from($this->siteEmail)->subject('Password reset')->view('emails.passwordReset')->with(['newPass' => $this->newPass, 'userName' => $this->user->username, 'site' => $this->siteTitle]);
     }
 }

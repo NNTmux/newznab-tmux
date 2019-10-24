@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
@@ -350,6 +351,7 @@ class ProfileController extends BasePageController
         if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {
             Auth::logout();
             $user = User::find($userId);
+            SendAccountDeletedEmail::dispatch($user)->onQueue('deleted');
             $user->delete();
         }
 
