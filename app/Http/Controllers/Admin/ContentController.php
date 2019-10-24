@@ -66,7 +66,7 @@ class ContentController extends BasePageController
 
             case 'submit':
                 // Validate and add or update.
-                if (! $request->has('id') || empty($request->input('id'))) {
+                if ($request->missing('id') || empty($request->input('id'))) {
                     $returnid = $contents->add($request->all());
                 } else {
                     $content = $contents->update($request->all());

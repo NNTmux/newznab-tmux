@@ -71,7 +71,7 @@ class ApiController extends BasePageController
         // Page is accessible only by the apikey
 
         if ($function !== 'c' && $function !== 'r') {
-            if (! $request->has('apikey') || ($request->has('apikey') && empty($request->input('apikey')))) {
+            if ($request->missing('apikey') || ($request->has('apikey') && empty($request->input('apikey')))) {
                 Utility::showApiError(200, 'Missing parameter (apikey)');
             } else {
                 $apiKey = $request->input('apikey');
@@ -274,7 +274,7 @@ class ApiController extends BasePageController
 
            // Get individual NZB details.
            case 'd':
-               if (! $request->has('id')) {
+               if ($request->missing('id')) {
                    Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
                }
 
@@ -286,7 +286,7 @@ class ApiController extends BasePageController
 
            // Get an NFO file for an individual release.
            case 'n':
-               if (! $request->has('id')) {
+               if ($request->missing('id')) {
                    Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
                }
 

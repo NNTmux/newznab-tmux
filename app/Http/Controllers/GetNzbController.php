@@ -36,7 +36,7 @@ class GetNzbController extends BasePageController
                 Utility::showApiError(101);
             }
         } else {
-            if (! $request->has('r')) {
+            if ($request->missing('r')) {
                 Utility::showApiError(200);
             }
 

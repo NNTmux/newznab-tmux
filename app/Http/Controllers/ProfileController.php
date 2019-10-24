@@ -160,7 +160,7 @@ class ProfileController extends BasePageController
                     $errorStr = implode('', Arr::collapse($validator->errors()->toArray()));
                 } elseif (! empty($request->input('nzbgeturl')) && $nzbGet->verifyURL($request->input('nzbgeturl')) === false) {
                     $errorStr = 'The NZBGet URL you entered is invalid!';
-                } elseif ((! $request->has('saburl') && $request->has('sabapikey')) || ($request->has('saburl') && ! $request->has('sabapikey'))) {
+                } elseif (($request->missing('saburl') && $request->has('sabapikey')) || ($request->has('saburl') && $request->missing('sabapikey'))) {
                     $errorStr = 'Insert a SABnzdb URL and API key.';
                 } else {
                     if ($request->has('sabetting') && $request->input('sabsetting') === 2) {

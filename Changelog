@@ -1,4 +1,5 @@
 2019-10-24 DariusIII
+	* Chg: Replace ! $request->has with new $request->missing
 	* Chg: Update regex in TV class
 2019-10-23 DariusIII
 	* Chg: Update laravel/framework (v6.3.0 => v6.4.0)

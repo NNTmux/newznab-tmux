@@ -30,7 +30,7 @@ class SiteController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                if (! $request->has('book_reqids')) {
+                if ($request->missing('book_reqids')) {
                     $request->merge(['book_reqids' => []]);
                 }
                 $error = '';
