@@ -783,7 +783,7 @@ class Releases extends Release
             $show = self::fromQuery($showQry)->take(1)->toArray();
 
             if (! empty($show)) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && ! empty($show[0]->episodes)) {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
