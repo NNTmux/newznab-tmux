@@ -780,7 +780,7 @@ class Releases extends Release
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = self::fromQuery($showQry)->take(1);
+            $show = self::fromQuery($showQry)->take(1)->toArray();
 
             if (! empty($show)) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
