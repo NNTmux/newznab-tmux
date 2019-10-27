@@ -1,3 +1,5 @@
+2019-10-27 DariusIII
+	* Chg: Update query used in tvSearch function
 2019-10-24 DariusIII
 	* Chg: Replace ! $request->has with new $request->missing
 	* Chg: Update regex in TV class
