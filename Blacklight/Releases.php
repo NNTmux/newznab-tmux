@@ -783,10 +783,10 @@ class Releases extends Release
             $show = self::fromQuery($showQry)->take(1);
 
             if (! empty($show)) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show->episodes !== '') {
-                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show->episodes);
-                } elseif ((int) $show->video > 0) {
-                    $showSql = 'AND r.videos_id = '.$show->video;
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
+                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
+                } elseif ((int) $show[0]->video > 0) {
+                    $showSql = 'AND r.videos_id = '.$show[0]->video;
                     // If $series is set but episode is not, return Season Packs only
                     if (! empty($series) && empty($episode)) {
                         $showSql .= ' AND r.tv_episodes_id = 0';
@@ -925,10 +925,10 @@ class Releases extends Release
             $show = self::fromQuery($showQry)->take(1);
 
             if ($show->isNotEmpty()) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show->episodes != '') {
-                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show->episodes);
-                } elseif ((int) $show->video > 0) {
-                    $showSql = 'AND r.videos_id = '.$show->video;
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes != '') {
+                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
+                } elseif ((int) $show[0]->video > 0) {
+                    $showSql = 'AND r.videos_id = '.$show[0]->video;
                     // If $series is set but episode is not, return Season Packs only
                     if (! empty($series) && empty($episode)) {
                         $showSql .= ' AND r.tv_episodes_id = 0';
