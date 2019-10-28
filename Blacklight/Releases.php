@@ -1164,7 +1164,7 @@ class Releases extends Release
      * @param $currentID
      * @param $name
      * @param array $excludedCats
-     * @return array|Collection
+     * @return array|bool
      */
     public function searchSimilar($currentID, $name, array $excludedCats = [])
     {
@@ -1177,7 +1177,7 @@ class Releases extends Release
 
             $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
             if (! $results) {
-                return $results;
+                return $ret;
             }
 
             $ret = [];

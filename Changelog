@@ -1,3 +1,5 @@
+2019-10-28 DariusIII
+	* Fix: Fix return value of searchSimilar when no results are found
 2019-10-27 DariusIII
 	* Chg: Update query used in tvSearch function
 2019-10-24 DariusIII
