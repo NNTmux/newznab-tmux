@@ -865,7 +865,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = self::fromQuery($sql) : [];
+        $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
         if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
