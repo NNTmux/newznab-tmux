@@ -91,21 +91,21 @@ class Releases extends Release
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			GROUP BY r.id
 			ORDER BY %10\$s %11\$s",
-            !empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            !empty($tags) ? " AND tt.tag_name IN ('" . implode("','", $tags) . "')" : '',
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             Category::getCategorySearch($cat),
-            ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
-            (\count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : ''),
-            ((int)$groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
+            ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
+            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $orderBy[0],
             $orderBy[1],
-            ($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
-        $releases = Cache::get(md5($qry . $page));
+        $releases = Cache::get(md5($qry.$page));
         if ($releases !== null) {
             return $releases;
         }
@@ -115,7 +115,7 @@ class Releases extends Release
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($qry . $page), $sql, $expiresAt);
+        Cache::put(md5($qry.$page), $sql, $expiresAt);
 
         return $sql;
     }
@@ -143,14 +143,14 @@ class Releases extends Release
 				%s
 				%s %s %s %s ',
             ($groupName !== -1 ? 'LEFT JOIN usenet_groups g ON g.id = r.groups_id' : ''),
-            !empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
             ($groupName !== -1 ? sprintf(' AND g.name = %s', escapeString($groupName)) : ''),
-            !empty($tags) ? ' AND tt.tag_name IN (' . escapeString(implode(',', $tags)) . ')' : '',
+            ! empty($tags) ? ' AND tt.tag_name IN ('.escapeString(implode(',', $tags)).')' : '',
             Category::getCategorySearch($cat),
-            ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
-            (\count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : '')
+            ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
+            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
         );
         $count = Cache::get(md5($sql));
         if ($count !== null) {
@@ -168,16 +168,16 @@ class Releases extends Release
      */
     public function showPasswords(): ?string
     {
-        $show = (int)Settings::settingValue('..showpasswordedrelease');
+        $show = (int) Settings::settingValue('..showpasswordedrelease');
         $setting = $show ?? 1;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
-                return '= ' . self::PASSWD_NONE;
+                return '= '.self::PASSWD_NONE;
 
             case 1: // Shows everything.
             default:
-                return '<= ' . self::PASSWD_RAR;
+                return '<= '.self::PASSWD_RAR;
         }
     }
 
@@ -266,14 +266,14 @@ class Releases extends Release
         if ($postFrom !== '') {
             $dateParts = explode('/', $postFrom);
             if (\count($dateParts) === 3) {
-                $query->where('r.postdate', '>', $dateParts[2] . '-' . $dateParts[1] . '-' . $dateParts[0] . '00:00:00');
+                $query->where('r.postdate', '>', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0].'00:00:00');
             }
         }
 
         if ($postTo !== '') {
             $dateParts = explode('/', $postTo);
             if (\count($dateParts) === 3) {
-                $query->where('r.postdate', '<', $dateParts[2] . '-' . $dateParts[1] . '-' . $dateParts[0] . '23:59:59');
+                $query->where('r.postdate', '<', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0].'23:59:59');
             }
         }
 
@@ -371,7 +371,7 @@ class Releases extends Release
 				GROUP BY r.id
 				ORDER BY %s %s %s",
             $this->uSQL($userShows, 'videos_id'),
-            (\count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             NZB::NZB_ADDED,
             Category::TV_ROOT,
             Category::TV_OTHER,
@@ -379,7 +379,7 @@ class Releases extends Release
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
             $orderBy[0],
             $orderBy[1],
-            ($offset === false ? '' : (' LIMIT ' . $limit . ' OFFSET ' . $offset))
+            ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -415,7 +415,7 @@ class Releases extends Release
 				AND r.passwordstatus %s
 				%s',
                 $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
@@ -433,7 +433,7 @@ class Releases extends Release
      */
     public function deleteMultiple($list): void
     {
-        $list = (array)$list;
+        $list = (array) $list;
 
         $nzb = new NZB();
         $releaseImage = new ReleaseImage();
@@ -457,7 +457,7 @@ class Releases extends Release
     {
         // Delete NZB from disk.
         $nzbPath = $nzb->NZBPath($identifiers['g']);
-        if (!empty($nzbPath)) {
+        if (! empty($nzbPath)) {
             File::delete($nzbPath);
         }
 
@@ -483,7 +483,7 @@ class Releases extends Release
      */
     public function updateMulti($guids, $category, $grabs, $videoId, $episodeId, $anidbId, $imdbId)
     {
-        if (!\is_array($guids) || \count($guids) < 1) {
+        if (! \is_array($guids) || \count($guids) < 1) {
             return false;
         }
 
@@ -512,7 +512,7 @@ class Releases extends Release
         $sql = '(1=2 ';
         foreach ($userQuery as $query) {
             $sql .= sprintf('OR (r.%s = %d', $type, $query->$type);
-            if (!empty($query->categories)) {
+            if (! empty($query->categories)) {
                 $catsArr = explode('|', $query->categories);
                 if (\count($catsArr) > 1) {
                     $sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', $catsArr));
@@ -583,23 +583,23 @@ class Releases extends Release
         $catQuery = '';
         if ($type === 'basic') {
             $catQuery = Category::getCategorySearch($cat);
-        } elseif ($type === 'advanced' && (int)$cat[0] !== -1) {
+        } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
-            !empty($tags) ? " AND tt.tag_name IN ('" . implode("','", $tags) . "')" : '',
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int)$groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
-            (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > ' . (104857600 * (int)$sizeRange[$sizeFrom]) . ' ' : ''),
-            (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < ' . (104857600 * (int)$sizeRange[$sizeTo]) . ' ' : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
+            (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
+            (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
             $catQuery,
-            ((int)$daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
-            ((int)$daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
-            (!empty($searchResult) ? 'AND r.id IN (' . implode(',', $searchResult) . ')' : ''),
+            ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
+            ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
+            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
@@ -622,7 +622,7 @@ class Releases extends Release
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			%s %s",
-            !empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -641,7 +641,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = !empty($searchResult) ? self::fromQuery($sql) : collect();
+        $releases = ! empty($searchResult) ? self::fromQuery($sql) : collect();
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -679,12 +679,12 @@ class Releases extends Release
             'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
-            !empty($tags) ? " AND tt.tag_name IN ('" . implode("','", $tags) . "')" : '',
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int)$groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
             $catQuery,
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
-            (!empty($searchResult) ? 'AND r.id IN (' . implode(',', $searchResult) . ')' : ''),
+            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
@@ -702,7 +702,7 @@ class Releases extends Release
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			%s %s",
-            !empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -719,7 +719,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        if ($searchName !== -1 && !empty($searchResult)) {
+        if ($searchName !== -1 && ! empty($searchResult)) {
             $releases = self::fromQuery($sql);
         } elseif ($searchName !== -1 && empty($searchResult)) {
             $releases = collect();
@@ -775,19 +775,19 @@ class Releases extends Release
 				WHERE (%s) %s %s %s
 				GROUP BY v.id",
             count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '',
-            ($series !== '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
-            ($episode !== '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
+            ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+            ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
             ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
         );
         $show = self::fromQuery($showQry)->take(1)->toArray();
 
-        if (!empty($show)) {
-            if ((!empty($series) || !empty($episode) || !empty($airdate)) && !empty($show[0]['episodes'])) {
+        if (! empty($show)) {
+            if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && ! empty($show[0]['episodes'])) {
                 $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
-            } elseif ((int)$show[0]['video'] > 0) {
-                $showSql = 'AND r.videos_id = ' . $show[0]['video'];
+            } elseif ((int) $show[0]['video'] > 0) {
+                $showSql = 'AND r.videos_id = '.$show[0]['video'];
                 // If $series is set but episode is not, return Season Packs only
-                if (!empty($series) && empty($episode)) {
+                if (! empty($series) && empty($episode)) {
                     $showSql .= ' AND r.tv_episodes_id = 0';
                 }
             } else {
@@ -799,18 +799,18 @@ class Releases extends Release
             return [];
         }
         // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
-        if (!empty($name) && $showSql === '') {
-            if (!empty($series) && (int)$series < 1900) {
+        if (! empty($name) && $showSql === '') {
+            if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
-                if (!empty($episode) && strpos($episode, '/') === false) {
+                if (! empty($episode) && strpos($episode, '/') === false) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                 }
-            } elseif (!empty($airdate)) {
+            } elseif (! empty($airdate)) {
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
             }
         }
 
-        if (!empty($name)) {
+        if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
@@ -820,13 +820,13 @@ class Releases extends Release
 			%s %s %s %s %s %s %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            !empty($tags) ? " AND tt.tag_name IN ('" . implode("','", $tags) . "')" : '',
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
-            ((!empty($name) && !empty($searchResult)) ? 'AND r.id IN (' . implode(',', $searchResult) . ')' : ''),
+            ((! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-            !empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(' . implode(',', $excludedCategories) . ')') : ''
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
@@ -848,7 +848,7 @@ class Releases extends Release
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
-            !empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -863,8 +863,8 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ((!empty($name) && !empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
-        if (!empty($releases) && $releases->isNotEmpty()) {
+        $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
+        if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -904,8 +904,8 @@ class Releases extends Release
             }
         }
 
-            // If we have show info, find the Episode ID/Video ID first to avoid table scans
-            $showQry = sprintf(
+        // If we have show info, find the Episode ID/Video ID first to avoid table scans
+        $showQry = sprintf(
                 "
 				SELECT
 					v.id AS video,
@@ -915,43 +915,43 @@ class Releases extends Release
 				WHERE (%s) %s %s %s
 				GROUP BY v.id",
                 count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '',
-                ($series !== '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
+                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = self::fromQuery($showQry)->take(1)->toArray();
+        $show = self::fromQuery($showQry)->take(1)->toArray();
 
-            if (!empty($show)) {
-                if ((!empty($series) || !empty($episode) || !empty($airdate)) && $show[0]['episodes'] !== '') {
-                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
-                } elseif ((int)$show[0]['video'] > 0) {
-                    $showSql = 'AND r.videos_id = ' . $show[0]['video'];
-                    // If $series is set but episode is not, return Season Packs only
-                    if (!empty($series) && empty($episode)) {
-                        $showSql .= ' AND r.tv_episodes_id = 0';
-                    }
-                } else {
-                    // If we were passed Episode Info and no match was found, do not run the query
-                    return [];
+        if (! empty($show)) {
+            if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]['episodes'] !== '') {
+                $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
+            } elseif ((int) $show[0]['video'] > 0) {
+                $showSql = 'AND r.videos_id = '.$show[0]['video'];
+                // If $series is set but episode is not, return Season Packs only
+                if (! empty($series) && empty($episode)) {
+                    $showSql .= ' AND r.tv_episodes_id = 0';
                 }
             } else {
-                // If we were passed Site ID Info and no match was found, do not run the query
+                // If we were passed Episode Info and no match was found, do not run the query
                 return [];
             }
+        } else {
+            // If we were passed Site ID Info and no match was found, do not run the query
+            return [];
+        }
 
         // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
-        if (!empty($name) && $showSql === '') {
-            if (!empty($series) && (int)$series < 1900) {
+        if (! empty($name) && $showSql === '') {
+            if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
-                if (!empty($episode) && strpos($episode, '/') === false) {
+                if (! empty($episode) && strpos($episode, '/') === false) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                 }
-            } elseif (!empty($airdate)) {
+            } elseif (! empty($airdate)) {
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
             }
         }
 
-        if (!empty($name)) {
+        if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
@@ -961,13 +961,13 @@ class Releases extends Release
 			%s %s %s %s %s %s %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            !empty($tags) ? " AND tt.tag_name IN ('" . implode("','", $tags) . "')" : '',
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
-            (!empty($searchResult) ? 'AND r.id IN (' . implode(',', $searchResult) . ')' : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-            !empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(' . implode(',', $excludedCategories) . ')') : ''
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id, r.haspreview, r.jpgstatus,
@@ -983,7 +983,7 @@ class Releases extends Release
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			%s %s",
-            !empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -1026,7 +1026,7 @@ class Releases extends Release
      */
     public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
-        if (!empty($name)) {
+        if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
@@ -1037,8 +1037,8 @@ class Releases extends Release
             $this->showPasswords(),
             NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
-            (!empty($searchResult) ? 'AND r.id IN (' . implode(',', $searchResult) . ')' : ''),
-            !empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(' . implode(',', $excludedCategories) . ')') : '',
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
@@ -1098,23 +1098,23 @@ class Releases extends Release
      */
     public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
-        if (!empty($name)) {
+        if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(
-            'WHERE r.categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
+            'WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s %s %s %s %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            (!empty($searchResult) ? 'AND r.id IN (' . implode(',', $searchResult) . ')' : ''),
-            !empty($tags) ? " AND tt.tag_name IN ('" . implode("','", $tags) . "')" : '',
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', $imDbId) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
-            !empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(' . implode(',', $excludedCategories) . ')') : '',
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
             Category::getCategorySearch($cat),
             $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
@@ -1131,7 +1131,7 @@ class Releases extends Release
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
-            !empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -1173,7 +1173,7 @@ class Releases extends Release
             $parentCat = $catRow['root_categories_id'];
 
             $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
-            if (!$results) {
+            if (! $results) {
                 return $ret;
             }
 
