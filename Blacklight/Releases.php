@@ -914,7 +914,7 @@ class Releases extends Release
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
 				WHERE (%s) %s %s %s
 				GROUP BY v.id",
-                count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '',
+                count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '1 = 1',
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
