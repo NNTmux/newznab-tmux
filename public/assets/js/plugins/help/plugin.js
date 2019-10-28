@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.0 (2019-10-17)
+ * Version: 5.1.1 (2019-10-28)
  */
 (function () {
     'use strict';
@@ -693,6 +693,14 @@
       {
         key: 'tinycomments',
         name: 'Tiny Comments*'
+      },
+      {
+        key: 'advtable',
+        name: 'Advanced Tables*'
+      },
+      {
+        key: 'autocorrect',
+        name: 'Autocorrect*'
       }
     ];
     var PluginUrls = { urls: urls };
@@ -702,6 +710,7 @@
         var premiumPlugins = [
           'Accessibility Checker',
           'Advanced Code Editor',
+          'Advanced Tables',
           'Case Change',
           'Checklist',
           'Tiny Comments',

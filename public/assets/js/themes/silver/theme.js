@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.0 (2019-10-17)
+ * Version: 5.1.1 (2019-10-28)
  */
 (function (domGlobals) {
     'use strict';
@@ -23466,15 +23466,16 @@
       var _a = getHorizontalBounds(contentAreaBox, viewportBounds), x = _a.x, width = _a.width;
       return bounds$1(x, viewportBounds.y(), width, viewportBounds.height());
     };
-    var getBounds$2 = function (editor, toolbarOrMenubarEnabled) {
+    var getContextToolbarBounds = function (editor) {
+      var toolbarOrMenubarEnabled = isMenubarEnabled(editor) || isToolbarEnabled(editor) || isMultipleToolbars(editor);
       var viewportBounds = getBounds(domGlobals.window);
       var contentAreaBox = box(Element.fromDom(editor.getContentAreaContainer()));
       if (editor.inline && !toolbarOrMenubarEnabled) {
-        return Option.some(getDistractionFreeBounds(editor, contentAreaBox, viewportBounds));
+        return getDistractionFreeBounds(editor, contentAreaBox, viewportBounds);
       } else if (editor.inline) {
-        return Option.some(getInlineBounds(editor, contentAreaBox, viewportBounds));
+        return getInlineBounds(editor, contentAreaBox, viewportBounds);
       } else {
-        return Option.some(getIframeBounds(editor, contentAreaBox, viewportBounds));
+        return getIframeBounds(editor, contentAreaBox, viewportBounds);
       }
     };
 
@@ -24612,40 +24613,31 @@
           return Option.some(true);
         }
       }));
-      var toolbarOrMenubarEnabled = isMenubarEnabled(editor) || isToolbarEnabled(editor) || isMultipleToolbars(editor);
       var getBounds = function () {
-        return getBounds$2(editor, toolbarOrMenubarEnabled);
+        return getContextToolbarBounds(editor);
       };
-      var isCompletelyBehindHeader = function (nodeBounds) {
-        var headerEle = descendant$1(Element.fromDom(editor.getContainer()), '.tox-editor-header').getOrDie();
-        var isHeaderDocked = get$4(headerEle, 'position') === 'fixed';
-        if (toolbarOrMenubarEnabled && isHeaderDocked) {
-          var headerBounds = headerEle.dom().getBoundingClientRect();
-          if (editor.inline) {
-            return nodeBounds.bottom < headerBounds.bottom;
-          } else {
-            var scroll = get$8();
-            var bodyBounds = absolute$1(Element.fromDom(editor.getBody()));
-            var nodeBottom = nodeBounds.bottom + (bodyBounds.y() - scroll.top());
-            return nodeBottom < headerBounds.bottom;
-          }
-        } else {
-          return false;
-        }
+      var isRangeOverlapping = function (aTop, aBottom, bTop, bBottom) {
+        return Math.max(aTop, bTop) <= Math.min(aBottom, bBottom);
       };
-      var shouldContextToolbarHide = function () {
-        if (isTouch() && extras.backstage.isContextMenuOpen()) {
-          return true;
-        }
+      var getLastElementVerticalBound = function () {
         var nodeBounds = lastElement.get().map(function (ele) {
           return ele.getBoundingClientRect();
         }).getOrThunk(function () {
           return editor.selection.getRng().getBoundingClientRect();
         });
-        var viewportHeight = defaultView(Element.fromDom(editor.getBody())).dom().innerHeight;
-        var aboveViewport = nodeBounds.bottom < 0;
-        var belowViewport = nodeBounds.top > viewportHeight;
-        return aboveViewport || belowViewport || isCompletelyBehindHeader(nodeBounds);
+        var diffTop = editor.inline ? get$8().top() : absolute$1(Element.fromDom(editor.getBody())).y();
+        return {
+          y: nodeBounds.top + diffTop,
+          bottom: nodeBounds.bottom + diffTop
+        };
+      };
+      var shouldContextToolbarHide = function () {
+        if (isTouch() && extras.backstage.isContextMenuOpen()) {
+          return true;
+        }
+        var lastElementBounds = getLastElementVerticalBound();
+        var contextToolbarBounds = getBounds();
+        return !isRangeOverlapping(lastElementBounds.y, lastElementBounds.bottom, contextToolbarBounds.y(), contextToolbarBounds.bottom());
       };
       var forceHide = function () {
         InlineView.hide(contextbar);
@@ -24657,7 +24649,7 @@
           if (shouldContextToolbarHide()) {
             set$2(contextBarEle, 'display', 'none');
           } else {
-            Positioning.positionWithinBounds(sink, anchor, contextbar, getBounds());
+            Positioning.positionWithinBounds(sink, anchor, contextbar, Option.some(getBounds()));
           }
         });
       };
@@ -24738,7 +24730,9 @@
         lastElement.set(elem);
         var contextBarEle = contextbar.element();
         remove$6(contextBarEle, 'display');
-        InlineView.showWithinBounds(contextbar, anchor, wrapInPopDialog(toolbarSpec), getBounds);
+        InlineView.showWithinBounds(contextbar, anchor, wrapInPopDialog(toolbarSpec), function () {
+          return Option.some(getBounds());
+        });
         if (shouldContextToolbarHide()) {
           set$2(contextBarEle, 'display', 'none');
         }
@@ -27245,7 +27239,6 @@
       };
     };
     var show = function (editor, e, items, backstage, contextmenu, isTriggeredByKeyboardEvent) {
-      var toolbarOrMenubarEnabled = isMenubarEnabled(editor) || isToolbarEnabled(editor) || isMultipleToolbars(editor);
       var anchorSpec = getAnchorSpec$1(editor, isTriggeredByKeyboardEvent);
       build$2(items, ItemResponse$1.CLOSE_ON_EXECUTE, backstage, true).map(function (menuData) {
         e.preventDefault();
@@ -27254,7 +27247,7 @@
           data: menuData,
           type: 'horizontal'
         }, function () {
-          return getBounds$2(editor, toolbarOrMenubarEnabled);
+          return Option.some(getContextToolbarBounds(editor));
         });
         editor.fire(hideContextToolbarEvent);
       });
@@ -28860,7 +28853,12 @@
         var externalBlocker = externals.blocker();
         var blocker = sink.getSystem().build(__assign(__assign({}, externalBlocker), {
           components: externalBlocker.components.concat([premade$1(dialog)]),
-          behaviours: derive$1([config('dialog-blocker-events', [
+          behaviours: derive$1([
+            Focusing.config({}),
+            config('dialog-blocker-events', [
+              runOnSource(focusin(), function () {
+                Keying.focusIn(dialog);
+              }),
               run(dialogIdleEvent, function (blocker, se) {
                 if (has$1(dialog.element(), 'aria-busy')) {
                   remove$1(dialog.element(), 'aria-busy');
@@ -28883,7 +28881,8 @@
                   Keying.focusIn(busy);
                 }
               })
-            ])])
+            ])
+          ])
         }));
         attach$1(sink, blocker);
         Keying.focusIn(dialog);
@@ -30300,6 +30299,155 @@
       return instanceApi;
     };
 
+    var isTouch$4 = global$6.deviceType.isTouch();
+    var hiddenHeader = function (title, close) {
+      return {
+        dom: {
+          tag: 'div',
+          styles: { display: 'none' },
+          classes: ['tox-dialog__header']
+        },
+        components: [
+          title,
+          close
+        ]
+      };
+    };
+    var pClose = function (onClose, providersBackstage) {
+      return ModalDialog.parts().close(Button.sketch({
+        dom: {
+          tag: 'button',
+          classes: [
+            'tox-button',
+            'tox-button--icon',
+            'tox-button--naked'
+          ],
+          attributes: {
+            'type': 'button',
+            'aria-label': providersBackstage.translate('Close')
+          }
+        },
+        action: onClose,
+        buttonBehaviours: derive$1([Tabstopping.config({})])
+      }));
+    };
+    var pUntitled = function () {
+      return ModalDialog.parts().title({
+        dom: {
+          tag: 'div',
+          classes: ['tox-dialog__title'],
+          innerHtml: '',
+          styles: { display: 'none' }
+        }
+      });
+    };
+    var pBodyMessage = function (message, providersBackstage) {
+      return ModalDialog.parts().body({
+        dom: {
+          tag: 'div',
+          classes: ['tox-dialog__body']
+        },
+        components: [{
+            dom: {
+              tag: 'div',
+              classes: ['tox-dialog__body-content']
+            },
+            components: [{ dom: fromHtml$2('<p>' + providersBackstage.translate(message) + '</p>') }]
+          }]
+      });
+    };
+    var pFooter = function (buttons) {
+      return ModalDialog.parts().footer({
+        dom: {
+          tag: 'div',
+          classes: ['tox-dialog__footer']
+        },
+        components: buttons
+      });
+    };
+    var pFooterGroup = function (startButtons, endButtons) {
+      return [
+        Container.sketch({
+          dom: {
+            tag: 'div',
+            classes: ['tox-dialog__footer-start']
+          },
+          components: startButtons
+        }),
+        Container.sketch({
+          dom: {
+            tag: 'div',
+            classes: ['tox-dialog__footer-end']
+          },
+          components: endButtons
+        })
+      ];
+    };
+    var renderDialog = function (spec) {
+      var _a;
+      var dialogClass = 'tox-dialog';
+      var blockerClass = dialogClass + '-wrap';
+      var blockerBackdropClass = blockerClass + '__backdrop';
+      var scrollLockClass = dialogClass + '__disable-scroll';
+      return ModalDialog.sketch({
+        lazySink: spec.lazySink,
+        onEscape: function (comp) {
+          spec.onEscape(comp);
+          return Option.some(true);
+        },
+        useTabstopAt: function (elem) {
+          return !NavigableObject.isPseudoStop(elem);
+        },
+        dom: {
+          tag: 'div',
+          classes: [dialogClass].concat(spec.extraClasses),
+          styles: __assign({ position: 'relative' }, spec.extraStyles)
+        },
+        components: __spreadArrays([
+          spec.header,
+          spec.body
+        ], spec.footer.toArray()),
+        parts: {
+          blocker: {
+            dom: fromHtml$2('<div class="' + blockerClass + '"></div>'),
+            components: [{
+                dom: {
+                  tag: 'div',
+                  classes: isTouch$4 ? [
+                    blockerBackdropClass,
+                    blockerBackdropClass + '--opaque'
+                  ] : [blockerBackdropClass]
+                }
+              }]
+          }
+        },
+        dragBlockClass: blockerClass,
+        modalBehaviours: derive$1(__spreadArrays([
+          Focusing.config({}),
+          config('dialog-events', spec.dialogEvents.concat([runOnSource(focusin(), function (comp, se) {
+              Keying.focusIn(comp);
+            })])),
+          config('scroll-lock', [
+            runOnAttached(function () {
+              add$2(body(), scrollLockClass);
+            }),
+            runOnDetached(function () {
+              remove$4(body(), scrollLockClass);
+            })
+          ])
+        ], spec.extraBehaviours)),
+        eventOrder: __assign((_a = {}, _a[execute()] = ['dialog-events'], _a[attachedToDom()] = [
+          'scroll-lock',
+          'dialog-events',
+          'alloy.base.behaviour'
+        ], _a[detachedFromDom()] = [
+          'alloy.base.behaviour',
+          'dialog-events',
+          'scroll-lock'
+        ], _a), spec.eventOrder)
+      });
+    };
+
     var renderClose = function (providersBackstage) {
       return Button.sketch({
         dom: {
@@ -30384,7 +30532,6 @@
       });
     };
 
-    var isTouch$4 = global$6.deviceType.isTouch();
     var getHeader = function (title, backstage) {
       return renderModalHeader({
         title: backstage.shared.providers.translate(title),
@@ -30426,76 +30573,37 @@
       var updateState = function (_comp, incoming) {
         return Option.some(incoming);
       };
-      return build$1(ModalDialog.sketch({
+      return build$1(renderDialog(__assign(__assign({}, spec), {
         lazySink: backstage.shared.getSink,
-        onEscape: function (c) {
-          emit(c, formCancelEvent);
-          return Option.some(true);
-        },
-        useTabstopAt: function (elem) {
-          return !NavigableObject.isPseudoStop(elem);
-        },
-        modalBehaviours: derive$1(__spreadArrays([
+        extraBehaviours: __spreadArrays([
           Reflecting.config({
             channel: dialogChannel,
             updateState: updateState,
             initialData: initialData
           }),
-          RepresentingConfigs.memory({}),
-          Focusing.config({}),
-          config('execute-on-form', dialogEvents.concat([runOnSource(focusin(), function (comp, se) {
-              Keying.focusIn(comp);
-            })])),
-          config('scroll-lock', [
-            runOnAttached(function () {
-              add$2(body(), 'tox-dialog__disable-scroll');
-            }),
-            runOnDetached(function () {
-              remove$4(body(), 'tox-dialog__disable-scroll');
-            })
-          ])
-        ], spec.extraBehaviours)),
-        eventOrder: (_a = {}, _a[execute()] = ['execute-on-form'], _a[receive()] = [
+          RepresentingConfigs.memory({})
+        ], spec.extraBehaviours),
+        onEscape: function (comp) {
+          emit(comp, formCancelEvent);
+        },
+        dialogEvents: dialogEvents,
+        eventOrder: (_a = {}, _a[receive()] = [
           'reflecting',
           'receiving'
         ], _a[attachedToDom()] = [
           'scroll-lock',
           'reflecting',
           'messages',
-          'execute-on-form',
+          'dialog-events',
           'alloy.base.behaviour'
         ], _a[detachedFromDom()] = [
           'alloy.base.behaviour',
-          'execute-on-form',
+          'dialog-events',
           'messages',
           'reflecting',
           'scroll-lock'
-        ], _a),
-        dom: {
-          tag: 'div',
-          classes: ['tox-dialog'].concat(spec.extraClasses),
-          styles: __assign({ position: 'relative' }, spec.extraStyles)
-        },
-        components: __spreadArrays([
-          spec.header,
-          spec.body
-        ], spec.footer.toArray()),
-        dragBlockClass: 'tox-dialog-wrap',
-        parts: {
-          blocker: {
-            dom: fromHtml$2('<div class="tox-dialog-wrap"></div>'),
-            components: [{
-                dom: {
-                  tag: 'div',
-                  classes: isTouch$4 ? [
-                    'tox-dialog-wrap__backdrop',
-                    'tox-dialog-wrap__backdrop--opaque'
-                  ] : ['tox-dialog-wrap__backdrop']
-                }
-              }]
-          }
-        }
-      }));
+        ], _a)
+      })));
     };
     var mapMenuButtons = function (buttons) {
       var mapItems = function (button) {
@@ -30525,7 +30633,7 @@
       }, {});
     };
 
-    var renderDialog = function (dialogInit, extra, backstage) {
+    var renderDialog$1 = function (dialogInit, extra, backstage) {
       var header = getHeader(dialogInit.internalDialog.title, backstage);
       var body = renderModalBody({ body: dialogInit.internalDialog.body }, backstage);
       var storagedMenuButtons = mapMenuButtons(dialogInit.internalDialog.buttons);
@@ -30821,136 +30929,6 @@
       };
     };
 
-    var isTouch$5 = global$6.deviceType.isTouch();
-    var hiddenHeader = {
-      dom: {
-        tag: 'div',
-        styles: { display: 'none' },
-        classes: ['tox-dialog__header']
-      }
-    };
-    var defaultHeader = {
-      dom: {
-        tag: 'div',
-        classes: ['tox-dialog__header']
-      }
-    };
-    var pClose = function (onClose, providersBackstage) {
-      return ModalDialog.parts().close(Button.sketch({
-        dom: {
-          tag: 'button',
-          classes: [
-            'tox-button',
-            'tox-button--icon',
-            'tox-button--naked'
-          ],
-          attributes: {
-            'type': 'button',
-            'aria-label': providersBackstage.translate('Close')
-          }
-        },
-        action: onClose,
-        buttonBehaviours: derive$1([Tabstopping.config({})])
-      }));
-    };
-    var pUntitled = function () {
-      return ModalDialog.parts().title({
-        dom: {
-          tag: 'div',
-          classes: ['tox-dialog__title'],
-          innerHtml: '',
-          styles: { display: 'none' }
-        }
-      });
-    };
-    var pBodyMessage = function (message, providersBackstage) {
-      return ModalDialog.parts().body({
-        dom: {
-          tag: 'div',
-          classes: ['tox-dialog__body']
-        },
-        components: [{
-            dom: {
-              tag: 'div',
-              classes: ['tox-dialog__body-content']
-            },
-            components: [{ dom: fromHtml$2('<p>' + providersBackstage.translate(message) + '</p>') }]
-          }]
-      });
-    };
-    var pFooter = function (buttons) {
-      return ModalDialog.parts().footer({
-        dom: {
-          tag: 'div',
-          classes: ['tox-dialog__footer']
-        },
-        components: buttons
-      });
-    };
-    var pFooterGroup = function (startButtons, endButtons) {
-      return [
-        Container.sketch({
-          dom: {
-            tag: 'div',
-            classes: ['tox-dialog__footer-start']
-          },
-          components: startButtons
-        }),
-        Container.sketch({
-          dom: {
-            tag: 'div',
-            classes: ['tox-dialog__footer-end']
-          },
-          components: endButtons
-        })
-      ];
-    };
-    var renderDialog$1 = function (spec) {
-      return ModalDialog.sketch({
-        lazySink: spec.lazySink,
-        onEscape: function () {
-          spec.onCancel();
-          return Option.some(true);
-        },
-        dom: {
-          tag: 'div',
-          classes: ['tox-dialog'].concat(spec.extraClasses)
-        },
-        components: [
-          deepMerge(spec.headerOverride.getOr(defaultHeader), {
-            components: [
-              spec.partSpecs.title,
-              spec.partSpecs.close
-            ]
-          }),
-          spec.partSpecs.body,
-          spec.partSpecs.footer
-        ],
-        parts: {
-          blocker: {
-            dom: fromHtml$2('<div class="tox-dialog-wrap"></div>'),
-            components: [{
-                dom: {
-                  tag: 'div',
-                  classes: isTouch$5 ? [
-                    'tox-dialog-wrap__backdrop',
-                    'tox-dialog-wrap__backdrop--opaque'
-                  ] : ['tox-dialog-wrap__backdrop']
-                }
-              }]
-          }
-        },
-        modalBehaviours: derive$1([config('basic-dialog-events', [
-            run(formCancelEvent, function (comp, se) {
-              spec.onCancel();
-            }),
-            run(formSubmitEvent, function (comp, se) {
-              spec.onSubmit();
-            })
-          ])])
-      });
-    };
-
     var setup$c = function (extras) {
       var sharedBackstage = extras.backstage.shared;
       var open = function (message, callback) {
@@ -30966,24 +30944,21 @@
           disabled: false,
           icon: Option.none()
         }, 'cancel', extras.backstage));
-        var alertDialog = build$1(renderDialog$1({
+        var titleSpec = pUntitled();
+        var closeSpec = pClose(closeDialog, sharedBackstage.providers);
+        var alertDialog = build$1(renderDialog({
           lazySink: function () {
             return sharedBackstage.getSink();
           },
-          headerOverride: Option.some(hiddenHeader),
-          partSpecs: {
-            title: pUntitled(),
-            close: pClose(function () {
-              closeDialog();
-            }, sharedBackstage.providers),
-            body: pBodyMessage(message, sharedBackstage.providers),
-            footer: pFooter(pFooterGroup([], [memFooterClose.asSpec()]))
-          },
-          onCancel: function () {
-            return closeDialog();
-          },
-          onSubmit: noop,
-          extraClasses: ['tox-alert-dialog']
+          header: hiddenHeader(titleSpec, closeSpec),
+          body: pBodyMessage(message, sharedBackstage.providers),
+          footer: Option.some(pFooter(pFooterGroup([], [memFooterClose.asSpec()]))),
+          onEscape: closeDialog,
+          extraClasses: ['tox-alert-dialog'],
+          extraBehaviours: [],
+          extraStyles: {},
+          dialogEvents: [run(formCancelEvent, closeDialog)],
+          eventOrder: {}
         }));
         ModalDialog.show(alertDialog);
         var footerCloseButton = memFooterClose.get(alertDialog);
@@ -31015,29 +30990,35 @@
           disabled: false,
           icon: Option.none()
         }, 'cancel', extras.backstage);
-        var confirmDialog = build$1(renderDialog$1({
+        var titleSpec = pUntitled();
+        var closeSpec = pClose(function () {
+          return closeDialog(false);
+        }, sharedBackstage.providers);
+        var confirmDialog = build$1(renderDialog({
           lazySink: function () {
             return sharedBackstage.getSink();
           },
-          headerOverride: Option.some(hiddenHeader),
-          partSpecs: {
-            title: pUntitled(),
-            close: pClose(function () {
-              closeDialog(false);
-            }, sharedBackstage.providers),
-            body: pBodyMessage(message, sharedBackstage.providers),
-            footer: pFooter(pFooterGroup([], [
-              footerNo,
-              memFooterYes.asSpec()
-            ]))
-          },
-          onCancel: function () {
+          header: hiddenHeader(titleSpec, closeSpec),
+          body: pBodyMessage(message, sharedBackstage.providers),
+          footer: Option.some(pFooter(pFooterGroup([], [
+            footerNo,
+            memFooterYes.asSpec()
+          ]))),
+          onEscape: function () {
             return closeDialog(false);
           },
-          onSubmit: function () {
-            return closeDialog(true);
-          },
-          extraClasses: ['tox-confirm-dialog']
+          extraClasses: ['tox-confirm-dialog'],
+          extraBehaviours: [],
+          extraStyles: {},
+          dialogEvents: [
+            run(formCancelEvent, function () {
+              return closeDialog(false);
+            }),
+            run(formSubmitEvent, function () {
+              return closeDialog(true);
+            })
+          ],
+          eventOrder: {}
         }));
         ModalDialog.show(confirmDialog);
         var footerYesButton = memFooterYes.get(confirmDialog);
@@ -31115,7 +31096,7 @@
             initialData: initialData,
             internalDialog: contents
           };
-          var dialog = renderDialog(dialogInit, {
+          var dialog = renderDialog$1(dialogInit, {
             redial: DialogManager.redial,
             closeWindow: function () {
               ModalDialog.hide(dialog.dialog);

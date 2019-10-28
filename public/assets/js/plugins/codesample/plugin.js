@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.0 (2019-10-17)
+ * Version: 5.1.1 (2019-10-28)
  */
 (function (domGlobals) {
   'use strict';
