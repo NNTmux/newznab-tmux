@@ -1,4 +1,5 @@
 2019-10-28 DariusIII
+	* Chg: Change logic of tv and api tv search queries
 	* Chg: Update tinyMCE to latest version
 	* Fix: Fix return value of searchSimilar when no results are found
 2019-10-27 DariusIII
