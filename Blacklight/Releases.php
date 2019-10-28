@@ -6,6 +6,7 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Models\Video;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -765,27 +766,26 @@ class Releases extends Release
         }
 
         // If we have show info, find the Episode ID/Video ID first to avoid table scans
-        $showQry = sprintf(
-            "
-				SELECT
-					v.id AS video,
-					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
-				FROM videos v
-				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s
-				GROUP BY v.id",
-            count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '1 = 1',
-            ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
-            ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-            ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
-        );
-        $show = self::fromQuery($showQry)->take(1)->toArray();
+        $showQry = Video::query()
+            ->select(['videos.id as video', DB::raw("GROUP_CONCAT(tv_episodes.id SEPARATOR ',') AS episodes")])
+            ->leftJoin('tv_episodes', 'videos.id', '=', 'tv_episodes.videos_id')->groupBy('videos.id');
+        if ($series !== '') {
+            $showQry->where('tv_episodes.series', '=', (int) preg_replace('/^s0*/i', '', $series));
+        }
+        if ($episode !== '') {
+            $showQry->where('tv_episodes.episode', '=', (int) preg_replace('/^e0*/i', '', $episode));
+        }
+
+        if ($airdate !== '') {
+            $showQry->where(DB::raw(sprintf('AND DATE(tv_episodes.firstaired) = %s', escapeString($airdate))));
+        }
+        $show = $showQry->first()->toArray();
 
         if (! empty($show)) {
-            if (! empty($show[0]['episodes'])) {
-                $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
-            } elseif ((int) $show[0]['video'] > 0) {
-                $showSql = 'AND r.videos_id = '.$show[0]['video'];
+            if (! empty($show['episodes'])) {
+                $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show['episodes']);
+            } elseif ((int) $show['video'] > 0) {
+                $showSql = 'AND r.videos_id = '.$show['video'];
                 // If $series is set but episode is not, return Season Packs only
                 if (! empty($series) && empty($episode)) {
                     $showSql .= ' AND r.tv_episodes_id = 0';
@@ -905,27 +905,26 @@ class Releases extends Release
         }
 
         // If we have show info, find the Episode ID/Video ID first to avoid table scans
-        $showQry = sprintf(
-                "
-				SELECT
-					v.id AS video,
-					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
-				FROM videos v
-				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s
-				GROUP BY v.id",
-                count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '1 = 1',
-                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
-            );
-        $show = self::fromQuery($showQry)->take(1)->toArray();
+        $showQry = Video::query()
+            ->select(['videos.id as video', DB::raw("GROUP_CONCAT(tv_episodes.id SEPARATOR ',') AS episodes")])
+            ->leftJoin('tv_episodes', 'videos.id', '=', 'tv_episodes.videos_id')->groupBy('videos.id');
+        if ($series !== '') {
+            $showQry->where('tv_episodes.series', '=', (int) preg_replace('/^s0*/i', '', $series));
+        }
+        if ($episode !== '') {
+            $showQry->where('tv_episodes.episode', '=', (int) preg_replace('/^e0*/i', '', $episode));
+        }
+
+        if ($airdate !== '') {
+            $showQry->where(DB::raw(sprintf('AND DATE(tv_episodes.firstaired) = %s', escapeString($airdate))));
+        }
+        $show = $showQry->first()->toArray();
 
         if (! empty($show)) {
-            if (! empty($show[0]['episodes'])) {
-                $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
-            } elseif ((int) $show[0]['video'] > 0) {
-                $showSql = 'AND r.videos_id = '.$show[0]['video'];
+            if (! empty($show['episodes'])) {
+                $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show['episodes']);
+            } elseif ((int) $show['video'] > 0) {
+                $showSql = 'AND r.videos_id = '.$show['video'];
                 // If $series is set but episode is not, return Season Packs only
                 if (! empty($series) && empty($episode)) {
                     $showSql .= ' AND r.tv_episodes_id = 0';
