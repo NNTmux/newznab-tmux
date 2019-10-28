@@ -2,11 +2,11 @@
 
 namespace Blacklight;
 
+use App\Models\Video;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use App\Models\Video;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
