@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use App\Models\Video;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
@@ -33,8 +32,8 @@ class Releases extends Release
     public $passwordStatus;
 
     /**
-     * @throws \Exception
      * @var array Class instances.
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -51,11 +50,11 @@ class Releases extends Release
      * @param       $start
      * @param       $num
      * @param       $orderBy
-     * @param int $maxAge
+     * @param int   $maxAge
      * @param array $excludedCats
      * @param array $tags
-     * @param int $groupName
-     * @param int $minSize
+     * @param int   $groupName
+     * @param int   $minSize
      *
      * @return Collection|mixed
      */
@@ -124,12 +123,12 @@ class Releases extends Release
     /**
      * Used for pager on browse page.
      *
-     * @param array $cat
-     * @param int $maxAge
-     * @param array $excludedCats
+     * @param array      $cat
+     * @param int        $maxAge
+     * @param array      $excludedCats
      * @param string|int $groupName
      *
-     * @param array $tags
+     * @param array      $tags
      *
      * @return int
      */
@@ -174,11 +173,11 @@ class Releases extends Release
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
-                return '= '.self::PASSWD_NONE;
+                    return '= '.self::PASSWD_NONE;
 
             case 1: // Shows everything.
             default:
-                return '<= '.self::PASSWD_RAR;
+                    return '<= '.self::PASSWD_RAR;
         }
     }
 
@@ -399,7 +398,7 @@ class Releases extends Release
      * Get count for my shows page pagination.
      *
      * @param       $userShows
-     * @param int $maxAge
+     * @param int   $maxAge
      * @param array $excludedCats
      *
      * @return int
@@ -429,7 +428,7 @@ class Releases extends Release
     /**
      * Delete multiple releases, or a single by ID.
      *
-     * @param array|int|string $list Array of GUID or ID of releases to delete.
+     * @param array|int|string $list   Array of GUID or ID of releases to delete.
      * @throws \Exception
      */
     public function deleteMultiple($list): void
@@ -447,9 +446,9 @@ class Releases extends Release
     /**
      * Deletes a single release by GUID, and all the corresponding files.
      *
-     * @param array $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
+     * @param array                    $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
      *                                              false)]
-     * @param \Blacklight\NZB $nzb
+     * @param \Blacklight\NZB          $nzb
      * @param \Blacklight\ReleaseImage $releaseImage
      *
      * @throws \Exception
@@ -489,12 +488,12 @@ class Releases extends Release
         }
 
         $update = [
-            'categories_id' => $category === -1 ? 'categories_id' : $category,
-            'grabs' => $grabs,
-            'videos_id' => $videoId,
+            'categories_id'     => $category === -1 ? 'categories_id' : $category,
+            'grabs'          => $grabs,
+            'videos_id'      => $videoId,
             'tv_episodes_id' => $episodeId,
-            'anidbid' => $anidbId,
-            'imdbid' => $imdbId,
+            'anidbid'        => $anidbId,
+            'imdbid'         => $imdbId,
         ];
 
         return self::query()->whereIn('guid', $guids)->update($update);
@@ -503,7 +502,7 @@ class Releases extends Release
     /**
      * Creates part of a query for some functions.
      *
-     * @param array|Collection $userQuery
+     * @param array|Collection  $userQuery
      * @param string $type
      *
      * @return string
@@ -532,21 +531,21 @@ class Releases extends Release
      * Function for searching on the site (by subject, searchname or advanced).
      *
      *
-     * @param array $searchArr
+     * @param  array       $searchArr
      * @param              $groupName
      * @param              $sizeFrom
      * @param              $sizeTo
      * @param              $daysNew
      * @param              $daysOld
-     * @param int $offset
-     * @param int $limit
+     * @param int          $offset
+     * @param int          $limit
      * @param string|array $orderBy
-     * @param int $maxAge
-     * @param array $excludedCats
-     * @param string $type
-     * @param array $cat
-     * @param int $minSize
-     * @param array $tags
+     * @param int          $maxAge
+     * @param array        $excludedCats
+     * @param string       $type
+     * @param array        $cat
+     * @param int          $minSize
+     * @param array        $tags
      *
      * @return array|Collection|mixed
      */
@@ -658,12 +657,12 @@ class Releases extends Release
      *
      * @param       $searchName
      * @param       $groupName
-     * @param int $offset
-     * @param int $limit
-     * @param int $maxAge
+     * @param int   $offset
+     * @param int   $limit
+     * @param int   $maxAge
      * @param array $excludedCats
      * @param array $cat
-     * @param int $minSize
+     * @param int   $minSize
      * @param array $tags
      *
      * @return Collection|mixed
@@ -765,38 +764,41 @@ class Releases extends Release
             }
         }
 
-        // If we have show info, find the Episode ID/Video ID first to avoid table scans
-        $showQry = Video::query()
-            ->select(['videos.id as video', DB::raw("GROUP_CONCAT(tv_episodes.id SEPARATOR ',') AS episodes")])
-            ->leftJoin('tv_episodes', 'videos.id', '=', 'tv_episodes.videos_id')->groupBy('videos.id');
-        if ($series !== '') {
-            $showQry->where('tv_episodes.series', '=', (int) preg_replace('/^s0*/i', '', $series));
-        }
-        if ($episode !== '') {
-            $showQry->where('tv_episodes.episode', '=', (int) preg_replace('/^e0*/i', '', $episode));
-        }
+        if (\count($siteSQL) > 0) {
+            // If we have show info, find the Episode ID/Video ID first to avoid table scans
+            $showQry = sprintf(
+                "
+				SELECT
+					v.id AS video,
+					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
+				FROM videos v
+				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
+				WHERE (%s) %s %s %s
+				GROUP BY v.id",
+                implode(' OR ', $siteSQL),
+                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
+                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
+            );
+            $show = self::fromQuery($showQry)->take(1)->toArray();
 
-        if ($airdate !== '') {
-            $showQry->where(DB::raw(sprintf('AND DATE(tv_episodes.firstaired) = %s', escapeString($airdate))));
-        }
-        $show = $showQry->first()->toArray();
-
-        if (! empty($show)) {
-            if (! empty($show['episodes'])) {
-                $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show['episodes']);
-            } elseif ((int) $show['video'] > 0) {
-                $showSql = 'AND r.videos_id = '.$show['video'];
-                // If $series is set but episode is not, return Season Packs only
-                if (! empty($series) && empty($episode)) {
-                    $showSql .= ' AND r.tv_episodes_id = 0';
+            if (! empty($show)) {
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && ! empty($show[0]['episodes'])) {
+                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
+                } elseif ((int) $show[0]['video'] > 0) {
+                    $showSql = 'AND r.videos_id = '.$show[0]['video'];
+                    // If $series is set but episode is not, return Season Packs only
+                    if (! empty($series) && empty($episode)) {
+                        $showSql .= ' AND r.tv_episodes_id = 0';
+                    }
+                } else {
+                    // If we were passed Episode Info and no match was found, do not run the query
+                    return [];
                 }
             } else {
-                // If we were passed Episode Info and no match was found, do not run the query
+                // If we were passed Site ID Info and no match was found, do not run the query
                 return [];
             }
-        } else {
-            // If we were passed Site ID Info and no match was found, do not run the query
-            return [];
         }
         // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
         if (! empty($name) && $showSql === '') {
@@ -863,7 +865,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
+        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = self::fromQuery($sql) : [];
         if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -904,40 +906,42 @@ class Releases extends Release
             }
         }
 
-        // If we have show info, find the Episode ID/Video ID first to avoid table scans
-        $showQry = Video::query()
-            ->select(['videos.id as video', DB::raw("GROUP_CONCAT(tv_episodes.id SEPARATOR ',') AS episodes")])
-            ->leftJoin('tv_episodes', 'videos.id', '=', 'tv_episodes.videos_id')->groupBy('videos.id');
-        if ($series !== '') {
-            $showQry->where('tv_episodes.series', '=', (int) preg_replace('/^s0*/i', '', $series));
-        }
-        if ($episode !== '') {
-            $showQry->where('tv_episodes.episode', '=', (int) preg_replace('/^e0*/i', '', $episode));
-        }
+        if (\count($siteSQL) > 0) {
+            // If we have show info, find the Episode ID/Video ID first to avoid table scans
+            $showQry = sprintf(
+                "
+				SELECT
+					v.id AS video,
+					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
+				FROM videos v
+				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
+				WHERE (%s) %s %s %s
+				GROUP BY v.id",
+                implode(' OR ', $siteSQL),
+                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
+                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
+            );
+            $show = self::fromQuery($showQry)->take(1)->toArray();
 
-        if ($airdate !== '') {
-            $showQry->where(DB::raw(sprintf('AND DATE(tv_episodes.firstaired) = %s', escapeString($airdate))));
-        }
-        $show = $showQry->first()->toArray();
-
-        if (! empty($show)) {
-            if (! empty($show['episodes'])) {
-                $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show['episodes']);
-            } elseif ((int) $show['video'] > 0) {
-                $showSql = 'AND r.videos_id = '.$show['video'];
-                // If $series is set but episode is not, return Season Packs only
-                if (! empty($series) && empty($episode)) {
-                    $showSql .= ' AND r.tv_episodes_id = 0';
+            if (! empty($show)) {
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]['episodes'] !== '') {
+                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
+                } elseif ((int) $show[0]['video'] > 0) {
+                    $showSql = 'AND r.videos_id = '.$show[0]['video'];
+                    // If $series is set but episode is not, return Season Packs only
+                    if (! empty($series) && empty($episode)) {
+                        $showSql .= ' AND r.tv_episodes_id = 0';
+                    }
+                } else {
+                    // If we were passed Episode Info and no match was found, do not run the query
+                    return [];
                 }
             } else {
-                // If we were passed Episode Info and no match was found, do not run the query
+                // If we were passed Site ID Info and no match was found, do not run the query
                 return [];
             }
-        } else {
-            // If we were passed Site ID Info and no match was found, do not run the query
-            return [];
         }
-
         // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
         if (! empty($name) && $showSql === '') {
             if (! empty($series) && (int) $series < 1900) {

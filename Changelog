@@ -1,5 +1,4 @@
 2019-10-28 DariusIII
-	* Chg: Change logic of tv and api tv search queries
 	* Chg: Update tinyMCE to latest version
 	* Fix: Fix return value of searchSimilar when no results are found
 2019-10-27 DariusIII
@@ -138,7 +137,7 @@
 	* Chg: Remove api and download hits reset functionality
 	* Chg: Update javascript and tpls
 	* Chg: Slightly improve movie matching
-	* Fix: Fix game covers 
+	* Fix: Fix game covers
 	* Chg: Update rtconner/laravel-tagging (3.2.2 => 3.2.3)
 2019-08-11 DariusIII
 	* Chg: Add year check in processMovieReleases function to help better movie matching
