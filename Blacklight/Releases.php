@@ -776,8 +776,8 @@ class Releases extends Release
             WHERE (%s) %s %s %s
             GROUP BY v.id",
                 \count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '1 = 1',
-                ($series !== '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
+                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
             $show = self::fromQuery($showQry)->take(1)->toArray();
@@ -785,10 +785,10 @@ class Releases extends Release
             if (! empty($show)) {
                 if (! empty($show[0]['episodes'])) {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
-                } elseif ((int)$show[0]['video'] > 0) {
-                    $showSql = 'AND r.videos_id = ' . $show[0]['video'];
+                } elseif ((int) $show[0]['video'] > 0) {
+                    $showSql = 'AND r.videos_id = '.$show[0]['video'];
                     // If $series is set but episode is not, return Season Packs only
-                    if (!empty($series) && empty($episode)) {
+                    if (! empty($series) && empty($episode)) {
                         $showSql .= ' AND r.tv_episodes_id = 0';
                     }
                 } else {
@@ -917,8 +917,8 @@ class Releases extends Release
             WHERE (%s) %s %s %s
             GROUP BY v.id",
                 \count($siteSQL) > 0 ? implode(' OR ', $siteSQL) : '1 = 1',
-                ($series !== '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
+                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
             $show = self::fromQuery($showQry)->take(1)->toArray();
@@ -927,9 +927,9 @@ class Releases extends Release
                 if ($show[0]['episodes'] !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]['episodes']);
                 } elseif ((int) $show[0]['video'] > 0) {
-                    $showSql = 'AND r.videos_id = ' . $show[0]['video'];
+                    $showSql = 'AND r.videos_id = '.$show[0]['video'];
                     // If $series is set but episode is not, return Season Packs only
-                    if (!empty($series) && empty($episode)) {
+                    if (! empty($series) && empty($episode)) {
                         $showSql .= ' AND r.tv_episodes_id = 0';
                     }
                 } else {
