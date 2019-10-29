@@ -869,8 +869,10 @@ class Releases extends Release
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
+
         return $releases;
     }
+
     /**
      * Search TV Shows via APIv2.
      *
@@ -999,6 +1001,7 @@ class Releases extends Release
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
+
         return $releases;
     }
 
