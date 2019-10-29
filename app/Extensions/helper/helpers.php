@@ -191,7 +191,7 @@ if (! function_exists('getSimilarName')) {
      */
     function getSimilarName($name): string
     {
-        return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
+        return implode(' ', \array_slice(str_word_count(str_replace(['.', '_', '-'], ' ', $name), 2), 0, 2));
     }
 }
 
