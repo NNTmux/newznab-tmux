@@ -18,7 +18,8 @@ use App\Http\Controllers\BasePageController;
 class ApiController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Symfony\Component\HttpFoundation\StreamedResponse
      * @throws \Throwable
      */
     public function api(Request $request)

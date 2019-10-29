@@ -725,8 +725,8 @@ return [
         'section' => '',
         'subsection' => '',
         'name' => 'showpasswordedrelease',
-        'value' => '10',
-        'hint' => 'Whether to show passworded or potentially passworded releases in browse, search, api and rss feeds. Potentially passworded means releases which contain .cab or .ace files which are typically password protected. (*yes): Unprocessed releases are hidden. (*no): Unprocessed releases are displayed.',
+        'value' => '0',
+        'hint' => 'Whether to show or hide passworded releases in browse, search, api and rss feeds.',
         'setting' => 'showpasswordedrelease',
     ],
     92 => [

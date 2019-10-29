@@ -166,18 +166,16 @@ class Releases extends Release
     /**
      * @return string
      */
-    public function showPasswords(): ?string
+    public function showPasswords()
     {
         $show = (int) Settings::settingValue('..showpasswordedrelease');
-        $setting = $show ?? 1;
+        $setting = $show ?? 0;
         switch ($setting) {
-            case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
-
-                    return '= '.self::PASSWD_NONE;
-
             case 1: // Shows everything.
-            default:
                     return '<= '.self::PASSWD_RAR;
+            case 0:
+            default:// Hide releases with a password.
+                return '= '.self::PASSWD_NONE;
         }
     }
 
