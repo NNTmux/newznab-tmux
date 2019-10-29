@@ -751,7 +751,7 @@ class Releases extends Release
      * @param int $minSize
      * @param array $excludedCategories
      * @param array $tags
-     * @return Collection|mixed
+     * @return array|Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
@@ -861,21 +861,26 @@ class Releases extends Release
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
+
+        if (! empty($series) || ! empty($episode) || ! empty($airdate) || ! empty($name) || ! empty($siteIdArr)) {
+            $releases = Cache::get(md5($sql));
+            if ($releases !== null) {
+                return $releases;
+            }
+            ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = self::fromQuery($sql) : [];
+            if (! empty($releases) && $releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount(
+                    preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
+                );
+            }
+
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            Cache::put(md5($sql), $releases, $expiresAt);
+
             return $releases;
         }
-        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = self::fromQuery($sql) : [];
-        if (! empty($releases) && $releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
-        }
 
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
+        return [];
     }
 
     /**
@@ -894,7 +899,7 @@ class Releases extends Release
      * @param int $minSize
      * @param array $excludedCategories
      * @param array $tags
-     * @return Collection|mixed
+     * @return array|Collection|mixed
      */
     public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
@@ -997,21 +1002,25 @@ class Releases extends Release
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
+        if (! empty($series) || ! empty($episode) || ! empty($airdate) || ! empty($name) || ! empty($siteIdArr)) {
+            $releases = Cache::get(md5($sql));
+            if ($releases !== null) {
+                return $releases;
+            }
+            $releases = self::fromQuery($sql);
+            if ($releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount(
+                    preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
+                );
+            }
+
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            Cache::put(md5($sql), $releases, $expiresAt);
+
             return $releases;
         }
-        $releases = self::fromQuery($sql);
-        if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
-        }
 
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
+        return [];
     }
 
     /**
