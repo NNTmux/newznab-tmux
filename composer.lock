@@ -9115,16 +9115,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "4.5.3",
+            "version": "4.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/captainhook.git",
-                "reference": "23e5b59033a2d852957171d4c4bcfcfae6d662c8"
+                "reference": "3d29aff5a8ae458cbc41fd946e4fa91dc93a2fdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/23e5b59033a2d852957171d4c4bcfcfae6d662c8",
-                "reference": "23e5b59033a2d852957171d4c4bcfcfae6d662c8",
+                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/3d29aff5a8ae458cbc41fd946e4fa91dc93a2fdd",
+                "reference": "3d29aff5a8ae458cbc41fd946e4fa91dc93a2fdd",
                 "shasum": ""
             },
             "require": {
@@ -9180,7 +9180,7 @@
                 "pre-push",
                 "prepare-commit-msg"
             ],
-            "time": "2019-10-29T10:04:50+00:00"
+            "time": "2019-10-31T15:40:21+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
