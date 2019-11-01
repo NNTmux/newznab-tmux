@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Release;
 use App\Models\Category;
-use Blacklight\ColorCLI;
+use App\Models\Release;
 use Blacklight\Categorize;
+use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
