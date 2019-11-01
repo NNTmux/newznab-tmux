@@ -5,9 +5,9 @@ namespace App\Models;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Conner\Tagging\Taggable;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\Release.
