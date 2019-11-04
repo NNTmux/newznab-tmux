@@ -321,16 +321,16 @@
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/canihavesomecoffee/theTVDbAPI.git",
-                "reference": "f23f544029269fe2a244818209b060d08654eca6"
+                "reference": "cb6979abf12675b9d6ae78bdf5f0cfde67447416"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/f23f544029269fe2a244818209b060d08654eca6",
-                "reference": "f23f544029269fe2a244818209b060d08654eca6",
+                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/cb6979abf12675b9d6ae78bdf5f0cfde67447416",
+                "reference": "cb6979abf12675b9d6ae78bdf5f0cfde67447416",
                 "shasum": ""
             },
             "require": {
@@ -361,7 +361,7 @@
                 }
             ],
             "description": "PHP implementation for the 2nd version of the TheTVDb API.",
-            "time": "2019-02-24T20:49:53+00:00"
+            "time": "2019-11-03T17:20:36+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -1074,31 +1074,30 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.9.2",
+            "version": "v2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "22800bd651c1d8d2a9719e2a3dc46d5108ebfcc9"
+                "reference": "0c9a646775ef549eb0a213a4f9bd4381d9b4d934"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/22800bd651c1d8d2a9719e2a3dc46d5108ebfcc9",
-                "reference": "22800bd651c1d8d2a9719e2a3dc46d5108ebfcc9",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/0c9a646775ef549eb0a213a4f9bd4381d9b4d934",
+                "reference": "0c9a646775ef549eb0a213a4f9bd4381d9b4d934",
                 "shasum": ""
             },
             "require": {
                 "doctrine/cache": "^1.0",
                 "doctrine/event-manager": "^1.0",
                 "ext-pdo": "*",
-                "php": "^7.1"
+                "php": "^7.2"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^5.0",
-                "jetbrains/phpstorm-stubs": "^2018.1.2",
-                "phpstan/phpstan": "^0.10.1",
-                "phpunit/phpunit": "^7.4",
-                "symfony/console": "^2.0.5|^3.0|^4.0",
-                "symfony/phpunit-bridge": "^3.4.5|^4.0.5"
+                "doctrine/coding-standard": "^6.0",
+                "jetbrains/phpstorm-stubs": "^2019.1",
+                "phpstan/phpstan": "^0.11.3",
+                "phpunit/phpunit": "^8.4.1",
+                "symfony/console": "^2.0.5|^3.0|^4.0|^5.0"
             },
             "suggest": {
                 "symfony/console": "For helpful console commands such as SQL execution and import of files."
@@ -1109,7 +1108,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.9.x-dev",
+                    "dev-master": "2.10.x-dev",
                     "dev-develop": "3.0.x-dev"
                 }
             },
@@ -1124,16 +1123,16 @@
             ],
             "authors": [
                 {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
                     "name": "Roman Borschel",
                     "email": "roman@code-factory.org"
                 },
                 {
                     "name": "Benjamin Eberlei",
                     "email": "kontakt@beberlei.de"
-                },
-                {
-                    "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com"
                 },
                 {
                     "name": "Jonathan Wage",
@@ -1145,14 +1144,25 @@
             "keywords": [
                 "abstraction",
                 "database",
+                "db2",
                 "dbal",
+                "mariadb",
+                "mssql",
                 "mysql",
-                "persistence",
+                "oci8",
+                "oracle",
+                "pdo",
                 "pgsql",
-                "php",
-                "queryobject"
+                "postgresql",
+                "queryobject",
+                "sasql",
+                "sql",
+                "sqlanywhere",
+                "sqlite",
+                "sqlserver",
+                "sqlsrv"
             ],
-            "time": "2018-12-31T03:27:51+00:00"
+            "time": "2019-11-03T16:50:43+00:00"
         },
         {
             "name": "doctrine/event-manager",
@@ -2104,16 +2114,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "2.5.0",
+            "version": "2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "39eaef720d082ecc54c64bf54541c55f10db546d"
+                "reference": "abbf18d5ab8367f96b3205ca3c89fb2fa598c69e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/39eaef720d082ecc54c64bf54541c55f10db546d",
-                "reference": "39eaef720d082ecc54c64bf54541c55f10db546d",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/abbf18d5ab8367f96b3205ca3c89fb2fa598c69e",
+                "reference": "abbf18d5ab8367f96b3205ca3c89fb2fa598c69e",
                 "shasum": ""
             },
             "require": {
@@ -2170,7 +2180,7 @@
                 "thumbnail",
                 "watermark"
             ],
-            "time": "2019-06-24T14:06:31+00:00"
+            "time": "2019-11-02T09:15:47+00:00"
         },
         {
             "name": "intervention/imagecache",
@@ -9835,16 +9845,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.15.3",
+            "version": "v2.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "705490b0f282f21017d73561e9498d2b622ee34c"
+                "reference": "ceaff36bee1ed3f1bbbedca36d2528c0826c336d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/705490b0f282f21017d73561e9498d2b622ee34c",
-                "reference": "705490b0f282f21017d73561e9498d2b622ee34c",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/ceaff36bee1ed3f1bbbedca36d2528c0826c336d",
+                "reference": "ceaff36bee1ed3f1bbbedca36d2528c0826c336d",
                 "shasum": ""
             },
             "require": {
@@ -9920,7 +9930,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2019-08-31T12:51:54+00:00"
+            "time": "2019-11-03T13:31:09+00:00"
         },
         {
             "name": "fzaninotto/faker",
