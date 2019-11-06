@@ -142,7 +142,7 @@ class Settings extends Model
      */
     public static function toTree($excludeUnsectioned = true): array
     {
-        $results = self::cursor();
+        $results = self::cursor()->remember();
 
         $tree = [];
         if (! empty($results)) {

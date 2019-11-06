@@ -23,7 +23,7 @@ class UserController extends BasePageController
         $meta_title = $title = 'User List';
 
         $roles = [];
-        $userRoles = Role::cursor();
+        $userRoles = Role::cursor()->remember();
         foreach ($userRoles as $userRole) {
             $roles[$userRole->id] = $userRole->name;
         }
@@ -100,7 +100,7 @@ class UserController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         //get the user roles
-        $userRoles = Role::cursor();
+        $userRoles = Role::cursor()->remember();
         $roles = [];
         $defaultRole = 'User';
         $defaultInvites = Invitation::DEFAULT_INVITES;

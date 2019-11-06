@@ -1,3 +1,5 @@
+2019-11-06 DariusIII
+	* Chg: Use the new remember() function for lazycollections
 2019-10-28 DariusIII
 	* Chg: Update tinyMCE to latest version
 	* Fix: Fix return value of searchSimilar when no results are found
