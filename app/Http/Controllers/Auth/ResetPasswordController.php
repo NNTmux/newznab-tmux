@@ -68,7 +68,7 @@ class ResetPasswordController extends Controller
                 $newpass = User::generatePassword();
                 User::updatePassword($ret['id'], $newpass);
 
-                $onscreen = 'Your password has been reset to <strong>' . $newpass . '</strong> and sent to your e-mail address.';
+                $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
                 SendPasswordResetEmail::dispatch($ret, $newpass);
                 $confirmed = true;
             }
