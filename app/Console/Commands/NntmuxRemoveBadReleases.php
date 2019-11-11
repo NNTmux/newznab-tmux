@@ -50,6 +50,6 @@ class NntmuxRemoveBadReleases extends Command
             $count++;
         }
 
-        $this->output('Updated '.$count.' bad releases');
+        $this->info('Updated '.$count.' bad releases');
     }
 }
