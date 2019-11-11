@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('disposable:update')->weekly();
         $schedule->command('clean:directories')->hourly()->withoutOverlapping();
-        $schedule->command('nntmux:delete-unverified-users')->twiceDaily(1, 13)->emailOutputTo();
+        $schedule->command('nntmux:delete-unverified-users')->twiceDaily(1, 13);
         $schedule->command('nntmux:update-expired-roles')->daily();
         $schedule->command('nntmux:remove-bad')->hourly()->withoutOverlapping();
         $schedule->command('telescope:prune')->daily();
