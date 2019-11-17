@@ -321,25 +321,25 @@
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
-            "version": "1.1.1",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/canihavesomecoffee/theTVDbAPI.git",
-                "reference": "cb6979abf12675b9d6ae78bdf5f0cfde67447416"
+                "reference": "562e8c90b660a44c416044d3b82d03d87a579fbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/cb6979abf12675b9d6ae78bdf5f0cfde67447416",
-                "reference": "cb6979abf12675b9d6ae78bdf5f0cfde67447416",
+                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/562e8c90b660a44c416044d3b82d03d87a579fbf",
+                "reference": "562e8c90b660a44c416044d3b82d03d87a579fbf",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "guzzlehttp/guzzle": "^6.2",
+                "guzzlehttp/guzzle": "^6.4",
                 "php": ">=7.2",
-                "symfony/property-access": "^3.3",
-                "symfony/property-info": "^3.3",
-                "symfony/serializer": "^3.2"
+                "symfony/property-access": "^3.4",
+                "symfony/property-info": "^3.4",
+                "symfony/serializer": "^3.4"
             },
             "require-dev": {
                 "phpunit/phpunit": "^8"
@@ -361,7 +361,7 @@
                 }
             ],
             "description": "PHP implementation for the 2nd version of the TheTVDb API.",
-            "time": "2019-11-03T17:20:36+00:00"
+            "time": "2019-11-17T10:12:33+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -999,16 +999,16 @@
         },
         {
             "name": "doctrine/cache",
-            "version": "1.9.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "c15dcd24b756f9e52ea7c3ae8227354f3628f11a"
+                "reference": "89a5c76c39c292f7798f964ab3c836c3f8192a55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/c15dcd24b756f9e52ea7c3ae8227354f3628f11a",
-                "reference": "c15dcd24b756f9e52ea7c3ae8227354f3628f11a",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/89a5c76c39c292f7798f964ab3c836c3f8192a55",
+                "reference": "89a5c76c39c292f7798f964ab3c836c3f8192a55",
                 "shasum": ""
             },
             "require": {
@@ -1078,7 +1078,7 @@
                 "riak",
                 "xcache"
             ],
-            "time": "2019-11-11T10:31:52+00:00"
+            "time": "2019-11-15T14:31:57+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -9138,16 +9138,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "4.5.5",
+            "version": "4.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/captainhook.git",
-                "reference": "b45d24fc55c67aa20784fc18b77006d51960d766"
+                "reference": "df18f103a26c03564931ecc56ddccaade80f7ef0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/b45d24fc55c67aa20784fc18b77006d51960d766",
-                "reference": "b45d24fc55c67aa20784fc18b77006d51960d766",
+                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/df18f103a26c03564931ecc56ddccaade80f7ef0",
+                "reference": "df18f103a26c03564931ecc56ddccaade80f7ef0",
                 "shasum": ""
             },
             "require": {
@@ -9204,7 +9204,7 @@
                 "pre-push",
                 "prepare-commit-msg"
             ],
-            "time": "2019-11-12T13:30:54+00:00"
+            "time": "2019-11-13T14:57:26+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -9683,16 +9683,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.11.2",
+            "version": "1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "862cbc2dfffa1fa28b47822a116e5b2e03b421db"
+                "reference": "67736a01597b9e08f00a1fc8966b92b918dba5ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/862cbc2dfffa1fa28b47822a116e5b2e03b421db",
-                "reference": "862cbc2dfffa1fa28b47822a116e5b2e03b421db",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/67736a01597b9e08f00a1fc8966b92b918dba5ea",
+                "reference": "67736a01597b9e08f00a1fc8966b92b918dba5ea",
                 "shasum": ""
             },
             "require": {
@@ -9750,7 +9750,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2019-10-13T10:42:06+00:00"
+            "time": "2019-11-14T10:51:35+00:00"
         },
         {
             "name": "facade/ignition-contracts",
@@ -9948,16 +9948,16 @@
         },
         {
             "name": "fzaninotto/faker",
-            "version": "v1.8.0",
+            "version": "v1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "f72816b43e74063c8b10357394b6bba8cb1c10de"
+                "reference": "27a216cbe72327b2d6369fab721a5843be71e57d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/f72816b43e74063c8b10357394b6bba8cb1c10de",
-                "reference": "f72816b43e74063c8b10357394b6bba8cb1c10de",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/27a216cbe72327b2d6369fab721a5843be71e57d",
+                "reference": "27a216cbe72327b2d6369fab721a5843be71e57d",
                 "shasum": ""
             },
             "require": {
@@ -9966,13 +9966,11 @@
             "require-dev": {
                 "ext-intl": "*",
                 "phpunit/phpunit": "^4.8.35 || ^5.7",
-                "squizlabs/php_codesniffer": "^1.5"
+                "squizlabs/php_codesniffer": "^2.9.2"
             },
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "1.8-dev"
-                }
+                "branch-alias": []
             },
             "autoload": {
                 "psr-4": {
@@ -9994,7 +9992,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2018-07-12T10:23:15+00:00"
+            "time": "2019-11-14T13:13:06+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
