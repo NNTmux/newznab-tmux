@@ -103,19 +103,6 @@ class AniDB
     }
 
     /**
-     * @param $id
-     * @param $type
-     * @param $lang
-     * @param $title
-     *
-     * @return array
-     */
-    private function checkDuplicateDbEntry($id, $type, $lang, $title)
-    {
-        return AnidbTitle::query()->where(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title])->first(['anidbid'])->toArray();
-    }
-
-    /**
      * @param $anidbId
      *
      * @return array|false
@@ -258,9 +245,9 @@ class AniDB
      */
     private function insertAniDb($id, $type, $lang, $title): void
     {
-        $check = $this->checkDuplicateDbEntry($id, $type, $lang, $title);
+        $check = AnidbTitle::query()->where(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title])->first();
 
-        if ($check === false) {
+        if ($check === null) {
             AnidbTitle::insertOrIgnore(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title]);
         } else {
             $this->colorCli->warning("Duplicate: $id");
