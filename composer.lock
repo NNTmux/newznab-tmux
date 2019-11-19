@@ -2784,16 +2784,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.5.1",
+            "version": "v6.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "e47180500498cf8aa2a8ffb59a3b4daa007fa13d"
+                "reference": "cca8906654e72d7bb118c3c18bb55e74c109a766"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/e47180500498cf8aa2a8ffb59a3b4daa007fa13d",
-                "reference": "e47180500498cf8aa2a8ffb59a3b4daa007fa13d",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/cca8906654e72d7bb118c3c18bb55e74c109a766",
+                "reference": "cca8906654e72d7bb118c3c18bb55e74c109a766",
                 "shasum": ""
             },
             "require": {
@@ -2926,20 +2926,20 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-11-12T15:20:18+00:00"
+            "time": "2019-11-19T14:52:01+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.4.2",
+            "version": "v3.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "d3bbfd72413357a5c509b67eee93b67a5a94ba65"
+                "reference": "37226dd66318014fac20351b4cc7ca209dd4ccb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/d3bbfd72413357a5c509b67eee93b67a5a94ba65",
-                "reference": "d3bbfd72413357a5c509b67eee93b67a5a94ba65",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/37226dd66318014fac20351b4cc7ca209dd4ccb6",
+                "reference": "37226dd66318014fac20351b4cc7ca209dd4ccb6",
                 "shasum": ""
             },
             "require": {
@@ -2995,7 +2995,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-10-21T13:46:02+00:00"
+            "time": "2019-11-19T16:23:21+00:00"
         },
         {
             "name": "laravel/scout",
@@ -4628,16 +4628,16 @@
         },
         {
             "name": "pear/pear",
-            "version": "v1.10.9",
+            "version": "v1.10.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core.git",
-                "reference": "82be5c2eed1dde9def0a84cc3420778b8b0ab9b8"
+                "reference": "fda04666873ec0fe2b4e5843f8f77cce88f7bb28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core/zipball/82be5c2eed1dde9def0a84cc3420778b8b0ab9b8",
-                "reference": "82be5c2eed1dde9def0a84cc3420778b8b0ab9b8",
+                "url": "https://api.github.com/repos/pear/pear-core/zipball/fda04666873ec0fe2b4e5843f8f77cce88f7bb28",
+                "reference": "fda04666873ec0fe2b4e5843f8f77cce88f7bb28",
                 "shasum": ""
             },
             "require": {
@@ -4673,14 +4673,14 @@
             ],
             "authors": [
                 {
-                    "name": "Helgi Thormar",
-                    "email": "dufuz@php.net",
+                    "name": "Greg Beaver",
+                    "email": "cellog@php.net",
                     "role": "Lead"
                 },
                 {
-                    "name": "Martin Jansen",
-                    "email": "mj@php.net",
-                    "role": "Helper"
+                    "name": "Pierre-Alain Joye",
+                    "email": "pierre@php.net",
+                    "role": "Lead"
                 },
                 {
                     "name": "Stig Bakken",
@@ -4688,8 +4688,13 @@
                     "role": "Lead"
                 },
                 {
-                    "name": "Pierre-Alain Joye",
-                    "email": "pierre@php.net",
+                    "name": "Tomas V.V.Cox",
+                    "email": "cox@idecnet.com",
+                    "role": "Lead"
+                },
+                {
+                    "name": "Helgi Thormar",
+                    "email": "dufuz@php.net",
                     "role": "Lead"
                 },
                 {
@@ -4708,18 +4713,13 @@
                     "role": "Helper"
                 },
                 {
-                    "name": "Greg Beaver",
-                    "email": "cellog@php.net",
-                    "role": "Lead"
-                },
-                {
-                    "name": "Tomas V.V.Cox",
-                    "email": "cox@idecnet.com",
-                    "role": "Lead"
+                    "name": "Martin Jansen",
+                    "email": "mj@php.net",
+                    "role": "Helper"
                 }
             ],
             "description": "This is the definitive source of PEAR's core files.",
-            "time": "2019-03-13T17:59:48+00:00"
+            "time": "2019-11-19T18:59:16+00:00"
         },
         {
             "name": "pear/structures_graph",
@@ -6384,16 +6384,16 @@
         },
         {
             "name": "spatie/laravel-fractal",
-            "version": "5.6.0",
+            "version": "5.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-fractal.git",
-                "reference": "21704e4a2cf62d9c2b981395fa5b15bd06848ed5"
+                "reference": "f8688094e15cea06cc233bc5e2e62d169f656eae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/21704e4a2cf62d9c2b981395fa5b15bd06848ed5",
-                "reference": "21704e4a2cf62d9c2b981395fa5b15bd06848ed5",
+                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/f8688094e15cea06cc233bc5e2e62d169f656eae",
+                "reference": "f8688094e15cea06cc233bc5e2e62d169f656eae",
                 "shasum": ""
             },
             "require": {
@@ -6448,7 +6448,7 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2019-09-04T07:02:37+00:00"
+            "time": "2019-11-19T17:21:37+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -9629,16 +9629,16 @@
         },
         {
             "name": "facade/flare-client-php",
-            "version": "1.1.2",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/flare-client-php.git",
-                "reference": "04c0bbd1881942f59e27877bac3b29ba57519666"
+                "reference": "5a1bfe4425974d17addeefce737d66a4c921a8df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/flare-client-php/zipball/04c0bbd1881942f59e27877bac3b29ba57519666",
-                "reference": "04c0bbd1881942f59e27877bac3b29ba57519666",
+                "url": "https://api.github.com/repos/facade/flare-client-php/zipball/5a1bfe4425974d17addeefce737d66a4c921a8df",
+                "reference": "5a1bfe4425974d17addeefce737d66a4c921a8df",
                 "shasum": ""
             },
             "require": {
@@ -9679,7 +9679,7 @@
                 "flare",
                 "reporting"
             ],
-            "time": "2019-11-08T11:11:17+00:00"
+            "time": "2019-11-19T08:42:39+00:00"
         },
         {
             "name": "facade/ignition",
