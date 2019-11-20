@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a53e969c125bf15d8a70a913fdb10b7f",
+    "content-hash": "d4a4fc9636f52a79f2542aa67c1187d6",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -4536,16 +4536,16 @@
         },
         {
             "name": "pear/console_getopt",
-            "version": "v1.4.2",
+            "version": "v1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Console_Getopt.git",
-                "reference": "6c77aeb625b32bd752e89ee17972d103588b90c0"
+                "reference": "a41f8d3e668987609178c7c4a9fe48fecac53fa0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Console_Getopt/zipball/6c77aeb625b32bd752e89ee17972d103588b90c0",
-                "reference": "6c77aeb625b32bd752e89ee17972d103588b90c0",
+                "url": "https://api.github.com/repos/pear/Console_Getopt/zipball/a41f8d3e668987609178c7c4a9fe48fecac53fa0",
+                "reference": "a41f8d3e668987609178c7c4a9fe48fecac53fa0",
                 "shasum": ""
             },
             "type": "library",
@@ -4563,11 +4563,6 @@
             ],
             "authors": [
                 {
-                    "name": "Greg Beaver",
-                    "email": "cellog@php.net",
-                    "role": "Helper"
-                },
-                {
                     "name": "Andrei Zmievski",
                     "email": "andrei@php.net",
                     "role": "Lead"
@@ -4576,10 +4571,15 @@
                     "name": "Stig Bakken",
                     "email": "stig@php.net",
                     "role": "Developer"
+                },
+                {
+                    "name": "Greg Beaver",
+                    "email": "cellog@php.net",
+                    "role": "Helper"
                 }
             ],
             "description": "More info available on: http://pear.php.net/package/Console_Getopt",
-            "time": "2019-02-06T16:52:33+00:00"
+            "time": "2019-11-20T18:27:48+00:00"
         },
         {
             "name": "pear/net_nntp",
@@ -8671,16 +8671,16 @@
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
-            "version": "v1.1.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wandersonwhcr/illuminate-romans.git",
-                "reference": "e3bf1263844b2249155e65c5e099d00a61be4365"
+                "reference": "3dd16a44ef6bb024c27dd30616e6f8a3d22c5103"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wandersonwhcr/illuminate-romans/zipball/e3bf1263844b2249155e65c5e099d00a61be4365",
-                "reference": "e3bf1263844b2249155e65c5e099d00a61be4365",
+                "url": "https://api.github.com/repos/wandersonwhcr/illuminate-romans/zipball/3dd16a44ef6bb024c27dd30616e6f8a3d22c5103",
+                "reference": "3dd16a44ef6bb024c27dd30616e6f8a3d22c5103",
                 "shasum": ""
             },
             "require": {
@@ -8736,7 +8736,7 @@
                 "roman-numeral",
                 "validator"
             ],
-            "time": "2019-09-09T22:20:53+00:00"
+            "time": "2019-09-09T22:52:05+00:00"
         },
         {
             "name": "wandersonwhcr/romans",
@@ -11266,12 +11266,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-coveralls/php-coveralls.git",
-                "reference": "aac1422361590cdea44532d083fac656e624d2bc"
+                "reference": "3e6420fa666ef7bae5e750ddeac903153e193bae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-coveralls/php-coveralls/zipball/aac1422361590cdea44532d083fac656e624d2bc",
-                "reference": "aac1422361590cdea44532d083fac656e624d2bc",
+                "url": "https://api.github.com/repos/php-coveralls/php-coveralls/zipball/3e6420fa666ef7bae5e750ddeac903153e193bae",
+                "reference": "3e6420fa666ef7bae5e750ddeac903153e193bae",
                 "shasum": ""
             },
             "require": {
