@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.1 (2019-10-28)
+ * Version: 5.1.2 (2019-11-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -77,21 +77,37 @@
     };
     var Conversions = { blobToBase64: blobToBase64 };
 
-    var pickFile = function () {
+    var global$2 = tinymce.util.Tools.resolve('tinymce.Env');
+
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+
+    var pickFile = function (editor) {
       return new global$1(function (resolve) {
-        var fileInput;
-        fileInput = domGlobals.document.createElement('input');
+        var fileInput = domGlobals.document.createElement('input');
         fileInput.type = 'file';
         fileInput.style.position = 'fixed';
-        fileInput.style.left = 0;
-        fileInput.style.top = 0;
-        fileInput.style.opacity = 0.001;
+        fileInput.style.left = '0';
+        fileInput.style.top = '0';
+        fileInput.style.opacity = '0.001';
         domGlobals.document.body.appendChild(fileInput);
-        fileInput.onchange = function (e) {
+        var changeHandler = function (e) {
           resolve(Array.prototype.slice.call(e.target.files));
         };
+        fileInput.addEventListener('change', changeHandler);
+        var cancelHandler = function (e) {
+          var cleanup = function () {
+            resolve([]);
+            fileInput.parentNode.removeChild(fileInput);
+          };
+          if (global$2.os.isAndroid() && e.type !== 'remove') {
+            global$3.setEditorTimeout(editor, cleanup, 0);
+          } else {
+            cleanup();
+          }
+          editor.off('focusin remove', cancelHandler);
+        };
+        editor.on('focusin remove', cancelHandler);
         fileInput.click();
-        fileInput.parentNode.removeChild(fileInput);
       });
     };
     var Picker = { pickFile: pickFile };
@@ -101,11 +117,13 @@
         icon: 'image',
         tooltip: 'Insert image',
         onAction: function () {
-          Picker.pickFile().then(function (files) {
-            var blob = files[0];
-            Conversions.blobToBase64(blob).then(function (base64) {
-              Actions.insertBlob(editor, base64, blob);
-            });
+          Picker.pickFile(editor).then(function (files) {
+            if (files.length > 0) {
+              var blob_1 = files[0];
+              Conversions.blobToBase64(blob_1).then(function (base64) {
+                Actions.insertBlob(editor, base64, blob_1);
+              });
+            }
           });
         }
       });

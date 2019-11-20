@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.1 (2019-10-28)
+ * Version: 5.1.2 (2019-11-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -2117,9 +2117,15 @@
       return function (evt) {
         if (hasSelectedContent(editor)) {
           setClipboardData(evt, getData(editor), fallback(editor), function () {
-            global$3.setTimeout(function () {
+            if (global$2.browser.isChrome()) {
+              var rng_1 = editor.selection.getRng();
+              global$3.setEditorTimeout(editor, function () {
+                editor.selection.setRng(rng_1);
+                editor.execCommand('Delete');
+              }, 0);
+            } else {
               editor.execCommand('Delete');
-            }, 0);
+            }
           });
         }
       };

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.1 (2019-10-28)
+ * Version: 5.1.2 (2019-11-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -949,11 +949,9 @@
       domGlobals.window.scrollTo(pos.x, pos.y);
     };
     var visualViewport = domGlobals.window['visualViewport'];
-    var isSafari$1 = global$2.browser.isSafari();
-    var viewportUpdate = !isSafari$1 || visualViewport === undefined ? {
+    var viewportUpdate = visualViewport === undefined ? {
       bind: noop,
-      unbind: noop,
-      update: noop
+      unbind: noop
     } : function () {
       var editorContainer = value();
       var refreshScroll = function () {

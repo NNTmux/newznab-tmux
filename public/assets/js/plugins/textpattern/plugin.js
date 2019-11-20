@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.1 (2019-10-28)
+ * Version: 5.1.2 (2019-11-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -820,22 +820,8 @@
         return has(format, 'block');
       });
     };
-    var isInlinePattern$1 = function (pattern) {
-      return has(pattern, 'end');
-    };
     var isReplacementPattern = function (pattern) {
       return pattern.start.length === 0;
-    };
-    var findPattern = function (patterns, text) {
-      return find(patterns, function (pattern) {
-        if (text.indexOf(pattern.start) !== 0) {
-          return false;
-        }
-        if (isInlinePattern$1(pattern) && pattern.end && text.lastIndexOf(pattern.end) !== text.length - pattern.end.length) {
-          return false;
-        }
-        return true;
-      });
     };
     var getParentBlock = function (editor, rng) {
       var parentBlockOpt = Option.from(editor.dom.getParent(rng.startContainer, editor.dom.isBlock));
@@ -1058,6 +1044,15 @@
         }
       });
       return true;
+    };
+    var findPattern = function (patterns, text) {
+      var nuText = text.replace('\xA0', ' ');
+      return find(patterns, function (pattern) {
+        if (text.indexOf(pattern.start) !== 0 && nuText.indexOf(pattern.start) !== 0) {
+          return false;
+        }
+        return true;
+      });
     };
     var findPatterns = function (editor, patterns) {
       var dom = editor.dom;

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.1 (2019-10-28)
+ * Version: 5.1.2 (2019-11-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -4968,7 +4968,7 @@
       });
     };
     var fireTableSelectionChange = function (editor, cells, start, finish, otherCells) {
-      editor.fire('tableselectionchange', {
+      editor.fire('TableSelectionChange', {
         cells: cells,
         start: start,
         finish: finish,
@@ -4976,7 +4976,7 @@
       });
     };
     var fireTableSelectionClear = function (editor) {
-      editor.fire('tableselectionclear');
+      editor.fire('TableSelectionClear');
     };
 
     var TableActions = function (editor, lazyWire) {
@@ -8545,6 +8545,23 @@
       var clearSelection = function () {
         clear(win);
       };
+      var collapseSelection = function (toStart) {
+        if (toStart === void 0) {
+          toStart = false;
+        }
+        get$a(win).each(function (sel) {
+          return sel.fold(function (rng) {
+            return rng.collapse(toStart);
+          }, function (startSitu, finishSitu) {
+            var situ = toStart ? startSitu : finishSitu;
+            setRelative(win, situ, situ);
+          }, function (start, soffset, finish, foffset) {
+            var node = toStart ? start : finish;
+            var offset = toStart ? soffset : foffset;
+            setExact(win, node, offset, node, offset);
+          });
+        });
+      };
       var selectContents = function (element) {
         setToElement(win, element);
       };
@@ -8572,6 +8589,7 @@
         fromSitus: fromSitus,
         situsFromPoint: situsFromPoint,
         clearSelection: clearSelection,
+        collapseSelection: collapseSelection,
         setSelection: setSelection,
         setRelativeSelection: setRelativeSelection,
         selectContents: selectContents,
@@ -8673,7 +8691,6 @@
         keyup: keyup
       };
     };
-    var platform$3 = detect$3();
     var external = function (win, container, isRoot, annotations) {
       var bridge = WindowBridge(win);
       return function (start, finish) {
@@ -8681,11 +8698,8 @@
         CellSelection.identify(start, finish, isRoot).each(function (cellSel) {
           var boxes = cellSel.boxes().getOr([]);
           annotations.selectRange(container, boxes, cellSel.start(), cellSel.finish());
-          if (platform$3.deviceType.isTouch()) {
-            bridge.clearSelection();
-          } else {
-            bridge.selectContents(finish);
-          }
+          bridge.selectContents(finish);
+          bridge.collapseSelection();
         });
       };
     };
@@ -8862,7 +8876,7 @@
         var hasShiftKey = function (event) {
           return event.raw().shiftKey === true;
         };
-        editor.on('tableselectorchange', function (e) {
+        editor.on('TableSelectorChange', function (e) {
           external(e.start, e.finish);
         });
         var handleResponse = function (event, response) {
@@ -9069,7 +9083,7 @@
           return targets.unmergable().isNone();
         });
       };
-      editor.on('NodeChange', resetTargets);
+      editor.on('NodeChange TableSelectorChange', resetTargets);
       return {
         onSetupTable: onSetupTable,
         onSetupCellOrRow: onSetupCellOrRow,
@@ -9087,7 +9101,7 @@
         tooltip: 'Table',
         icon: 'table',
         fetch: function (callback) {
-          return callback('inserttable tableprops deletetable | cell row column');
+          return callback('inserttable | cell row column | advtablesort | tableprops deletetable');
         }
       });
       var cmd = function (command) {
@@ -9400,16 +9414,11 @@
             if (name(targets.element()) === 'caption') {
               return 'tableprops deletetable';
             } else {
-              return 'cell row column | tableprops deletetable';
+              return 'cell row column | advtablesort | tableprops deletetable';
             }
           });
         }
       });
-      return {
-        rowItems: rowItems,
-        columnItems: columnItems,
-        cellItems: cellItems
-      };
     };
     var MenuItems = { addMenuItems: addMenuItems };
 
@@ -9426,7 +9435,7 @@
       var sugarRows = map(rows, Element.fromDom);
       clipboardRows.set(Option.from(sugarRows));
     };
-    var getApi = function (editor, clipboardRows, resizeHandler, selectionTargets, menuItems) {
+    var getApi = function (editor, clipboardRows, resizeHandler, selectionTargets) {
       return {
         insertTable: function (columns, rows) {
           return InsertTable.insert(editor, columns, rows);
@@ -9438,7 +9447,6 @@
           return getClipboardRows(clipboardRows);
         },
         resizeHandler: resizeHandler,
-        menuItems: menuItems,
         selectionTargets: selectionTargets
       };
     };
@@ -9452,7 +9460,7 @@
       var clipboardRows = Cell(Option.none());
       Commands.registerCommands(editor, actions, cellSelection, selections, clipboardRows);
       Clipboard.registerEvents(editor, selections, actions, cellSelection);
-      var menuItems = MenuItems.addMenuItems(editor, selectionTargets);
+      MenuItems.addMenuItems(editor, selectionTargets);
       Buttons.addButtons(editor, selectionTargets);
       Buttons.addToolbars(editor);
       editor.on('PreInit', function () {
@@ -9468,7 +9476,7 @@
         resizeHandler.destroy();
         cellSelection.destroy();
       });
-      return getApi(editor, clipboardRows, resizeHandler, selectionTargets, menuItems);
+      return getApi(editor, clipboardRows, resizeHandler, selectionTargets);
     }
     function Plugin$1 () {
       global.add('table', Plugin);

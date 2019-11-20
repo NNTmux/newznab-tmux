@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.1 (2019-10-28)
+ * Version: 5.1.2 (2019-11-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -32,6 +32,14 @@
             t[p[i]] = s[p[i]];
         }
       return t;
+    }
+    function __spreadArrays() {
+      for (var s = 0, i = 0, il = arguments.length; i < il; i++)
+        s += arguments[i].length;
+      for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+          r[k] = a[j];
+      return r;
     }
 
     var noop = function () {
@@ -248,21 +256,6 @@
     var has = function (obj, key) {
       return hasOwnProperty.call(obj, key);
     };
-
-    var touchstart = constant('touchstart');
-    var touchmove = constant('touchmove');
-    var touchend = constant('touchend');
-    var mousedown = constant('mousedown');
-    var mousemove = constant('mousemove');
-    var mouseup = constant('mouseup');
-    var mouseover = constant('mouseover');
-    var keydown = constant('keydown');
-    var keyup = constant('keyup');
-    var input = constant('input');
-    var change = constant('change');
-    var click = constant('click');
-    var transitionend = constant('transitionend');
-    var selectstart = constant('selectstart');
 
     var Cell = function (initial) {
       var value = initial;
@@ -766,6 +759,21 @@
       return platform.get();
     };
 
+    var touchstart = constant('touchstart');
+    var touchmove = constant('touchmove');
+    var touchend = constant('touchend');
+    var mousedown = constant('mousedown');
+    var mousemove = constant('mousemove');
+    var mouseup = constant('mouseup');
+    var mouseover = constant('mouseover');
+    var keydown = constant('keydown');
+    var keyup = constant('keyup');
+    var input = constant('input');
+    var change = constant('change');
+    var click = constant('click');
+    var transitionend = constant('transitionend');
+    var selectstart = constant('selectstart');
+
     var alloy = { tap: constant('alloy.tap') };
     var focus = constant('alloy.focus');
     var postBlur = constant('alloy.blur.post');
@@ -774,7 +782,9 @@
     var execute = constant('alloy.execute');
     var focusItem = constant('alloy.focus.item');
     var tap = alloy.tap;
-    var tapOrClick = detect$3().deviceType.isTouch() ? alloy.tap : click;
+    var tapOrClick = function () {
+      return detect$3().deviceType.isTouch() ? alloy.tap() : click();
+    };
     var longpress = constant('alloy.longpress');
     var systemInit = constant('alloy.system.init');
     var attachedToDom = constant('alloy.system.attached');
@@ -3122,27 +3132,25 @@
       prefix: constant(prefix)
     };
 
+    var pointerEvents = function () {
+      return [
+        run(tapOrClick(), function (component, simulatedEvent) {
+          simulatedEvent.stop();
+          emitExecute(component);
+        }),
+        cutter(detect$3().deviceType.isTouch() ? touchstart() : mousedown())
+      ];
+    };
     var events$2 = function (optAction) {
       var executeHandler = function (action) {
-        return run(execute(), function (component, simulatedEvent) {
+        return runOnExecute(function (component, simulatedEvent) {
           action(component);
           simulatedEvent.stop();
         });
       };
-      var onClick = function (component, simulatedEvent) {
-        simulatedEvent.stop();
-        emitExecute(component);
-      };
-      var onMousedown = function (component, simulatedEvent) {
-        simulatedEvent.cut();
-      };
-      var pointerEvents = detect$3().deviceType.isTouch() ? [run(tap(), onClick)] : [
-        run(click(), onClick),
-        run(mousedown(), onMousedown)
-      ];
       return derive(flatten([
         optAction.map(executeHandler).toArray(),
-        pointerEvents
+        pointerEvents()
       ]));
     };
 
@@ -7918,6 +7926,11 @@
             'alloy.base.behaviour',
             'item-type-events'
           ],
+          'touchstart': [
+            'focusing',
+            'alloy.base.behaviour',
+            'item-type-events'
+          ],
           'mouseover': [
             'item-type-events',
             'tooltipping'
@@ -8168,12 +8181,10 @@
               initialValue: detail.data
             }
           }),
-          config('item-type-events', [
-            run(tapOrClick(), emitExecute),
-            cutter(mousedown()),
+          config('item-type-events', __spreadArrays(pointerEvents(), [
             run(mouseover(), onHover),
             run(focusItem(), Focusing.focus)
-          ])
+          ]))
         ]),
         components: detail.components,
         eventOrder: detail.eventOrder
@@ -11570,6 +11581,7 @@
         'touchstart',
         'touchmove',
         'touchend',
+        'touchcancel',
         'gesturestart'
       ] : [
         'mousedown',
