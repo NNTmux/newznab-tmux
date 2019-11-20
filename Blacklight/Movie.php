@@ -974,12 +974,14 @@ class Movie
                         $ret['overview'] = $resp['overview'] ?? '';
                         $ret['tagline'] = $resp['tagline'] ?? '';
                         $ret['year'] = $resp['year'] ?? '';
+                        $ret['genres'] = $resp['genres'] ?? '';
 
                         if (isset($resp['title'])) {
                             $ret['title'] = $resp['title'];
                         } else {
                             return false;
                         }
+
                         if ($this->echooutput && Utility::isCLI()) {
                             $this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
