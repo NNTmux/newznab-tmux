@@ -18,7 +18,7 @@
 		<h1>{$animeTitle}
 			{if isset($isadmin)}
 				<a class="btn btn-xs btn-warning" title="Edit AniDB data"
-				   href="{{(url(")/admin/anidb-edit/{$animeAnidbid}")}}">Edit</a>
+				   href="{{url("/admin/anidb-edit/{$animeAnidbid}")}}">Edit</a>
 			{/if}
 		</h1>
 		{if animePicture != ''}

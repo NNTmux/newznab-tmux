@@ -1,3 +1,5 @@
+2019-11-20 DariusIII
+	* Fix: Fix wrong url string in viewanime template
 2019-11-19 DariusIII
 	* Fix: Fix duplicate check in Blacklight/db/populate/AniDB class
 2019-11-06 DariusIII
