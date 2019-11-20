@@ -12,7 +12,6 @@ use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
  */
 class TVDB extends TV
 {
-    private const TVDB_IMAGES_URL = 'https://www.thetvdb.com/banners';
     private const TVDB_API_KEY = '31740C28BAC74DEF';
     private const MATCH_PROBABILITY = 75;
 
@@ -57,7 +56,7 @@ class TVDB extends TV
         // Check if we can get the time for API status
         // If we can't then we set local to true
         try {
-            $this->token = $this->client->authentication()->login(self::TVDB_API_KEY);
+            $this->token = $this->client->authentication()->login(config('tvdb.api_key'));
         } catch (UnauthorizedException $error) {
             $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
             $this->local = true;

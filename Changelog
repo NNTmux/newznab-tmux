@@ -1,4 +1,5 @@
 2019-11-20 DariusIII
+	* Chg: Move TVDB apikey to .env
 	* Fix: Fix Trakt genres error
 	* Fix: Fix wrong url string in viewanime template
 2019-11-19 DariusIII
