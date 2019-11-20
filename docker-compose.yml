@@ -27,7 +27,7 @@ services:
     build:
       context: .
     restart: unless-stopped
-    #command: bash -c "apachectl -D FOREGROUND & sudo -E -u notroot screen -d -m php artisan tmux-ui:start"
+    container_name: nn-tmux
     command: apachectl -D FOREGROUND
     volumes:
       - /var/www/NNTmux/vendor/
@@ -44,8 +44,9 @@ services:
       - manticore
   nn-tmux-ui:
     <<: *nn-tmux
+    container_name: nn-tmux-ui
     stdin_open: true
     tty: true
     command: sudo -E -u notroot php artisan tmux-ui:start
     ports:
-      - 127.0.0.1:23323:23342
+      - 127.0.0.1:12345:12345

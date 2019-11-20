@@ -95,7 +95,13 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
   docker-compose up nn-tmux
   # check the logs, if everything is working fine ctrl + c
   # start and run in background
-  docker-compose up nn-tmux -d
+  docker-compose up -d nn-tmux
+  # start the automatic import
+  docker-compose up -d nn-tmux-ui
+  # check the monitor tmux
+  docker exec -it nn-tmux-ui bash
+  root@:/var/www/NNTmux# sudo -E -u notroot tmux attach
+
 ```
 ### Support
 
