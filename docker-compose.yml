@@ -1,0 +1,46 @@
+version: '3.4'
+services:
+  redis:
+    image: redis:5
+    volumes:
+      - ./docker/redis-data;/data
+      - ./docker/redis.conf:/usr/local/etc/redis/redis.conf
+  manticore:
+    image: manticoresearch/manticore:3
+    volumes:
+      - ./docker/manticore-data;/var/lib/manticore/data
+      - ./docker/sphinx.conf:/etc/sphinxsearch/sphinx.conf
+  mariadb:
+    image: mariadb:10
+    restart: unless-stopped
+    volumes:
+      - ./docker/my.cnf:/etc/mysql/conf.d/newsnab-tmux.cnf
+      - ./docker/mariadb-data:/var/lib/mysql
+      - .:/var/www/NNTmux/
+    ports:
+      - 53306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ilmdvV8H
+      MYSQL_DATABASE: nntmux
+      MYSQL_USER: nntmux
+      MYSQL_PASSWORD: Nntmux!
+      TZ: ${APP_TZ}
+  nn-tmux:
+    build:
+      context: .
+    restart: unless-stopped
+    command: bash -c "apachectl -D FOREGROUND & sudo -E -u notroot screen -d -m php artisan tmux-ui:start"
+    #command: apachectl -D FOREGROUND
+    volumes:
+      - /var/www/NNTmux/vendor/
+      - .:/var/www/NNTmux/
+    env_file: .env
+    ports:
+      - 8089:80
+    environment:
+      MYSQL_ROOT_PASSWORD: ilmdvV8H
+      TZ: ${APP_TZ}
+    depends_on:
+      - mariadb
+      - redis
+      - manticore
