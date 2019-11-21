@@ -1,4 +1,5 @@
 2019-11-21 DariusIII
+	* Fix: Fix issue that prevented adding tv series aliases
 	* Fix: Fix TVDB poster URL
 	* Chg: Set default value for posterUrl for TV processing
 2019-11-20 DariusIII

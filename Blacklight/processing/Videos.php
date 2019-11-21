@@ -318,6 +318,6 @@ abstract class Videos
             }
         }
 
-        return empty($return) ? false : $return;
+        return $return->isEmpty() ? false : $return;
     }
 }
