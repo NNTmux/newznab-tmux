@@ -22,9 +22,9 @@ class TVMaze extends TV
     public $client;
 
     /**
-     * @var string The URL for the medium sized image for poster
+     * @string URL for show poster art
      */
-    public $posterUrl;
+    public $posterUrl = '';
 
     /**
      * TVMaze constructor.

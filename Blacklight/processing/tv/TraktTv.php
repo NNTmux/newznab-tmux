@@ -27,11 +27,9 @@ class TraktTv extends TV
     public $time;
 
     /**
-     * The URL to grab the TV poster.
-     *
-     * @var string
+     * @string URL for show poster art
      */
-    public $posterUrl;
+    public $posterUrl = '';
 
     /**
      * The URL to grab the TV fanart.

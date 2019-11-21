@@ -15,9 +15,9 @@ class TMDB extends TV
     protected const MATCH_PROBABILITY = 75;
 
     /**
-     * @var string The URL for the image for poster
+     * @string URL for show poster art
      */
-    public $posterUrl;
+    public $posterUrl = '';
     /**
      * @var ApiToken
      */
