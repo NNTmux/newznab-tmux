@@ -381,7 +381,7 @@ class TVDB extends TV
     {
         try {
             $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
-            $this->posterUrl = $poster[0]->thumbnail ? self::TVDB_POSTER_URL.$poster[0]->thumbnail : '';
+            $this->posterUrl = ! empty($poster[0]->thumbnail) ? self::TVDB_POSTER_URL.$poster[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
