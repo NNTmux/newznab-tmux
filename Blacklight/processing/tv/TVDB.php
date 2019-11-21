@@ -12,7 +12,7 @@ use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
  */
 class TVDB extends TV
 {
-    private const TVDB_API_KEY = '31740C28BAC74DEF';
+    private const TVDB_POSTER_URL = 'https://artworks.thetvdb.com';
     private const MATCH_PROBABILITY = 75;
 
     /**
@@ -381,14 +381,14 @@ class TVDB extends TV
     {
         try {
             $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
-            $this->posterUrl = $poster[0]->thumbnail ?? '';
+            $this->posterUrl = $poster[0]->thumbnail ? self::TVDB_POSTER_URL.$poster[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
             $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
-            $this->fanartUrl = $fanart[0]->thumbnail ?? '';
+            $this->fanartUrl = $fanart[0]->thumbnail ? self::TVDB_POSTER_URL.$fanart[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
@@ -402,8 +402,8 @@ class TVDB extends TV
             'summary'   => (string) $show->overview,
             'started'   => $show->firstAired,
             'publisher' => (string) $show->network,
-            'poster'    => $poster[0]->thumbnail ?? '',
-            'fanart'    => $fanart[0]->thumbnail ?? '',
+            'poster'    => $this->posterUrl,
+            'fanart'    => $this->fanartUrl,
             'source'    => parent::SOURCE_TVDB,
             'imdb'      => (int) ($imdb['imdbid'] ?? 0),
             'tvdb'      => (int) $show->id,

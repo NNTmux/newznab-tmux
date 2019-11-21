@@ -1,4 +1,5 @@
 2019-11-21 DariusIII
+	* Fix: Fix TVDB poster URL
 	* Chg: Set default value for posterUrl for TV processing
 2019-11-20 DariusIII
 	* Chg: Move TVDB apikey to .env
