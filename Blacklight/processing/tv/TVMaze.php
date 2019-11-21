@@ -76,7 +76,7 @@ class TVMaze extends TV
 
             foreach ($res as $row) {
                 $tvMazeId = false;
-                $this->posterUrl = $this->fanartUrl = '';
+                $this->posterUrl = '';
 
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
