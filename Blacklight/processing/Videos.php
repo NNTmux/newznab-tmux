@@ -292,10 +292,10 @@ abstract class Videos
     /**
      * Retrieves all aliases for given VideoID or VideoID for a given alias.
      *
-     * @param int    $videoId
-     * @param string $alias
      *
-     * @return \PDOStatement|false
+     * @param $videoId
+     * @param string $alias
+     * @return VideoAlias[]|bool|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getAliases($videoId, $alias = '')
     {
