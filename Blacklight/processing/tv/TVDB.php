@@ -89,6 +89,7 @@ class TVDB extends TV
 
         foreach ($res as $row) {
             $tvDbId = false;
+            $this->posterUrl = $this->fanartUrl = '';
 
             // Clean the show name for better match probability
             $release = $this->parseInfo($row['searchname']);

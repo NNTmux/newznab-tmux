@@ -99,6 +99,7 @@ class TMDB extends TV
 
             foreach ($res as $row) {
                 $tmdbid = false;
+                $this->posterUrl = '';
 
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);

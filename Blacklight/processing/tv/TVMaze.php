@@ -76,6 +76,7 @@ class TVMaze extends TV
 
             foreach ($res as $row) {
                 $tvMazeId = false;
+                $this->posterUrl = $this->fanartUrl = '';
 
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
@@ -319,7 +320,7 @@ class TVMaze extends TV
         $hasCover = 0;
 
         // Try to get the Poster
-        if (! empty($this->posterUrl)) {
+        if (! empty( v )) {
             $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
 
             // Mark it retrieved if we saved an image
