@@ -283,7 +283,7 @@ abstract class Videos
                 $check = $this->getAliases(0, $title);
 
                 if ($check === false) {
-                    VideoAlias::insertOrIgnore(['videos_id' => $videoId, 'title' => $title]);
+                    VideoAlias::insertOrIgnore(['videos_id' => $videoId, 'title' => $title, 'created_at' => now(), 'updated_at' => now()]);
                 }
             }
         }
