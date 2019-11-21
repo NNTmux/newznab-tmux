@@ -12,7 +12,7 @@ use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
  */
 class TVDB extends TV
 {
-    private const TVDB_POSTER_URL = 'https://artworks.thetvdb.com';
+    private const TVDB_POSTER_URL = 'https://artworks.thetvdb.com/banners/';
     private const MATCH_PROBABILITY = 75;
 
     /**
