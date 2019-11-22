@@ -547,6 +547,8 @@ class Movie
         }
 
         MovieInfo::fromQuery($query[0].') '.$query[1].') '.$query[2]);
+
+        return true;
     }
 
     /**
@@ -731,7 +733,7 @@ class Movie
                 );
         }
 
-        return (int) $movieID > 0;
+        return $movieID;
     }
 
     /**
