@@ -1234,7 +1234,11 @@ class Movie
                 if ($movieUpdated === false) {
                     $omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
                     if ($this->omdbapikey !== null) {
-                        $buffer = $this->omdbApi->search($omdbTitle, 'movie');
+                        if ($this->currentYear != null) {
+                            $buffer = $this->omdbApi->search($omdbTitle, 'movie', $this->currentYear);
+                        } else {
+                            $buffer = $this->omdbApi->search($omdbTitle, 'movie');
+                        }
 
                         if (\is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response === 'True') {
                             $getIMDBid = $buffer->data->Search[0]->imdbID;
