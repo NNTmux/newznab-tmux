@@ -254,7 +254,10 @@ abstract class Videos
             if ($source > 0) {
                 $sql->where('source', $source);
             }
-            $return = $sql->first()->value('id');
+            $query = $sql->first();
+            if (! empty($query)) {
+                $return = $query->value('id');
+            }
             // Try for an alias
             if (empty($return)) {
                 $sql = Video::query()
@@ -264,7 +267,10 @@ abstract class Videos
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
                 }
-                $return = $sql->first()->value('videos.id');
+                $query = $sql->first();
+                if (! empty($query)) {
+                    $return = $query->value('videos.id');
+                }
             }
         }
 
