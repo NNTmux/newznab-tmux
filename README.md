@@ -100,7 +100,10 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
   docker-compose up -d nn-tmux-ui
   # check the monitor tmux
   docker exec -it nn-tmux-ui bash
-  root@:/var/www/NNTmux# sudo -E -u notroot tmux attach
+  # attach
+  root@:/var/www/NNTmux# sudo -E -u notroot tmux attach -d
+  # stop
+  root@:/var/www/NNTmux# sudo -E -u notroot php artisan tmux-ui:stop --kill
 
 ```
 ### Support

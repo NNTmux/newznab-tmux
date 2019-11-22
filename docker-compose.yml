@@ -49,6 +49,11 @@ services:
     container_name: nn-tmux-ui
     stdin_open: true
     tty: true
+    environment:
+      MYSQL_ROOT_PASSWORD: ilmdvV8H
+      TZ: ${APP_TZ}
+      COLUMNS: "`tput cols`"
+      LINES: "`tput lines`"
     command: sudo -E -u notroot php artisan tmux-ui:start
     ports:
       - 127.0.0.1:12345:12345
