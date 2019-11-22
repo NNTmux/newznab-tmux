@@ -185,9 +185,15 @@ abstract class TV extends Videos
      */
     public function setVideoIdFound($videoId, $releaseId, $episodeId): void
     {
-        Release::query()
+        if ($episodeId != null) {
+            Release::query()
             ->where('id', $releaseId)
             ->update(['videos_id' => $videoId, 'tv_episodes_id' => $episodeId]);
+        } else {
+            Release::query()
+            ->where('id', $releaseId)
+            ->update(['videos_id' => $videoId]);
+        }
     }
 
     /**
