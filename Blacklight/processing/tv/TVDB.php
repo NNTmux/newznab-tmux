@@ -191,8 +191,7 @@ class TVDB extends TV
                             $this->colorCli->primary('Found TVDB Match!', true);
                         }
                     } else {
-                        //Processing failed, set the episode ID to the next processing group
-                        $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+                        $this->setVideoIdFound($videoId, $row['id'], 0);
                     }
                 } else {
                     //Processing failed, set the episode ID to the next processing group

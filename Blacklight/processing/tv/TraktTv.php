@@ -174,9 +174,9 @@ class TraktTv extends TV
                                 $this->colorCli->primary('Found TRAKT Match!', true);
                             }
                             continue;
+                        } else {
+                            $this->setVideoIdFound($videoId, $row['id'], 0);
                         }
-                        //Processing failed, set the episode ID to the next processing group
-                        $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                     } else {
                         //Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
