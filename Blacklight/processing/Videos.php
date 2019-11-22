@@ -139,15 +139,15 @@ abstract class Videos
     {
         // Check if we already have an entry for this show.
         $res = $this->getTitleExact($title, $type, $source);
-        if (isset($res['id'])) {
-            return $res['id'];
+        if (isset($res)) {
+            return $res;
         }
 
         $title2 = str_replace(' and ', ' & ', $title);
         if ((string) $title !== (string) $title2) {
             $res = $this->getTitleExact($title2, $type, $source);
-            if (isset($res['id'])) {
-                return $res['id'];
+            if (isset($res)) {
+                return $res;
             }
             $pieces = explode(' ', $title2);
             $title2 = '%';
@@ -155,8 +155,8 @@ abstract class Videos
                 $title2 .= str_replace(["'", '!'], '', $piece).'%';
             }
             $res = $this->getTitleLoose($title2, $type, $source);
-            if (isset($res['id'])) {
-                return $res['id'];
+            if (isset($res)) {
+                return $res;
             }
         }
 
@@ -174,8 +174,8 @@ abstract class Videos
                 $title2 .= str_replace(["'", '!'], '', $piece).'%';
             }
             $res = $this->getTitleLoose($title2, $type, $source);
-            if (isset($res['id'])) {
-                return $res['id'];
+            if (isset($res)) {
+                return $res;
             }
         } else {
 
@@ -189,8 +189,8 @@ abstract class Videos
                     $title2 .= str_replace(["'", '!'], '', $piece).'%';
                 }
                 $res = $this->getTitleLoose($title2, $type, $source);
-                if (isset($res['id'])) {
-                    return $res['id'];
+                if (isset($res)) {
+                    return $res;
                 }
             }
         }
@@ -212,16 +212,16 @@ abstract class Videos
             if ($source > 0) {
                 $sql->where('source', $source);
             }
-            $return = $sql->first(['id']);
+            $return = $sql->first()->value('id');
             // Try for an alias
             if (empty($return)) {
                 $sql = Video::query()
                     ->join('videos_aliases', 'videos.id', '=', 'videos_aliases.videos_id')
-                    ->where(['videos.title' => $title, 'videos.type' => $type]);
+                    ->where(['videos_aliases.title' => $title, 'videos.type' => $type]);
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
                 }
-                $return = $sql->first(['videos.id']);
+                $return = $sql->first()->value('videos.id');
             }
         }
 
@@ -248,7 +248,7 @@ abstract class Videos
             if ($source > 0) {
                 $sql->where('source', $source);
             }
-            $return = $sql->first(['id']);
+            $return = $sql->first()->value('id');
             // Try for an alias
             if (empty($return)) {
                 $sql = Video::query()
@@ -258,7 +258,7 @@ abstract class Videos
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
                 }
-                $return = $sql->first(['videos.id']);
+                $return = $sql->first()->value('videos.id');
             }
         }
 
@@ -280,7 +280,7 @@ abstract class Videos
                     $title = $title['name'];
                 }
                 // Check if we have the AKA already
-                $check = $this->getAliases(0, $title);
+                $check = $this->getAliases($videoId, $title);
 
                 if ($check === false) {
                     VideoAlias::insertOrIgnore(['videos_id' => $videoId, 'title' => $title, 'created_at' => now(), 'updated_at' => now()]);
@@ -293,11 +293,11 @@ abstract class Videos
      * Retrieves all aliases for given VideoID or VideoID for a given alias.
      *
      *
-     * @param $videoId
+     * @param int $videoId
      * @param string $alias
      * @return VideoAlias[]|bool|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function getAliases($videoId, $alias = '')
+    public function getAliases(int $videoId, string $alias = '')
     {
         $return = false;
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
