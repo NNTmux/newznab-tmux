@@ -1234,7 +1234,7 @@ class Movie
                 if ($movieUpdated === false) {
                     $omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
                     if ($this->omdbapikey !== null) {
-                        if ($this->currentYear != null) {
+                        if ($this->currentYear !== '') {
                             $buffer = $this->omdbApi->search($omdbTitle, 'movie', $this->currentYear);
                         } else {
                             $buffer = $this->omdbApi->search($omdbTitle, 'movie');
