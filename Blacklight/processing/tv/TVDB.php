@@ -192,6 +192,7 @@ class TVDB extends TV
                         }
                     } else {
                         //Processing failed, set the episode ID to the next processing group
+                        $this->setVideoIdFound($videoId, $row['id'], 0);
                         $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     }
                 } else {

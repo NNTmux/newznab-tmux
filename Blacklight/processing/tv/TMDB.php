@@ -197,10 +197,11 @@ class TMDB extends TV
                             if ($this->echooutput) {
                                 $this->colorCli->primary('Found TMDB Match!', true);
                             }
-                            continue;
+                        } else {
+                            //Processing failed, set the episode ID to the next processing group
+                            $this->setVideoIdFound($videoId, $row['id'], 0);
+                            $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                         }
-                        //Processing failed, set the episode ID to the next processing group
-                        $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                     } else {
                         //Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
