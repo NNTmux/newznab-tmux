@@ -214,7 +214,7 @@ abstract class Videos
             }
             $query = $sql->first();
             if (! empty($query)) {
-                $return = $query->value('id');
+                $return = $query->id;
             }
             // Try for an alias
             if (empty($return)) {
@@ -226,7 +226,7 @@ abstract class Videos
                 }
                 $query = $sql->first();
                 if (! empty($query)) {
-                    $return = $query->value('videos.id');
+                    $return = $query->id;
                 }
             }
         }
@@ -256,7 +256,7 @@ abstract class Videos
             }
             $query = $sql->first();
             if (! empty($query)) {
-                $return = $query->value('id');
+                $return = $query->id;
             }
             // Try for an alias
             if (empty($return)) {
@@ -269,7 +269,7 @@ abstract class Videos
                 }
                 $query = $sql->first();
                 if (! empty($query)) {
-                    $return = $query->value('videos.id');
+                    $return = $query->id;
                 }
             }
         }
