@@ -126,14 +126,10 @@ abstract class Videos
     }
 
     /**
-     * Attempt a local lookup via the title first by exact match and then by like.
-     * Returns a false for no match or the Video ID of the match.
-     *
-     * @param        $title
-     * @param        $type
-     * @param int    $source
-     *
-     * @return false|int
+     * @param $title
+     * @param $type
+     * @param int $source
+     * @return $this|array|bool|false|\Illuminate\Database\Eloquent\Model|mixed|null
      */
     public function getByTitle($title, $type, $source = 0)
     {
