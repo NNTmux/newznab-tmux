@@ -82,16 +82,16 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
  - REDIS_PASSWORD=null
  - REDIS_PORT=6379
 
- ´´´bash
- docker-compose run --rm nn-tmux sh /tmp/install.sh
- # answer the questions, since this will fetch predb entries this takes an hour or two, just press ctrl + c if you dont like it ;)
- docker-compose run --rm --service-ports -T nn-tmux apachectl -D FOREGROUND 
- ```
+Start installation script and configuration
+```bash
+  docker-compose run --rm nn-tmux sh /tmp/install.sh
+  # answer the questions, since this will fetch predb entries this takes an hour or two, just press ctrl + c if you dont like it ;)
+  docker-compose run --rm --service-ports -T nn-tmux apachectl -D FOREGROUND 
+```
  Open http://localhost:8089
  sign in as admin (username, password from .env) and configure side settings and tmux settings
-
-  ´´´bash
-  ctrl + c
+```bash
+  # ctrl + c
   docker-compose up nn-tmux
   # check the logs, if everything is working fine ctrl + c
   # start and run in background
@@ -104,7 +104,6 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
   root@:/var/www/NNTmux# sudo -E -u notroot tmux attach -d
   # stop
   root@:/var/www/NNTmux# sudo -E -u notroot php artisan tmux-ui:stop --kill
-
 ```
 ### Support
 
