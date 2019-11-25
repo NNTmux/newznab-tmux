@@ -1,3 +1,5 @@
+2019-11-25 DariusIII
+	* Chg: Use Tmux 2.9a in install_tmux shell script
 2019-11-22 DariusIII
 	* Chg: Update getTitleExact and getTitleLoose functions
 2019-11-21 DariusIII
