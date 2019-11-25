@@ -19,11 +19,12 @@ services:
       - $PWD/docker/my.cnf:/etc/mysql/conf.d/newsnab-tmux.cnf
       - $PWD/docker/mariadb-data:/var/lib/mysql
       - $PWD:/var/www/NNTmux/
+    env_file: .env
     environment:
-      MYSQL_ROOT_PASSWORD: ilmdvV8H
-      MYSQL_DATABASE: nntmux
-      MYSQL_USER: nntmux
-      MYSQL_PASSWORD: Nntmux!
+      MYSQL_ROOT_PASSWORD: ${DB_ROOTPASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: ${APP_TZ}
   nn-tmux: &nn-tmux
     build:
@@ -38,7 +39,7 @@ services:
     ports:
       - 127.0.0.1:8089:80
     environment:
-      MYSQL_ROOT_PASSWORD: ilmdvV8H
+      MYSQL_ROOT_PASSWORD: ${DB_ROOTPASSWORD}
       TZ: ${APP_TZ}
     depends_on:
       - mariadb
@@ -50,7 +51,7 @@ services:
     stdin_open: true
     tty: true
     environment:
-      MYSQL_ROOT_PASSWORD: ilmdvV8H
+      MYSQL_ROOT_PASSWORD: ${DB_ROOTPASSWORD}
       TZ: ${APP_TZ}
       COLUMNS: "`tput cols`"
       LINES: "`tput lines`"
