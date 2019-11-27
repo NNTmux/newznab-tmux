@@ -1,3 +1,5 @@
+2019-11-27 DariusIII
+	* Fix: Fix wrong Book categories seeders and fixtures
 2019-11-25 DariusIII
 	* Chg: Update foreign matching regexes to include web-dl and web-rip releases
 	* Chg: Use Tmux 2.9a in install_tmux shell script

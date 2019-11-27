@@ -608,7 +608,7 @@ class CategoriesTableSeeder extends Seeder
             ],
             67 => [
                 'id' => 7010,
-                'title' => 'Ebook',
+                'title' => 'Magazines',
                 'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
@@ -618,7 +618,7 @@ class CategoriesTableSeeder extends Seeder
             ],
             68 => [
                 'id' => 7020,
-                'title' => 'Comics',
+                'title' => 'Ebook',
                 'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
@@ -628,7 +628,7 @@ class CategoriesTableSeeder extends Seeder
             ],
             69 => [
                 'id' => 7030,
-                'title' => 'Magazines',
+                'title' => 'Comics',
                 'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
