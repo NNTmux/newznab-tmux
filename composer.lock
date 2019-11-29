@@ -999,16 +999,16 @@
         },
         {
             "name": "doctrine/cache",
-            "version": "1.9.1",
+            "version": "1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "89a5c76c39c292f7798f964ab3c836c3f8192a55"
+                "reference": "382e7f4db9a12dc6c19431743a2b096041bcdd62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/89a5c76c39c292f7798f964ab3c836c3f8192a55",
-                "reference": "89a5c76c39c292f7798f964ab3c836c3f8192a55",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/382e7f4db9a12dc6c19431743a2b096041bcdd62",
+                "reference": "382e7f4db9a12dc6c19431743a2b096041bcdd62",
                 "shasum": ""
             },
             "require": {
@@ -1075,10 +1075,9 @@
                 "memcached",
                 "php",
                 "redis",
-                "riak",
                 "xcache"
             ],
-            "time": "2019-11-15T14:31:57+00:00"
+            "time": "2019-11-29T15:36:20+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -1690,16 +1689,16 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
-                "reference": "f892381e10e279e3408acd0df8454972fcc17ff9"
+                "reference": "ee9da1f3078bcf556ebcdb1788a52eae5875124d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/f892381e10e279e3408acd0df8454972fcc17ff9",
-                "reference": "f892381e10e279e3408acd0df8454972fcc17ff9",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/ee9da1f3078bcf556ebcdb1788a52eae5875124d",
+                "reference": "ee9da1f3078bcf556ebcdb1788a52eae5875124d",
                 "shasum": ""
             },
             "require": {
@@ -1708,15 +1707,14 @@
                 "jenssegers/model": "^1.2"
             },
             "require-dev": {
-                "codedungeon/phpunit-result-printer": "*",
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^3.9",
-                "orchestra/testbench-browser-kit": "^3.9",
-                "orchestra/testbench-dusk": "^3.9",
-                "php-coveralls/php-coveralls": "*",
-                "phpmd/phpmd": "*",
+                "orchestra/testbench": "^4.0",
+                "orchestra/testbench-browser-kit": "^4.0",
+                "orchestra/testbench-dusk": "^4.0",
+                "php-coveralls/php-coveralls": "^2.2",
+                "phpmd/phpmd": "^2.7",
                 "phpunit/phpunit": "^8.0",
-                "sebastian/phpcpd": "*"
+                "sebastian/phpcpd": "^4.1"
             },
             "type": "library",
             "extra": {
@@ -1742,7 +1740,7 @@
                 }
             ],
             "description": "Keeping Your Laravel Forms Awake",
-            "time": "2019-10-08T17:40:35+00:00"
+            "time": "2019-11-28T19:47:30+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -4364,16 +4362,16 @@
         },
         {
             "name": "opis/closure",
-            "version": "3.4.1",
+            "version": "3.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/opis/closure.git",
-                "reference": "e79f851749c3caa836d7ccc01ede5828feb762c7"
+                "reference": "27fdc275b7963492d0bf0852525da57ff2be67a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/opis/closure/zipball/e79f851749c3caa836d7ccc01ede5828feb762c7",
-                "reference": "e79f851749c3caa836d7ccc01ede5828feb762c7",
+                "url": "https://api.github.com/repos/opis/closure/zipball/27fdc275b7963492d0bf0852525da57ff2be67a0",
+                "reference": "27fdc275b7963492d0bf0852525da57ff2be67a0",
                 "shasum": ""
             },
             "require": {
@@ -4386,7 +4384,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3.x-dev"
+                    "dev-master": "3.4.x-dev"
                 }
             },
             "autoload": {
@@ -4421,7 +4419,7 @@
                 "serialization",
                 "serialize"
             ],
-            "time": "2019-10-19T18:38:51+00:00"
+            "time": "2019-11-29T11:33:32+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -5802,16 +5800,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.9.10",
+            "version": "v0.9.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "5442009e4ac8ad01ed7e06823350bd75e692257a"
+                "reference": "75d9ac1c16db676de27ab554a4152b594be4748e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/5442009e4ac8ad01ed7e06823350bd75e692257a",
-                "reference": "5442009e4ac8ad01ed7e06823350bd75e692257a",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/75d9ac1c16db676de27ab554a4152b594be4748e",
+                "reference": "75d9ac1c16db676de27ab554a4152b594be4748e",
                 "shasum": ""
             },
             "require": {
@@ -5872,7 +5870,7 @@
                 "interactive",
                 "shell"
             ],
-            "time": "2019-11-27T19:51:19+00:00"
+            "time": "2019-11-27T22:44:29+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
