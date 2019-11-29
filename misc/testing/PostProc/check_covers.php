@@ -30,10 +30,10 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
         $limit = $argv[2];
     }
     $colorCli->header('Scanning for releases missing covers');
-    $res = DB::select('SELECT r.id, r.imdbid
+    $res = DB::select('SELECT r.imdbid
 								FROM releases r
 								LEFT JOIN movieinfo m ON m.imdbid = r.imdbid
-								WHERE nzbstatus = 1 AND m.cover = 1 AND adddate >  (NOW() - INTERVAL 5 HOUR)');
+								WHERE nzbstatus = 1 AND m.cover = 1 AND adddate >  (NOW() - INTERVAL 24 HOUR) GROUP BY r.imdbid');
 
     foreach ($res as $row) {
         $nzbpath = $path2cover.$row->imdbid.'-cover.jpg';
