@@ -126,11 +126,6 @@ class Movie
     public $service;
 
     /**
-     * @var \Tmdb\ApiToken
-     */
-    public $tmdbtoken;
-
-    /**
      * @var \Blacklight\processing\tv\TraktTv
      */
     public $traktTv;
