@@ -105,7 +105,7 @@
 																	   id="chksingle"/>
 															</label>
 															<span class="badge badge-info">{$result->size|filesize}</span>
-															<span class="badge badge-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+															<span class="badge badge-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
 																ago</span>
 															<br/>
 															{if isset($result->review) && $result->review != ""}<span
