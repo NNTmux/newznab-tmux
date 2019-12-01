@@ -149,7 +149,7 @@
 											</td>
 											<td><span class="badge badge-info">{$result->category_name}</span>
 											</td>
-											<td>{Illuminate\Support\Carbon::parse({{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}})->diffForHumans}</td>
+											<td>{Illuminate\Support\Carbon::parse({{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}})->diffForHumans()}</td>
 											<td>{$result->size|filesize}</td>
 											<td>
 												<a href="{{url("/getnzb?id={$result->guid}")}}"
