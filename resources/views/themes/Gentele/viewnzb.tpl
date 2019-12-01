@@ -571,12 +571,12 @@
 														</tr>
 														<tr>
 															<th width="140">Posted</th>
-															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $release.postdate), 'F j, Y H:i:s')}}
+															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $release.postdate, config('app.timezone')), 'F j, Y H:i:s')}}
 															</td>
 														</tr>
 														<tr>
 															<th width="140">Added</th>
-															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $release.adddate), 'F j, Y H:i:s')}}
+															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $release.adddate, config('app.timezone')), 'F j, Y H:i:s')}}
 															</td>
 														</tr>
 														{if isset($isadmin)}
