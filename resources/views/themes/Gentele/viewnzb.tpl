@@ -571,7 +571,7 @@
 														</tr>
 														<tr>
 															<th width="140">Posted</th>
-															<td>{$release.postdate|date_format:"%b %e, %Y %T"}
+															<td>{{Timezone::convertToLocal($release.postdate, 'F j, Y H:i:s')}}
 																({$release.postdate|daysago}
 																)
 															</td>

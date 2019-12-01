@@ -149,7 +149,7 @@
 											</td>
 											<td><span class="badge badge-info">{$result->category_name}</span>
 											</td>
-											<td>{$result->postdate|timeago}</td>
+											<td>{{{Timezone::convertToLocal($result->postdate, 'Y-m-d h:i:s')}}|timeago}</td>
 											<td>{$result->size|filesize}</td>
 											<td>
 												<a href="{{url("/getnzb?id={$result->guid}")}}"

@@ -206,7 +206,7 @@
                                                 <span class="badge badge-info">{$result->category_name}</span>
                                             </td>
                                             <td width="40"
-                                                title="{$result->postdate}">{$result->postdate|timeago}</td>
+                                                title="{{Timezone::convertToLocal($result->postdate, 'Y-m-d h:i:s')}}">{{{Timezone::convertToLocal($result->postdate, 'Y-m-d h:i:s')}}|timeago}</td>
                                             <td>
                                                 {$result->size|filesize}
                                             </td>

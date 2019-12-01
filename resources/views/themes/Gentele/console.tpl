@@ -115,7 +115,7 @@
 																		   id="chksingle"/>
 																</label>
 																<span class="badge badge-default">{$result->size|filesize}</span>
-																<span class="badge badge-default">Posted {$result->postdate|timeago}
+																<span class="badge badge-default">Posted {{{Timezone::convertToLocal($result->postdate, 'Y-m-d h:i:s')}}|timeago}
 																	ago</span>
 																{if isset($isadmin)}
 																<a

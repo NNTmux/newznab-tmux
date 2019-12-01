@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d4a4fc9636f52a79f2542aa67c1187d6",
+    "content-hash": "3bce991fe31d6165781b1c3aa94c8176",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2393,6 +2393,60 @@
                 "tags"
             ],
             "time": "2019-09-16T19:08:47+00:00"
+        },
+        {
+            "name": "jamesmills/laravel-timezone",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jamesmills/laravel-timezone.git",
+                "reference": "c8fefb4da8222914fc048a89be20af450d98d6fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/c8fefb4da8222914fc048a89be20af450d98d6fe",
+                "reference": "c8fefb4da8222914fc048a89be20af450d98d6fe",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6",
+                "nesbot/carbon": "^1.0 || ^2.0",
+                "php": ">=7",
+                "torann/geoip": "^1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.12"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JamesMills\\LaravelTimezone\\LaravelTimezoneServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JamesMills\\LaravelTimezone\\": "src/",
+                    "JamesMills\\LaravelTimezone\\Database\\Seeds\\": "database/seeds/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "James Mills",
+                    "email": "james@clicksco.com"
+                }
+            ],
+            "description": "Timezone storage and retrieval for Laravel",
+            "keywords": [
+                "laravel",
+                "timezone"
+            ],
+            "time": "2019-10-21T12:14:23+00:00"
         },
         {
             "name": "jenssegers/model",
@@ -8616,6 +8670,80 @@
             "description": "CssToInlineStyles is a class that enables you to convert HTML-pages/files into HTML-pages/files with inline styles. This is very useful when you're sending emails.",
             "homepage": "https://github.com/tijsverkoyen/CssToInlineStyles",
             "time": "2019-10-24T08:53:34+00:00"
+        },
+        {
+            "name": "torann/geoip",
+            "version": "1.0.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Torann/laravel-geoip.git",
+                "reference": "9577c9d865050af39bb4c23795c9eb09bebb6476"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Torann/laravel-geoip/zipball/9577c9d865050af39bb4c23795c9eb09bebb6476",
+                "reference": "9577c9d865050af39bb4c23795c9eb09bebb6476",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "~5.5|^6.0",
+                "illuminate/support": "~5.5|^6.0",
+                "php": "^7.1",
+                "vlucas/phpdotenv": "^3.5"
+            },
+            "require-dev": {
+                "geoip2/geoip2": "~2.1",
+                "mockery/mockery": "^0.9.4",
+                "phpunit/phpunit": "^7.0"
+            },
+            "suggest": {
+                "geoip2/geoip2": "Required to use the MaxMind database or web service with GeoIP (~2.1).",
+                "monolog/monolog": "Allows for storing location not found errors to the log"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Torann\\GeoIP\\GeoIPServiceProvider"
+                    ],
+                    "aliases": {
+                        "GeoIP": "Torann\\GeoIP\\Facades\\GeoIP"
+                    }
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Torann\\GeoIP\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Stainback",
+                    "email": "torann@gmail.com"
+                }
+            ],
+            "description": "Support for multiple GeoIP services.",
+            "keywords": [
+                "IP API",
+                "geoip",
+                "geolocation",
+                "infoDB",
+                "laravel",
+                "laravel 5",
+                "location",
+                "maxmind"
+            ],
+            "time": "2019-10-30T15:41:29+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

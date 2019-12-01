@@ -123,7 +123,7 @@ return [
     */
 
     'redis' => [
-        'client' => 'phpredis',
+        'client' => env('REDIS_CLIENT', 'phpredis'),
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => Str::slug(env('APP_NAME', 'laravel'), '_').'_database_',
