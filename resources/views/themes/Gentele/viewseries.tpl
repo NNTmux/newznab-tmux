@@ -206,7 +206,7 @@
                                                 <span class="badge badge-info">{$result->category_name}</span>
                                             </td>
                                             <td width="40"
-                                                title="{{Timezone::convertToLocal($result->postdate, 'Y-m-d h:i:s')}}">{{{Timezone::convertToLocal($result->postdate, 'Y-m-d h:i:s')}}|timeago}</td>
+                                                title="{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $result->postdate), 'Y-m-d h:i:s')}}">{{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $result->postdate), 'Y-m-d h:i:s')}}|timeago}</td>
                                             <td>
                                                 {$result->size|filesize}
                                             </td>

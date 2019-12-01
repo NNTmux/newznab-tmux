@@ -571,8 +571,8 @@
 														</tr>
 														<tr>
 															<th width="140">Posted</th>
-															<td>{{Timezone::convertToLocal($release.postdate, 'F j, Y H:i:s')}}
-																({$release.postdate|daysago}
+															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $release.postdate), 'F j, Y H:i:s')}}
+																({{Timezone::convertToLocal(Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $release.postdate), 'Y-m-d h:i:s')}}|daysago}
 																)
 															</td>
 														</tr>
