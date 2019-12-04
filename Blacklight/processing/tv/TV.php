@@ -608,7 +608,7 @@ abstract class TV extends Videos
         elseif (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9]([ivx]+)/i', $relname, $matches)) {
             $episodeArr['season'] = 1;
             $epLow = $matches[2];
-            $episodeArr['episode'] = roman_to_int($epLow);
+            $episodeArr['episode'] = roman_to_int(strtoupper($epLow));
         }
         // Band.Of.Brothers.EP06.Bastogne.DVDRiP.XviD-DEiTY
         elseif (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $matches)) {
