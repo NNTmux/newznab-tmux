@@ -472,16 +472,16 @@
         },
         {
             "name": "czproject/git-php",
-            "version": "v3.17.0",
+            "version": "v3.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/czproject/git-php.git",
-                "reference": "a7b911b81a2fe626f748a4ac8955353c5777bc6c"
+                "reference": "b5e709f0e9c4e4e39b49d4e322f7fa73c1bb21dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/czproject/git-php/zipball/a7b911b81a2fe626f748a4ac8955353c5777bc6c",
-                "reference": "a7b911b81a2fe626f748a4ac8955353c5777bc6c",
+                "url": "https://api.github.com/repos/czproject/git-php/zipball/b5e709f0e9c4e4e39b49d4e322f7fa73c1bb21dc",
+                "reference": "b5e709f0e9c4e4e39b49d4e322f7fa73c1bb21dc",
                 "shasum": ""
             },
             "require": {
@@ -510,7 +510,7 @@
             "keywords": [
                 "git"
             ],
-            "time": "2019-02-09T13:11:36+00:00"
+            "time": "2019-12-03T02:28:45+00:00"
         },
         {
             "name": "dariusiii/l5-fixtures",
@@ -2835,16 +2835,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.6.0",
+            "version": "v6.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "b48528ba5422ac909dbabf0b1cc34534928e7bce"
+                "reference": "27efba7e13aaf91a87ae9a63db158e943eb71410"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/b48528ba5422ac909dbabf0b1cc34534928e7bce",
-                "reference": "b48528ba5422ac909dbabf0b1cc34534928e7bce",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/27efba7e13aaf91a87ae9a63db158e943eb71410",
+                "reference": "27efba7e13aaf91a87ae9a63db158e943eb71410",
                 "shasum": ""
             },
             "require": {
@@ -2940,7 +2940,7 @@
                 "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
                 "moontoast/math": "Required to use ordered UUIDs (^1.1).",
                 "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-                "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0)",
+                "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
                 "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
                 "symfony/cache": "Required to PSR-6 cache bridge (^4.3.4).",
                 "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^1.2).",
@@ -2977,7 +2977,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-11-26T15:33:08+00:00"
+            "time": "2019-12-05T13:49:53+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -4521,16 +4521,16 @@
         },
         {
             "name": "pear/archive_tar",
-            "version": "1.4.8",
+            "version": "1.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Archive_Tar.git",
-                "reference": "442bdffb7edb84c898cfd94f7ac8500e49d5bbb5"
+                "reference": "c5b00053770e1d72128252c62c2c1a12c26639f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/442bdffb7edb84c898cfd94f7ac8500e49d5bbb5",
-                "reference": "442bdffb7edb84c898cfd94f7ac8500e49d5bbb5",
+                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/c5b00053770e1d72128252c62c2c1a12c26639f0",
+                "reference": "c5b00053770e1d72128252c62c2c1a12c26639f0",
                 "shasum": ""
             },
             "require": {
@@ -4583,7 +4583,7 @@
                 "archive",
                 "tar"
             ],
-            "time": "2019-10-21T13:31:24+00:00"
+            "time": "2019-12-04T10:17:28+00:00"
         },
         {
             "name": "pear/console_getopt",
@@ -4814,16 +4814,16 @@
         },
         {
             "name": "pear/xml_util",
-            "version": "v1.4.3",
+            "version": "v1.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/XML_Util.git",
-                "reference": "c74278d925be9c2f7d39955cdce45d8275571a1d"
+                "reference": "49cffb77aee118484cd55b9c5c1fd5323e9ceb9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/XML_Util/zipball/c74278d925be9c2f7d39955cdce45d8275571a1d",
-                "reference": "c74278d925be9c2f7d39955cdce45d8275571a1d",
+                "url": "https://api.github.com/repos/pear/XML_Util/zipball/49cffb77aee118484cd55b9c5c1fd5323e9ceb9a",
+                "reference": "49cffb77aee118484cd55b9c5c1fd5323e9ceb9a",
                 "shasum": ""
             },
             "require": {
@@ -4831,7 +4831,7 @@
                 "php": ">=5.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "@stable"
+                "phpunit/phpunit": "<=7"
             },
             "type": "library",
             "autoload": {
@@ -4848,13 +4848,13 @@
             ],
             "authors": [
                 {
-                    "name": "Stephan Schmidt",
-                    "email": "schst@php-tools.net",
+                    "name": "Chuck Burgess",
+                    "email": "ashnazg@php.net",
                     "role": "Lead"
                 },
                 {
-                    "name": "Chuck Burgess",
-                    "email": "ashnazg@php.net",
+                    "name": "Stephan Schmidt",
+                    "email": "schst@php-tools.net",
                     "role": "Lead"
                 },
                 {
@@ -4865,7 +4865,7 @@
             ],
             "description": "Methods to work with XML documents",
             "homepage": "http://pear.php.net/package/XML_Util",
-            "time": "2017-06-28T19:21:19+00:00"
+            "time": "2019-12-05T19:08:39+00:00"
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",
