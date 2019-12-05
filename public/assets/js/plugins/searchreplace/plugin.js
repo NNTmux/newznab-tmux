@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.2 (2019-11-19)
+ * Version: 5.1.3 (2019-12-04)
  */
 (function () {
     'use strict';
@@ -618,6 +618,8 @@
       };
     };
 
+    var global$2 = tinymce.util.Tools.resolve('tinymce.Env');
+
     var open = function (editor, currentSearchState) {
       var dialogApi = value();
       editor.undoManager.add();
@@ -643,6 +645,11 @@
           api.focus('findtext');
         });
       }
+      var focusButtonIfRequired = function (api, name) {
+        if (global$2.browser.isSafari() && global$2.deviceType.isTouch() && (name === 'find' || name === 'replace' || name === 'replaceall')) {
+          api.focus(name);
+        }
+      };
       var reset = function (api) {
         done(editor, currentSearchState, false);
         disableAll(api, true);
@@ -788,8 +795,12 @@
           default:
             break;
           }
+          focusButtonIfRequired(api, details.name);
         },
-        onSubmit: doFind,
+        onSubmit: function (api) {
+          doFind(api);
+          focusButtonIfRequired(api, 'find');
+        },
         onClose: function () {
           editor.focus();
           done(editor, currentSearchState);

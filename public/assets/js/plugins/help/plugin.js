@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.2 (2019-11-19)
+ * Version: 5.1.3 (2019-12-04)
  */
 (function () {
     'use strict';
@@ -811,6 +811,7 @@
     var tab$3 = function () {
       var body = {
         type: 'htmlpanel',
+        presets: 'document',
         html: description
       };
       return {

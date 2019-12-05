@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.2 (2019-11-19)
+ * Version: 5.1.3 (2019-12-04)
  */
 (function (domGlobals) {
     'use strict';
@@ -100,6 +100,19 @@
       appendClickRemove(link, evt);
     };
     var OpenUrl = { open: open };
+
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
+        }
+        return t;
+      };
+      return __assign.apply(this, arguments);
+    };
 
     var noop = function () {
     };
@@ -344,6 +357,18 @@
       }
       return href;
     };
+    var applyLinkOverrides = function (editor, linkAttrs) {
+      var newLinkAttrs = __assign({}, linkAttrs);
+      if (!(Settings.getRelList(editor).length > 0) && Settings.allowUnsafeLinkTarget(editor) === false) {
+        var newRel = applyRelTargetRules(newLinkAttrs.rel, newLinkAttrs.target === '_blank');
+        newLinkAttrs.rel = newRel ? newRel : null;
+      }
+      if (Option.from(newLinkAttrs.target).isNone() && Settings.getTargetList(editor) === false) {
+        newLinkAttrs.target = Settings.getDefaultLinkTarget(editor);
+      }
+      newLinkAttrs.href = handleExternalTargets(newLinkAttrs.href, Settings.assumeExternalTargets(editor));
+      return newLinkAttrs;
+    };
     var updateLink = function (editor, anchorElm, text, linkAttrs) {
       text.each(function (text) {
         if (anchorElm.hasOwnProperty('innerText')) {
@@ -367,18 +392,10 @@
       }
     };
     var link = function (editor, attachState, data) {
+      var selectedElm = editor.selection.getNode();
+      var anchorElm = getAnchorElement(editor, selectedElm);
+      var linkAttrs = applyLinkOverrides(editor, getLinkAttrs(data));
       editor.undoManager.transact(function () {
-        var selectedElm = editor.selection.getNode();
-        var anchorElm = getAnchorElement(editor, selectedElm);
-        var linkAttrs = getLinkAttrs(data);
-        if (!(Settings.getRelList(editor).length > 0) && Settings.allowUnsafeLinkTarget(editor) === false) {
-          var newRel = applyRelTargetRules(linkAttrs.rel, linkAttrs.target === '_blank');
-          linkAttrs.rel = newRel ? newRel : null;
-        }
-        if (Option.from(linkAttrs.target).isNone()) {
-          linkAttrs.target = Settings.getDefaultLinkTarget(editor);
-        }
-        linkAttrs.href = handleExternalTargets(linkAttrs.href, Settings.assumeExternalTargets(editor));
         if (data.href === attachState.href) {
           attachState.attach();
         }
@@ -586,19 +603,6 @@
     var DialogChanges = {
       init: init,
       getDelta: getDelta
-    };
-
-    var __assign = function () {
-      __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-          s = arguments[i];
-          for (var p in s)
-            if (Object.prototype.hasOwnProperty.call(s, p))
-              t[p] = s[p];
-        }
-        return t;
-      };
-      return __assign.apply(this, arguments);
     };
 
     var exports$1 = {}, module = { exports: exports$1 };

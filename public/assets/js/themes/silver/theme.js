@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.2 (2019-11-19)
+ * Version: 5.1.3 (2019-12-04)
  */
 (function (domGlobals) {
     'use strict';
@@ -3415,13 +3415,13 @@
     };
     var getBounds = function (_win) {
       var win = _win === undefined ? domGlobals.window : _win;
+      var doc = win.document;
+      var scroll = get$8(Element.fromDom(doc));
       var visualViewport = win['visualViewport'];
       if (visualViewport !== undefined) {
-        return bounds(visualViewport.pageLeft, visualViewport.pageTop, visualViewport.width, visualViewport.height);
+        return bounds(Math.max(visualViewport.pageLeft, scroll.left()), Math.max(visualViewport.pageTop, scroll.top()), visualViewport.width, visualViewport.height);
       } else {
-        var doc = Element.fromDom(win.document);
-        var html = win.document.documentElement;
-        var scroll = get$8(doc);
+        var html = doc.documentElement;
         var width = html.clientWidth;
         var height = html.clientHeight;
         return bounds(scroll.left(), scroll.top(), width, height);
@@ -10558,7 +10558,10 @@
           config('insert-table-picker-cell', [
             run(mouseover(), Focusing.focus),
             run(execute(), emitExecute),
-            run(tapOrClick(), emitExecute)
+            run(tapOrClick(), function (c, se) {
+              se.stop();
+              emitExecute(c);
+            })
           ]),
           Toggling.config({
             toggleClass: 'tox-insert-table-picker__selected',
@@ -12818,7 +12821,7 @@
       var distY = Math.abs(touch.clientY - data.y());
       return distX > SIGNIFICANT_MOVE$1 || distY > SIGNIFICANT_MOVE$1;
     };
-    var setupLongpress = function (editor) {
+    var setup$2 = function (editor) {
       var startData = Cell(Option.none());
       var longpressFired = Cell(false);
       var debounceLongpress = last$2(function (e) {
@@ -12852,16 +12855,24 @@
       }, true);
       editor.on('touchend touchcancel', function (e) {
         debounceLongpress.cancel();
-        if (e.type === 'touchend' && longpressFired.get()) {
-          startData.get().filter(function (data) {
-            return data.target().isEqualNode(e.target);
-          }).map(function () {
-            e.preventDefault();
-          });
+        if (e.type === 'touchcancel') {
+          return;
         }
+        startData.get().filter(function (data) {
+          return data.target().isEqualNode(e.target);
+        }).each(function () {
+          if (longpressFired.get()) {
+            e.preventDefault();
+          } else {
+            var result = editor.fire('tap');
+            if (result.isDefaultPrevented()) {
+              e.preventDefault();
+            }
+          }
+        });
       }, true);
     };
-    var TouchEvents = { setupLongpress: setupLongpress };
+    var TouchEvents = { setup: setup$2 };
 
     var formChangeEvent = generate$1('form-component-change');
     var formCloseEvent = generate$1('form-close');
@@ -19803,7 +19814,7 @@
         init: init$6
     });
 
-    var setup$2 = function (streamInfo, streamState) {
+    var setup$3 = function (streamInfo, streamState) {
       var sInfo = streamInfo.stream;
       var throttler = last$2(streamInfo.onStream, sInfo.delay);
       streamState.setTimer(throttler);
@@ -19820,7 +19831,7 @@
           strict$1('delay'),
           defaulted$1('stopEvent', true),
           output('streams', {
-            setup: setup$2,
+            setup: setup$3,
             state: throttle
           })
         ]
@@ -20702,7 +20713,7 @@
       var runOnItem = function (f) {
         return function (comp, se) {
           closest$3(se.event().target(), '[data-collection-item-value]').each(function (target) {
-            f(comp, target, get$2(target, 'data-collection-item-value'));
+            f(comp, se, target, get$2(target, 'data-collection-item-value'));
           });
         };
       };
@@ -20734,27 +20745,28 @@
         set(comp.element(), html.join(''));
       };
       var collectionEvents = [
-        run(mouseover(), runOnItem(function (comp, tgt) {
+        run(mouseover(), runOnItem(function (comp, se, tgt) {
           focus$1(tgt);
         })),
-        run(tapOrClick(), runOnItem(function (comp, tgt, itemValue) {
+        run(tapOrClick(), runOnItem(function (comp, se, tgt, itemValue) {
+          se.stop();
           emitWith(comp, formActionEvent, {
             name: spec.name,
             value: itemValue
           });
         })),
-        run(focusin(), runOnItem(function (comp, tgt, itemValue) {
+        run(focusin(), runOnItem(function (comp, se, tgt) {
           descendant$1(comp.element(), '.' + activeClass).each(function (currentActive) {
             remove$4(currentActive, activeClass);
           });
           add$2(tgt, activeClass);
         })),
-        run(focusout(), runOnItem(function (comp, tgt, itemValue) {
+        run(focusout(), runOnItem(function (comp) {
           descendant$1(comp.element(), '.' + activeClass).each(function (currentActive) {
             remove$4(currentActive, activeClass);
           });
         })),
-        runOnExecute(runOnItem(function (comp, tgt, itemValue) {
+        runOnExecute(runOnItem(function (comp, se, tgt, itemValue) {
           emitWith(comp, formActionEvent, {
             name: spec.name,
             value: itemValue
@@ -24860,105 +24872,68 @@
     };
     var ContextToolbar = { register: register$4 };
 
-    var setup$3 = function (editor, mothership, uiMothership) {
-      var onMousedown = bind$3(Element.fromDom(domGlobals.document), 'mousedown', function (evt) {
+    var setup$4 = function (editor, mothership, uiMothership) {
+      var broadcastEvent = function (name, evt) {
         each([
           mothership,
           uiMothership
         ], function (ship) {
-          ship.broadcastOn([dismissPopups()], { target: evt.target() });
+          ship.broadcastEvent(name, evt);
         });
-      });
-      var onTouchstart = bind$3(Element.fromDom(domGlobals.document), 'touchstart', function (evt) {
+      };
+      var broadcastOn = function (channel, message) {
         each([
           mothership,
           uiMothership
         ], function (ship) {
-          ship.broadcastOn([dismissPopups()], { target: evt.target() });
+          ship.broadcastOn([channel], message);
         });
-      });
+      };
+      var fireDismissPopups = function (evt) {
+        return broadcastOn(dismissPopups(), { target: evt.target() });
+      };
+      var onTouchstart = bind$3(Element.fromDom(domGlobals.document), 'touchstart', fireDismissPopups);
       var onTouchmove = bind$3(Element.fromDom(domGlobals.document), 'touchmove', function (evt) {
-        each([
-          mothership,
-          uiMothership
-        ], function (ship) {
-          ship.broadcastEvent(documentTouchmove(), evt);
-        });
+        return broadcastEvent(documentTouchmove(), evt);
       });
       var onTouchend = bind$3(Element.fromDom(domGlobals.document), 'touchend', function (evt) {
-        each([
-          mothership,
-          uiMothership
-        ], function (ship) {
-          ship.broadcastEvent(documentTouchend(), evt);
-        });
+        return broadcastEvent(documentTouchend(), evt);
       });
+      var onMousedown = bind$3(Element.fromDom(domGlobals.document), 'mousedown', fireDismissPopups);
       var onMouseup = bind$3(Element.fromDom(domGlobals.document), 'mouseup', function (evt) {
         if (evt.raw().button === 0) {
-          each([
-            mothership,
-            uiMothership
-          ], function (ship) {
-            ship.broadcastOn([mouseReleased()], { target: evt.target() });
-          });
+          broadcastOn(mouseReleased(), { target: evt.target() });
         }
       });
-      var onContentMousedown = function (raw) {
-        each([
-          mothership,
-          uiMothership
-        ], function (ship) {
-          ship.broadcastOn([dismissPopups()], { target: Element.fromDom(raw.target) });
-        });
+      var onContentClick = function (raw) {
+        return broadcastOn(dismissPopups(), { target: Element.fromDom(raw.target) });
       };
       var onContentMouseup = function (raw) {
         if (raw.button === 0) {
-          each([
-            mothership,
-            uiMothership
-          ], function (ship) {
-            ship.broadcastOn([mouseReleased()], { target: Element.fromDom(raw.target) });
-          });
+          broadcastOn(mouseReleased(), { target: Element.fromDom(raw.target) });
         }
       };
       var onWindowScroll = function (evt) {
-        var sugarEvent = fromRawEvent$1(evt);
-        each([
-          mothership,
-          uiMothership
-        ], function (ship) {
-          ship.broadcastEvent(windowScroll(), sugarEvent);
-        });
+        return broadcastEvent(windowScroll(), fromRawEvent$1(evt));
       };
       var onWindowResize = function (evt) {
-        var sugarEvent = fromRawEvent$1(evt);
-        each([
-          mothership,
-          uiMothership
-        ], function (ship) {
-          ship.broadcastOn([repositionPopups()], {});
-          ship.broadcastEvent(windowResize(), sugarEvent);
-        });
+        broadcastOn(repositionPopups(), {});
+        broadcastEvent(windowResize(), fromRawEvent$1(evt));
       };
       var onEditorResize = function () {
-        each([
-          mothership,
-          uiMothership
-        ], function (ship) {
-          ship.broadcastOn([repositionPopups()], {});
-        });
+        return broadcastOn(repositionPopups(), {});
       };
       editor.on('PostRender', function () {
-        editor.on('mousedown', onContentMousedown);
-        editor.on('touchstart', onContentMousedown);
+        editor.on('click', onContentClick);
+        editor.on('tap', onContentClick);
         editor.on('mouseup', onContentMouseup);
         editor.on('ScrollWindow', onWindowScroll);
         editor.on('ResizeWindow', onWindowResize);
         editor.on('ResizeEditor', onEditorResize);
       });
       editor.on('remove', function () {
-        editor.off('mousedown', onContentMousedown);
-        editor.off('touchstart', onContentMousedown);
+        editor.off('click', onContentClick);
+        editor.off('tap', onContentClick);
         editor.off('mouseup', onContentMouseup);
         editor.off('ScrollWindow', onWindowScroll);
         editor.off('ResizeWindow', onWindowResize);
@@ -24976,7 +24951,7 @@
         uiMothership.destroy();
       });
     };
-    var Events$1 = { setup: setup$3 };
+    var Events$1 = { setup: setup$4 };
 
     var parts$c = AlloyParts;
     var partType$1 = PartType;
@@ -25262,9 +25237,10 @@
         return revertToOriginal(elem, dockInfo, box);
       });
     };
-    var morphToFixed = function (elem, dockInfo, viewport, scroll, origin) {
+    var morphToFixed = function (elem, dockInfo, viewport, scroll, lazyOrigin) {
       var box$1 = box(elem);
       if (!isVisibleForModes(dockInfo.modes, box$1, viewport)) {
+        var origin = lazyOrigin();
         var position = get$4(elem, 'position');
         setPrior(elem, dockInfo, box$1.x(), box$1.y(), position);
         var coord = absolute$3(box$1.x(), box$1.y());
@@ -25277,10 +25253,10 @@
         return Option.none();
       }
     };
-    var getMorph = function (component, dockInfo, viewport, scroll, origin) {
+    var getMorph = function (component, dockInfo, viewport, scroll, lazyOrigin) {
       var elem = component.element();
       var isDocked = getRaw(elem, 'position').is('fixed');
-      return isDocked ? morphToOriginal(elem, dockInfo, viewport) : morphToFixed(elem, dockInfo, viewport, scroll, origin);
+      return isDocked ? morphToOriginal(elem, dockInfo, viewport) : morphToFixed(elem, dockInfo, viewport, scroll, lazyOrigin);
     };
     var getMorphToOriginal = function (component, dockInfo) {
       var elem = component.element();
@@ -25330,20 +25306,22 @@
       var elem = component.element();
       var doc = owner(elem);
       var scroll = get$8(doc);
-      var origin = getOrigin(elem);
+      var lazyOrigin = cached(function () {
+        return getOrigin(elem);
+      });
       var isDocked = state.isDocked();
       if (isDocked) {
         updateVisibility(component, config, state, viewport);
       }
-      getMorph(component, config, viewport, scroll, origin).each(function (morph) {
+      getMorph(component, config, viewport, scroll, lazyOrigin).each(function (morph) {
         state.setDocked(!isDocked);
         morph.fold(function () {
           return morphToStatic(component, config);
         }, function (x, y) {
-          return morphToCoord(component, config, scroll, origin, absolute$3(x, y));
+          return morphToCoord(component, config, scroll, lazyOrigin(), absolute$3(x, y));
         }, function (x, y) {
           updateVisibility(component, config, state, viewport, true);
-          morphToCoord(component, config, scroll, origin, fixed$1(x, y));
+          morphToCoord(component, config, scroll, lazyOrigin(), fixed$1(x, y));
         });
       });
     };
@@ -25540,13 +25518,16 @@
         });
       });
     };
-    var setup$4 = function (editor, lazyHeader) {
+    var setup$5 = function (editor, lazyHeader) {
       if (!editor.inline) {
         editor.on('ResizeWindow ResizeEditor ResizeContent', function () {
           lazyHeader().each(updateIframeContentFlow);
         });
         editor.on('SkinLoaded', function () {
           lazyHeader().each(Docking.reset);
+        });
+        editor.on('FullscreenStateChanged', function () {
+          lazyHeader().each(Docking.refresh);
         });
       }
       editor.on('PostRender', function () {
@@ -25629,17 +25610,17 @@
     };
 
     var StickyHeader = /*#__PURE__*/Object.freeze({
-        setup: setup$4,
+        setup: setup$5,
         isDocked: isDocked$1,
         getBehaviours: getBehaviours$2
     });
 
-    var setup$5 = noop;
+    var setup$6 = noop;
     var isDocked$2 = never;
     var getBehaviours$3 = constant([]);
 
     var StaticHeader = /*#__PURE__*/Object.freeze({
-        setup: setup$5,
+        setup: setup$6,
         isDocked: isDocked$2,
         getBehaviours: getBehaviours$3
     });
@@ -25886,7 +25867,7 @@
       return asRaw('sidebar', sidebarSchema, spec);
     };
 
-    var setup$6 = function (editor) {
+    var setup$7 = function (editor) {
       var sidebars = editor.ui.registry.getAll().sidebars;
       each(keys(sidebars), function (name) {
         var spec = sidebars[name];
@@ -26121,7 +26102,7 @@
         components: []
       };
     };
-    var setup$7 = function (editor, lazyThrobber, sharedBackstage) {
+    var setup$8 = function (editor, lazyThrobber, sharedBackstage) {
       var throbberState = Cell(false);
       var timer = Cell(Option.none());
       var toggle = function (state) {
@@ -27189,7 +27170,7 @@
     };
     var ComplexControls = { register: register$a };
 
-    var setup$8 = function (editor, backstage) {
+    var setup$9 = function (editor, backstage) {
       AlignmentButtons.register(editor);
       SimpleControls.register(editor);
       ComplexControls.register(editor, backstage);
@@ -27198,7 +27179,7 @@
       VisualAid.register(editor);
       IndentOutdent.register(editor);
     };
-    var FormatControls = { setup: setup$8 };
+    var FormatControls = { setup: setup$9 };
 
     var nu$d = function (x, y) {
       return {
@@ -27509,7 +27490,7 @@
     var isNativeOverrideKeyEvent = function (editor, e) {
       return e.ctrlKey && !Settings$1.shouldNeverUseNative(editor);
     };
-    var setup$9 = function (editor, lazySink, backstage) {
+    var setup$a = function (editor, lazySink, backstage) {
       var detection = detect$3();
       var isTouch = detection.deviceType.isTouch;
       var contextmenu = build$1(InlineView.sketch({
@@ -27552,7 +27533,7 @@
         initAndShow$2(editor, e, buildMenu, backstage, contextmenu, isTriggeredByKeyboardEvent);
       };
       editor.on('init', function () {
-        var hideEvents = 'ResizeEditor ScrollContent ScrollWindow longpresscancel' + (isTouch() ? '' : 'ResizeWindow');
+        var hideEvents = 'ResizeEditor ScrollContent ScrollWindow longpresscancel' + (isTouch() ? '' : ' ResizeWindow');
         editor.on(hideEvents, hideContextMenu);
         editor.on(isTouch() ? 'longpress' : 'longpress contextmenu', showContextMenu);
       });
@@ -28109,7 +28090,7 @@
         }
       }));
     };
-    var setup$a = function (editor, sink) {
+    var setup$b = function (editor, sink) {
       var tlTds = Cell([]);
       var brTds = Cell([]);
       var isVisible = Cell(false);
@@ -28217,7 +28198,7 @@
         });
       }
     };
-    var TableSelectorHandles = { setup: setup$a };
+    var TableSelectorHandles = { setup: setup$b };
 
     var ResizeTypes;
     (function (ResizeTypes) {
@@ -28488,7 +28469,7 @@
       };
     };
 
-    var setup$b = function (editor) {
+    var setup$c = function (editor) {
       var isInline = editor.inline;
       var mode = isInline ? Inline : Iframe;
       var header = isStickyToolbar(editor) ? StickyHeader : StaticHeader;
@@ -28689,7 +28670,7 @@
       var mothership = takeover(outerContainer);
       var uiMothership = takeover(sink);
       Events$1.setup(editor, mothership, uiMothership);
-      TouchEvents.setupLongpress(editor);
+      TouchEvents.setup(editor);
       var getUi = function () {
         var channels = {
           broadcastAll: uiMothership.broadcast,
@@ -28717,9 +28698,9 @@
       var renderUI = function () {
         header.setup(editor, lazyHeader);
         FormatControls.setup(editor, backstage);
-        setup$9(editor, lazySink, backstage);
-        setup$6(editor);
-        setup$7(editor, lazyThrobber, backstage.shared);
+        setup$a(editor, lazySink, backstage);
+        setup$7(editor);
+        setup$8(editor, lazyThrobber, backstage.shared);
         var _a = editor.ui.registry.getAll(), buttons = _a.buttons, menuItems = _a.menuItems, contextToolbars = _a.contextToolbars, sidebars = _a.sidebars;
         var toolbarOpt = getMultipleToolbarsSetting(editor);
         var rawUiConfig = {
@@ -28757,7 +28738,7 @@
         getUi: getUi
       };
     };
-    var Render = { setup: setup$b };
+    var Render = { setup: setup$c };
 
     var describedBy = function (describedElement, describeElement) {
       var describeId = Option.from(get$2(describedElement, 'id')).fold(function () {
@@ -30723,6 +30704,97 @@
       };
     };
 
+    var renderInlineDialog = function (dialogInit, extra, backstage, ariaAttrs) {
+      var _a, _b;
+      var dialogLabelId = generate$1('dialog-label');
+      var dialogContentId = generate$1('dialog-content');
+      var updateState = function (_comp, incoming) {
+        return Option.some(incoming);
+      };
+      var memHeader = record(renderInlineHeader({
+        title: dialogInit.internalDialog.title,
+        draggable: true
+      }, dialogLabelId, backstage.shared.providers));
+      var memBody = record(renderInlineBody({ body: dialogInit.internalDialog.body }, dialogContentId, backstage, ariaAttrs));
+      var storagedMenuButtons = mapMenuButtons(dialogInit.internalDialog.buttons);
+      var objOfCells = extractCellsToObject(storagedMenuButtons);
+      var memFooter = record(renderInlineFooter({ buttons: storagedMenuButtons }, backstage));
+      var dialogEvents = SilverDialogEvents.initDialog(function () {
+        return instanceApi;
+      }, {
+        onBlock: function () {
+        },
+        onUnblock: function () {
+        },
+        onClose: function () {
+          return extra.closeWindow();
+        }
+      });
+      var dialog = build$1({
+        dom: {
+          tag: 'div',
+          classes: [
+            'tox-dialog',
+            'tox-dialog-inline'
+          ],
+          attributes: (_a = { role: 'dialog' }, _a['aria-labelledby'] = dialogLabelId, _a['aria-describedby'] = '' + dialogContentId, _a)
+        },
+        eventOrder: (_b = {}, _b[receive()] = [
+          Reflecting.name(),
+          Receiving.name()
+        ], _b[execute()] = ['execute-on-form'], _b[attachedToDom()] = [
+          'reflecting',
+          'execute-on-form'
+        ], _b),
+        behaviours: derive$1([
+          Keying.config({
+            mode: 'cyclic',
+            onEscape: function (c) {
+              emit(c, formCloseEvent);
+              return Option.some(true);
+            },
+            useTabstopAt: function (elem) {
+              return !NavigableObject.isPseudoStop(elem) && (name(elem) !== 'button' || get$2(elem, 'disabled') !== 'disabled');
+            }
+          }),
+          Reflecting.config({
+            channel: dialogChannel,
+            updateState: updateState,
+            initialData: dialogInit
+          }),
+          Focusing.config({}),
+          config('execute-on-form', dialogEvents.concat([runOnSource(focusin(), function (comp, se) {
+              Keying.focusIn(comp);
+            })])),
+          RepresentingConfigs.memory({})
+        ]),
+        components: [
+          memHeader.asSpec(),
+          memBody.asSpec(),
+          memFooter.asSpec()
+        ]
+      });
+      var instanceApi = getDialogApi({
+        getRoot: function () {
+          return dialog;
+        },
+        getFooter: function () {
+          return memFooter.get(dialog);
+        },
+        getBody: function () {
+          return memBody.get(dialog);
+        },
+        getFormWrapper: function () {
+          var body = memBody.get(dialog);
+          return Composing.getCurrent(body).getOr(body);
+        }
+      }, extra.redial, objOfCells);
+      return {
+        dialog: dialog,
+        instanceApi: instanceApi
+      };
+    };
+
     var global$g = tinymce.util.Tools.resolve('tinymce.util.URI');
 
     var getUrlDialogApi = function (root) {
@@ -30882,98 +30954,7 @@
       };
     };
 
-    var renderInlineDialog = function (dialogInit, extra, backstage, ariaAttrs) {
-      var _a, _b;
-      var dialogLabelId = generate$1('dialog-label');
-      var dialogContentId = generate$1('dialog-content');
-      var updateState = function (_comp, incoming) {
-        return Option.some(incoming);
-      };
-      var memHeader = record(renderInlineHeader({
-        title: dialogInit.internalDialog.title,
-        draggable: true
-      }, dialogLabelId, backstage.shared.providers));
-      var memBody = record(renderInlineBody({ body: dialogInit.internalDialog.body }, dialogContentId, backstage, ariaAttrs));
-      var storagedMenuButtons = mapMenuButtons(dialogInit.internalDialog.buttons);
-      var objOfCells = extractCellsToObject(storagedMenuButtons);
-      var memFooter = record(renderInlineFooter({ buttons: storagedMenuButtons }, backstage));
-      var dialogEvents = SilverDialogEvents.initDialog(function () {
-        return instanceApi;
-      }, {
-        onBlock: function () {
-        },
-        onUnblock: function () {
-        },
-        onClose: function () {
-          return extra.closeWindow();
-        }
-      });
-      var dialog = build$1({
-        dom: {
-          tag: 'div',
-          classes: [
-            'tox-dialog',
-            'tox-dialog-inline'
-          ],
-          attributes: (_a = { role: 'dialog' }, _a['aria-labelledby'] = dialogLabelId, _a['aria-describedby'] = '' + dialogContentId, _a)
-        },
-        eventOrder: (_b = {}, _b[receive()] = [
-          Reflecting.name(),
-          Receiving.name()
-        ], _b[execute()] = ['execute-on-form'], _b[attachedToDom()] = [
-          'reflecting',
-          'execute-on-form'
-        ], _b),
-        behaviours: derive$1([
-          Keying.config({
-            mode: 'cyclic',
-            onEscape: function (c) {
-              emit(c, formCloseEvent);
-              return Option.some(true);
-            },
-            useTabstopAt: function (elem) {
-              return !NavigableObject.isPseudoStop(elem) && (name(elem) !== 'button' || get$2(elem, 'disabled') !== 'disabled');
-            }
-          }),
-          Reflecting.config({
-            channel: dialogChannel,
-            updateState: updateState,
-            initialData: dialogInit
-          }),
-          Focusing.config({}),
-          config('execute-on-form', dialogEvents.concat([runOnSource(focusin(), function (comp, se) {
-              Keying.focusIn(comp);
-            })])),
-          RepresentingConfigs.memory({})
-        ]),
-        components: [
-          memHeader.asSpec(),
-          memBody.asSpec(),
-          memFooter.asSpec()
-        ]
-      });
-      var instanceApi = getDialogApi({
-        getRoot: function () {
-          return dialog;
-        },
-        getFooter: function () {
-          return memFooter.get(dialog);
-        },
-        getBody: function () {
-          return memBody.get(dialog);
-        },
-        getFormWrapper: function () {
-          var body = memBody.get(dialog);
-          return Composing.getCurrent(body).getOr(body);
-        }
-      }, extra.redial, objOfCells);
-      return {
-        dialog: dialog,
-        instanceApi: instanceApi
-      };
-    };
-
-    var setup$c = function (extras) {
+    var setup$d = function (extras) {
       var sharedBackstage = extras.backstage.shared;
       var open = function (message, callback) {
         var closeDialog = function () {
@@ -31011,7 +30992,7 @@
       return { open: open };
     };
 
-    var setup$d = function (extras) {
+    var setup$e = function (extras) {
       var sharedBackstage = extras.backstage.shared;
       var open = function (message, callback) {
         var closeDialog = function (state) {
@@ -31090,23 +31071,16 @@
             leftAttr: 'data-dock-left',
             topAttr: 'data-dock-top',
             positionAttr: 'data-dock-pos',
-            modes: ['top'],
-            lazyViewport: function () {
-              var win$1 = win();
-              var headerEle = descendant$1(Element.fromDom(editor.getContainer()), '.tox-editor-header').getOrDie();
-              var headerBounds = absolute$1(headerEle);
-              var topBounds = Math.max(win$1.y(), headerBounds.bottom());
-              return bounds$1(win$1.x(), topBounds, win$1.width(), win$1.bottom() - topBounds);
-            }
+            modes: ['top']
           })];
       }
     };
-    var setup$e = function (extras) {
+    var setup$f = function (extras) {
       var backstage = extras.backstage;
       var editor = extras.editor;
       var isStickyToolbar$1 = isStickyToolbar(editor);
-      var alertDialog = setup$c(extras);
-      var confirmDialog = setup$d(extras);
+      var alertDialog = setup$d(extras);
+      var confirmDialog = setup$e(extras);
       var open = function (config, params, closeWindow) {
         if (params !== undefined && params.inline === 'toolbar') {
           return openInlineDialog(config, backstage.shared.anchors.toolbar(), closeWindow, params.ariaAttrs);
@@ -31220,7 +31194,7 @@
         confirm: confirm
       };
     };
-    var WindowManager = { setup: setup$e };
+    var WindowManager = { setup: setup$f };
 
     function Theme () {
       global$1.add('silver', function (editor) {

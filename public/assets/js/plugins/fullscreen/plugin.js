@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.2 (2019-11-19)
+ * Version: 5.1.3 (2019-12-04)
  */
 (function (domGlobals) {
     'use strict';
@@ -840,13 +840,13 @@
     };
     var getBounds = function (_win) {
       var win = _win === undefined ? domGlobals.window : _win;
+      var doc = win.document;
+      var scroll = get$3(Element.fromDom(doc));
       var visualViewport = win['visualViewport'];
       if (visualViewport !== undefined) {
-        return bounds(visualViewport.pageLeft, visualViewport.pageTop, visualViewport.width, visualViewport.height);
+        return bounds(Math.max(visualViewport.pageLeft, scroll.left()), Math.max(visualViewport.pageTop, scroll.top()), visualViewport.width, visualViewport.height);
       } else {
-        var doc = Element.fromDom(win.document);
-        var html = win.document.documentElement;
-        var scroll = get$3(doc);
+        var html = doc.documentElement;
         var width = html.clientWidth;
         var height = html.clientHeight;
         return bounds(scroll.left(), scroll.top(), width, height);
