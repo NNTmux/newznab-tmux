@@ -168,7 +168,7 @@
 											<td>{$result->size|filesize}</td>
                                             <td style="width:auto;text-align:center;white-space:nowrap;">
                                                 <a title="View file list" href="{{url("/filelist/{$result.guid}")}}">{$result->totalpart}</a>
-                                                <i class="fa fa-file"></i>
+                                                <i class="far fa-file"></i>
                                                     {if $result->rarinnerfilecount > 0}
                                                     <div class="rarfilelist">
                                                         <i class="fas fa-search-plus"></i>
