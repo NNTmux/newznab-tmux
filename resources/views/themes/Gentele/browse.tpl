@@ -80,28 +80,28 @@
 									<tr class="headings">
 										<th><input id="check-all" type="checkbox" class="flat-all"></th>
 										<th>Name<br>
-											<a title="Sort Descending" href="{$orderbyname_desc}"><i class="fas fa-caret-down"></i></a>
-											<a title="Sort Ascending" href="{$orderbyname_asc}"><i class="fas fa-caret-up"> </i></a>
+											<a title="Sort Descending" href="{$orderbyname_desc}"><i class="fas fa-chevron-down"></i></a>
+											<a title="Sort Ascending" href="{$orderbyname_asc}"><i class="fas fa-chevron-up"> </i></a>
 										</th>
 										<th class="column-title" style="display: table-cell;">Category<br>
-                                            <a title="Sort Descending" href="{$orderbycat_desc}"><i class="fas fa-caret-down"></i></a>
-						                    <a title="Sort Ascending" href="{$orderbycat_asc}"><i class="fas fa-caret-up"></i></a>
+                                            <a title="Sort Descending" href="{$orderbycat_desc}"><i class="fas fa-chevron-down"></i></a>
+						                    <a title="Sort Ascending" href="{$orderbycat_asc}"><i class="fas fa-chevron-up"></i></a>
                                         </th>
 										<th class="column-title" style="display: table-cell;">Posted<br>
-                                            <a title="Sort Descending" href="{$orderbyposted_desc}"><i class="fas fa-caret-down"></i></a>
-						                    <a title="Sort Ascending" href="{$orderbyposted_asc}"><i class="fas fa-caret-up"></i></a>
+                                            <a title="Sort Descending" href="{$orderbyposted_desc}"><i class="fas fa-chevron-down"></i></a>
+						                    <a title="Sort Ascending" href="{$orderbyposted_asc}"><i class="fas fa-chevron-up"></i></a>
                                         </th>
 										<th style="vertical-align:top;text-align:center;">Size<br>
-                                            <a title="Sort Descending" href="{$orderbysize_desc}"><i class="fas fa-caret-down"></i></a>
-                                            <a title="Sort Ascending" href="{$orderbysize_asc}"><i class="fas fa-caret-up"></i></a>
+                                            <a title="Sort Descending" href="{$orderbysize_desc}"><i class="fas fa-chevron-down"></i></a>
+                                            <a title="Sort Ascending" href="{$orderbysize_asc}"><i class="fas fa-chevron-up"></i></a>
                                         </th>
                                         <th style="vertical-align:top;text-align:center;">Files<br>
-                                            <a title="Sort Descending" href="{$orderbyfiles_desc}"><i class="fas fa-caret-down"></i></a>
-                                            <a title="Sort Ascending" href="{$orderbyfiles_asc}"><i class="fas fa-caret-up"></i></a>
+                                            <a title="Sort Descending" href="{$orderbyfiles_desc}"><i class="fas fa-chevron-down"></i></a>
+                                            <a title="Sort Ascending" href="{$orderbyfiles_asc}"><i class="fas fa-chevron-up"></i></a>
                                         </th>
                                         <th style="vertical-align:top;text-align:center;">Grabs<br>
-                                            <a title="Sort Descending" href="{$orderbystats_desc}"><i class="fas fa-caret-down"></i></a>
-                                            <a title="Sort Ascending" href="{$orderbystats_asc}"><i class="fas fa-caret-up"></i></a>
+                                            <a title="Sort Descending" href="{$orderbystats_desc}"><i class="fas fa-chevron-down"></i></a>
+                                            <a title="Sort Ascending" href="{$orderbystats_asc}"><i class="fas fa-chevron-up"></i></a>
                                         </th>
 										<th class="column-title no-link last" style="display: table-cell;">Action</th>
 										<th class="bulk-actions" colspan="7">
