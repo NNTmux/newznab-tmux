@@ -19,6 +19,7 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('category', -1);
 
+        $ordering = $releases->getBrowseOrdering();
         $orderBy = request()->has('ob') && ! empty(request()->input('ob')) ? request()->input('ob') : '';
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
@@ -41,6 +42,10 @@ class BrowseController extends BasePageController
                 'resultsadd' => $browse,
             ]
         );
+
+        foreach ($ordering as $orderType) {
+            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/All?ob='.$orderType);
+        }
 
         $meta_title = 'Browse All Releases';
         $meta_keywords = 'browse,nzb,description,details';
@@ -79,6 +84,7 @@ class BrowseController extends BasePageController
         $this->smarty->assign('parentcat', ucfirst($parentCategory));
         $this->smarty->assign('category', $category);
 
+        $ordering = $releases->getBrowseOrdering();
         $orderBy = request()->has('ob') && ! empty(request()->input('ob')) ? request()->input('ob') : '';
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
@@ -129,11 +135,21 @@ class BrowseController extends BasePageController
 
         if ($id === 'All' && $parentCategory === 'All') {
             $meta_title = 'Browse '.$parentCategory.' releases';
+            foreach ($ordering as $orderType) {
+                $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/'.$parentCategory.'?ob='.$orderType);
+            }
         } else {
             $meta_title = 'Browse '.$parentCategory.' / '.$id.' releases';
+            foreach ($ordering as $orderType) {
+                $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/'.$parentCategory.'/'.$id.'?ob='.$orderType);
+            }
         }
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Nzbs';
+
+        foreach ($ordering as $orderType) {
+            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/All?ob='.$orderType);
+        }
 
         $content = $this->smarty->fetch('browse.tpl');
         $this->smarty->assign(compact('content', 'covgroup', 'meta_title', 'meta_keywords', 'meta_description'));
