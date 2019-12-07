@@ -147,10 +147,6 @@ class BrowseController extends BasePageController
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Nzbs';
 
-        foreach ($ordering as $orderType) {
-            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/All?ob='.$orderType);
-        }
-
         $content = $this->smarty->fetch('browse.tpl');
         $this->smarty->assign(compact('content', 'covgroup', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
