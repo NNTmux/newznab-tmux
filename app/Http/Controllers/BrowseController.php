@@ -79,7 +79,7 @@ class BrowseController extends BasePageController
         $this->smarty->assign('parentcat', ucfirst($parentCategory));
         $this->smarty->assign('category', $category);
 
-        $orderBy = '';
+        $orderBy = request()->has('ob') && ! empty(request()->input('ob')) ? request()->input('ob') : '';
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
