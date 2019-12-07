@@ -44,7 +44,7 @@ class BrowseController extends BasePageController
         );
 
         foreach ($ordering as $orderType) {
-            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/All?ob='.$orderType);
+            $this->smarty->assign('orderby'.$orderType, url('browse/All?ob='.$orderType));
         }
 
         $meta_title = 'Browse All Releases';
@@ -136,12 +136,12 @@ class BrowseController extends BasePageController
         if ($id === 'All' && $parentCategory === 'All') {
             $meta_title = 'Browse '.$parentCategory.' releases';
             foreach ($ordering as $orderType) {
-                $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/'.$parentCategory.'?ob='.$orderType);
+                $this->smarty->assign('orderby'.$orderType, url('browse/'.$parentCategory.'?ob='.$orderType));
             }
         } else {
             $meta_title = 'Browse '.$parentCategory.' / '.$id.' releases';
             foreach ($ordering as $orderType) {
-                $this->smarty->assign('orderby'.$orderType, WWW_TOP.'browse/'.$parentCategory.'/'.$id.'?ob='.$orderType);
+                $this->smarty->assign('orderby'.$orderType, url('browse/'.$parentCategory.'/'.$id.'?ob='.$orderType));
             }
         }
         $meta_keywords = 'browse,nzb,description,details';
