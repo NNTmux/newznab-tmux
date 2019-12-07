@@ -166,6 +166,15 @@
 											</td>
 											<td>{Illuminate\Support\Carbon::parse({{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}})->diffForHumans()}</td>
 											<td>{$result->size|filesize}</td>
+                                            <td style="width:auto;text-align:center;white-space:nowrap;">
+                                                <a title="View file list" href="{{url("/filelist/{$result.guid}")}}">{$result->totalpart}</a>
+                                                <i class="fa fa-file"></i>
+                                                    {if $result->rarinnerfilecount > 0}
+                                                    <div class="rarfilelist">
+                                                        <i class="fas fa-search-plus"></i>
+                                                    </div>
+                                                    {/if}
+                                            </td>
                                             <td>{$result->grabs}</td>
 											<td>
 												<a href="{{url("/getnzb?id={$result->guid}")}}"
