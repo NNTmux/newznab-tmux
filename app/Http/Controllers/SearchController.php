@@ -135,8 +135,8 @@ class SearchController extends BasePageController
             foreach ($ordering as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    WWW_TOP.'/search?'.$orderByString.'&search_type=adv&ob='.$orderType
-                );
+                    url('/search?'.$orderByString.'&search_type=adv&ob='.$orderType
+                ));
             }
 
             $searchArr = [

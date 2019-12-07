@@ -99,15 +99,11 @@
                                             <a title="Sort Descending" href="{$orderbyfiles_desc}"><i class="fas fa-chevron-down"></i></a>
                                             <a title="Sort Ascending" href="{$orderbyfiles_asc}"><i class="fas fa-chevron-up"></i></a>
                                         </th>
-                                        <th style="vertical-align:top;text-align:center;">Grabs<br>
+                                        <th style="vertical-align:top;text-align:center;">Downloads<br>
                                             <a title="Sort Descending" href="{$orderbystats_desc}"><i class="fas fa-chevron-down"></i></a>
                                             <a title="Sort Ascending" href="{$orderbystats_asc}"><i class="fas fa-chevron-up"></i></a>
                                         </th>
 										<th class="column-title no-link last" style="display: table-cell;">Action</th>
-										<th class="bulk-actions" colspan="7">
-											<a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span
-														class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
-										</th>
 									</tr>
 									</thead>
 									<tbody>
