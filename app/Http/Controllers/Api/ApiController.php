@@ -267,7 +267,7 @@ class ApiController extends BasePageController
                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $relData = Release::checkGuidForApi($request->input('id'));
                if ($relData) {
-                   return redirect(WWW_TOP.'/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+                   return redirect(url('/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
                }
 
                Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');

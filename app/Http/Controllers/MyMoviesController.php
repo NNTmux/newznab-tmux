@@ -26,9 +26,9 @@ class MyMoviesController extends BasePageController
         $imdbid = $request->input('imdb') ?? '';
 
         if ($request->has('from')) {
-            $this->smarty->assign('from', WWW_TOP.$request->input('from'));
+            $this->smarty->assign('from', url($request->input('from')));
         } else {
-            $this->smarty->assign('from', WWW_TOP.'/mymovies');
+            $this->smarty->assign('from', url('/mymovies'));
         }
 
         switch ($action) {
@@ -39,7 +39,7 @@ class MyMoviesController extends BasePageController
                 }
                 UserMovie::delMovie($this->userdata->id, $imdbid);
                 if ($request->has('from')) {
-                    header('Location:'.WWW_TOP.$request->input('from'));
+                    header('Location:'.url($request->input('from')));
                 } else {
                     return redirect('/mymovies');
                 }
@@ -157,7 +157,7 @@ class MyMoviesController extends BasePageController
                 $this->smarty->assign('covgroup', '');
 
                 foreach ($ordering as $ordertype) {
-                    $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/mymovies/browse?ob='.$ordertype.'&amp;offset=0');
+                    $this->smarty->assign('orderby'.$ordertype, url('/mymovies/browse?ob='.$ordertype.'&amp;offset=0'));
                 }
 
                 $this->smarty->assign('lastvisit', $this->userdata->lastlogin);

@@ -78,7 +78,7 @@ if (! function_exists('makeFieldLinks')) {
             if ($i > 7) {
                 break;
             }
-            $newArr[] = '<a href="'.WWW_TOP.'/'.ucfirst($type).'?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
+            $newArr[] = '<a href="'.url('/'.ucfirst($type).'?'.$field.'='.urlencode($ta)).'" title="'.$ta.'">'.$ta.'</a>';
             $i++;
         }
 

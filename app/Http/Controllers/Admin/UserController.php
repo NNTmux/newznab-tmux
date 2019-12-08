@@ -66,7 +66,7 @@ class UserController extends BasePageController
         );
 
         foreach ($ordering as $orderType) {
-            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'user-list?ob='.$orderType);
+            $this->smarty->assign('orderby'.$orderType, url('admin/user-list?ob='.$orderType));
         }
 
         $content = $this->smarty->fetch('user-list.tpl');

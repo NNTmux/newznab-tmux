@@ -48,7 +48,7 @@ class ShowsController extends BasePageController
                     exit;
                 }
 
-                header('Location:'.WWW_TOP.'admin/show-list');
+                header('Location:'.url('admin/show-list'));
                 break;
 
             case 'view':

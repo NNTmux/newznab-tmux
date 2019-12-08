@@ -87,7 +87,7 @@ class BooksController extends BasePageController
         }
 
         foreach ($ordering as $ordertype) {
-            $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/books?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0');
+            $this->smarty->assign('orderby'.$ordertype, url('/books?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0'));
         }
 
         $this->smarty->assign(
