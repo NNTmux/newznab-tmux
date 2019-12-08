@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3bce991fe31d6165781b1c3aa94c8176",
+    "content-hash": "72e31aad46832e1a1e0809e9f2cb60b0",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -1842,16 +1842,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.4.1",
+            "version": "6.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "0895c932405407fd3a7368b6910c09a24d26db11"
+                "reference": "dbc2bc3a293ed6b1ae08a3651e2bfd213d19b6a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/0895c932405407fd3a7368b6910c09a24d26db11",
-                "reference": "0895c932405407fd3a7368b6910c09a24d26db11",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/dbc2bc3a293ed6b1ae08a3651e2bfd213d19b6a5",
+                "reference": "dbc2bc3a293ed6b1ae08a3651e2bfd213d19b6a5",
                 "shasum": ""
             },
             "require": {
@@ -1866,12 +1866,13 @@
                 "psr/log": "^1.1"
             },
             "suggest": {
+                "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.3-dev"
+                    "dev-master": "6.5-dev"
                 }
             },
             "autoload": {
@@ -1904,7 +1905,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2019-10-23T15:58:00+00:00"
+            "time": "2019-12-07T18:20:45+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -3438,16 +3439,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.57",
+            "version": "1.0.59",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "0e9db7f0b96b9f12dcf6f65bc34b72b1a30ea55a"
+                "reference": "1426da21dae81e1f3fe1074a166eb6dd3045f810"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/0e9db7f0b96b9f12dcf6f65bc34b72b1a30ea55a",
-                "reference": "0e9db7f0b96b9f12dcf6f65bc34b72b1a30ea55a",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/1426da21dae81e1f3fe1074a166eb6dd3045f810",
+                "reference": "1426da21dae81e1f3fe1074a166eb6dd3045f810",
                 "shasum": ""
             },
             "require": {
@@ -3518,7 +3519,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2019-10-16T21:01:05+00:00"
+            "time": "2019-12-08T12:25:29+00:00"
         },
         {
             "name": "league/fractal",
@@ -8804,16 +8805,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.8",
+            "version": "4.7.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "fe9e1077e43f60981dab363108770daaae9818bc"
+                "reference": "a5cbfbd6a19d5a6f9facd5e1e0050f6d60dfd4ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/fe9e1077e43f60981dab363108770daaae9818bc",
-                "reference": "fe9e1077e43f60981dab363108770daaae9818bc",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/a5cbfbd6a19d5a6f9facd5e1e0050f6d60dfd4ec",
+                "reference": "a5cbfbd6a19d5a6f9facd5e1e0050f6d60dfd4ec",
                 "shasum": ""
             },
             "require": {
@@ -8859,127 +8860,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-12-03T07:59:25+00:00"
-        },
-        {
-            "name": "wandersonwhcr/illuminate-romans",
-            "version": "v2.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wandersonwhcr/illuminate-romans.git",
-                "reference": "3dd16a44ef6bb024c27dd30616e6f8a3d22c5103"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wandersonwhcr/illuminate-romans/zipball/3dd16a44ef6bb024c27dd30616e6f8a3d22c5103",
-                "reference": "3dd16a44ef6bb024c27dd30616e6f8a3d22c5103",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^6.0",
-                "php": ">=7.2",
-                "wandersonwhcr/romans": "^1.0"
-            },
-            "require-dev": {
-                "doctrine/instantiator": "^1.0",
-                "illuminate/container": "^6.0",
-                "illuminate/contracts": "^6.0",
-                "jakub-onderka/php-parallel-lint": "^0.9",
-                "phpmd/phpmd": "^2.6",
-                "phpunit/phpunit": "^6.3",
-                "sebastian/phpcpd": "^3.0",
-                "squizlabs/php_codesniffer": "^2.8"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-develop": "1.0.x-dev"
-                },
-                "laravel": {
-                    "providers": [
-                        "Illuminate\\Romans\\Providers\\RomansProvider"
-                    ],
-                    "aliases": {
-                        "IntToRoman": "Illuminate\\Romans\\Support\\Facades\\IntToRoman",
-                        "RomanToInt": "Illuminate\\Romans\\Support\\Facades\\RomanToInt"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Illuminate\\Romans\\": "src/"
-                },
-                "files": [
-                    "src/helpers.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Laravel Illuminate Romans Integration",
-            "keywords": [
-                "converter",
-                "format",
-                "illuminate",
-                "laravel",
-                "roman",
-                "roman-number",
-                "roman-numeral",
-                "validator"
-            ],
-            "time": "2019-09-09T22:52:05+00:00"
-        },
-        {
-            "name": "wandersonwhcr/romans",
-            "version": "v1.1.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wandersonwhcr/romans.git",
-                "reference": "cb076a6371abc6627a261157b856effc77784320"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wandersonwhcr/romans/zipball/cb076a6371abc6627a261157b856effc77784320",
-                "reference": "cb076a6371abc6627a261157b856effc77784320",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0"
-            },
-            "require-dev": {
-                "jakub-onderka/php-parallel-lint": "0.9.*",
-                "phpmd/phpmd": "2.6.*",
-                "phpunit/phpunit": "6.1.*",
-                "sebastian/phpcpd": "3.0.*",
-                "squizlabs/php_codesniffer": "2.8.*"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-develop": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Romans\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A Simple PHP Roman Numerals Library",
-            "keywords": [
-                "converter",
-                "filter",
-                "format",
-                "roman",
-                "roman-number",
-                "roman-numeral",
-                "validator"
-            ],
-            "time": "2018-01-30T11:08:31+00:00"
+            "time": "2019-12-08T02:25:30+00:00"
         },
         {
             "name": "wildbit/swiftmailer-postmark",
