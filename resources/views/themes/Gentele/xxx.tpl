@@ -102,7 +102,7 @@
 															name="viewade{$result->title}"
 															title="View AdultdvdEmpire page"
 													><img
-																src="{{asset("/images/icons/ade.png")}}"
+																src="{{asset("/assets/images/icons/ade.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "adm"}
@@ -112,7 +112,7 @@
 															name="viewadm{$result->title}"
 															title="View AdultDVDMarketplace page"
 													><img
-																src="{{asset("/images/icons/adm.png")}}"
+																src="{{asset("/assets/images/icons/adm.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "aebn"}
@@ -121,7 +121,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewaebn{$result->title}"
 															title="View AEBN page"
-													><img src="{{asset("/images/icons/aebn.png")}}"
+													><img src="{{asset("/assets/images/icons/aebn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "hotm"}
@@ -130,7 +130,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewhm{$result->title}"
 															title="View HotMovies page"
-													><img src="{{asset("/images/icons/hotmovies.png")}}"
+													><img src="{{asset("/assets/images/icons/hotmovies.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "pop"}
@@ -139,7 +139,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewpop{$result->id}"
 															title="View Popporn page"
-													><img src="{{asset("/images/icons/popporn.png")}}"
+													><img src="{{asset("/assets/images/icons/popporn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
@@ -257,7 +257,7 @@
                                                     {if $m@first}
 													<a href="{{url("/XXX?id={$result->id}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg")}}{else}{{asset("/images/no-cover.png")}}"{/if}"
+																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg")}}{else}{{asset("/assets/images/no-cover.png")}}"{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="fa fa-exclamation-circle" style="color: red"
@@ -270,7 +270,7 @@
 															name="viewade{$result->title}"
 															title="View AdultdvdEmpire page"
 													><img
-																src="{{asset("/images/icons/ade.png")}}"
+																src="{{asset("/assets/images/icons/ade.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "adm"}
@@ -280,7 +280,7 @@
 															name="viewadm{$result->title}"
 															title="View AdultDVDMarketplace page"
 													><img
-																src="{{asset("/images/icons/adm.png")}}"
+																src="{{asset("/assets/images/icons/adm.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "aebn"}
@@ -289,7 +289,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewaebn{$result->title}"
 															title="View AEBN page"
-													><img src="{{asset("/images/icons/aebn.png")}}"
+													><img src="{{asset("/assets/images/icons/aebn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "hotm"}
@@ -298,7 +298,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewhm{$result->title}"
 															title="View HotMovies page"
-													><img src="{{asset("/images/icons/hotmovies.png")}}"
+													><img src="{{asset("/assets/images/icons/hotmovies.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "pop"}
@@ -307,7 +307,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewpop{$result->id}"
 															title="View Popporn page"
-													><img src="{{asset("/images/icons/popporn.png")}}"
+													><img src="{{asset("/assets/images/icons/popporn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a

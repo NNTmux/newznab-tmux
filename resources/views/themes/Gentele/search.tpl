@@ -245,7 +245,7 @@
 												{release_flag($result->searchname, browse)}
 												{if $result->passwordstatus == 1}
 													<img title="RAR/ZIP is Passworded."
-														 src="{{asset("/images/icons/lock.gif")}}"
+														 src="{{asset("/assets/images/icons/lock.gif")}}"
 														 alt="RAR/ZIP is Passworded.">
 												{/if}
 												{if $result->videostatus > 0}
@@ -342,7 +342,7 @@
 										   href="{{url("/filelist/{$result->guid}")}}">{$result->totalpart}</a>
 										{if $result->rarinnerfilecount > 0}
 											<div class="rarfilelist">
-												<img src="{{asset("/images/icons/magnifier.png")}}"
+												<img src="{{asset("/assets/images/icons/magnifier.png")}}"
 													 alt="{$result->guid}">
 											</div>
 										{/if}
