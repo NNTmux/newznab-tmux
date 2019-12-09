@@ -81,7 +81,7 @@
 							href="{$site->dereferrer_link}http://nzbindex.com/search/?q={$result.title}"
 							target="_blank"
 					>
-						<img src="{{asset("/assets/images/icons/nzbindex.png")}}"/>
+						<img src="{{asset("/images/icons/nzbindex.png")}}"/>
 						&nbsp;
 					</a>
 				</td>
@@ -92,7 +92,7 @@
 							href="{$site->dereferrer_link}http://binsearch.info/?q={$result.title}"
 							target="_blank"
 					>
-						<img src="{{asset("/assets/images/icons/binsearch.png")}}"/>
+						<img src="{{asset("/images/icons/binsearch.png")}}"/>
 						&nbsp;
 					</a>
 				</td>

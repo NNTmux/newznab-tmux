@@ -9,7 +9,7 @@
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 
 
-	{{Html::style("{{asset("/assets/css/all-css.css")}}")}}
+	{{Html::style("{{asset("/css/all-css.css")}}")}}
 
 </head>
 <body class="nav-md">
@@ -68,7 +68,7 @@
 
 </div>
 
-{{Html::script("{{asset("/assets/js/all-js.js")}}")}}
+{{Html::script("{{asset("/js/all-js.js")}}")}}
 
 </body>
 
