@@ -19,7 +19,6 @@
  * @copyright 2014 nZEDb
  */
 use App\Models\Category;
-use Illuminate\Support\Str;
 
 /**
  * Returns the value of the specified Category constant.
