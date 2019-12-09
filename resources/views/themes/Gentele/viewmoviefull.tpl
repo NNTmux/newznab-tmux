@@ -20,7 +20,7 @@
 					{else}
 						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
-							 src="{asset("/images/nomoviecover.jpg")}}"/>
+							 src="{asset("/assets/images/nomoviecover.jpg")}}"/>
 					{/if}
 					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"} ({$result->year})</span>
 					<a class="btn btn-transparent btn-success" target="_blank"
