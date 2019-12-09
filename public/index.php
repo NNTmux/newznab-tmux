@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 

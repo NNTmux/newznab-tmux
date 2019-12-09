@@ -1,3 +1,5 @@
+2019-12-09 DariusIII
+	* Chg: Remove smarty.php from index.php
 2019-12-08 DariusIII
 	* Chg: Replace WWW_TOP with url() helper
 2019-12-03 DariusIII
