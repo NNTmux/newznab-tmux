@@ -159,7 +159,7 @@ function release_flag($text, $page)
         $www = Str::finish(WWW_TOP, '/');
 
         return
-            '<img title="'.$language.'" alt="'.$language.'" src="'.$www.'assets/images/flags/'.$code.'.png"/>';
+            '<img title="'.$language.'" alt="'.$language.'" src="'.asset('assets/images/flags/'.$code.'.png').'"/>';
     }
 
     if ($page === 'search') {
