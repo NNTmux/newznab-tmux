@@ -16,18 +16,18 @@
 				<th>options</th>
 			</tr>
 
-			{foreach from=$releaselist item=release}
+			{foreach $releaselist as $release}
 				<tr class="{cycle values=",alt"}">
 					<td title="{$release.name}"><a
-								href="{{url("/admin/release-edit?id={$release.guid}")}}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+								href="{{url("/admin/release-edit?id={$release->guid}")}}">{$release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 					</td>
-					<td class="less">{$release.category_name}</td>
-					<td class="less right">{$release.size|filesize}</td>
-					<td class="less mid"><a href="release-files?id={$release.guid}">{$release.totalpart}</a></td>
-					<td class="less">{Timezone::convertToLocal($release.postdate, 'Y-m-d H:i:s')}}</td>
-					<td class="less">{$release.adddate|date_format}</td>
-					<td class="less mid">{$release.grabs}</td>
-					<td><a href="{{url("/admin/release-delete/{$release.guid}")}}">delete</a></td>
+					<td class="less">{$release->category_name}</td>
+					<td class="less right">{$release->size|filesize}</td>
+					<td class="less mid"><a href="release-files?id={$release->guid}">{$release->totalpart}</a></td>
+					<td class="less">{Timezone::convertToLocal($release->postdate, 'Y-m-d H:i:s')}}</td>
+					<td class="less">{$release->adddate|date_format}</td>
+					<td class="less mid">{$release->grabs}</td>
+					<td><a href="{{url("/admin/release-delete/{$release->guid}")}}">delete</a></td>
 				</tr>
 			{/foreach}
 
