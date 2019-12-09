@@ -688,16 +688,16 @@
         },
         {
             "name": "dariusiii/rarinfo",
-            "version": "v2.7.4.1",
+            "version": "v2.7.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "37f18f0cd5da625cbcb399bfcf49238b34fffa68"
+                "reference": "c43c3ab99de6e0fdc3a102dfe80afdf278d4a845"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/37f18f0cd5da625cbcb399bfcf49238b34fffa68",
-                "reference": "37f18f0cd5da625cbcb399bfcf49238b34fffa68",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/c43c3ab99de6e0fdc3a102dfe80afdf278d4a845",
+                "reference": "c43c3ab99de6e0fdc3a102dfe80afdf278d4a845",
                 "shasum": ""
             },
             "require": {
@@ -723,15 +723,15 @@
             ],
             "authors": [
                 {
-                    "name": "Hecks"
-                },
-                {
                     "name": "DariusIII",
                     "email": "dkrisan@gmail.com"
+                },
+                {
+                    "name": "Hecks"
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2019-03-20T11:22:25+00:00"
+            "time": "2019-12-09T14:53:22+00:00"
         },
         {
             "name": "dariusiii/tmdb-laravel",
@@ -3439,16 +3439,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.59",
+            "version": "1.0.61",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "1426da21dae81e1f3fe1074a166eb6dd3045f810"
+                "reference": "4fb13c01784a6c9f165a351e996871488ca2d8c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/1426da21dae81e1f3fe1074a166eb6dd3045f810",
-                "reference": "1426da21dae81e1f3fe1074a166eb6dd3045f810",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/4fb13c01784a6c9f165a351e996871488ca2d8c9",
+                "reference": "4fb13c01784a6c9f165a351e996871488ca2d8c9",
                 "shasum": ""
             },
             "require": {
@@ -3519,7 +3519,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2019-12-08T12:25:29+00:00"
+            "time": "2019-12-08T21:46:50+00:00"
         },
         {
             "name": "league/fractal",
