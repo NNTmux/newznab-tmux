@@ -7,7 +7,7 @@
 	<meta name="csrf-token" content="{{csrf_token()}}">
 
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-	{{Html::style("{{asset('/assets/css/all-css.css')}}")}}
+	{{Html::style("{{asset('/css/all-css.css')}}")}}
 
 </head>
 <body class="nav-md">
@@ -24,7 +24,7 @@
 				{if Auth::check()}
 					<div class="profile">
 						<div class="profile_pic">
-							<img src="{{asset('/assets/images/userimage.png')}}" alt="User Image"
+							<img src="{{asset('/images/userimage.png')}}" alt="User Image"
 								 class="img-circle profile_img">
 						</div>
 						<div class="profile_info">
@@ -194,7 +194,7 @@
 <!-- /footer content -->
 
 <!-- jQuery 3.3.0 -->
-{{Html::script("{{asset("/assets/js/all-js.js")}}")}}
+{{Html::script("{{asset("/js/all-js.js")}}")}}
 
 
 <script>

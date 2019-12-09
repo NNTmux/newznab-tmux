@@ -71,7 +71,7 @@
 												<div class="col-md-2 small-gutter-left">
 													<a title="View details"
 													   href="{{url("/details/{$result->guid}")}}">
-														<img src="{{url("/covers/console/{if $result->cover == 1}{$result->consoleinfo_id}.jpg{else}{{asset("/assets/images/no-cover.png")}}{/if}")}}"
+														<img src="{{url("/covers/console/{if $result->cover == 1}{$result->consoleinfo_id}.jpg{else}{{asset("/images/no-cover.png")}}{/if}")}}"
 															 class="img-fluid rounded"
 															 width="140" border="0"
 															 alt="{$result->title|escape:"htmlall"}"/>{if !empty($result->failed)}
