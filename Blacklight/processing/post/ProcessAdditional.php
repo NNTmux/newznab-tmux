@@ -1702,65 +1702,69 @@ class ProcessAdditional
             if (! $retVal) {
 
                 // Get the media info for the file.
-                $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
+                try {
+                    $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
-                if ($xmlArray !== null) {
-                    foreach ($xmlArray->getAudios() as $track) {
-                        if ($track->get('album') !== null && $track->get('performer') !== null) {
-                            if ((int) $this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
-                                // Make the extension upper case.
-                                $ext = strtoupper($fileExtension);
+                    if ($xmlArray !== null) {
+                        foreach ($xmlArray->getAudios() as $track) {
+                            if ($track->get('album') !== null && $track->get('performer') !== null) {
+                                if ((int)$this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
+                                    // Make the extension upper case.
+                                    $ext = strtoupper($fileExtension);
 
-                                // Form a new search name.
-                                if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
-                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' ('.$Year[0].') '.$ext;
-                                } else {
-                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' '.$ext;
+                                    // Form a new search name.
+                                    if (!empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
+                                        $newName = $track->get('performer')->getFullName() . ' - ' . $track->get('album')->getFullName() . ' (' . $Year[0] . ') ' . $ext;
+                                    } else {
+                                        $newName = $track->get('performer')->getFullName() . ' - ' . $track->get('album')->getFullName() . ' ' . $ext;
+                                    }
+
+                                    // Get the category or try to determine it.
+                                    if ($ext === 'MP3') {
+                                        $newCat = Category::MUSIC_MP3;
+                                    } elseif ($ext === 'FLAC') {
+                                        $newCat = Category::MUSIC_LOSSLESS;
+                                    } else {
+                                        $newCat = $this->_categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname);
+                                    }
+
+                                    $newTitle = escapeString(substr($newName, 0, 255));
+                                    // Update the search name.
+                                    $release = Release::whereId($this->_release->id);
+                                    $release->update(['searchname' => $newTitle, 'categories_id' => $newCat['categories_id'], 'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1]);
+                                    $release->retag($newCat['tags']);
+                                    $this->sphinx->updateRelease($this->_release->id);
+
+                                    // Echo the changed name.
+                                    if ($this->_echoCLI) {
+                                        NameFixer::echoChangedReleaseName(
+                                            [
+                                                'new_name' => $newName,
+                                                'old_name' => $rQuery->searchname,
+                                                'new_category' => $newCat,
+                                                'old_category' => $rQuery->id,
+                                                'group' => $rQuery->groups_id,
+                                                'releases_id' => $this->_release->id,
+                                                'method' => 'ProcessAdditional->_getAudioInfo',
+                                            ]
+                                        );
+                                    }
                                 }
 
-                                // Get the category or try to determine it.
-                                if ($ext === 'MP3') {
-                                    $newCat = Category::MUSIC_MP3;
-                                } elseif ($ext === 'FLAC') {
-                                    $newCat = Category::MUSIC_LOSSLESS;
-                                } else {
-                                    $newCat = $this->_categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname);
-                                }
+                                // Add the media info.
+                                $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
 
-                                $newTitle = escapeString(substr($newName, 0, 255));
-                                // Update the search name.
-                                $release = Release::whereId($this->_release->id);
-                                $release->update(['searchname' => $newTitle, 'categories_id' => $newCat['categories_id'],  'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1]);
-                                $release->retag($newCat['tags']);
-                                $this->sphinx->updateRelease($this->_release->id);
-
-                                // Echo the changed name.
+                                $retVal = true;
+                                $this->_foundAudioInfo = true;
                                 if ($this->_echoCLI) {
-                                    NameFixer::echoChangedReleaseName(
-                                        [
-                                            'new_name' => $newName,
-                                            'old_name' => $rQuery->searchname,
-                                            'new_category' => $newCat,
-                                            'old_category' => $rQuery->id,
-                                            'group' => $rQuery->groups_id,
-                                            'releases_id' => $this->_release->id,
-                                            'method' => 'ProcessAdditional->_getAudioInfo',
-                                        ]
-                                    );
+                                    $this->_echo('a', 'primaryOver');
                                 }
+                                break;
                             }
-
-                            // Add the media info.
-                            $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
-
-                            $retVal = true;
-                            $this->_foundAudioInfo = true;
-                            if ($this->_echoCLI) {
-                                $this->_echo('a', 'primaryOver');
-                            }
-                            break;
                         }
                     }
+                } catch (\RuntimeException $e) {
+                    Log::debug($e->getMessage());
                 }
             }
 
