@@ -1708,15 +1708,15 @@ class ProcessAdditional
                     if ($xmlArray !== null) {
                         foreach ($xmlArray->getAudios() as $track) {
                             if ($track->get('album') !== null && $track->get('performer') !== null) {
-                                if ((int)$this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
+                                if ((int) $this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
                                     // Make the extension upper case.
                                     $ext = strtoupper($fileExtension);
 
                                     // Form a new search name.
-                                    if (!empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
-                                        $newName = $track->get('performer')->getFullName() . ' - ' . $track->get('album')->getFullName() . ' (' . $Year[0] . ') ' . $ext;
+                                    if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
+                                        $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' ('.$Year[0].') '.$ext;
                                     } else {
-                                        $newName = $track->get('performer')->getFullName() . ' - ' . $track->get('album')->getFullName() . ' ' . $ext;
+                                        $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' '.$ext;
                                     }
 
                                     // Get the category or try to determine it.
