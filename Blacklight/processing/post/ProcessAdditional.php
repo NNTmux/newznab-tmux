@@ -2104,6 +2104,7 @@ class ProcessAdditional
                 return true;
             } catch (\RuntimeException $e) {
                 Log::debug($e->getMessage());
+
                 return false;
             }
         }
