@@ -1,3 +1,5 @@
+2019-12-10 DariusIII
+	* Chg: Update laravel/framework and laravel/horizon to latest versions
 2019-12-09 DariusIII
 	* Chg: Remove smarty.php from index.php
 2019-12-08 DariusIII
