@@ -2084,23 +2084,28 @@ class ProcessAdditional
 
         // Look for the video file.
         if (File::isFile($fileLocation)) {
-            $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
+            try {
+                $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
-            // Check if we got it.
+                // Check if we got it.
 
-            if ($xmlArray === null) {
+                if ($xmlArray === null) {
+                    return false;
+                }
+
+                // Insert it into the DB.
+                $this->_releaseExtra->addFull($this->_release->id, $xmlArray);
+                $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
+
+                if ($this->_echoCLI) {
+                    $this->_echo('m', 'primaryOver');
+                }
+
+                return true;
+            } catch (\RuntimeException $e) {
+                Log::debug($e->getMessage());
                 return false;
             }
-
-            // Insert it into the DB.
-            $this->_releaseExtra->addFull($this->_release->id, $xmlArray);
-            $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
-
-            if ($this->_echoCLI) {
-                $this->_echo('m', 'primaryOver');
-            }
-
-            return true;
         }
 
         return false;
