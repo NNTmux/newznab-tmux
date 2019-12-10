@@ -156,7 +156,7 @@ function release_flag($text, $page)
 
     if ($code !== '' && $page === 'browse') {
         return
-            '<img title="'.$language.'" alt="'.$language.'" src="'.asset('/images/flags/'.$code.'.png').'"/>';
+            '<img title="'.$language.'" alt="'.$language.'" src="'.asset('/assets/images/flags/'.$code.'.png').'"/>';
     }
 
     if ($page === 'search') {
