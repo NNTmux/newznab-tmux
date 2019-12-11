@@ -45,111 +45,111 @@ function release_flag($text, $page)
 
     switch (true) {
         case stripos($text, 'Arabic') !== false:
-            $code = 'pk';
+            $code = 'PK';
             $language = 'Arabic';
             break;
         case stripos($text, 'Cantonese') !== false:
-            $code = 'tw';
+            $code = 'TW';
             $language = 'Cantonese';
             break;
         case preg_match('/Chinese|Mandarin|\bc[hn]\b/i', $text):
-            $code = 'cn';
+            $code = 'CN';
             $language = 'Chinese';
             break;
         case preg_match('/\bCzech\b/i', $text):
-            $code = 'cz';
+            $code = 'CZ';
             $language = 'Czech';
             break;
         case stripos($text, 'Danish') !== false:
-            $code = 'dk';
+            $code = 'DK';
             $language = 'Danish';
             break;
         case stripos($text, 'Finnish') !== false:
-            $code = 'fi';
+            $code = 'FI';
             $language = 'Finnish';
             break;
         case preg_match('/Flemish|\b(Dutch|nl)\b|NlSub/i', $text):
-            $code = 'nl';
+            $code = 'NL';
             $language = 'Dutch';
             break;
         case preg_match('/French|Vostfr|Multi/i', $text):
-            $code = 'fr';
+            $code = 'FR';
             $language = 'French';
             break;
         case preg_match('/German(bed)?|\bger\b/i', $text):
-            $code = 'de';
+            $code = 'DE';
             $language = 'German';
             break;
         case preg_match('/\bGreek\b/i', $text):
-            $code = 'gr';
+            $code = 'GR';
             $language = 'Greek';
             break;
         case preg_match('/Hebrew|Yiddish/i', $text):
-            $code = 'il';
+            $code = 'IL';
             $language = 'Hebrew';
             break;
         case preg_match('/\bHindi\b/i', $text):
-            $code = 'in';
+            $code = 'IN';
             $language = 'Hindi';
             break;
         case preg_match('/Hungarian|\bhun\b/i', $text):
-            $code = 'hu';
+            $code = 'HU';
             $language = 'Hungarian';
             break;
         case preg_match('/Italian|\bita\b/i', $text):
-            $code = 'it';
+            $code = 'IT';
             $language = 'Italian';
             break;
         case preg_match('/Japanese|\bjp\b/i', $text):
-            $code = 'jp';
+            $code = 'JP';
             $language = 'Japanese';
             break;
         case preg_match('/Korean|\bkr\b/i', $text):
-            $code = 'kr';
+            $code = 'KR';
             $language = 'Korean';
             break;
         case stripos($text, 'Norwegian') !== false:
-            $code = 'no';
+            $code = 'NO';
             $language = 'Norwegian';
             break;
         case stripos($text, 'Polish') !== false:
-            $code = 'pl';
+            $code = 'PL';
             $language = 'Polish';
             break;
         case stripos($text, 'Portuguese') !== false:
-            $code = 'pt';
+            $code = 'PT';
             $language = 'Portugese';
             break;
         case stripos($text, 'Romanian') !== false:
-            $code = 'ro';
+            $code = 'RO';
             $language = 'Romanian';
             break;
         case stripos($text, 'Spanish') !== false:
-            $code = 'es';
+            $code = 'ES';
             $language = 'Spanish';
             break;
         case preg_match('/Swe(dish|sub)/i', $text):
-            $code = 'se';
+            $code = 'SE';
             $language = 'Swedish';
             break;
         case preg_match('/Tagalog|Filipino/i', $text):
-            $code = 'ph';
+            $code = 'PH';
             $language = 'Tagalog|Filipino';
             break;
         case preg_match('/\bThai\b/i', $text):
-            $code = 'th';
+            $code = 'TH';
             $language = 'Thai';
             break;
         case stripos($text, 'Turkish') !== false:
-            $code = 'tr';
+            $code = 'TR';
             $language = 'Turkish';
             break;
         case stripos($text, 'Russian') !== false:
-            $code = 'ru';
+            $code = 'RU';
             $language = 'Russian';
             break;
         case stripos($text, 'Vietnamese') !== false:
-            $code = 'vn';
+            $code = 'VN';
             $language = 'Vietnamese';
             break;
     }

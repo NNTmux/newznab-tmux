@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.3 (2019-12-04)
+ * Version: 5.1.4 (2019-12-11)
  */
 (function (domGlobals) {
     'use strict';
@@ -394,7 +394,8 @@
     var Html = { wrapCharWithSpan: wrapCharWithSpan };
 
     var isMatch = function (n) {
-      return isText(n) && value(n) !== undefined && Data.regExp.test(value(n));
+      var value$1 = value(n);
+      return isText(n) && value$1 !== undefined && Data.regExp.test(value$1);
     };
     var filterDescendants = function (scope, predicate) {
       var result = [];
@@ -416,8 +417,8 @@
         elm = elm.parentNode;
       }
     };
-    var replaceWithSpans = function (html) {
-      return html.replace(Data.regExpGlobal, Html.wrapCharWithSpan);
+    var replaceWithSpans = function (text) {
+      return text.replace(Data.regExpGlobal, Html.wrapCharWithSpan);
     };
     var Nodes = {
       isMatch: isMatch,
@@ -436,7 +437,7 @@
         if (isWrappedNbsp(parent)) {
           add$2(Element.fromDom(parent), Data.nbspClass);
         } else {
-          var withSpans = Nodes.replaceWithSpans(value(n));
+          var withSpans = Nodes.replaceWithSpans(editor.dom.encode(value(n)));
           var div = editor.dom.create('div', null, withSpans);
           var node = void 0;
           while (node = div.lastChild) {

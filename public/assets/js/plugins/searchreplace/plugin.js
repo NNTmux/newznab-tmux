@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.3 (2019-12-04)
+ * Version: 5.1.4 (2019-12-11)
  */
 (function () {
     'use strict';
@@ -309,11 +309,13 @@
         dom.remove(parent);
       }
     };
+    var escapeSearchText = function (text, wholeWord) {
+      var escapedText = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&').replace(/\s/g, '[^\\S\\r\\n]');
+      return wholeWord ? '\\b' + escapedText + '\\b' : escapedText;
+    };
     var find = function (editor, currentSearchState, text, matchCase, wholeWord) {
-      text = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-      text = text.replace(/\s/g, '[^\\S\\r\\n]');
-      text = wholeWord ? '\\b' + text + '\\b' : text;
-      var count = markAllMatches(editor, currentSearchState, new RegExp(text, matchCase ? 'g' : 'gi'));
+      var escapedText = escapeSearchText(text, wholeWord);
+      var count = markAllMatches(editor, currentSearchState, new RegExp(escapedText, matchCase ? 'g' : 'gi'));
       if (count) {
         var newIndex = moveSelection(editor, currentSearchState, true);
         currentSearchState.set({
@@ -630,6 +632,14 @@
         var updatePrev = hasPrev(editor, currentSearchState) ? api.enable : api.disable;
         updatePrev('prev');
       }
+      var updateSearchState = function (api) {
+        var data = api.getData();
+        var current = currentSearchState.get();
+        currentSearchState.set(__assign(__assign({}, current), {
+          matchCase: data.matchcase,
+          wholeWord: data.wholewords
+        }));
+      };
       var disableAll = function (api, disable) {
         var buttons = [
           'replace',
@@ -791,6 +801,11 @@
           case 'next':
             next(editor, currentSearchState);
             updateButtonStates(api);
+            break;
+          case 'matchcase':
+          case 'wholewords':
+            updateSearchState(api);
+            reset(api);
             break;
           default:
             break;

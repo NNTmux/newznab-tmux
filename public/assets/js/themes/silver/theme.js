@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.3 (2019-12-04)
+ * Version: 5.1.4 (2019-12-11)
  */
 (function (domGlobals) {
     'use strict';
@@ -17656,6 +17656,9 @@
     var getFetch$1 = function (items, getButton, backstage) {
       var getMenuItemAction = function (item) {
         return function (api) {
+          var newValue = !api.isActive();
+          api.setActive(newValue);
+          item.storage.set(newValue);
           backstage.shared.getSink().each(function (sink) {
             getButton().getOpt(sink).each(function (orig) {
               focus$1(orig.element());
@@ -17665,9 +17668,6 @@
               });
             });
           });
-          var newValue = !api.isActive();
-          api.setActive(newValue);
-          item.storage.set(newValue);
         };
       };
       var getMenuItemSetup = function (item) {
