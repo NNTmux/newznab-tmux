@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-require_once NN_LIB.'utility/SmartyUtils.php';
-
 use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Forumpost;
