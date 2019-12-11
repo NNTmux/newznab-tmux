@@ -356,7 +356,7 @@ if (! function_exists('getZipped')) {
 }
 
 if (! function_exists('release_flag')) {
-// Function inspired by c0r3@newznabforums adds country flags on the browse page.
+    // Function inspired by c0r3@newznabforums adds country flags on the browse page.
     /**
      * @param string $text Text to match against.
      * @param string $page Type of page. browse or search.
@@ -480,7 +480,7 @@ if (! function_exists('release_flag')) {
 
         if ($code !== '' && $page === 'browse') {
             return
-                '<img title="' . $language . '" alt="' . $language . '" src="' . asset('/assets/images/flags/' . $code . '.png') . '"/>';
+                '<img title="'.$language.'" alt="'.$language.'" src="'.asset('/assets/images/flags/'.$code.'.png').'"/>';
         }
 
         if ($page === 'search') {
