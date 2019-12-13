@@ -1743,26 +1743,27 @@
         },
         {
             "name": "geoip2/geoip2",
-            "version": "v2.9.0",
+            "version": "v2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maxmind/GeoIP2-php.git",
-                "reference": "a807fbf65212eef5d8d2db1a1b31082b53633d77"
+                "reference": "419557cd21d9fe039721a83490701a58c8ce784a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxmind/GeoIP2-php/zipball/a807fbf65212eef5d8d2db1a1b31082b53633d77",
-                "reference": "a807fbf65212eef5d8d2db1a1b31082b53633d77",
+                "url": "https://api.github.com/repos/maxmind/GeoIP2-php/zipball/419557cd21d9fe039721a83490701a58c8ce784a",
+                "reference": "419557cd21d9fe039721a83490701a58c8ce784a",
                 "shasum": ""
             },
             "require": {
-                "maxmind-db/reader": "~1.0",
-                "maxmind/web-service-common": "~0.5",
-                "php": ">=5.4"
+                "ext-json": "*",
+                "maxmind-db/reader": "~1.5",
+                "maxmind/web-service-common": "~0.6",
+                "php": ">=5.6"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "2.*",
-                "phpunit/phpunit": "4.*",
+                "phpunit/phpunit": "5.*",
                 "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
@@ -1779,7 +1780,7 @@
                 {
                     "name": "Gregory J. Oschwald",
                     "email": "goschwald@maxmind.com",
-                    "homepage": "http://www.maxmind.com/"
+                    "homepage": "https://www.maxmind.com/"
                 }
             ],
             "description": "MaxMind GeoIP2 PHP API",
@@ -1791,7 +1792,7 @@
                 "geolocation",
                 "maxmind"
             ],
-            "time": "2018-04-10T15:32:59+00:00"
+            "time": "2019-12-12T18:48:39+00:00"
         },
         {
             "name": "google/recaptcha",
@@ -3116,16 +3117,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v2.1.1",
+            "version": "v2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "05af183b914b6f8dca890eadb3edccbbc3ce887b"
+                "reference": "a4d11d6dcc16fab19c75faa1fcfa0a688dfa2bd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/05af183b914b6f8dca890eadb3edccbbc3ce887b",
-                "reference": "05af183b914b6f8dca890eadb3edccbbc3ce887b",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/a4d11d6dcc16fab19c75faa1fcfa0a688dfa2bd8",
+                "reference": "a4d11d6dcc16fab19c75faa1fcfa0a688dfa2bd8",
                 "shasum": ""
             },
             "require": {
@@ -3133,15 +3134,16 @@
                 "laravel/framework": "~5.8.0|^6.0|^7.0",
                 "moontoast/math": "^1.1",
                 "php": "^7.1.3",
-                "symfony/var-dumper": "^4.1"
+                "symfony/var-dumper": "^4.1|^5.0"
             },
             "require-dev": {
+                "ext-gd": "*",
                 "orchestra/testbench": "^3.8|^4.0|^5.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0-dev"
+                    "dev-master": "2.x-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -3174,7 +3176,7 @@
                 "laravel",
                 "monitoring"
             ],
-            "time": "2019-11-23T16:51:14+00:00"
+            "time": "2019-12-13T14:44:09+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -3693,16 +3695,16 @@
         },
         {
             "name": "maxmind-db/reader",
-            "version": "v1.5.0",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maxmind/MaxMind-DB-Reader-php.git",
-                "reference": "bd436094fc0a9b0558a899fb80b0ae34fe1808a0"
+                "reference": "f096bbe4d37e3d93e62626297bfc2179472a972d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxmind/MaxMind-DB-Reader-php/zipball/bd436094fc0a9b0558a899fb80b0ae34fe1808a0",
-                "reference": "bd436094fc0a9b0558a899fb80b0ae34fe1808a0",
+                "url": "https://api.github.com/repos/maxmind/MaxMind-DB-Reader-php/zipball/f096bbe4d37e3d93e62626297bfc2179472a972d",
+                "reference": "f096bbe4d37e3d93e62626297bfc2179472a972d",
                 "shasum": ""
             },
             "require": {
@@ -3746,31 +3748,31 @@
                 "geolocation",
                 "maxmind"
             ],
-            "time": "2019-09-30T22:56:38+00:00"
+            "time": "2019-12-12T18:32:55+00:00"
         },
         {
             "name": "maxmind/web-service-common",
-            "version": "v0.5.0",
+            "version": "v0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maxmind/web-service-common-php.git",
-                "reference": "61a9836fa3bb1743ab89752bae5005d71e78c73b"
+                "reference": "40c928bb0194c45088b369a17f9baef9c3fc7460"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxmind/web-service-common-php/zipball/61a9836fa3bb1743ab89752bae5005d71e78c73b",
-                "reference": "61a9836fa3bb1743ab89752bae5005d71e78c73b",
+                "url": "https://api.github.com/repos/maxmind/web-service-common-php/zipball/40c928bb0194c45088b369a17f9baef9c3fc7460",
+                "reference": "40c928bb0194c45088b369a17f9baef9c3fc7460",
                 "shasum": ""
             },
             "require": {
                 "composer/ca-bundle": "^1.0.3",
                 "ext-curl": "*",
                 "ext-json": "*",
-                "php": ">=5.4"
+                "php": ">=5.6"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "2.*",
-                "phpunit/phpunit": "4.*",
+                "phpunit/phpunit": "^4.8.36 || ^5.7 || ^6.5 || ^7.0",
                 "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
@@ -3792,7 +3794,7 @@
             ],
             "description": "Internal MaxMind Web Service API",
             "homepage": "https://github.com/maxmind/web-service-common-php",
-            "time": "2018-02-12T22:31:54+00:00"
+            "time": "2019-12-12T15:56:05+00:00"
         },
         {
             "name": "mhor/php-mediainfo",
@@ -5375,28 +5377,29 @@
         },
         {
             "name": "phpoption/phpoption",
-            "version": "1.6.1",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-option.git",
-                "reference": "a8593bf5176bf3d3f2966942c530be19b44ec87c"
+                "reference": "318ad673ba36e53e10ca510aec1c54b4f2a5f2ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/a8593bf5176bf3d3f2966942c530be19b44ec87c",
-                "reference": "a8593bf5176bf3d3f2966942c530be19b44ec87c",
+                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/318ad673ba36e53e10ca510aec1c54b4f2a5f2ae",
+                "reference": "318ad673ba36e53e10ca510aec1c54b4f2a5f2ae",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.5.9 || ^7.0"
             },
             "require-dev": {
+                "bamarni/composer-bin-plugin": "^1.3",
                 "phpunit/phpunit": "^4.8.35 || ^5.0 || ^6.0 || ^7.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6-dev"
+                    "dev-master": "1.7-dev"
                 }
             },
             "autoload": {
@@ -5425,7 +5428,7 @@
                 "php",
                 "type"
             ],
-            "time": "2019-12-11T13:45:14+00:00"
+            "time": "2019-12-13T00:10:22+00:00"
         },
         {
             "name": "pragmarx/firewall",
@@ -6385,16 +6388,16 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "120b9d78ed94f71963f78da461581669b5085ff3"
+                "reference": "dd587505e009ea1b13ce343ef09c2fc3905e2774"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/120b9d78ed94f71963f78da461581669b5085ff3",
-                "reference": "120b9d78ed94f71963f78da461581669b5085ff3",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/dd587505e009ea1b13ce343ef09c2fc3905e2774",
+                "reference": "dd587505e009ea1b13ce343ef09c2fc3905e2774",
                 "shasum": ""
             },
             "require": {
@@ -6444,7 +6447,7 @@
                 "laravel-directory-cleanup",
                 "spatie"
             ],
-            "time": "2019-09-04T19:00:48+00:00"
+            "time": "2019-12-12T16:47:16+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
@@ -10025,16 +10028,16 @@
         },
         {
             "name": "fzaninotto/faker",
-            "version": "v1.9.0",
+            "version": "v1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "27a216cbe72327b2d6369fab721a5843be71e57d"
+                "reference": "fc10d778e4b84d5bd315dad194661e091d307c6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/27a216cbe72327b2d6369fab721a5843be71e57d",
-                "reference": "27a216cbe72327b2d6369fab721a5843be71e57d",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/fc10d778e4b84d5bd315dad194661e091d307c6f",
+                "reference": "fc10d778e4b84d5bd315dad194661e091d307c6f",
                 "shasum": ""
             },
             "require": {
@@ -10047,7 +10050,9 @@
             },
             "type": "library",
             "extra": {
-                "branch-alias": []
+                "branch-alias": {
+                    "dev-master": "1.9-dev"
+                }
             },
             "autoload": {
                 "psr-4": {
@@ -10069,7 +10074,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2019-11-14T13:13:06+00:00"
+            "time": "2019-12-12T13:22:17+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -12142,16 +12147,16 @@
         },
         {
             "name": "scrivo/highlight.php",
-            "version": "v9.15.10.0",
+            "version": "v9.16.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scrivo/highlight.php.git",
-                "reference": "9ad3adb4456dc91196327498dbbce6aa1ba1239e"
+                "reference": "e1f92b62790f489a0986be860aefacb3c9f0a3d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scrivo/highlight.php/zipball/9ad3adb4456dc91196327498dbbce6aa1ba1239e",
-                "reference": "9ad3adb4456dc91196327498dbbce6aa1ba1239e",
+                "url": "https://api.github.com/repos/scrivo/highlight.php/zipball/e1f92b62790f489a0986be860aefacb3c9f0a3d3",
+                "reference": "e1f92b62790f489a0986be860aefacb3c9f0a3d3",
                 "shasum": ""
             },
             "require": {
@@ -12161,7 +12166,8 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8|^5.7",
-                "symfony/finder": "^2.8"
+                "symfony/finder": "^3.4",
+                "symfony/var-dumper": "^3.4"
             },
             "suggest": {
                 "ext-dom": "Needed to make use of the features in the utilities namespace"
@@ -12183,18 +12189,18 @@
             "authors": [
                 {
                     "name": "Geert Bergman",
-                    "role": "Project Author",
-                    "homepage": "http://www.scrivo.org/"
+                    "homepage": "http://www.scrivo.org/",
+                    "role": "Project Author"
                 },
                 {
                     "name": "Vladimir Jimenez",
-                    "role": "Contributor",
-                    "homepage": "https://allejo.io"
+                    "homepage": "https://allejo.io",
+                    "role": "Maintainer"
                 },
                 {
                     "name": "Martin Folkers",
-                    "role": "Contributor",
-                    "homepage": "https://twobrain.io"
+                    "homepage": "https://twobrain.io",
+                    "role": "Contributor"
                 }
             ],
             "description": "Server side syntax highlighter that supports 185 languages. It's a PHP port of highlight.js",
@@ -12205,7 +12211,7 @@
                 "highlight.php",
                 "syntax"
             ],
-            "time": "2019-08-27T04:27:48+00:00"
+            "time": "2019-12-13T02:58:38+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
