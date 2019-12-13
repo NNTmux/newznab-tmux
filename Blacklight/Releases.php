@@ -102,7 +102,7 @@ class Releases extends Release
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $orderBy[0],
             $orderBy[1],
-            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            ($start === 0 ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
         $releases = Cache::get(md5($qry.$page));
