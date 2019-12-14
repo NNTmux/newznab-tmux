@@ -102,7 +102,7 @@ class Releases extends Release
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $orderBy[0],
             $orderBy[1],
-            ($start === 0 ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
         $releases = Cache::get(md5($qry.$page));
@@ -134,7 +134,7 @@ class Releases extends Release
      */
     public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = '', array $tags = []): int
     {
-        $sql = sprintf(
+        return $this->getPagerCount(sprintf(
             'SELECT COUNT(r.id) AS count
 				FROM releases r
 				%s %s
@@ -151,16 +151,7 @@ class Releases extends Release
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
-        );
-        $count = Cache::get(md5($sql));
-        if ($count !== null) {
-            return $count;
-        }
-        $count = self::fromQuery($sql);
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
-        Cache::put(md5($sql), $count[0]->count, $expiresAt);
-
-        return $count[0]->count ?? 0;
+        ));
     }
 
     /**
@@ -1193,7 +1184,7 @@ class Releases extends Release
         $sql = sprintf(
             'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
             preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
-            config('nntmux.max_pager_results')
+            (int) config('nntmux.max_pager_results')
         );
         $count = Cache::get(md5($sql));
         if ($count !== null) {
