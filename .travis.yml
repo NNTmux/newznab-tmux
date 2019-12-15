@@ -24,7 +24,7 @@ php:
   - '7.4'
 
 addons:
-  mariadb: '10.4'
+  mariadb: '10.2'
   apt:
       packages:
       - curl
