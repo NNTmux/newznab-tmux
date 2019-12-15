@@ -18,13 +18,9 @@ $colorCli = new ColorCLI();
 Utility::clearScreen();
 
 echo 'Starting Tmux...'.PHP_EOL;
-// Create a placeholder session so tmux commands do not throw server not found errors.
-exec('tmux new-session -ds placeholder 2>/dev/null');
 
 //check if session exists
 $session = shell_exec("tmux list-session | grep $tmux_session");
-// Kill the placeholder
-exec('tmux kill-session -t placeholder');
 if ($session !== null) {
     $colorCli->error("tmux session: '".$tmux_session."' is already running, aborting.");
     exit();
