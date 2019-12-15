@@ -52,7 +52,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/pear/Net_NNTP"
+            "url": "https://github.com/DariusIII/Net_NNTP"
         }
     ],
   "require": {
@@ -126,7 +126,7 @@
     "monolog/monolog": "^1.22",
     "nesbot/carbon": "^2.14",
     "omnipay/paypal": "^3.0",
-    "pear/net_nntp": "^1.5",
+    "pear/net_nntp": "^1.6.0",
     "php-ffmpeg/php-ffmpeg": "^0.14",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
