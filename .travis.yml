@@ -21,9 +21,10 @@ notifications:
 
 php:
   - '7.3'
+  - '7.4'
 
 addons:
-  mariadb: '10.2'
+  mariadb: '10.4'
   apt:
       packages:
       - curl
