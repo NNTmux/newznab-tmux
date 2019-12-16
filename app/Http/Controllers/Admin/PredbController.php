@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\BasePageController;
 use App\Models\Predb;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BasePageController;
 
 class PredbController extends BasePageController
 {

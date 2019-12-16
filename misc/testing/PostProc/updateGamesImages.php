@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\GamesInfo;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use App\Models\GamesInfo;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\NZB;
 use App\Models\Release;
+use Blacklight\NZB;
 
 class FileListController extends BasePageController
 {
