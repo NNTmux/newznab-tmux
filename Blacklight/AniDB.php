@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use App\Models\Category;
 use App\Models\AnidbTitle;
+use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 
 /**

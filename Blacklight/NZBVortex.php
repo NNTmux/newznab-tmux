@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Page;
 use App\Models\User;
+use Page;
 
 /**
  * Class NZBVortex.

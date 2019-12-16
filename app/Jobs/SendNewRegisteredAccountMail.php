@@ -2,14 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Mail\NewAccountCreatedEmail;
 use App\Models\Settings;
 use Illuminate\Bus\Queueable;
-use App\Mail\NewAccountCreatedEmail;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class SendNewRegisteredAccountMail implements ShouldQueue
 {

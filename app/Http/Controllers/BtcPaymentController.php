@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Omnipay\Omnipay;
-use App\Models\Settings;
-use Illuminate\Http\Request;
 use App\Models\PaypalPayment;
+use App\Models\Settings;
+use App\Models\User;
 use Blacklight\libraries\Geary;
+use Illuminate\Http\Request;
+use Omnipay\Omnipay;
 use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController

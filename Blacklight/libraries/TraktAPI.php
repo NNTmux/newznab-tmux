@@ -3,8 +3,8 @@
 namespace Blacklight\libraries;
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Str;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Str;
 
 /**
  * Class TraktAPI

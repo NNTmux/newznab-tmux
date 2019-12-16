@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BasePageController;
 
 class CategoryController extends BasePageController
 {
