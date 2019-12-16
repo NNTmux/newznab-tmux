@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Blacklight\AniDB;
-use App\Models\Release;
 use App\Http\Controllers\BasePageController;
+use App\Models\Release;
+use Blacklight\AniDB;
 
 class AnidbController extends BasePageController
 {
