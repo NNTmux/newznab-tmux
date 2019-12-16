@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\Movie;
 use App\Models\Category;
 use App\Models\Settings;
-use Blacklight\Releases;
 use App\Models\UserMovie;
+use Blacklight\Movie;
+use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class MyMoviesController extends BasePageController

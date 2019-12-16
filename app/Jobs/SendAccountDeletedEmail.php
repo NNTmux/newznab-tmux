@@ -2,14 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\Settings;
 use App\Mail\AccountDeleted;
+use App\Models\Settings;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class SendAccountDeletedEmail implements ShouldQueue
 {
