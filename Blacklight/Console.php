@@ -2,16 +2,16 @@
 
 namespace Blacklight;
 
+use App\Models\Category;
+use App\Models\ConsoleInfo;
 use App\Models\Genre;
 use App\Models\Release;
-use App\Models\Category;
 use App\Models\Settings;
-use App\Models\ConsoleInfo;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use MarcReichel\IGDBLaravel\Models\Game;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use MarcReichel\IGDBLaravel\Models\Company;
+use MarcReichel\IGDBLaravel\Models\Game;
 use MarcReichel\IGDBLaravel\Models\Platform;
 
 /**
