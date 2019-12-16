@@ -3,9 +3,9 @@
 //This script will update all records in the movieinfo table where there is no cover
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Movie;
-use Blacklight\ColorCLI;
 use App\Models\MovieInfo;
+use Blacklight\ColorCLI;
+use Blacklight\Movie;
 
 $movie = new Movie(['Echo' => true]);
 $colorCli = new ColorCLI();

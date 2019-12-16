@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Blacklight\SphinxSearch;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\ReleaseFile.
