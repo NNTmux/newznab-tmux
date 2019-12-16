@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Release;
+use App\Models\ReleaseFile;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
-use App\Models\ReleaseFile;
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 

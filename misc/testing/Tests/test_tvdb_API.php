@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\processing\tv\TVDB;
-use Adrenth\Thetvdb\Exception\UnauthorizedException;
-use Adrenth\Thetvdb\Exception\RequestFailedException;
 use Adrenth\Thetvdb\Exception\InvalidArgumentException;
 use Adrenth\Thetvdb\Exception\InvalidJsonInResponseException;
+use Adrenth\Thetvdb\Exception\RequestFailedException;
+use Adrenth\Thetvdb\Exception\UnauthorizedException;
+use Blacklight\processing\tv\TVDB;
 
 $c = new Blacklight\ColorCLI();
 $tvdb = new TVDB();
