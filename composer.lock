@@ -99,9 +99,9 @@
                 },
                 {
                     "name": "Jens Hausdorf",
-                    "role": "Maintainer",
                     "email": "mail@jens-hausdorf.de",
-                    "homepage": "https://jens-hausdorf.de"
+                    "homepage": "https://jens-hausdorf.de",
+                    "role": "Maintainer"
                 }
             ],
             "description": "A set of tools to build binary drivers",
@@ -2425,7 +2425,7 @@
             "time": "2019-10-04T10:46:28+00:00"
         },
         {
-            "name": "jeremeamia/SuperClosure",
+            "name": "jeremeamia/superclosure",
             "version": "2.4.0",
             "source": {
                 "type": "git",
@@ -6297,16 +6297,16 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "120b9d78ed94f71963f78da461581669b5085ff3"
+                "reference": "dd587505e009ea1b13ce343ef09c2fc3905e2774"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/120b9d78ed94f71963f78da461581669b5085ff3",
-                "reference": "120b9d78ed94f71963f78da461581669b5085ff3",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/dd587505e009ea1b13ce343ef09c2fc3905e2774",
+                "reference": "dd587505e009ea1b13ce343ef09c2fc3905e2774",
                 "shasum": ""
             },
             "require": {
@@ -6356,7 +6356,7 @@
                 "laravel-directory-cleanup",
                 "spatie"
             ],
-            "time": "2019-09-04T19:00:48+00:00"
+            "time": "2019-12-12T16:47:16+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
@@ -9099,9 +9099,9 @@
             "authors": [
                 {
                     "name": "Marcel Pociot",
-                    "role": "Developer",
                     "email": "marcel@beyondco.de",
-                    "homepage": "https://beyondco.de"
+                    "homepage": "https://beyondco.de",
+                    "role": "Developer"
                 }
             ],
             "description": "Symfony Var-Dump Server for Laravel",
@@ -9816,8 +9816,8 @@
             "authors": [
                 {
                     "name": "Filipe Dobreira",
-                    "role": "Developer",
-                    "homepage": "https://github.com/filp"
+                    "homepage": "https://github.com/filp",
+                    "role": "Developer"
                 }
             ],
             "description": "php error handling for cool kids",
@@ -10674,7 +10674,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🍸 Nette NEON: encodes and decodes NEON file format.",
+            "description": "? Nette NEON: encodes and decodes NEON file format.",
             "homepage": "http://ne-on.org",
             "keywords": [
                 "export",
@@ -12082,18 +12082,18 @@
             "authors": [
                 {
                     "name": "Geert Bergman",
-                    "role": "Project Author",
-                    "homepage": "http://www.scrivo.org/"
+                    "homepage": "http://www.scrivo.org/",
+                    "role": "Project Author"
                 },
                 {
                     "name": "Vladimir Jimenez",
-                    "role": "Contributor",
-                    "homepage": "https://allejo.io"
+                    "homepage": "https://allejo.io",
+                    "role": "Contributor"
                 },
                 {
                     "name": "Martin Folkers",
-                    "role": "Contributor",
-                    "homepage": "https://twobrain.io"
+                    "homepage": "https://twobrain.io",
+                    "role": "Contributor"
                 }
             ],
             "description": "Server side syntax highlighter that supports 185 languages. It's a PHP port of highlight.js",
