@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Release;
 use App\Http\Controllers\BasePageController;
+use App\Models\Release;
 
 class FailedReleasesController extends BasePageController
 {

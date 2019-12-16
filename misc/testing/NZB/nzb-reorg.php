@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\NZB;
 use Blacklight\ConsoleTools;
+use Blacklight\NZB;
 use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1]) || ! isset($argv[2])) {
