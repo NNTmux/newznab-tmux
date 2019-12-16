@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\BasePageController;
 use Blacklight\Games;
 use Blacklight\Genres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Http\Controllers\BasePageController;
 
 class GameController extends BasePageController
 {

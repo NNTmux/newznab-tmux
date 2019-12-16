@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use Blacklight\Contents;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BasePageController;
 
 class ContentController extends BasePageController
 {
