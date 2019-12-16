@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\Tmux;
 use App\Extensions\util\Git;
+use Blacklight\Tmux;
 use Illuminate\Console\Command;
 
 class UpdateNNTmuxGit extends Command
