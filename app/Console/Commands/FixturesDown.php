@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use DariusIII\L5Fixtures\FixturesFacade;
+use Illuminate\Console\Command;
 
 class FixturesDown extends Command
 {

@@ -2,11 +2,11 @@
 
 namespace Blacklight\db\populate;
 
-use App\Models\Settings;
-use Blacklight\ColorCLI;
+use App\Models\AnidbEpisode;
 use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
-use App\Models\AnidbEpisode;
+use App\Models\Settings;
+use Blacklight\ColorCLI;
 use Blacklight\ReleaseImage;
 use Illuminate\Support\Carbon;
 

@@ -2,8 +2,8 @@
 
 namespace App\Transformers;
 
-use App\Models\Release;
 use App\Models\Category;
+use App\Models\Release;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
 
