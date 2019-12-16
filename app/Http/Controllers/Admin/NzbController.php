@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Blacklight\Releases;
+use App\Http\Controllers\BasePageController;
 use Blacklight\NZBExport;
 use Blacklight\NZBImport;
-use Illuminate\Http\Request;
+use Blacklight\Releases;
 use Blacklight\utility\Utility;
-use App\Http\Controllers\BasePageController;
+use Illuminate\Http\Request;
 
 class NzbController extends BasePageController
 {

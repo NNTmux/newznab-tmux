@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Models\User;
 use App\Events\UserLoggedIn;
+use App\Models\User;
 
 class UpdateUserLoggedIn
 {

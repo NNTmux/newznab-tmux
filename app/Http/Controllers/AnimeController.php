@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\AniDB;
 use App\Models\Category;
+use Blacklight\AniDB;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
 
