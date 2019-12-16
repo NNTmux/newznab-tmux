@@ -116,7 +116,7 @@
     "laravel/horizon": "^3.0",
     "laravel/scout": "^7.0",
     "laravel/telescope": "^2.0",
-    "laravel/tinker": "~1.0",
+    "laravel/tinker": "^2.0",
     "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
     "league/omnipay": "^3",
@@ -162,7 +162,7 @@
     "nunomaduro/collision": "^3.0",
     "nunomaduro/larastan": "^0.4",
     "php-coveralls/php-coveralls": "^2.0",
-    "phpunit/phpunit": "^7.0"
+    "phpunit/phpunit": "^8.0"
   },
 
   "scripts": {
