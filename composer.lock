@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dae82380a2608aebf8b64ca4c0d4c65",
+    "content-hash": "2f2813874b195daaa2c0e54bb236d930",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2557,16 +2557,16 @@
         },
         {
             "name": "joshpinkney/tv-maze-php-api",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper.git",
-                "reference": "174429341ef2009a42f77743faa342726d7d8467"
+                "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
+                "reference": "620d124ee15264cff185654850070c12dbea4790"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/174429341ef2009a42f77743faa342726d7d8467",
-                "reference": "174429341ef2009a42f77743faa342726d7d8467",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/620d124ee15264cff185654850070c12dbea4790",
+                "reference": "620d124ee15264cff185654850070c12dbea4790",
                 "shasum": ""
             },
             "type": "library",
@@ -2575,7 +2575,6 @@
                     "JPinkney\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2586,7 +2585,10 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2018-01-09T14:46:56+00:00"
+            "support": {
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/v1.0.0"
+            },
+            "time": "2019-12-17T10:07:45+00:00"
         },
         {
             "name": "jrean/laravel-user-verification",
@@ -5975,22 +5977,22 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "3.9.1",
+            "version": "3.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "5ac2740e0c8c599d2bbe7f113a939f2b5b216c67"
+                "reference": "7779489a47d443f845271badbdcedfe4df8e06fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/5ac2740e0c8c599d2bbe7f113a939f2b5b216c67",
-                "reference": "5ac2740e0c8c599d2bbe7f113a939f2b5b216c67",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/7779489a47d443f845271badbdcedfe4df8e06fb",
+                "reference": "7779489a47d443f845271badbdcedfe4df8e06fb",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "paragonie/random_compat": "^1 | ^2 | 9.99.99",
-                "php": "^5.4 | ^7",
+                "php": "^5.4 | ^7 | ^8",
                 "symfony/polyfill-ctype": "^1.8"
             },
             "replace": {
@@ -6000,13 +6002,13 @@
                 "codeception/aspect-mock": "^1 | ^2",
                 "doctrine/annotations": "^1.2",
                 "goaop/framework": "1.0.0-alpha.2 | ^1 | ^2.1",
-                "jakub-onderka/php-parallel-lint": "^0.9.0",
-                "mockery/mockery": "^0.9.9",
+                "jakub-onderka/php-parallel-lint": "^1",
+                "mockery/mockery": "^0.9.11 | ^1",
                 "moontoast/math": "^1.1",
                 "paragonie/random-lib": "^2",
                 "php-mock/php-mock-phpunit": "^0.3 | ^1.1",
                 "phpunit/phpunit": "^4.8 | ^5.4 | ^6.5",
-                "squizlabs/php_codesniffer": "^2.3"
+                "squizlabs/php_codesniffer": "^3.5"
             },
             "suggest": {
                 "ext-ctype": "Provides support for PHP Ctype functions",
@@ -6058,7 +6060,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2019-12-01T04:55:27+00:00"
+            "time": "2019-12-17T08:18:51+00:00"
         },
         {
             "name": "rtconner/laravel-tagging",
@@ -13269,8 +13271,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "b3rs3rk/steamfront": 20,
-        "joshpinkney/tv-maze-php-api": 20
+        "b3rs3rk/steamfront": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
