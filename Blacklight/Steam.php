@@ -73,14 +73,14 @@ class Steam
         if ($res !== false) {
             $result = [
                 'title'       => $res->name,
-                'description' => $res->description['short'],
-                'cover'       => $res->images['header'],
-                'backdrop'    => $res->images['background'],
+                'description' => $res->description['short'] ?? null,
+                'cover'       => $res->images['header'] ?? null,
+                'backdrop'    => $res->images['background'] ?? null,
                 'steamid'     => $res->appid,
                 'directurl'   => Main::STEAM_STORE_ROOT.'app/'.$res->appid,
                 'publisher'   => $res->publishers,
-                'rating'      => $res->metacritic['score'],
-                'releasedate' => $res->releasedate['date'],
+                'rating'      => $res->metacritic['score'] ?? null,
+                'releasedate' => $res->releasedate['date'] ?? null,
                 'genres'      => $res->genres !== null ? implode(',', array_column($res->genres, 'description')) : '',
             ];
 
