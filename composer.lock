@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f2813874b195daaa2c0e54bb236d930",
+    "content-hash": "2dae82380a2608aebf8b64ca4c0d4c65",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2557,16 +2557,16 @@
         },
         {
             "name": "joshpinkney/tv-maze-php-api",
-            "version": "v1.0.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "69090718ea87c8f6cd48aeaae4c11c266782d6da"
+                "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper.git",
+                "reference": "174429341ef2009a42f77743faa342726d7d8467"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/69090718ea87c8f6cd48aeaae4c11c266782d6da",
-                "reference": "69090718ea87c8f6cd48aeaae4c11c266782d6da",
+                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/174429341ef2009a42f77743faa342726d7d8467",
+                "reference": "174429341ef2009a42f77743faa342726d7d8467",
                 "shasum": ""
             },
             "type": "library",
@@ -2575,6 +2575,7 @@
                     "JPinkney\\": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2585,10 +2586,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/v1.0.2"
-            },
-            "time": "2019-12-17T11:46:44+00:00"
+            "time": "2018-01-09T14:46:56+00:00"
         },
         {
             "name": "jrean/laravel-user-verification",
@@ -13271,7 +13269,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "b3rs3rk/steamfront": 20
+        "b3rs3rk/steamfront": 20,
+        "joshpinkney/tv-maze-php-api": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
