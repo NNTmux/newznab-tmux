@@ -2557,16 +2557,16 @@
         },
         {
             "name": "joshpinkney/tv-maze-php-api",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "94db46283e5ef62cf3782fc6386ee32b159feaeb"
+                "reference": "69090718ea87c8f6cd48aeaae4c11c266782d6da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/94db46283e5ef62cf3782fc6386ee32b159feaeb",
-                "reference": "94db46283e5ef62cf3782fc6386ee32b159feaeb",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/69090718ea87c8f6cd48aeaae4c11c266782d6da",
+                "reference": "69090718ea87c8f6cd48aeaae4c11c266782d6da",
                 "shasum": ""
             },
             "type": "library",
@@ -2586,9 +2586,9 @@
             ],
             "description": "TVMaze-API-Wrapper",
             "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/v1.0.1"
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/v1.0.2"
             },
-            "time": "2019-12-17T11:39:07+00:00"
+            "time": "2019-12-17T11:46:44+00:00"
         },
         {
             "name": "jrean/laravel-user-verification",
