@@ -1,3 +1,5 @@
+2019-12-18 DariusIII
+	* Chg: Check if $release['cleanname'] is set
 2019-12-15 DariusIII
 	* Chg: Update install_tmux.sh to install tmux 3.0a
 2019-12-11 DariusIII

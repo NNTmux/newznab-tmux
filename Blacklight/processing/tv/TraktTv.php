@@ -181,12 +181,12 @@ class TraktTv extends TV
                     } else {
                         //Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
-                        $this->titleCache[] = $release['cleanname'];
+                        $this->titleCache[] = $release['cleanname'] ?? null;
                     }
                 } else {
                     //Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
-                    $this->titleCache[] = $release['cleanname'];
+                    $this->titleCache[] = $release['cleanname'] ?? null;
                 }
             }
         }
