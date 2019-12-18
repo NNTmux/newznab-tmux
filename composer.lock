@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dae82380a2608aebf8b64ca4c0d4c65",
+    "content-hash": "2f2813874b195daaa2c0e54bb236d930",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2335,16 +2335,16 @@
         },
         {
             "name": "james-heinrich/getid3",
-            "version": "v1.9.18",
+            "version": "v1.9.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JamesHeinrich/getID3.git",
-                "reference": "0723b77cafe9278618cfb6bc91b75e73705d3de8"
+                "reference": "c6fd499a690ae67eea2eec6b2edba5df13f60f6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/0723b77cafe9278618cfb6bc91b75e73705d3de8",
-                "reference": "0723b77cafe9278618cfb6bc91b75e73705d3de8",
+                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/c6fd499a690ae67eea2eec6b2edba5df13f60f6f",
+                "reference": "c6fd499a690ae67eea2eec6b2edba5df13f60f6f",
                 "shasum": ""
             },
             "require": {
@@ -2394,7 +2394,7 @@
                 "php",
                 "tags"
             ],
-            "time": "2019-09-16T19:08:47+00:00"
+            "time": "2019-12-17T21:17:26+00:00"
         },
         {
             "name": "jamesmills/laravel-timezone",
@@ -2557,16 +2557,16 @@
         },
         {
             "name": "joshpinkney/tv-maze-php-api",
-            "version": "dev-master",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper.git",
-                "reference": "174429341ef2009a42f77743faa342726d7d8467"
+                "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
+                "reference": "69090718ea87c8f6cd48aeaae4c11c266782d6da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/174429341ef2009a42f77743faa342726d7d8467",
-                "reference": "174429341ef2009a42f77743faa342726d7d8467",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/69090718ea87c8f6cd48aeaae4c11c266782d6da",
+                "reference": "69090718ea87c8f6cd48aeaae4c11c266782d6da",
                 "shasum": ""
             },
             "type": "library",
@@ -2575,7 +2575,6 @@
                     "JPinkney\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2586,7 +2585,10 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2018-01-09T14:46:56+00:00"
+            "support": {
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/v1.0.2"
+            },
+            "time": "2019-12-17T11:46:44+00:00"
         },
         {
             "name": "jrean/laravel-user-verification",
@@ -2837,16 +2839,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.7.0",
+            "version": "v6.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "ba4204f3a8b9672b6116398c165bd9c0c6eac077"
+                "reference": "3d1d74bf11a72f030983f39e0f6b7ec55de952f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/ba4204f3a8b9672b6116398c165bd9c0c6eac077",
-                "reference": "ba4204f3a8b9672b6116398c165bd9c0c6eac077",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/3d1d74bf11a72f030983f39e0f6b7ec55de952f4",
+                "reference": "3d1d74bf11a72f030983f39e0f6b7ec55de952f4",
                 "shasum": ""
             },
             "require": {
@@ -2979,7 +2981,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-12-10T16:01:57+00:00"
+            "time": "2019-12-17T15:13:23+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -11626,33 +11628,33 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.9.0",
+            "version": "1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "f6811d96d97bdf400077a0cc100ae56aa32b9203"
+                "reference": "d638ebbb58daba25a6a0dc7969e1358a0e3c6682"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/f6811d96d97bdf400077a0cc100ae56aa32b9203",
-                "reference": "f6811d96d97bdf400077a0cc100ae56aa32b9203",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/d638ebbb58daba25a6a0dc7969e1358a0e3c6682",
+                "reference": "d638ebbb58daba25a6a0dc7969e1358a0e3c6682",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.0.2",
                 "php": "^5.3|^7.0",
                 "phpdocumentor/reflection-docblock": "^2.0|^3.0.2|^4.0|^5.0",
-                "sebastian/comparator": "^1.1|^2.0|^3.0",
+                "sebastian/comparator": "^1.2.3|^2.0|^3.0",
                 "sebastian/recursion-context": "^1.0|^2.0|^3.0"
             },
             "require-dev": {
-                "phpspec/phpspec": "^2.5|^3.2",
+                "phpspec/phpspec": "^2.5 || ^3.2",
                 "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5 || ^7.1"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.8.x-dev"
+                    "dev-master": "1.10.x-dev"
                 }
             },
             "autoload": {
@@ -11685,7 +11687,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2019-10-03T11:07:50+00:00"
+            "time": "2019-12-17T16:54:23+00:00"
         },
         {
             "name": "phpstan/phpdoc-parser",
@@ -13269,8 +13271,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "b3rs3rk/steamfront": 20,
-        "joshpinkney/tv-maze-php-api": 20
+        "b3rs3rk/steamfront": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
