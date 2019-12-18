@@ -688,16 +688,16 @@
         },
         {
             "name": "dariusiii/rarinfo",
-            "version": "v2.7.5",
+            "version": "v2.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "eddbe484082edc0667a7d36a9f2ce884446165b5"
+                "reference": "048380650b56ff9a9e76bb5c599ccd300902fa47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/eddbe484082edc0667a7d36a9f2ce884446165b5",
-                "reference": "eddbe484082edc0667a7d36a9f2ce884446165b5",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/048380650b56ff9a9e76bb5c599ccd300902fa47",
+                "reference": "048380650b56ff9a9e76bb5c599ccd300902fa47",
                 "shasum": ""
             },
             "require": {
@@ -731,7 +731,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2019-12-15T21:11:33+00:00"
+            "time": "2019-12-18T10:21:35+00:00"
         },
         {
             "name": "dariusiii/tmdb-laravel",
