@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\NZB;
-use App\Models\User;
 use App\Models\Release;
+use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
-use Illuminate\Http\Request;
+use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetNzbController extends BasePageController
 {
@@ -69,7 +69,7 @@ class GetNzbController extends BasePageController
         // User requested a zip of guid,guid,guid releases.
         if ($request->has('zip') && $request->input('zip') === '1') {
             $guids = explode(',', $request->input('id'));
-            if ($requests['num'] + \count($guids) > $maxDownloads) {
+            if (isset($requests['num']) && ($requests['num'] + \count($guids) > $maxDownloads)) {
                 Utility::showApiError(501);
             }
 

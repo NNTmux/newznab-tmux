@@ -19,7 +19,7 @@
         function getOverview() {
             $.ajax
             ({
-                url: WWW_TOP + '/nzbvortex?getOverview&isAjax',
+                url:{{url('/nzbvortex?getOverview&isAjax')}},
                 cache: false
             }).done(function (html) {
                 $("#vortex").html(html);

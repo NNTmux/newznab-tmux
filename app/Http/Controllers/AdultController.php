@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\XXX;
 use App\Models\Category;
-use Illuminate\Support\Arr;
+use Blacklight\XXX;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class AdultController extends BasePageController
 {
@@ -88,7 +88,7 @@ class AdultController extends BasePageController
         }
 
         foreach ($ordering as $ordertype) {
-            $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/xxx?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0');
+            $this->smarty->assign('orderby'.$ordertype, url('/xxx?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0'));
         }
 
         $this->smarty->assign(

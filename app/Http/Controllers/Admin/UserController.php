@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
+use App\Http\Controllers\BasePageController;
+use App\Jobs\SendAccountChangedEmail;
 use App\Models\Invitation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use App\Jobs\SendAccountChangedEmail;
-use App\Http\Controllers\BasePageController;
 
 class UserController extends BasePageController
 {
@@ -23,7 +23,7 @@ class UserController extends BasePageController
         $meta_title = $title = 'User List';
 
         $roles = [];
-        $userRoles = Role::cursor();
+        $userRoles = Role::cursor()->remember();
         foreach ($userRoles as $userRole) {
             $roles[$userRole->id] = $userRole->name;
         }
@@ -66,7 +66,7 @@ class UserController extends BasePageController
         );
 
         foreach ($ordering as $orderType) {
-            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'user-list?ob='.$orderType);
+            $this->smarty->assign('orderby'.$orderType, url('admin/user-list?ob='.$orderType));
         }
 
         $content = $this->smarty->fetch('user-list.tpl');
@@ -100,7 +100,7 @@ class UserController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         //get the user roles
-        $userRoles = Role::cursor();
+        $userRoles = Role::cursor()->remember();
         $roles = [];
         $defaultRole = 'User';
         $defaultInvites = Invitation::DEFAULT_INVITES;

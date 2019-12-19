@@ -3,17 +3,16 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
-use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
-use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
+use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
+use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
 
 /**
  * Class TVDB -- functions used to post process releases against TVDB.
  */
 class TVDB extends TV
 {
-    private const TVDB_IMAGES_URL = 'https://www.thetvdb.com/banners';
-    private const TVDB_API_KEY = '31740C28BAC74DEF';
+    private const TVDB_POSTER_URL = 'https://artworks.thetvdb.com/banners/';
     private const MATCH_PROBABILITY = 75;
 
     /**
@@ -57,7 +56,7 @@ class TVDB extends TV
         // Check if we can get the time for API status
         // If we can't then we set local to true
         try {
-            $this->token = $this->client->authentication()->login(self::TVDB_API_KEY);
+            $this->token = $this->client->authentication()->login(config('tvdb.api_key'));
         } catch (UnauthorizedException $error) {
             $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
             $this->local = true;
@@ -90,6 +89,7 @@ class TVDB extends TV
 
         foreach ($res as $row) {
             $tvDbId = false;
+            $this->posterUrl = $this->fanartUrl = '';
 
             // Clean the show name for better match probability
             $release = $this->parseInfo($row['searchname']);
@@ -192,17 +192,18 @@ class TVDB extends TV
                         }
                     } else {
                         //Processing failed, set the episode ID to the next processing group
+                        $this->setVideoIdFound($videoId, $row['id'], 0);
                         $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     }
                 } else {
                     //Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
-                    $this->titleCache[] = $release['cleanname'];
+                    $this->titleCache[] = $release['cleanname'] ?? null;
                 }
             } else {
                 //Parsing failed, take it out of the queue for examination
                 $this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
-                $this->titleCache[] = $release['cleanname'];
+                $this->titleCache[] = $release['cleanname'] ?? null;
             }
         }
     }
@@ -381,14 +382,14 @@ class TVDB extends TV
     {
         try {
             $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
-            $this->posterUrl = $poster[0]->thumbnail ?? '';
+            $this->posterUrl = ! empty($poster[0]->thumbnail) ? self::TVDB_POSTER_URL.$poster[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
             $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
-            $this->fanartUrl = $fanart[0]->thumbnail ?? '';
+            $this->fanartUrl = $fanart[0]->thumbnail ? self::TVDB_POSTER_URL.$fanart[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
@@ -402,8 +403,8 @@ class TVDB extends TV
             'summary'   => (string) $show->overview,
             'started'   => $show->firstAired,
             'publisher' => (string) $show->network,
-            'poster'    => $poster[0]->thumbnail ?? '',
-            'fanart'    => $fanart[0]->thumbnail ?? '',
+            'poster'    => $this->posterUrl,
+            'fanart'    => $this->fanartUrl,
             'source'    => parent::SOURCE_TVDB,
             'imdb'      => (int) ($imdb['imdbid'] ?? 0),
             'tvdb'      => (int) $show->id,

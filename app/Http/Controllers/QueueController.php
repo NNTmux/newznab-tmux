@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\NZBGet;
-use Blacklight\SABnzbd;
 use App\Models\Settings;
+use Blacklight\NZBGet;
 use Blacklight\NZBVortex;
+use Blacklight\SABnzbd;
 use Illuminate\Http\Request;
 
 class QueueController extends BasePageController

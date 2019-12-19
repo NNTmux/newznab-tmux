@@ -2,15 +2,15 @@
 
 namespace Blacklight\processing\tv;
 
-use App\Models\Video;
-use App\Models\TvInfo;
-use App\Models\Release;
 use App\Models\Category;
+use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use App\Models\TvEpisode;
-use Blacklight\utility\Country;
+use App\Models\TvInfo;
+use App\Models\Video;
+use Blacklight\ColorCLI;
 use Blacklight\processing\Videos;
+use Blacklight\utility\Country;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -604,12 +604,7 @@ abstract class TV extends Videos
             $episodeArr['season'] = 1;
             $episodeArr['episode'] = (int) $matches[2];
         }
-        //The.Pacific.Pt.VI.HDTV.XviD-XII / Part.IV
-        elseif (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9]([ivx]+)/i', $relname, $matches)) {
-            $episodeArr['season'] = 1;
-            $epLow = $matches[2];
-            $episodeArr['episode'] = roman_to_int($epLow);
-        }
+
         // Band.Of.Brothers.EP06.Bastogne.DVDRiP.XviD-DEiTY
         elseif (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $matches)) {
             $episodeArr['season'] = 1;

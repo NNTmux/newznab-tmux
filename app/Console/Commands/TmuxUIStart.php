@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\Tmux;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Blacklight\Tmux;
 use Illuminate\Console\Command;
 
 class TmuxUIStart extends Command
@@ -34,13 +34,8 @@ class TmuxUIStart extends Command
         // Set running value to on.
         $tmux->startRunning();
 
-        // Create a placeholder session so tmux commands do not throw server not found errors.
-        exec('tmux new-session -ds placeholder 2>/dev/null');
-
         //check if session exists
         $session = shell_exec("tmux list-session | grep $tmux_session");
-        // Kill the placeholder
-        exec('tmux kill-session -t placeholder');
         if ($session === null) {
             (new ColorCLI())->info('Starting the tmux server and monitor script.');
             passthru('php '.app()->/* @scrutinizer ignore-call */ path().'/../misc/update/tmux/run.php');

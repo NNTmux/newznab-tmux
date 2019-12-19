@@ -172,8 +172,8 @@ class Categorize
                 return false;
             case preg_match('/[._ -](chinese|dk|fin|french|ger?|heb|ita|jap|kor|nor|nordic|nl|pl|swe)[._ -]?(sub|dub)(ed|bed|s)?|<German>/i', $this->releaseName):
             case preg_match('/[._ -](brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|ita|latin|mandarin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish).+(720p|1080p|Divx|DOKU|DUB(BED)?|DLMUX|NOVARIP|RealCo|Sub(bed|s)?|Web[._ -]?Rip|WS|Xvid|x264)[._ -]/i', $this->releaseName):
-            case preg_match('/[._ -](720p|1080p|Divx|DOKU|DUB(BED)?|DLMUX|NOVARIP|RealCo|Sub(bed|s)?|Web[._ -]?Rip|WS|Xvid).+(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|ita|latin|mandarin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[._ -]/i', $this->releaseName):
-            case preg_match('/(S\d\d[EX]\d\d|DOCU(MENTAIRE)?|TV)?[._ -](FRENCH|German|Dutch)[._ -](720p|1080p|dv([bd])r(ip)?|LD|HD\-?TV|TV[._ -]?RIP|x264)[._ -]/i', $this->releaseName):
+            case preg_match('/[._ -](720p|1080p|Divx|DOKU|DUB(BED)?|DLMUX|NOVARIP|RealCo|Sub(bed|s)?|WEB(-DL|-?RIP)|WS|Xvid).+(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|ita|latin|mandarin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[._ -]/i', $this->releaseName):
+            case preg_match('/(S\d\d[EX]\d\d|DOCU(MENTAIRE)?|TV)?[._ -](FRENCH|German|Dutch)[._ -](720p|1080p|dv([bd])r(ip)?|LD|HD\-?TV|TV[._ -]?RIP|x264|WEB(-DL|-?RIP))[._ -]/i', $this->releaseName):
             case preg_match('/[._ -]FastSUB|NL|nlvlaams|patrfa|RealCO|Seizoen|slosinh|Videomann|Vostfr|xslidian[._ -]|x264\-iZU/i', $this->releaseName):
                 $this->tmpCat = Category::TV_FOREIGN;
                 $this->tmpTag[] = Category::TAG_TV_FOREIGN;
@@ -379,7 +379,7 @@ class Categorize
                 return true;
             case preg_match('/(danish|flemish|Deutsch|dutch|french|german|heb|hebrew|nl[._ -]?sub|dub(bed|s)?|\.NL|norwegian|swedish|swesub|spanish|Staffel)[._ -]|\(german\)|Multisub/i', $this->releaseName):
             case stripos($this->releaseName, 'Castellano') !== false:
-            case preg_match('/(720p|1080p|AC3|AVC|DIVX|DVD(5|9|RIP|R)|XVID)[._ -](Dutch|French|German|ITA)|\(?(Dutch|French|German|ITA)\)?[._ -](720P|1080p|AC3|AVC|DIVX|DVD(5|9|RIP|R)|HD[._ -]|XVID)/i', $this->releaseName):
+            case preg_match('/(720p|1080p|AC3|AVC|DIVX|DVD(5|9|RIP|R)|XVID)[._ -](Dutch|French|German|ITA)|\(?(Dutch|French|German|ITA)\)?[._ -](720P|1080p|AC3|AVC|DIVX|DVD(5|9|RIP|R)|WEB(-DL|-?RIP)|HD[._ -]|XVID)/i', $this->releaseName):
                 $this->tmpCat = Category::MOVIE_FOREIGN;
                 $this->tmpTag[] = Category::TAG_MOVIE_FOREIGN;
 

@@ -89,8 +89,8 @@ return [
 
         'sphinx' => [
             'driver'      => 'mysql',
-            'host'        => '127.0.0.1',
-            'port'        => 9306,
+            'host'        => env('SPHINX_HOST', '127.0.0.1'),
+            'port'        => env('SPHINX_PORT', 9306),
             'database'    => '',
             'unix_socket' => '',
             'charset'     => 'utf8',
@@ -123,7 +123,7 @@ return [
     */
 
     'redis' => [
-        'client' => 'phpredis',
+        'client' => env('REDIS_CLIENT', 'phpredis'),
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => Str::slug(env('APP_NAME', 'laravel'), '_').'_database_',

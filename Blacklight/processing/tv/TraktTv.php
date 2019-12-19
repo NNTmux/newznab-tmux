@@ -3,9 +3,9 @@
 namespace Blacklight\processing\tv;
 
 use App\Models\Settings;
+use Blacklight\libraries\TraktAPI;
 use Blacklight\ReleaseImage;
 use Blacklight\utility\Time;
-use Blacklight\libraries\TraktAPI;
 
 /**
  * Class TraktTv.
@@ -27,11 +27,9 @@ class TraktTv extends TV
     public $time;
 
     /**
-     * The URL to grab the TV poster.
-     *
-     * @var string
+     * @string URL for show poster art
      */
-    public $posterUrl;
+    public $posterUrl = '';
 
     /**
      * The URL to grab the TV fanart.
@@ -175,19 +173,20 @@ class TraktTv extends TV
                             if ($this->echooutput) {
                                 $this->colorCli->primary('Found TRAKT Match!', true);
                             }
-                            continue;
+                        } else {
+                            //Processing failed, set the episode ID to the next processing group
+                            $this->setVideoIdFound($videoId, $row['id'], 0);
+                            $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                         }
-                        //Processing failed, set the episode ID to the next processing group
-                        $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                     } else {
                         //Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
-                        $this->titleCache[] = $release['cleanname'];
+                        $this->titleCache[] = $release['cleanname'] ?? null;
                     }
                 } else {
                     //Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
-                    $this->titleCache[] = $release['cleanname'];
+                    $this->titleCache[] = $release['cleanname'] ?? null;
                 }
             }
         }

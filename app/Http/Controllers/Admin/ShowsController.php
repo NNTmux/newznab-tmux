@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Video;
-use App\Models\Release;
-use Illuminate\Http\Request;
 use App\Http\Controllers\BasePageController;
+use App\Models\Release;
+use App\Models\Video;
+use Illuminate\Http\Request;
 
 class ShowsController extends BasePageController
 {
@@ -48,7 +48,7 @@ class ShowsController extends BasePageController
                     exit;
                 }
 
-                header('Location:'.WWW_TOP.'admin/show-list');
+                header('Location:'.url('admin/show-list'));
                 break;
 
             case 'view':

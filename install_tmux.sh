@@ -14,6 +14,8 @@ sudo apt install -y libevent-dev
 sudo apt install -y libncurses5-dev
 sudo apt install -y fonts-powerline
 sudo apt install -y powerline
+sudo apt install -y bison
+sudo apt install -y byacc
 
 rm -fr /tmp/tmux
 
@@ -23,7 +25,7 @@ cd /tmp/tmux
 
 git fetch --all --tags --prune
 
-git checkout 2.9
+git checkout 3.0a
 
 sh autogen.sh
 

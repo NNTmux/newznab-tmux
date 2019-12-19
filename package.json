@@ -14,18 +14,18 @@
         "axios": "^0.19",
         "cross-env": "^6.0.3",
         "jquery": "^3.4.1",
-        "laravel-mix": "^5.0.0",
+        "laravel-mix": "^5.0.1",
         "lodash": "^4.17.15",
         "popper.js": "^1.16.0",
-        "prettier": "^1.18.2",
-        "vue": "^2.6.10"
+        "prettier": "^1.19.1",
+        "vue": "^2.6.11"
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
-        "@fortawesome/fontawesome-free": "^5.11.2",
+        "@fortawesome/fontawesome-free": "^5.12.0",
         "animate.css": "^3.7.2",
         "autosize": "^4.0.2",
-        "bootstrap": "^4.3.1",
+        "bootstrap": "^4.4.1",
         "bootstrap-datepicker": "^1.9.0",
         "bootstrap-hover-dropdown": "^2.2.1",
         "bootstrap-progressbar": "^0.9.0",
@@ -39,6 +39,6 @@
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0",
-        "tinymce": "^5.1.0"
+        "tinymce": "^5.1.5"
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
-use App\Models\Settings;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendPasswordResetEmail;
+use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
 
 class ResetPasswordController extends Controller
 {
@@ -55,21 +55,23 @@ class ResetPasswordController extends Controller
             $error = 'No reset code provided.';
         }
 
-        $ret = User::getByPassResetGuid($request->input('guid'));
-        if ($ret === null) {
-            $error = 'Bad reset code provided.';
-        } else {
+        if ($error === '') {
+            $ret = User::getByPassResetGuid($request->input('guid'));
+            if ($ret === null) {
+                $error = 'Bad reset code provided.';
+            } else {
 
-            //
-            // reset the password, inform the user, send out the email
-            //
-            User::updatePassResetGuid($ret['id'], '');
-            $newpass = User::generatePassword();
-            User::updatePassword($ret['id'], $newpass);
+                //
+                // reset the password, inform the user, send out the email
+                //
+                User::updatePassResetGuid($ret['id'], '');
+                $newpass = User::generatePassword();
+                User::updatePassword($ret['id'], $newpass);
 
-            $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
-            SendPasswordResetEmail::dispatch($ret, $newpass);
-            $confirmed = true;
+                $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
+                SendPasswordResetEmail::dispatch($ret, $newpass);
+                $confirmed = true;
+            }
         }
 
         $theme = Settings::settingValue('site.main.style');

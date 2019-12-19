@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Blacklight\Releases;
 use App\Models\UsenetGroup;
+use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class SearchController extends BasePageController
@@ -61,8 +61,7 @@ class SearchController extends BasePageController
             foreach ($releases->getBrowseOrdering() as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    WWW_TOP.'/search?id='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType
-                );
+                    url('/search?id='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType));
             }
 
             $tags = [];
@@ -135,8 +134,8 @@ class SearchController extends BasePageController
             foreach ($ordering as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    WWW_TOP.'/search?'.$orderByString.'&search_type=adv&ob='.$orderType
-                );
+                    url('/search?'.$orderByString.'&search_type=adv&ob='.$orderType
+                ));
             }
 
             $searchArr = [

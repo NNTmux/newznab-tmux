@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Blacklight\Releases;
 use App\Models\RootCategory;
+use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class BrowseController extends BasePageController
@@ -19,11 +19,12 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('category', -1);
 
-        $orderby = '';
+        $ordering = $releases->getBrowseOrdering();
+        $orderBy = request()->has('ob') && ! empty(request()->input('ob')) ? request()->input('ob') : '';
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions, -1);
+        $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, -1);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $this->smarty->assign('catname', 'All');
@@ -41,6 +42,10 @@ class BrowseController extends BasePageController
                 'resultsadd' => $browse,
             ]
         );
+
+        foreach ($ordering as $orderType) {
+            $this->smarty->assign('orderby'.$orderType, url('browse/All?ob='.$orderType));
+        }
 
         $meta_title = 'Browse All Releases';
         $meta_keywords = 'browse,nzb,description,details';
@@ -79,11 +84,12 @@ class BrowseController extends BasePageController
         $this->smarty->assign('parentcat', ucfirst($parentCategory));
         $this->smarty->assign('category', $category);
 
-        $orderby = '';
+        $ordering = $releases->getBrowseOrdering();
+        $orderBy = request()->has('ob') && ! empty(request()->input('ob')) ? request()->input('ob') : '';
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions, $grp);
+        $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, $grp);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $browse = [];
@@ -129,8 +135,14 @@ class BrowseController extends BasePageController
 
         if ($id === 'All' && $parentCategory === 'All') {
             $meta_title = 'Browse '.$parentCategory.' releases';
+            foreach ($ordering as $orderType) {
+                $this->smarty->assign('orderby'.$orderType, url('browse/'.$parentCategory.'?ob='.$orderType));
+            }
         } else {
             $meta_title = 'Browse '.$parentCategory.' / '.$id.' releases';
+            foreach ($ordering as $orderType) {
+                $this->smarty->assign('orderby'.$orderType, url('browse/'.$parentCategory.'/'.$id.'?ob='.$orderType));
+            }
         }
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Nzbs';

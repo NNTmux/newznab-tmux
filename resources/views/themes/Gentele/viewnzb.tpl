@@ -571,16 +571,12 @@
 														</tr>
 														<tr>
 															<th width="140">Posted</th>
-															<td>{$release.postdate|date_format:"%b %e, %Y %T"}
-																({$release.postdate|daysago}
-																)
+															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($release.postdate, config('app.timezone')), 'F j, Y H:i:s')}}
 															</td>
 														</tr>
 														<tr>
 															<th width="140">Added</th>
-															<td>{$release.adddate|date_format:"%b %e, %Y %T"}
-																({$release.adddate|daysago}
-																)
+															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($release.adddate, config('app.timezone')), 'F j, Y H:i:s')}}
 															</td>
 														</tr>
 														{if isset($isadmin)}

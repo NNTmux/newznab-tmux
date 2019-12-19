@@ -78,21 +78,32 @@
 								<table class="data table table-striped">
 									<thead class="thead-light">
 									<tr class="headings">
-										<th><input id="check-all" type="checkbox" class="flat-all"/></th>
-										<th>Name
-											<a title="Sort Descending" href="{$orderbyname_desc}"><i
-														class="fa-icon-caret-down text-muted"> </i></a>
-											<a title="Sort Ascending" href="{$orderbyname_asc}"><i
-														class="fa-icon-caret-up text-muted"> </i></a>
+										<th><input id="check-all" type="checkbox" class="flat-all"></th>
+										<th>Name<br>
+											<a title="Sort Descending" href="{$orderbyname_desc}"><i class="fas fa-chevron-down"></i></a>
+											<a title="Sort Ascending" href="{$orderbyname_asc}"><i class="fas fa-chevron-up"> </i></a>
 										</th>
-										<th class="column-title" style="display: table-cell;">Category</th>
-										<th class="column-title" style="display: table-cell;">Posted</th>
-										<th class="column-title" style="display: table-cell;">Size</th>
+										<th class="column-title" style="display: table-cell;">Category<br>
+                                            <a title="Sort Descending" href="{$orderbycat_desc}"><i class="fas fa-chevron-down"></i></a>
+						                    <a title="Sort Ascending" href="{$orderbycat_asc}"><i class="fas fa-chevron-up"></i></a>
+                                        </th>
+										<th class="column-title" style="display: table-cell;">Posted<br>
+                                            <a title="Sort Descending" href="{$orderbyposted_desc}"><i class="fas fa-chevron-down"></i></a>
+						                    <a title="Sort Ascending" href="{$orderbyposted_asc}"><i class="fas fa-chevron-up"></i></a>
+                                        </th>
+										<th style="vertical-align:top;text-align:center;">Size<br>
+                                            <a title="Sort Descending" href="{$orderbysize_desc}"><i class="fas fa-chevron-down"></i></a>
+                                            <a title="Sort Ascending" href="{$orderbysize_asc}"><i class="fas fa-chevron-up"></i></a>
+                                        </th>
+                                        <th style="vertical-align:top;text-align:center;">Files<br>
+                                            <a title="Sort Descending" href="{$orderbyfiles_desc}"><i class="fas fa-chevron-down"></i></a>
+                                            <a title="Sort Ascending" href="{$orderbyfiles_asc}"><i class="fas fa-chevron-up"></i></a>
+                                        </th>
+                                        <th style="vertical-align:top;text-align:center;">Downloads<br>
+                                            <a title="Sort Descending" href="{$orderbystats_desc}"><i class="fas fa-chevron-down"></i></a>
+                                            <a title="Sort Ascending" href="{$orderbystats_asc}"><i class="fas fa-chevron-up"></i></a>
+                                        </th>
 										<th class="column-title no-link last" style="display: table-cell;">Action</th>
-										<th class="bulk-actions" colspan="7">
-											<a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span
-														class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
-										</th>
 									</tr>
 									</thead>
 									<tbody>
@@ -149,8 +160,18 @@
 											</td>
 											<td><span class="badge badge-info">{$result->category_name}</span>
 											</td>
-											<td>{$result->postdate|timeago}</td>
+											<td>{Illuminate\Support\Carbon::parse({{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}})->diffForHumans()}</td>
 											<td>{$result->size|filesize}</td>
+                                            <td style="width:auto;text-align:center;white-space:nowrap;">
+                                                <a title="View file list" href="{{url("/filelist/{$result.guid}")}}">{$result->totalpart}</a>
+                                                <i class="far fa-file"></i>
+                                                    {if $result->rarinnerfilecount > 0}
+                                                    <div class="rarfilelist">
+                                                        <i class="fas fa-search-plus"></i>
+                                                    </div>
+                                                    {/if}
+                                            </td>
+                                            <td>{$result->grabs}</td>
 											<td>
 												<a href="{{url("/getnzb?id={$result->guid}")}}"
 												   class="icon_nzb text-muted"><i

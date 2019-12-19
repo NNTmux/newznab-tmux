@@ -5,9 +5,9 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Movie;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Blacklight\Movie;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
@@ -30,10 +30,10 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
         $limit = $argv[2];
     }
     $colorCli->header('Scanning for releases missing covers');
-    $res = DB::select('SELECT r.id, r.imdbid
+    $res = DB::select('SELECT r.imdbid
 								FROM releases r
 								LEFT JOIN movieinfo m ON m.imdbid = r.imdbid
-								WHERE nzbstatus = 1 AND m.cover = 1 AND adddate >  (NOW() - INTERVAL 5 HOUR)');
+								WHERE nzbstatus = 1 AND m.cover = 1 AND adddate >  (NOW() - INTERVAL 24 HOUR) GROUP BY r.imdbid');
 
     foreach ($res as $row) {
         $nzbpath = $path2cover.$row->imdbid.'-cover.jpg';

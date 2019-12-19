@@ -21,8 +21,8 @@
 namespace App\Models;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Settings - model for settings table.
@@ -142,7 +142,7 @@ class Settings extends Model
      */
     public static function toTree($excludeUnsectioned = true): array
     {
-        $results = self::cursor();
+        $results = self::cursor()->remember();
 
         $tree = [];
         if (! empty($results)) {

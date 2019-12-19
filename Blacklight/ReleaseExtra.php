@@ -3,10 +3,10 @@
 namespace Blacklight;
 
 use App\Models\AudioData;
-use App\Models\VideoData;
-use App\Models\ReleaseUnique;
-use App\Models\ReleaseSubtitle;
 use App\Models\ReleaseExtraFull;
+use App\Models\ReleaseSubtitle;
+use App\Models\ReleaseUnique;
+use App\Models\VideoData;
 use Illuminate\Support\Facades\DB;
 use Mhor\MediaInfo\Container\MediaInfoContainer;
 
@@ -147,7 +147,7 @@ class ReleaseExtra
             if (! empty($videos)) {
                 foreach ($videos as $video) {
                     if ($video->get('duration') !== null) {
-                        $videoDuration = $general->get('duration')->getMilliseconds();
+                        $videoDuration = $video->get('duration')->getMilliseconds();
                     }
 
                     if ($video->get('format') !== null) {
@@ -294,7 +294,7 @@ class ReleaseExtra
     ): void {
         $ckid = VideoData::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
-            VideoData::query()->insert([
+            VideoData::insertOrIgnore([
                     'releases_id' => $releaseID,
                     'containerformat' => $containerFormat,
                     'overallbitrate' => $overallBitRate,
@@ -327,7 +327,7 @@ class ReleaseExtra
     {
         $ckid = AudioData::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
-            AudioData::query()->insert([
+            AudioData::insertOrIgnore([
                     'releases_id' => $releaseID,
                     'audioid' => $audioID,
                     'audioformat' => \is_array($audioFormat) ? implode($audioFormat) : $audioFormat,
@@ -360,7 +360,7 @@ class ReleaseExtra
             }
         }
         if ($ckid === null) {
-            ReleaseSubtitle::query()->insert([
+            ReleaseSubtitle::insertOrIgnore([
                 'releases_id' => $releaseID,
                 'subsid' => $subsID,
                 'subslanguage' => $subs,
@@ -379,7 +379,7 @@ class ReleaseExtra
                     'uniqueid' => $uniqueId,
                 ])->first(['releases_id']);
         if ($dupecheck === null) {
-            ReleaseUnique::query()->insert([
+            ReleaseUnique::insertOrIgnore([
                         'releases_id' => $releaseID,
                         'uniqueid' => $uniqueId,
                     ]);
@@ -415,7 +415,7 @@ class ReleaseExtra
         $ckid = ReleaseExtraFull::query()->where('releases_id', $id)->first();
         if ($ckid === null) {
             $xml = $xmlArray->__toXML()->asXML();
-            ReleaseExtraFull::query()->insert(['releases_id' => $id, 'mediainfo' => $xml]);
+            ReleaseExtraFull::insertOrIgnore(['releases_id' => $id, 'mediainfo' => $xml]);
         }
     }
 }

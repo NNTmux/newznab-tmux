@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.0 (2019-10-17)
+ * Version: 5.1.5 (2019-12-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -840,13 +840,13 @@
     };
     var getBounds = function (_win) {
       var win = _win === undefined ? domGlobals.window : _win;
+      var doc = win.document;
+      var scroll = get$3(Element.fromDom(doc));
       var visualViewport = win['visualViewport'];
       if (visualViewport !== undefined) {
-        return bounds(visualViewport.pageLeft, visualViewport.pageTop, visualViewport.width, visualViewport.height);
+        return bounds(Math.max(visualViewport.pageLeft, scroll.left()), Math.max(visualViewport.pageTop, scroll.top()), visualViewport.width, visualViewport.height);
       } else {
-        var doc = Element.fromDom(win.document);
-        var html = win.document.documentElement;
-        var scroll = get$3(doc);
+        var html = doc.documentElement;
         var width = html.clientWidth;
         var height = html.clientHeight;
         return bounds(scroll.left(), scroll.top(), width, height);
@@ -949,11 +949,9 @@
       domGlobals.window.scrollTo(pos.x, pos.y);
     };
     var visualViewport = domGlobals.window['visualViewport'];
-    var isSafari$1 = global$2.browser.isSafari();
-    var viewportUpdate = !isSafari$1 || visualViewport === undefined ? {
+    var viewportUpdate = visualViewport === undefined ? {
       bind: noop,
-      unbind: noop,
-      update: noop
+      unbind: noop
     } : function () {
       var editorContainer = value();
       var refreshScroll = function () {

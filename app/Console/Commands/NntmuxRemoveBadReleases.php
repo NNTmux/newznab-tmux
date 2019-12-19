@@ -36,6 +36,7 @@ class NntmuxRemoveBadReleases extends Command
      * Execute the console command.
      *
      * @return mixed
+     * @throws \Exception
      */
     public function handle()
     {
@@ -43,8 +44,12 @@ class NntmuxRemoveBadReleases extends Command
 
         $passReleases = ReleaseFile::query()->where('passworded', '=', 1)->groupBy('releases_id')->get();
 
+        $count = 0;
         foreach ($passReleases as $passRelease) {
             Release::whereId($passRelease->releases_id)->update(['passwordstatus' => 1]);
+            $count++;
         }
+
+        $this->info('Updated '.$count.' bad releases');
     }
 }

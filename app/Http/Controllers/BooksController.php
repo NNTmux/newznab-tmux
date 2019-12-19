@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\Books;
 use App\Models\Category;
-use Illuminate\Support\Arr;
+use Blacklight\Books;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class BooksController extends BasePageController
 {
@@ -87,7 +87,7 @@ class BooksController extends BasePageController
         }
 
         foreach ($ordering as $ordertype) {
-            $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/books?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0');
+            $this->smarty->assign('orderby'.$ordertype, url('/books?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0'));
         }
 
         $this->smarty->assign(

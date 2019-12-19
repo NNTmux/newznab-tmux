@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\BasePageController;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use App\Http\Controllers\BasePageController;
 
 class RoleController extends BasePageController
 {
@@ -18,7 +18,7 @@ class RoleController extends BasePageController
         $meta_title = $title = 'User Role List';
 
         //get the user roles
-        $userroles = Role::cursor();
+        $userroles = Role::cursor()->remember();
 
         $this->smarty->assign('userroles', $userroles);
 
@@ -126,7 +126,7 @@ class RoleController extends BasePageController
         $meta_title = $title = 'User Roles';
 
         // Get the user roles.
-        $userRoles = Role::cursor();
+        $userRoles = Role::cursor()->remember();
         $roles = [];
         foreach ($userRoles as $userRole) {
             $roles[$userRole->id] = $userRole->name;

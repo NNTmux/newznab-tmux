@@ -2,11 +2,11 @@
 
 namespace Blacklight\processing\tv;
 
-use Tmdb\Client;
-use Tmdb\ApiToken;
 use Blacklight\ReleaseImage;
-use Tmdb\Helper\ImageHelper;
+use Tmdb\ApiToken;
+use Tmdb\Client;
 use Tmdb\Exception\TmdbApiException;
+use Tmdb\Helper\ImageHelper;
 use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
 use Tmdb\Repository\ConfigurationRepository;
 
@@ -15,9 +15,9 @@ class TMDB extends TV
     protected const MATCH_PROBABILITY = 75;
 
     /**
-     * @var string The URL for the image for poster
+     * @string URL for show poster art
      */
-    public $posterUrl;
+    public $posterUrl = '';
     /**
      * @var ApiToken
      */
@@ -99,6 +99,7 @@ class TMDB extends TV
 
             foreach ($res as $row) {
                 $tmdbid = false;
+                $this->posterUrl = '';
 
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
@@ -196,19 +197,20 @@ class TMDB extends TV
                             if ($this->echooutput) {
                                 $this->colorCli->primary('Found TMDB Match!', true);
                             }
-                            continue;
+                        } else {
+                            //Processing failed, set the episode ID to the next processing group
+                            $this->setVideoIdFound($videoId, $row['id'], 0);
+                            $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                         }
-                        //Processing failed, set the episode ID to the next processing group
-                        $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                     } else {
                         //Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
-                        $this->titleCache[] = $release['cleanname'];
+                        $this->titleCache[] = $release['cleanname'] ?? null;
                     }
                 } else {
                     //Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
-                    $this->titleCache[] = $release['cleanname'];
+                    $this->titleCache[] = $release['cleanname'] ?? null;
                 }
             }
         }

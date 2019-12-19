@@ -2,15 +2,15 @@
 
 namespace App\Observers;
 
-use App\Models\User;
-use App\Models\Settings;
-use Illuminate\Support\Str;
+use App\Jobs\SendNewRegisteredAccountMail;
 use App\Jobs\SendWelcomeEmail;
-use Spatie\Permission\Models\Role;
+use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Password;
-use App\Jobs\SendNewRegisteredAccountMail;
+use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
+use Spatie\Permission\Models\Role;
 
 class UserServiceObserver
 {

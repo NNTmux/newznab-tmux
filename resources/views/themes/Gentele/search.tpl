@@ -198,20 +198,31 @@
 							<thead class="thead-light">
 							<tr>
 								<th><input id="check-all" type="checkbox" class="flat-all"/></th>
-								<th>Name
-									<a title="Sort Descending" href="{$orderbyname_desc}">
-										<i class="fa-icon-caret-down text-muted"> </i>
-									</a>
-									<a title="Sort Ascending" href="{$orderbyname_asc}">
-										<i class="fa-icon-caret-up text-muted"> </i>
-									</a>
-								</th>
-								<th>Category</th>
-								<th>Posted</th>
-								<th>Size</th>
-								<th>Files</th>
-								<th>Downloads</th>
-								<th>Action</th>
+                                <th>Name<br>
+                                    <a title="Sort Descending" href="{$orderbyname_desc}"><i class="fas fa-chevron-down"></i></a>
+                                    <a title="Sort Ascending" href="{$orderbyname_asc}"><i class="fas fa-chevron-up"> </i></a>
+                                </th>
+                                <th class="column-title" style="display: table-cell;">Category<br>
+                                    <a title="Sort Descending" href="{$orderbycat_desc}"><i class="fas fa-chevron-down"></i></a>
+                                    <a title="Sort Ascending" href="{$orderbycat_asc}"><i class="fas fa-chevron-up"></i></a>
+                                </th>
+                                <th class="column-title" style="display: table-cell;">Posted<br>
+                                    <a title="Sort Descending" href="{$orderbyposted_desc}"><i class="fas fa-chevron-down"></i></a>
+                                    <a title="Sort Ascending" href="{$orderbyposted_asc}"><i class="fas fa-chevron-up"></i></a>
+                                </th>
+                                <th style="vertical-align:top;text-align:center;">Size<br>
+                                    <a title="Sort Descending" href="{$orderbysize_desc}"><i class="fas fa-chevron-down"></i></a>
+                                    <a title="Sort Ascending" href="{$orderbysize_asc}"><i class="fas fa-chevron-up"></i></a>
+                                </th>
+                                <th style="vertical-align:top;text-align:center;">Files<br>
+                                    <a title="Sort Descending" href="{$orderbyfiles_desc}"><i class="fas fa-chevron-down"></i></a>
+                                    <a title="Sort Ascending" href="{$orderbyfiles_asc}"><i class="fas fa-chevron-up"></i></a>
+                                </th>
+                                <th style="vertical-align:top;text-align:center;">Downloads<br>
+                                    <a title="Sort Descending" href="{$orderbystats_desc}"><i class="fas fa-chevron-down"></i></a>
+                                    <a title="Sort Ascending" href="{$orderbystats_asc}"><i class="fas fa-chevron-up"></i></a>
+                                </th>
+                                <th class="column-title no-link last" style="display: table-cell;">Action</th>
 							</tr>
 							</thead>
 							<tbody>
@@ -312,8 +323,8 @@
 										<a title="Browse {$result->category_name}"
 										   href="{{url("/browse/{$result->parent_category}/{$result->sub_category}")}}"> {$result->category_name}</a>
 									</td>
-									<td class="posted" title="{$result->postdate}">
-										{$result->postdate|timeago}
+									<td class="posted" title="{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}">
+                                        {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
 									</td>
 									<td class="size">
 										{$result->size|filesize}

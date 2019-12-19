@@ -2,15 +2,15 @@
 
 namespace Blacklight;
 
-use App\Models\Release;
 use App\Models\Category;
+use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class Releases.
@@ -102,7 +102,7 @@ class Releases extends Release
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $orderBy[0],
             $orderBy[1],
-            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
         $releases = Cache::get(md5($qry.$page));
@@ -134,7 +134,7 @@ class Releases extends Release
      */
     public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = '', array $tags = []): int
     {
-        $sql = sprintf(
+        return $this->getPagerCount(sprintf(
             'SELECT COUNT(r.id) AS count
 				FROM releases r
 				%s %s
@@ -151,33 +151,22 @@ class Releases extends Release
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
-        );
-        $count = Cache::get(md5($sql));
-        if ($count !== null) {
-            return $count;
-        }
-        $count = self::fromQuery($sql);
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
-        Cache::put(md5($sql), $count[0]->count, $expiresAt);
-
-        return $count[0]->count ?? 0;
+        ));
     }
 
     /**
      * @return string
      */
-    public function showPasswords(): ?string
+    public function showPasswords()
     {
         $show = (int) Settings::settingValue('..showpasswordedrelease');
-        $setting = $show ?? 1;
+        $setting = $show ?? 0;
         switch ($setting) {
-            case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
-
-                    return '= '.self::PASSWD_NONE;
-
             case 1: // Shows everything.
-            default:
                     return '<= '.self::PASSWD_RAR;
+            case 0:
+            default:// Hide releases with a password.
+                return '= '.self::PASSWD_NONE;
         }
     }
 
@@ -757,13 +746,11 @@ class Releases extends Release
     {
         $siteSQL = [];
         $showSql = '';
-
         foreach ($siteIdArr as $column => $Id) {
             if ($Id > 0) {
                 $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
         }
-
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -782,7 +769,6 @@ class Releases extends Release
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
             $show = self::fromQuery($showQry);
-
             if (! empty($show[0])) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
@@ -812,11 +798,9 @@ class Releases extends Release
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
             }
         }
-
         if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
-
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
@@ -872,7 +856,6 @@ class Releases extends Release
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
         }
-
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
@@ -906,7 +889,6 @@ class Releases extends Release
                 $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
         }
-
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -925,7 +907,6 @@ class Releases extends Release
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
             $show = self::fromQuery($showQry);
-
             if ($show->isNotEmpty()) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes != '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
@@ -955,11 +936,9 @@ class Releases extends Release
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
             }
         }
-
         if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
-
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
@@ -1009,7 +988,6 @@ class Releases extends Release
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
         }
-
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
@@ -1166,7 +1144,7 @@ class Releases extends Release
      * @param $currentID
      * @param $name
      * @param array $excludedCats
-     * @return array|Collection
+     * @return array|bool
      */
     public function searchSimilar($currentID, $name, array $excludedCats = [])
     {
@@ -1179,7 +1157,7 @@ class Releases extends Release
 
             $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
             if (! $results) {
-                return $results;
+                return $ret;
             }
 
             $ret = [];
@@ -1206,7 +1184,7 @@ class Releases extends Release
         $sql = sprintf(
             'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
             preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
-            config('nntmux.max_pager_results')
+            (int) config('nntmux.max_pager_results')
         );
         $count = Cache::get(md5($sql));
         if ($count !== null) {

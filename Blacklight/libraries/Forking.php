@@ -2,18 +2,18 @@
 
 namespace Blacklight\libraries;
 
-use Blacklight\Nfo;
-use Blacklight\NZB;
-use Blacklight\NNTP;
-use Spatie\Async\Pool;
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use App\Models\UsenetGroup;
+use Blacklight\ColorCLI;
+use Blacklight\Nfo;
+use Blacklight\NNTP;
+use Blacklight\NZB;
+use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Opis\Closure\SerializableClosure;
-use Blacklight\processing\PostProcess;
+use Spatie\Async\Pool;
 
 /**
  * Class Forking.
@@ -776,7 +776,7 @@ class Forking
             return DB::select(sprintf('
 						SELECT id
 						FROM releases
-						WHERE categories_id BETWEEN 5000 AND 5999
+						WHERE categories_id BETWEEN 2000 AND 2999
 						AND nzbstatus = %d
 						AND imdbid IS NULL
 						%s %s
@@ -799,7 +799,7 @@ class Forking
                     '
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
-					WHERE categories_id BETWEEN 5000 AND 5999
+					WHERE categories_id BETWEEN 2000 AND 2999
 					AND nzbstatus = %d
 					AND imdbid IS NULL
 					%s %s
@@ -852,7 +852,7 @@ class Forking
                     '
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
-					WHERE categories_id BETWEEN 3000 AND 3999
+					WHERE categories_id BETWEEN 5000 AND 5999
 					AND nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576

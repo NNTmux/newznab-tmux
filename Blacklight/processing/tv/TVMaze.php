@@ -22,9 +22,9 @@ class TVMaze extends TV
     public $client;
 
     /**
-     * @var string The URL for the medium sized image for poster
+     * @string URL for show poster art
      */
-    public $posterUrl;
+    public $posterUrl = '';
 
     /**
      * TVMaze constructor.
@@ -76,6 +76,7 @@ class TVMaze extends TV
 
             foreach ($res as $row) {
                 $tvMazeId = false;
+                $this->posterUrl = '';
 
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
@@ -175,19 +176,20 @@ class TVMaze extends TV
                             if ($this->echooutput) {
                                 $this->colorCli->primary('Found TVMaze Match!', true);
                             }
-                            continue;
+                        } else {
+                            //Processing failed, set the episode ID to the next processing group
+                            $this->setVideoIdFound($videoId, $row['id'], 0);
+                            $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         }
-                        //Processing failed, set the episode ID to the next processing group
-                        $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                     } else {
                         //Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
-                        $this->titleCache[] = $release['cleanname'];
+                        $this->titleCache[] = $release['cleanname'] ?? null;
                     }
                 } else {
                     //Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
-                    $this->titleCache[] = $release['cleanname'];
+                    $this->titleCache[] = $release['cleanname'] ?? null;
                 }
             }
         }

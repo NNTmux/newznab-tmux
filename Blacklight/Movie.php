@@ -2,28 +2,28 @@
 
 namespace Blacklight;
 
-use Imdb\Title;
-use Imdb\Config;
 use aharen\OMDbAPI;
-use Imdb\TitleSearch;
-use GuzzleHttp\Client;
-use App\Models\Release;
 use App\Models\Category;
-use App\Models\Settings;
 use App\Models\MovieInfo;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Tmdb\Laravel\Facades\Tmdb;
-use Blacklight\utility\Utility;
-use DariusIII\ItunesApi\iTunes;
+use App\Models\Release;
+use App\Models\Settings;
 use Blacklight\libraries\FanartTV;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
-use Illuminate\Support\Facades\Cache;
+use Blacklight\utility\Utility;
 use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
+use DariusIII\ItunesApi\iTunes;
+use GuzzleHttp\Client;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Imdb\Config;
+use Imdb\Title;
+use Imdb\TitleSearch;
+use Tmdb\Exception\TmdbApiException;
+use Tmdb\Laravel\Facades\Tmdb;
 
 /**
  * Class Movie.
@@ -124,11 +124,6 @@ class Movie
      * @var string
      */
     public $service;
-
-    /**
-     * @var \Tmdb\ApiToken
-     */
-    public $tmdbtoken;
 
     /**
      * @var \Blacklight\processing\tv\TraktTv
@@ -547,6 +542,8 @@ class Movie
         }
 
         MovieInfo::fromQuery($query[0].') '.$query[1].') '.$query[2]);
+
+        return true;
     }
 
     /**
@@ -653,16 +650,16 @@ class Movie
         }
 
         // RottenTomatoes rating from OmdbAPI
-        if (! empty($omdb['rtRating'])) {
+        if ($omdb !== false && ! empty($omdb['rtRating'])) {
             $mov['rtrating'] = $omdb['rtRating'];
         }
 
-        $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title'], $iTunes['title']);
+        $mov['title'] = $this->setVariables($imdb['title'] ?? '', $tmdb['title'] ?? '', $trakt['title'] ?? '', $omdb['title'] ?? '', $iTunes['title'] ?? '');
         $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '', $iTunes['rating'] ?? '');
-        $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot'], $iTunes['plot']);
-        $mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline'], $iTunes['tagline']);
-        $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year'], $iTunes['year']);
-        $mov['genre'] = $this->setVariables($imdb['genre'], $tmdb['genre'], $trakt['genres'], $omdb['genre'], $iTunes['genre']);
+        $mov['plot'] = $this->setVariables($imdb['plot'] ?? '', $tmdb['plot'] ?? '', $trakt['overview'] ?? '', $omdb['plot'] ?? '', $iTunes['plot'] ?? '');
+        $mov['tagline'] = $this->setVariables($imdb['tagline'] ?? '', $tmdb['tagline'] ?? '', $trakt['tagline'] ?? '', $omdb['tagline'] ?? '', $iTunes['tagline'] ?? '');
+        $mov['year'] = $this->setVariables($imdb['year'] ?? '', $tmdb['year'] ?? '', $trakt['year'] ?? '', $omdb['year'] ?? '', $iTunes['year'] ?? '');
+        $mov['genre'] = $this->setVariables($imdb['genre'] ?? '', $tmdb['genre'] ?? '', $trakt['genres'] ?? '', $omdb['genre'] ?? '', $iTunes['genre'] ?? '');
 
         if (! empty($imdb['type'])) {
             $mov['type'] = $imdb['type'];
@@ -731,7 +728,7 @@ class Movie
                 );
         }
 
-        return (int) $movieID > 0;
+        return $movieID;
     }
 
     /**
@@ -974,12 +971,14 @@ class Movie
                         $ret['overview'] = $resp['overview'] ?? '';
                         $ret['tagline'] = $resp['tagline'] ?? '';
                         $ret['year'] = $resp['year'] ?? '';
+                        $ret['genres'] = $resp['genres'] ?? '';
 
                         if (isset($resp['title'])) {
                             $ret['title'] = $resp['title'];
                         } else {
                             return false;
                         }
+
                         if ($this->echooutput && Utility::isCLI()) {
                             $this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
@@ -1102,7 +1101,7 @@ class Movie
     public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
     {
         $imdbID = false;
-        if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,7})/i', $buffer, $matches)) {
+        if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $matches)) {
             $imdbID = $matches['imdbid'];
         }
 
@@ -1232,7 +1231,11 @@ class Movie
                 if ($movieUpdated === false) {
                     $omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
                     if ($this->omdbapikey !== null) {
-                        $buffer = $this->omdbApi->search($omdbTitle, 'movie');
+                        if ($this->currentYear !== '') {
+                            $buffer = $this->omdbApi->search($omdbTitle, 'movie', $this->currentYear);
+                        } else {
+                            $buffer = $this->omdbApi->search($omdbTitle, 'movie');
+                        }
 
                         if (\is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response === 'True') {
                             $getIMDBid = $buffer->data->Search[0]->imdbID;

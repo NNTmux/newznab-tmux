@@ -1,3 +1,43 @@
+2019-12-18 DariusIII
+	* Chg: Check if $release['cleanname'] is set
+2019-12-15 DariusIII
+	* Chg: Update install_tmux.sh to install tmux 3.0a
+2019-12-11 DariusIII
+	* Chg: Update font-awesome and tinyMCE to latest versions
+2019-12-10 DariusIII
+	* Chg: Update laravel/framework and laravel/horizon to latest versions
+2019-12-09 DariusIII
+	* Chg: Remove smarty.php from index.php
+2019-12-08 DariusIII
+	* Chg: Replace WWW_TOP with url() helper
+2019-12-03 DariusIII
+	* Chg: Change the name of users table migration
+2019-12-01 DariusIII
+	* Chg: Display releases postdate information based on users location
+2019-11-27 DariusIII
+	* Fix: Fix wrong Book categories seeders and fixtures
+2019-11-25 DariusIII
+	* Chg: Update foreign matching regexes to include web-dl and web-rip releases
+	* Chg: Use Tmux 2.9a in install_tmux shell script
+2019-11-22 DariusIII
+	* Chg: Update getTitleExact and getTitleLoose functions
+2019-11-21 DariusIII
+	* Fix: Fix issue that prevented adding tv series aliases
+	* Fix: Fix TVDB poster URL
+	* Chg: Set default value for posterUrl for TV processing
+2019-11-20 DariusIII
+	* Chg: Move TVDB apikey to .env
+	* Fix: Fix Trakt genres error
+	* Fix: Fix wrong url string in viewanime template
+2019-11-19 DariusIII
+	* Fix: Fix duplicate check in Blacklight/db/populate/AniDB class
+2019-11-06 DariusIII
+	* Chg: Use the new remember() function for lazycollections
+2019-10-28 DariusIII
+	* Chg: Update tinyMCE to latest version
+	* Fix: Fix return value of searchSimilar when no results are found
+2019-10-27 DariusIII
+	* Chg: Update query used in tvSearch function
 2019-10-24 DariusIII
 	* Chg: Replace ! $request->has with new $request->missing
 	* Chg: Update regex in TV class
@@ -132,7 +172,7 @@
 	* Chg: Remove api and download hits reset functionality
 	* Chg: Update javascript and tpls
 	* Chg: Slightly improve movie matching
-	* Fix: Fix game covers 
+	* Fix: Fix game covers
 	* Chg: Update rtconner/laravel-tagging (3.2.2 => 3.2.3)
 2019-08-11 DariusIII
 	* Chg: Add year check in processMovieReleases function to help better movie matching

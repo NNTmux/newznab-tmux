@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Video;
 use App\Models\Category;
 use App\Models\Settings;
-use Blacklight\Releases;
 use App\Models\UserSerie;
+use App\Models\Video;
+use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class MyShowsController extends BasePageController
@@ -23,9 +23,9 @@ class MyShowsController extends BasePageController
         $videoId = $request->input('id') ?? '';
 
         if ($request->has('from')) {
-            $this->smarty->assign('from', WWW_TOP.$request->input('from'));
+            $this->smarty->assign('from', url($request->input('from')));
         } else {
-            $this->smarty->assign('from', WWW_TOP.'/myshows');
+            $this->smarty->assign('from', url('/myshows'));
         }
 
         switch ($action) {
@@ -37,7 +37,7 @@ class MyShowsController extends BasePageController
 
                 UserSerie::delShow($this->userdata->id, $videoId);
                 if ($request->has('from')) {
-                    header('Location:'.WWW_TOP.$request->input('from'));
+                    header('Location:'.url($request->input('from')));
                 } else {
                     return redirect('myshows');
                 }
@@ -191,7 +191,7 @@ class MyShowsController extends BasePageController
         $this->smarty->assign('covgroup', '');
 
         foreach ($ordering as $ordertype) {
-            $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/myshows/browse?ob='.$ordertype.'&amp;offset=0');
+            $this->smarty->assign('orderby'.$ordertype, url('/myshows/browse?ob='.$ordertype.'&amp;offset=0'));
         }
 
         $this->smarty->assign('lastvisit', $this->userdata->lastlogin);

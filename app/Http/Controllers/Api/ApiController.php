@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
+use App\Events\UserAccessedApi;
+use App\Http\Controllers\BasePageController;
 use App\Models\Release;
+use App\Models\ReleaseNfo;
+use App\Models\User;
+use App\Models\UserDownload;
+use App\Models\UserRequest;
 use Blacklight\http\API;
 use Blacklight\Releases;
-use App\Models\ReleaseNfo;
-use App\Models\UserRequest;
-use App\Models\UserDownload;
+use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Events\UserAccessedApi;
-use Blacklight\utility\Utility;
-use App\Http\Controllers\BasePageController;
 
 class ApiController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Symfony\Component\HttpFoundation\StreamedResponse
      * @throws \Throwable
      */
     public function api(Request $request)
@@ -266,7 +267,7 @@ class ApiController extends BasePageController
                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $relData = Release::checkGuidForApi($request->input('id'));
                if ($relData) {
-                   return redirect(WWW_TOP.'/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+                   return redirect(url('/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
                }
 
                Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
