@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.4 (2019-12-11)
+ * Version: 5.1.5 (2019-12-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -1923,6 +1923,86 @@
       return eq(component.element(), simulatedEvent.event().target());
     };
 
+    function ClosestOrAncestor (is, ancestor, scope, a, isRoot) {
+      return is(scope, a) ? Option.some(scope) : isFunction(isRoot) && isRoot(scope) ? Option.none() : ancestor(scope, a, isRoot);
+    }
+
+    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+
+    var name = function (element) {
+      var r = element.dom().nodeName;
+      return r.toLowerCase();
+    };
+    var type = function (element) {
+      return element.dom().nodeType;
+    };
+    var isType$1 = function (t) {
+      return function (element) {
+        return type(element) === t;
+      };
+    };
+    var isElement = isType$1(ELEMENT);
+    var isText = isType$1(TEXT);
+
+    var inBody = function (element) {
+      var dom = isText(element) ? element.dom().parentNode : element.dom();
+      return dom !== undefined && dom !== null && dom.ownerDocument.body.contains(dom);
+    };
+    var body = cached(function () {
+      return getBody(Element.fromDom(domGlobals.document));
+    });
+    var getBody = function (doc) {
+      var b = doc.dom().body;
+      if (b === null || b === undefined) {
+        throw new Error('Body is not available yet');
+      }
+      return Element.fromDom(b);
+    };
+
+    var ancestor = function (scope, predicate, isRoot) {
+      var element = scope.dom();
+      var stop = isFunction(isRoot) ? isRoot : constant(false);
+      while (element.parentNode) {
+        element = element.parentNode;
+        var el = Element.fromDom(element);
+        if (predicate(el)) {
+          return Option.some(el);
+        } else if (stop(el)) {
+          break;
+        }
+      }
+      return Option.none();
+    };
+    var closest = function (scope, predicate, isRoot) {
+      var is = function (s, test) {
+        return test(s);
+      };
+      return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
+    };
+    var descendant = function (scope, predicate) {
+      var descend = function (node) {
+        for (var i = 0; i < node.childNodes.length; i++) {
+          var child_1 = Element.fromDom(node.childNodes[i]);
+          if (predicate(child_1)) {
+            return Option.some(child_1);
+          }
+          var res = descend(node.childNodes[i]);
+          if (res.isSome()) {
+            return res;
+          }
+        }
+        return Option.none();
+      };
+      return descend(scope.dom());
+    };
+
+    var closest$1 = function (target, transform, isRoot) {
+      var delegate = closest(target, function (elem) {
+        return transform(elem).isSome();
+      }, isRoot);
+      return delegate.bind(transform);
+    };
+
     var nu$4 = function (parts) {
       if (!hasKey$1(parts, 'can') && !hasKey$1(parts, 'abort') && !hasKey$1(parts, 'run')) {
         throw new Error('EventHandler defined by: ' + JSON.stringify(parts, null, 2) + ' does not have can, abort, or run!');
@@ -2012,9 +2092,6 @@
     var execute = constant('alloy.execute');
     var focusItem = constant('alloy.focus.item');
     var tap = alloy.tap;
-    var tapOrClick = function () {
-      return detect$3().deviceType.isTouch() ? alloy.tap() : click();
-    };
     var longpress = constant('alloy.longpress');
     var sandboxClose = constant('alloy.sandbox.close');
     var typeaheadCancel = constant('alloy.typeahead.cancel');
@@ -2054,86 +2131,6 @@
       component.getSystem().triggerEvent(event, target, simulatedEvent.event());
     };
 
-    function ClosestOrAncestor (is, ancestor, scope, a, isRoot) {
-      return is(scope, a) ? Option.some(scope) : isFunction(isRoot) && isRoot(scope) ? Option.none() : ancestor(scope, a, isRoot);
-    }
-
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
-
-    var name = function (element) {
-      var r = element.dom().nodeName;
-      return r.toLowerCase();
-    };
-    var type = function (element) {
-      return element.dom().nodeType;
-    };
-    var isType$1 = function (t) {
-      return function (element) {
-        return type(element) === t;
-      };
-    };
-    var isElement = isType$1(ELEMENT);
-    var isText = isType$1(TEXT);
-
-    var inBody = function (element) {
-      var dom = isText(element) ? element.dom().parentNode : element.dom();
-      return dom !== undefined && dom !== null && dom.ownerDocument.body.contains(dom);
-    };
-    var body = cached(function () {
-      return getBody(Element.fromDom(domGlobals.document));
-    });
-    var getBody = function (doc) {
-      var b = doc.dom().body;
-      if (b === null || b === undefined) {
-        throw new Error('Body is not available yet');
-      }
-      return Element.fromDom(b);
-    };
-
-    var ancestor = function (scope, predicate, isRoot) {
-      var element = scope.dom();
-      var stop = isFunction(isRoot) ? isRoot : constant(false);
-      while (element.parentNode) {
-        element = element.parentNode;
-        var el = Element.fromDom(element);
-        if (predicate(el)) {
-          return Option.some(el);
-        } else if (stop(el)) {
-          break;
-        }
-      }
-      return Option.none();
-    };
-    var closest = function (scope, predicate, isRoot) {
-      var is = function (s, test) {
-        return test(s);
-      };
-      return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
-    };
-    var descendant = function (scope, predicate) {
-      var descend = function (node) {
-        for (var i = 0; i < node.childNodes.length; i++) {
-          var child_1 = Element.fromDom(node.childNodes[i]);
-          if (predicate(child_1)) {
-            return Option.some(child_1);
-          }
-          var res = descend(node.childNodes[i]);
-          if (res.isSome()) {
-            return res;
-          }
-        }
-        return Option.none();
-      };
-      return descend(scope.dom());
-    };
-
-    var closest$1 = function (target, transform, isRoot) {
-      var delegate = closest(target, function (elem) {
-        return transform(elem).isSome();
-      }, isRoot);
-      return delegate.bind(transform);
-    };
-
     var derive = function (configs) {
       return wrapAll$1(configs);
     };
@@ -2169,8 +2166,11 @@
       return {
         key: name,
         value: nu$4({
-          run: function (component) {
-            action.apply(undefined, [component].concat(extra));
+          run: function (component, simulatedEvent) {
+            action.apply(undefined, [
+              component,
+              simulatedEvent
+            ].concat(extra));
           }
         })
       };
@@ -7715,12 +7715,15 @@
     });
 
     var pointerEvents = function () {
+      var onClick = function (component, simulatedEvent) {
+        simulatedEvent.stop();
+        emitExecute(component);
+      };
       return [
-        run(tapOrClick(), function (component, simulatedEvent) {
-          simulatedEvent.stop();
-          emitExecute(component);
-        }),
-        cutter(detect$3().deviceType.isTouch() ? touchstart() : mousedown())
+        run(click(), onClick),
+        run(tap(), onClick),
+        cutter(touchstart()),
+        cutter(mousedown())
       ];
     };
     var events$7 = function (optAction) {
@@ -10549,6 +10552,10 @@
           col: col
         });
       };
+      var onClick = function (c, se) {
+        se.stop();
+        emitExecute(c);
+      };
       return build$1({
         dom: {
           tag: 'div',
@@ -10558,10 +10565,8 @@
           config('insert-table-picker-cell', [
             run(mouseover(), Focusing.focus),
             run(execute(), emitExecute),
-            run(tapOrClick(), function (c, se) {
-              se.stop();
-              emitExecute(c);
-            })
+            run(click(), onClick),
+            run(tap(), onClick)
           ]),
           Toggling.config({
             toggleClass: 'tox-insert-table-picker__selected',
@@ -12210,13 +12215,12 @@
     };
     var setup$1 = function (container, rawSettings) {
       var settings = asRawOrDie('Getting GUI events settings', settingsSchema, rawSettings);
-      var pointerEvents = detect$3().deviceType.isTouch() ? [
+      var pointerEvents = [
         'touchstart',
         'touchmove',
         'touchend',
         'touchcancel',
-        'gesturestart'
-      ] : [
+        'gesturestart',
         'mousedown',
         'mouseup',
         'mouseover',
@@ -12864,7 +12868,7 @@
           if (longpressFired.get()) {
             e.preventDefault();
           } else {
-            var result = editor.fire('tap');
+            var result = editor.fire('tap', { touches: e.touches });
             if (result.isDefaultPrevented()) {
               e.preventDefault();
             }
@@ -14562,8 +14566,6 @@
     var sliderUpdate = constant(generate$1('slider-update'));
     var paletteUpdate = constant(generate$1('palette-update'));
 
-    var platform$1 = detect$3();
-    var isTouch = platform$1.deviceType.isTouch();
     var labelPart = optional({
       schema: [strict$1('dom')],
       name: 'label'
@@ -14576,16 +14578,17 @@
           return action.fold(function () {
             return {};
           }, function (a) {
-            var touchEvents = derive([runActionExtra(touchstart(), a, [detail])]);
-            var mouseEvents = derive([
-              runActionExtra(mousedown(), a, [detail]),
-              runActionExtra(mousemove(), function (l, det) {
-                if (det.mouseIsDown.get()) {
-                  a(l, det);
-                }
-              }, [detail])
-            ]);
-            return { events: isTouch ? touchEvents : mouseEvents };
+            return {
+              events: derive([
+                runActionExtra(touchstart(), a, [detail]),
+                runActionExtra(mousedown(), a, [detail]),
+                runActionExtra(mousemove(), function (l, se, det) {
+                  if (det.mouseIsDown.get()) {
+                    a(l, det);
+                  }
+                }, [detail])
+              ])
+            };
           });
         }
       });
@@ -14627,20 +14630,8 @@
             return model.setValueFrom(component, detail, value);
           });
         };
-        var touchEvents = derive([
-          run(touchstart(), setValueFrom),
-          run(touchmove(), setValueFrom)
-        ]);
-        var mouseEvents = derive([
-          run(mousedown(), setValueFrom),
-          run(mousemove(), function (spectrum, se) {
-            if (detail.mouseIsDown.get()) {
-              setValueFrom(spectrum, se);
-            }
-          })
-        ]);
         return {
-          behaviours: derive$1(isTouch ? [] : [
+          behaviours: derive$1([
             Keying.config({
               mode: 'special',
               onLeft: function (spectrum) {
@@ -14658,7 +14649,16 @@
             }),
             Focusing.config({})
           ]),
-          events: isTouch ? touchEvents : mouseEvents
+          events: derive([
+            run(touchstart(), setValueFrom),
+            run(touchmove(), setValueFrom),
+            run(mousedown(), setValueFrom),
+            run(mousemove(), function (spectrum, se) {
+              if (detail.mouseIsDown.get()) {
+                setValueFrom(spectrum, se);
+              }
+            })
+          ])
         };
       }
     });
@@ -14676,12 +14676,14 @@
       spectrumPart
     ];
 
-    var isTouch$1 = detect$3().deviceType.isTouch();
     var _sliderChangeEvent = 'slider.change.value';
     var sliderChangeEvent = constant(_sliderChangeEvent);
+    var isTouchEvent = function (evt) {
+      return evt.type.indexOf('touch') !== -1;
+    };
     var getEventSource = function (simulatedEvent) {
       var evt = simulatedEvent.event().raw();
-      if (isTouch$1) {
+      if (isTouchEvent(evt)) {
         var touchEvent = evt;
         return touchEvent.touches !== undefined && touchEvent.touches.length === 1 ? Option.some(touchEvent.touches[0]).map(function (t) {
           return Position(t.clientX, t.clientY);
@@ -15266,7 +15268,6 @@
         edgeActions: edgeActions$2
     });
 
-    var isTouch$2 = detect$3().deviceType.isTouch();
     var SliderSchema = [
       defaulted$1('stepSize', 1),
       defaulted$1('onChange', noop),
@@ -15314,13 +15315,14 @@
       field$1('sliderBehaviours', [
         Keying,
         Representing
-      ])
-    ].concat(!isTouch$2 ? [state$1('mouseIsDown', function () {
+      ]),
+      state$1('mouseIsDown', function () {
         return Cell(false);
-      })] : []);
+      })
+    ];
 
-    var isTouch$3 = detect$3().deviceType.isTouch();
     var sketch = function (detail, components, _spec, _externals) {
+      var _a;
       var getThumb = function (component) {
         return getPartOrDie(component, detail, 'thumb');
       };
@@ -15363,70 +15365,50 @@
       var resetToMax = function (slider) {
         model.setToMax(slider, detail);
       };
-      var touchEvents = [
-        run(touchstart(), function (slider, _simulatedEvent) {
-          detail.onDragStart(slider, getThumb(slider));
-        }),
-        run(touchend(), function (slider, _simulatedEvent) {
-          detail.onDragEnd(slider, getThumb(slider));
-        })
-      ];
-      var mouseEvents = [
-        run(mousedown(), function (slider, simulatedEvent) {
-          simulatedEvent.stop();
-          detail.onDragStart(slider, getThumb(slider));
-          detail.mouseIsDown.set(true);
-        }),
-        run(mouseup(), function (slider, _simulatedEvent) {
-          detail.onDragEnd(slider, getThumb(slider));
-        })
-      ];
-      var uiEventsArr = isTouch$3 ? touchEvents : mouseEvents;
+      var choose = function (slider) {
+        var fireOnChoose = function () {
+          getPart(slider, detail, 'thumb').each(function (thumb) {
+            var value = modelDetail.value.get();
+            detail.onChoose(slider, thumb, value);
+          });
+        };
+        var wasDown = detail.mouseIsDown.get();
+        detail.mouseIsDown.set(false);
+        if (wasDown) {
+          fireOnChoose();
+        }
+      };
+      var onDragStart = function (slider, simulatedEvent) {
+        simulatedEvent.stop();
+        detail.mouseIsDown.set(true);
+        detail.onDragStart(slider, getThumb(slider));
+      };
+      var onDragEnd = function (slider, simulatedEvent) {
+        simulatedEvent.stop();
+        detail.onDragEnd(slider, getThumb(slider));
+        choose(slider);
+      };
       return {
         uid: detail.uid,
         dom: detail.dom,
         components: components,
-        behaviours: augment(detail.sliderBehaviours, flatten([
-          !isTouch$3 ? [Keying.config({
-              mode: 'special',
-              focusIn: function (slider) {
-                return getPart(slider, detail, 'spectrum').map(Keying.focusIn).map(constant(true));
+        behaviours: augment(detail.sliderBehaviours, [
+          Keying.config({
+            mode: 'special',
+            focusIn: function (slider) {
+              return getPart(slider, detail, 'spectrum').map(Keying.focusIn).map(constant(true));
+            }
+          }),
+          Representing.config({
+            store: {
+              mode: 'manual',
+              getValue: function (_) {
+                return modelDetail.value.get();
               }
-            })] : [],
-          [
-            Representing.config({
-              store: {
-                mode: 'manual',
-                getValue: function (_) {
-                  return modelDetail.value.get();
-                }
-              }
-            }),
-            Receiving.config({
-              channels: {
-                'mouse.released': {
-                  onReceive: function (slider, se) {
-                    var fireOnChoose = function () {
-                      getPart(slider, detail, 'thumb').each(function (thumb) {
-                        var value = modelDetail.value.get();
-                        detail.onChoose(slider, thumb, value);
-                      });
-                    };
-                    if (isTouch$3) {
-                      fireOnChoose();
-                    } else {
-                      var wasDown = detail.mouseIsDown.get();
-                      detail.mouseIsDown.set(false);
-                      if (wasDown) {
-                        fireOnChoose();
-                      }
-                    }
-                  }
-                }
-              }
-            })
-          ]
-        ])),
+            }
+          }),
+          Receiving.config({ channels: (_a = {}, _a[mouseReleased()] = { onReceive: choose }, _a) })
+        ]),
         events: derive([
           run(sliderChangeEvent(), function (slider, simulatedEvent) {
             changeValue(slider, simulatedEvent.event().value());
@@ -15438,8 +15420,12 @@
             refresh(slider, thumb);
             var spectrum = getSpectrum(slider);
             detail.onInit(slider, thumb, spectrum, modelDetail.value.get());
-          })
-        ].concat(uiEventsArr)),
+          }),
+          run(touchstart(), onDragStart),
+          run(touchend(), onDragEnd),
+          run(mousedown(), onDragStart),
+          run(mouseup(), onDragEnd)
+        ]),
         apis: {
           resetToMin: resetToMin,
           resetToMax: resetToMax,
@@ -16260,7 +16246,10 @@
           },
           styles: { display: 'none' }
         },
-        behaviours: derive$1([config('input-file-events', [cutter(tapOrClick())])])
+        behaviours: derive$1([config('input-file-events', [
+            cutter(click()),
+            cutter(tap())
+          ])])
       });
       var renderField = function (s) {
         return {
@@ -20744,17 +20733,19 @@
         });
         set(comp.element(), html.join(''));
       };
+      var onClick = runOnItem(function (comp, se, tgt, itemValue) {
+        se.stop();
+        emitWith(comp, formActionEvent, {
+          name: spec.name,
+          value: itemValue
+        });
+      });
       var collectionEvents = [
         run(mouseover(), runOnItem(function (comp, se, tgt) {
           focus$1(tgt);
         })),
-        run(tapOrClick(), runOnItem(function (comp, se, tgt, itemValue) {
-          se.stop();
-          emitWith(comp, formActionEvent, {
-            name: spec.name,
-            value: itemValue
-          });
-        })),
+        run(click(), onClick),
+        run(tap(), onClick),
         run(focusin(), runOnItem(function (comp, se, tgt) {
           descendant$1(comp.element(), '.' + activeClass).each(function (currentActive) {
             remove$4(currentActive, activeClass);
@@ -27191,11 +27182,11 @@
     var transpose$1 = function (pos, dx, dy) {
       return nu$d(pos.x + dx, pos.y + dy);
     };
-    var isTouchEvent = function (e) {
+    var isTouchEvent$1 = function (e) {
       return e.type === 'longpress' || e.type.indexOf('touch') === 0;
     };
     var fromPageXY = function (e) {
-      if (isTouchEvent(e)) {
+      if (isTouchEvent$1(e)) {
         var touch = e.touches[0];
         return nu$d(touch.pageX, touch.pageY);
       } else {
@@ -27203,7 +27194,7 @@
       }
     };
     var fromClientXY = function (e) {
-      if (isTouchEvent(e)) {
+      if (isTouchEvent$1(e)) {
         var touch = e.touches[0];
         return nu$d(touch.clientX, touch.clientY);
       } else {
@@ -27584,6 +27575,26 @@
       }));
     };
 
+    var SnapSchema = optionObjOf('snaps', [
+      strict$1('getSnapPoints'),
+      onHandler('onSensor'),
+      strict$1('leftAttr'),
+      strict$1('topAttr'),
+      defaulted$1('lazyViewport', win),
+      defaulted$1('mustSnap', false)
+    ]);
+
+    var schema$s = [
+      defaulted$1('useFixed', never),
+      strict$1('blockerClass'),
+      defaulted$1('getTarget', identity),
+      defaulted$1('onDrag', noop),
+      defaulted$1('repositionTarget', true),
+      defaulted$1('onDrop', noop),
+      defaultedFunction('getBounds', win),
+      SnapSchema
+    ];
+
     var get$d = function (component, snapsInfo) {
       var element = component.element();
       var x = parseInt(get$2(element, snapsInfo.leftAttr), 10);
@@ -27763,15 +27774,18 @@
       dragState.reset();
       dragConfig.onDrop(component, target);
     };
-
-    var SnapSchema = optionObjOf('snaps', [
-      strict$1('getSnapPoints'),
-      onHandler('onSensor'),
-      strict$1('leftAttr'),
-      strict$1('topAttr'),
-      defaulted$1('lazyViewport', win),
-      defaulted$1('mustSnap', false)
-    ]);
+    var handlers = function (events) {
+      return function (dragConfig, dragState) {
+        var updateStartState = function (comp) {
+          dragState.setStartData(calcStartData(dragConfig, comp));
+        };
+        return derive(__spreadArrays([run(windowScroll(), function (comp) {
+            dragState.getStartData().each(function () {
+              return updateStartState(comp);
+            });
+          })], events(dragConfig, dragState, updateStartState)));
+      };
+    };
 
     var init$c = function (dragApi) {
       return derive([
@@ -27796,17 +27810,8 @@
         getDelta: getDelta$1
     });
 
-    var handlers = function (dragConfig, dragState) {
-      var updateStartState = function (comp) {
-        dragState.setStartData(calcStartData(dragConfig, comp));
-      };
-      return derive([
-        run(windowScroll(), function (comp) {
-          dragState.getStartData().each(function () {
-            return updateStartState(comp);
-          });
-        }),
-        run(mousedown(), function (component, simulatedEvent) {
+    var events$g = function (dragConfig, dragState, updateStartState) {
+      return [run(mousedown(), function (component, simulatedEvent) {
           var raw = simulatedEvent.event().raw();
           if (raw.button !== 0) {
             return;
@@ -27831,20 +27836,9 @@
             instigate(component, blocker);
           };
           start();
-        })
-      ]);
+        })];
     };
-    var schema$s = [
-      defaulted$1('useFixed', never),
-      strict$1('blockerClass'),
-      defaulted$1('getTarget', identity),
-      defaulted$1('onDrag', noop),
-      defaulted$1('repositionTarget', true),
-      onHandler('onDrop'),
-      defaultedFunction('getBounds', win),
-      SnapSchema,
-      output('dragger', { handlers: handlers })
-    ];
+    var schema$t = __spreadArrays(schema$s, [output('dragger', { handlers: handlers(events$g) })]);
 
     var init$d = function (dragApi) {
       return derive([
@@ -27875,17 +27869,9 @@
         getDelta: getDelta$2
     });
 
-    var handlers$1 = function (dragConfig, dragState) {
+    var events$h = function (dragConfig, dragState, updateStartState) {
       var blockerCell = Cell(Option.none());
-      var updateStartState = function (comp) {
-        dragState.setStartData(calcStartData(dragConfig, comp));
-      };
-      return derive([
-        run(windowScroll(), function (comp) {
-          dragState.getStartData().each(function () {
-            return updateStartState(comp);
-          });
-        }),
+      return [
         run(touchstart(), function (component, simulatedEvent) {
           simulatedEvent.stop();
           var stop$1 = function () {
@@ -27913,7 +27899,8 @@
           simulatedEvent.stop();
           move$1(component, dragConfig, dragState, TouchData, simulatedEvent.event());
         }),
-        run(touchend(), function (component) {
+        run(touchend(), function (component, simulatedEvent) {
+          simulatedEvent.stop();
           stop(component, blockerCell.get(), dragConfig, dragState);
           blockerCell.set(Option.none());
         }),
@@ -27921,26 +27908,23 @@
           stop(component, blockerCell.get(), dragConfig, dragState);
           blockerCell.set(Option.none());
         })
-      ]);
+      ];
     };
-    var schema$t = [
-      defaulted$1('useFixed', never),
-      strict$1('blockerClass'),
-      defaulted$1('getTarget', identity),
-      defaulted$1('onDrag', noop),
-      defaulted$1('repositionTarget', true),
-      defaulted$1('onDrop', noop),
-      defaultedFunction('getBounds', win),
-      SnapSchema,
-      output('dragger', { handlers: handlers$1 })
-    ];
+    var schema$u = __spreadArrays(schema$s, [output('dragger', { handlers: handlers(events$h) })]);
 
-    var mouse = schema$s;
-    var touch = schema$t;
+    var events$i = function (dragConfig, dragState, updateStartState) {
+      return __spreadArrays(events$g(dragConfig, dragState, updateStartState), events$h(dragConfig, dragState, updateStartState));
+    };
+    var schema$v = __spreadArrays(schema$s, [output('dragger', { handlers: handlers(events$i) })]);
+
+    var mouse = schema$t;
+    var touch = schema$u;
+    var mouseOrTouch = schema$v;
 
     var DraggingBranches = /*#__PURE__*/Object.freeze({
         mouse: mouse,
-        touch: touch
+        touch: touch,
+        mouseOrTouch: mouseOrTouch
     });
 
     var init$e = function () {
@@ -28019,7 +28003,7 @@
       apis: DraggingApis
     });
 
-    var platform$2 = detect$3();
+    var platform$1 = detect$3();
     var snapWidth = 40;
     var snapOffset = snapWidth / 2;
     var calcSnap = function (selectorOpt, td, x, y, width, height) {
@@ -28072,7 +28056,7 @@
         },
         buttonBehaviours: derive$1([
           Dragging.config({
-            mode: platform$2.deviceType.isTouch() ? 'touch' : 'mouse',
+            mode: 'mouseOrTouch',
             blockerClass: 'blocker',
             snaps: snaps
           }),
@@ -28167,7 +28151,7 @@
       var snapLastBottomRight = function () {
         return finishCell.get().each(snapBottomRight);
       };
-      if (platform$2.deviceType.isTouch()) {
+      if (platform$1.deviceType.isTouch()) {
         editor.on('TableSelectionChange', function (e) {
           if (!isVisible.get()) {
             attach$1(sink, topLeft);
@@ -28183,7 +28167,7 @@
             snapBottomRight(e.finish);
           });
         });
-        editor.on('resize ScrollContent', function () {
+        editor.on('ResizeEditor ResizeWindow ScrollContent', function () {
           snapLastTopLeft();
           snapLastBottomRight();
         });
@@ -28329,7 +28313,6 @@
     var ElementPath = { renderElementPath: renderElementPath };
 
     var renderWordCount = function (editor, providersBackstage) {
-      var _a;
       var replaceCountText = function (comp, count, mode) {
         return Replacing.set(comp, [text(providersBackstage.translate([
             '{0} ' + mode,
@@ -28358,7 +28341,7 @@
             }
           }),
           config('wordcount-events', [
-            run(tapOrClick(), function (comp) {
+            runOnExecute(function (comp) {
               var currentVal = Representing.getValue(comp);
               var newMode = currentVal.mode === 'words' ? 'characters' : 'words';
               Representing.setValue(comp, {
@@ -28378,11 +28361,7 @@
               });
             })
           ])
-        ]),
-        eventOrder: (_a = {}, _a[tapOrClick()] = [
-          'wordcount-events',
-          'alloy.base.behaviour'
-        ], _a)
+        ])
       });
     };
 
@@ -28760,7 +28739,7 @@
       }
     };
 
-    var schema$u = constant([
+    var schema$w = constant([
       strict$1('lazySink'),
       option('dragBlockClass'),
       defaultedFunction('getBounds', win),
@@ -28944,7 +28923,7 @@
     };
     var ModalDialog = composite$1({
       name: 'ModalDialog',
-      configFields: schema$u(),
+      configFields: schema$w(),
       partFields: parts$e(),
       factory: factory$h,
       apis: {
@@ -29487,7 +29466,7 @@
       factory: factory$i
     });
 
-    var schema$v = constant([
+    var schema$x = constant([
       strict$1('tabs'),
       strict$1('dom'),
       defaulted$1('clickToDismiss', false),
@@ -29573,7 +29552,7 @@
     };
     var Tabbar = composite$1({
       name: 'Tabbar',
-      configFields: schema$v(),
+      configFields: schema$x(),
       partFields: parts$f(),
       factory: factory$j
     });
@@ -29592,7 +29571,7 @@
       factory: factory$k
     });
 
-    var schema$w = constant([
+    var schema$y = constant([
       defaulted$1('selectFirst', true),
       onHandler('onChangeTab'),
       onHandler('onDismissTab'),
@@ -29685,7 +29664,7 @@
     };
     var TabSection = composite$1({
       name: 'TabSection',
-      configFields: schema$w(),
+      configFields: schema$y(),
       partFields: parts$g(),
       factory: factory$l,
       apis: {
@@ -30324,7 +30303,7 @@
       return instanceApi;
     };
 
-    var isTouch$4 = global$6.deviceType.isTouch();
+    var isTouch = global$6.deviceType.isTouch();
     var hiddenHeader = function (title, close) {
       return {
         dom: {
@@ -30438,7 +30417,7 @@
             components: [{
                 dom: {
                   tag: 'div',
-                  classes: isTouch$4 ? [
+                  classes: isTouch ? [
                     blockerBackdropClass,
                     blockerBackdropClass + '--opaque'
                   ] : [blockerBackdropClass]

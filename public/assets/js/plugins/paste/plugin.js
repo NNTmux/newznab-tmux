@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.4 (2019-12-11)
+ * Version: 5.1.5 (2019-12-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -1580,8 +1580,8 @@
         return action(editor, html, pasteHtml) !== true;
       });
     };
-    var insertContent = function (editor, html) {
-      if (Settings.isSmartPasteEnabled(editor) === false) {
+    var insertContent = function (editor, html, pasteAsText) {
+      if (pasteAsText || Settings.isSmartPasteEnabled(editor) === false) {
         pasteHtml(editor, html);
       } else {
         smartInsertContent(editor, html);
@@ -1629,18 +1629,21 @@
       return result.str;
     };
 
+    var doPaste = function (editor, content, internal, pasteAsText) {
+      var args = ProcessFilters.process(editor, content, internal);
+      if (args.cancelled === false) {
+        SmartPaste.insertContent(editor, args.content, pasteAsText);
+      }
+    };
     var pasteHtml$1 = function (editor, html, internalFlag) {
       var internal = internalFlag ? internalFlag : InternalHtml.isMarked(html);
-      var args = ProcessFilters.process(editor, InternalHtml.unmark(html), internal);
-      if (args.cancelled === false) {
-        SmartPaste.insertContent(editor, args.content);
-      }
+      doPaste(editor, InternalHtml.unmark(html), internal, false);
     };
     var pasteText = function (editor, text) {
       var encodedText = editor.dom.encode(text).replace(/\r\n/g, '\n');
       var normalizedText = normalizeWhitespace(encodedText);
       var html = Newlines.convert(normalizedText, editor.settings.forced_root_block, editor.settings.forced_root_block_attrs);
-      pasteHtml$1(editor, html, false);
+      doPaste(editor, html, false, true);
     };
     var getDataTransferItems = function (dataTransfer) {
       var items = {};
@@ -1803,7 +1806,7 @@
         }
       });
       function insertClipboardContent(clipboardContent, isKeyBoardPaste, plainTextMode, internal) {
-        var content, isPlainTextHtml;
+        var content, isPlainTextHtml, isImage;
         if (hasContentType(clipboardContent, 'text/html')) {
           content = clipboardContent['text/html'];
         } else {
@@ -1816,10 +1819,11 @@
         content = Utils.trimHtml(content);
         pasteBin.remove();
         isPlainTextHtml = internal === false && Newlines.isPlainText(content);
-        if (!content.length || isPlainTextHtml) {
+        isImage = SmartPaste.isImageUrl(content);
+        if (!content.length || isPlainTextHtml && !isImage) {
           plainTextMode = true;
         }
-        if (plainTextMode) {
+        if (plainTextMode || isImage) {
           if (hasContentType(clipboardContent, 'text/plain') && isPlainTextHtml) {
             content = clipboardContent['text/plain'];
           } else {
@@ -2051,8 +2055,6 @@
       };
     };
 
-    var noop$1 = function () {
-    };
     var hasWorkingClipboardApi = function (clipboardData) {
       return global$2.iOS === false && clipboardData !== undefined && typeof clipboardData.setData === 'function' && Utils.isMsEdge() !== true;
     };
@@ -2140,7 +2142,8 @@
     var copy = function (editor) {
       return function (evt) {
         if (hasSelectedContent(editor)) {
-          setClipboardData(evt, getData(editor), fallback(editor), noop$1);
+          setClipboardData(evt, getData(editor), fallback(editor), function () {
+          });
         }
       };
     };

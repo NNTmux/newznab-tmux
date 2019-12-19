@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.4 (2019-12-11)
+ * Version: 5.1.5 (2019-12-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -1631,7 +1631,8 @@
           }
         }
       };
-      editor.windowManager.open(bridgeSpec);
+      var dialogApi = editor.windowManager.open(bridgeSpec);
+      dialogApi.focus(patternName);
     };
     var Dialog = { open: open };
 

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.4 (2019-12-11)
+ * Version: 5.1.5 (2019-12-19)
  */
 (function (domGlobals) {
     'use strict';
@@ -782,9 +782,6 @@
     var execute = constant('alloy.execute');
     var focusItem = constant('alloy.focus.item');
     var tap = alloy.tap;
-    var tapOrClick = function () {
-      return detect$3().deviceType.isTouch() ? alloy.tap() : click();
-    };
     var longpress = constant('alloy.longpress');
     var systemInit = constant('alloy.system.init');
     var attachedToDom = constant('alloy.system.attached');
@@ -2104,6 +2101,54 @@
       return eq(component.element(), simulatedEvent.event().target());
     };
 
+    function ClosestOrAncestor (is, ancestor, scope, a, isRoot) {
+      return is(scope, a) ? Option.some(scope) : isFunction(isRoot) && isRoot(scope) ? Option.none() : ancestor(scope, a, isRoot);
+    }
+
+    var ancestor = function (scope, predicate, isRoot) {
+      var element = scope.dom();
+      var stop = isFunction(isRoot) ? isRoot : constant(false);
+      while (element.parentNode) {
+        element = element.parentNode;
+        var el = Element.fromDom(element);
+        if (predicate(el)) {
+          return Option.some(el);
+        } else if (stop(el)) {
+          break;
+        }
+      }
+      return Option.none();
+    };
+    var closest = function (scope, predicate, isRoot) {
+      var is = function (s, test) {
+        return test(s);
+      };
+      return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
+    };
+    var descendant = function (scope, predicate) {
+      var descend = function (node) {
+        for (var i = 0; i < node.childNodes.length; i++) {
+          var child_1 = Element.fromDom(node.childNodes[i]);
+          if (predicate(child_1)) {
+            return Option.some(child_1);
+          }
+          var res = descend(node.childNodes[i]);
+          if (res.isSome()) {
+            return res;
+          }
+        }
+        return Option.none();
+      };
+      return descend(scope.dom());
+    };
+
+    var closest$1 = function (target, transform, isRoot) {
+      var delegate = closest(target, function (elem) {
+        return transform(elem).isSome();
+      }, isRoot);
+      return delegate.bind(transform);
+    };
+
     var nu$4 = function (parts) {
       if (!hasKey$1(parts, 'can') && !hasKey$1(parts, 'abort') && !hasKey$1(parts, 'run')) {
         throw new Error('EventHandler defined by: ' + JSON.stringify(parts, null, 2) + ' does not have can, abort, or run!');
@@ -2166,54 +2211,6 @@
       });
     };
 
-    function ClosestOrAncestor (is, ancestor, scope, a, isRoot) {
-      return is(scope, a) ? Option.some(scope) : isFunction(isRoot) && isRoot(scope) ? Option.none() : ancestor(scope, a, isRoot);
-    }
-
-    var ancestor = function (scope, predicate, isRoot) {
-      var element = scope.dom();
-      var stop = isFunction(isRoot) ? isRoot : constant(false);
-      while (element.parentNode) {
-        element = element.parentNode;
-        var el = Element.fromDom(element);
-        if (predicate(el)) {
-          return Option.some(el);
-        } else if (stop(el)) {
-          break;
-        }
-      }
-      return Option.none();
-    };
-    var closest = function (scope, predicate, isRoot) {
-      var is = function (s, test) {
-        return test(s);
-      };
-      return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
-    };
-    var descendant = function (scope, predicate) {
-      var descend = function (node) {
-        for (var i = 0; i < node.childNodes.length; i++) {
-          var child_1 = Element.fromDom(node.childNodes[i]);
-          if (predicate(child_1)) {
-            return Option.some(child_1);
-          }
-          var res = descend(node.childNodes[i]);
-          if (res.isSome()) {
-            return res;
-          }
-        }
-        return Option.none();
-      };
-      return descend(scope.dom());
-    };
-
-    var closest$1 = function (target, transform, isRoot) {
-      var delegate = closest(target, function (elem) {
-        return transform(elem).isSome();
-      }, isRoot);
-      return delegate.bind(transform);
-    };
-
     var derive = function (configs) {
       return wrapAll$1(configs);
     };
@@ -2239,8 +2236,11 @@
       return {
         key: name,
         value: nu$4({
-          run: function (component) {
-            action.apply(undefined, [component].concat(extra));
+          run: function (component, simulatedEvent) {
+            action.apply(undefined, [
+              component,
+              simulatedEvent
+            ].concat(extra));
           }
         })
       };
@@ -3133,12 +3133,15 @@
     };
 
     var pointerEvents = function () {
+      var onClick = function (component, simulatedEvent) {
+        simulatedEvent.stop();
+        emitExecute(component);
+      };
       return [
-        run(tapOrClick(), function (component, simulatedEvent) {
-          simulatedEvent.stop();
-          emitExecute(component);
-        }),
-        cutter(detect$3().deviceType.isTouch() ? touchstart() : mousedown())
+        run(click(), onClick),
+        run(tap(), onClick),
+        cutter(touchstart()),
+        cutter(mousedown())
       ];
     };
     var events$2 = function (optAction) {
@@ -4992,8 +4995,6 @@
       getToolbarIconButton: getToolbarIconButton
     };
 
-    var platform$1 = detect$3();
-    var isTouch = platform$1.deviceType.isTouch();
     var labelPart = optional({
       schema: [strict$1('dom')],
       name: 'label'
@@ -5006,16 +5007,17 @@
           return action.fold(function () {
             return {};
           }, function (a) {
-            var touchEvents = derive([runActionExtra(touchstart(), a, [detail])]);
-            var mouseEvents = derive([
-              runActionExtra(mousedown(), a, [detail]),
-              runActionExtra(mousemove(), function (l, det) {
-                if (det.mouseIsDown.get()) {
-                  a(l, det);
-                }
-              }, [detail])
-            ]);
-            return { events: isTouch ? touchEvents : mouseEvents };
+            return {
+              events: derive([
+                runActionExtra(touchstart(), a, [detail]),
+                runActionExtra(mousedown(), a, [detail]),
+                runActionExtra(mousemove(), function (l, se, det) {
+                  if (det.mouseIsDown.get()) {
+                    a(l, det);
+                  }
+                }, [detail])
+              ])
+            };
           });
         }
       });
@@ -5057,20 +5059,8 @@
             return model.setValueFrom(component, detail, value);
           });
         };
-        var touchEvents = derive([
-          run(touchstart(), setValueFrom),
-          run(touchmove(), setValueFrom)
-        ]);
-        var mouseEvents = derive([
-          run(mousedown(), setValueFrom),
-          run(mousemove(), function (spectrum, se) {
-            if (detail.mouseIsDown.get()) {
-              setValueFrom(spectrum, se);
-            }
-          })
-        ]);
         return {
-          behaviours: derive$1(isTouch ? [] : [
+          behaviours: derive$1([
             Keying.config({
               mode: 'special',
               onLeft: function (spectrum) {
@@ -5088,7 +5078,16 @@
             }),
             Focusing.config({})
           ]),
-          events: isTouch ? touchEvents : mouseEvents
+          events: derive([
+            run(touchstart(), setValueFrom),
+            run(touchmove(), setValueFrom),
+            run(mousedown(), setValueFrom),
+            run(mousemove(), function (spectrum, se) {
+              if (detail.mouseIsDown.get()) {
+                setValueFrom(spectrum, se);
+              }
+            })
+          ])
         };
       }
     });
@@ -5363,12 +5362,14 @@
     };
     var Position = r;
 
-    var isTouch$1 = detect$3().deviceType.isTouch();
     var _sliderChangeEvent = 'slider.change.value';
     var sliderChangeEvent = constant(_sliderChangeEvent);
+    var isTouchEvent = function (evt) {
+      return evt.type.indexOf('touch') !== -1;
+    };
     var getEventSource = function (simulatedEvent) {
       var evt = simulatedEvent.event().raw();
-      if (isTouch$1) {
+      if (isTouchEvent(evt)) {
         var touchEvent = evt;
         return touchEvent.touches !== undefined && touchEvent.touches.length === 1 ? Option.some(touchEvent.touches[0]).map(function (t) {
           return Position(t.clientX, t.clientY);
@@ -5953,7 +5954,6 @@
         edgeActions: edgeActions$2
     });
 
-    var isTouch$2 = detect$3().deviceType.isTouch();
     var SliderSchema = [
       defaulted$1('stepSize', 1),
       defaulted$1('onChange', noop),
@@ -6001,13 +6001,16 @@
       field$1('sliderBehaviours', [
         Keying,
         Representing
-      ])
-    ].concat(!isTouch$2 ? [state$1('mouseIsDown', function () {
+      ]),
+      state$1('mouseIsDown', function () {
         return Cell(false);
-      })] : []);
+      })
+    ];
 
-    var isTouch$3 = detect$3().deviceType.isTouch();
+    var mouseReleased = constant('mouse.released');
+
     var sketch = function (detail, components, _spec, _externals) {
+      var _a;
       var getThumb = function (component) {
         return getPartOrDie(component, detail, 'thumb');
       };
@@ -6050,70 +6053,50 @@
       var resetToMax = function (slider) {
         model.setToMax(slider, detail);
       };
-      var touchEvents = [
-        run(touchstart(), function (slider, _simulatedEvent) {
-          detail.onDragStart(slider, getThumb(slider));
-        }),
-        run(touchend(), function (slider, _simulatedEvent) {
-          detail.onDragEnd(slider, getThumb(slider));
-        })
-      ];
-      var mouseEvents = [
-        run(mousedown(), function (slider, simulatedEvent) {
-          simulatedEvent.stop();
-          detail.onDragStart(slider, getThumb(slider));
-          detail.mouseIsDown.set(true);
-        }),
-        run(mouseup(), function (slider, _simulatedEvent) {
-          detail.onDragEnd(slider, getThumb(slider));
-        })
-      ];
-      var uiEventsArr = isTouch$3 ? touchEvents : mouseEvents;
+      var choose = function (slider) {
+        var fireOnChoose = function () {
+          getPart(slider, detail, 'thumb').each(function (thumb) {
+            var value = modelDetail.value.get();
+            detail.onChoose(slider, thumb, value);
+          });
+        };
+        var wasDown = detail.mouseIsDown.get();
+        detail.mouseIsDown.set(false);
+        if (wasDown) {
+          fireOnChoose();
+        }
+      };
+      var onDragStart = function (slider, simulatedEvent) {
+        simulatedEvent.stop();
+        detail.mouseIsDown.set(true);
+        detail.onDragStart(slider, getThumb(slider));
+      };
+      var onDragEnd = function (slider, simulatedEvent) {
+        simulatedEvent.stop();
+        detail.onDragEnd(slider, getThumb(slider));
+        choose(slider);
+      };
       return {
         uid: detail.uid,
         dom: detail.dom,
         components: components,
-        behaviours: augment(detail.sliderBehaviours, flatten([
-          !isTouch$3 ? [Keying.config({
-              mode: 'special',
-              focusIn: function (slider) {
-                return getPart(slider, detail, 'spectrum').map(Keying.focusIn).map(constant(true));
+        behaviours: augment(detail.sliderBehaviours, [
+          Keying.config({
+            mode: 'special',
+            focusIn: function (slider) {
+              return getPart(slider, detail, 'spectrum').map(Keying.focusIn).map(constant(true));
+            }
+          }),
+          Representing.config({
+            store: {
+              mode: 'manual',
+              getValue: function (_) {
+                return modelDetail.value.get();
               }
-            })] : [],
-          [
-            Representing.config({
-              store: {
-                mode: 'manual',
-                getValue: function (_) {
-                  return modelDetail.value.get();
-                }
-              }
-            }),
-            Receiving.config({
-              channels: {
-                'mouse.released': {
-                  onReceive: function (slider, se) {
-                    var fireOnChoose = function () {
-                      getPart(slider, detail, 'thumb').each(function (thumb) {
-                        var value = modelDetail.value.get();
-                        detail.onChoose(slider, thumb, value);
-                      });
-                    };
-                    if (isTouch$3) {
-                      fireOnChoose();
-                    } else {
-                      var wasDown = detail.mouseIsDown.get();
-                      detail.mouseIsDown.set(false);
-                      if (wasDown) {
-                        fireOnChoose();
-                      }
-                    }
-                  }
-                }
-              }
-            })
-          ]
-        ])),
+            }
+          }),
+          Receiving.config({ channels: (_a = {}, _a[mouseReleased()] = { onReceive: choose }, _a) })
+        ]),
         events: derive([
           run(sliderChangeEvent(), function (slider, simulatedEvent) {
             changeValue(slider, simulatedEvent.event().value());
@@ -6125,8 +6108,12 @@
             refresh(slider, thumb);
             var spectrum = getSpectrum(slider);
             detail.onInit(slider, thumb, spectrum, modelDetail.value.get());
-          })
-        ].concat(uiEventsArr)),
+          }),
+          run(touchstart(), onDragStart),
+          run(touchend(), onDragEnd),
+          run(mousedown(), onDragStart),
+          run(mouseup(), onDragEnd)
+        ]),
         apis: {
           resetToMin: resetToMin,
           resetToMax: resetToMax,
@@ -6770,14 +6757,14 @@
       query: query
     };
 
-    var platform$2 = detect$3();
+    var platform$1 = detect$3();
     var preserve = function (f, editor) {
       var rng = editor.selection.getRng();
       f();
       editor.selection.setRng(rng);
     };
     var forAndroid = function (editor, f) {
-      var wrapper = platform$2.os.isAndroid() ? preserve : apply;
+      var wrapper = platform$1.os.isAndroid() ? preserve : apply;
       wrapper(f, editor);
     };
     var RangePreserver = { forAndroid: forAndroid };
@@ -11577,13 +11564,12 @@
     };
     var setup$2 = function (container, rawSettings) {
       var settings = asRawOrDie('Getting GUI events settings', settingsSchema, rawSettings);
-      var pointerEvents = detect$3().deviceType.isTouch() ? [
+      var pointerEvents = [
         'touchstart',
         'touchmove',
         'touchend',
         'touchcancel',
-        'gesturestart'
-      ] : [
+        'gesturestart',
         'mousedown',
         'mouseup',
         'mouseover',
