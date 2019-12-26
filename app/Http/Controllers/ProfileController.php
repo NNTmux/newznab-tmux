@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Auth\LoginController;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
 use App\Models\Settings;
@@ -12,7 +11,6 @@ use App\Models\UserRequest;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
 use Blacklight\utility\Utility;
-use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -268,7 +266,7 @@ class ProfileController extends BasePageController
                     }
 
                     if (! $this->userdata->hasRole('Admin')) {
-                        if (!empty($request->input('email')) && $this->userdata->email !== $request->input('email')) {
+                        if (! empty($request->input('email')) && $this->userdata->email !== $request->input('email')) {
                             $this->userdata->email = $request->input('email');
 
                             $verify_user = User::find(Auth::id());
