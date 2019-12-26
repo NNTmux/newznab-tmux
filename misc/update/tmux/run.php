@@ -6,7 +6,6 @@ use App\Models\Collection;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\DB;
 
 $DIR = NN_TMUX;
 $import = Settings::settingValue('site.tmux.import') ?? 0;
