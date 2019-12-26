@@ -131,6 +131,6 @@ class LoginController extends Controller
         $request->session()->flush();
         $request->session()->regenerate();
 
-        return redirect('/login')->with('info', 'You have been logged out successfully');
+        return redirect('login')->with('info', 'You have been logged out successfully');
     }
 }

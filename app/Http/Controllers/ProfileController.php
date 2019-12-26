@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
 use App\Models\Settings;
@@ -11,6 +12,7 @@ use App\Models\UserRequest;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
 use Blacklight\utility\Utility;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -117,7 +119,7 @@ class ProfileController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -265,12 +267,20 @@ class ProfileController extends BasePageController
                         User::updatePassword($userid, $request->input('password'));
                     }
 
-                    if (! empty($request->input('email')) && $this->userdata->email !== $request->input('email')) {
-                        $this->userdata->email = $request->input('email');
+                    if (! $this->userdata->hasRole('Admin')) {
+                        if (!empty($request->input('email')) && $this->userdata->email !== $request->input('email')) {
+                            $this->userdata->email = $request->input('email');
 
-                        UserVerification::generate($this->userdata);
+                            $verify_user = User::find(Auth::id());
 
-                        UserVerification::send($this->userdata, 'User email verification required');
+                            UserVerification::generate($verify_user);
+
+                            UserVerification::send($verify_user, 'User email verification required');
+
+                            Auth::logout();
+
+                            return redirect('login')->with('info', 'You will be able to login after you verify your new email address');
+                        }
                     }
 
                     return redirect('profile')->with('success', 'Profile changes saved');
