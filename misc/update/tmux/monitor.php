@@ -343,13 +343,6 @@ while ($runVar['counts']['iterations'] > 0) {
             echo $e;
         }
 
-        //run sharing regardless of sequential setting
-        try {
-            $tRun->runPane('sharing', $runVar);
-        } catch (Exception $e) {
-            echo $e;
-        }
-
         //update tv and theaters
         try {
             $tRun->runPane('updatetv', $runVar);

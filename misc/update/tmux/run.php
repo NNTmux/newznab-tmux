@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Collection;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
@@ -27,22 +28,9 @@ if ($session !== null) {
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-$colorCli->header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
+$colorCli->header('Resetting expired collections dateadded to now. This could take some time if many collections need to be reset');
 
-$ran = 0;
-
-DB::transaction(function () use ($ran, $delaytimet) {
-    $run = DB::update(
-        'UPDATE collections SET dateadded = now() WHERE dateadded < now() - INTERVAL '.
-        $delaytimet.' HOUR'
-    );
-    if ($run > 0) {
-        $ran += $run;
-    }
-}, 5);
-
-$colorCli->primary(number_format($ran).' collections reset.');
-sleep(2);
+Collection::query()->where('dateadded', '<', now()->subHours($delaytimet))->update(['dateadded' => now()]);
 
 function writelog($pane)
 {
@@ -158,25 +146,9 @@ function window_optimize($tmux_session)
     exec("tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;optimize\033\"'");
 }
 
-function window_sharing($tmux_session)
-{
-    $sharing = DB::select('SELECT enabled, posting, fetching FROM sharing LIMIT 1');
-    $tmux_share = Settings::settingValue('site.tmux.run_sharing') ?? 0;
-
-    if ($tmux_share && (int) $sharing[0]->enabled === 1 && ((int) $sharing[0]->posting === 1 || (int) $sharing[0]->fetching === 1)) {
-        exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");
-    }
-}
-
 function attach($DIR, $tmux_session)
 {
-    $PHP = 'php';
-
-    //get list of panes by name
-    $panes_win_1 = exec("echo `tmux list-panes -t $tmux_session:0 -F '#{pane_title}'`");
-    $panes0 = str_replace("\n", '', explode(' ', $panes_win_1));
-    $log = writelog($panes0[0]);
-    exec("tmux respawnp -t $tmux_session:0.0 '$PHP ".$DIR."monitor.php $log'");
+    exec("tmux respawnp -t $tmux_session:0.0 'php ".$DIR."monitor.php'");
     exec("tmux select-window -t $tmux_session:0; tmux attach-session -d -t $tmux_session");
 }
 
@@ -192,7 +164,6 @@ if ((int) $seq === 1) {
     window_utilities($tmux_session);
     window_post($tmux_session);
     window_ircscraper($tmux_session);
-    window_sharing($tmux_session);
     start_apps($tmux_session);
     attach($DIR, $tmux_session);
 } elseif ((int) $seq === 2) {
@@ -202,7 +173,6 @@ if ((int) $seq === 1) {
 
     window_stripped_utilities($tmux_session);
     window_ircscraper($tmux_session);
-    window_sharing($tmux_session);
     start_apps($tmux_session);
     attach($DIR, $tmux_session);
 } else {
@@ -215,7 +185,6 @@ if ((int) $seq === 1) {
     window_utilities($tmux_session);
     window_post($tmux_session);
     window_ircscraper($tmux_session);
-    window_sharing($tmux_session);
     start_apps($tmux_session);
     attach($DIR, $tmux_session);
 }
