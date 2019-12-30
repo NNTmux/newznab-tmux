@@ -1,4 +1,5 @@
 2019-12-30 DariusIII
+	* Fix: Fix wrong name of data received in TVDB class
 	* Chg: Rename misc/sphinxsearch to misc/manticoresearch and sphinx.conf to manticore.conf
 2019-12-26 DariusIII
 	* Chg: Remove panes logging and comment sharing window from tmux

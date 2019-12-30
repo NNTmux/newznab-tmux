@@ -347,7 +347,7 @@ class TVDB extends TV
             }
         } else {
             try {
-                $response = $this->client->series()->getEpisodesWithQuery($tvDbId, ['airedSeason' => $season, 'airedEpisode' => $episode])->getData();
+                $response = $this->client->series()->getEpisodesWithQuery($tvDbId, ['airedSeason' => $season, 'airedEpisodeNumber' => $episode])->getData();
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
