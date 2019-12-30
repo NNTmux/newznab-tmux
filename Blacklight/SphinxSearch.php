@@ -57,6 +57,9 @@ class SphinxSearch
     /**
      * Insert release into Sphinx RT table.
      * @param $parameters
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function insertRelease($parameters): void
     {
@@ -72,6 +75,9 @@ class SphinxSearch
     /**
      * Insert release into Sphinx RT table.
      * @param $parameters
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function insertPredb($parameters): void
     {
@@ -186,22 +192,25 @@ class SphinxSearch
     }
 
     /**
+     * @param string $rt_index (releases_rt or predb_rt)
      * @param string $searchString (what are we looking for?)
-     * @param array $column       (one or multiple columns from the columns that exist in indexes)
-     * @param string       $rt_index     (releases_rt or predb_rt)
-     * @param array        $searchArray
+     * @param array $column (one or multiple columns from the columns that exist in indexes)
+     * @param array $searchArray
      *
      * @return array
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function searchIndexes(string $rt_index, $searchString = '', $column = [], array $searchArray = []): array
     {
         $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(0, 10000)->orderBy('id', 'desc');
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
-                $query->match($key, $value);
+                $query->match($key, SphinxQL::expr(self::escapeString($value)));
             }
         } else {
-            $query->match($column, $searchString);
+            $query->match($column, SphinxQL::expr(self::escapeString($searchString)));
         }
 
         return $query->execute()->fetchAllAssoc() ?? [];
