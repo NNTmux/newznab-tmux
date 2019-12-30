@@ -116,8 +116,8 @@ class SphinxSearch
      */
     public static function escapeString($string): string
     {
-        $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '='];
-        $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\='];
+        $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', "'"];
+        $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\=', "\'"];
 
         return str_replace($from, $to, $string);
     }
@@ -207,10 +207,10 @@ class SphinxSearch
         $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(0, 10000)->orderBy('id', 'desc');
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
-                $query->match($key, SphinxQL::expr(self::escapeString($value)));
+                $query->match($key, $value, true);
             }
         } else {
-            $query->match($column, SphinxQL::expr(self::escapeString($searchString)));
+            $query->match($column, $searchString, true);
         }
 
         return $query->execute()->fetchAllAssoc() ?? [];

@@ -520,23 +520,26 @@ class Releases extends Release
      * Function for searching on the site (by subject, searchname or advanced).
      *
      *
-     * @param  array       $searchArr
+     * @param array $searchArr
      * @param              $groupName
      * @param              $sizeFrom
      * @param              $sizeTo
      * @param              $daysNew
      * @param              $daysOld
-     * @param int          $offset
-     * @param int          $limit
+     * @param int $offset
+     * @param int $limit
      * @param string|array $orderBy
-     * @param int          $maxAge
-     * @param array        $excludedCats
-     * @param string       $type
-     * @param array        $cat
-     * @param int          $minSize
-     * @param array        $tags
+     * @param int $maxAge
+     * @param array $excludedCats
+     * @param string $type
+     * @param array $cat
+     * @param int $minSize
+     * @param array $tags
      *
      * @return array|Collection|mixed
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function search($searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
@@ -646,15 +649,18 @@ class Releases extends Release
      *
      * @param       $searchName
      * @param       $groupName
-     * @param int   $offset
-     * @param int   $limit
-     * @param int   $maxAge
+     * @param int $offset
+     * @param int $limit
+     * @param int $maxAge
      * @param array $excludedCats
      * @param array $cat
-     * @param int   $minSize
+     * @param int $minSize
      * @param array $tags
      *
      * @return Collection|mixed
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $tags = [])
     {
