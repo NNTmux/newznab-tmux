@@ -718,8 +718,10 @@ class Releases extends Release
             $releases = self::fromQuery($sql);
         } elseif ($searchName !== -1 && empty($searchResult)) {
             $releases = collect();
-        } else {
+        } elseif ($searchName === -1) {
             $releases = self::fromQuery($sql);
+        } else {
+            $releases = collect();
         }
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
@@ -737,7 +739,7 @@ class Releases extends Release
      * @param array $siteIdArr
      * @param string $series
      * @param string $episode
-     * @param string $airdate
+     * @param string $airDate
      * @param int $offset
      * @param int $limit
      * @param string $name
@@ -747,8 +749,11 @@ class Releases extends Release
      * @param array $excludedCategories
      * @param array $tags
      * @return Collection|mixed
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airDate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         $siteSQL = [];
         $showSql = '';
@@ -772,11 +777,11 @@ class Releases extends Release
                 implode(' OR ', $siteSQL),
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
+                ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
             $show = self::fromQuery($showQry);
-            if (! empty($show[0])) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
+            if (! empty($show[0]) && $show->isNotEmpty()) {
+                if ((! empty($series) || ! empty($episode) || ! empty($airDate)) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
@@ -800,8 +805,8 @@ class Releases extends Release
                 if (! empty($episode) && strpos($episode, '/') === false) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                 }
-            } elseif (! empty($airdate)) {
-                $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
+            } elseif (! empty($airDate)) {
+                $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airDate));
             }
         }
         if (! empty($name)) {
@@ -856,7 +861,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = self::fromQuery($sql) : [];
+        $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
         if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -875,7 +880,7 @@ class Releases extends Release
      * @param array $siteIdArr
      * @param string $series
      * @param string $episode
-     * @param string $airdate
+     * @param string $airDate
      * @param int $offset
      * @param int $limit
      * @param string $name
@@ -885,8 +890,11 @@ class Releases extends Release
      * @param array $excludedCategories
      * @param array $tags
      * @return Collection|mixed
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airDate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         $siteSQL = [];
         $showSql = '';
@@ -910,11 +918,11 @@ class Releases extends Release
                 implode(' OR ', $siteSQL),
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
+                ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
             $show = self::fromQuery($showQry);
             if ($show->isNotEmpty()) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes != '') {
+                if ((! empty($series) || ! empty($episode) || ! empty($airDate)) && $show[0]->episodes != '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
@@ -938,8 +946,8 @@ class Releases extends Release
                 if (! empty($episode) && strpos($episode, '/') === false) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                 }
-            } elseif (! empty($airdate)) {
-                $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
+            } elseif (! empty($airDate)) {
+                $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airDate));
             }
         }
         if (! empty($name)) {
@@ -1012,6 +1020,9 @@ class Releases extends Release
      * @param int $maxAge
      * @param array $excludedCategories
      * @return Collection|mixed
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
@@ -1084,6 +1095,9 @@ class Releases extends Release
      * @param array $excludedCategories
      * @param array $tags
      * @return Collection|mixed
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
@@ -1151,6 +1165,9 @@ class Releases extends Release
      * @param $name
      * @param array $excludedCats
      * @return array|bool
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function searchSimilar($currentID, $name, array $excludedCats = [])
     {
