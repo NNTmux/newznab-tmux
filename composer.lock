@@ -2984,16 +2984,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.4.5",
+            "version": "v3.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "025f953b4902a9b0b172e6d5fe19d0809701259e"
+                "reference": "78516806b280b360996e514565bc0e1f8d3cc7e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/025f953b4902a9b0b172e6d5fe19d0809701259e",
-                "reference": "025f953b4902a9b0b172e6d5fe19d0809701259e",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/78516806b280b360996e514565bc0e1f8d3cc7e3",
+                "reference": "78516806b280b360996e514565bc0e1f8d3cc7e3",
                 "shasum": ""
             },
             "require": {
@@ -3049,7 +3049,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-12-23T19:45:03+00:00"
+            "time": "2019-12-30T22:01:12+00:00"
         },
         {
             "name": "laravel/scout",
