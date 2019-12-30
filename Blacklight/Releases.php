@@ -811,6 +811,10 @@ class Releases extends Release
         }
         if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+
+            if (empty($searchResult)) {
+                return collect();
+            }
         }
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
@@ -820,10 +824,10 @@ class Releases extends Release
             $this->showPasswords(),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
-            ((! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            (! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : '',
             Category::getCategorySearch($cat),
-            ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
+            $maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : '',
+            $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '',
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
@@ -952,6 +956,10 @@ class Releases extends Release
         }
         if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+
+            if (empty($searchResult)) {
+                return collect();
+            }
         }
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
@@ -1028,6 +1036,10 @@ class Releases extends Release
     {
         if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+
+            if (empty($searchResult)) {
+                return collect();
+            }
         }
 
         $whereSql = sprintf(
@@ -1103,6 +1115,10 @@ class Releases extends Release
     {
         if (! empty($name)) {
             $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+
+            if (empty($searchResult)) {
+                return collect();
+            }
         }
 
         $whereSql = sprintf(

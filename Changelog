@@ -1,4 +1,5 @@
 2019-12-30 DariusIII
+	* Chg: Return empty data if manticore does not find anything for api related searches
 	* Fix: Fix wrong name of data received in TVDB class
 	* Chg: Rename misc/sphinxsearch to misc/manticoresearch and sphinx.conf to manticore.conf
 2019-12-26 DariusIII
