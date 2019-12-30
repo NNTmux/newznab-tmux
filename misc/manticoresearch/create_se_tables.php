@@ -61,4 +61,4 @@ foreach ($tables2 as $table => $query) {
     DB::statement($query);
 }
 
-echo 'All done! If you messed up your sphinx connection info, you can rerun this script.'.PHP_EOL;
+echo 'All done! If you messed up your manticore search connection info, you can rerun this script.'.PHP_EOL;
