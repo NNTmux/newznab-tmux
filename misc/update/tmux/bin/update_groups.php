@@ -38,11 +38,11 @@ $result = Arr::pluck(UsenetGroup::query()->where('active', '=', 1)->orWhere('bac
 foreach ($data as $newgroup) {
     if (\in_array($newgroup['group'], $result, false)) {
         ShortGroup::query()->insert([
-                    'name' => $newgroup['group'],
-                    'first_record' => $newgroup['first'],
-                    'last_record' => $newgroup['last'],
-                    'updated' => now(),
-                ]);
+            'name' => $newgroup['group'],
+            'first_record' => $newgroup['first'],
+            'last_record' => $newgroup['last'],
+            'updated' => now(),
+        ]);
         $colorCli->primary('Updated '.$newgroup['group']);
     }
 }

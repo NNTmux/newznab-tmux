@@ -236,25 +236,25 @@ abstract class TV extends Videos
             if ($title === null) {
                 // Insert the Show
                 $videoId = Video::query()->insertGetId([
-                        'type' => $show['type'],
-                        'title' => $show['title'],
-                        'countries_id' => $show['country'] ?? '',
-                        'started' => $show['started'],
-                        'source' => $show['source'],
-                        'tvdb' => $show['tvdb'],
-                        'trakt' => $show['trakt'],
-                        'tvrage' => $show['tvrage'],
-                        'tvmaze' => $show['tvmaze'],
-                        'imdb' => $show['imdb'],
-                        'tmdb' => $show['tmdb'],
-                    ]);
+                    'type' => $show['type'],
+                    'title' => $show['title'],
+                    'countries_id' => $show['country'] ?? '',
+                    'started' => $show['started'],
+                    'source' => $show['source'],
+                    'tvdb' => $show['tvdb'],
+                    'trakt' => $show['trakt'],
+                    'tvrage' => $show['tvrage'],
+                    'tvmaze' => $show['tvmaze'],
+                    'imdb' => $show['imdb'],
+                    'tmdb' => $show['tmdb'],
+                ]);
                 // Insert the supplementary show info
                 TvInfo::query()->insert([
-                            'videos_id' => $videoId,
-                            'summary' => $show['summary'],
-                            'publisher' => $show['publisher'],
-                            'localzone' => $show['localzone'],
-                        ]);
+                    'videos_id' => $videoId,
+                    'summary' => $show['summary'],
+                    'publisher' => $show['publisher'],
+                    'localzone' => $show['localzone'],
+                ]);
                 // If we have AKAs\aliases, insert those as well
                 if (! empty($show['aliases'])) {
                     $this->addAliases($videoId, $show['aliases']);

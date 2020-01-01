@@ -11,15 +11,15 @@ class FixturesUp extends Command
      * @var array
      */
     private static $allowedTables = [
-      'binaryblacklist',
-      'root_categories',
-      'categories',
-      'category_regexes',
-      'collection_regexes',
-      'content',
-      'usenet_groups',
-      'release_naming_regexes',
-      'settings',
+        'binaryblacklist',
+        'root_categories',
+        'categories',
+        'category_regexes',
+        'collection_regexes',
+        'content',
+        'usenet_groups',
+        'release_naming_regexes',
+        'settings',
     ];
     /**
      * The name and signature of the console command.

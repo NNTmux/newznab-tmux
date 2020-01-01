@@ -6,5 +6,5 @@ return [
     'indexes'   => [
         'releases' => 'releases_rt',
         'predb' => 'predb_rt',
-        ],
+    ],
 ];

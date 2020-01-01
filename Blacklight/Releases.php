@@ -461,7 +461,6 @@ class Releases extends Release
                 }
             }
             if ($identifiers['i'] !== false) {
-
                 $params = [
                     'index' => 'releases',
                     'id' => $identifiers['i'],
@@ -592,8 +591,8 @@ class Releases extends Release
                 'body' => [
                     'query' => [
                         'match' => $searchFields,
-                    ]
-                ]
+                    ],
+                ],
             ];
 
             $results = \Elasticsearch::search($search);
@@ -601,7 +600,6 @@ class Releases extends Release
             $searchResult = [];
             foreach ($results['hits']['hits'] as $result) {
                 $searchResult[] = $result['_source']['id'];
-
             }
         } else {
             $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
@@ -710,8 +708,8 @@ class Releases extends Release
                             'match' => [
                                 'searchname' => $searchName,
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ];
 
                 $results = \Elasticsearch::search($search);
@@ -719,7 +717,6 @@ class Releases extends Release
                 $searchResult = [];
                 foreach ($results['hits']['hits'] as $result) {
                     $searchResult[] = $result['_source']['id'];
-
                 }
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
@@ -874,10 +871,10 @@ class Releases extends Release
                     'body' => [
                         'query' => [
                             'match' => [
-                                'searchname' => $name
+                                'searchname' => $name,
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ];
 
                 $results = \Elasticsearch::search($search);
@@ -885,7 +882,6 @@ class Releases extends Release
                 $searchResult = [];
                 foreach ($results['hits']['hits'] as $result) {
                     $searchResult[] = $result['_source']['id'];
-
                 }
                 if (empty($searchResult)) {
                     return collect();
@@ -1043,10 +1039,10 @@ class Releases extends Release
                     'body' => [
                         'query' => [
                             'match' => [
-                                'searchname' => $name
+                                'searchname' => $name,
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ];
 
                 $results = \Elasticsearch::search($search);
@@ -1054,7 +1050,6 @@ class Releases extends Release
                 $searchResult = [];
                 foreach ($results['hits']['hits'] as $result) {
                     $searchResult[] = $result['_source']['id'];
-
                 }
                 if (empty($searchResult)) {
                     return collect();
@@ -1148,10 +1143,10 @@ class Releases extends Release
                         'body' => [
                             'query' => [
                                 'match' => [
-                                    'searchname' => $name
+                                    'searchname' => $name,
                                 ],
-                            ]
-                        ]
+                            ],
+                        ],
                     ];
 
                     $results = \Elasticsearch::search($search);
@@ -1159,7 +1154,6 @@ class Releases extends Release
                     $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
-
                     }
                     if (empty($searchResult)) {
                         return collect();
@@ -1253,10 +1247,10 @@ class Releases extends Release
                         'body' => [
                             'query' => [
                                 'match' => [
-                                    'searchname' => $name
+                                    'searchname' => $name,
                                 ],
-                            ]
-                        ]
+                            ],
+                        ],
                     ];
 
                     $results = \Elasticsearch::search($search);
@@ -1264,7 +1258,6 @@ class Releases extends Release
                     $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
-
                     }
                     if (empty($searchResult)) {
                         return collect();

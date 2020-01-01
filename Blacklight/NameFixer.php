@@ -1309,9 +1309,9 @@ class NameFixer
                                 'multi_match' => [
                                     'query' => $preMatch[1],
                                     'fields' => ['filename', 'title'],
-                                ]
-                            ]
-                        ]
+                                ],
+                            ],
+                        ],
                     ];
 
                     $primaryResults = \Elasticsearch::search($search);
@@ -2505,9 +2505,9 @@ class NameFixer
                             'multi_match' => [
                                 'query' => $this->_fileName,
                                 'fields' => ['filename', 'title'],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ];
 
                 $primaryResults = \Elasticsearch::search($search);
@@ -2561,9 +2561,9 @@ class NameFixer
                             'multi_match' => [
                                 'query' => $this->_fileName,
                                 'fields' => ['filename', 'title'],
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ];
 
                 $primaryResults = \Elasticsearch::search($search);
@@ -2582,7 +2582,7 @@ class NameFixer
                 }
             } else {
                 foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {
-                    if (!empty($match)) {
+                    if (! empty($match)) {
                         $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
 
                         return true;

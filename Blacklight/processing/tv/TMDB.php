@@ -51,10 +51,10 @@ class TMDB extends TV
         parent::__construct($options);
         $this->token = new ApiToken(config('tmdb.api_key'));
         $this->client = new Client($this->token, [
-                'cache' => [
-                    'enabled' => false,
-                ],
-            ]
+            'cache' => [
+                'enabled' => false,
+            ],
+        ]
         );
         $this->configRepository = new ConfigurationRepository($this->client);
         $this->config = $this->configRepository->load();
@@ -372,21 +372,21 @@ class TMDB extends TV
         }
 
         return [
-                'type'      => parent::TYPE_TV,
-                'title'     => (string) $show['name'],
-                'summary'   => (string) $show['overview'],
-                'started'   => (string) $show['first_air_date'],
-                'publisher' => isset($show['network']) ? (string) $show['network'] : '',
-                'country'   => $show['origin_country'][0] ?? '',
-                'source'    => parent::SOURCE_TMDB,
-                'imdb'      => isset($imdb['imdbid']) ? (int) $imdb['imdbid'] : 0,
-                'tvdb'      => isset($show['external_ids']['tvdb_id']) ? (int) $show['external_ids']['tvdb_id'] : 0,
-                'trakt'     => 0,
-                'tvrage'    => isset($show['external_ids']['tvrage_id']) ? (int) $show['external_ids']['tvrage_id'] : 0,
-                'tvmaze'    => 0,
-                'tmdb'      => (int) $show['id'],
-                'aliases'   => ! empty($show['alternative_titles']) ? (array) $show['alternative_titles'] : '',
-                'localzone' => "''",
+            'type'      => parent::TYPE_TV,
+            'title'     => (string) $show['name'],
+            'summary'   => (string) $show['overview'],
+            'started'   => (string) $show['first_air_date'],
+            'publisher' => isset($show['network']) ? (string) $show['network'] : '',
+            'country'   => $show['origin_country'][0] ?? '',
+            'source'    => parent::SOURCE_TMDB,
+            'imdb'      => isset($imdb['imdbid']) ? (int) $imdb['imdbid'] : 0,
+            'tvdb'      => isset($show['external_ids']['tvdb_id']) ? (int) $show['external_ids']['tvdb_id'] : 0,
+            'trakt'     => 0,
+            'tvrage'    => isset($show['external_ids']['tvrage_id']) ? (int) $show['external_ids']['tvrage_id'] : 0,
+            'tvmaze'    => 0,
+            'tmdb'      => (int) $show['id'],
+            'aliases'   => ! empty($show['alternative_titles']) ? (array) $show['alternative_titles'] : '',
+            'localzone' => "''",
         ];
     }
 
@@ -401,12 +401,12 @@ class TMDB extends TV
     protected function formatEpisodeInfo($episode): array
     {
         return [
-                'title'       => (string) $episode['name'],
-                'series'      => (int) $episode['season_number'],
-                'episode'     => (int) $episode['episode_number'],
-                'se_complete' => 'S'.sprintf('%02d', $episode['season_number']).'E'.sprintf('%02d', $episode['episode_number']),
-                'firstaired'  => (string) $episode['air_date'],
-                'summary'     => (string) $episode['overview'],
+            'title'       => (string) $episode['name'],
+            'series'      => (int) $episode['season_number'],
+            'episode'     => (int) $episode['episode_number'],
+            'se_complete' => 'S'.sprintf('%02d', $episode['season_number']).'E'.sprintf('%02d', $episode['episode_number']),
+            'firstaired'  => (string) $episode['air_date'],
+            'summary'     => (string) $episode['overview'],
         ];
     }
 }

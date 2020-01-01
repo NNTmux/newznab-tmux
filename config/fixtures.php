@@ -20,5 +20,5 @@ return [
     | The size of each insert chunk columns x rows <= $chunk_size.
     |
     */
-   'chunk_size' => 500,
+    'chunk_size' => 500,
 ];
