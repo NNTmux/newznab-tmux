@@ -335,7 +335,22 @@ class IRCScraper extends IRCClient
             'source' => $this->_curPre['source'],
         ];
 
-        $this->sphinxsearch->insertPredb($parameters);
+        if (config('nntmux.elasticsearch_enabled') === true) {
+            $data = [
+                'body' => [
+                    'id' => $parameters['id'],
+                    'title' => $parameters['title'],
+                    'source' => $parameters['source'],
+                    'filename' => $parameters['filename'],
+                ],
+                'index' => 'predb',
+                'id' => $parameters['id'],
+            ];
+
+            Elasticsearch::index($data);
+        } else {
+            $this->sphinxsearch->insertPredb($parameters);
+        }
 
         $this->_doEcho(true);
     }

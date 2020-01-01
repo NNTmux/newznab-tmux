@@ -295,7 +295,23 @@ class Release extends Model
                 ]
             );
 
-        (new SphinxSearch())->insertRelease($parameters);
+        if (config('nntmux.elasticsearch_enabled') === true) {
+            $data = [
+                'body' => [
+                    'id' => $parameters['id'],
+                    'name' => $parameters['name'],
+                    'searchname' => $parameters['searchname'],
+                    'fromname' => $parameters['fromname'],
+                    'filename' => $parameters['filename'],
+                ],
+                'index' => 'releases',
+                'id' => $parameters['id'],
+            ];
+
+            Elasticsearch::index($data);
+        } else {
+            (new SphinxSearch())->insertRelease($parameters);
+        }
 
         return $parameters['id'];
     }
@@ -344,7 +360,26 @@ class Release extends Model
                 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId->id : $movieInfoId,
             ]
         );
-        (new SphinxSearch())->updateRelease($ID);
+
+        if (config('nntmux.elasticsearch_enabled') === true) {
+            $data = [
+                'body' => [
+                    'doc' => [
+                        'id' => $ID,
+                        'name' => $name,
+                        'searchname' => $searchName,
+                        'fromname' => $fromName,
+                    ],
+                ],
+
+                'index' => 'releases',
+                'id' => $ID,
+            ];
+
+            Elasticsearch::update($data);
+        } else {
+            (new SphinxSearch())->updateRelease($ID);
+        }
         if (! empty($tags)) {
             $newTags = explode(',', $tags);
             self::find($ID)->retag($newTags);

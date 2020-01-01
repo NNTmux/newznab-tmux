@@ -1174,7 +1174,34 @@ class ProcessAdditional
             $this->_addFileInfo($file);
         }
         if ($this->_addedFileInfo > 0) {
-            $this->sphinx->updateRelease($this->_release->id);
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $new = Release::query()
+                    ->where('releases.id', $this->_release->id)
+                    ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
+                    ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
+                    ->groupBy('releases.id')
+                    ->first();
+                if ($new !== null) {
+                    $data = [
+                        'body' => [
+                            'doc' => [
+                                'id' => $this->_release->id,
+                                'name' => $new->name,
+                                'searchname' => $new->searchname,
+                                'fromname' => $new->fromname,
+                                'filename' => ! empty($new->filename) ? $new->filename : '',
+                            ],
+                        ],
+
+                        'index' => 'releases',
+                        'id' => $this->_release->id,
+                    ];
+
+                    Elasticsearch::update($data);
+                }
+            } else {
+                $this->sphinx->updateRelease($this->_release->id);
+            }
         }
 
         return $this->_totalFileInfo > 0;
@@ -1733,13 +1760,29 @@ class ProcessAdditional
                                     $release = Release::whereId($this->_release->id);
                                     $release->update(['searchname' => $newTitle, 'categories_id' => $newCat['categories_id'], 'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1]);
                                     $release->retag($newCat['tags']);
-                                    $this->sphinx->updateRelease($this->_release->id);
+
+                                    if (config('nntmux.elasticsearch_enabled') === true) {
+                                        $data = [
+                                            'body' => [
+                                                'doc' => [
+                                                    'searchname' => $newTitle,
+                                                ],
+                                            ],
+
+                                            'index' => 'releases',
+                                            'id' => $this->_release->id,
+                                        ];
+
+                                        Elasticsearch::update($data);
+                                    } else {
+                                        $this->sphinx->updateRelease($this->_release->id);
+                                    }
 
                                     // Echo the changed name.
                                     if ($this->_echoCLI) {
                                         NameFixer::echoChangedReleaseName(
                                             [
-                                                'new_name' => $newName,
+                                                'new_name' => $newTitle,
                                                 'old_name' => $rQuery->searchname,
                                                 'new_category' => $newCat,
                                                 'old_category' => $rQuery->id,

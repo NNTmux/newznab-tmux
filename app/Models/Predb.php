@@ -190,8 +190,27 @@ class Predb extends Model
         }
         $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if (! empty($search)) {
-            $sphinx = new SphinxSearch();
-            $ids = Arr::pluck($sphinx->searchIndexes('predb_rt', $search, ['title']), 'id');
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $search = [
+                    'index' => 'predb',
+                    'body' => [
+                        'query' => [
+                            'match' =>['title' => $search],
+                        ]
+                    ]
+                ];
+
+                $results = \Elasticsearch::search($search);
+
+                $ids = [];
+                foreach ($results['hits']['hits'] as $result) {
+                    $ids[] = $result['_source']['id'];
+
+                }
+            } else {
+                $sphinx = new SphinxSearch();
+                $ids = Arr::pluck($sphinx->searchIndexes('predb_rt', $search, ['title']), 'id');
+            }
             $sql->whereIn('predb.id', $ids);
         }
 

@@ -87,7 +87,41 @@ class NntmuxResetDb extends Command
             DB::statement("CALL loop_cbpm('truncate')");
             $this->info('Truncating completed.');
 
-            (new SphinxSearch())->truncateRTIndex(['releases_rt', 'predb_rt']);
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                if (Elasticsearch::indices()->exists(['index' => 'releases'])) {
+                    Elasticsearch::indices()->delete(['index' => 'releases']);
+                }
+                $releases_index = [
+                    'index' => 'releases',
+                    'body'  => [
+                        'settings' => [
+                            'number_of_shards' => 2,
+                            'number_of_replicas' => 0
+                        ]
+                    ]
+                ];
+
+                Elasticsearch::indices()->create($releases_index);
+
+                if (Elasticsearch::indices()->exists(['index' => 'predb'])) {
+                    Elasticsearch::indices()->delete(['index' => 'predb']);
+                }
+                $predb_index = [
+                    'index' => 'predb',
+                    'body'  => [
+                        'settings' => [
+                            'number_of_shards' => 2,
+                            'number_of_replicas' => 0
+                        ]
+                    ]
+                ];
+
+                Elasticsearch::indices()->create($predb_index);
+
+                $this->info('All done! ElasticSearch indexes are deleted and recreated.');
+            } else {
+                (new SphinxSearch())->truncateRTIndex(['releases_rt', 'predb_rt']);
+            }
 
             $this->info('Deleting nzbfiles subfolders.');
             $files = File::allFiles(Settings::settingValue('..nzbpath'));

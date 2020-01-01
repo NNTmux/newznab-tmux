@@ -82,22 +82,6 @@ class ReleaseFile extends Model
     }
 
     /**
-     * Delete a releasefiles row.
-     *
-     *
-     * @param $id
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function deleteReleaseFiles($id)
-    {
-        $res = self::query()->where('releases_id', $id)->delete();
-        (new SphinxSearch())->updateRelease($id);
-
-        return $res;
-    }
-
-    /**
      * Add new files for a release ID.
      *
      *
@@ -148,7 +132,30 @@ class ReleaseFile extends Model
             if (\strlen($hash) === 32) {
                 ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
-            (new SphinxSearch())->updateRelease($id);
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $new = Release::query()
+                    ->where('releases.id', $id)
+                    ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
+                    ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
+                    ->groupBy('releases.id')
+                    ->first();
+                if ($new !== null) {
+                    $data = [
+                        'body' => [
+                            'doc' => [
+                                'filename' => ! empty($new->filename) ? $new->filename : '',
+                            ],
+                        ],
+
+                        'index' => 'releases',
+                        'id' => $id,
+                    ];
+
+                    Elasticsearch::update($data);
+                }
+            } else {
+                (new SphinxSearch())->updateRelease($id);
+            }
         }
 
         return $insert ?? 0;

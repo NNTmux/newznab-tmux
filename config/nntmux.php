@@ -23,4 +23,5 @@ return [
     'multiprocessing_log_type' => env('NN_MULTIPROCESSING_LOG_TYPE', 6),
     'multiprocessing_child_output_type' => env('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE', 1),
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
+    'elasticsearch_enabled' => env('ELASTICSEARCH_ENABLED', false),
 ];

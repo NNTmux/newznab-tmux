@@ -1032,7 +1032,22 @@ class NameFixer
 
                         $taggedRelease->update($updateColumns);
                         $taggedRelease->retag($determinedCategory['tags']);
-                        $this->sphinx->updateRelease($release->releases_id);
+                        if (config('nntmux.elasticsearch_enabled') === true) {
+                            $data = [
+                                'body' => [
+                                    'doc' => [
+                                        'searchname' => $newTitle,
+                                    ],
+                                ],
+
+                                'index' => 'releases',
+                                'id' => $release->releases_id,
+                            ];
+
+                            Elasticsearch::update($data);
+                        } else {
+                            $this->sphinx->updateRelease($release->releases_id);
+                        }
                     } else {
                         $newTitle = substr($newName, 0, 299);
 
@@ -1052,7 +1067,31 @@ class NameFixer
                                 ]
                             );
                         $taggedRelease->retag($determinedCategory['tags']);
-                        $this->sphinx->updateRelease($release->releases_id);
+                        if (config('nntmux.elasticsearch_enabled') === true) {
+                            $new = Release::query()
+                                ->where('releases.id', $release->releases_id)
+                                ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
+                                ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
+                                ->groupBy('releases.id')
+                                ->first();
+                            if ($new !== null) {
+                                $data = [
+                                    'body' => [
+                                        'doc' => [
+                                            'searchname' => $newTitle,
+                                            'filename' => ! empty($new->filename) ? $new->filename : '',
+                                        ],
+                                    ],
+
+                                    'index' => 'releases',
+                                    'id' => $release->releases_id,
+                                ];
+
+                                Elasticsearch::update($data);
+                            }
+                        } else {
+                            $this->sphinx->updateRelease($release->releases_id);
+                        }
                     }
                 }
             }
@@ -1262,7 +1301,28 @@ class NameFixer
             $this->_cleanMatchFiles();
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
-                $results = $this->sphinx->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
+                if (config('nntmux.elasticsearch_enabled') === true) {
+                    $search = [
+                        'index' => 'predb',
+                        'body' => [
+                            'query' => [
+                                'multi_match' => [
+                                    'query' => $preMatch[1],
+                                    'fields' => ['filename', 'title'],
+                                ]
+                            ]
+                        ]
+                    ];
+
+                    $primaryResults = \Elasticsearch::search($search);
+
+                    $results = [];
+                    foreach ($primaryResults['hits']['hits'] as $primaryResult) {
+                        $results[] = $primaryResult['_source'];
+                    }
+                } else {
+                    $results = $this->sphinx->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
+                }
                 if (! empty($results)) {
                     foreach ($results as $result) {
                         if (! empty($result)) {
@@ -2437,11 +2497,40 @@ class NameFixer
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
-            foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $match) {
-                if (! empty($match)) {
-                    $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $search = [
+                    'index' => 'predb',
+                    'body' => [
+                        'query' => [
+                            'multi_match' => [
+                                'query' => $this->_fileName,
+                                'fields' => ['filename', 'title'],
+                            ]
+                        ]
+                    ]
+                ];
 
-                    return true;
+                $primaryResults = \Elasticsearch::search($search);
+
+                $results = [];
+                foreach ($primaryResults['hits']['hits'] as $primaryResult) {
+                    $results[] = $primaryResult['_source'];
+                }
+
+                foreach ($results as $match) {
+                    if (! empty($match)) {
+                        $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
+
+                        return true;
+                    }
+                }
+            } else {
+                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $match) {
+                    if (! empty($match)) {
+                        $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
+
+                        return true;
+                    }
                 }
             }
         }
@@ -2464,11 +2553,40 @@ class NameFixer
         $this->_cleanMatchFiles();
         $this->cleanFileNames();
         if (! empty($this->_fileName)) {
-            foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {
-                if (! empty($match)) {
-                    $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $search = [
+                    'index' => 'predb',
+                    'body' => [
+                        'query' => [
+                            'multi_match' => [
+                                'query' => $this->_fileName,
+                                'fields' => ['filename', 'title'],
+                            ]
+                        ]
+                    ]
+                ];
 
-                    return true;
+                $primaryResults = \Elasticsearch::search($search);
+
+                $results = [];
+                foreach ($primaryResults['hits']['hits'] as $primaryResult) {
+                    $results[] = $primaryResult['_source'];
+                }
+
+                foreach ($results as $match) {
+                    if (! empty($match)) {
+                        $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
+
+                        return true;
+                    }
+                }
+            } else {
+                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {
+                    if (!empty($match)) {
+                        $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
+
+                        return true;
+                    }
                 }
             }
         }

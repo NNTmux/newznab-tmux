@@ -1,3 +1,5 @@
+2020-01-02 DariusIII
+	* Chg: Add ElasticSearch support
 2019-12-30 DariusIII
 	* Chg: Return empty data if manticore does not find anything for api related searches
 	* Fix: Fix wrong name of data received in TVDB class
