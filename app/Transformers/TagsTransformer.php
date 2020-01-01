@@ -18,7 +18,7 @@ class TagsTransformer extends TransformerAbstract
             'name' => [
                 'normal' => $tagged->name,
                 'slug' => $tagged->slug,
-                ],
+            ],
         ];
     }
 }

@@ -55,12 +55,12 @@ class Git
         $defaults = [
             'branches' => [
                 'stable' => [
-                        'master',
-                        '\d+\.\d+\.\d+(\.\d+)?',
-                    ],
+                    'master',
+                    '\d+\.\d+\.\d+(\.\d+)?',
+                ],
                 'development' => [
-                        'dev',
-                    ],
+                    'dev',
+                ],
             ],
             'filepath' => NN_ROOT,
         ];

@@ -117,14 +117,14 @@ class ReleaseFile extends Model
         if ($duplicateCheck === null && $releaseCheck !== null) {
             try {
                 $insert = self::insertOrIgnore([
-                        'releases_id' => $id,
-                        'name' => $name,
-                        'size' => $size,
-                        'created_at' => $adjustedCreatedTime,
-                        'updated_at' => now()->timestamp,
-                        'passworded' => $hasPassword,
-                        'crc32' => $crc,
-                    ]);
+                    'releases_id' => $id,
+                    'name' => $name,
+                    'size' => $size,
+                    'created_at' => $adjustedCreatedTime,
+                    'updated_at' => now()->timestamp,
+                    'passworded' => $hasPassword,
+                    'crc32' => $crc,
+                ]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());
             }

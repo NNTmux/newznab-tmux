@@ -1364,10 +1364,10 @@ class ReleaseRemover
                 str_replace(
                     ['-', '(', ')', '.', '?', 'nl  subed|bed|s'],
                     [
-                    '',
-                    '',
-                    '',
-                    ' ', '', 'nlsubs|nlsubbed|nlsubed', ],
+                        '',
+                        '',
+                        '',
+                        ' ', '', 'nlsubs|nlsubbed|nlsubed', ],
                     substr(
                         $dbRegex,
                         $forBegin,

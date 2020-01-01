@@ -183,7 +183,7 @@ class RegisterController extends Controller
                     return $this->registered($request, $user) ?: redirect($this->redirectPath())->with('info', 'Your Account has been created. You will receive a separate verification email shortly.');
                 }
                 break;
-            case 'view': {
+            case 'view':
                 // See if it is a valid invite.
                 if (($inviteCode !== null) && ! Invite::isValid($inviteCode)) {
                     $error = 'Invalid invitation token!';
@@ -192,7 +192,7 @@ class RegisterController extends Controller
                     $showRegister = 1;
                 }
                 break;
-            }
+
         }
         app('smarty.view')->assign(
             [

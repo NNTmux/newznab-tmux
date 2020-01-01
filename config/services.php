@@ -47,6 +47,6 @@ return [
     'igdb' => [
         'key' => env('IGDB_KEY', ''),
         'url' => 'https://api-v3.igdb.com',
-],
+    ],
 
 ];

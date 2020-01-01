@@ -56,10 +56,10 @@ class TraktTv extends TV
         parent::__construct($options);
         $clientId = Settings::settingValue('APIs..trakttvclientkey');
         $requestHeaders = [
-                'Content-Type' => 'application/json',
-                'trakt-api-version' => 2,
-                'trakt-api-key' => $clientId,
-                'Content-Length' => 0,
+            'Content-Type' => 'application/json',
+            'trakt-api-version' => 2,
+            'trakt-api-key' => $clientId,
+            'Content-Length' => 0,
         ];
         $this->client = new TraktAPI($requestHeaders);
     }
@@ -331,21 +331,21 @@ class TraktTv extends TV
         $this->localizedTZ = $show['airs']['timezone'];
 
         return [
-                'type'      => parent::TYPE_TV,
-                'title'     => (string) $show['title'],
-                'summary'   => (string) $show['overview'],
-                'started'   => Time::localizeAirdate($show['first_aired'], $this->localizedTZ),
-                'publisher' => (string) $show['network'],
-                'country'   => (string) $show['country'],
-                'source'    => parent::SOURCE_TRAKT,
-                'imdb'      => $imdb['imdbid'] ?? 0,
-                'tvdb'      => $show['ids']['tvdb'] ?? 0,
-                'trakt'     => (int) $show['ids']['trakt'],
-                'tvrage'    => $show['ids']['tvrage'] ?? 0,
-                'tvmaze'    => 0,
-                'tmdb'      => $show['ids']['tmdb'] ?? 0,
-                'aliases'   => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
-                'localzone' => $this->localizedTZ,
+            'type'      => parent::TYPE_TV,
+            'title'     => (string) $show['title'],
+            'summary'   => (string) $show['overview'],
+            'started'   => Time::localizeAirdate($show['first_aired'], $this->localizedTZ),
+            'publisher' => (string) $show['network'],
+            'country'   => (string) $show['country'],
+            'source'    => parent::SOURCE_TRAKT,
+            'imdb'      => $imdb['imdbid'] ?? 0,
+            'tvdb'      => $show['ids']['tvdb'] ?? 0,
+            'trakt'     => (int) $show['ids']['trakt'],
+            'tvrage'    => $show['ids']['tvrage'] ?? 0,
+            'tvmaze'    => 0,
+            'tmdb'      => $show['ids']['tmdb'] ?? 0,
+            'aliases'   => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
+            'localzone' => $this->localizedTZ,
         ];
     }
 
@@ -360,12 +360,12 @@ class TraktTv extends TV
     public function formatEpisodeInfo($episode): array
     {
         return [
-                'title'       => (string) $episode['title'],
-                'series'      => (int) $episode['season'],
-                'episode'     => (int) $episode['epsiode'],
-                'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', $episode['episode']),
-                'firstaired'  => Time::localizeAirdate($episode['first_aired'], $this->localizedTZ),
-                'summary'     => (string) $episode['overview'],
+            'title'       => (string) $episode['title'],
+            'series'      => (int) $episode['season'],
+            'episode'     => (int) $episode['epsiode'],
+            'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', $episode['episode']),
+            'firstaired'  => Time::localizeAirdate($episode['first_aired'], $this->localizedTZ),
+            'summary'     => (string) $episode['overview'],
         ];
     }
 }

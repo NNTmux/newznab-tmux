@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
-
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 if (Elasticsearch::indices()->exists(['index' => 'releases'])) {
@@ -12,9 +10,9 @@ $releases_index = [
     'body'  => [
         'settings' => [
             'number_of_shards' => 2,
-            'number_of_replicas' => 0
-        ]
-    ]
+            'number_of_replicas' => 0,
+        ],
+    ],
 ];
 
 $response = Elasticsearch::indices()->create($releases_index);
@@ -28,14 +26,13 @@ $predb_index = [
     'body'  => [
         'settings' => [
             'number_of_shards' => 2,
-            'number_of_replicas' => 0
-        ]
-    ]
+            'number_of_replicas' => 0,
+        ],
+    ],
 ];
 
 $response = Elasticsearch::indices()->create($predb_index);
 
 print_r($response);
-
 
 echo 'All done! ElasticSearch indexes are created now.'.PHP_EOL;

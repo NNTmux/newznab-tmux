@@ -196,8 +196,8 @@ class Predb extends Model
                     'body' => [
                         'query' => [
                             'match' =>['title' => $search],
-                        ]
-                    ]
+                        ],
+                    ],
                 ];
 
                 $results = \Elasticsearch::search($search);
@@ -205,7 +205,6 @@ class Predb extends Model
                 $ids = [];
                 foreach ($results['hits']['hits'] as $result) {
                     $ids[] = $result['_source']['id'];
-
                 }
             } else {
                 $sphinx = new SphinxSearch();

@@ -96,9 +96,9 @@ class NntmuxResetDb extends Command
                     'body'  => [
                         'settings' => [
                             'number_of_shards' => 2,
-                            'number_of_replicas' => 0
-                        ]
-                    ]
+                            'number_of_replicas' => 0,
+                        ],
+                    ],
                 ];
 
                 Elasticsearch::indices()->create($releases_index);
@@ -111,9 +111,9 @@ class NntmuxResetDb extends Command
                     'body'  => [
                         'settings' => [
                             'number_of_shards' => 2,
-                            'number_of_replicas' => 0
-                        ]
-                    ]
+                            'number_of_replicas' => 0,
+                        ],
+                    ],
                 ];
 
                 Elasticsearch::indices()->create($predb_index);

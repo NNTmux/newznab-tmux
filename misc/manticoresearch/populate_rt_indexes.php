@@ -78,21 +78,21 @@ function populate_rt($table, $max)
                 switch ($table) {
                     case 'releases_rt':
                         $sphinx->insertRelease([
-                                'id' => $row->id,
-                                'name' => $row->name,
-                                'searchname' => $row->searchname,
-                                'fromname' => $row->fromname,
-                                'filename' => $row->filename,
-                            ]);
+                            'id' => $row->id,
+                            'name' => $row->name,
+                            'searchname' => $row->searchname,
+                            'fromname' => $row->fromname,
+                            'filename' => $row->filename,
+                        ]);
                         break;
 
                     case 'predb_rt':
                         $sphinx->insertPredb([
-                                'id' => $row->id,
-                                'title' => $row->title,
-                                'filename' => $row->filename,
-                                'source' => $row->source,
-                            ]);
+                            'id' => $row->id,
+                            'title' => $row->title,
+                            'filename' => $row->filename,
+                            'source' => $row->source,
+                        ]);
                         break;
                 }
             }

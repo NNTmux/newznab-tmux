@@ -295,18 +295,18 @@ class ReleaseExtra
         $ckid = VideoData::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
             VideoData::insertOrIgnore([
-                    'releases_id' => $releaseID,
-                    'containerformat' => $containerFormat,
-                    'overallbitrate' => $overallBitRate,
-                    'videoduration' => is_numeric($videoDuration) ? realDuration($videoDuration) : $videoDuration,
-                    'videoformat' => $videoFormat,
-                    'videocodec' => $videoCodec,
-                    'videowidth' => $videoWidth,
-                    'videoheight' => $videoHeight,
-                    'videoaspect' => $videoAspect,
-                    'videoframerate' => $videoFrameRate,
-                    'videolibrary' => $videoLibrary,
-                ]);
+                'releases_id' => $releaseID,
+                'containerformat' => $containerFormat,
+                'overallbitrate' => $overallBitRate,
+                'videoduration' => is_numeric($videoDuration) ? realDuration($videoDuration) : $videoDuration,
+                'videoformat' => $videoFormat,
+                'videocodec' => $videoCodec,
+                'videowidth' => $videoWidth,
+                'videoheight' => $videoHeight,
+                'videoaspect' => $videoAspect,
+                'videoframerate' => $videoFrameRate,
+                'videolibrary' => $videoLibrary,
+            ]);
         }
     }
 
@@ -328,18 +328,18 @@ class ReleaseExtra
         $ckid = AudioData::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
             AudioData::insertOrIgnore([
-                    'releases_id' => $releaseID,
-                    'audioid' => $audioID,
-                    'audioformat' => \is_array($audioFormat) ? implode($audioFormat) : $audioFormat,
-                    'audiomode' => \is_array($audioMode) ? implode($audioMode) : $audioMode,
-                    'audiobitratemode' => \is_array($audioBitRateMode) ? implode($audioBitRateMode) : $audioBitRateMode,
-                    'audiobitrate' => \is_array($audioBitRate) ? implode($audioBitRate) : $audioBitRate,
-                    'audiochannels' => \is_array($audioChannels) ? implode($audioChannels) : $audioChannels,
-                    'audiosamplerate' => \is_array($audioSampleRate) ? implode($audioSampleRate) : $audioSampleRate,
-                    'audiolibrary' => \is_array($audioLibrary) ? implode($audioLibrary) : $audioLibrary,
-                    'audiolanguage' => ! empty($audioLanguage) ? $audioLanguage[1] : '',
-                    'audiotitle' => \is_array($audioTitle) ? implode($audioTitle) : $audioTitle,
-                ]);
+                'releases_id' => $releaseID,
+                'audioid' => $audioID,
+                'audioformat' => \is_array($audioFormat) ? implode($audioFormat) : $audioFormat,
+                'audiomode' => \is_array($audioMode) ? implode($audioMode) : $audioMode,
+                'audiobitratemode' => \is_array($audioBitRateMode) ? implode($audioBitRateMode) : $audioBitRateMode,
+                'audiobitrate' => \is_array($audioBitRate) ? implode($audioBitRate) : $audioBitRate,
+                'audiochannels' => \is_array($audioChannels) ? implode($audioChannels) : $audioChannels,
+                'audiosamplerate' => \is_array($audioSampleRate) ? implode($audioSampleRate) : $audioSampleRate,
+                'audiolibrary' => \is_array($audioLibrary) ? implode($audioLibrary) : $audioLibrary,
+                'audiolanguage' => ! empty($audioLanguage) ? $audioLanguage[1] : '',
+                'audiotitle' => \is_array($audioTitle) ? implode($audioTitle) : $audioTitle,
+            ]);
         }
     }
 
@@ -375,14 +375,14 @@ class ReleaseExtra
     public function addUID($releaseID, $uniqueId): void
     {
         $dupecheck = ReleaseUnique::query()->where('releases_id', $releaseID)->orWhere([
-                    'releases_id' => $releaseID,
-                    'uniqueid' => $uniqueId,
-                ])->first(['releases_id']);
+            'releases_id' => $releaseID,
+            'uniqueid' => $uniqueId,
+        ])->first(['releases_id']);
         if ($dupecheck === null) {
             ReleaseUnique::insertOrIgnore([
-                        'releases_id' => $releaseID,
-                        'uniqueid' => $uniqueId,
-                    ]);
+                'releases_id' => $releaseID,
+                'uniqueid' => $uniqueId,
+            ]);
         }
     }
 
