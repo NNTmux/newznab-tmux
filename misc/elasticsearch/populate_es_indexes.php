@@ -74,8 +74,8 @@ function populate_indexes($table, $max)
                             'index' => [
                                 '_index' => 'releases',
                                 '_type' => 'releases',
-                                '_id' => $row->id
-                            ]
+                                '_id' => $row->id,
+                            ],
                         ];
 
                         $data['body'][] = [
@@ -92,15 +92,15 @@ function populate_indexes($table, $max)
                             'index' => [
                                 '_index' => 'predb',
                                 '_type' => 'predb',
-                                '_id' => $row->id
-                            ]
+                                '_id' => $row->id,
+                            ],
                         ];
                         $data['body'][] = [
-                                'id' => $row->id,
-                                'title' => $row->title,
-                                'filename' => $row->filename,
-                                'source' => $row->source,
-                            ];
+                            'id' => $row->id,
+                            'title' => $row->title,
+                            'filename' => $row->filename,
+                            'source' => $row->source,
+                        ];
                         break;
                 }
             }
