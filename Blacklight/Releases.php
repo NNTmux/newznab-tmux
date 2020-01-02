@@ -600,7 +600,7 @@ class Releases extends Release
                             'query' => implode(' ', $phrases),
                             'fields' => $fields,
                             'type' => 'phrase',
-                        ]
+                        ],
                     ],
                     'size' => $limit,
                 ],
@@ -1186,7 +1186,6 @@ class Releases extends Release
                 }
             }
         }
-
 
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s
