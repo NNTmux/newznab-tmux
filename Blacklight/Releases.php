@@ -585,12 +585,22 @@ class Releases extends Release
             return $value !== -1;
         });
 
+        $fields = $phrases = [];
+        foreach ($searchFields as $key => $value) {
+            $fields[] = $key;
+            $phrases[] = $value;
+        }
+
         if (config('nntmux.elasticsearch_enabled') === true) {
             $search = [
                 'index' => 'releases',
                 'body' => [
                     'query' => [
-                        'match' => $searchFields,
+                        'multi_match' => [
+                            'query' => implode(' ', $phrases),
+                            'fields' => $fields,
+                            'type' => 'phrase',
+                        ]
                     ],
                     'size' => $limit,
                 ],
@@ -706,8 +716,10 @@ class Releases extends Release
                     'index' => 'releases',
                     'body' => [
                         'query' => [
-                            'match' => [
-                                'searchname' => $searchName,
+                            'multi_match' => [
+                                'query' => $searchName,
+                                'fields' => ['searchname'],
+                                'type' => 'phrase',
                             ],
                         ],
                         'size' => $limit,
@@ -872,8 +884,10 @@ class Releases extends Release
                     'index' => 'releases',
                     'body' => [
                         'query' => [
-                            'match' => [
-                                'searchname' => $name,
+                            'multi_match' => [
+                                'query' => $name,
+                                'fields' => ['searchname'],
+                                'type' => 'phrase',
                             ],
                         ],
                         'size' => $limit,
@@ -1040,10 +1054,10 @@ class Releases extends Release
                 $search = [
                     'index' => 'releases',
                     'body' => [
-                        'query' => [
-                            'match' => [
-                                'searchname' => $name,
-                            ],
+                        'multi_match' => [
+                            'query' => $name,
+                            'fields' => ['searchname'],
+                            'type' => 'phrase',
                         ],
                         'size' => $limit,
                     ],
@@ -1140,38 +1154,39 @@ class Releases extends Release
     public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
         if (! empty($name)) {
-            if (! empty($name)) {
-                if (config('nntmux.elasticsearch_enabled') === true) {
-                    $search = [
-                        'index' => 'releases',
-                        'body' => [
-                            'query' => [
-                                'match' => [
-                                    'searchname' => $name,
-                                ],
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $search = [
+                    'index' => 'releases',
+                    'body' => [
+                        'query' => [
+                            'multi_match' => [
+                                'query' => $name,
+                                'fields' => ['searchname'],
+                                'type' => 'phrase',
                             ],
-                            'size' => $limit,
                         ],
-                    ];
+                        'size' => $limit,
+                    ],
+                ];
 
-                    $results = \Elasticsearch::search($search);
+                $results = \Elasticsearch::search($search);
 
-                    $searchResult = [];
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-                    if (empty($searchResult)) {
-                        return collect();
-                    }
-                } else {
-                    $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+                $searchResult = [];
+                foreach ($results['hits']['hits'] as $result) {
+                    $searchResult[] = $result['_source']['id'];
+                }
+                if (empty($searchResult)) {
+                    return collect();
+                }
+            } else {
+                $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
 
-                    if (empty($searchResult)) {
-                        return collect();
-                    }
+                if (empty($searchResult)) {
+                    return collect();
                 }
             }
         }
+
 
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s
@@ -1245,35 +1260,35 @@ class Releases extends Release
     public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         if (! empty($name)) {
-            if (! empty($name)) {
-                if (config('nntmux.elasticsearch_enabled') === true) {
-                    $search = [
-                        'index' => 'releases',
-                        'body' => [
-                            'query' => [
-                                'match' => [
-                                    'searchname' => $name,
-                                ],
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $search = [
+                    'index' => 'releases',
+                    'body' => [
+                        'query' => [
+                            'multi_match' => [
+                                'query' => $name,
+                                'fields' => ['searchname'],
+                                'type' => 'phrase',
                             ],
-                            'size' => $limit,
                         ],
-                    ];
+                        'size' => $limit,
+                    ],
+                ];
 
-                    $results = \Elasticsearch::search($search);
+                $results = \Elasticsearch::search($search);
 
-                    $searchResult = [];
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-                    if (empty($searchResult)) {
-                        return collect();
-                    }
-                } else {
-                    $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+                $searchResult = [];
+                foreach ($results['hits']['hits'] as $result) {
+                    $searchResult[] = $result['_source']['id'];
+                }
+                if (empty($searchResult)) {
+                    return collect();
+                }
+            } else {
+                $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
 
-                    if (empty($searchResult)) {
-                        return collect();
-                    }
+                if (empty($searchResult)) {
+                    return collect();
                 }
             }
         }
