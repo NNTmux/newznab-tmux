@@ -592,6 +592,7 @@ class Releases extends Release
                     'query' => [
                         'match' => $searchFields,
                     ],
+                    'size' => $limit,
                 ],
             ];
 
@@ -709,6 +710,7 @@ class Releases extends Release
                                 'searchname' => $searchName,
                             ],
                         ],
+                        'size' => $limit,
                     ],
                 ];
 
@@ -874,6 +876,7 @@ class Releases extends Release
                                 'searchname' => $name,
                             ],
                         ],
+                        'size' => $limit,
                     ],
                 ];
 
@@ -1042,6 +1045,7 @@ class Releases extends Release
                                 'searchname' => $name,
                             ],
                         ],
+                        'size' => $limit,
                     ],
                 ];
 
@@ -1146,6 +1150,7 @@ class Releases extends Release
                                     'searchname' => $name,
                                 ],
                             ],
+                            'size' => $limit,
                         ],
                     ];
 
@@ -1250,6 +1255,7 @@ class Releases extends Release
                                     'searchname' => $name,
                                 ],
                             ],
+                            'size' => $limit,
                         ],
                     ];
 
