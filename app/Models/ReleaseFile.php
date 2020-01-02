@@ -148,6 +148,7 @@ class ReleaseFile extends Model
                         ],
 
                         'index' => 'releases',
+                        'type' => 'releases',
                         'id' => $id,
                     ];
 

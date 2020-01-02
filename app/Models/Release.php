@@ -305,6 +305,7 @@ class Release extends Model
                     'filename' => $parameters['filename'],
                 ],
                 'index' => 'releases',
+                'type' => 'releases',
                 'id' => $parameters['id'],
             ];
 
@@ -373,6 +374,7 @@ class Release extends Model
                 ],
 
                 'index' => 'releases',
+                'type' => 'releases',
                 'id' => $ID,
             ];
 

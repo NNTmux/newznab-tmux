@@ -344,6 +344,7 @@ class IRCScraper extends IRCClient
                     'filename' => $parameters['filename'],
                 ],
                 'index' => 'predb',
+                'type' => 'predb',
                 'id' => $parameters['id'],
             ];
 

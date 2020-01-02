@@ -13,10 +13,10 @@ if (! isset($argv[1])) {
     );
 }
 
-populate_rt($argv[1], (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : 10000));
+populate_indexes($argv[1], (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : 10000));
 
 // Bulk insert releases into sphinx RT index.
-function populate_rt($table, $max)
+function populate_indexes($table, $max)
 {
     $allowedIndexes = ['releases', 'predb'];
     if (\in_array($table, $allowedIndexes, true)) {
@@ -57,6 +57,7 @@ function populate_rt($table, $max)
 
         $lastId = $minId - 1;
         echo "[Starting to populate ElasticSearch index $table with $total releases.]".PHP_EOL;
+        $data = ['body' => []];
         for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
             $rows = DB::select(sprintf($query, $lastId, $max));
             if ($rows === 0) {
@@ -69,38 +70,55 @@ function populate_rt($table, $max)
                 }
                 switch ($table) {
                     case 'releases':
-                        $data = [
-                            'body' => [
-                                'id' => $row->id,
-                                'name' => $row->name,
-                                'searchname' => $row->searchname,
-                                'fromname' => $row->fromname,
-                                'filename' => $row->filename,
-                            ],
-                            'index' => 'releases',
-                            'id' => $row->id,
+                        $data['body'][] = [
+                            'index' => [
+                                '_index' => 'releases',
+                                '_type' => 'releases',
+                                '_id' => $row->id
+                            ]
                         ];
 
-                        Elasticsearch::index($data);
+                        $data['body'][] = [
+                            'id' => $row->id,
+                            'name' => $row->name,
+                            'searchname' => $row->searchname,
+                            'fromname' => $row->fromname,
+                            'filename' => $row->filename,
+                        ];
                         break;
 
                     case 'predb':
-                        $data = [
-                            'body' => [
+                        $data['body'][] = [
+                            'index' => [
+                                '_index' => 'predb',
+                                '_type' => 'predb',
+                                '_id' => $row->id
+                            ]
+                        ];
+                        $data['body'][] = [
                                 'id' => $row->id,
                                 'title' => $row->title,
                                 'filename' => $row->filename,
                                 'source' => $row->source,
-                            ],
-                            'index' => 'predb',
-                            'id' => $row->id,
-                        ];
-                        Elasticsearch::index($data);
+                            ];
                         break;
                 }
             }
+            // Stop and send the bulk request
+            $responses = Elasticsearch::bulk($data);
+
+            // erase the old bulk request
+            $data = ['body' => []];
+
+            // unset the bulk response when you are done to save memory
+            unset($responses);
 
             echo '.';
+        }
+
+        // Send the last batch if it exists
+        if (! empty($data['body'])) {
+            $responses = Elasticsearch::bulk($data);
         }
         echo "\n[Done]\n";
     } else {
