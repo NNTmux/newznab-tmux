@@ -603,6 +603,7 @@ class Releases extends Release
                         ],
                     ],
                     'size' => $limit,
+                    'from' => $offset,
                 ],
             ];
 
@@ -723,6 +724,7 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'from' => $offset,
                     ],
                 ];
 
@@ -891,6 +893,7 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'from' => $offset,
                     ],
                 ];
 
@@ -1060,6 +1063,7 @@ class Releases extends Release
                             'type' => 'phrase',
                         ],
                         'size' => $limit,
+                        'from' => $offset,
                     ],
                 ];
 
@@ -1166,6 +1170,7 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'from' => $offset,
                     ],
                 ];
 
@@ -1271,6 +1276,7 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'from' => $offset,
                     ],
                 ];
 
