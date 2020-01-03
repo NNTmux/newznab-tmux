@@ -302,7 +302,7 @@ class Release extends Model
                     'name' => $parameters['name'],
                     'searchname' => $parameters['searchname'],
                     'fromname' => $parameters['fromname'],
-                    'filename' => $parameters['filename'],
+                    'filename' => $parameters['filename'] ?? '',
                 ],
                 'index' => 'releases',
                 'type' => 'releases',
