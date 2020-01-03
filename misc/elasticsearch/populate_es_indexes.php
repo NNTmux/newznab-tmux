@@ -104,16 +104,18 @@ function populate_indexes($table, $max)
                         break;
                 }
             }
-            // Stop and send the bulk request
-            $responses = \Elasticsearch::bulk($data);
+            if (! empty($data['body'])) {
+                // Stop and send the bulk request
+                $responses = \Elasticsearch::bulk($data);
 
-            // erase the old bulk request
-            $data = ['body' => []];
+                // erase the old bulk request
+                $data = ['body' => []];
 
-            // unset the bulk response when you are done to save memory
-            unset($responses);
+                // unset the bulk response when you are done to save memory
+                unset($responses);
 
-            echo '.';
+                echo '.';
+            }
         }
 
         // Send the last batch if it exists
