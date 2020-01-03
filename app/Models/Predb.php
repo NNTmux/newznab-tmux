@@ -195,8 +195,13 @@ class Predb extends Model
                     'index' => 'predb',
                     'body' => [
                         'query' => [
-                            'match' =>['title' => $search],
+                            'multi_match' => [
+                                'query' => $search,
+                                'fields' => ['title'],
+                                'type' => 'phrase',
+                            ],
                         ],
+                        'size' => 1000,
                     ],
                 ];
 
