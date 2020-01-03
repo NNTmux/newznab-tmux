@@ -348,7 +348,7 @@ class IRCScraper extends IRCClient
                 'id' => $parameters['id'],
             ];
 
-            Elasticsearch::index($data);
+            \Elasticsearch::index($data);
         } else {
             $this->sphinxsearch->insertPredb($parameters);
         }
