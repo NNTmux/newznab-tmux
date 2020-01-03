@@ -1045,7 +1045,7 @@ class NameFixer
                                 'id' => $release->releases_id,
                             ];
 
-                            Elasticsearch::update($data);
+                            \Elasticsearch::update($data);
                         } else {
                             $this->sphinx->updateRelease($release->releases_id);
                         }
@@ -1089,7 +1089,7 @@ class NameFixer
                                     'id' => $release->releases_id,
                                 ];
 
-                                Elasticsearch::update($data);
+                                \Elasticsearch::update($data);
                             }
                         } else {
                             $this->sphinx->updateRelease($release->releases_id);

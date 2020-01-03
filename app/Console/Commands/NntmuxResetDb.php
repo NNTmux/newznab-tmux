@@ -88,8 +88,8 @@ class NntmuxResetDb extends Command
             $this->info('Truncating completed.');
 
             if (config('nntmux.elasticsearch_enabled') === true) {
-                if (Elasticsearch::indices()->exists(['index' => 'releases'])) {
-                    Elasticsearch::indices()->delete(['index' => 'releases']);
+                if (\Elasticsearch::indices()->exists(['index' => 'releases'])) {
+                    \Elasticsearch::indices()->delete(['index' => 'releases']);
                 }
                 $releases_index = [
                     'index' => 'releases',
@@ -102,10 +102,10 @@ class NntmuxResetDb extends Command
                     ],
                 ];
 
-                Elasticsearch::indices()->create($releases_index);
+                \Elasticsearch::indices()->create($releases_index);
 
-                if (Elasticsearch::indices()->exists(['index' => 'predb'])) {
-                    Elasticsearch::indices()->delete(['index' => 'predb']);
+                if (\Elasticsearch::indices()->exists(['index' => 'predb'])) {
+                    \Elasticsearch::indices()->delete(['index' => 'predb']);
                 }
                 $predb_index = [
                     'index' => 'predb',
@@ -118,7 +118,7 @@ class NntmuxResetDb extends Command
                     ],
                 ];
 
-                Elasticsearch::indices()->create($predb_index);
+                \Elasticsearch::indices()->create($predb_index);
 
                 $this->info('All done! ElasticSearch indexes are deleted and recreated.');
             } else {

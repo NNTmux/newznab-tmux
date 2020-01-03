@@ -152,7 +152,7 @@ class ReleaseFile extends Model
                         'id' => $id,
                     ];
 
-                    Elasticsearch::update($data);
+                    \Elasticsearch::update($data);
                 }
             } else {
                 (new SphinxSearch())->updateRelease($id);

@@ -105,7 +105,7 @@ function populate_indexes($table, $max)
                 }
             }
             // Stop and send the bulk request
-            $responses = Elasticsearch::bulk($data);
+            $responses = \Elasticsearch::bulk($data);
 
             // erase the old bulk request
             $data = ['body' => []];
@@ -118,7 +118,7 @@ function populate_indexes($table, $max)
 
         // Send the last batch if it exists
         if (! empty($data['body'])) {
-            $responses = Elasticsearch::bulk($data);
+            $responses = \Elasticsearch::bulk($data);
         }
         echo "\n[Done]\n";
     } else {

@@ -1198,7 +1198,7 @@ class ProcessAdditional
                         'id' => $this->_release->id,
                     ];
 
-                    Elasticsearch::update($data);
+                    \Elasticsearch::update($data);
                 }
             } else {
                 $this->sphinx->updateRelease($this->_release->id);
@@ -1775,7 +1775,7 @@ class ProcessAdditional
                                             'id' => $this->_release->id,
                                         ];
 
-                                        Elasticsearch::update($data);
+                                        \Elasticsearch::update($data);
                                     } else {
                                         $this->sphinx->updateRelease($this->_release->id);
                                     }

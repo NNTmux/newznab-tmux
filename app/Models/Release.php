@@ -309,7 +309,7 @@ class Release extends Model
                 'id' => $parameters['id'],
             ];
 
-            Elasticsearch::index($data);
+            \Elasticsearch::index($data);
         } else {
             (new SphinxSearch())->insertRelease($parameters);
         }
@@ -378,7 +378,7 @@ class Release extends Model
                 'id' => $ID,
             ];
 
-            Elasticsearch::update($data);
+            \Elasticsearch::update($data);
         } else {
             (new SphinxSearch())->updateRelease($ID);
         }

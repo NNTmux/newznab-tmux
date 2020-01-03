@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-if (Elasticsearch::indices()->exists(['index' => 'releases'])) {
-    Elasticsearch::indices()->delete(['index' => 'releases']);
+if (\Elasticsearch::indices()->exists(['index' => 'releases'])) {
+    \Elasticsearch::indices()->delete(['index' => 'releases']);
 }
 $releases_index = [
     'index' => 'releases',
@@ -15,11 +15,11 @@ $releases_index = [
     ],
 ];
 
-$response = Elasticsearch::indices()->create($releases_index);
+$response = \Elasticsearch::indices()->create($releases_index);
 
 print_r($response);
-if (Elasticsearch::indices()->exists(['index' => 'predb'])) {
-    Elasticsearch::indices()->delete(['index' => 'predb']);
+if (\Elasticsearch::indices()->exists(['index' => 'predb'])) {
+    \Elasticsearch::indices()->delete(['index' => 'predb']);
 }
 $predb_index = [
     'index' => 'predb',
@@ -31,7 +31,7 @@ $predb_index = [
     ],
 ];
 
-$response = Elasticsearch::indices()->create($predb_index);
+$response = \Elasticsearch::indices()->create($predb_index);
 
 print_r($response);
 
