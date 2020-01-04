@@ -16,21 +16,21 @@ $releases_index = [
             'properties' => [
                 'id' => [
                     'type' => 'long',
-                    'index' => false
+                    'index' => false,
                 ],
                 'name' => ['type' => 'text'],
                 'searchname' => [
                     'type' => 'text',
                     'fields' => [
                         'sort' => [
-                            'type' => 'keyword'
-                        ]
-                    ]
+                            'type' => 'keyword',
+                        ],
+                    ],
                 ],
                 'fromname' => ['type' => 'text'],
                 'filename' => ['type' => 'text'],
-            ]
-        ]
+            ],
+        ],
     ],
 ];
 
@@ -51,20 +51,20 @@ $predb_index = [
             'properties' => [
                 'id' => [
                     'type' => 'long',
-                    'index' => false
+                    'index' => false,
                 ],
                 'title' => [
                     'type' => 'text',
                     'fields' => [
                         'sort' => [
-                            'type' => 'keyword'
-                        ]
-                    ]
+                            'type' => 'keyword',
+                        ],
+                    ],
                 ],
                 'filename' => ['type' => 'text'],
                 'source' => ['type' => 'text'],
-            ]
-        ]
+            ],
+        ],
     ],
 
 ];
