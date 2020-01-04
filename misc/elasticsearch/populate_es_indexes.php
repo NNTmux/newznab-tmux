@@ -73,7 +73,6 @@ function populate_indexes($table, $max)
                         $data['body'][] = [
                             'index' => [
                                 '_index' => 'releases',
-                                '_type' => 'releases',
                                 '_id' => $row->id,
                             ],
                         ];
@@ -91,7 +90,6 @@ function populate_indexes($table, $max)
                         $data['body'][] = [
                             'index' => [
                                 '_index' => 'predb',
-                                '_type' => 'predb',
                                 '_id' => $row->id,
                             ],
                         ];

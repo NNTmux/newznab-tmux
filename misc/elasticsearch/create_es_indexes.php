@@ -12,6 +12,25 @@ $releases_index = [
             'number_of_shards' => 2,
             'number_of_replicas' => 0,
         ],
+        'mappings' => [
+            'properties' => [
+                'id' => [
+                    'type' => 'long',
+                    'index' => false
+                ],
+                'name' => ['type' => 'text'],
+                'searchname' => [
+                    'type' => 'text',
+                    'fields' => [
+                        'sort' => [
+                            'type' => 'keyword'
+                        ]
+                    ]
+                ],
+                'fromname' => ['type' => 'text'],
+                'filename' => ['type' => 'text'],
+            ]
+        ]
     ],
 ];
 
@@ -28,7 +47,26 @@ $predb_index = [
             'number_of_shards' => 2,
             'number_of_replicas' => 0,
         ],
+        'mappings' => [
+            'properties' => [
+                'id' => [
+                    'type' => 'long',
+                    'index' => false
+                ],
+                'title' => [
+                    'type' => 'text',
+                    'fields' => [
+                        'sort' => [
+                            'type' => 'keyword'
+                        ]
+                    ]
+                ],
+                'filename' => ['type' => 'text'],
+                'source' => ['type' => 'text'],
+            ]
+        ]
     ],
+
 ];
 
 $response = \Elasticsearch::indices()->create($predb_index);
