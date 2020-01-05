@@ -43,12 +43,17 @@ class ProfileController extends BasePageController
             if ($altID === false && $altUsername !== false) {
                 $user = User::getByUsername($altUsername);
                 if ($user) {
+                    $this->userdata = $user;
                     $altID = $user['id'];
                     $userID = $altID;
                 }
             } elseif ($altID !== false) {
-                $userID = $altID;
-                $publicView = true;
+                $user = User::find($altID);
+                if ($user) {
+                    $this->userdata = $user;
+                    $userID = $altID;
+                    $publicView = true;
+                }
             }
         }
 

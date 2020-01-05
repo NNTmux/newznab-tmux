@@ -33,7 +33,7 @@
                                                         <th width="200">Username</th>
                                                         <td>{$user.username|escape:"htmlall"}</td>
                                                     </tr>
-                                                    {if isset($isadmin) || !$publicview}
+                                                    {if (isset($isadmin) && $isadmin === "true") || !$publicview}
                                                         <tr>
                                                             <th width="200" title="Not public">E-mail</th>
                                                             <td>{$user.email}</td>
@@ -135,7 +135,7 @@
                                                             </td>
                                                         </tr>
                                                     {/if}
-                                                    {if isset($isadmin) || !$publicview}
+                                                    {if (isset($isadmin) && $isadmin === "true") || !$publicview}
                                                         <tr>
                                                             <th title="Not public">API/RSS Key</th>
                                                             <td>
@@ -149,14 +149,14 @@
                                                             <th title="Admin Notes">Notes:</th>
                                                             <td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}
                                                                     <br/>
-                                                                {/if}{if isset($isadmin)}<a
+                                                                {/if}{if (isset($isadmin) && $isadmin === "true")}<a
                                                                     href="{{url("/admin/user-edit.php?id={$user.id}#notes")}}"
                                                                     class="badge badge-info">Add/Edit</a>{/if}</td>
                                                         </tr>
                                                     {/if}
                                                     </tbody>
                                                 </table>
-                                                {if ($user.id == $userdata.id || $isadmin) && $site->registerstatus == 1}
+                                                {if ($user.id === $userdata.id || $isadmin === "true") && $site->registerstatus == 1}
                                                     <table class="data data table table-striped">
                                                         <tbody>
                                                         <tr class="bg-blue-sky">
@@ -206,7 +206,7 @@
                                                         </tbody>
                                                     </table>
                                                 {/if}
-                                                {if isset($isadmin) && $downloadlist|@count > 0}
+                                                {if (isset($isadmin) && $isadmin === "true") && $downloadlist|@count > 0}
                                                     <table class="data data table table-striped">
                                                         <tbody>
                                                         <tr class="bg-blue-sky">
@@ -244,11 +244,11 @@
                                 </li>
                             </ul>
                         </div>
-                        {if isset($isadmin) || !$publicview}
+                        {if (isset($isadmin) && $isadmin === "true") || !$publicview}
                             <a class="btn btn-success" href="{{route("profileedit")}}">Edit
                                 Profile</a>
                         {/if}
-                        {if !isset($isadmin)}
+                        {if $isadmin === "false" && !$publicview}
                             <a class="btn btn-warning confirm_action"
                                href="{{url("profile_delete?id={$user.id}")}}">Delete your account</a>
                         {/if}
