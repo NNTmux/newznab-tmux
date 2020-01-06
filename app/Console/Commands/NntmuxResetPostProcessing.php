@@ -20,6 +20,7 @@ class NntmuxResetPostProcessing extends Command
         'game',
         'tv',
         'adult',
+        'book',
         'misc',
     ];
     /**
