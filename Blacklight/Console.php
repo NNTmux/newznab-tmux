@@ -313,7 +313,7 @@ class Console
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseBy .= 'AND con.'.$bbv.' LIKE '.escapeString('%'.$bbs.'%');
+                $browseBy .= ' AND con.'.$bbv.' LIKE '.escapeString('%'.$bbs.'%');
             }
         }
 

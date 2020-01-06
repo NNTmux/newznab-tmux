@@ -380,9 +380,9 @@ class Movie
                     $bbv .= '.';
                 }
                 if ($bb === 'imdb') {
-                    $browseBy .= sprintf('AND m.imdbid = %d', $bbv);
+                    $browseBy .= sprintf(' AND m.imdbid = %d', $bbv);
                 } else {
-                    $browseBy .= 'AND m.'.$bb.' '.'LIKE '.escapeString('%'.$bbv.'%');
+                    $browseBy .= ' AND m.'.$bb.' '.'LIKE '.escapeString('%'.$bbv.'%');
                 }
             }
         }

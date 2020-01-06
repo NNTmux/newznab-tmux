@@ -312,7 +312,7 @@ class Books
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseby .= 'AND boo.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
+                $browseby .= ' AND boo.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
             }
         }
 

@@ -273,9 +273,9 @@ class XXX
                     $bbv = $this->getGenreID($bbv);
                 }
                 if ($bb === 'id') {
-                    $browseBy .= 'AND xxx.'.$bb.'='.$bbv;
+                    $browseBy .= ' AND xxx.'.$bb.'='.$bbv;
                 } else {
-                    $browseBy .= 'AND xxx.'.$bb.' '.'LIKE '.escapeString('%'.$bbv.'%');
+                    $browseBy .= ' AND xxx.'.$bb.' '.'LIKE '.escapeString('%'.$bbv.'%');
                 }
             }
         }
