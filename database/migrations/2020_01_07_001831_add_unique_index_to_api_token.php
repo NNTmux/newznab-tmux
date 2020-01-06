@@ -26,7 +26,7 @@ class AddUniqueIndexToApiToken extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropIndex('ux_users_api_token');
+            $table->dropUnique('ux_users_api_token');
         });
     }
 }
