@@ -297,9 +297,9 @@ class Music
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if (stripos($bbv, 'id') !== false) {
-                    $browseby .= 'AND m.'.$bbv.' = '.$bbs;
+                    $browseby .= ' AND m.'.$bbv.' = '.$bbs;
                 } else {
-                    $browseby .= 'AND m.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
+                    $browseby .= ' AND m.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
                 }
             }
         }
