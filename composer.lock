@@ -319,16 +319,16 @@
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/canihavesomecoffee/theTVDbAPI.git",
-                "reference": "3c69c5530c22e7a210ebd8c871b03aec50d60ebb"
+                "reference": "e9a0d6c3a90e0950400206b422a0127d439ae7b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/3c69c5530c22e7a210ebd8c871b03aec50d60ebb",
-                "reference": "3c69c5530c22e7a210ebd8c871b03aec50d60ebb",
+                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/e9a0d6c3a90e0950400206b422a0127d439ae7b7",
+                "reference": "e9a0d6c3a90e0950400206b422a0127d439ae7b7",
                 "shasum": ""
             },
             "require": {
@@ -358,8 +358,8 @@
                     "email": "thetvdbapi@canihavesome.coffee"
                 }
             ],
-            "description": "PHP implementation for the 2nd version of the TheTVDb API.",
-            "time": "2019-11-18T07:53:15+00:00"
+            "description": "PHP implementation for the 2nd (or newer) version of the TheTVDb API.",
+            "time": "2020-01-07T20:43:10+00:00"
         },
         {
             "name": "clue/stream-filter",
