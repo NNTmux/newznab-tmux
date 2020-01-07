@@ -209,8 +209,10 @@ class SphinxSearch
             foreach ($searchArray as $key => $value) {
                 $query->match($key, $value);
             }
-        } else {
+        } elseif (! empty($searchString)) {
             $query->match($column, $searchString);
+        } else {
+            return [];
         }
 
         return $query->execute()->fetchAllAssoc() ?? [];
