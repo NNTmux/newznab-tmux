@@ -835,7 +835,7 @@ class ProcessReleases
             $this->consoleTools->header('Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.');
         }
 
-        $groupID === '' ? $groupIDs = UsenetGroup::getActiveIDs() : $groupIDs = [['id' => $groupID]];
+        $groupIDs = $groupID === '' ? UsenetGroup::getActiveIDs() : [['id' => $groupID]];
 
         $maxSizeSetting = Settings::settingValue('.release.maxsizetoformrelease');
         $minSizeSetting = Settings::settingValue('.release.minsizetoformrelease');
