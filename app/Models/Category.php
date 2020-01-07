@@ -589,7 +589,7 @@ class Category extends Model
             $sql->where('status', '=', self::STATUS_ACTIVE);
         }
 
-        if (\count($excludedCats) > 0) {
+        if (! empty($excludedCats)) {
             $sql->whereNotIn('id', $excludedCats);
         }
 
