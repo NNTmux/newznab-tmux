@@ -341,7 +341,7 @@ class TVDB extends TV
             }
         } elseif ($videoId > 0) {
             try {
-                $response = $this->client->series()->getEpisodes($tvDbId)->getData();
+                $response = $this->client->series()->getAllEpisodes($tvDbId);
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
