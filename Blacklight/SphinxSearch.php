@@ -210,6 +210,10 @@ class SphinxSearch
                 $query->match($key, $value);
             }
         } elseif (! empty($searchString)) {
+            $searchString= ltrim($searchString, '\()-!@%~"&/^$=');
+            if(! $searchString) {
+                return [];
+            }
             $query->match($column, $searchString);
         } else {
             return [];
