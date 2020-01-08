@@ -400,7 +400,25 @@ class IRCScraper extends IRCClient
             'source' => $this->_curPre['source'],
         ];
 
-        $this->sphinxsearch->updatePreDb($parameters);
+        if (config('nntmux.elasticsearch_enabled') === true) {
+            $data = [
+                'body' => [
+                    'doc' => [
+                        'id' => $parameters['id'],
+                        'title' => $parameters['title'],
+                        'filename' => $parameters['filename'],
+                        'source' => $parameters['source'],
+                    ],
+                ],
+
+                'index' => 'predb',
+                'id' => $parameters['id'],
+            ];
+
+            \Elasticsearch::update($data);
+        } else {
+            $this->sphinxsearch->updatePreDb($parameters);
+        }
 
         $this->_doEcho(false);
     }
