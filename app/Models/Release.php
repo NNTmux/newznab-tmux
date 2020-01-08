@@ -303,7 +303,7 @@ class Release extends Model
                     'searchname' => $parameters['searchname'],
                     'fromname' => $parameters['fromname'],
                     'filename' => $parameters['filename'] ?? '',
-                    'add_date' => now(),
+                    'add_date' => now()->format('Y-m-d H:i:s'),
                     'post_date' => $parameters['postdate'],
                 ],
                 'index' => 'releases',
