@@ -362,9 +362,9 @@ class ProfileController extends BasePageController
         $userId = $request->input('id');
 
         if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {
-            Auth::logout();
             $user = User::find($userId);
-            SendAccountDeletedEmail::dispatch($user)->onQueue('deleted');
+            SendAccountDeletedEmail::dispatch($user);
+            Auth::logout();
             $user->delete();
         }
 
