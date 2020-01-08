@@ -605,11 +605,11 @@ class Releases extends Release
                     'size' => $limit,
                     'sort' => [
                         'add_date' => [
-                            'order' =>'desc'
+                            'order' =>'desc',
                         ],
                         'post_date' => [
-                            'order' => 'desc'
-                        ]
+                            'order' => 'desc',
+                        ],
                     ],
                 ],
             ];
@@ -733,11 +733,11 @@ class Releases extends Release
                         'size' => $limit,
                         'sort' => [
                             'add_date' => [
-                                'order' =>'desc'
+                                'order' =>'desc',
                             ],
                             'post_date' => [
-                                'order' => 'desc'
-                            ]
+                                'order' => 'desc',
+                            ],
                         ],
                     ],
                 ];
@@ -909,11 +909,11 @@ class Releases extends Release
                         'size' => $limit,
                         'sort' => [
                             'add_date' => [
-                                'order' =>'desc'
+                                'order' =>'desc',
                             ],
                             'post_date' => [
-                                'order' => 'desc'
-                            ]
+                                'order' => 'desc',
+                            ],
                         ],
                     ],
                 ];
@@ -1086,11 +1086,11 @@ class Releases extends Release
                         'size' => $limit,
                         'sort' => [
                             'add_date' => [
-                                'order' =>'desc'
+                                'order' =>'desc',
                             ],
                             'post_date' => [
-                                'order' => 'desc'
-                            ]
+                                'order' => 'desc',
+                            ],
                         ],
                     ],
                 ];
@@ -1200,11 +1200,11 @@ class Releases extends Release
                         'size' => $limit,
                         'sort' => [
                             'add_date' => [
-                                'order' =>'desc'
+                                'order' =>'desc',
                             ],
                             'post_date' => [
-                                'order' => 'desc'
-                            ]
+                                'order' => 'desc',
+                            ],
                         ],
                     ],
                 ];
@@ -1313,11 +1313,11 @@ class Releases extends Release
                         'size' => $limit,
                         'sort' => [
                             'add_date' => [
-                                'order' =>'desc'
+                                'order' =>'desc',
                             ],
                             'post_date' => [
-                                'order' => 'desc'
-                            ]
+                                'order' => 'desc',
+                            ],
                         ],
                     ],
                 ];
