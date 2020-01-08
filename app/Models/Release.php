@@ -307,7 +307,6 @@ class Release extends Model
                     'post_date' => $parameters['postdate'],
                 ],
                 'index' => 'releases',
-                'type' => 'releases',
                 'id' => $parameters['id'],
             ];
 
