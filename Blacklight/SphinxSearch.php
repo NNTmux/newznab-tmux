@@ -5,6 +5,8 @@ namespace Blacklight;
 use App\Models\Predb;
 use App\Models\Release;
 use Foolz\SphinxQL\Drivers\Pdo\Connection;
+use Foolz\SphinxQL\Exception\DatabaseException;
+use Foolz\SphinxQL\Exception\SphinxQLException;
 use Foolz\SphinxQL\Helper;
 use Foolz\SphinxQL\SphinxQL;
 use Illuminate\Support\Facades\DB;
@@ -214,11 +216,17 @@ class SphinxSearch
             if (! $searchString) {
                 return [];
             }
-            $query->match($column, $searchString);
+            $query->match($column, $searchString, true);
         } else {
             return [];
         }
 
-        return $query->execute()->fetchAllAssoc() ?? [];
+        try {
+            return $query->execute()->fetchAllAssoc() ?? [];
+        } catch (SphinxQLException $exception) {
+            return [];
+        } catch (DatabaseException $databaseException) {
+            return [];
+        }
     }
 }
