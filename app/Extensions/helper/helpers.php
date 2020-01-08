@@ -73,7 +73,7 @@ if (! function_exists('makeFieldLinks')) {
             }
             if ($type === 'xxx' && $field === 'genre') {
                 $ta = (new XXX())->getGenres(true, $ta);
-                $ta = $ta['title'];
+                $ta = $ta['title'] ?? '';
             }
             if ($i > 7) {
                 break;
