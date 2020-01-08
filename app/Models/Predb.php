@@ -192,13 +192,15 @@ class Predb extends Model
         if (! empty($search)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
+                    'scroll' => '30s',
                     'index' => 'predb',
                     'body' => [
                         'query' => [
-                            'multi_match' => [
+                            'query_string' => [
                                 'query' => $search,
                                 'fields' => ['title'],
-                                'type' => 'phrase',
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
                             ],
                         ],
                         'size' => 1000,
@@ -208,8 +210,23 @@ class Predb extends Model
                 $results = \Elasticsearch::search($search);
 
                 $ids = [];
-                foreach ($results['hits']['hits'] as $result) {
-                    $ids[] = $result['_source']['id'];
+                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
+                    foreach ($results['hits']['hits'] as $result) {
+                        $ids[] = $result['_source']['id'];
+                    }
+                    if (empty($ids)) {
+                        return collect();
+                    }
+                    // When done, get the new scroll_id
+                    // You must always refresh your _scroll_id!  It can change sometimes
+                    $scroll_id = $results['_scroll_id'];
+
+                    // Execute a Scroll request and repeat
+                    $results = \Elasticsearch::scroll([
+                            'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                            'scroll'    => '30s',        // and the same timeout window
+                        ]
+                    );
                 }
             } else {
                 $sphinx = new SphinxSearch();

@@ -1306,9 +1306,11 @@ class NameFixer
                         'index' => 'predb',
                         'body' => [
                             'query' => [
-                                'multi_match' => [
+                                'query_string' => [
                                     'query' => $preMatch[1],
-                                    'fields' => ['filename', 'title'],
+                                    'fields' => ['title', 'filename'],
+                                    'analyze_wildcard' => true,
+                                    'default_operator' => 'and',
                                 ],
                             ],
                         ],
@@ -2502,9 +2504,11 @@ class NameFixer
                     'index' => 'predb',
                     'body' => [
                         'query' => [
-                            'multi_match' => [
+                            'query_string' => [
                                 'query' => $this->_fileName,
-                                'fields' => ['filename', 'title'],
+                                'fields' => ['title', 'filename'],
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
                             ],
                         ],
                     ],
@@ -2558,9 +2562,11 @@ class NameFixer
                     'index' => 'predb',
                     'body' => [
                         'query' => [
-                            'multi_match' => [
+                            'query_string' => [
                                 'query' => $this->_fileName,
-                                'fields' => ['filename', 'title'],
+                                'fields' => ['title', 'filename'],
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
                             ],
                         ],
                     ],

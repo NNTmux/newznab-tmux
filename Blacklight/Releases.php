@@ -597,11 +597,11 @@ class Releases extends Release
                 'index' => 'releases',
                 'body' => [
                     'query' => [
-                        'multi_match' => [
+                        'query_string' => [
                             'query' => implode(' ', $phrases),
                             'fields' => $fields,
-                            'type' => 'phrase',
-                            'operator' => 'AND',
+                            'analyze_wildcard' => true,
+                            'default_operator' => 'and',
                         ],
                     ],
                     'size' => $limit,
@@ -743,10 +743,11 @@ class Releases extends Release
                     'index' => 'releases',
                     'body' => [
                         'query' => [
-                            'multi_match' => [
+                            'query_string' => [
                                 'query' => $searchName,
                                 'fields' => ['searchname'],
-                                'type' => 'phrase',
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
                             ],
                         ],
                         'size' => $limit,
@@ -933,11 +934,11 @@ class Releases extends Release
                     'index' => 'releases',
                     'body' => [
                         'query' => [
-                            'multi_match' => [
+                            'query_string' => [
                                 'query' => $name,
                                 'fields' => ['searchname'],
-                                'type' => 'phrase',
-                                'operator' => 'AND',
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
                             ],
                         ],
                         'size' => $limit,
@@ -1126,11 +1127,13 @@ class Releases extends Release
                     'scroll' => '30s',
                     'index' => 'releases',
                     'body' => [
-                        'multi_match' => [
-                            'query' => $name,
-                            'fields' => ['searchname'],
-                            'type' => 'phrase',
-                            'operator' => 'AND',
+                        'query' => [
+                            'query_string' => [
+                                'query' => $name,
+                                'fields' => ['searchname'],
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
+                            ],
                         ],
                         'size' => $limit,
                         'sort' => [
@@ -1254,11 +1257,11 @@ class Releases extends Release
                     'index' => 'releases',
                     'body' => [
                         'query' => [
-                            'multi_match' => [
+                            'query_string' => [
                                 'query' => $name,
                                 'fields' => ['searchname'],
-                                'type' => 'phrase',
-                                'operator' => 'AND',
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
                             ],
                         ],
                         'size' => $limit,
@@ -1382,11 +1385,11 @@ class Releases extends Release
                     'index' => 'releases',
                     'body' => [
                         'query' => [
-                            'multi_match' => [
+                            'query_string' => [
                                 'query' => $name,
                                 'fields' => ['searchname'],
-                                'type' => 'phrase',
-                                'operator' => 'AND',
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
                             ],
                         ],
                         'size' => $limit,
