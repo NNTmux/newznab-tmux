@@ -1301,13 +1301,14 @@ class NameFixer
             $this->_cleanMatchFiles();
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
+                $preMatch[1] = $this->escapeString($preMatch[1]);
                 if (config('nntmux.elasticsearch_enabled') === true) {
                     $search = [
                         'index' => 'predb',
                         'body' => [
                             'query' => [
-                                'simple_query_string' => [
-                                    'query' => $this->escapeString($preMatch[1]),
+                                'query_string' => [
+                                    'query' => $preMatch[1],
                                     'fields' => ['title', 'filename'],
                                     'analyze_wildcard' => true,
                                     'default_operator' => 'and',
@@ -2499,13 +2500,14 @@ class NameFixer
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
+            $this->_fileName = $this->escapeString($this->_fileName);
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
                     'index' => 'predb',
                     'body' => [
                         'query' => [
-                            'simple_query_string' => [
-                                'query' => $this->escapeString($this->_fileName),
+                            'query_string' => [
+                                'query' => $this->_fileName,
                                 'fields' => ['title', 'filename'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
