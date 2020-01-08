@@ -617,9 +617,8 @@ class Releases extends Release
 
             $results = \Elasticsearch::search($search);
 
+            $searchResult = [];
             while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
-                $searchResult = [];
                 foreach ($results['hits']['hits'] as $result) {
                     $searchResult[] = $result['_source']['id'];
                 }
@@ -763,9 +762,8 @@ class Releases extends Release
 
                 $results = \Elasticsearch::search($search);
 
+                $searchResult = [];
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
-                    $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
@@ -954,9 +952,9 @@ class Releases extends Release
 
                 $results = \Elasticsearch::search($search);
 
+                $searchResult = [];
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
 
-                    $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
@@ -1146,9 +1144,9 @@ class Releases extends Release
 
                 $results = \Elasticsearch::search($search);
 
+                $searchResult = [];
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
 
-                    $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
@@ -1275,9 +1273,8 @@ class Releases extends Release
 
                 $results = \Elasticsearch::search($search);
 
+                $searchResult = [];
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
-                    $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
@@ -1402,9 +1399,8 @@ class Releases extends Release
                 ];
 
                 $results = \Elasticsearch::search($search);
+                $searchResult = [];
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
-                    $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
