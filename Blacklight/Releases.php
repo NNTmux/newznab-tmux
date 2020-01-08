@@ -618,7 +618,6 @@ class Releases extends Release
             $results = \Elasticsearch::search($search);
 
             while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
                 $searchResult = [];
                 foreach ($results['hits']['hits'] as $result) {
                     $searchResult[] = $result['_source']['id'];
@@ -633,9 +632,9 @@ class Releases extends Release
 
                 // Execute a Scroll request and repeat
                 $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '2s'        // and the same timeout window
-                    ]
+                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                    'scroll'    => '2s',        // and the same timeout window
+                ]
                 );
             }
         } else {
@@ -764,7 +763,6 @@ class Releases extends Release
                 $results = \Elasticsearch::search($search);
 
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
                     $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
@@ -776,9 +774,9 @@ class Releases extends Release
 
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
-                            'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                            'scroll'    => '2s'        // and the same timeout window
-                        ]
+                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                        'scroll'    => '2s',        // and the same timeout window
+                    ]
                     );
                 }
             } else {
@@ -955,7 +953,6 @@ class Releases extends Release
                 $results = \Elasticsearch::search($search);
 
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
                     $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
@@ -970,9 +967,9 @@ class Releases extends Release
 
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
-                            'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                            'scroll'    => '2s'        // and the same timeout window
-                        ]
+                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                        'scroll'    => '2s',        // and the same timeout window
+                    ]
                     );
                 }
             } else {
@@ -1147,7 +1144,6 @@ class Releases extends Release
                 $results = \Elasticsearch::search($search);
 
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
                     $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
@@ -1162,9 +1158,9 @@ class Releases extends Release
 
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
-                            'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                            'scroll'    => '2s'        // and the same timeout window
-                        ]
+                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                        'scroll'    => '2s',        // and the same timeout window
+                    ]
                     );
                 }
             } else {
@@ -1276,7 +1272,6 @@ class Releases extends Release
                 $results = \Elasticsearch::search($search);
 
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
                     $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
@@ -1291,9 +1286,9 @@ class Releases extends Release
 
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
-                            'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                            'scroll'    => '2s'        // and the same timeout window
-                        ]
+                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                        'scroll'    => '2s',        // and the same timeout window
+                    ]
                     );
                 }
             } else {
@@ -1403,7 +1398,6 @@ class Releases extends Release
 
                 $results = \Elasticsearch::search($search);
                 while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-
                     $searchResult = [];
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
@@ -1417,9 +1411,9 @@ class Releases extends Release
 
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
-                            'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                            'scroll'    => '2s'        // and the same timeout window
-                        ]
+                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                        'scroll'    => '2s',        // and the same timeout window
+                    ]
                     );
                 }
             } else {
