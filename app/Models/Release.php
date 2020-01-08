@@ -303,6 +303,8 @@ class Release extends Model
                     'searchname' => $parameters['searchname'],
                     'fromname' => $parameters['fromname'],
                     'filename' => $parameters['filename'] ?? '',
+                    'add_date' => now(),
+                    'post_date' => $parameters['postdate'],
                 ],
                 'index' => 'releases',
                 'type' => 'releases',

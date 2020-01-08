@@ -603,6 +603,14 @@ class Releases extends Release
                         ],
                     ],
                     'size' => $limit,
+                    'sort' => [
+                        'add_date' => [
+                            'order' =>'desc'
+                        ],
+                        'post_date' => [
+                            'order' => 'desc'
+                        ]
+                    ],
                 ],
             ];
 
@@ -723,6 +731,14 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'sort' => [
+                            'add_date' => [
+                                'order' =>'desc'
+                            ],
+                            'post_date' => [
+                                'order' => 'desc'
+                            ]
+                        ],
                     ],
                 ];
 
@@ -891,6 +907,14 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'sort' => [
+                            'add_date' => [
+                                'order' =>'desc'
+                            ],
+                            'post_date' => [
+                                'order' => 'desc'
+                            ]
+                        ],
                     ],
                 ];
 
@@ -1060,6 +1084,14 @@ class Releases extends Release
                             'type' => 'phrase',
                         ],
                         'size' => $limit,
+                        'sort' => [
+                            'add_date' => [
+                                'order' =>'desc'
+                            ],
+                            'post_date' => [
+                                'order' => 'desc'
+                            ]
+                        ],
                     ],
                 ];
 
@@ -1166,6 +1198,14 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'sort' => [
+                            'add_date' => [
+                                'order' =>'desc'
+                            ],
+                            'post_date' => [
+                                'order' => 'desc'
+                            ]
+                        ],
                     ],
                 ];
 
@@ -1271,6 +1311,14 @@ class Releases extends Release
                             ],
                         ],
                         'size' => $limit,
+                        'sort' => [
+                            'add_date' => [
+                                'order' =>'desc'
+                            ],
+                            'post_date' => [
+                                'order' => 'desc'
+                            ]
+                        ],
                     ],
                 ];
 

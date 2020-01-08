@@ -29,6 +29,8 @@ $releases_index = [
                 ],
                 'fromname' => ['type' => 'text'],
                 'filename' => ['type' => 'text'],
+                'add_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
+                'post_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
             ],
         ],
     ],
