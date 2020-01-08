@@ -117,10 +117,12 @@ class RssController extends BasePageController
             $this->smarty->assign('anidb', 1);
         }
 
+        $catExclusions = $this->userdata->categoryexclusions ?? [];
+
         $this->smarty->assign(
             [
-                'categorylist'       => Category::getCategories(true, $this->userdata->categoryexclusions),
-                'parentcategorylist' => Category::getForMenu($this->userdata->categoryexclusions),
+                'categorylist'       => Category::getCategories(true, $catExclusions),
+                'parentcategorylist' => Category::getForMenu($catExclusions),
             ]
         );
 
