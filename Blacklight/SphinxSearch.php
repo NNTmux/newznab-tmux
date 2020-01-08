@@ -209,7 +209,7 @@ class SphinxSearch
         $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(0, 10000)->orderBy('id', 'desc');
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
-                $query->match($key, $value);
+                $query->match($key, $value, true);
             }
         } elseif (! empty($searchString)) {
             $searchString = ltrim($searchString, '\()-!@%~"&/^$=');
