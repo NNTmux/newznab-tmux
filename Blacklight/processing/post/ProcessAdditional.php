@@ -1194,7 +1194,6 @@ class ProcessAdditional
                         ],
 
                         'index' => 'releases',
-                        'type' => 'releases',
                         'id' => $this->_release->id,
                     ];
 
@@ -1771,7 +1770,6 @@ class ProcessAdditional
                                             ],
 
                                             'index' => 'releases',
-                                            'type' => 'releases',
                                             'id' => $this->_release->id,
                                         ];
 

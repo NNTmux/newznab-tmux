@@ -375,7 +375,6 @@ class Release extends Model
                 ],
 
                 'index' => 'releases',
-                'type' => 'releases',
                 'id' => $ID,
             ];
 

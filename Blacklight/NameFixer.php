@@ -1041,7 +1041,6 @@ class NameFixer
                                 ],
 
                                 'index' => 'releases',
-                                'type' => 'releases',
                                 'id' => $release->releases_id,
                             ];
 
@@ -1085,7 +1084,6 @@ class NameFixer
                                     ],
 
                                     'index' => 'releases',
-                                    'type' => 'releases',
                                     'id' => $release->releases_id,
                                 ];
 
