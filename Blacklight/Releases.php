@@ -593,7 +593,7 @@ class Releases extends Release
 
         if (config('nntmux.elasticsearch_enabled') === true) {
             $search = [
-                'scroll' => '2s',
+                'scroll' => '30s',
                 'index' => 'releases',
                 'body' => [
                     'query' => [
@@ -633,7 +633,7 @@ class Releases extends Release
                 // Execute a Scroll request and repeat
                 $results = \Elasticsearch::scroll([
                     'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                    'scroll'    => '2s',        // and the same timeout window
+                    'scroll'    => '30s',        // and the same timeout window
                 ]
                 );
             }
@@ -738,7 +738,7 @@ class Releases extends Release
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
-                    'scroll' => '2s',
+                    'scroll' => '30s',
                     'index' => 'releases',
                     'body' => [
                         'query' => [
@@ -775,7 +775,7 @@ class Releases extends Release
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
                         'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '2s',        // and the same timeout window
+                        'scroll'    => '30s',        // and the same timeout window
                     ]
                     );
                 }
@@ -928,7 +928,7 @@ class Releases extends Release
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
-                    'scroll' => '2s',
+                    'scroll' => '30s',
                     'index' => 'releases',
                     'body' => [
                         'query' => [
@@ -968,7 +968,7 @@ class Releases extends Release
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
                         'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '2s',        // and the same timeout window
+                        'scroll'    => '30s',        // and the same timeout window
                     ]
                     );
                 }
@@ -1121,7 +1121,7 @@ class Releases extends Release
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
-                    'scroll' => '2s',
+                    'scroll' => '30s',
                     'index' => 'releases',
                     'body' => [
                         'multi_match' => [
@@ -1159,7 +1159,7 @@ class Releases extends Release
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
                         'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '2s',        // and the same timeout window
+                        'scroll'    => '30s',        // and the same timeout window
                     ]
                     );
                 }
@@ -1247,7 +1247,7 @@ class Releases extends Release
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
-                    'scroll' => '2s',
+                    'scroll' => '30s',
                     'index' => 'releases',
                     'body' => [
                         'query' => [
@@ -1287,7 +1287,7 @@ class Releases extends Release
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
                         'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '2s',        // and the same timeout window
+                        'scroll'    => '30s',        // and the same timeout window
                     ]
                     );
                 }
@@ -1374,7 +1374,7 @@ class Releases extends Release
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
-                    'scroll' => '2s',
+                    'scroll' => '30s',
                     'index' => 'releases',
                     'body' => [
                         'query' => [
@@ -1412,7 +1412,7 @@ class Releases extends Release
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
                         'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '2s',        // and the same timeout window
+                        'scroll'    => '30s',        // and the same timeout window
                     ]
                     );
                 }
