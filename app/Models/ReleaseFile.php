@@ -5,6 +5,7 @@ namespace App\Models;
 use Blacklight\SphinxSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
