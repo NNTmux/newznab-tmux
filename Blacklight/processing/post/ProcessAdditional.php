@@ -28,6 +28,7 @@ use FFMpeg\Filters\Video\ResizeFilter;
 use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Format\Video\Ogg;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Mhor\MediaInfo\MediaInfo;
