@@ -1299,7 +1299,6 @@ class NameFixer
         foreach (explode('||', $release->filename) as $key => $fileName) {
             $this->_fileName = $fileName;
             $this->_cleanMatchFiles();
-            $this->_fileName = str_replace('/', '\/', $this->_fileName);
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
                 if (config('nntmux.elasticsearch_enabled') === true) {
@@ -1308,7 +1307,7 @@ class NameFixer
                         'body' => [
                             'query' => [
                                 'simple_query_string' => [
-                                    'query' => $preMatch[1],
+                                    'query' => $this->escapeString($preMatch[1]),
                                     'fields' => ['title', 'filename'],
                                     'analyze_wildcard' => true,
                                     'default_operator' => 'and',
@@ -2500,14 +2499,13 @@ class NameFixer
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
-            $this->_fileName = str_replace('/', '\/', $this->_fileName);
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
                     'index' => 'predb',
                     'body' => [
                         'query' => [
                             'simple_query_string' => [
-                                'query' => $this->_fileName,
+                                'query' => $this->escapeString($this->_fileName),
                                 'fields' => ['title', 'filename'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
@@ -2638,5 +2636,16 @@ class NameFixer
         }
 
         return $this->_fileName;
+    }
+
+    /**
+     * @param $string
+     * @return string|string[]
+     */
+    private function escapeString($string) {
+        $from = ["+", "-", "=", "&&", "|", "!", "(", ")", "{", "}", "[", "]", "^", '"', "~", "*", "?", ":", "\\", "/"];
+        $to = ["\+", "\-", "\=", "\&&", "\|", "\!", "\(", "\)", "\{", "\}", "\[", "\]", "\^", '\"', "\~", "\*", "\?", "\:", "\\\\", "\/"];
+
+        return str_replace($from, $to, $string);
     }
 }
