@@ -1306,7 +1306,7 @@ class NameFixer
                         'index' => 'predb',
                         'body' => [
                             'query' => [
-                                'query_string' => [
+                                'simple_query_string' => [
                                     'query' => $preMatch[1],
                                     'fields' => ['title', 'filename'],
                                     'analyze_wildcard' => true,
@@ -2504,7 +2504,7 @@ class NameFixer
                     'index' => 'predb',
                     'body' => [
                         'query' => [
-                            'query_string' => [
+                            'simple_query_string' => [
                                 'query' => $this->_fileName,
                                 'fields' => ['title', 'filename'],
                                 'analyze_wildcard' => true,
