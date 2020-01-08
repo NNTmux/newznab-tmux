@@ -1299,6 +1299,7 @@ class NameFixer
         foreach (explode('||', $release->filename) as $key => $fileName) {
             $this->_fileName = $fileName;
             $this->_cleanMatchFiles();
+            $this->_fileName = str_replace('/', '\/', $this->_fileName);
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
                 if (config('nntmux.elasticsearch_enabled') === true) {
@@ -2499,6 +2500,7 @@ class NameFixer
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
+            $this->_fileName = str_replace('/', '\/', $this->_fileName);
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
                     'index' => 'predb',
@@ -2557,6 +2559,7 @@ class NameFixer
         $this->_cleanMatchFiles();
         $this->cleanFileNames();
         if (! empty($this->_fileName)) {
+            $this->_fileName = str_replace('/', '\/', $this->_fileName);
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $search = [
                     'index' => 'predb',
