@@ -2500,8 +2500,8 @@ class NameFixer
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
-            $this->_fileName = $this->escapeString($this->_fileName);
             if (config('nntmux.elasticsearch_enabled') === true) {
+                $this->_fileName = $this->escapeString($this->_fileName);
                 $search = [
                     'index' => 'predb',
                     'body' => [
@@ -2559,8 +2559,8 @@ class NameFixer
         $this->_cleanMatchFiles();
         $this->cleanFileNames();
         if (! empty($this->_fileName)) {
-            $this->_fileName = str_replace('/', '\/', $this->_fileName);
             if (config('nntmux.elasticsearch_enabled') === true) {
+                $this->_fileName = $this->escapeString($this->_fileName);
                 $search = [
                     'index' => 'predb',
                     'body' => [
