@@ -2578,16 +2578,16 @@
         },
         {
             "name": "jamesmills/laravel-timezone",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jamesmills/laravel-timezone.git",
-                "reference": "c8fefb4da8222914fc048a89be20af450d98d6fe"
+                "reference": "0d9f69d4bc0031ee4b9877ef5d8918ee6240a915"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/c8fefb4da8222914fc048a89be20af450d98d6fe",
-                "reference": "c8fefb4da8222914fc048a89be20af450d98d6fe",
+                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/0d9f69d4bc0031ee4b9877ef5d8918ee6240a915",
+                "reference": "0d9f69d4bc0031ee4b9877ef5d8918ee6240a915",
                 "shasum": ""
             },
             "require": {
@@ -2628,7 +2628,7 @@
                 "laravel",
                 "timezone"
             ],
-            "time": "2019-10-21T12:14:23+00:00"
+            "time": "2020-01-09T05:56:44+00:00"
         },
         {
             "name": "jenssegers/model",
