@@ -63,7 +63,7 @@ $predb_index = [
                         ],
                         'dotless' => [
                             'type' => 'keyword',
-                        ]
+                        ],
                     ],
                 ],
                 'filename' => ['type' => 'text'],
