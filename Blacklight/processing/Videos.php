@@ -135,42 +135,48 @@ abstract class Videos
     {
         // Check if we already have an entry for this show.
         $res = $this->getTitleExact($title, $type, $source);
-        if (isset($res)) {
+        if ($res) {
+            return $res;
+        }
+        
+        // Check alt. title (Strip ' and :) Maybe strip more in the future.
+        $res = $this->getAlternativeTitleExact($title, $type, $source);
+        if ($res) {
             return $res;
         }
 
-        $title2 = str_replace(' and ', ' & ', $title);
+        $title2 = str_ireplace(' and ', ' & ', $title);
         if ((string) $title !== (string) $title2) {
             $res = $this->getTitleExact($title2, $type, $source);
-            if (isset($res)) {
+            if ($res) {
                 return $res;
             }
             $pieces = explode(' ', $title2);
             $title2 = '%';
             foreach ($pieces as $piece) {
-                $title2 .= str_replace(["'", '!'], '', $piece).'%';
+                $title2 .= str_ireplace(["'", '!'], '', $piece).'%';
             }
             $res = $this->getTitleLoose($title2, $type, $source);
-            if (isset($res)) {
+            if ($res) {
                 return $res;
             }
         }
 
         // Some words are spelled correctly 2 ways
         // example theatre and theater
-        $title2 = str_replace('er', 're', $title);
+        $title2 = str_ireplace('er', 're', $title);
         if ((string) $title !== (string) $title2) {
             $res = $this->getTitleExact($title2, $type, $source);
-            if (isset($res['id'])) {
+            if ($res['id']) {
                 return $res['id'];
             }
             $pieces = explode(' ', $title2);
             $title2 = '%';
             foreach ($pieces as $piece) {
-                $title2 .= str_replace(["'", '!'], '', $piece).'%';
+                $title2 .= str_ireplace(["'", '!'], '', $piece).'%';
             }
             $res = $this->getTitleLoose($title2, $type, $source);
-            if (isset($res)) {
+            if ($res) {
                 return $res;
             }
         } else {
@@ -182,10 +188,10 @@ abstract class Videos
             if (\count($pieces) > 1) {
                 $title2 = '%';
                 foreach ($pieces as $piece) {
-                    $title2 .= str_replace(["'", '!'], '', $piece).'%';
+                    $title2 .= str_ireplace(["'", '!'], '', $piece).'%';
                 }
                 $res = $this->getTitleLoose($title2, $type, $source);
-                if (isset($res)) {
+                if ($res) {
                     return $res;
                 }
             }
@@ -267,6 +273,41 @@ abstract class Videos
                 if (! empty($query)) {
                     $return = $query->id;
                 }
+            }
+        }
+
+        return $return;
+    }
+    
+    /**
+     * Supplementary function for getByTitle that replaces special chars to find an exact match.
+     * Add more ->whereRaw() methods if needed. Might slow TV PP down though.
+     *
+     * @param $title
+     * @param $type
+     * @param int $source
+     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
+     */
+    public function getAlternativeTitleExact($title, $type, $source = 0)
+    {
+        $return = false;
+        if (! empty($title)) {
+            if ($source > 0) {
+                $query = DB::table('videos')
+                ->whereRaw("REPLACE(title,'\'','') = ?", $title)
+                ->orWhereRaw("REPLACE(title,':','') = ?", $title)
+                ->where("type", "=", $type)
+                ->where("source", "=", $source)
+                ->first();
+            } else {
+                $query = DB::table('videos')
+                ->whereRaw("REPLACE(title,'\'','') = ?", $title)
+                ->orWhereRaw("REPLACE(title,':','') = ?", $title)
+                ->where("type", "=", $type)
+                ->first();
+            }
+            if (! empty($query)) {
+                $return = $query->id;
             }
         }
 
