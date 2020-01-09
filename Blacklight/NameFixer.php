@@ -8,6 +8,7 @@ use App\Models\Release;
 use App\Models\UsenetGroup;
 use Blacklight\processing\PostProcess;
 use Blacklight\utility\Utility;
+use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 use Illuminate\Support\Arr;
 
 /**
@@ -1317,12 +1318,17 @@ class NameFixer
                         ],
                     ];
 
-                    $primaryResults = \Elasticsearch::search($search);
+                    try {
+                        $primaryResults = \Elasticsearch::search($search);
 
-                    $results = [];
-                    foreach ($primaryResults['hits']['hits'] as $primaryResult) {
-                        $results[] = $primaryResult['_source'];
+                        $results = [];
+                        foreach ($primaryResults['hits']['hits'] as $primaryResult) {
+                            $results[] = $primaryResult['_source'];
+                        }
+                    } catch (BadRequest400Exception $badRequest400Exception) {
+                        return false;
                     }
+
                 } else {
                     $results = $this->sphinx->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
                 }
@@ -2498,7 +2504,7 @@ class NameFixer
     {
         $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
-
+        $this->cleanFileNames();
         if (! empty($this->_fileName)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $this->_fileName = $this->escapeString($this->_fileName);
@@ -2516,20 +2522,25 @@ class NameFixer
                     ],
                 ];
 
-                $primaryResults = \Elasticsearch::search($search);
-
-                $results = [];
-                foreach ($primaryResults['hits']['hits'] as $primaryResult) {
-                    $results[] = $primaryResult['_source'];
-                }
-
-                foreach ($results as $match) {
-                    if (! empty($match)) {
-                        $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
-
-                        return true;
+                try {
+                    $primaryResults = \Elasticsearch::search($search);
+                    $results = [];
+                    foreach ($primaryResults['hits']['hits'] as $primaryResult) {
+                        $results[] = $primaryResult['_source'];
                     }
+
+                    foreach ($results as $match) {
+                        if (! empty($match)) {
+                            $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
+
+                            return true;
+                        }
+                    }
+                } catch (BadRequest400Exception $badRequest400Exception) {
+                    return false;
                 }
+
+
             } else {
                 foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $match) {
                     if (! empty($match)) {
@@ -2575,19 +2586,23 @@ class NameFixer
                     ],
                 ];
 
-                $primaryResults = \Elasticsearch::search($search);
+                try {
+                    $primaryResults = \Elasticsearch::search($search);
 
-                $results = [];
-                foreach ($primaryResults['hits']['hits'] as $primaryResult) {
-                    $results[] = $primaryResult['_source'];
-                }
-
-                foreach ($results as $match) {
-                    if (! empty($match)) {
-                        $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
-
-                        return true;
+                    $results = [];
+                    foreach ($primaryResults['hits']['hits'] as $primaryResult) {
+                        $results[] = $primaryResult['_source'];
                     }
+
+                    foreach ($results as $match) {
+                        if (!empty($match)) {
+                            $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
+
+                            return true;
+                        }
+                    }
+                } catch (BadRequest400Exception $badRequest400Exception) {
+                    return false;
                 }
             } else {
                 foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {
