@@ -1034,13 +1034,14 @@ class NameFixer
                         $taggedRelease->update($updateColumns);
                         $taggedRelease->retag($determinedCategory['tags']);
                         if (config('nntmux.elasticsearch_enabled') === true) {
-                            $newTitle = str_replace(['.', '-'], ' ', $newTitle);
+                            $newTitleDotless = str_replace(['.', '-'], ' ', $newTitle);
                             $data = [
                                 'body' => [
                                     'doc' => [
                                         'id' => $release->releases_id,
                                         'name' => $release->name,
                                         'searchname' => $newTitle,
+                                        'searchname.dotless' => $newTitleDotless,
                                         'fromname' => $release->fromname,
                                     ],
                                     'doc_as_upsert' => true,
@@ -1081,13 +1082,14 @@ class NameFixer
                                 ->groupBy('releases.id')
                                 ->first();
                             if ($new !== null) {
-                                $newTitle = str_replace(['.', '-'], ' ', $newTitle);
+                                $newTitleDotless = str_replace(['.', '-'], ' ', $newTitle);
                                 $data = [
                                     'body' => [
                                         'doc' => [
                                             'id' => $release->releases_id,
                                             'name' => $new->name,
                                             'searchname' => $newTitle,
+                                            'searchname.dotless' => $newTitleDotless,
                                             'fromname' => $new->fromname,
                                             'filename' => ! empty($new->filename) ? $new->filename : '',
                                         ],

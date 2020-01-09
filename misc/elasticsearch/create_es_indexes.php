@@ -61,6 +61,9 @@ $predb_index = [
                         'sort' => [
                             'type' => 'keyword',
                         ],
+                        'dotless' => [
+                            'type' => 'keyword',
+                        ]
                     ],
                 ],
                 'filename' => ['type' => 'text'],

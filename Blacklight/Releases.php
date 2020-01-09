@@ -591,6 +591,8 @@ class Releases extends Release
             $phrases[] = $value;
         }
 
+        $fields[] = Arr::prepend($fields, 'searchname.dotless');
+
         if (config('nntmux.elasticsearch_enabled') === true) {
             $search = [
                 'scroll' => '30s',
@@ -745,7 +747,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $searchName,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'searchname.dotless'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -936,7 +938,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'searchname.dotless'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -1130,7 +1132,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'searchname.dotless'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -1259,7 +1261,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'searchname.dotless'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -1387,7 +1389,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'searchname.dotless'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],

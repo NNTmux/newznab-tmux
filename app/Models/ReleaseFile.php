@@ -147,7 +147,8 @@ class ReleaseFile extends Model
                             'doc' => [
                                 'id' => $id,
                                 'name' => $new->name,
-                                'searchname' => $searchName,
+                                'searchname' => $new->searchname,
+                                'searchname.dotless' => $searchName,
                                 'fromname' => $new->fromname,
                                 'filename' => ! empty($new->filename) ? $new->filename : '',
                             ],
