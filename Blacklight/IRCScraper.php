@@ -437,6 +437,7 @@ class IRCScraper extends IRCClient
                         'filename' => $parameters['filename'],
                         'source' => $parameters['source'],
                     ],
+                    'doc_as_upsert' => true,
                 ],
 
                 'index' => 'predb',

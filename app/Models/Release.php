@@ -372,6 +372,7 @@ class Release extends Model
                         'searchname' => $searchName,
                         'fromname' => $fromName,
                     ],
+                    'doc_as_upsert' => true,
                 ],
 
                 'index' => 'releases',

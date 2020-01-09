@@ -144,8 +144,13 @@ class ReleaseFile extends Model
                     $data = [
                         'body' => [
                             'doc' => [
+                                'id' => $id,
+                                'name' => $new->name,
+                                'searchname' => $new->searchname,
+                                'fromname' => $new->fromname,
                                 'filename' => ! empty($new->filename) ? $new->filename : '',
                             ],
+                            'doc_as_upsert' => true,
                         ],
 
                         'index' => 'releases',

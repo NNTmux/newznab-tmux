@@ -1192,6 +1192,7 @@ class ProcessAdditional
                                 'fromname' => $new->fromname,
                                 'filename' => ! empty($new->filename) ? $new->filename : '',
                             ],
+                            'doc_as_upsert' => true,
                         ],
 
                         'index' => 'releases',
@@ -1766,8 +1767,12 @@ class ProcessAdditional
                                         $data = [
                                             'body' => [
                                                 'doc' => [
+                                                    'id' => $this->_release->id,
+                                                    'name' => $this->_release->name,
                                                     'searchname' => $newTitle,
+                                                    'fromname' => $this->_release->fromname,
                                                 ],
+                                                'doc_as_upsert' => true,
                                             ],
 
                                             'index' => 'releases',

@@ -1037,8 +1037,12 @@ class NameFixer
                             $data = [
                                 'body' => [
                                     'doc' => [
+                                        'id' => $release->releases_id,
+                                        'name' => $release->name,
                                         'searchname' => $newTitle,
+                                        'fromname' => $release->fromname,
                                     ],
+                                    'doc_as_upsert' => true,
                                 ],
 
                                 'index' => 'releases',
@@ -1079,9 +1083,13 @@ class NameFixer
                                 $data = [
                                     'body' => [
                                         'doc' => [
+                                            'id' => $release->releases_id,
+                                            'name' => $new->name,
                                             'searchname' => $newTitle,
+                                            'fromname' => $new->fromname,
                                             'filename' => ! empty($new->filename) ? $new->filename : '',
                                         ],
+                                        'doc_as_upsert' => true,
                                     ],
 
                                     'index' => 'releases',
