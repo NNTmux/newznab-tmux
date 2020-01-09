@@ -1034,6 +1034,7 @@ class NameFixer
                         $taggedRelease->update($updateColumns);
                         $taggedRelease->retag($determinedCategory['tags']);
                         if (config('nntmux.elasticsearch_enabled') === true) {
+                            $newTitle = str_replace(['.', '-'], ' ', $newTitle);
                             $data = [
                                 'body' => [
                                     'doc' => [
@@ -1080,6 +1081,7 @@ class NameFixer
                                 ->groupBy('releases.id')
                                 ->first();
                             if ($new !== null) {
+                                $newTitle = str_replace(['.', '-'], ' ', $newTitle);
                                 $data = [
                                     'body' => [
                                         'doc' => [

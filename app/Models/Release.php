@@ -364,6 +364,7 @@ class Release extends Model
         );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
+            $searchName = str_replace(['.', '-'], ' ', $searchName);
             $data = [
                 'body' => [
                     'doc' => [
