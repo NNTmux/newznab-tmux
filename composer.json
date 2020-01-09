@@ -164,7 +164,6 @@
     "laracasts/generators": "^1.1",
     "matt-allan/laravel-code-style": "^0.4.0",
     "mockery/mockery": "^1.0",
-    "moontoast/math": "^1.1",
     "nunomaduro/collision": "^3.0",
     "nunomaduro/larastan": "^0.4",
     "php-coveralls/php-coveralls": "^2.0",
