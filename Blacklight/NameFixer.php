@@ -1328,7 +1328,6 @@ class NameFixer
                     } catch (BadRequest400Exception $badRequest400Exception) {
                         return false;
                     }
-
                 } else {
                     $results = $this->sphinx->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
                 }
@@ -2539,8 +2538,6 @@ class NameFixer
                 } catch (BadRequest400Exception $badRequest400Exception) {
                     return false;
                 }
-
-
             } else {
                 foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $match) {
                     if (! empty($match)) {
@@ -2595,7 +2592,7 @@ class NameFixer
                     }
 
                     foreach ($results as $match) {
-                        if (!empty($match)) {
+                        if (! empty($match)) {
                             $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
 
                             return true;
