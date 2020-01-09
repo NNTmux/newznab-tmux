@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Predb;
 use App\Models\UsenetGroup;
+use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -289,8 +290,35 @@ class IRCScraper extends IRCClient
      */
     protected function _insertNewPre()
     {
-        $sphinxData = $this->sphinxsearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
-        if (! empty($sphinxData) || empty($this->_curPre['title'])) {
+        if (config('nntmux.elasticsearch_enabled') === true) {
+            $search = [
+                'index' => 'predb',
+                'body' => [
+                    'query' => [
+                        'query_string' => [
+                            'query' => $this->_curPre['title'],
+                            'fields' => ['title'],
+                            'analyze_wildcard' => true,
+                            'default_operator' => 'and',
+                        ],
+                    ],
+                ],
+            ];
+
+            try {
+                $results = \Elasticsearch::search($search);
+
+                $indexData = [];
+                foreach ($results['hits']['hits'] as $result) {
+                    $indexData[] = $result['_source'];
+                }
+            } catch (BadRequest400Exception $badRequest400Exception) {
+                return;
+            }
+        } else {
+            $indexData = $this->sphinxsearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
+        }
+        if (! empty($indexData) || empty($this->_curPre['title'])) {
             return;
         }
 
