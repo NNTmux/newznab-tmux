@@ -27,6 +27,14 @@ $releases_index = [
                         ],
                     ],
                 ],
+                'plainsearchname' => [
+                    'type' => 'text',
+                    'fields' => [
+                        'sort' => [
+                            'type' => 'keyword',
+                        ],
+                    ],
+                ],
                 'fromname' => ['type' => 'text'],
                 'filename' => ['type' => 'text'],
                 'add_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],

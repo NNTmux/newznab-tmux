@@ -70,6 +70,7 @@ function populate_indexes($table, $max)
                 }
                 switch ($table) {
                     case 'releases':
+                        $searchName = str_replace(['.', '-'], ' ', $row->searchname);
                         $data['body'][] = [
                             'index' => [
                                 '_index' => 'releases',
@@ -81,6 +82,7 @@ function populate_indexes($table, $max)
                             'id' => $row->id,
                             'name' => $row->name,
                             'searchname' => $row->searchname,
+                            'plainsearchname' => $searchName,
                             'fromname' => $row->fromname,
                             'filename' => $row->filename,
                             'add_date' => $row->adddate,

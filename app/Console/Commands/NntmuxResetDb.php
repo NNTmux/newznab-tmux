@@ -98,6 +98,35 @@ class NntmuxResetDb extends Command
                             'number_of_shards' => 2,
                             'number_of_replicas' => 0,
                         ],
+                        'mappings' => [
+                            'properties' => [
+                                'id' => [
+                                    'type' => 'long',
+                                    'index' => false,
+                                ],
+                                'name' => ['type' => 'text'],
+                                'searchname' => [
+                                    'type' => 'text',
+                                    'fields' => [
+                                        'sort' => [
+                                            'type' => 'keyword',
+                                        ],
+                                    ],
+                                ],
+                                'plainsearchname' => [
+                                    'type' => 'text',
+                                    'fields' => [
+                                        'sort' => [
+                                            'type' => 'keyword',
+                                        ],
+                                    ],
+                                ],
+                                'fromname' => ['type' => 'text'],
+                                'filename' => ['type' => 'text'],
+                                'add_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
+                                'post_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
+                            ],
+                        ],
                     ],
                 ];
 
@@ -108,13 +137,31 @@ class NntmuxResetDb extends Command
                 }
                 $predb_index = [
                     'index' => 'predb',
-                    'type' => 'predb',
                     'body'  => [
                         'settings' => [
                             'number_of_shards' => 2,
                             'number_of_replicas' => 0,
                         ],
+                        'mappings' => [
+                            'properties' => [
+                                'id' => [
+                                    'type' => 'long',
+                                    'index' => false,
+                                ],
+                                'title' => [
+                                    'type' => 'text',
+                                    'fields' => [
+                                        'sort' => [
+                                            'type' => 'keyword',
+                                        ],
+                                    ],
+                                ],
+                                'filename' => ['type' => 'text'],
+                                'source' => ['type' => 'text'],
+                            ],
+                        ],
                     ],
+
                 ];
 
                 \Elasticsearch::indices()->create($predb_index);

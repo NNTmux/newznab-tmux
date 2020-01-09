@@ -141,12 +141,14 @@ class ReleaseFile extends Model
                     ->groupBy('releases.id')
                     ->first();
                 if ($new !== null) {
+                    $searchName = str_replace(['.', '-'], ' ', $new->searchname);
                     $data = [
                         'body' => [
                             'doc' => [
                                 'id' => $id,
                                 'name' => $new->name,
                                 'searchname' => $new->searchname,
+                                'plainsearchname' => $searchName,
                                 'fromname' => $new->fromname,
                                 'filename' => ! empty($new->filename) ? $new->filename : '',
                             ],

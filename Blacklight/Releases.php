@@ -585,9 +585,8 @@ class Releases extends Release
             return $value !== -1;
         });
 
-        $fields = $phrases = [];
+        $phrases = [];
         foreach ($searchFields as $key => $value) {
-            $fields[] = $key;
             $phrases[] = $value;
         }
 
@@ -599,7 +598,7 @@ class Releases extends Release
                     'query' => [
                         'query_string' => [
                             'query' => implode(' ', $phrases),
-                            'fields' => $fields,
+                            'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
                         ],
@@ -745,7 +744,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $searchName,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'plainsearchname'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -936,7 +935,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'plainsearchname'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -1130,7 +1129,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'plainsearchname'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -1259,7 +1258,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'plainsearchname'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],
@@ -1387,7 +1386,7 @@ class Releases extends Release
                         'query' => [
                             'query_string' => [
                                 'query' => $name,
-                                'fields' => ['searchname'],
+                                'fields' => ['searchname', 'plainsearchname'],
                                 'analyze_wildcard' => true,
                                 'default_operator' => 'and',
                             ],

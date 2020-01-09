@@ -1183,12 +1183,14 @@ class ProcessAdditional
                     ->groupBy('releases.id')
                     ->first();
                 if ($new !== null) {
+                    $searchName = str_replace(['.', '-'], ' ', $new->searchname);
                     $data = [
                         'body' => [
                             'doc' => [
                                 'id' => $this->_release->id,
                                 'name' => $new->name,
                                 'searchname' => $new->searchname,
+                                'plainsearchname' => $searchName,
                                 'fromname' => $new->fromname,
                                 'filename' => ! empty($new->filename) ? $new->filename : '',
                             ],
@@ -1764,12 +1766,14 @@ class ProcessAdditional
                                     $release->retag($newCat['tags']);
 
                                     if (config('nntmux.elasticsearch_enabled') === true) {
+                                        $newTitleDotless = str_replace(['.', '-'], ' ', $newTitle);
                                         $data = [
                                             'body' => [
                                                 'doc' => [
                                                     'id' => $this->_release->id,
                                                     'name' => $this->_release->name,
                                                     'searchname' => $newTitle,
+                                                    'plainsearchname' => $newTitleDotless,
                                                     'fromname' => $this->_release->fromname,
                                                 ],
                                                 'doc_as_upsert' => true,
