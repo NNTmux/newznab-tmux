@@ -364,14 +364,12 @@ class Release extends Model
         );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $searchNameDotless = str_replace(['.', '-'], ' ', $searchName);
             $data = [
                 'body' => [
                     'doc' => [
                         'id' => $ID,
                         'name' => $name,
                         'searchname' => $searchName,
-                        'searchname.dotless' => $searchNameDotless,
                         'fromname' => $fromName,
                     ],
                     'doc_as_upsert' => true,
