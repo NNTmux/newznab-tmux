@@ -138,7 +138,7 @@ abstract class Videos
         if ($res) {
             return $res;
         }
-        
+
         // Check alt. title (Strip ' and :) Maybe strip more in the future.
         $res = $this->getAlternativeTitleExact($title, $type, $source);
         if ($res) {
@@ -278,7 +278,7 @@ abstract class Videos
 
         return $return;
     }
-    
+
     /**
      * Supplementary function for getByTitle that replaces special chars to find an exact match.
      * Add more ->whereRaw() methods if needed. Might slow TV PP down though.
@@ -296,14 +296,14 @@ abstract class Videos
                 $query = DB::table('videos')
                 ->whereRaw("REPLACE(title,'\'','') = ?", $title)
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
-                ->where("type", "=", $type)
-                ->where("source", "=", $source)
+                ->where('type', '=', $type)
+                ->where('source', '=', $source)
                 ->first();
             } else {
                 $query = DB::table('videos')
                 ->whereRaw("REPLACE(title,'\'','') = ?", $title)
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
-                ->where("type", "=", $type)
+                ->where('type', '=', $type)
                 ->first();
             }
             if (! empty($query)) {
