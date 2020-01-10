@@ -1,7 +1,7 @@
 {if isset($covgroup)}
 	<div class="form-group">
 	{if $covgroup == "movies"}
-        {{Form::open(['name' => 'browseby', 'url' => 'Movies', 'class' => 'form-inline'])}}
+        {{Form::open(['name' => 'browseby', 'url' => 'Movies', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="movietitle" type="text" name="title" value="{$title}"
 				   placeholder="Title">
 			<input class="form-control form-control-sm"  id="movieactors" type="text" name="actors"
@@ -37,7 +37,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "xxx"}
-        {{Form::open(['name' => 'browseby', 'url' => 'XXX', 'class' => 'form-inline'])}}
+        {{Form::open(['name' => 'browseby', 'url' => 'XXX', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm"
 				   style="width: 150px;"
 				   id="xxxtitle"
@@ -80,7 +80,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "books"}
-        {{Form::open(['name' => 'browseby', 'url' => 'Books', 'class' => 'form-inline'])}}
+        {{Form::open(['name' => 'browseby', 'url' => 'Books', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="author" type="text" name="author" value="{$author}"
 				   placeholder="Author">
 			<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
@@ -118,7 +118,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "console"}
-        {{Form::open(['name' => 'browseby', 'url' => 'Console', 'class' => 'form-inline'])}}
+        {{Form::open(['name' => 'browseby', 'url' => 'Console', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
 			<input class="form-control form-control-sm" id="platform" type="text" name="platform"
@@ -140,7 +140,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "games"}
-        {{Form::open(['name' => 'browseby', 'url' => 'Games', 'class' => 'form-inline'])}}
+        {{Form::open(['name' => 'browseby', 'url' => 'Games', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
 			<select class="form-control form-control-sm" id="genre" name="genre">
@@ -160,7 +160,7 @@
 	{/if}
 {/if}
 {if {$smarty.get.page} == "console"}
-    {{Form::open(['name' => 'browseby', 'url' => 'Console', 'class' => 'form-inline'])}}
+    {{Form::open(['name' => 'browseby', 'url' => 'Console', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 			   placeholder="Title">
 		<input class="form-control form-control-sm" id="platform" type="text" name="platform" value="{$platform}"
@@ -181,7 +181,7 @@
 	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "games"}
-    {{Form::open(['name' => 'browseby', 'url' => 'Games', 'class' => 'form-inline'])}}
+    {{Form::open(['name' => 'browseby', 'url' => 'Games', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 			   placeholder="Title">
 		<select class="form-control form-control-sm" style="width: auto;" id="genre" name="genre">
@@ -200,7 +200,7 @@
 	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "books"}
-    {{Form::open(['name' => 'browseby', 'url' => 'Books', 'class' => 'form-inline'])}}
+    {{Form::open(['name' => 'browseby', 'url' => 'Books', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="author" type="text" name="author" value="{$author}"
 			   placeholder="Author">
 		<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
@@ -244,7 +244,7 @@
 	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "xxx"}
-    {{Form::open(['name' => 'browseby', 'url' => 'XXX', 'class' => 'form-inline'])}}
+    {{Form::open(['name' => 'browseby', 'url' => 'XXX', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm"
 			   style="width: 150px;"
 			   id="xxxtitle"
@@ -287,7 +287,7 @@
 	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "music"}
-    {{Form::open(['name' => 'browseby', 'url' => 'Audio', 'class' => 'form-inline'])}}
+    {{Form::open(['name' => 'browseby', 'url' => 'Audio', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="musicartist" type="text" name="artist" value="{$artist}"
 			   placeholder="Artist">
 		<input class="form-control form-control-sm" id="musictitle" type="text" name="title" value="{$title}"
