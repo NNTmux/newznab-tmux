@@ -226,7 +226,7 @@ class Categorize
      */
     public function isWEBDL(): bool
     {
-        if (preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName)) {
+        if (preg_match('/(S\d+).*.web[._-]?(dl|rip).*/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_WEBDL;
             $this->tmpTag = [Category::TAG_TV_WEBDL, Category::TAG_TV_HD];
 
