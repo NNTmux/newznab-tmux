@@ -13,7 +13,6 @@ use App\Models\UserRequest;
 use App\Transformers\ApiTransformer;
 use App\Transformers\CategoryTransformer;
 use App\Transformers\DetailsTransformer;
-use App\Transformers\TagsTransformer;
 use Blacklight\http\API;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
