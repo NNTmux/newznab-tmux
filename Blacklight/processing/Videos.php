@@ -25,6 +25,7 @@ use App\Models\TvInfo;
 use App\Models\Video;
 use App\Models\VideoAlias;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
