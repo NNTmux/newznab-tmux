@@ -168,7 +168,7 @@ abstract class Videos
         $title2 = str_ireplace('er', 're', $title);
         if ((string) $title !== (string) $title2) {
             $res = $this->getTitleExact($title2, $type, $source);
-            if ($res['id']) {
+            if ($res) {
                 return $res['id'];
             }
             $pieces = explode(' ', $title2);
