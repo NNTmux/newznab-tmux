@@ -1,3 +1,5 @@
+2020-01-10 DariusIII
+	* Chg: Remove reporting of existing tags from ApiV2 capabilities response
 2020-01-06 DariusIII
 	* Fix: Fix access to user profiles as admin
 2020-01-02 DariusIII

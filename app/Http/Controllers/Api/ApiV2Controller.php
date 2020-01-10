@@ -27,16 +27,14 @@ class ApiV2Controller extends BasePageController
      */
     public function capabilities(): \Illuminate\Http\JsonResponse
     {
-        $serverroot = url('/');
         $category = Category::getForApi();
-        $tags = Release::existingTags();
 
         $capabilities = [
             'server' => [
                 'title'      => Settings::settingValue('site.main.title'),
                 'strapline'  => Settings::settingValue('site.main.strapline'),
                 'email'      => Settings::settingValue('site.main.email'),
-                'url'        => $serverroot,
+                'url'        => url('/'),
             ],
             'limits' => [
                 'max'     => 100,
@@ -53,7 +51,6 @@ class ApiV2Controller extends BasePageController
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
             'categories' => fractal($category, new CategoryTransformer()),
-            'tags' => fractal($tags, new TagsTransformer()),
         ];
 
         return response()->json($capabilities);
