@@ -9237,16 +9237,16 @@
         },
         {
             "name": "torann/geoip",
-            "version": "1.0.13",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Torann/laravel-geoip.git",
-                "reference": "9577c9d865050af39bb4c23795c9eb09bebb6476"
+                "reference": "f7104f317be2e844baa772d424d865c13a782ac9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Torann/laravel-geoip/zipball/9577c9d865050af39bb4c23795c9eb09bebb6476",
-                "reference": "9577c9d865050af39bb4c23795c9eb09bebb6476",
+                "url": "https://api.github.com/repos/Torann/laravel-geoip/zipball/f7104f317be2e844baa772d424d865c13a782ac9",
+                "reference": "f7104f317be2e844baa772d424d865c13a782ac9",
                 "shasum": ""
             },
             "require": {
@@ -9307,7 +9307,7 @@
                 "location",
                 "maxmind"
             ],
-            "time": "2019-10-30T15:41:29+00:00"
+            "time": "2020-01-10T23:07:53+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
