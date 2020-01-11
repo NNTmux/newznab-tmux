@@ -71,7 +71,7 @@ class MovieController extends BasePageController
                 ];
         }
 
-        $category = $request->has('imdb') ? -1 : Category::MOVIE_ROOT;
+        $category = $request->has('imdb') ? -1 : ($request->has('t') ? $request->input('t') : Category::MOVIE_ROOT);
         if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where(['title'=> $id, 'root_categories_id' => Category::MOVIE_ROOT])
