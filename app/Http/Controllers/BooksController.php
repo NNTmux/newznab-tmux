@@ -31,7 +31,7 @@ class BooksController extends BasePageController
                     'title' => $bcat->title,
                 ];
         }
-        $category = Category::BOOKS_ROOT;
+        $category = $request->has('t') ? $request->input('t') : Category::BOOKS_ROOT;
         if ($id && \in_array($id, Arr::pluck($btmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)

@@ -35,7 +35,7 @@ class ConsoleController extends BasePageController
                     'title' => $ccat->title,
                 ];
         }
-        $category = Category::GAME_ROOT;
+        $category = $request->has('t') ? $request->input('t') : Category::GAME_ROOT;
         if ($id && \in_array($id, Arr::pluck($ctmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)

@@ -29,7 +29,7 @@ class AdultController extends BasePageController
                     'title' => $mcat->title,
                 ];
         }
-        $category = Category::XXX_ROOT;
+        $category = $request->has('t') ? $request->input('t') : Category::XXX_ROOT;
         if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)

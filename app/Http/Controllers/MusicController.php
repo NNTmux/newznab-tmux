@@ -32,7 +32,7 @@ class MusicController extends BasePageController
                 ];
         }
 
-        $category = Category::MUSIC_ROOT;
+        $category = $request->has('t') ? $request->input('t') : Category::MUSIC_ROOT;
         if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
