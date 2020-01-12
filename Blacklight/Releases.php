@@ -351,7 +351,7 @@ class Releases extends Release
 				GROUP BY r.id
 				ORDER BY %s %s %s",
             $this->uSQL($userShows, 'videos_id'),
-            (! empty ($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (! empty($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             NZB::NZB_ADDED,
             Category::TV_ROOT,
             Category::TV_OTHER,
@@ -368,6 +368,7 @@ class Releases extends Release
         }
         $result = self::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
+
         return $result;
     }
 
