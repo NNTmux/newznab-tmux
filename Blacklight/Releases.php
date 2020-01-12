@@ -339,19 +339,10 @@ class Releases extends Release
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
-					CONCAT(cp.title, '-', c.title) AS category_name,
-					g.name AS group_name,
-					rn.releases_id AS nfoid, re.releases_id AS reid,
-					tve.firstaired,
-					df.failed AS failed
+					CONCAT(cp.title, '->', c.title) AS category_name
 				FROM releases r
-				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-				LEFT JOIN usenet_groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				LEFT JOIN categories c ON c.id = r.categories_id
 				LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE %s %s
 				AND r.nzbstatus = %d
 				AND r.categories_id BETWEEN %d AND %d
@@ -360,7 +351,7 @@ class Releases extends Release
 				GROUP BY r.id
 				ORDER BY %s %s %s",
             $this->uSQL($userShows, 'videos_id'),
-            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (! empty ($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             NZB::NZB_ADDED,
             Category::TV_ROOT,
             Category::TV_OTHER,
@@ -370,16 +361,13 @@ class Releases extends Release
             $orderBy[1],
             ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
-
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         $result = Cache::get(md5($sql));
         if ($result !== null) {
             return $result;
         }
-
         $result = self::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
-
         return $result;
     }
 
