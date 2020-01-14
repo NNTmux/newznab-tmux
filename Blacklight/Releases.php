@@ -611,9 +611,6 @@ class Releases extends Release
                 foreach ($results['hits']['hits'] as $result) {
                     $searchResult[] = $result['_source']['id'];
                 }
-                if (empty($searchResult)) {
-                    return collect();
-                }
 
                 // When done, get the new scroll_id
                 // You must always refresh your _scroll_id!  It can change sometimes
@@ -630,6 +627,10 @@ class Releases extends Release
             $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
 
             $searchResult = Arr::pluck($results, 'id');
+        }
+
+        if (empty($searchResult)) {
+            return collect();
         }
 
         $catQuery = '';
@@ -1139,9 +1140,6 @@ class Releases extends Release
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
-                    if (empty($searchResult)) {
-                        return collect();
-                    }
 
                     // When done, get the new scroll_id
                     // You must always refresh your _scroll_id!  It can change sometimes
@@ -1156,10 +1154,10 @@ class Releases extends Release
                 }
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+            }
 
-                if (empty($searchResult)) {
-                    return collect();
-                }
+            if (empty($searchResult)) {
+                return collect();
             }
         }
         $whereSql = sprintf(
@@ -1268,9 +1266,6 @@ class Releases extends Release
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
-                    if (empty($searchResult)) {
-                        return collect();
-                    }
 
                     // When done, get the new scroll_id
                     // You must always refresh your _scroll_id!  It can change sometimes
@@ -1285,10 +1280,10 @@ class Releases extends Release
                 }
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+            }
 
-                if (empty($searchResult)) {
-                    return collect();
-                }
+            if (empty($searchResult)) {
+                return collect();
             }
         }
 
@@ -1395,9 +1390,6 @@ class Releases extends Release
                     foreach ($results['hits']['hits'] as $result) {
                         $searchResult[] = $result['_source']['id'];
                     }
-                    if (empty($searchResult)) {
-                        return collect();
-                    }
                     // When done, get the new scroll_id
                     // You must always refresh your _scroll_id!  It can change sometimes
                     $scroll_id = $results['_scroll_id'];
@@ -1411,10 +1403,10 @@ class Releases extends Release
                 }
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+            }
 
-                if (empty($searchResult)) {
-                    return collect();
-                }
+            if (empty($searchResult)) {
+                return collect();
             }
         }
 
