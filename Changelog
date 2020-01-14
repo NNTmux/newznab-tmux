@@ -1,3 +1,5 @@
+2020-01-14 DariusIII
+	* Fix: Fix tvSearch returning maximum results when sphinx or elasticsearch find nothing
 2020-01-11 DariusIII
 	* Fix: Fix rest of the cover pages search filters
 	* Fix: Fix cover pages search filter
