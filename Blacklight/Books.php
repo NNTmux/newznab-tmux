@@ -367,7 +367,7 @@ class Books
                 $startTime = now()->timestamp;
                 $usedAmazon = false;
                 // audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
-                if ($arr['categories_id'] === '3030') {
+                if ($arr['categories_id'] === (int) Category::MUSIC_AUDIOBOOK) {
                     // audiobook
                     $bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'audiobook');
                 } else {
