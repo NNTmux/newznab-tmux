@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Category;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 
 /**
  * Categorizing of releases by name/group.
@@ -55,6 +56,11 @@ class Categorize
     public $groupid;
 
     /**
+     * @var string
+     */
+    public $groupName;
+
+    /**
      * Categorize constructor.
      *
      * @throws \Exception
@@ -82,6 +88,7 @@ class Categorize
         $this->releaseName = $releaseName;
         $this->groupid = $groupID;
         $this->poster = $poster;
+        $this->groupName = UsenetGroup::whereId($this->groupid)->value('name');
 
         switch (true) {
             case $this->isMisc():
@@ -1241,6 +1248,15 @@ class Categorize
             $this->tmpCat = Category::MUSIC_FOREIGN;
             $this->tmpTag[] = Category::TAG_MUSIC_FOREIGN;
 
+            return true;
+        }
+
+        if (preg_match('/audiobook/', $this->groupName)) {
+            if ($this->categorizeForeign && $this->isMusicForeign()) {
+                return false;
+            }
+            $this->tmpCat = Category::MUSIC_AUDIOBOOK;
+            $this->tmpTag[] = Category::TAG_MUSIC_AUDIOBOOK;
             return true;
         }
 
