@@ -1257,6 +1257,7 @@ class Categorize
             }
             $this->tmpCat = Category::MUSIC_AUDIOBOOK;
             $this->tmpTag[] = Category::TAG_MUSIC_AUDIOBOOK;
+
             return true;
         }
 
