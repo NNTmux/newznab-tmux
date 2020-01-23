@@ -263,16 +263,16 @@
         },
         {
             "name": "brick/math",
-            "version": "0.8.9",
+            "version": "0.8.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "2667c1659c1dcc681b4207f722180024d12a3626"
+                "reference": "bf4894d6373d396666d280a42ecdf1ad75f8222f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/2667c1659c1dcc681b4207f722180024d12a3626",
-                "reference": "2667c1659c1dcc681b4207f722180024d12a3626",
+                "url": "https://api.github.com/repos/brick/math/zipball/bf4894d6373d396666d280a42ecdf1ad75f8222f",
+                "reference": "bf4894d6373d396666d280a42ecdf1ad75f8222f",
                 "shasum": ""
             },
             "require": {
@@ -303,7 +303,7 @@
                 "brick",
                 "math"
             ],
-            "time": "2020-01-08T09:40:28+00:00"
+            "time": "2020-01-23T00:19:01+00:00"
         },
         {
             "name": "cakephp/chronos",
@@ -2203,6 +2203,7 @@
                 }
             ],
             "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
+            "abandoned": true,
             "time": "2018-07-31T13:22:33+00:00"
         },
         {
@@ -2623,16 +2624,16 @@
         },
         {
             "name": "jamesmills/laravel-timezone",
-            "version": "1.6.0",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jamesmills/laravel-timezone.git",
-                "reference": "4fdad73f09d2c72af137c65f9360df3120d27fa5"
+                "reference": "3bf24bbdaa6af1d6f3fc6986f54a8df265c7611c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/4fdad73f09d2c72af137c65f9360df3120d27fa5",
-                "reference": "4fdad73f09d2c72af137c65f9360df3120d27fa5",
+                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/3bf24bbdaa6af1d6f3fc6986f54a8df265c7611c",
+                "reference": "3bf24bbdaa6af1d6f3fc6986f54a8df265c7611c",
                 "shasum": ""
             },
             "require": {
@@ -2673,7 +2674,7 @@
                 "laravel",
                 "timezone"
             ],
-            "time": "2020-01-16T07:11:20+00:00"
+            "time": "2020-01-22T05:54:08+00:00"
         },
         {
             "name": "jenssegers/model",
@@ -3064,16 +3065,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.11.0",
+            "version": "v6.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "17af23842c259edcfd8c5b9e6a7c86596e040034"
+                "reference": "8e189a8dee7ff76bf50acb7e80aa1a36afaf54d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/17af23842c259edcfd8c5b9e6a7c86596e040034",
-                "reference": "17af23842c259edcfd8c5b9e6a7c86596e040034",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/8e189a8dee7ff76bf50acb7e80aa1a36afaf54d4",
+                "reference": "8e189a8dee7ff76bf50acb7e80aa1a36afaf54d4",
                 "shasum": ""
             },
             "require": {
@@ -3148,7 +3149,7 @@
                 "moontoast/math": "^1.1",
                 "orchestra/testbench-core": "^4.0",
                 "pda/pheanstalk": "^4.0",
-                "phpunit/phpunit": "^8.4|^9.0",
+                "phpunit/phpunit": "^7.5.15|^8.4|^9.0",
                 "predis/predis": "^1.1.1",
                 "symfony/cache": "^4.3.4"
             },
@@ -3207,7 +3208,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-01-14T15:12:09+00:00"
+            "time": "2020-01-21T15:10:03+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -3345,16 +3346,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v2.1.3",
+            "version": "v2.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "7fd3dc40684d1d035676cf48a5ecc98dc8ef7089"
+                "reference": "d6b8c40e2cc1102fb7ed40ecf841bd09d712ab67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/7fd3dc40684d1d035676cf48a5ecc98dc8ef7089",
-                "reference": "7fd3dc40684d1d035676cf48a5ecc98dc8ef7089",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/d6b8c40e2cc1102fb7ed40ecf841bd09d712ab67",
+                "reference": "d6b8c40e2cc1102fb7ed40ecf841bd09d712ab67",
                 "shasum": ""
             },
             "require": {
@@ -3404,7 +3405,7 @@
                 "laravel",
                 "monitoring"
             ],
-            "time": "2019-12-19T14:33:58+00:00"
+            "time": "2020-01-21T21:06:27+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -9369,16 +9370,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.11",
+            "version": "4.7.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "d1f004fe9abb226affd1685a2f11a01afe62ff79"
+                "reference": "9eba9460896bca215e1e1d8814dd4b90c45be85d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/d1f004fe9abb226affd1685a2f11a01afe62ff79",
-                "reference": "d1f004fe9abb226affd1685a2f11a01afe62ff79",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/9eba9460896bca215e1e1d8814dd4b90c45be85d",
+                "reference": "9eba9460896bca215e1e1d8814dd4b90c45be85d",
                 "shasum": ""
             },
             "require": {
@@ -9424,7 +9425,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2020-01-10T14:59:03+00:00"
+            "time": "2020-01-22T00:08:59+00:00"
         },
         {
             "name": "wildbit/swiftmailer-postmark",
@@ -10323,16 +10324,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "1.15.0",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "c3cb2e85cf65917c50e519d64d879c5634336715"
+                "reference": "37f094775814b68d0c6cc8b8ff3c3be243f20725"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/c3cb2e85cf65917c50e519d64d879c5634336715",
-                "reference": "c3cb2e85cf65917c50e519d64d879c5634336715",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/37f094775814b68d0c6cc8b8ff3c3be243f20725",
+                "reference": "37f094775814b68d0c6cc8b8ff3c3be243f20725",
                 "shasum": ""
             },
             "require": {
@@ -10359,7 +10360,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "v2.x-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -10390,7 +10391,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2020-01-21T07:56:45+00:00"
+            "time": "2020-01-21T17:46:02+00:00"
         },
         {
             "name": "facade/ignition-contracts",
