@@ -47,62 +47,55 @@ class InstallNntmux extends Command
     {
         $error = false;
 
-        if (env('DB_CONNECTION') === 'mysql' && (! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || ! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION))) {
-            $this->error('Version of MariaDB/MySQL/ used is lower than required version: '.NN_MINIMUM_MARIA_VERSION.PHP_EOL.' Please update your install of Mariadb/MySQL');
-            $error = true;
-        }
-
-        if (! $error) {
-            if ($this->confirm('Are you sure you want to install NNTmux? This will wipe your database!!')) {
-                if (file_exists(NN_ROOT.'_install/install.lock')) {
-                    if ($this->confirm('Do you want to remove install.lock file so you can continue with install?')) {
-                        $this->info('Removing install.lock file so we can continue with install process');
-                        $remove = new Process('rm _install/install.lock');
-                        $remove->setTimeout(600);
-                        $remove->run(function ($type, $buffer) {
-                            if (Process::ERR === $type) {
-                                echo 'ERR > '.$buffer;
-                            } else {
-                                echo $buffer;
-                            }
-                        });
-                    } else {
-                        $this->info('Not removing install.lock, stopping install process');
-                        exit;
-                    }
-                }
-                $this->info('Migrating tables and seeding them with initial data');
-                if (config('app.env') !== 'production') {
-                    $this->call('migrate:fresh', ['--seed' => true]);
+        if ($this->confirm('Are you sure you want to install NNTmux? This will wipe your database!!')) {
+            if (file_exists(NN_ROOT.'_install/install.lock')) {
+                if ($this->confirm('Do you want to remove install.lock file so you can continue with install?')) {
+                    $this->info('Removing install.lock file so we can continue with install process');
+                    $remove = new Process('rm _install/install.lock');
+                    $remove->setTimeout(600);
+                    $remove->run(function ($type, $buffer) {
+                        if (Process::ERR === $type) {
+                            echo 'ERR > '.$buffer;
+                        } else {
+                            echo $buffer;
+                        }
+                    });
                 } else {
-                    $this->call('migrate:fresh', ['--force' => true, '--seed' => true]);
+                    $this->info('Not removing install.lock, stopping install process');
+                    exit;
                 }
-
-                $paths = $this->updatePaths();
-                if ($paths !== false) {
-                    $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
-                    $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $paths['unrar_path']]);
-                    $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
-                    if ($sql1 === null || $sql2 === null || $sql3 === null) {
-                        $error = true;
-                    } else {
-                        $this->info('Settings table updated successfully');
-                    }
-                }
-
-                if (! $error && $this->addAdminUser()) {
-                    File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
-                    $this->info('Generating application key');
-                    $this->call('key:generate', ['--force' => true]);
-                    $this->info('NNTmux installation completed successfully');
-                    exit();
-                }
-
-                $this->error('NNTmux installation failed. Fix reported problems and try again');
-            } else {
-                $this->info('Stopping install process');
-                exit;
             }
+            $this->info('Migrating tables and seeding them with initial data');
+            if (config('app.env') !== 'production') {
+                $this->call('migrate:fresh', ['--seed' => true]);
+            } else {
+                $this->call('migrate:fresh', ['--force' => true, '--seed' => true]);
+            }
+
+            $paths = $this->updatePaths();
+            if ($paths !== false) {
+                $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
+                $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $paths['unrar_path']]);
+                $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
+                if ($sql1 === null || $sql2 === null || $sql3 === null) {
+                    $error = true;
+                } else {
+                    $this->info('Settings table updated successfully');
+                }
+            }
+
+            if (! $error && $this->addAdminUser()) {
+                File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
+                $this->info('Generating application key');
+                $this->call('key:generate', ['--force' => true]);
+                $this->info('NNTmux installation completed successfully');
+                exit();
+            }
+
+            $this->error('NNTmux installation failed. Fix reported problems and try again');
+        } else {
+            $this->info('Stopping install process');
+            exit;
         }
     }
 
