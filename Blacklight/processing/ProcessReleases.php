@@ -489,7 +489,7 @@ class ProcessReleases
                 );
 
                 if (\is_array($cleanedName)) {
-                    $properName = $cleanedName['properlynamed'];
+                    $properName = $cleanedName['properlynamed'] ?? false;
                     $preID = $cleanedName['predb'] ?? false;
                     $cleanedName = $cleanedName['cleansubject'] ?? $cleanRelName;
                 } else {
@@ -519,7 +519,7 @@ class ProcessReleases
                         'postdate' => $collection->date,
                         'fromname' => $fromName,
                         'size' => $collection->filesize,
-                        'categories_id' => $determinedCategory['categories_id'],
+                        'categories_id' => $determinedCategory['categories_id'] ?? Category::OTHER_MISC,
                         'isrenamed' => $properName === true ? 1 : 0,
                         'predb_id' => $preID === false ? 0 : $preID,
                         'nzbstatus' => NZB::NZB_NONE,
