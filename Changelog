@@ -1,3 +1,5 @@
+2020-01-27 DariusIII
+	* Chg: Use immutable date when starting phases, try to prevent php7.4 null array access error
 2020-01-26 DariusIII
 	* Chg: Remove check for mysql/mariadb version when installing NNTmux
 2020-01-14 DariusIII

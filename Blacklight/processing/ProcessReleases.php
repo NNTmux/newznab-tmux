@@ -270,7 +270,7 @@ class ProcessReleases
      */
     public function processIncompleteCollections($groupID): void
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
             $this->consoleTools->header('Process Releases -> Attempting to find complete collections.');
@@ -312,7 +312,7 @@ class ProcessReleases
      */
     public function processCollectionSizes($groupID): void
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
             $this->consoleTools->header('Process Releases -> Calculating collection sizes (in bytes).');
@@ -356,7 +356,7 @@ class ProcessReleases
      */
     public function deleteUnwantedCollections($groupID): void
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
             $this->consoleTools->header('Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.');
@@ -446,7 +446,7 @@ class ProcessReleases
      */
     public function createReleases($groupID): array
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
 
         $categorize = new Categorize();
         $returnCount = $duplicate = 0;
@@ -491,7 +491,7 @@ class ProcessReleases
                 if (\is_array($cleanedName)) {
                     $properName = $cleanedName['properlynamed'];
                     $preID = $cleanedName['predb'] ?? false;
-                    $cleanedName = $cleanedName['cleansubject'];
+                    $cleanedName = $cleanedName['cleansubject'] ?? $cleanRelName;
                 } else {
                     $properName = true;
                     $preID = false;
@@ -631,7 +631,7 @@ class ProcessReleases
      */
     public function createNZBs($groupID): int
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
             $this->consoleTools->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
@@ -682,7 +682,7 @@ class ProcessReleases
      */
     public function categorizeReleases($categorize, $groupID = ''): void
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
         if ($this->echoCLI) {
             $this->consoleTools->header('Process Releases -> Categorize releases.');
         }
@@ -736,7 +736,7 @@ class ProcessReleases
      */
     public function deleteCollections($groupID): void
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
 
         $deletedCount = 0;
 
@@ -828,7 +828,7 @@ class ProcessReleases
      */
     public function deletedReleasesByGroup($groupID = ''): void
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
         if ($this->echoCLI) {
@@ -887,7 +887,7 @@ class ProcessReleases
      */
     public function deleteReleases(): void
     {
-        $startTime = now();
+        $startTime = now()->toImmutable();
         $genres = new Genres();
         $passwordDeleted = $duplicateDeleted = $retentionDeleted = $completionDeleted = $disabledCategoryDeleted = 0;
         $disabledGenreDeleted = $miscRetentionDeleted = $miscHashedDeleted = $categoryMinSizeDeleted = 0;
