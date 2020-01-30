@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.5 (2019-12-19)
+ * Version: 5.1.6 (2020-01-28)
  */
 (function (domGlobals) {
     'use strict';
@@ -1048,80 +1048,6 @@
     var deepMerge = baseMerge(deep);
     var merge = baseMerge(shallow);
 
-    var makeItems = function (info) {
-      var imageUrl = {
-        name: 'src',
-        type: 'urlinput',
-        filetype: 'image',
-        label: 'Source'
-      };
-      var imageList = info.imageList.map(function (items) {
-        return {
-          name: 'images',
-          type: 'selectbox',
-          label: 'Image list',
-          items: items
-        };
-      });
-      var imageDescription = {
-        name: 'alt',
-        type: 'input',
-        label: 'Image description'
-      };
-      var imageTitle = {
-        name: 'title',
-        type: 'input',
-        label: 'Image title'
-      };
-      var imageDimensions = {
-        name: 'dimensions',
-        type: 'sizeinput'
-      };
-      var classList = info.classList.map(function (items) {
-        return {
-          name: 'classes',
-          type: 'selectbox',
-          label: 'Class',
-          items: items
-        };
-      });
-      var caption = {
-        type: 'label',
-        label: 'Caption',
-        items: [{
-            type: 'checkbox',
-            name: 'caption',
-            label: 'Show caption'
-          }]
-      };
-      return flatten([
-        [imageUrl],
-        imageList.toArray(),
-        info.hasDescription ? [imageDescription] : [],
-        info.hasImageTitle ? [imageTitle] : [],
-        info.hasDimensions ? [imageDimensions] : [],
-        [{
-            type: 'grid',
-            columns: 2,
-            items: flatten([
-              classList.toArray(),
-              info.hasImageCaption ? [caption] : []
-            ])
-          }]
-      ]);
-    };
-    var makeTab = function (info) {
-      return {
-        title: 'General',
-        name: 'general',
-        items: makeItems(info)
-      };
-    };
-    var MainTab = {
-      makeTab: makeTab,
-      makeItems: makeItems
-    };
-
     var global$2 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
     var global$3 = tinymce.util.Tools.resolve('tinymce.util.Promise');
@@ -1173,6 +1099,9 @@
     var getUploadCredentials = function (editor) {
       return editor.getParam('images_upload_credentials', false, 'boolean');
     };
+    var isAutomaticUploadsEnabled = function (editor) {
+      return editor.getParam('automatic_uploads', true, 'boolean');
+    };
     var Settings = {
       hasDimensions: hasDimensions,
       hasUploadTab: hasUploadTab,
@@ -1188,7 +1117,8 @@
       getUploadUrl: getUploadUrl,
       getUploadHandler: getUploadHandler,
       getUploadBasePath: getUploadBasePath,
-      getUploadCredentials: getUploadCredentials
+      getUploadCredentials: getUploadCredentials,
+      isAutomaticUploadsEnabled: isAutomaticUploadsEnabled
     };
 
     var parseIntAndGetMax = function (val1, val2) {
@@ -1757,7 +1687,7 @@
       return { upload: upload };
     }
 
-    var makeTab$1 = function (info) {
+    var makeTab = function (info) {
       return {
         title: 'Advanced',
         name: 'advanced',
@@ -1845,7 +1775,7 @@
         ]
       };
     };
-    var AdvTab = { makeTab: makeTab$1 };
+    var AdvTab = { makeTab: makeTab };
 
     var collect = function (editor) {
       var urlListSanitizer = ListUtils.sanitizer(function (item) {
@@ -1878,6 +1808,7 @@
       var basePath = Settings.getUploadBasePath(editor);
       var credentials = Settings.getUploadCredentials(editor);
       var handler = Settings.getUploadHandler(editor);
+      var automaticUploads = Settings.isAutomaticUploadsEnabled(editor);
       var prependURL = Option.some(Settings.getPrependUrl(editor)).filter(function (preUrl) {
         return isString(preUrl) && preUrl.length > 0;
       });
@@ -1898,9 +1829,84 @@
           basePath: basePath,
           credentials: credentials,
           handler: handler,
+          automaticUploads: automaticUploads,
           prependURL: prependURL
         };
       });
+    };
+
+    var makeItems = function (info) {
+      var imageUrl = {
+        name: 'src',
+        type: 'urlinput',
+        filetype: 'image',
+        label: 'Source'
+      };
+      var imageList = info.imageList.map(function (items) {
+        return {
+          name: 'images',
+          type: 'selectbox',
+          label: 'Image list',
+          items: items
+        };
+      });
+      var imageDescription = {
+        name: 'alt',
+        type: 'input',
+        label: 'Image description'
+      };
+      var imageTitle = {
+        name: 'title',
+        type: 'input',
+        label: 'Image title'
+      };
+      var imageDimensions = {
+        name: 'dimensions',
+        type: 'sizeinput'
+      };
+      var classList = info.classList.map(function (items) {
+        return {
+          name: 'classes',
+          type: 'selectbox',
+          label: 'Class',
+          items: items
+        };
+      });
+      var caption = {
+        type: 'label',
+        label: 'Caption',
+        items: [{
+            type: 'checkbox',
+            name: 'caption',
+            label: 'Show caption'
+          }]
+      };
+      return flatten([
+        [imageUrl],
+        imageList.toArray(),
+        info.hasDescription ? [imageDescription] : [],
+        info.hasImageTitle ? [imageTitle] : [],
+        info.hasDimensions ? [imageDimensions] : [],
+        [{
+            type: 'grid',
+            columns: 2,
+            items: flatten([
+              classList.toArray(),
+              info.hasImageCaption ? [caption] : []
+            ])
+          }]
+      ]);
+    };
+    var makeTab$1 = function (info) {
+      return {
+        title: 'General',
+        name: 'general',
+        items: makeItems(info)
+      };
+    };
+    var MainTab = {
+      makeTab: makeTab$1,
+      makeItems: makeItems
     };
 
     var makeTab$2 = function (info) {
@@ -2143,22 +2149,31 @@
           api.unblock();
           domGlobals.URL.revokeObjectURL(blobUri);
         };
+        var updateSrcAndSwitchTab = function (url) {
+          api.setData({
+            src: {
+              value: url,
+              meta: {}
+            }
+          });
+          api.showTab('general');
+          changeSrc(helpers, info, state, api);
+        };
         Utils.blobToDataUri(file).then(function (dataUrl) {
           var blobInfo = helpers.createBlobCache(file, blobUri, dataUrl);
-          uploader.upload(blobInfo).then(function (url) {
-            api.setData({
-              src: {
-                value: url,
-                meta: {}
-              }
+          if (info.automaticUploads) {
+            uploader.upload(blobInfo).then(function (url) {
+              updateSrcAndSwitchTab(url);
+              finalize();
+            }).catch(function (err) {
+              finalize();
+              helpers.alertErr(api, err);
             });
-            api.showTab('general');
-            changeSrc(helpers, info, state, api);
-            finalize();
-          }).catch(function (err) {
-            finalize();
-            helpers.alertErr(api, err);
-          });
+          } else {
+            helpers.addToBlobCache(blobInfo);
+            updateSrcAndSwitchTab(blobInfo.blobUri());
+            api.unblock();
+          }
         });
       });
     };
@@ -2267,6 +2282,11 @@
         });
       };
     };
+    var addToBlobCache = function (editor) {
+      return function (blobInfo) {
+        editor.editorUpload.blobCache.add(blobInfo);
+      };
+    };
     var alertErr = function (editor) {
       return function (api, message) {
         editor.windowManager.alert(message, api.close);
@@ -2291,6 +2311,7 @@
       var helpers = {
         onSubmit: submitHandler(editor),
         imageSize: imageSize(editor),
+        addToBlobCache: addToBlobCache(editor),
         createBlobCache: createBlobCache(editor),
         alertErr: alertErr(editor),
         normalizeCss: normalizeCss$1(editor),

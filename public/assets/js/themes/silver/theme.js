@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.5 (2019-12-19)
+ * Version: 5.1.6 (2020-01-28)
  */
 (function (domGlobals) {
     'use strict';
@@ -1622,6 +1622,7 @@
     var osx = 'OSX';
     var solaris = 'Solaris';
     var freebsd = 'FreeBSD';
+    var chromeos = 'ChromeOS';
     var isOS = function (name, current) {
       return function () {
         return current === name;
@@ -1645,7 +1646,8 @@
         isOSX: isOS(osx, current),
         isLinux: isOS(linux, current),
         isSolaris: isOS(solaris, current),
-        isFreeBSD: isOS(freebsd, current)
+        isFreeBSD: isOS(freebsd, current),
+        isChromeOS: isOS(chromeos, current)
       };
     };
     var OperatingSystem = {
@@ -1657,7 +1659,8 @@
       linux: constant(linux),
       osx: constant(osx),
       solaris: constant(solaris),
-      freebsd: constant(freebsd)
+      freebsd: constant(freebsd),
+      chromeos: constant(chromeos)
     };
 
     var DeviceType = function (os, browser, userAgent, mediaMatch) {
@@ -1813,8 +1816,8 @@
       },
       {
         name: 'OSX',
-        search: checkContains('os x'),
-        versionRegexes: [/.*?os\ x\ ?([0-9]+)_([0-9]+).*/]
+        search: checkContains('mac os x'),
+        versionRegexes: [/.*?mac\ os\ x\ ?([0-9]+)_([0-9]+).*/]
       },
       {
         name: 'Linux',
@@ -1830,6 +1833,11 @@
         name: 'FreeBSD',
         search: checkContains('freebsd'),
         versionRegexes: []
+      },
+      {
+        name: 'ChromeOS',
+        search: checkContains('cros'),
+        versionRegexes: [/.*?chrome\/([0-9]+)\.([0-9]+).*/]
       }
     ];
     var PlatformInfo = {
@@ -24152,13 +24160,13 @@
       var getMatchingValue = function () {
         var matchOpt = Option.none();
         var items = dataset.data;
-        var px = editor.queryCommandValue('FontSize');
-        if (px) {
+        var fontSize = editor.queryCommandValue('FontSize');
+        if (fontSize) {
           var _loop_1 = function (precision) {
-            var pt = toPt(px, precision);
+            var pt = toPt(fontSize, precision);
             var legacy = toLegacy(pt);
             matchOpt = find(items, function (item) {
-              return item.format === px || item.format === pt || item.format === legacy;
+              return item.format === fontSize || item.format === pt || item.format === legacy;
             });
           };
           for (var precision = 3; matchOpt.isNone() && precision >= 0; precision--) {
@@ -24167,7 +24175,7 @@
         }
         return {
           matchOpt: matchOpt,
-          px: px
+          size: fontSize
         };
       };
       var isSelectedFor = function (item) {
@@ -24191,9 +24199,9 @@
         };
       };
       var updateSelectMenuText = function (comp) {
-        var _a = getMatchingValue(), matchOpt = _a.matchOpt, px = _a.px;
+        var _a = getMatchingValue(), matchOpt = _a.matchOpt, size = _a.size;
         var text = matchOpt.fold(function () {
-          return px;
+          return size;
         }, function (match) {
           return match.title;
         });
@@ -27481,6 +27489,9 @@
     var isNativeOverrideKeyEvent = function (editor, e) {
       return e.ctrlKey && !Settings$1.shouldNeverUseNative(editor);
     };
+    var isTriggeredByKeyboard = function (editor, e) {
+      return e.type !== 'longpress' && (e.button !== 2 || e.target === editor.getBody() && e.pointerType === '');
+    };
     var setup$a = function (editor, lazySink, backstage) {
       var detection = detect$3();
       var isTouch = detection.deviceType.isTouch;
@@ -27506,14 +27517,13 @@
         return InlineView.hide(contextmenu);
       };
       var showContextMenu = function (e) {
-        var isLongpress = e.type === 'longpress';
         if (Settings$1.shouldNeverUseNative(editor)) {
           e.preventDefault();
         }
         if (isNativeOverrideKeyEvent(editor, e) || Settings$1.isContextMenuDisabled(editor)) {
           return;
         }
-        var isTriggeredByKeyboardEvent = !isLongpress && (e.button !== 2 || e.target === editor.getBody());
+        var isTriggeredByKeyboardEvent = isTriggeredByKeyboard(editor, e);
         var buildMenu = function () {
           var selectedElement = isTriggeredByKeyboardEvent ? editor.selection.getStart(true) : e.target;
           var registry = editor.ui.registry.getAll();
@@ -27526,7 +27536,7 @@
       editor.on('init', function () {
         var hideEvents = 'ResizeEditor ScrollContent ScrollWindow longpresscancel' + (isTouch() ? '' : ' ResizeWindow');
         editor.on(hideEvents, hideContextMenu);
-        editor.on(isTouch() ? 'longpress' : 'longpress contextmenu', showContextMenu);
+        editor.on('longpress contextmenu', showContextMenu);
       });
     };
 

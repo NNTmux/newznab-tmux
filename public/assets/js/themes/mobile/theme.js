@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.5 (2019-12-19)
+ * Version: 5.1.6 (2020-01-28)
  */
 (function (domGlobals) {
     'use strict';
@@ -368,6 +368,7 @@
     var osx = 'OSX';
     var solaris = 'Solaris';
     var freebsd = 'FreeBSD';
+    var chromeos = 'ChromeOS';
     var isOS = function (name, current) {
       return function () {
         return current === name;
@@ -391,7 +392,8 @@
         isOSX: isOS(osx, current),
         isLinux: isOS(linux, current),
         isSolaris: isOS(solaris, current),
-        isFreeBSD: isOS(freebsd, current)
+        isFreeBSD: isOS(freebsd, current),
+        isChromeOS: isOS(chromeos, current)
       };
     };
     var OperatingSystem = {
@@ -403,7 +405,8 @@
       linux: constant(linux),
       osx: constant(osx),
       solaris: constant(solaris),
-      freebsd: constant(freebsd)
+      freebsd: constant(freebsd),
+      chromeos: constant(chromeos)
     };
 
     var DeviceType = function (os, browser, userAgent, mediaMatch) {
@@ -713,8 +716,8 @@
       },
       {
         name: 'OSX',
-        search: checkContains('os x'),
-        versionRegexes: [/.*?os\ x\ ?([0-9]+)_([0-9]+).*/]
+        search: checkContains('mac os x'),
+        versionRegexes: [/.*?mac\ os\ x\ ?([0-9]+)_([0-9]+).*/]
       },
       {
         name: 'Linux',
@@ -730,6 +733,11 @@
         name: 'FreeBSD',
         search: checkContains('freebsd'),
         versionRegexes: []
+      },
+      {
+        name: 'ChromeOS',
+        search: checkContains('cros'),
+        versionRegexes: [/.*?chrome\/([0-9]+)\.([0-9]+).*/]
       }
     ];
     var PlatformInfo = {
