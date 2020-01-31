@@ -81,7 +81,7 @@ class LoginController extends Controller
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                    $userIp = (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '';
+                    $userIp = (int) Settings::settingValue('..storeuserips') === 1 ? (request()->ip() ?? request()->getClientIp()) : '';
                     event(new UserLoggedIn($user, $userIp));
 
                     Auth::logoutOtherDevices($request->input('password'));
