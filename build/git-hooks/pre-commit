@@ -11,5 +11,6 @@ $config = realpath(__DIR__ . '/../../captainhook.json');
 $app    = new CaptainHook\App\Console\Application\Hook();
 $app->setHook('pre-commit');
 $app->setConfigFile($config);
+$app->setRepositoryPath(dirname(dirname(__DIR__)));
 $app->run();
 

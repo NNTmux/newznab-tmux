@@ -263,16 +263,16 @@
         },
         {
             "name": "brick/math",
-            "version": "0.8.11",
+            "version": "0.8.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "bf4894d6373d396666d280a42ecdf1ad75f8222f"
+                "reference": "ea9a095b902f5d42126aba4455a64476f5528241"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/bf4894d6373d396666d280a42ecdf1ad75f8222f",
-                "reference": "bf4894d6373d396666d280a42ecdf1ad75f8222f",
+                "url": "https://api.github.com/repos/brick/math/zipball/ea9a095b902f5d42126aba4455a64476f5528241",
+                "reference": "ea9a095b902f5d42126aba4455a64476f5528241",
                 "shasum": ""
             },
             "require": {
@@ -280,7 +280,8 @@
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "2.*",
-                "phpunit/phpunit": "7.*"
+                "phpunit/phpunit": "7.*",
+                "vimeo/psalm": "3.*"
             },
             "type": "library",
             "autoload": {
@@ -303,7 +304,7 @@
                 "brick",
                 "math"
             ],
-            "time": "2020-01-23T00:19:01+00:00"
+            "time": "2020-01-27T13:00:05+00:00"
         },
         {
             "name": "cakephp/chronos",
@@ -12710,16 +12711,16 @@
         },
         {
             "name": "scrivo/highlight.php",
-            "version": "v9.18.0.0",
+            "version": "v9.18.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scrivo/highlight.php.git",
-                "reference": "0e7860058231b5bc843d1f5ac5c091be6b15b2d1"
+                "reference": "a57c858cb753f543965a1e17af386a648012ed8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scrivo/highlight.php/zipball/0e7860058231b5bc843d1f5ac5c091be6b15b2d1",
-                "reference": "0e7860058231b5bc843d1f5ac5c091be6b15b2d1",
+                "url": "https://api.github.com/repos/scrivo/highlight.php/zipball/a57c858cb753f543965a1e17af386a648012ed8f",
+                "reference": "a57c858cb753f543965a1e17af386a648012ed8f",
                 "shasum": ""
             },
             "require": {
@@ -12774,7 +12775,7 @@
                 "highlight.php",
                 "syntax"
             ],
-            "time": "2020-01-29T15:18:09+00:00"
+            "time": "2020-02-03T02:19:36+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
