@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f8c501ac71332ccbfeb14176663e2129",
+    "content-hash": "d16ab923da252c203eb7def8ee12a601",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3411,16 +3411,16 @@
         },
         {
             "name": "laravel/tinker",
-            "version": "v2.1.0",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/tinker.git",
-                "reference": "d8ce361f2fd979c03e5f66c79d4a95a1c1e68640"
+                "reference": "37579c93271ec30ef099dd633ec7c2de5e5fb112"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/tinker/zipball/d8ce361f2fd979c03e5f66c79d4a95a1c1e68640",
-                "reference": "d8ce361f2fd979c03e5f66c79d4a95a1c1e68640",
+                "url": "https://api.github.com/repos/laravel/tinker/zipball/37579c93271ec30ef099dd633ec7c2de5e5fb112",
+                "reference": "37579c93271ec30ef099dd633ec7c2de5e5fb112",
                 "shasum": ""
             },
             "require": {
@@ -3432,7 +3432,8 @@
                 "symfony/var-dumper": "^4.0|^5.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.0"
+                "mockery/mockery": "^1.3.1",
+                "phpunit/phpunit": "^8.0|^9.0"
             },
             "suggest": {
                 "illuminate/database": "The Illuminate Database package (^6.0|^7.0)."
@@ -3470,7 +3471,7 @@
                 "laravel",
                 "psysh"
             ],
-            "time": "2020-01-14T16:58:39+00:00"
+            "time": "2020-02-05T15:00:44+00:00"
         },
         {
             "name": "laravelcollective/html",
@@ -10857,16 +10858,16 @@
         },
         {
             "name": "matt-allan/laravel-code-style",
-            "version": "0.4.0",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matt-allan/laravel-code-style.git",
-                "reference": "ac5dcc39c41f7a12665dda8aafb7a40e2bc2e7a0"
+                "reference": "f267c917f4cc3c8e2f85fdf0d9d2905da5166b8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/ac5dcc39c41f7a12665dda8aafb7a40e2bc2e7a0",
-                "reference": "ac5dcc39c41f7a12665dda8aafb7a40e2bc2e7a0",
+                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/f267c917f4cc3c8e2f85fdf0d9d2905da5166b8f",
+                "reference": "f267c917f4cc3c8e2f85fdf0d9d2905da5166b8f",
                 "shasum": ""
             },
             "require": {
@@ -10875,7 +10876,7 @@
                 "php": ">=7.2"
             },
             "require-dev": {
-                "laravel/framework": "^6.0",
+                "laravel/framework": "^6.0.3",
                 "phpunit/phpunit": "^7.0"
             },
             "type": "library",
@@ -10912,7 +10913,7 @@
                 "laravel",
                 "php-cs-fixer"
             ],
-            "time": "2019-09-05T13:41:48+00:00"
+            "time": "2019-12-15T15:09:59+00:00"
         },
         {
             "name": "mockery/mockery",
