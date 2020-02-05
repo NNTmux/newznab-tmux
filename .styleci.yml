@@ -1,6 +1,7 @@
 preset: laravel
 
 risky: false
+alpha_ordered_imports: true
 
 disabled:
     - no_tab_indentation
