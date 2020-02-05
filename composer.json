@@ -157,8 +157,8 @@
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^2.4",
     "beyondcode/laravel-dump-server": "^1.0",
-    "captainhook/captainhook": "^4.4",
-    "captainhook/plugin-composer": "^4.0",
+    "captainhook/captainhook": "^5.1",
+    "captainhook/plugin-composer": "^5.1",
     "facade/ignition": "^1.6",
     "friendsofphp/php-cs-fixer": "^2.14",
     "fzaninotto/faker": "~1.4",
@@ -166,7 +166,7 @@
     "matt-allan/laravel-code-style": "^0.4.0",
     "mockery/mockery": "^1.0",
     "nunomaduro/collision": "^3.0",
-    "nunomaduro/larastan": "^0.4",
+    "nunomaduro/larastan": "^0.5",
     "php-coveralls/php-coveralls": "^2.0",
     "phpunit/phpunit": "^8.0"
   },
