@@ -2,24 +2,24 @@
 
 namespace App\Models;
 
-use Carbon\CarbonImmutable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Jobs\SendInviteEmail;
-use Illuminate\Support\Carbon;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
 use App\Jobs\SendAccountExpiredEmail;
-use Spatie\Permission\Traits\HasRoles;
-use Junaidnasir\Larainvite\InviteTrait;
 use App\Jobs\SendAccountWillExpireEmail;
+use App\Jobs\SendInviteEmail;
+use Carbon\CarbonImmutable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Junaidnasir\Larainvite\Facades\Invite;
+use Illuminate\Support\Str;
 use Jrean\UserVerification\Traits\UserVerification;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Junaidnasir\Larainvite\Facades\Invite;
+use Junaidnasir\Larainvite\InviteTrait;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * App\Models\User.

@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendAccountDeletedEmail;
+use App\Models\ReleaseComment;
+use App\Models\Settings;
 use App\Models\User;
+use App\Models\UserDownload;
+use App\Models\UserRequest;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
-use App\Models\Settings;
-use App\Models\UserRequest;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use App\Models\UserDownload;
-use Illuminate\Http\Request;
-use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use App\Jobs\SendAccountDeletedEmail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController

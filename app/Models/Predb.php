@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
-use Illuminate\Support\Arr;
 use Blacklight\ConsoleTools;
 use Blacklight\SphinxSearch;
-use Laravel\Scout\Searchable;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Laravel\Scout\Searchable;
 
 /**
  * App\Models\Predb.

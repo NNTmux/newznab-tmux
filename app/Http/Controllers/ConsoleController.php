@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\Genres;
-use Blacklight\Console;
 use App\Models\Category;
-use Illuminate\Support\Arr;
+use Blacklight\Console;
+use Blacklight\Genres;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class ConsoleController extends BasePageController
 {

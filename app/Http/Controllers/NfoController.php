@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use App\Models\ReleaseNfo;
-use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
+use Illuminate\Http\Request;
 
 class NfoController extends BasePageController
 {
