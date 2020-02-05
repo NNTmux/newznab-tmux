@@ -4,6 +4,7 @@ risky: false
 
 disabled:
     - no_tab_indentation
+    - unused_use
 
 finder:
     exclude:
@@ -17,3 +18,9 @@ finder:
       - "database/migrations"
       - "database/seeds"
       - "database/fixtures"
+
+js:
+  finder:
+    not-name:
+      - webpack.mix.js
+css: true
