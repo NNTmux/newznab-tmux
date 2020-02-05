@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Collection;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use App\Models\Collection;
 use Blacklight\utility\Utility;
 
 $DIR = NN_TMUX;

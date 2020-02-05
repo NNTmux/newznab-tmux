@@ -3,8 +3,8 @@
 //This script will update all records in the movieinfo table
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Movie;
 use Blacklight\ColorCLI;
+use Blacklight\Movie;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();

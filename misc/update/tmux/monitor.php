@@ -2,13 +2,13 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Tmux;
-use App\Models\Release;
-use Blacklight\TmuxRun;
 use App\Models\Category;
+use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Blacklight\Tmux;
 use Blacklight\TmuxOutput;
+use Blacklight\TmuxRun;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 

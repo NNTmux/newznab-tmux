@@ -3,9 +3,9 @@
 namespace Blacklight\processing\tv;
 
 use App\Models\Settings;
+use Blacklight\libraries\TraktAPI;
 use Blacklight\ReleaseImage;
 use Blacklight\utility\Time;
-use Blacklight\libraries\TraktAPI;
 
 /**
  * Class TraktTv.

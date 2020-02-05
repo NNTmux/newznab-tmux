@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Release;
 use App\Models\Category;
+use App\Models\Release;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Illuminate\Console\Command;

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserSerie;
 use App\Models\Video;
 use Blacklight\Releases;
-use App\Models\UserSerie;
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class SeriesController extends BasePageController
 {

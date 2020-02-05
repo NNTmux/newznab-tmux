@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\Tmux;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Blacklight\Tmux;
 use Illuminate\Console\Command;
 
 class TmuxUIStart extends Command
