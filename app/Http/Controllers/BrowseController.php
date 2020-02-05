@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\RootCategory;
 use Blacklight\Releases;
+use App\Models\RootCategory;
 use Illuminate\Http\Request;
 
 class BrowseController extends BasePageController

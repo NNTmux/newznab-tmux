@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Release;
+use Blacklight\NZB;
 use App\Models\User;
+use App\Models\Release;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
-use Blacklight\NZB;
+use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GetNzbController extends BasePageController
 {

@@ -1,18 +1,18 @@
 <?php
 
-use App\Models\Release;
-use Blacklight\NZB;
-use Blacklight\utility\Utility;
-use Blacklight\XXX;
 use Colors\Color;
-use DariusIII\Zipper\Zipper;
+use Blacklight\NZB;
+use Blacklight\XXX;
 use GuzzleHttp\Client;
+use App\Models\Release;
+use DariusIII\Zipper\Zipper;
+use Blacklight\utility\Utility;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
+use GuzzleHttp\Exception\RequestException;
 
 if (! function_exists('getRawHtml')) {
 

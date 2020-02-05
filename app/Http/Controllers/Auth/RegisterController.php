@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\Invitation;
-use App\Models\Settings;
 use App\Models\User;
-use Blacklight\utility\Utility;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
+use App\Models\Settings;
+use App\Models\Invitation;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use Illuminate\Routing\Redirector;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Junaidnasir\Larainvite\Facades\Invite;
+use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Validation\ValidationException;
 use Jrean\UserVerification\Traits\VerifiesUsers;
-use Junaidnasir\Larainvite\Facades\Invite;
-use Spatie\Permission\Models\Role;
 
 class RegisterController extends Controller
 {

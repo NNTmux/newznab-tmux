@@ -3,8 +3,8 @@
 //This script will update all records in the xxxinfo table where there is no cover
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\ColorCLI;
 use Blacklight\XXX;
+use Blacklight\ColorCLI;
 
 $movie = new XXX();
 $c = new ColorCLI();

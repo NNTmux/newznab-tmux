@@ -21,11 +21,11 @@
 
 namespace Blacklight\processing;
 
-use App\Models\TvInfo;
 use App\Models\Video;
+use App\Models\TvInfo;
 use App\Models\VideoAlias;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.

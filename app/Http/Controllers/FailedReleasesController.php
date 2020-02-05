@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Release;
 use App\Models\User;
+use App\Models\Release;
 use Illuminate\Http\Request;
 
 class FailedReleasesController extends BasePageController

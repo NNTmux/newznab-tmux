@@ -2,16 +2,16 @@
 
 namespace Blacklight;
 
-use App\Models\BinaryBlacklist;
+use App\Models\Settings;
 use App\Models\Collection;
 use App\Models\MissedPart;
-use App\Models\Settings;
 use App\Models\UsenetGroup;
-use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use App\Models\BinaryBlacklist;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Illuminate\Database\QueryException;
 
 /**
  * Class Binaries.

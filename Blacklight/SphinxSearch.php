@@ -4,12 +4,12 @@ namespace Blacklight;
 
 use App\Models\Predb;
 use App\Models\Release;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
-use Foolz\SphinxQL\Exception\DatabaseException;
-use Foolz\SphinxQL\Exception\SphinxQLException;
 use Foolz\SphinxQL\Helper;
 use Foolz\SphinxQL\SphinxQL;
 use Illuminate\Support\Facades\DB;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
+use Foolz\SphinxQL\Exception\DatabaseException;
+use Foolz\SphinxQL\Exception\SphinxQLException;
 
 /**
  * Class SphinxSearch.

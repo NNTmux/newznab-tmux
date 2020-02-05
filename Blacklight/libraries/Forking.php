@@ -2,18 +2,18 @@
 
 namespace Blacklight\libraries;
 
-use App\Models\Settings;
-use App\Models\UsenetGroup;
-use Blacklight\ColorCLI;
 use Blacklight\Nfo;
-use Blacklight\NNTP;
 use Blacklight\NZB;
-use Blacklight\processing\PostProcess;
+use Blacklight\NNTP;
+use Spatie\Async\Pool;
+use App\Models\Settings;
+use Blacklight\ColorCLI;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Opis\Closure\SerializableClosure;
-use Spatie\Async\Pool;
+use Blacklight\processing\PostProcess;
 
 /**
  * Class Forking.

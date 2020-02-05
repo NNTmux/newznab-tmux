@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use Blacklight\Console;
 use Blacklight\Genres;
-use Blacklight\utility\Utility;
+use Blacklight\Console;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use App\Http\Controllers\BasePageController;
 
 class ConsoleController extends BasePageController
 {

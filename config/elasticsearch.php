@@ -2,7 +2,7 @@
 
 return [
 
-    /**
+    /*
      * You can specify one of several different connections when building an
      * Elasticsearch client.
      *
@@ -12,14 +12,14 @@ return [
      */
     'defaultConnection' => 'default',
 
-    /**
+    /*
      * These are the connection parameters used when building a client.
      */
     'connections' => [
 
         'default' => [
 
-            /**
+            /*
              * Hosts.
              *
              * This is an array of hosts that the client will connect to. It can be a
@@ -52,7 +52,7 @@ return [
                 ],
             ],
 
-            /**
+            /*
              * SSL.
              *
              * If your Elasticsearch instance uses an out-dated or self-signed SSL
@@ -69,7 +69,7 @@ return [
              */
             'sslVerification' => null,
 
-            /**
+            /*
              * Logging.
              *
              * Logging is handled by passing in an instance of Monolog\Logger (which
@@ -95,7 +95,7 @@ return [
 
             'logLevel' => Monolog\Logger::INFO,
 
-            /**
+            /*
              * Retries.
              *
              * By default, the client will retry n times, where n = number of nodes in
@@ -106,21 +106,21 @@ return [
              */
             'retries' => null,
 
-            /**
+            /*
              * The remainder of the configuration options can almost always be left
              * as-is unless you have specific reasons to change them.  Refer to the
              * appropriate sections in the Elasticsearch documentation for what each option
              * does and what values it expects.
              */
 
-            /**
+            /*
              * Sniff On Start.
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html
              */
             'sniffOnStart' => false,
 
-            /**
+            /*
              * HTTP Handler.
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html#_configure_the_http_handler
@@ -128,7 +128,7 @@ return [
              */
             'httpHandler' => null,
 
-            /**
+            /*
              * Connection Pool.
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html#_setting_the_connection_pool
@@ -136,7 +136,7 @@ return [
              */
             'connectionPool' => null,
 
-            /**
+            /*
              * Connection Selector.
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html#_setting_the_connection_selector
@@ -144,7 +144,7 @@ return [
              */
             'connectionSelector' => null,
 
-            /**
+            /*
              * Serializer.
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html#_setting_the_serializer
@@ -152,21 +152,21 @@ return [
              */
             'serializer' => null,
 
-            /**
+            /*
              * Connection Factory.
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html#_setting_a_custom_connectionfactory
              */
             'connectionFactory' => null,
 
-            /**
+            /*
              * Endpoint.
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/6.0/_configuration.html#_set_the_endpoint_closure
              */
             'endpoint' => null,
 
-            /**
+            /*
              * Register additional namespaces.
              *
              * An array of additional namespaces to register.
@@ -176,7 +176,7 @@ return [
              */
             'namespaces' => [],
 
-            /**
+            /*
              * Tracer.
              *
              * Tracer is handled by passing in a name of the class implements Psr\Log\LoggerInterface.

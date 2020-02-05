@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use Blacklight\NNTP;
 use App\Models\Settings;
-use App\Models\UsenetGroup;
 use Blacklight\Binaries;
 use Blacklight\ColorCLI;
-use Blacklight\NNTP;
+use App\Models\UsenetGroup;
 
 $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
 $colorCli = new ColorCLI();

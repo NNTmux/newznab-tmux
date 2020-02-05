@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use Blacklight\Genres;
 use Blacklight\Music;
-use Illuminate\Http\Request;
+use Blacklight\Genres;
+use App\Models\Category;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 
 class MusicController extends BasePageController
 {

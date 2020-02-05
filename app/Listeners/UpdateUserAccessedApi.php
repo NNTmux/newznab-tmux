@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\UserAccessedApi;
 use App\Models\User;
+use App\Events\UserAccessedApi;
 
 class UpdateUserAccessedApi
 {

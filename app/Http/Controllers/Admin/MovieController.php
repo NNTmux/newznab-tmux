@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\MovieInfo;
-use App\Models\Release;
 use Blacklight\Movie;
-use Blacklight\utility\Utility;
+use App\Models\Release;
+use App\Models\MovieInfo;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use App\Http\Controllers\BasePageController;
 
 class MovieController extends BasePageController
 {

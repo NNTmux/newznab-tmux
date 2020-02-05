@@ -2,14 +2,14 @@
 
 namespace Blacklight\http;
 
-use App\Models\Category;
+use Blacklight\NZB;
 use App\Models\Release;
+use App\Models\Category;
+use Blacklight\Releases;
 use App\Models\UserMovie;
 use App\Models\UserSerie;
-use Blacklight\NZB;
-use Blacklight\Releases;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class RSS -- contains specific functions for RSS.

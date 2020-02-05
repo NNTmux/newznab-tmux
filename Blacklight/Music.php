@@ -2,18 +2,18 @@
 
 namespace Blacklight;
 
-use App\Models\Category;
 use App\Models\Genre;
-use App\Models\MusicInfo;
 use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
+use App\Models\MusicInfo;
+use DariusIII\ItunesApi\iTunes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
+use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
 use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
-use DariusIII\ItunesApi\iTunes;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Music.

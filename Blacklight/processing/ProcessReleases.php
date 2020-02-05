@@ -2,27 +2,27 @@
 
 namespace Blacklight\processing;
 
-use App\Models\Category;
-use App\Models\Collection;
-use App\Models\MusicInfo;
-use App\Models\Predb;
-use App\Models\Release;
-use App\Models\ReleaseRegex;
-use App\Models\ReleasesGroups;
-use App\Models\Settings;
-use App\Models\UsenetGroup;
-use Blacklight\Categorize;
-use Blacklight\ConsoleTools;
-use Blacklight\Genres;
-use Blacklight\NNTP;
 use Blacklight\NZB;
-use Blacklight\ReleaseCleaning;
-use Blacklight\ReleaseImage;
+use Blacklight\NNTP;
+use App\Models\Predb;
+use Blacklight\Genres;
+use App\Models\Release;
+use App\Models\Category;
+use App\Models\Settings;
 use Blacklight\Releases;
+use App\Models\MusicInfo;
+use App\Models\Collection;
+use Blacklight\Categorize;
+use App\Models\UsenetGroup;
+use Illuminate\Support\Str;
+use App\Models\ReleaseRegex;
+use Blacklight\ConsoleTools;
+use Blacklight\ReleaseImage;
+use App\Models\ReleasesGroups;
 use Illuminate\Support\Carbon;
+use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class ProcessReleases
 {

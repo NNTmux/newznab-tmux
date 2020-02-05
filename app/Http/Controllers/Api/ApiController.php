@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\UserAccessedApi;
-use App\Http\Controllers\BasePageController;
-use App\Models\Release;
-use App\Models\ReleaseNfo;
 use App\Models\User;
-use App\Models\UserDownload;
-use App\Models\UserRequest;
+use App\Models\Release;
 use Blacklight\http\API;
 use Blacklight\Releases;
-use Blacklight\utility\Utility;
+use App\Models\ReleaseNfo;
+use App\Models\UserRequest;
+use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Events\UserAccessedApi;
+use Blacklight\utility\Utility;
+use App\Http\Controllers\BasePageController;
 
 class ApiController extends BasePageController
 {

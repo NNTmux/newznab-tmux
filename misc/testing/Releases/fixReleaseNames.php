@@ -9,10 +9,10 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use Blacklight\NNTP;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
-use Blacklight\NNTP;
 
 $namefixer = new NameFixer();
 $colorCli = new ColorCLI();

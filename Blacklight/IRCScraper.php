@@ -4,9 +4,9 @@ namespace Blacklight;
 
 use App\Models\Predb;
 use App\Models\UsenetGroup;
-use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 
 /**
  * Class IRCScraper.

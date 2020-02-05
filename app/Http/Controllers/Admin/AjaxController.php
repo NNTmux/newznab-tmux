@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\ReleaseComment;
 use App\Models\Sharing;
+use Blacklight\Regexes;
+use Blacklight\Binaries;
 use App\Models\SharingSite;
 use App\Models\UsenetGroup;
-use Blacklight\Binaries;
-use Blacklight\Regexes;
 use Illuminate\Http\Request;
+use App\Models\ReleaseComment;
+use App\Http\Controllers\BasePageController;
 
 class AjaxController extends BasePageController
 {

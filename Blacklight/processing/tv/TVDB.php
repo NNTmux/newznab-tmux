@@ -3,9 +3,9 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
-use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
-use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
 use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
+use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
+use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 
 /**
  * Class TVDB -- functions used to post process releases against TVDB.
