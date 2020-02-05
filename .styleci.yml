@@ -18,9 +18,3 @@ finder:
       - "database/migrations"
       - "database/seeds"
       - "database/fixtures"
-
-js:
-  finder:
-    not-name:
-      - webpack.mix.js
-css: true
