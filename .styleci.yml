@@ -1,8 +1,7 @@
 preset: laravel
 
 risky: false
-enabled:
-    - alpha_ordered_imports
+
 disabled:
     - no_tab_indentation
     - unused_use
