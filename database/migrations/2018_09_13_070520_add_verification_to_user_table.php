@@ -4,8 +4,8 @@
  *
  * (c) Jean Ragouin <go@askjong.com> <www.askjong.com>
  */
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddVerificationToUserTable extends Migration
 {

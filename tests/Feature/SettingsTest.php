@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\Settings;
+use Tests\TestCase;
 
 class SettingsTest extends TestCase
 {

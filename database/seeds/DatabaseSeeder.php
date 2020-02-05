@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use Bhuvidya\Countries\CountriesSeeder;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {

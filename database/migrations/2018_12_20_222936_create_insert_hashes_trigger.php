@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use DariusIII\LaravelDatabaseTrigger\TriggerFacade as Schema;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateInsertHashesTrigger extends Migration
 {
