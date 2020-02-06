@@ -110,7 +110,6 @@
     "google/recaptcha": "^1.2",
     "guzzlehttp/guzzle": "^6.3",
     "imdbphp/imdbphp": "^6.0",
-    "inkedcurtis/omnipay-coinpayments": "^1.0",
     "intervention/image": "^2.4",
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",

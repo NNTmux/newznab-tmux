@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d16ab923da252c203eb7def8ee12a601",
+    "content-hash": "02a9f3b9547b32372d356b9f1bbb24f1",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2298,56 +2298,6 @@
             ],
             "description": "Library for retrieving film and tv information from IMDb",
             "time": "2019-09-13T17:38:18+00:00"
-        },
-        {
-            "name": "inkedcurtis/omnipay-coinpayments",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/InkedCurtis/omnipay-coinpayments.git",
-                "reference": "3eac0d9f70486d55ba1a8eba72dd1a2381d538e1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/InkedCurtis/omnipay-coinpayments/zipball/3eac0d9f70486d55ba1a8eba72dd1a2381d538e1",
-                "reference": "3eac0d9f70486d55ba1a8eba72dd1a2381d538e1",
-                "shasum": ""
-            },
-            "require": {
-                "omnipay/common": "^3.0",
-                "php-http/guzzle6-adapter": "*"
-            },
-            "require-dev": {
-                "omnipay/tests": "^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Omnipay\\Coinpayments\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Curtis",
-                    "email": "wscrewey@hotmail.com"
-                }
-            ],
-            "description": "Coinpayments driver for the Omnipay payment processing library",
-            "homepage": "https://github.com/inkedcurtis/omnipay-coinpayments",
-            "keywords": [
-                "bitcoin",
-                "coinpayments",
-                "gateway",
-                "merchant",
-                "omnipay",
-                "pay",
-                "payment"
-            ],
-            "time": "2018-07-21T14:00:19+00:00"
         },
         {
             "name": "intervention/image",
