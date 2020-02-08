@@ -12719,26 +12719,23 @@
         },
         {
             "name": "sebastianfeldmann/git",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/git.git",
-                "reference": "cf2aafb8d897ee2ca2d35b988fff021e46f84b87"
+                "reference": "e7a939afe33eb1a8f9af478b9e9fe9f15410709d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/cf2aafb8d897ee2ca2d35b988fff021e46f84b87",
-                "reference": "cf2aafb8d897ee2ca2d35b988fff021e46f84b87",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/e7a939afe33eb1a8f9af478b9e9fe9f15410709d",
+                "reference": "e7a939afe33eb1a8f9af478b9e9fe9f15410709d",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-xml": "*",
                 "php": "^7.1",
-                "sebastianfeldmann/cli": "^3.0.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7.5"
+                "sebastianfeldmann/cli": "^3.0"
             },
             "type": "library",
             "extra": {
@@ -12766,7 +12763,7 @@
             "keywords": [
                 "git"
             ],
-            "time": "2020-01-23T14:31:38+00:00"
+            "time": "2020-02-07T11:47:04+00:00"
         },
         {
             "name": "seld/jsonlint",
