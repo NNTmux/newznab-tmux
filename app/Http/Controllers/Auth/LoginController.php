@@ -54,7 +54,6 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'username' => ['required'],
             'password' => ['required'],
@@ -69,6 +68,7 @@ class LoginController extends Controller
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
             $error = 'You have failed to login too many times.Try again in: '.$this->decayMinutes().' minutes.';
+
             return $this->showLoginForm($error);
         }
 
@@ -107,6 +107,7 @@ class LoginController extends Controller
                 $this->incrementLoginAttempts($request);
                 $error = 'Username or email used do not match our records!';
             }
+
             return $this->showLoginForm($error);
         }
 
