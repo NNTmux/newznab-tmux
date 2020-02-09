@@ -537,13 +537,13 @@ class Games
                         }
 
                         if ($this->_gameResults->get('publishers') !== '') {
-                            $game['publisher'] = (string) $this->_gameResults->publishers[0]['name'];
+                            $game['publisher'] = $this->_gameResults->publishers[0]['name'] ?? 'Unknown';
                         } else {
                             $game['publisher'] = 'Unknown';
                         }
 
                         if (! empty($this->_gameResults->original_game_rating[0]['name'])) {
-                            $game['esrb'] = (string) $this->_gameResults->original_game_rating[0]['name'];
+                            $game['esrb'] = $this->_gameResults->original_game_rating[0]['name'] ?? 'Not Rated';
                         } else {
                             $game['esrb'] = 'Not Rated';
                         }
