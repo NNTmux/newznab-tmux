@@ -66,12 +66,12 @@ class BrowseController extends BasePageController
         $this->setPrefs();
         $releases = new Releases();
 
-        $parentId = RootCategory::query()->where('title', $parentCategory)->first();
+        $parentId = RootCategory::query()->where('title', $parentCategory)->value('id');
 
-        $query = Category::query();
+        $query = Category::query()->where('title', $id)->where('root_categories_id', $parentId);
         if ($id !== 'All') {
-            $query->where('title', $id)->where('root_categories_id', $parentId->id);
-            $category = $query->first(['id']) ?? -1;
+            $cat = $query->first();
+            $category = $cat !== null ? $cat->id : -1;
         } else {
             $category = $parentId ?? -1;
         }
@@ -79,7 +79,7 @@ class BrowseController extends BasePageController
         $grp = -1;
 
         $catarray = [];
-        $catarray[] = $category['id'];
+        $catarray[] = $category;
 
         $this->smarty->assign('parentcat', ucfirst($parentCategory));
         $this->smarty->assign('category', $category);
@@ -113,7 +113,7 @@ class BrowseController extends BasePageController
         if ($category === -1 && $grp === -1) {
             $this->smarty->assign('catname', 'All');
         } elseif ($category !== -1 && $grp === -1) {
-            $cdata = Category::find($category['id']);
+            $cdata = Category::find($category);
             if ($cdata !== null) {
                 if ($cdata->root_categories_id === Category::GAME_ROOT) {
                     $covgroup = 'console';
