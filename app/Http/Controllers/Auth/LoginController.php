@@ -27,6 +27,9 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
+    protected $maxAttempts = 3; // Default is 5
+    protected $decayMinutes = 2; // Default is 1
+
     /**
      * Where to redirect users after login.
      *
@@ -45,12 +48,13 @@ class LoginController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
      * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'username' => ['required'],
             'password' => ['required'],
@@ -61,6 +65,13 @@ class LoginController extends Controller
         $request->merge([
             $login_type => $request->input('username'),
         ]);
+
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+            $error = 'You have failed to login too many times.Try again in: '.$this->decayMinutes().' minutes.';
+            return $this->showLoginForm($error);
+        }
+
         if ($validator->passes()) {
             $user = User::getByUsername($request->input('username'));
             if ($user === null) {
@@ -85,17 +96,21 @@ class LoginController extends Controller
                     event(new UserLoggedIn($user, $userIp));
 
                     Auth::logoutOtherDevices($request->input('password'));
+                    $this->clearLoginAttempts($request);
 
                     return redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
                 }
 
-                $error = 'Username/email and password combination used does not match our records!';
+                $this->incrementLoginAttempts($request);
+                $error = 'Username or email and password combination used does not match our records!';
             } else {
+                $this->incrementLoginAttempts($request);
                 $error = 'Username or email used do not match our records!';
             }
-
             return $this->showLoginForm($error);
         }
+
+        $this->incrementLoginAttempts($request);
 
         $error = implode('', Arr::collapse($validator->errors()->toArray()));
 
