@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -67,9 +68,8 @@ class LoginController extends Controller
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            $error = 'You have failed to login too many times.Try again in: '.$this->decayMinutes().' minutes.';
-
-            return $this->showLoginForm($error);
+            Session::flash('message', 'You have failed to login too many times.Try again in '.$this->decayMinutes().' minutes.');
+            return $this->showLoginForm();
         }
 
         if ($validator->passes()) {
@@ -88,7 +88,8 @@ class LoginController extends Controller
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
                 if (! $user->isVerified() || $user->isPendingVerification()) {
-                    return $this->showLoginForm('You have not verified your email address!');
+                    Session::flash('message', 'You have not verified your email address!');
+                    return $this->showLoginForm();
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
@@ -102,30 +103,24 @@ class LoginController extends Controller
                 }
 
                 $this->incrementLoginAttempts($request);
-                $error = 'Username or email and password combination used does not match our records!';
+                Session::flash('message', 'Username or email and password combination used does not match our records!');
             } else {
                 $this->incrementLoginAttempts($request);
-                $error = 'Username or email used do not match our records!';
+                Session::flash('message', 'Username or email used do not match our records!');
             }
 
-            return $this->showLoginForm($error);
+            return $this->showLoginForm();
         }
 
         $this->incrementLoginAttempts($request);
+        Session::flash('message', implode('', Arr::collapse($validator->errors()->toArray())));
 
-        $error = implode('', Arr::collapse($validator->errors()->toArray()));
-
-        return $this->showLoginForm($error);
+        return $this->showLoginForm();
     }
 
-    /**
-     * @param string $error
-     * @param string $notice
-     */
-    public function showLoginForm($error = '', $notice = '')
+    public function showLoginForm()
     {
         $theme = Settings::settingValue('site.main.style');
-        app('smarty.view')->assign(['error' => $error, 'notice' => $notice, 'username' => '', 'rememberme' => '']);
 
         $meta_title = 'Login';
         $meta_keywords = 'Login';
@@ -147,6 +142,6 @@ class LoginController extends Controller
         $request->session()->flush();
         $request->session()->regenerate();
 
-        return redirect('login')->with('info', 'You have been logged out successfully');
+        return redirect('login')->with('message', 'You have been logged out successfully');
     }
 }

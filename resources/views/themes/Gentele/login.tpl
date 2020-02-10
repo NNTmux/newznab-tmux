@@ -1,9 +1,6 @@
 <div class="card card-body card-header">
-	{if isset($error) && $error != ''}
-		<div class="alert alert-danger">{$error}</div>
-	{/if}
-	{if isset($notice) && $notice != ''}
-		<div class="alert alert-info">{$notice}</div>
+	{if Session::has('message')}
+		<div class="alert alert-danger">{Session::get('message')}</div>
 	{/if}
 	<div class="login-box">
 		<div class="login-logo">
