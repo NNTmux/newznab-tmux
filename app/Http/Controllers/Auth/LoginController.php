@@ -69,6 +69,7 @@ class LoginController extends Controller
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
             Session::flash('message', 'You have failed to login too many times.Try again in '.$this->decayMinutes().' minutes.');
+
             return $this->showLoginForm();
         }
 
@@ -89,6 +90,7 @@ class LoginController extends Controller
 
                 if (! $user->isVerified() || $user->isPendingVerification()) {
                     Session::flash('message', 'You have not verified your email address!');
+
                     return $this->showLoginForm();
                 }
 
