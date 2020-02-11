@@ -8,14 +8,13 @@
 		</div><!-- /.login-logo -->
 		<div class="login-box-body">
 			<p class="login-box-msg">Please sign in to access the site</p>
-			{{Form::open(['url' => 'login'])}}
+			{{Form::open(['url' => 'login', 'id' => 'login'])}}
 				<div class="form-group has-feedback">
-					<input id="username" name="username" type="text" class="form-control"
-						   placeholder="Username or email"/>
+					{{Form::text('username', 'Username or email', ['class' => 'form-control'])}}
 					<span class="fas fa-envelope form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
-					<input id="password" name="password" type="password" class="form-control" placeholder="Password"/>
+					{{Form::password('password', ['class' => 'form-control'])}}
 					<span class="fas fa-lock form-control-feedback"></span>
 				</div>
 				<div class="row">
@@ -32,8 +31,7 @@
 						</div>
 					</div><!-- /.col -->
 					<div class="col-4">
-						<button type="submit" class="btn btn-success btn-block btn-flat">Sign In</button>
-
+						{{Form::submit('Sign In', ['class' => 'btn btn-success btn-block btn-flat'])}}
 					</div><!-- /.col -->
 				</div>
 			{{Form::close()}}
