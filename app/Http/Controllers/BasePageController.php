@@ -300,6 +300,10 @@ class BasePageController extends Controller
         $this->smarty->assign('header_menu', $header_menu);
         $notification = $this->smarty->fetch('notification.tpl');
         $this->smarty->assign('notification', $notification);
+        $sidebar = $this->smarty->fetch('sidebar.tpl');
+        $this->smarty->assign('sidebar', $sidebar);
+        $footer = $this->smarty->fetch('footer.tpl');
+        $this->smarty->assign('footer', $footer);
     }
 
     /**
