@@ -1,16 +1,5 @@
-#!/usr/bin/env php
-<?php
-$autoLoader = __DIR__ . '/../../vendor/autoload.php';
+#!/bin/sh
 
-if (!file_exists($autoLoader)) {
-    fwrite(STDERR, 'Composer autoload.php could not be found');
-    exit(1);
-}
-require $autoLoader;
-$config = realpath(__DIR__ . '/../../captainhook.json');
-$app    = new CaptainHook\App\Console\Application\Hook();
-$app->setHook('pre-commit');
-$app->setConfigFile($config);
-$app->setRepositoryPath(dirname(dirname(__DIR__)));
-$app->run();
+# installed by CaptainHook 5.1.1
 
+vendor/captainhook/captainhook/bin/captainhook --configuration=captainhook.json --bootstrap=vendor/autoload.php hook:pre-commit "$@"
