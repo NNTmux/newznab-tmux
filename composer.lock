@@ -1539,16 +1539,16 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "2.1.16",
+            "version": "2.1.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "5065fafc8c29d229ff207f2a89b02175f479a909"
+                "reference": "ade6887fd9bd74177769645ab5c474824f8a418a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/5065fafc8c29d229ff207f2a89b02175f479a909",
-                "reference": "5065fafc8c29d229ff207f2a89b02175f479a909",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/ade6887fd9bd74177769645ab5c474824f8a418a",
+                "reference": "ade6887fd9bd74177769645ab5c474824f8a418a",
                 "shasum": ""
             },
             "require": {
@@ -1593,7 +1593,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2020-02-12T22:28:28+00:00"
+            "time": "2020-02-13T22:36:52+00:00"
         },
         {
             "name": "elasticsearch/elasticsearch",
@@ -3163,16 +3163,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.6.1",
+            "version": "v3.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "56d25493d1d994a30ae0a20002428d6fd64b567f"
+                "reference": "f0295eec1fb96d0adace50aac01c3984877c034c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/56d25493d1d994a30ae0a20002428d6fd64b567f",
-                "reference": "56d25493d1d994a30ae0a20002428d6fd64b567f",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/f0295eec1fb96d0adace50aac01c3984877c034c",
+                "reference": "f0295eec1fb96d0adace50aac01c3984877c034c",
                 "shasum": ""
             },
             "require": {
@@ -3228,7 +3228,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2020-02-12T14:13:07+00:00"
+            "time": "2020-02-14T15:17:05+00:00"
         },
         {
             "name": "laravel/scout",
@@ -6732,27 +6732,27 @@
         },
         {
             "name": "spatie/async",
-            "version": "1.1.1",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "23b1e855310da03f6dc2accf9f41e27c7fa41481"
+                "reference": "8d4b54dc53acc434cfba6a3432b03510dc3d2a8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/23b1e855310da03f6dc2accf9f41e27c7fa41481",
-                "reference": "23b1e855310da03f6dc2accf9f41e27c7fa41481",
+                "url": "https://api.github.com/repos/spatie/async/zipball/8d4b54dc53acc434cfba6a3432b03510dc3d2a8c",
+                "reference": "8d4b54dc53acc434cfba6a3432b03510dc3d2a8c",
                 "shasum": ""
             },
             "require": {
-                "opis/closure": "^3.0",
+                "opis/closure": "^3.4.2",
                 "php": "^7.1",
                 "symfony/process": "^3.3 || ^4.0 || ^5.0"
             },
             "require-dev": {
                 "larapack/dd": "^1.1",
-                "phpunit/phpunit": "^6.0",
-                "symfony/stopwatch": "^4.0"
+                "phpunit/phpunit": "^6.5",
+                "symfony/stopwatch": "^4.0 || ^5.0"
             },
             "suggest": {
                 "ext-pcntl": "Required to use async processes",
@@ -6785,7 +6785,7 @@
                 "async",
                 "spatie"
             ],
-            "time": "2019-12-24T11:06:08+00:00"
+            "time": "2020-02-14T07:11:19+00:00"
         },
         {
             "name": "spatie/fractalistic",
@@ -9740,16 +9740,16 @@
         },
         {
             "name": "captainhook/plugin-composer",
-            "version": "5.1.0",
+            "version": "5.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/plugin-composer.git",
-                "reference": "5690b1de316643488426d4266937380fae09c8f1"
+                "reference": "c6ac1b4c3ec66e086994e84fffc1468982f137e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/5690b1de316643488426d4266937380fae09c8f1",
-                "reference": "5690b1de316643488426d4266937380fae09c8f1",
+                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/c6ac1b4c3ec66e086994e84fffc1468982f137e8",
+                "reference": "c6ac1b4c3ec66e086994e84fffc1468982f137e8",
                 "shasum": ""
             },
             "require": {
@@ -9787,7 +9787,7 @@
                 }
             ],
             "description": "Composer-Plugin handling your git-hooks",
-            "time": "2020-01-31T09:33:19+00:00"
+            "time": "2020-02-14T14:44:38+00:00"
         },
         {
             "name": "composer/composer",
@@ -9932,16 +9932,16 @@
         },
         {
             "name": "composer/spdx-licenses",
-            "version": "1.5.2",
+            "version": "1.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/spdx-licenses.git",
-                "reference": "7ac1e6aec371357df067f8a688c3d6974df68fa5"
+                "reference": "0c3e51e1880ca149682332770e25977c70cf9dae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/spdx-licenses/zipball/7ac1e6aec371357df067f8a688c3d6974df68fa5",
-                "reference": "7ac1e6aec371357df067f8a688c3d6974df68fa5",
+                "url": "https://api.github.com/repos/composer/spdx-licenses/zipball/0c3e51e1880ca149682332770e25977c70cf9dae",
+                "reference": "0c3e51e1880ca149682332770e25977c70cf9dae",
                 "shasum": ""
             },
             "require": {
@@ -9988,7 +9988,7 @@
                 "spdx",
                 "validator"
             ],
-            "time": "2019-07-29T10:31:59+00:00"
+            "time": "2020-02-14T07:44:31+00:00"
         },
         {
             "name": "composer/xdebug-handler",
@@ -12754,16 +12754,16 @@
         },
         {
             "name": "seld/phar-utils",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/phar-utils.git",
-                "reference": "84715761c35808076b00908a20317a3a8a67d17e"
+                "reference": "8800503d56b9867d43d9c303b9cbcc26016e82f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/phar-utils/zipball/84715761c35808076b00908a20317a3a8a67d17e",
-                "reference": "84715761c35808076b00908a20317a3a8a67d17e",
+                "url": "https://api.github.com/repos/Seldaek/phar-utils/zipball/8800503d56b9867d43d9c303b9cbcc26016e82f0",
+                "reference": "8800503d56b9867d43d9c303b9cbcc26016e82f0",
                 "shasum": ""
             },
             "require": {
@@ -12792,9 +12792,9 @@
             ],
             "description": "PHAR file format utilities, for when PHP phars you up",
             "keywords": [
-                "phra"
+                "phar"
             ],
-            "time": "2020-01-13T10:41:09+00:00"
+            "time": "2020-02-14T15:25:33+00:00"
         },
         {
             "name": "symfony/config",
@@ -12952,16 +12952,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "573381c0a64f155a0d9a23f4b0c797194805b925"
+                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/573381c0a64f155a0d9a23f4b0c797194805b925",
-                "reference": "573381c0a64f155a0d9a23f4b0c797194805b925",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/aed98a490f9a8f78468232db345ab9cf606cf598",
+                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598",
                 "shasum": ""
             },
             "require": {
@@ -12996,7 +12996,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2019-11-24T13:36:37+00:00"
+            "time": "2020-02-14T12:15:55+00:00"
         }
     ],
     "aliases": [],
