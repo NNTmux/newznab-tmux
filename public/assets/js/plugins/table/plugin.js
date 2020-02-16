@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.6 (2020-01-28)
+ * Version: 5.2.0 (2020-02-13)
  */
 (function (domGlobals) {
     'use strict';
@@ -302,8 +302,7 @@
       return r;
     };
     var bind = function (xs, f) {
-      var output = map(xs, f);
-      return flatten(output);
+      return flatten(map(xs, f));
     };
     var forall = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; ++i) {
@@ -324,6 +323,15 @@
     };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return nativeSlice.call(x);
+    };
+    var findMap = function (arr, f) {
+      for (var i = 0; i < arr.length; i++) {
+        var r = f(arr[i], i);
+        if (r.isSome()) {
+          return r;
+        }
+      }
+      return Option.none();
     };
 
     var keys = Object.keys;
@@ -1553,6 +1561,8 @@
     };
     var CopySelected = { extract: extract };
 
+    var nbsp = '\xA0';
+
     function NodeValue (is, name) {
       var get = function (element) {
         if (!is(element)) {
@@ -1594,10 +1604,9 @@
         return v.length;
       });
     };
-    var NBSP = '\xA0';
     var isTextNodeWithCursorPosition = function (el) {
       return getOption(el).filter(function (text) {
-        return text.trim().length !== 0 || text.indexOf(NBSP) > -1;
+        return text.trim().length !== 0 || text.indexOf(nbsp) > -1;
       }).isSome();
     };
     var elementsWithCursorPosition = [
@@ -1927,6 +1936,9 @@
           'input'
         ], name(element));
       };
+      var isNonEditable = function (element) {
+        return isElement(element) && get$1(element, 'contenteditable') === 'false';
+      };
       var comparePosition = function (element, other) {
         return element.dom().compareDocumentPosition(other.dom());
       };
@@ -1991,7 +2003,8 @@
           getText: get$3,
           setText: set$2,
           isBoundary: isBoundary,
-          isEmptyTag: isEmptyTag
+          isEmptyTag: isEmptyTag,
+          isNonEditable: isNonEditable
         }),
         eq: eq,
         is: is$1
@@ -2931,15 +2944,6 @@
         arr[i].each(push);
       }
       return r;
-    };
-    var findMap = function (arr, f) {
-      for (var i = 0; i < arr.length; i++) {
-        var r = f(arr[i], i);
-        if (r.isSome()) {
-          return r;
-        }
-      }
-      return Option.none();
     };
 
     var setIfNot = function (element, property, value, ignore) {
@@ -5840,33 +5844,6 @@
     };
     var RowDialog = { open: open$1 };
 
-    var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
-    var shallow$1 = function (old, nu) {
-      return nu;
-    };
-    var baseMerge = function (merger) {
-      return function () {
-        var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++) {
-          objects[i] = arguments[i];
-        }
-        if (objects.length === 0) {
-          throw new Error('Can\'t merge zero objects');
-        }
-        var ret = {};
-        for (var j = 0; j < objects.length; j++) {
-          var curObject = objects[j];
-          for (var key in curObject) {
-            if (hasOwnProperty$1.call(curObject, key)) {
-              ret[key] = merger(ret[key], curObject[key]);
-            }
-          }
-        }
-        return ret;
-      };
-    };
-    var merge$3 = baseMerge(shallow$1);
-
     var global$2 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var DefaultRenderOptions = {
@@ -6122,8 +6099,8 @@
         styles['border-color'] = data.bordercolor;
         styles['border-style'] = data.borderstyle;
       }
-      attrs.style = dom.serializeStyle(merge$3(getDefaultStyles(editor), styles));
-      dom.setAttribs(tableElm, merge$3(getDefaultAttributes(editor), attrs));
+      attrs.style = dom.serializeStyle(__assign(__assign({}, getDefaultStyles(editor)), styles));
+      dom.setAttribs(tableElm, __assign(__assign({}, getDefaultAttributes(editor)), attrs));
     };
     var onSubmitTableForm = function (editor, tableElm, api) {
       var dom = editor.dom;
@@ -6146,7 +6123,7 @@
         }
         if (!captionElm && data.caption) {
           captionElm = dom.create('caption');
-          captionElm.innerHTML = !global$2.ie ? '<br data-mce-bogus="1"/>' : '\xA0';
+          captionElm.innerHTML = !global$2.ie ? '<br data-mce-bogus="1"/>' : nbsp;
           tableElm.insertBefore(captionElm, tableElm.firstChild);
         }
         if (data.align === '') {
@@ -6516,7 +6493,7 @@
     var Styles$2 = { resolve: styles$1.resolve };
 
     var Blocker = function (options) {
-      var settings = merge$3({ layerClass: Styles$2.resolve('blocker') }, options);
+      var settings = __assign({ layerClass: Styles$2.resolve('blocker') }, options);
       var div = Element.fromTag('div');
       set(div, 'role', 'presentation');
       setAll$1(div, {
@@ -7393,6 +7370,8 @@
         }
       });
     };
+    var ltr$2 = adt$4.ltr;
+    var rtl$2 = adt$4.rtl;
 
     var searchForPoint = function (rectForOffset, x, y, maxX, length) {
       if (length === 0) {

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.6 (2020-01-28)
+ * Version: 5.2.0 (2020-02-13)
  */
 (function () {
     'use strict';
@@ -151,8 +151,7 @@
       return r;
     };
     var bind = function (xs, f) {
-      var output = map(xs, f);
-      return flatten(output);
+      return flatten(map(xs, f));
     };
     var from = isFunction(Array.from) ? Array.from : function (x) {
       return nativeSlice.call(x);

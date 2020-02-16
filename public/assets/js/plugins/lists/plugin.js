@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.6 (2020-01-28)
+ * Version: 5.2.0 (2020-02-13)
  */
 (function (domGlobals) {
     'use strict';
@@ -239,8 +239,7 @@
       return r;
     };
     var bind = function (xs, f) {
-      var output = map(xs, f);
-      return flatten(output);
+      return flatten(map(xs, f));
     };
     var reverse = function (xs) {
       var r = nativeSlice.call(xs, 0);
@@ -269,6 +268,19 @@
     var Node = {
       documentPositionPreceding: documentPositionPreceding,
       documentPositionContainedBy: documentPositionContainedBy
+    };
+
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
+        }
+        return t;
+      };
+      return __assign.apply(this, arguments);
     };
 
     var Cell = function (initial) {
@@ -986,18 +998,38 @@
       getSelectedListRoots: getSelectedListRoots
     };
 
+    var shouldIndentOnTab = function (editor) {
+      return editor.getParam('lists_indent_on_tab', true);
+    };
+    var getForcedRootBlock = function (editor) {
+      var block = editor.getParam('forced_root_block', 'p');
+      if (block === false) {
+        return '';
+      } else if (block === true) {
+        return 'p';
+      } else {
+        return block;
+      }
+    };
+    var getForcedRootBlockAttrs = function (editor) {
+      return editor.getParam('forced_root_block_attrs', {});
+    };
+    var Settings = {
+      shouldIndentOnTab: shouldIndentOnTab,
+      getForcedRootBlock: getForcedRootBlock,
+      getForcedRootBlockAttrs: getForcedRootBlockAttrs
+    };
+
     var createTextBlock = function (editor, contentNode) {
       var dom = editor.dom;
       var blockElements = editor.schema.getBlockElements();
       var fragment = dom.createFragment();
-      var node, textBlock, blockName, hasContentNode;
-      if (editor.settings.forced_root_block) {
-        blockName = editor.settings.forced_root_block;
-      }
+      var blockName = Settings.getForcedRootBlock(editor);
+      var node, textBlock, hasContentNode;
       if (blockName) {
         textBlock = dom.create(blockName);
-        if (textBlock.tagName === editor.settings.forced_root_block) {
-          dom.setAttribs(textBlock, editor.settings.forced_root_block_attrs);
+        if (textBlock.tagName === blockName.toUpperCase()) {
+          dom.setAttribs(textBlock, Settings.getForcedRootBlockAttrs(editor));
         }
         if (!NodeType.isBlock(contentNode.firstChild, blockElements)) {
           fragment.appendChild(textBlock);
@@ -1025,7 +1057,7 @@
           }
         }
       }
-      if (!editor.settings.forced_root_block) {
+      if (!blockName) {
         fragment.appendChild(dom.create('br'));
       } else {
         if (!hasContentNode) {
@@ -1233,36 +1265,9 @@
       }
     };
 
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
-    var shallow = function (old, nu) {
-      return nu;
-    };
-    var baseMerge = function (merger) {
-      return function () {
-        var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++) {
-          objects[i] = arguments[i];
-        }
-        if (objects.length === 0) {
-          throw new Error('Can\'t merge zero objects');
-        }
-        var ret = {};
-        for (var j = 0; j < objects.length; j++) {
-          var curObject = objects[j];
-          for (var key in curObject) {
-            if (hasOwnProperty.call(curObject, key)) {
-              ret[key] = merger(ret[key], curObject[key]);
-            }
-          }
-        }
-        return ret;
-      };
-    };
-    var merge = baseMerge(shallow);
-
     var cloneListProperties = function (target, source) {
       target.listType = source.listType;
-      target.listAttributes = merge({}, source.listAttributes);
+      target.listAttributes = __assign({}, source.listAttributes);
     };
     var previousSiblingEntry = function (entries, start) {
       var depth = entries[start].depth;
@@ -2093,11 +2098,6 @@
       editor.addQueryStateHandler('InsertDefinitionList', queryListCommandState(editor, 'DL'));
     };
     var Commands = { register: register };
-
-    var shouldIndentOnTab = function (editor) {
-      return editor.getParam('lists_indent_on_tab', true);
-    };
-    var Settings = { shouldIndentOnTab: shouldIndentOnTab };
 
     var setupTabKey = function (editor) {
       editor.on('keydown', function (e) {

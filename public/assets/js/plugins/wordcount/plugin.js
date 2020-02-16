@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.6 (2020-01-28)
+ * Version: 5.2.0 (2020-02-13)
  */
 (function () {
     'use strict';
@@ -255,6 +255,8 @@
       return true;
     };
 
+    var zeroWidth = '\uFEFF';
+
     var EMPTY_STRING$1 = EMPTY_STRING;
     var WHITESPACE$1 = WHITESPACE;
     var PUNCTUATION$1 = PUNCTUATION;
@@ -311,7 +313,7 @@
       var extractedChars = [];
       for (var i = 0; i < chars.length; i++) {
         var ch = extract(chars[i]);
-        if (ch !== '\uFEFF') {
+        if (ch !== zeroWidth) {
           filteredChars.push(chars[i]);
           extractedChars.push(ch);
         }

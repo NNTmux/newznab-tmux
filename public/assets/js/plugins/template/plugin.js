@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.6 (2020-01-28)
+ * Version: 5.2.0 (2020-02-13)
  */
 (function () {
     'use strict';
@@ -439,6 +439,11 @@
           return t.text === templateTitle;
         });
       };
+      var loadFailedAlert = function (api) {
+        editor.windowManager.alert('Could not load the specified template.', function () {
+          return api.focus('template');
+        });
+      };
       var getTemplateContent = function (t) {
         return new global$3(function (resolve, reject) {
           t.value.url.fold(function () {
@@ -464,7 +469,10 @@
               api.block('Loading...');
               getTemplateContent(t).then(function (previewHtml) {
                 updateDialog(api, t, previewHtml);
-                api.unblock();
+              }).catch(function () {
+                updateDialog(api, t, '');
+                api.disable('save');
+                loadFailedAlert(api);
               });
             });
           }
@@ -477,6 +485,9 @@
             getTemplateContent(t).then(function (previewHtml) {
               Templates.insertTemplate(editor, false, previewHtml);
               api.close();
+            }).catch(function () {
+              api.disable('save');
+              loadFailedAlert(api);
             });
           });
         };
@@ -544,6 +555,10 @@
         dialogApi.block('Loading...');
         getTemplateContent(templates[0]).then(function (previewHtml) {
           updateDialog(dialogApi, templates[0], previewHtml);
+        }).catch(function () {
+          updateDialog(dialogApi, templates[0], '');
+          dialogApi.disable('save');
+          loadFailedAlert(dialogApi);
         });
       };
       var optTemplates = createTemplates();

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.6 (2020-01-28)
+ * Version: 5.2.0 (2020-02-13)
  */
 (function (domGlobals) {
     'use strict';
@@ -806,9 +806,13 @@
     var getInsertToolbarItems = function (editor) {
       return EditorSettings.getToolbarItemsOr(editor, 'quickbars_insert_toolbar', 'quickimage quicktable');
     };
+    var getImageToolbarItems = function (editor) {
+      return EditorSettings.getToolbarItemsOr(editor, 'quickbars_image_toolbar', 'alignleft aligncenter alignright');
+    };
     var Settings = {
       getTextSelectionToolbarItems: getTextSelectionToolbarItems,
-      getInsertToolbarItems: getInsertToolbarItems
+      getInsertToolbarItems: getInsertToolbarItems,
+      getImageToolbarItems: getImageToolbarItems
     };
 
     var addToEditor = function (editor) {
@@ -838,21 +842,29 @@
     var InsertToolbars = { addToEditor: addToEditor };
 
     var addToEditor$1 = function (editor) {
-      editor.ui.registry.addContextToolbar('imageselection', {
-        predicate: function (node) {
-          return node.nodeName === 'IMG' || node.nodeName === 'FIGURE' && /image/i.test(node.className);
-        },
-        items: 'alignleft aligncenter alignright',
-        position: 'node'
-      });
+      var isEditable = function (node) {
+        return editor.dom.getContentEditableParent(node) !== 'false';
+      };
+      var isImage = function (node) {
+        return node.nodeName === 'IMG' || node.nodeName === 'FIGURE' && /image/i.test(node.className);
+      };
+      var imageToolbarItems = Settings.getImageToolbarItems(editor);
+      if (imageToolbarItems.trim().length > 0) {
+        editor.ui.registry.addContextToolbar('imageselection', {
+          predicate: isImage,
+          items: imageToolbarItems,
+          position: 'node'
+        });
+      }
       var textToolbarItems = Settings.getTextSelectionToolbarItems(editor);
       if (textToolbarItems.trim().length > 0) {
         editor.ui.registry.addContextToolbar('textselection', {
           predicate: function (node) {
-            return !editor.selection.isCollapsed();
+            return !isImage(node) && !editor.selection.isCollapsed() && isEditable(node);
           },
           items: textToolbarItems,
-          position: 'selection'
+          position: 'selection',
+          scope: 'editor'
         });
       }
     };

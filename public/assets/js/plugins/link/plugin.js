@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.1.6 (2020-01-28)
+ * Version: 5.2.0 (2020-02-13)
  */
 (function (domGlobals) {
     'use strict';
@@ -72,6 +72,9 @@
     var useQuickLink = function (editor) {
       return editor.getParam('link_quicklink', false, 'boolean');
     };
+    var getDefaultLinkProtocol = function (editor) {
+      return editor.getParam('link_default_protocol', 'http', 'string');
+    };
     var Settings = {
       assumeExternalTargets: assumeExternalTargets,
       hasContextToolbar: hasContextToolbar,
@@ -82,7 +85,8 @@
       getLinkClassList: getLinkClassList,
       shouldShowLinkTitle: shouldShowLinkTitle,
       allowUnsafeLinkTarget: allowUnsafeLinkTarget,
-      useQuickLink: useQuickLink
+      useQuickLink: useQuickLink,
+      getDefaultLinkProtocol: getDefaultLinkProtocol
     };
 
     var appendClickRemove = function (link, evt) {
@@ -274,11 +278,19 @@
       return r;
     };
     var bind = function (xs, f) {
-      var output = map(xs, f);
-      return flatten(output);
+      return flatten(map(xs, f));
     };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return nativeSlice.call(x);
+    };
+    var findMap = function (arr, f) {
+      for (var i = 0; i < arr.length; i++) {
+        var r = f(arr[i], i);
+        if (r.isSome()) {
+          return r;
+        }
+      }
+      return Option.none();
     };
 
     var global$3 = tinymce.util.Tools.resolve('tinymce.util.Tools');
@@ -462,15 +474,6 @@
       }
       return r;
     };
-    var findMap = function (arr, f) {
-      for (var i = 0; i < arr.length; i++) {
-        var r = f(arr[i], i);
-        if (r.isSome()) {
-          return r;
-        }
-      }
-      return Option.none();
-    };
 
     var getValue = function (item) {
       return isString(item.value) ? item.value : '';
@@ -574,7 +577,11 @@
       var onUrlChange = function (data) {
         if (persistentText.get().length <= 0) {
           var urlText = data.url.meta.text !== undefined ? data.url.meta.text : data.url.value;
-          return Option.some({ text: urlText });
+          var urlTitle = data.url.meta.title !== undefined ? data.url.meta.title : '';
+          return Option.some({
+            text: urlText,
+            title: urlTitle
+          });
         } else {
           return Option.none();
         }
@@ -1241,22 +1248,22 @@
         }
       }) : Option.none();
     };
-    var tryProtocolTransform = function (assumeExternalTargets) {
+    var tryProtocolTransform = function (assumeExternalTargets, defaultLinkProtocol) {
       return function (data) {
         var url = data.href;
         var suggestProtocol = assumeExternalTargets === 1 && !Utils.hasProtocol(url) || assumeExternalTargets === 0 && /^\s*www[\.|\d\.]/i.test(url);
         return suggestProtocol ? Option.some({
-          message: 'The URL you entered seems to be an external link. Do you want to add the required http:// prefix?',
+          message: 'The URL you entered seems to be an external link. Do you want to add the required ' + defaultLinkProtocol + ':// prefix?',
           preprocess: function (oldData) {
-            return __assign(__assign({}, oldData), { href: 'http://' + url });
+            return __assign(__assign({}, oldData), { href: defaultLinkProtocol + '://' + url });
           }
         }) : Option.none();
       };
     };
-    var preprocess = function (editor, assumeExternalTargets, data) {
+    var preprocess = function (editor, data) {
       return findMap([
         tryEmailTransform,
-        tryProtocolTransform(assumeExternalTargets)
+        tryProtocolTransform(Settings.assumeExternalTargets(editor), Settings.getDefaultLinkProtocol(editor))
       ], function (f) {
         return f(data);
       }).fold(function () {
@@ -1422,7 +1429,7 @@
     };
     var DialogInfo = { collect: collect };
 
-    var handleSubmit = function (editor, info, assumeExternalTargets) {
+    var handleSubmit = function (editor, info) {
       return function (api) {
         var data = api.getData();
         if (!data.url.value) {
@@ -1448,7 +1455,7 @@
           attach: data.url.meta !== undefined && data.url.meta.attach ? data.url.meta.attach : function () {
           }
         };
-        DialogConfirms.preprocess(editor, assumeExternalTargets, changedData).get(function (pData) {
+        DialogConfirms.preprocess(editor, changedData).get(function (pData) {
           Utils.link(editor, attachState, pData);
         });
         api.close();
@@ -1550,7 +1557,7 @@
     var open$1 = function (editor) {
       var data = collectData(editor);
       data.map(function (info) {
-        var onSubmit = handleSubmit(editor, info, Settings.assumeExternalTargets(editor));
+        var onSubmit = handleSubmit(editor, info);
         return makeDialog(info, onSubmit, editor);
       }).get(function (spec) {
         editor.windowManager.open(spec);
