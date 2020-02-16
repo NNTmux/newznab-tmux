@@ -263,16 +263,16 @@
         },
         {
             "name": "brick/math",
-            "version": "0.8.12",
+            "version": "0.8.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "ea9a095b902f5d42126aba4455a64476f5528241"
+                "reference": "d6c1421d82992198835613b0d099050b66f2edc7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/ea9a095b902f5d42126aba4455a64476f5528241",
-                "reference": "ea9a095b902f5d42126aba4455a64476f5528241",
+                "url": "https://api.github.com/repos/brick/math/zipball/d6c1421d82992198835613b0d099050b66f2edc7",
+                "reference": "d6c1421d82992198835613b0d099050b66f2edc7",
                 "shasum": ""
             },
             "require": {
@@ -304,7 +304,7 @@
                 "brick",
                 "math"
             ],
-            "time": "2020-01-27T13:00:05+00:00"
+            "time": "2020-02-16T17:16:11+00:00"
         },
         {
             "name": "cakephp/chronos",
@@ -11505,16 +11505,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.10",
+            "version": "0.12.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "39004edc7fc308752f625b89b70ad1710708f45e"
+                "reference": "ca5f2b7cf81c6d8fba74f9576970399c5817e03b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/39004edc7fc308752f625b89b70ad1710708f45e",
-                "reference": "39004edc7fc308752f625b89b70ad1710708f45e",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ca5f2b7cf81c6d8fba74f9576970399c5817e03b",
+                "reference": "ca5f2b7cf81c6d8fba74f9576970399c5817e03b",
                 "shasum": ""
             },
             "require": {
@@ -11540,7 +11540,7 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2020-02-12T22:03:42+00:00"
+            "time": "2020-02-16T14:00:29+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
