@@ -50,23 +50,23 @@
         },
         {
             "name": "alchemy/binary-driver",
-            "version": "v5.1.1",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alchemy-fr/BinaryDriver.git",
-                "reference": "48c31f7b47d78b6bc49ff2d95ab78aa3a63529ab"
+                "reference": "e0615cdff315e6b4b05ada67906df6262a020d22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alchemy-fr/BinaryDriver/zipball/48c31f7b47d78b6bc49ff2d95ab78aa3a63529ab",
-                "reference": "48c31f7b47d78b6bc49ff2d95ab78aa3a63529ab",
+                "url": "https://api.github.com/repos/alchemy-fr/BinaryDriver/zipball/e0615cdff315e6b4b05ada67906df6262a020d22",
+                "reference": "e0615cdff315e6b4b05ada67906df6262a020d22",
                 "shasum": ""
             },
             "require": {
-                "evenement/evenement": "^2.0|^1.0",
+                "evenement/evenement": "^3.0|^2.0|^1.0",
                 "php": ">=5.5",
                 "psr/log": "^1.0",
-                "symfony/process": "^2.3|^3.0|^4.0"
+                "symfony/process": "^2.3|^3.0|^4.0|^5.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.0|^5.0"
@@ -108,7 +108,7 @@
                 "binary",
                 "driver"
             ],
-            "time": "2020-01-04T11:09:57+00:00"
+            "time": "2020-02-12T19:35:11+00:00"
         },
         {
             "name": "anhskohbo/no-captcha",
@@ -1660,30 +1660,25 @@
         },
         {
             "name": "evenement/evenement",
-            "version": "v2.1.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/igorw/evenement.git",
-                "reference": "6ba9a777870ab49f417e703229d53931ed40fd7a"
+                "reference": "531bfb9d15f8aa57454f5f0285b18bec903b8fb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/igorw/evenement/zipball/6ba9a777870ab49f417e703229d53931ed40fd7a",
-                "reference": "6ba9a777870ab49f417e703229d53931ed40fd7a",
+                "url": "https://api.github.com/repos/igorw/evenement/zipball/531bfb9d15f8aa57454f5f0285b18bec903b8fb7",
+                "reference": "531bfb9d15f8aa57454f5f0285b18bec903b8fb7",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.0||^5.7||^4.8.35"
+                "phpunit/phpunit": "^6.0"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                }
-            },
             "autoload": {
                 "psr-0": {
                     "Evenement": "src"
@@ -1704,7 +1699,7 @@
                 "event-dispatcher",
                 "event-emitter"
             ],
-            "time": "2017-07-17T17:39:19+00:00"
+            "time": "2017-07-23T21:35:13+00:00"
         },
         {
             "name": "ezimuel/guzzlestreams",
@@ -4442,24 +4437,24 @@
         },
         {
             "name": "neutron/temporary-filesystem",
-            "version": "2.3.0",
+            "version": "2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/romainneutron/Temporary-Filesystem.git",
-                "reference": "694aa3885f653dd429584e825ffbab79441d285f"
+                "reference": "3c55497da8d7762fb4dcabc91d54a5de510e3c99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/romainneutron/Temporary-Filesystem/zipball/694aa3885f653dd429584e825ffbab79441d285f",
-                "reference": "694aa3885f653dd429584e825ffbab79441d285f",
+                "url": "https://api.github.com/repos/romainneutron/Temporary-Filesystem/zipball/3c55497da8d7762fb4dcabc91d54a5de510e3c99",
+                "reference": "3c55497da8d7762fb4dcabc91d54a5de510e3c99",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.6 || ^7.0",
-                "symfony/filesystem": "^2.3 || ^3.0 || ^4.0"
+                "symfony/filesystem": "^2.3 || ^3.0 || ^4.0 || ^5.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.0"
+                "symfony/phpunit-bridge": "^5.0.4"
             },
             "type": "library",
             "autoload": {
@@ -4478,7 +4473,7 @@
                 }
             ],
             "description": "Symfony filesystem extension to handle temporary files",
-            "time": "2018-02-07T21:11:57+00:00"
+            "time": "2020-02-17T15:27:36+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -6969,16 +6964,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "3.7.1",
+            "version": "3.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "3aff5437b3e66e877dcc3158f6cfaaced8e468ab"
+                "reference": "ce5d82fc5f5300575876c42131f9e9ae2e18f6aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/3aff5437b3e66e877dcc3158f6cfaaced8e468ab",
-                "reference": "3aff5437b3e66e877dcc3158f6cfaaced8e468ab",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/ce5d82fc5f5300575876c42131f9e9ae2e18f6aa",
+                "reference": "ce5d82fc5f5300575876c42131f9e9ae2e18f6aa",
                 "shasum": ""
             },
             "require": {
@@ -7033,7 +7028,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2020-02-15T17:52:58+00:00"
+            "time": "2020-02-17T17:06:57+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -9258,16 +9253,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.12",
+            "version": "4.7.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "9eba9460896bca215e1e1d8814dd4b90c45be85d"
+                "reference": "301e41cb38df258d3e8749a7ee514d37845fe54e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/9eba9460896bca215e1e1d8814dd4b90c45be85d",
-                "reference": "9eba9460896bca215e1e1d8814dd4b90c45be85d",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/301e41cb38df258d3e8749a7ee514d37845fe54e",
+                "reference": "301e41cb38df258d3e8749a7ee514d37845fe54e",
                 "shasum": ""
             },
             "require": {
@@ -9313,7 +9308,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2020-01-22T00:08:59+00:00"
+            "time": "2020-02-17T15:47:33+00:00"
         },
         {
             "name": "wildbit/swiftmailer-postmark",
