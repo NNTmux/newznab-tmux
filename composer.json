@@ -121,7 +121,7 @@
     "laravel/framework": "^6.0",
     "laravel/horizon": "^3.0",
     "laravel/scout": "^7.0",
-    "laravel/telescope": "^2.0",
+    "laravel/telescope": "^3.0",
     "laravel/tinker": "^2.0",
     "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
