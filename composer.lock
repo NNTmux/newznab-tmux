@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b26c4c9d71c101c4c3ecbf7703b49279",
+    "content-hash": "74b4886a89cbecbcf8a072ccd0993cf5",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3889,16 +3889,16 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "v0.10.2",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "aef5fbb5e0886d3bb2cba2eb628d84921af8ce17"
+                "reference": "9076092a145c3a6fec68f79d165b7b0dda13b56f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/aef5fbb5e0886d3bb2cba2eb628d84921af8ce17",
-                "reference": "aef5fbb5e0886d3bb2cba2eb628d84921af8ce17",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/9076092a145c3a6fec68f79d165b7b0dda13b56f",
+                "reference": "9076092a145c3a6fec68f79d165b7b0dda13b56f",
                 "shasum": ""
             },
             "require": {
@@ -3939,7 +3939,7 @@
                 "laravel",
                 "wrapper"
             ],
-            "time": "2019-09-26T12:58:05+00:00"
+            "time": "2019-12-31T15:39:21+00:00"
         },
         {
             "name": "maxmind-db/reader",

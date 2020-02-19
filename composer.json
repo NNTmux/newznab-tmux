@@ -126,7 +126,7 @@
     "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
     "league/omnipay": "^3",
-    "marcreichel/igdb-laravel": "^0.10.0",
+    "marcreichel/igdb-laravel": "^1.0",
     "mhor/php-mediainfo": "^4.1",
     "monicahq/laravel-cloudflare": "^1.3",
     "monolog/monolog": "^1.22",
