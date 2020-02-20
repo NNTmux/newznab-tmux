@@ -12606,16 +12606,16 @@
         },
         {
             "name": "sebastianfeldmann/cli",
-            "version": "3.2.2",
+            "version": "3.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/cli.git",
-                "reference": "a20e8560fd4f21bac193a65f8678a7d1b3932e08"
+                "reference": "7435ca26c2d7e745774e9911cd7e821309e643ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/a20e8560fd4f21bac193a65f8678a7d1b3932e08",
-                "reference": "a20e8560fd4f21bac193a65f8678a7d1b3932e08",
+                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/7435ca26c2d7e745774e9911cd7e821309e643ab",
+                "reference": "7435ca26c2d7e745774e9911cd7e821309e643ab",
                 "shasum": ""
             },
             "require": {
@@ -12646,7 +12646,7 @@
             "keywords": [
                 "cli"
             ],
-            "time": "2019-10-29T13:48:15+00:00"
+            "time": "2020-02-20T13:28:45+00:00"
         },
         {
             "name": "sebastianfeldmann/git",
