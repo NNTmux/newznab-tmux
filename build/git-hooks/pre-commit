@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# installed by CaptainHook 5.1.1
-
-vendor/captainhook/captainhook/bin/captainhook --configuration=captainhook.json --bootstrap=vendor/autoload.php hook:pre-commit "$@"
