@@ -7,6 +7,7 @@ use App\Jobs\SendAccountChangedEmail;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
 class UserController extends BasePageController
@@ -237,5 +238,36 @@ class UserController extends BasePageController
         }
 
         return redirect($request->server('HTTP_REFERER'));
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
+     */
+    public function resendVerification(Request $request)
+    {
+        if ($request->has('id')) {
+            $user = User::find($request->input('id'));
+            UserVerification::generate($user);
+
+            UserVerification::send($user, 'User email verification required');
+
+            return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
+        } else {
+            return redirect()->back()->with('error', 'User is invalid');
+        }
+    }
+
+    public function verify(Request $request)
+    {
+        if ($request->has('id')) {
+            $user = User::find($request->input('id'));
+            User::query()->where('id', $request->input('id'))->update(['verified' => 1, 'email_verified_at' => now()]);
+
+            return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
+        } else {
+            return redirect()->back()->with('error', 'User is invalid');
+        }
     }
 }
