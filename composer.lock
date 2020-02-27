@@ -3010,16 +3010,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.17.0",
+            "version": "v6.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "40fd590b93f060f2ebe407b3e6d29e66b0e57fbb"
+                "reference": "32d1ed55dd46dcd706ff2e45bb7965be7320b87d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/40fd590b93f060f2ebe407b3e6d29e66b0e57fbb",
-                "reference": "40fd590b93f060f2ebe407b3e6d29e66b0e57fbb",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/32d1ed55dd46dcd706ff2e45bb7965be7320b87d",
+                "reference": "32d1ed55dd46dcd706ff2e45bb7965be7320b87d",
                 "shasum": ""
             },
             "require": {
@@ -3152,7 +3152,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-02-25T15:07:46+00:00"
+            "time": "2020-02-26T14:23:01+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -6964,16 +6964,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "3.8.0",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "2339b6fae8f8aa5af047e1a0c54b6fb37546058a"
+                "reference": "ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/2339b6fae8f8aa5af047e1a0c54b6fb37546058a",
-                "reference": "2339b6fae8f8aa5af047e1a0c54b6fb37546058a",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66",
+                "reference": "ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66",
                 "shasum": ""
             },
             "require": {
@@ -7028,7 +7028,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2020-02-18T21:16:24+00:00"
+            "time": "2020-02-26T16:23:16+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
