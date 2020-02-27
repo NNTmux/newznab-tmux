@@ -86,7 +86,7 @@ return [
              *
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html#enabling_logger
              */
-            'logging' => true,
+            'logging' => env('ELASTICSEARCH_LOGGING', false),
 
             // If you have an existing instance of Monolog you can use it here.
             // 'logObject' => \Log::getMonolog(),
