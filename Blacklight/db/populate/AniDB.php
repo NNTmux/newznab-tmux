@@ -75,7 +75,7 @@ class AniDB
         $lastupdated = Settings::settingValue('APIs.AniDB.last_full_update');
 
         $this->imgSavePath = NN_COVERS.'anime'.DS;
-        $this->apiKey = Settings::settingValue('APIs..anidbkey');
+        $this->apiKey = config('nntmux_api.anidb_api_key');
 
         $this->updateInterval = $anidbupdint ?? '7';
         $this->lastUpdate = $lastupdated ?? '0';

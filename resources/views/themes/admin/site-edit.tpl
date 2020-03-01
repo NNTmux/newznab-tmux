@@ -116,7 +116,7 @@
 			</table>
 		</fieldset>
 		<fieldset>
-			<legend>3<sup>rd</sup> Party API Keys</legend>
+			<legend>3<sup>rd</sup> Party API Keys (will be removed, all values should be in .env)</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
 					<td style="width:180px;"><label for="trakttvclientkey">Trakt.tv API Client ID:</label></td>

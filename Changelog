@@ -1,3 +1,5 @@
+2020-03-01 DariusIII
+	* Chg: Move all third party api keys from database to .env file
 2020-02-27 DariusIII
 	* Chg: Add option to disable or enable elasticsearch logging
 2020-01-27 DariusIII

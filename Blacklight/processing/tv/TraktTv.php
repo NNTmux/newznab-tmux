@@ -54,7 +54,7 @@ class TraktTv extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $clientId = Settings::settingValue('APIs..trakttvclientkey');
+        $clientId = config('nntmux_api.trakttv_api_key');
         $requestHeaders = [
             'Content-Type' => 'application/json',
             'trakt-api-version' => 2,

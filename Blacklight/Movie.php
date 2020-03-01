@@ -167,16 +167,16 @@ class Movie
 
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->colorCli = new ColorCLI();
-        $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
+        $this->traktcheck = config('nntmux_api.trakttv_api_key');
         if ($this->traktcheck !== null) {
             $this->traktTv = new TraktTv(['Settings' => null]);
         }
         $this->client = new Client();
-        $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
+        $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
         if ($this->fanartapikey !== null) {
             $this->fanart = new FanartTV($this->fanartapikey);
         }
-        $this->omdbapikey = Settings::settingValue('APIs..omdbkey');
+        $this->omdbapikey = config('nntmux_api.omdb_api_key');
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }

@@ -126,7 +126,7 @@ class Games
 
         $this->colorCli = new ColorCLI();
 
-        $this->publicKey = Settings::settingValue('APIs..giantbombkey');
+        $this->publicKey = config('nntmux_api.giantbomb_api_key');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
         $this->imgSavePath = NN_COVERS.'games'.DS;
         $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
