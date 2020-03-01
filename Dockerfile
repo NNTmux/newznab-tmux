@@ -17,7 +17,7 @@ RUN git clone https://github.com/tmux/tmux.git && \
     cd .. && \
     rm -rf tmux
 
-ENV HASH a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1
+ENV HASH e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a
 RUN cd ~ && curl -sS https://getcomposer.org/installer -o composer-setup.php && php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && composer global require hirak/prestissimo
 COPY docker/php.ini /etc/php/7.3/apache2/conf.d/99-nn-tmux.ini
