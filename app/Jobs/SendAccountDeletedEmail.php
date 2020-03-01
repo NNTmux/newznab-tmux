@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Mail\AccountDeleted;
-use App\Models\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

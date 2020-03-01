@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\PaypalPayment;
-use App\Models\Settings;
 use App\Models\User;
 use Blacklight\libraries\Geary;
 use Illuminate\Http\Request;

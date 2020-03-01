@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendContactUsEmail;
-use App\Models\Settings;
 use Illuminate\Http\Request;
 
 class ContactUsController extends BasePageController

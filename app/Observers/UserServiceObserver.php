@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Jobs\SendNewRegisteredAccountMail;
 use App\Jobs\SendWelcomeEmail;
-use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Password;
