@@ -170,7 +170,7 @@ class BtcPaymentController extends BasePageController
                 User::updateUserRoleChangeDate($userId, null, $role->addyears);
                 PaypalPayment::query()->insert(['users_id' => $userId, 'transaction_id' => $request->input('paymentId'), 'created_at' => now(), 'updated_at' => now()]);
                 $title = 'Cheers!';
-                $meta_title = Settings::settingValue('site.main.title').' - Payment Complete';
+                $meta_title = config('app.name').' - Payment Complete';
                 $meta_description = 'Payment Complete';
                 $content = $this->smarty->fetch('thankyou.tpl');
                 $this->smarty->assign(compact('content', 'meta_title', 'title', 'meta_description'));

@@ -41,8 +41,8 @@ class PasswordReset extends Mailable
     {
         $this->user = $user;
         $this->newPass = $newPass;
-        $this->siteEmail = Settings::settingValue('site.main.email');
-        $this->siteTitle = Settings::settingValue('site.main.title');
+        $this->siteEmail = config('mail.from.address');
+        $this->siteTitle = config('app.name');
     }
 
     /**

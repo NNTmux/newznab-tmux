@@ -37,6 +37,6 @@ class SendAccountDeletedEmail implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($this->user));
+        Mail::to(config('mail.from.address'))->send(new AccountDeleted($this->user));
     }
 }

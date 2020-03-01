@@ -37,6 +37,6 @@ class SendNewRegisteredAccountMail implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to(Settings::settingValue('site.main.email'))->send(new NewAccountCreatedEmail($this->user));
+        Mail::to(config('mail.from.address'))->send(new NewAccountCreatedEmail($this->user));
     }
 }

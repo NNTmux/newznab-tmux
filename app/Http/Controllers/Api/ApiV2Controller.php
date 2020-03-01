@@ -30,9 +30,9 @@ class ApiV2Controller extends BasePageController
 
         $capabilities = [
             'server' => [
-                'title'      => Settings::settingValue('site.main.title'),
+                'title'      => config('app.name'),
                 'strapline'  => Settings::settingValue('site.main.strapline'),
-                'email'      => Settings::settingValue('site.main.email'),
+                'email'      => config('mail.from.address'),
                 'url'        => url('/'),
             ],
             'limits' => [

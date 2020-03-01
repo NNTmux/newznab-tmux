@@ -41,8 +41,8 @@ class SendInvite extends Mailable
     {
         $this->user = $user;
         $this->invite = $invite;
-        $this->siteEmail = Settings::settingValue('site.main.email');
-        $this->siteTitle = Settings::settingValue('site.main.title');
+        $this->siteEmail = config('mail.from.address');
+        $this->siteTitle = config('app.name');
     }
 
     /**

@@ -17,7 +17,7 @@
             <div class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
                     <a href="{$site->home_link}" class="site_title"><i class="fab fa-phoenix-framework"></i>
-                        <span>{$site->title}</span></a>
+                        <span>{{config('app.name')}}</span></a>
                 </div>
                 <div class="clearfix"></div>
                 <!-- menu profile quick info -->

@@ -9,7 +9,7 @@ class SettingsTest extends TestCase
 {
     public function testSettingValue()
     {
-        $name = Settings::settingValue('site.main.title');
+        $name = config('app.name');
 
         $this->assertEquals('NNTmux', $name);
     }

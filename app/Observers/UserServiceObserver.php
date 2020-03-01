@@ -35,12 +35,12 @@ class UserServiceObserver
                 'rate_limit' => $rateLimit,
             ]
         );
-        if (! empty(Settings::settingValue('site.main.email') && File::isFile(base_path().'/_install/install.lock'))) {
+        if (! empty(config('mail.from.address') && File::isFile(base_path().'/_install/install.lock'))) {
             SendNewRegisteredAccountMail::dispatch($user)->onQueue('newreg');
             SendWelcomeEmail::dispatch($user)->onQueue('welcomeemails');
             UserVerification::generate($user);
 
-            UserVerification::send($user, 'User email verification required', Settings::settingValue('site.main.email'));
+            UserVerification::send($user, 'User email verification required', config('mail.from.address'));
         }
     }
 }
