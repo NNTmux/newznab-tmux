@@ -857,12 +857,6 @@ class NNTP extends \Net_NNTP_Client
     }
 
     /**
-     * Path to yyDecoder binary.
-     * @var bool|string
-     */
-    protected $_yyDecoderPath;
-
-    /**
      * If on unix, hide yydecode CLI output.
      * @var string
      */

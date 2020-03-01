@@ -754,23 +754,6 @@
 						<div class="hint">Maximum amount of times to try part repair.</div>
 					</td>
 				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="yydecoderpath">yEnc Type:</label></td>
-					<td>
-						<input id="yydecoderpath" class="long" name="yydecoderpath" type="text"
-							   value="{$site->yydecoderpath}"/>
-
-						<div class="hint">
-							Leaving this empty will use PHP to decode yEnc, which is slow.
-							<br/>Putting the path to yydecode will use yydecode, which is faster than PHP. <a
-									style="color:#0082E1"
-									href="http://sourceforge.net/projects/yydecode/files/yydecode/0.2.10/">Download
-								yydecode
-								on sourceforce.</a>
-						</div>
-					</td>
-				</tr>
 				<tr>
 					<td style="width:180px;"><label for="processjpg">Process JPG:</label></td>
 					<td>

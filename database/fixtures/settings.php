@@ -881,14 +881,6 @@ return [
         'hint' => 'The path to an unrar binary, used in deep password detection and media info grabbing. Use forward slashes in windows c:/path/to/unrar.exe',
         'setting' => 'unrarpath',
     ],
-    122 => [
-        'section' => 'apps',
-        'subsection' => '',
-        'name' => 'yydecoderpath',
-        'value' => '',
-        'hint' => 'Path to yydecode, this will decode yEnc articles. On ubuntu/debian you can get yydecode in the getdeb repository. Compiling yydecode from source is easy/fast also. Use forward slashes in windows c:/path/to/yydecode.exe',
-        'setting' => 'yydecoderpath',
-    ],
     123 => [
         'section' => 'apps',
         'subsection' => '',
