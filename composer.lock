@@ -112,21 +112,21 @@
         },
         {
             "name": "anhskohbo/no-captcha",
-            "version": "3.1.1",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/anhskohbo/no-captcha.git",
-                "reference": "3b2f7d461e1fc7153e0c724c3ccac7a2db156733"
+                "reference": "c14dd67024f30fd28f38ac9faa44cc47e1d4bddf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/3b2f7d461e1fc7153e0c724c3ccac7a2db156733",
-                "reference": "3b2f7d461e1fc7153e0c724c3ccac7a2db156733",
+                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/c14dd67024f30fd28f38ac9faa44cc47e1d4bddf",
+                "reference": "c14dd67024f30fd28f38ac9faa44cc47e1d4bddf",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
-                "illuminate/support": "^5.0|^6.0",
+                "illuminate/support": "^5.0|^6.0|^7.0",
                 "php": ">=5.5.5"
             },
             "require-dev": {
@@ -168,7 +168,7 @@
                 "no-captcha",
                 "recaptcha"
             ],
-            "time": "2019-10-03T06:42:31+00:00"
+            "time": "2020-03-04T03:27:38+00:00"
         },
         {
             "name": "b3rs3rk/steamfront",
@@ -2364,21 +2364,21 @@
         },
         {
             "name": "intervention/imagecache",
-            "version": "2.4.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/imagecache.git",
-                "reference": "d73f4a69e000fd21bcd54559b94546f180abce68"
+                "reference": "2fae78a3f299597c5179740f9e70b4f5e367b350"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/imagecache/zipball/d73f4a69e000fd21bcd54559b94546f180abce68",
-                "reference": "d73f4a69e000fd21bcd54559b94546f180abce68",
+                "url": "https://api.github.com/repos/Intervention/imagecache/zipball/2fae78a3f299597c5179740f9e70b4f5e367b350",
+                "reference": "2fae78a3f299597c5179740f9e70b4f5e367b350",
                 "shasum": ""
             },
             "require": {
-                "illuminate/cache": "~4|~5|~6",
-                "illuminate/filesystem": "~4|~5|~6",
+                "illuminate/cache": "~4|~5|~6|~7",
+                "illuminate/filesystem": "~4|~5|~6|~7",
                 "intervention/image": "dev-master|~2,>=2.2.0",
                 "jeremeamia/superclosure": "~1|~2",
                 "nesbot/carbon": "^1.26.3 || ^2.0",
@@ -2414,7 +2414,7 @@
                 "imagick",
                 "laravel"
             ],
-            "time": "2019-09-03T16:35:20+00:00"
+            "time": "2020-03-03T19:18:15+00:00"
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -3889,23 +3889,23 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "9076092a145c3a6fec68f79d165b7b0dda13b56f"
+                "reference": "0e3dd6adae47ee742aff9959f849f2f03d5d7900"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/9076092a145c3a6fec68f79d165b7b0dda13b56f",
-                "reference": "9076092a145c3a6fec68f79d165b7b0dda13b56f",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/0e3dd6adae47ee742aff9959f849f2f03d5d7900",
+                "reference": "0e3dd6adae47ee742aff9959f849f2f03d5d7900",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "~6.0",
-                "laravel/framework": "5.8.*|^6.0",
-                "php": "^7.2"
+                "laravel/framework": "5.8.*|^6.0|^7.0",
+                "php": "^7.2.5"
             },
             "type": "library",
             "extra": {
@@ -3939,7 +3939,7 @@
                 "laravel",
                 "wrapper"
             ],
-            "time": "2019-12-31T15:39:21+00:00"
+            "time": "2020-03-04T09:46:03+00:00"
         },
         {
             "name": "maxmind-db/reader",
@@ -6005,25 +6005,25 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.0.8",
+            "version": "2.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "e57b9ac8eb460ebf2b08276d400dc45ddb71df34"
+                "reference": "76d81838a67acaf248402037def6a36ed9492c5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/e57b9ac8eb460ebf2b08276d400dc45ddb71df34",
-                "reference": "e57b9ac8eb460ebf2b08276d400dc45ddb71df34",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/76d81838a67acaf248402037def6a36ed9492c5c",
+                "reference": "76d81838a67acaf248402037def6a36ed9492c5c",
                 "shasum": ""
             },
             "require": {
-                "illuminate/cache": "^5.5|^6.0",
-                "illuminate/config": "^5.5|^6.0",
-                "illuminate/console": "^5.5|^6.0",
-                "illuminate/contracts": "^5.5|^6.0",
-                "illuminate/support": "^5.5|^6.0",
-                "illuminate/validation": "^5.5|^6.0",
+                "illuminate/cache": "^5.5|^6.0|^7.0",
+                "illuminate/config": "^5.5|^6.0|^7.0",
+                "illuminate/console": "^5.5|^6.0|^7.0",
+                "illuminate/contracts": "^5.5|^6.0|^7.0",
+                "illuminate/support": "^5.5|^6.0|^7.0",
+                "illuminate/validation": "^5.5|^6.0|^7.0",
                 "php": ">=7.1"
             },
             "require-dev": {
@@ -6065,7 +6065,7 @@
                 "throwaway",
                 "validator"
             ],
-            "time": "2019-12-27T09:58:41+00:00"
+            "time": "2020-03-04T08:55:39+00:00"
         },
         {
             "name": "psr/container",
@@ -6836,27 +6836,27 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.4.1",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "dd587505e009ea1b13ce343ef09c2fc3905e2774"
+                "reference": "eed92ac11e93cd4428296d322690b74b552ab988"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/dd587505e009ea1b13ce343ef09c2fc3905e2774",
-                "reference": "dd587505e009ea1b13ce343ef09c2fc3905e2774",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/eed92ac11e93cd4428296d322690b74b552ab988",
+                "reference": "eed92ac11e93cd4428296d322690b74b552ab988",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "~5.8.0|^6.0",
+                "illuminate/support": "~5.8.0|^6.0|^7.0",
                 "nesbot/carbon": "^1.0|^2.0",
                 "php": "^7.2"
             },
             "require-dev": {
-                "mockery/mockery": "^1.1",
-                "orchestra/testbench": "~3.8.0|^4.0",
-                "phpunit/phpunit": "^8.0"
+                "mockery/mockery": "^1.3",
+                "orchestra/testbench": "~3.8.0|^4.0|^5.0",
+                "phpunit/phpunit": "^8.0|^9.0"
             },
             "type": "library",
             "extra": {
@@ -6895,7 +6895,7 @@
                 "laravel-directory-cleanup",
                 "spatie"
             ],
-            "time": "2019-12-12T16:47:16+00:00"
+            "time": "2020-03-04T07:41:48+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
@@ -6967,16 +6967,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "3.10.1",
+            "version": "3.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "b0861793b5942eeaaa27cd38787fba7666c10d3c"
+                "reference": "e90ed6242a8fa29735529160b9c21cb77b233e7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/b0861793b5942eeaaa27cd38787fba7666c10d3c",
-                "reference": "b0861793b5942eeaaa27cd38787fba7666c10d3c",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/e90ed6242a8fa29735529160b9c21cb77b233e7f",
+                "reference": "e90ed6242a8fa29735529160b9c21cb77b233e7f",
                 "shasum": ""
             },
             "require": {
@@ -7031,7 +7031,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2020-03-03T17:38:17+00:00"
+            "time": "2020-03-03T21:31:02+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -9737,16 +9737,16 @@
         },
         {
             "name": "captainhook/plugin-composer",
-            "version": "5.1.2",
+            "version": "5.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/plugin-composer.git",
-                "reference": "57db2a8208a6748fb77ba05f8c981f752b893d1d"
+                "reference": "097b03f6bcee40a3a396174a8254f072a9b015fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/57db2a8208a6748fb77ba05f8c981f752b893d1d",
-                "reference": "57db2a8208a6748fb77ba05f8c981f752b893d1d",
+                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/097b03f6bcee40a3a396174a8254f072a9b015fe",
+                "reference": "097b03f6bcee40a3a396174a8254f072a9b015fe",
                 "shasum": ""
             },
             "require": {
@@ -9784,7 +9784,7 @@
                 }
             ],
             "description": "Composer-Plugin handling your git-hooks",
-            "time": "2020-02-29T07:22:14+00:00"
+            "time": "2020-03-04T16:33:48+00:00"
         },
         {
             "name": "composer/composer",
@@ -10691,25 +10691,25 @@
         },
         {
             "name": "matt-allan/laravel-code-style",
-            "version": "0.5.0",
+            "version": "0.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matt-allan/laravel-code-style.git",
-                "reference": "f267c917f4cc3c8e2f85fdf0d9d2905da5166b8f"
+                "reference": "df9dc0910f5470d3050ccdbe0468160972ab80fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/f267c917f4cc3c8e2f85fdf0d9d2905da5166b8f",
-                "reference": "f267c917f4cc3c8e2f85fdf0d9d2905da5166b8f",
+                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/df9dc0910f5470d3050ccdbe0468160972ab80fa",
+                "reference": "df9dc0910f5470d3050ccdbe0468160972ab80fa",
                 "shasum": ""
             },
             "require": {
                 "friendsofphp/php-cs-fixer": "^2.14",
-                "illuminate/support": "5.7.x|5.8.x|^6.0",
+                "illuminate/support": "5.7.x|5.8.x|^6.0|^7.0",
                 "php": ">=7.2"
             },
             "require-dev": {
-                "laravel/framework": "^6.0.3",
+                "laravel/framework": "^7.0",
                 "phpunit/phpunit": "^7.0"
             },
             "type": "library",
@@ -10746,7 +10746,7 @@
                 "laravel",
                 "php-cs-fixer"
             ],
-            "time": "2019-12-15T15:09:59+00:00"
+            "time": "2020-03-04T16:46:29+00:00"
         },
         {
             "name": "mockery/mockery",
