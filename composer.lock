@@ -622,22 +622,22 @@
         },
         {
             "name": "dariusiii/l5-fixtures",
-            "version": "v2.0.2",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/l5-fixtures.git",
-                "reference": "ecaec8209e132a3f43ac456299dd680bc7031c0a"
+                "reference": "74d02af744b73b0502ece8b6a4d6907a2c8dfaa6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/l5-fixtures/zipball/ecaec8209e132a3f43ac456299dd680bc7031c0a",
-                "reference": "ecaec8209e132a3f43ac456299dd680bc7031c0a",
+                "url": "https://api.github.com/repos/DariusIII/l5-fixtures/zipball/74d02af744b73b0502ece8b6a4d6907a2c8dfaa6",
+                "reference": "74d02af744b73b0502ece8b6a4d6907a2c8dfaa6",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^5.8|^6.0",
-                "illuminate/database": "^5.8|^6.0",
-                "illuminate/support": "^5.8|^6.0",
+                "illuminate/console": "^6.0|^7.0",
+                "illuminate/database": "^6.0|^7.0",
+                "illuminate/support": "^6.0|^7.0",
                 "league/csv": "^9.0",
                 "league/flysystem": "~1.0.16",
                 "php": ">=7.2.0",
@@ -645,7 +645,7 @@
             },
             "require-dev": {
                 "mockery/mockery": "^1.2",
-                "phpunit/phpunit": "^7.0"
+                "phpunit/phpunit": "^7.0|^8.0"
             },
             "type": "library",
             "extra": {
@@ -673,7 +673,7 @@
                     "email": "mayconbordin@gmail.com"
                 }
             ],
-            "description": "A fixtures package for Laravel 5",
+            "description": "A fixtures package for Laravel",
             "homepage": "https://github.com/dariusiii/l5-fixtures",
             "keywords": [
                 "csv",
@@ -683,7 +683,7 @@
                 "laravel 5",
                 "yaml"
             ],
-            "time": "2019-09-13T11:05:02+00:00"
+            "time": "2020-03-05T20:20:46+00:00"
         },
         {
             "name": "dariusiii/laravel-database-trigger",
