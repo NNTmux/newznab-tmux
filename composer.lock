@@ -2623,25 +2623,25 @@
         },
         {
             "name": "jenssegers/model",
-            "version": "v1.2.2",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/model.git",
-                "reference": "44fb64d4dae0daee89eb62a4fcc40ef6cf7da370"
+                "reference": "3a70a5b155a690d0dc3a063e1878d4fd7b0b5b6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jenssegers/model/zipball/44fb64d4dae0daee89eb62a4fcc40ef6cf7da370",
-                "reference": "44fb64d4dae0daee89eb62a4fcc40ef6cf7da370",
+                "url": "https://api.github.com/repos/jenssegers/model/zipball/3a70a5b155a690d0dc3a063e1878d4fd7b0b5b6d",
+                "reference": "3a70a5b155a690d0dc3a063e1878d4fd7b0b5b6d",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "^5.0|^6.0",
-                "illuminate/support": "^4.0|^5.0|^6.0"
+                "illuminate/contracts": "^5.0|^6.0|^7.0",
+                "illuminate/support": "^4.0|^5.0|^6.0|^7.0"
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "*",
-                "phpunit/phpunit": "^4.0|^5.0"
+                "phpunit/phpunit": "*"
             },
             "type": "library",
             "autoload": {
@@ -2666,7 +2666,7 @@
                 "laravel",
                 "model"
             ],
-            "time": "2019-10-04T10:46:28+00:00"
+            "time": "2020-03-05T17:17:42+00:00"
         },
         {
             "name": "jeremeamia/SuperClosure",
