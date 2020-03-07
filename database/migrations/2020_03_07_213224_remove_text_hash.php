@@ -13,7 +13,7 @@ class RemoveTextHash extends Migration
      */
     public function up()
     {
-        Schema::table('release_commments', function (Blueprint $table) {
+        Schema::table('release_comments', function (Blueprint $table) {
             $table->dropUnique('ix_release_comments_hash_releases_id');
             $table->dropColumn('text_hash');
         });
@@ -26,7 +26,7 @@ class RemoveTextHash extends Migration
      */
     public function down()
     {
-        Schema::table('release_commments', function (Blueprint $table) {
+        Schema::table('release_comments', function (Blueprint $table) {
             $table->string('text_hash', 32)->default('');
             $table->unique(['text_hash', 'releases_id'], 'ix_release_comments_hash_releases_id');
         });
