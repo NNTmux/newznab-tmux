@@ -148,10 +148,6 @@ class UserController extends BasePageController
                         User::updateUserRoleChangeDate($editedUser->id, $request->input('rolechangedate'));
                     }
                     if ($request->input('role') !== null) {
-                        $roleName = Role::query()->where('id', $request->input('role'))->value('name');
-                        if (($roleName === 'Disabled') && config('firewall.enabled') === true && ! \Firewall::isBlacklisted($editedUser->host)) {
-                            \Firewall::blacklist($editedUser->host);
-                        }
                         $editedUser->refresh();
                         SendAccountChangedEmail::dispatch($editedUser)->onQueue('emails');
                     }
