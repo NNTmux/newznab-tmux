@@ -119,7 +119,7 @@
     "junaidnasir/larainvite": "^3.0",
     "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "^6.0",
-    "laravel/horizon": "^3.0",
+    "laravel/horizon": "^3.7.2",
     "laravel/scout": "^7.0",
     "laravel/telescope": "^3.0",
     "laravel/tinker": "^2.0",

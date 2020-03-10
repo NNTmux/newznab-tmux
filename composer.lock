@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "706a79d378abbc8a37fa650a431a68f9",
+    "content-hash": "6e3be9d3ec4269bf299260c87892aa7b",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -843,26 +843,26 @@
         },
         {
             "name": "dariusiii/tmdb-laravel",
-            "version": "v2.0.1",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/tmdb-laravel.git",
-                "reference": "dfb351bfeba2cef84987f8988c56fe3888b66858"
+                "reference": "7c21141f0643c77d19bc718a503674fd92373c6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/dfb351bfeba2cef84987f8988c56fe3888b66858",
-                "reference": "dfb351bfeba2cef84987f8988c56fe3888b66858",
+                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/7c21141f0643c77d19bc718a503674fd92373c6a",
+                "reference": "7c21141f0643c77d19bc718a503674fd92373c6a",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^5.8|^6.0",
+                "illuminate/support": "^5.8|^6.0|^7.0",
                 "php": ">=7.2.0",
                 "php-tmdb/api": "^2.1"
             },
             "require-dev": {
                 "doctrine/cache": "^1.8",
-                "illuminate/events": "^5.8|^6.0",
+                "illuminate/events": "^5.8|^6.0|^7.0",
                 "monolog/monolog": "^2.0",
                 "phpunit/phpunit": "^7.0|^8.0",
                 "psr/event-dispatcher": "^1.0",
@@ -910,24 +910,24 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2019-09-12T09:20:42+00:00"
+            "time": "2020-03-10T10:40:20+00:00"
         },
         {
             "name": "dariusiii/token",
-            "version": "v3.0.0",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/laravel-token.git",
-                "reference": "f5d63473008fb2a2eb5a3fc1ecd66ab047e32d5b"
+                "reference": "42ec7b322c8a91b4220c6264a252d2ce9b8b1504"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel-token/zipball/f5d63473008fb2a2eb5a3fc1ecd66ab047e32d5b",
-                "reference": "f5d63473008fb2a2eb5a3fc1ecd66ab047e32d5b",
+                "url": "https://api.github.com/repos/DariusIII/laravel-token/zipball/42ec7b322c8a91b4220c6264a252d2ce9b8b1504",
+                "reference": "42ec7b322c8a91b4220c6264a252d2ce9b8b1504",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^5.8|^6.0",
+                "illuminate/support": "^5.8|^6.0|^7.0",
                 "php": ">=7.2.0"
             },
             "type": "library",
@@ -966,26 +966,26 @@
                 "token generator",
                 "unique token"
             ],
-            "time": "2019-09-11T07:28:10+00:00"
+            "time": "2020-03-10T10:32:39+00:00"
         },
         {
             "name": "dariusiii/zipper",
-            "version": "v2.0.2",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/Zipper.git",
-                "reference": "2c6a504c38f815e717ed164b15d36d51be97d4b9"
+                "reference": "4d783e2f23509cc7401ba30ad5866827c0259481"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/Zipper/zipball/2c6a504c38f815e717ed164b15d36d51be97d4b9",
-                "reference": "2c6a504c38f815e717ed164b15d36d51be97d4b9",
+                "url": "https://api.github.com/repos/DariusIII/Zipper/zipball/4d783e2f23509cc7401ba30ad5866827c0259481",
+                "reference": "4d783e2f23509cc7401ba30ad5866827c0259481",
                 "shasum": ""
             },
             "require": {
                 "ext-zip": "*",
-                "illuminate/filesystem": "^5.8|^6.0",
-                "illuminate/support": "^5.8|^6.0",
+                "illuminate/filesystem": "^5.8|^6.0|^7.0",
+                "illuminate/support": "^5.8|^6.0|^7.0",
                 "php": ">=7.2.0"
             },
             "require-dev": {
@@ -1027,7 +1027,7 @@
                 "laravel",
                 "zip"
             ],
-            "time": "2020-02-23T13:36:07+00:00"
+            "time": "2020-03-10T10:02:59+00:00"
         },
         {
             "name": "dborsatto/php-giantbomb",
@@ -2826,26 +2826,26 @@
         },
         {
             "name": "junaidnasir/larainvite",
-            "version": "v3.0.0",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/junaidnasir/larainvite.git",
-                "reference": "7612f2ee0d8a9a36cf346f774804562d735d8373"
+                "reference": "c097121334487787fb12030e3549a3169515168d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/7612f2ee0d8a9a36cf346f774804562d735d8373",
-                "reference": "7612f2ee0d8a9a36cf346f774804562d735d8373",
+                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/c097121334487787fb12030e3549a3169515168d",
+                "reference": "c097121334487787fb12030e3549a3169515168d",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^5.8|^6.0",
-                "illuminate/events": "^5.8|^6.0",
-                "illuminate/support": "^5.8|^6.0",
+                "illuminate/database": "^5.8|^6.0|^7.0",
+                "illuminate/events": "^5.8|^6.0|^7.0",
+                "illuminate/support": "^5.8|^6.0|^7.0",
                 "php": ">=5.5.9"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.2"
+                "phpunit/phpunit": "^5.2|^7.0|^8.0"
             },
             "type": "library",
             "extra": {
@@ -2880,7 +2880,7 @@
                 "invitations",
                 "laravel"
             ],
-            "time": "2019-09-09T18:59:05+00:00"
+            "time": "2020-03-10T10:07:51+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",
