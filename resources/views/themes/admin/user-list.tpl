@@ -73,6 +73,9 @@
                             class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
                                                                          href="{$orderbyverification_asc}"><span><i
                             class="fa fa-chevron-up"></i></span></a></th>
+            <th>Verification Date</th>
+            <th>Verify User</th>
+            <th>Verification email</th>
             <th>Options</th>
         </tr>
 
@@ -97,6 +100,9 @@
                 <td>{$user->rolename}</td>
                 <td>{if !empty($user->rolechangedate)}{$user->rolechangedate}{/if}</td>
                 <td>{if {$user->verified} == 1} Yes {else} No {/if}</td>
+                <td>{$user->email_verified_at}</td>
+                <td class="mid"><a title="Verify User" href="{{url("admin/verify?id={$user->id}")}}">Verify User</a></td>
+                <td class="mid"><a title="Resend verification email" href="{{url("admin/resendverification?id={$user->id}")}}">Resend verification email</a></td>
                 <td>{if $user->roles_id !="2"}<a class="confirm_action"
                                                  href="{{url("/admin/user-delete?id={$user->id}")}}">
                             delete</a>{/if}

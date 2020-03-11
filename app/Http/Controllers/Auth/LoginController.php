@@ -79,7 +79,7 @@ class LoginController extends Controller
                 $user = User::getByEmail($request->input('username'));
             }
 
-            if ($user !== null && ((config('firewall.enabled') === true && ! \Firewall::isBlacklisted($user->host)) || config('firewall.enabled') === false)) {
+            if ($user !== null) {
                 if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
                     $this->validate($request, [
                         'g-recaptcha-response' => ['required', 'captcha'],

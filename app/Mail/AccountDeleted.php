@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -35,8 +34,8 @@ class AccountDeleted extends Mailable
     public function __construct($user)
     {
         $this->user = $user;
-        $this->siteEmail = Settings::settingValue('site.main.email');
-        $this->siteTitle = Settings::settingValue('site.main.title');
+        $this->siteEmail = config('mail.from.address');
+        $this->siteTitle = config('app.name');
     }
 
     /**

@@ -116,7 +116,7 @@ class NZB
         );
         $this->_siteCommentString = sprintf(
             'NZB downloaded from %s',
-            Settings::settingValue('site.main.title')
+            config('app.name')
         );
     }
 

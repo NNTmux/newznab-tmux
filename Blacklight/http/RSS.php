@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
  */
 class RSS extends Capabilities
 {
-    /** Releases class
+    /** Releases class.
      * @var Releases
      */
     public $releases;

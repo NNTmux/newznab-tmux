@@ -259,6 +259,10 @@ Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' =
     Route::post('user-edit', 'UserController@edit');
     Route::get('user-delete', 'UserController@destroy');
     Route::post('user-delete', 'UserController@destroy');
+    Route::get('verify', 'UserController@verify');
+    Route::post('verify', 'UserController@verify');
+    Route::get('resendverification', 'UserController@resendVerification');
+    Route::post('resendverification', 'UserController@resendVerification');
     Route::get('site-edit', 'SiteController@edit');
     Route::post('site-edit', 'SiteController@edit');
     Route::get('site-stats', 'SiteController@stats');

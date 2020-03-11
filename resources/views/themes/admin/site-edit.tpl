@@ -11,15 +11,6 @@
 		<fieldset>
 			<legend>Main Site Settings, HTML Layout, Tags</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
-
-				<tr>
-					<td><label for="title">Title</label>:</td>
-					<td>
-						<input id="title" class="long" name="title" type="text" value="{$site->title}"/>
-						<div class="hint">Displayed around the site and contact form as the name for the site.</div>
-					</td>
-				</tr>
-
 				<tr>
 					<td><label for="strapline">Strapline</label>:</td>
 					<td>
@@ -70,16 +61,6 @@
 						</div>
 					</td>
 				</tr>
-
-				<tr>
-					<td style="width:160px;"><label for="codename">Code Name</label>:</td>
-					<td>
-						<input id="codename" name="code" type="text" value="{$site->code}"/>
-						<input type="hidden" name="id" value="{$site->id}"/>
-						<div class="hint">A just for fun value shown in debug and not on public pages.</div>
-					</td>
-				</tr>
-
 				<tr>
 					<td style="width: 180px;"><label for="coverspath">Cover&apos;s path:</label></td>
 					<td>
@@ -125,16 +106,6 @@
 						</div>
 					</td>
 				</tr>
-
-				<tr>
-					<td><label for="email">Email</label>:</td>
-					<td>
-						<input id="email" class="long" name="email" type="text" value="{$site->email}"/>
-						<div class="hint">Shown in the contact us page, and where the contact html form is sent to.
-						</div>
-					</td>
-				</tr>
-
 				<tr>
 					<td><label for="tandc">Terms and Conditions</label>:</td>
 					<td>
@@ -144,69 +115,8 @@
 				</tr>
 			</table>
 		</fieldset>
-
 		<fieldset>
-			<legend>Google Adsense, Analytics and 3rd Party Banners</legend>
-			<table class="input data table table-striped responsive-utilities jambo-table">
-				<tr>
-					<td style="width:160px;"><label for="google_analytics_acc">Google Analytics</label>:</td>
-					<td>
-						<input id="google_analytics_acc" name="google_analytics_acc" type="text"
-							   value="{$site->google_analytics_acc}"/>
-						<div class="hint">e.g. UA-xxxxxx-x</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:160px;"><label for="google_adsense_acc">Google Adsense</label>:</td>
-					<td>
-						<input id="google_adsense_acc" name="google_adsense_acc" type="text"
-							   value="{$site->google_adsense_acc}"/>
-						<div class="hint">e.g. pub-123123123123123</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="google_adsense_search">Google Adsense Search</label>:</td>
-					<td>
-						<input id="google_adsense_search" name="google_adsense_search" type="text"
-							   value="{$site->google_adsense_search}"/>
-						<div class="hint">The id of the google search ad card displayed at the bottom of the left
-							menu.
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="adheader">Advert Space in Banner</label>:</td>
-					<td>
-						<textarea id="adheader" name="adheader">{$site->adheader}</textarea>
-						<div class="hint">The banner slot in the header.</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="adbrowse">Advert Space in Browse List</label>:</td>
-					<td>
-						<textarea id="adbrowse" name="adbrowse">{$site->adbrowse}</textarea>
-						<div class="hint">The banner slot in the header.</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="addetail">Advert Space in Detail View</label>:</td>
-					<td>
-						<textarea id="addetail" name="addetail">{$site->addetail}</textarea>
-						<div class="hint">The banner slot in the release details view.</div>
-					</td>
-				</tr>
-
-			</table>
-		</fieldset>
-
-
-		<fieldset>
-			<legend>3<sup>rd</sup> Party API Keys</legend>
+			<legend>3<sup>rd</sup> Party API Keys (will be removed, all values should be in .env)</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
 					<td style="width:180px;"><label for="trakttvclientkey">Trakt.tv API Client ID:</label></td>
@@ -737,23 +647,6 @@
 				</tr>
 			</table>
 		</fieldset>
-
-		<fieldset>
-			<legend>IMDB.com URL</legend>
-			<table class="input data table table-striped responsive-utilities jambo-table">
-				<tr>
-					<td style="width:180px;"><label for="imdburl">IMDB.com:</label></td>
-					<td>
-						{html_options style="width:180px;" class="imdburl" id="imdburl" name='imdburl' values=$imdb_urls output=$imdburl_names selected=$site->imdburl}
-						<div class="hint">Akas.imdb.com returns titles in their original title, imdb.com returns titles
-							based on
-							your IP address (if you are in france, you will get french titles).
-						</div>
-					</td>
-				</tr>
-			</table>
-		</fieldset>
-
 		<fieldset>
 			<legend>Usenet Settings</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
@@ -859,23 +752,6 @@
 						<input class="short" id="partrepairmaxtries" name="partrepairmaxtries" type="text"
 							   value="{$site->partrepairmaxtries}"/>
 						<div class="hint">Maximum amount of times to try part repair.</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="yydecoderpath">yEnc Type:</label></td>
-					<td>
-						<input id="yydecoderpath" class="long" name="yydecoderpath" type="text"
-							   value="{$site->yydecoderpath}"/>
-
-						<div class="hint">
-							Leaving this empty will use PHP to decode yEnc, which is slow.
-							<br/>Putting the path to yydecode will use yydecode, which is faster than PHP. <a
-									style="color:#0082E1"
-									href="http://sourceforge.net/projects/yydecode/files/yydecode/0.2.10/">Download
-								yydecode
-								on sourceforce.</a>
-						</div>
 					</td>
 				</tr>
 				<tr>

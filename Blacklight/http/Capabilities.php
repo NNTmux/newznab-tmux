@@ -122,9 +122,9 @@ abstract class Capabilities
 
         return [
             'server' => [
-                'title'      => Settings::settingValue('site.main.title'),
+                'title'      => config('app.name'),
                 'strapline'  => Settings::settingValue('site.main.strapline'),
-                'email'      => Settings::settingValue('site.main.email'),
+                'email'      => config('mail.from.address'),
                 'meta'       => Settings::settingValue('site.main.metakeywords'),
                 'url'        => $serverroot,
                 'image'      => $serverroot.'/assets/images/tmux_logo.png',

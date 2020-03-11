@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendContactUsEmail;
-use App\Models\Settings;
 use Illuminate\Http\Request;
 
 class ContactUsController extends BasePageController
@@ -32,7 +31,7 @@ class ContactUsController extends BasePageController
 
         if ($request->has('useremail')) {
             $email = $request->input('useremail');
-            $mailTo = Settings::settingValue('site.main.email');
+            $mailTo = config('mail.from.address');
             $mailBody = 'Values submitted from contact form: ';
 
             foreach ($request->all() as $key => $value) {
@@ -44,7 +43,7 @@ class ContactUsController extends BasePageController
             if (! preg_match("/\n/i", $request->input('useremail'))) {
                 SendContactUsEmail::dispatch($email, $mailTo, $mailBody)->onQueue('contactemail');
             }
-            $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
+            $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".config('app.name').'.</h2>';
         }
 
         return $this->showContactForm($msg);
@@ -58,10 +57,10 @@ class ContactUsController extends BasePageController
     public function showContactForm($msg = '')
     {
         $this->setPrefs();
-        $title = 'Contact '.Settings::settingValue('site.main.title');
-        $meta_title = 'Contact '.Settings::settingValue('site.main.title');
+        $title = 'Contact '.config('app.name');
+        $meta_title = 'Contact '.config('app.name');
         $meta_keywords = 'contact us,contact,get in touch,email';
-        $meta_description = 'Contact us at '.Settings::settingValue('site.main.title').' and submit your feedback';
+        $meta_description = 'Contact us at '.config('app.name').' and submit your feedback';
         $content = $this->smarty->fetch('contact.tpl');
 
         $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description', 'msg'));

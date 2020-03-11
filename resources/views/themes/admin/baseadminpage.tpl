@@ -19,7 +19,7 @@
 			<div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
 					<a href="{$site->home_link}" class="site_title"><i class="fa fa-mixcloud"></i>
-						<span>{$site->title}</span></a>
+						<span>{{config('app.name')}}</span></a>
 				</div>
 				<div class="clearfix"></div>
 				<br/>
@@ -46,6 +46,7 @@
 			<div class="clearfix"></div>
 			<div class="row">
 				<div class="col-md-12 col-sm-12 col-12">
+					{$notification}
 					{$content}
 					<div class="clearfix"></div>
 				</div>

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Settings;
-
 class TermsController extends BasePageController
 {
     /**
@@ -13,9 +11,9 @@ class TermsController extends BasePageController
     {
         $this->setPrefs();
         $title = 'Terms and Conditions';
-        $meta_title = Settings::settingValue('site.main.title').' - Terms and conditions';
+        $meta_title = config('app.name').' - Terms and conditions';
         $meta_keywords = 'terms,conditions';
-        $meta_description = 'Terms and Conditions for '.Settings::settingValue('site.main.title');
+        $meta_description = 'Terms and Conditions for '.config('app.name');
 
         $content = $this->smarty->fetch($this->theme.'/terms.tpl');
 

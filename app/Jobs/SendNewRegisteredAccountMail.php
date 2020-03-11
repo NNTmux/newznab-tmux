@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Mail\NewAccountCreatedEmail;
-use App\Models\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -37,6 +36,6 @@ class SendNewRegisteredAccountMail implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to(Settings::settingValue('site.main.email'))->send(new NewAccountCreatedEmail($this->user));
+        Mail::to(config('mail.from.address'))->send(new NewAccountCreatedEmail($this->user));
     }
 }
