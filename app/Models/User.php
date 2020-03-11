@@ -6,6 +6,7 @@ use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Jobs\SendInviteEmail;
 use Carbon\CarbonImmutable;
+use DariusIII\Token\Token;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -692,7 +693,7 @@ class User extends Authenticatable
      */
     public static function generatePassword($length = 15): string
     {
-        return \Token::random($length, true);
+        return Token::random($length, true);
     }
 
     /**

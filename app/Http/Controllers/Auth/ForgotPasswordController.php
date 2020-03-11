@@ -7,6 +7,7 @@ use App\Jobs\SendPasswordForgottenEmail;
 use App\Mail\ForgottenPassword;
 use App\Models\Settings;
 use App\Models\User;
+use DariusIII\Token\Token;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 
@@ -64,7 +65,7 @@ class ForgotPasswordController extends Controller
                 //
                 // Generate a forgottenpassword guid, store it in the user table
                 //
-                $guid = \Token::random(32);
+                $guid = Token::random(32);
                 User::updatePassResetGuid($ret['id'], $guid);
                 //
                 // Send the email
