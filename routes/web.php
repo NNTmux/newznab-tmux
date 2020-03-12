@@ -13,15 +13,13 @@
 
 Auth::routes();
 
-Route::group(['middleware' => ['fw-block-blacklisted']], function () {
-    Route::get('/', 'ContentController@show');
+Route::get('/', 'ContentController@show');
 
-    Route::get('register', 'Auth\RegisterController@showregistrationForm');
-    Route::post('register', 'Auth\RegisterController@register')->name('register');
+Route::get('register', 'Auth\RegisterController@showregistrationForm');
+Route::post('register', 'Auth\RegisterController@register')->name('register');
 
-    Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
-    Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
-});
+Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
+Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
 
 Route::get('terms-and-conditions', 'TermsController@terms');
 
@@ -29,7 +27,7 @@ Route::get('login', 'Auth\LoginController@showLoginForm');
 Route::post('login', 'Auth\LoginController@login')->name('login');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function () {
+Route::group(['middleware' => ['isVerified']], function () {
     Route::get('resetpassword', 'Auth\ResetPasswordController@reset');
     Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
 

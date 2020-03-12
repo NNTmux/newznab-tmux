@@ -11,7 +11,7 @@
 |
 */
 
-Route::group(['prefix' => 'v1', 'namespace' => 'Api', 'middleware' => 'fw-block-blacklisted'], function () {
+Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
     Route::get('api', 'ApiController@api');
     Route::post('api', 'ApiController@api');
 });
@@ -21,7 +21,7 @@ Route::group(['prefix' => 'v2', 'namespace' => 'Api'], function () {
     Route::post('capabilities', 'ApiV2Controller@capabilities');
 });
 
-Route::group(['prefix' => 'v2', 'namespace' => 'Api', 'middleware' => ['auth:api', 'throttle:rate_limit,1', 'fw-block-blacklisted']], function () {
+Route::group(['prefix' => 'v2', 'namespace' => 'Api', 'middleware' => ['auth:api', 'throttle:rate_limit,1']], function () {
     Route::get('movies', 'ApiV2Controller@movie');
     Route::post('movies', 'ApiV2Controller@movie');
     Route::get('search', 'ApiV2Controller@apiSearch');

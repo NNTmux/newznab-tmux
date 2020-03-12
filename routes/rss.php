@@ -9,7 +9,7 @@
 |
 */
 
-Route::group(['guard' => 'rss', 'middleware' => ['auth:api', 'fw-block-blacklisted']], function () {
+Route::group(['guard' => 'rss', 'middleware' => ['auth:api']], function () {
     Route::get('mymovies', 'RssController@myMoviesRss');
     Route::post('mymovies', 'RssController@myMoviesRss');
     Route::get('myshows', 'RssController@myShowsRss');
