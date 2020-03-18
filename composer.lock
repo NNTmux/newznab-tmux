@@ -914,16 +914,16 @@
         },
         {
             "name": "dariusiii/token",
-            "version": "v3.2.0",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/laravel-token.git",
-                "reference": "6b7ff88f4be2990227699e69b80b9778236d5d34"
+                "reference": "8e9733caf713cbeaa03cd198052addb1c6f424bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel-token/zipball/6b7ff88f4be2990227699e69b80b9778236d5d34",
-                "reference": "6b7ff88f4be2990227699e69b80b9778236d5d34",
+                "url": "https://api.github.com/repos/DariusIII/laravel-token/zipball/8e9733caf713cbeaa03cd198052addb1c6f424bd",
+                "reference": "8e9733caf713cbeaa03cd198052addb1c6f424bd",
                 "shasum": ""
             },
             "require": {
@@ -937,7 +937,7 @@
                         "DariusIII\\Token\\TokenServiceProvider"
                     ],
                     "aliases": {
-                        "Token": "DariusIII\\Token\\Facades\\TokenFacade"
+                        "Token": "DariusIII\\Token\\Facades\\Token"
                     }
                 }
             },
@@ -966,7 +966,7 @@
                 "token generator",
                 "unique token"
             ],
-            "time": "2020-03-11T11:59:07+00:00"
+            "time": "2020-03-18T20:07:24+00:00"
         },
         {
             "name": "dariusiii/zipper",
