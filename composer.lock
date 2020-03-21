@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79f82171de5c118807ff25a92308da9b",
+    "content-hash": "15249e5c3f5fe1d4d713e4b1d3391b82",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -6156,16 +6156,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.10.0",
+            "version": "v0.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "e361c8b7e5114534078e0ce04ddc442b39018a3c"
+                "reference": "573c2362c3cdebe846b4adae4b630eecb350afd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/e361c8b7e5114534078e0ce04ddc442b39018a3c",
-                "reference": "e361c8b7e5114534078e0ce04ddc442b39018a3c",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/573c2362c3cdebe846b4adae4b630eecb350afd8",
+                "reference": "573c2362c3cdebe846b4adae4b630eecb350afd8",
                 "shasum": ""
             },
             "require": {
@@ -6225,7 +6225,7 @@
                 "interactive",
                 "shell"
             ],
-            "time": "2020-03-15T22:52:37+00:00"
+            "time": "2020-03-21T06:55:27+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -9250,25 +9250,25 @@
         },
         {
             "name": "ytake/laravel-smarty",
-            "version": "3.0.1",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ytake/Laravel.Smarty.git",
-                "reference": "a61b75665b6032c8d2ee352b22dbc87f04122b49"
+                "reference": "57ada1943844f71874f1e91821ebdf4c7501e590"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/a61b75665b6032c8d2ee352b22dbc87f04122b49",
-                "reference": "a61b75665b6032c8d2ee352b22dbc87f04122b49",
+                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/57ada1943844f71874f1e91821ebdf4c7501e590",
+                "reference": "57ada1943844f71874f1e91821ebdf4c7501e590",
                 "shasum": ""
             },
             "require": {
-                "illuminate/config": "^5.5|^6.0",
-                "illuminate/console": "^5.5|^6.0",
-                "illuminate/events": "^5.5|^6.0",
-                "illuminate/support": "^5.5|^6.0",
-                "illuminate/view": "^5.5|^6.0",
-                "php": ">=7.0.0",
+                "illuminate/config": "^6.0|^7.0",
+                "illuminate/console": "^6.0|^7.0",
+                "illuminate/events": "^6.0|^7.0",
+                "illuminate/support": "^6.0|^7.0",
+                "illuminate/view": "^6.0|^7.0",
+                "php": ">=7.2",
                 "smarty/smarty": "^3.1.33"
             },
             "require-dev": {
@@ -9276,14 +9276,14 @@
                 "pdepend/pdepend": "^2.5.2",
                 "phploc/phploc": "*",
                 "phpmd/phpmd": "@stable",
-                "phpunit/phpunit": "^6.0|^7.0",
+                "phpunit/phpunit": "^8.5",
                 "predis/predis": "^1.0",
                 "satooshi/php-coveralls": "*",
                 "sebastian/phpcpd": "*",
                 "sensiolabs/security-checker": "^5.0|^6.0",
                 "squizlabs/php_codesniffer": "^3.4.2",
-                "symfony/console": "^3.0|^4.0",
-                "symfony/framework-bundle": "^3.0|^4.0"
+                "symfony/console": "^4.0|^5.0",
+                "symfony/framework-bundle": "^4.0|^5.0"
             },
             "suggest": {
                 "ext-memcached": "memcached Template Cache Driver",
@@ -9322,7 +9322,7 @@
                 "template",
                 "view"
             ],
-            "time": "2020-02-13T11:47:13+00:00"
+            "time": "2020-03-19T05:24:59+00:00"
         }
     ],
     "packages-dev": [

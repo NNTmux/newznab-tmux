@@ -149,7 +149,7 @@
     "voku/simple_html_dom": "^4.3",
     "wildbit/swiftmailer-postmark": "^3.0",
     "yab/laravel-scout-mysql-driver": "^2.1",
-    "ytake/laravel-smarty": "^3.0"
+    "ytake/laravel-smarty": "^4.0"
   },
 
   "require-dev": {
