@@ -43,8 +43,8 @@ class NzbController extends BasePageController
 
                 // Get the path the user set in the browser if he put one.
                 $path = ($request->has('folder') ? $request->input('folder') : '');
-                if (substr($path, \strlen($path) - 1) !== DS) {
-                    $path .= DS;
+                if (substr($path, \strlen($path) - 1) !== '/') {
+                    $path .= '/';
                 }
 
                 // Get the files from the user specified path.

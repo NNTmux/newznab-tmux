@@ -76,8 +76,8 @@ class NZBExport
         $path = $params[0];
 
         // Check if the path ends with dir separator.
-        if (substr($path, -1) !== DS) {
-            $path .= DS;
+        if (substr($path, -1) !== '/') {
+            $path .= '/';
         }
 
         // Check if it's a directory.
