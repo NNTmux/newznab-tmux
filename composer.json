@@ -177,8 +177,7 @@
       "@php artisan key:generate --ansi"
     ],
     "post-install-cmd": [
-      "Blacklight\\build\\ComposerScripts::postInstall",
-      "Blacklight\\build\\ComposerScripts::postInstallCmd"
+      "Blacklight\\build\\ComposerScripts::postInstall"
     ],
     "post-update-cmd": [
       "Blacklight\\build\\ComposerScripts::postUpdate",

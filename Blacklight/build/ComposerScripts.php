@@ -24,20 +24,6 @@ use Illuminate\Foundation\Application;
 
 class ComposerScripts
 {
-    public static function postInstallCmd()
-    {
-        $last = $output = $return = null;
-        if ((int) getenv('COMPOSER_DEV_MODE') === 1) {
-            echo 'Updating git hooks... ';
-            $last = exec('build/git-hooks/addHooks.sh', $output, $return);
-            if ($return > 0) {
-                echo PHP_EOL;
-                exit($last);
-            }
-            echo 'done'.PHP_EOL;
-        }
-    }
-
     /**
      * Handle the post-install Composer event.
      *
