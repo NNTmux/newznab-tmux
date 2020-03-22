@@ -5,13 +5,11 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
