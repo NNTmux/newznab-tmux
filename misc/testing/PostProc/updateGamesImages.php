@@ -19,13 +19,7 @@ if ($argc === 1 || $argv[1] !== 'true') {
 
 $pdo = DB::connection()->getPdo();
 
-$row = Settings::settingValue('site.main.coverspath');
-if ($row !== null) {
-    Utility::setCoversConstant($row);
-} else {
-    die("Unable to set Covers' constant!\n");
-}
-$path2covers = NN_COVERS.'games'.DS;
+$path2covers = resource_path().'/covers/games/';
 
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {

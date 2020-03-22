@@ -137,7 +137,7 @@ class SiteController extends BasePageController
         $this->smarty->assign('lookup_reqids_ids', [0, 1, 2]);
         $this->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded']);
 
-        $this->smarty->assign('coversPath', NN_COVERS);
+        $this->smarty->assign('coversPath', resource_path().'/covers/');
 
         // return a list of audiobooks, mags, ebooks, technical and foreign books
         $result = Category::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);

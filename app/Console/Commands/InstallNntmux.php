@@ -48,7 +48,7 @@ class InstallNntmux extends Command
         $error = false;
 
         if ($this->confirm('Are you sure you want to install NNTmux? This will wipe your database!!')) {
-            if (file_exists(NN_ROOT.'_install/install.lock')) {
+            if (file_exists(base_path().'/'.'_install/install.lock')) {
                 if ($this->confirm('Do you want to remove install.lock file so you can continue with install?')) {
                     $this->info('Removing install.lock file so we can continue with install process');
                     $remove = new Process('rm _install/install.lock');

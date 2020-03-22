@@ -21,7 +21,7 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 {
     public function testFullInstall()
     {
-        passthru('php '.NN_ROOT.'artisan migrate:fresh --seed');
+        passthru('php '.base_path().'/'.'artisan migrate:fresh --seed');
 
         $message = 'NNTmux installation completed successfully';
 

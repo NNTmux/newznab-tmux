@@ -17,14 +17,7 @@ use Illuminate\Support\Facades\DB;
 $pdo = DB::connection()->getPdo();
 $colorCli = new ColorCLI();
 
-$row = Settings::settingValue('site.main.coverspath');
-if ($row !== null) {
-    Utility::setCoversConstant($row);
-} else {
-    die("Unable to determine covers path!\n");
-}
-
-$path2preview = NN_COVERS.'preview'.DS;
+$path2preview = resource_path().'/covers/preview/';
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $releases = new Releases();

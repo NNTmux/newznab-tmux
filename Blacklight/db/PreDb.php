@@ -212,15 +212,16 @@ SQL_EXPORT;
     }
 
     /**
-     * @param null  $settings
+     * @param null $settings
      * @param array $options
      *
      * @return mixed|null
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function progress($settings = null, array $options = [])
     {
         $defaults = [
-            'path'    => NN_ROOT.'cli'.DS.'data'.DS.'predb_progress.txt',
+            'path'    => base_path().'/'.'cli/data/predb_progress.txt',
             'read'    => true,
         ];
         $options += $defaults;

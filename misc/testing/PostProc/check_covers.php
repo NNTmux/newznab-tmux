@@ -14,14 +14,7 @@ use Illuminate\Support\Facades\DB;
 $movie = new Movie(['Echo' => true]);
 $colorCli = new ColorCLI();
 
-$row = Settings::settingValue('site.main.coverspath');
-if ($row !== null) {
-    Utility::setCoversConstant($row);
-} else {
-    die('Unable to determine covers path!'.PHP_EOL);
-}
-
-$path2cover = NN_COVERS.'movies'.DS;
+$path2cover = resource_path().'/covers/movies/';
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $couldbe = $argv[1] === 'true' ? $couldbe = 'had ' : 'could have ';

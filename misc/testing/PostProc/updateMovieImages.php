@@ -16,13 +16,7 @@ if ($argc === 1 || $argv[1] !== 'true') {
     exit();
 }
 
-$row = Settings::settingValue('site.main.coverspath');
-if ($row !== null) {
-    Utility::setCoversConstant($row);
-} else {
-    die("Unable to set Covers' constant!\n");
-}
-$path2covers = NN_COVERS.'movies'.DS;
+$path2covers = resource_path().'/covers/movies/';
 
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {

@@ -62,14 +62,6 @@
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 180px;"><label for="coverspath">Cover&apos;s path:</label></td>
-					<td>
-						<input id="coverspath" class="long" name="coverspath" type="text" value="{$site->coverspath}"/>
-						<div class="hint">The absolute path to the place covers will be stored.</div>
-					</td>
-				</tr>
-
-				<tr>
 					<td><label for="style">Theme</label>:</td>
 					<td>
 						{html_options class="siteeditstyle" id="style" name='style' values=$themelist output=$themelist selected=$site->style}
