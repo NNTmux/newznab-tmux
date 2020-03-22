@@ -782,7 +782,7 @@ class ProcessAdditional
     protected function _createTempFolder(): bool
     {
         // Per release defaults.
-        $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
+        $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.'/';
         if (! File::isDirectory($this->tmpPath)) {
             if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');

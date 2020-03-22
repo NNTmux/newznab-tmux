@@ -31,10 +31,10 @@ class Utility
     public static function canExecuteRead($path)
     {
         $paths = explode('#/#', $path);
-        $fullPath = DS;
+        $fullPath = '/';
         foreach ($paths as $singlePath) {
             if ($singlePath !== '') {
-                $fullPath .= $singlePath.DS;
+                $fullPath .= $singlePath.'/';
                 if (! is_readable($fullPath) || ! is_executable($fullPath)) {
                     return "The '$fullPath' directory must be readable and executable by all .".PHP_EOL;
                 }
