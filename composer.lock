@@ -5756,16 +5756,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.25",
+            "version": "2.0.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0"
+                "reference": "09655fcc1f8bab65727be036b28f6f20311c126c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
-                "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/09655fcc1f8bab65727be036b28f6f20311c126c",
+                "reference": "09655fcc1f8bab65727be036b28f6f20311c126c",
                 "shasum": ""
             },
             "require": {
@@ -5844,7 +5844,21 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2020-02-25T04:16:50+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/terrafrost",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpseclib",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-03-13T04:15:39+00:00"
         },
         {
             "name": "predis/predis",
@@ -10781,16 +10795,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.5.3",
+            "version": "v0.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "8e7989f32519c8e8c7b8b61f51b0ef0c97ef6c9d"
+                "reference": "d5ef8812cefb4ef951f18f27e70e5fd8a81cd2bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/8e7989f32519c8e8c7b8b61f51b0ef0c97ef6c9d",
-                "reference": "8e7989f32519c8e8c7b8b61f51b0ef0c97ef6c9d",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/d5ef8812cefb4ef951f18f27e70e5fd8a81cd2bf",
+                "reference": "d5ef8812cefb4ef951f18f27e70e5fd8a81cd2bf",
                 "shasum": ""
             },
             "require": {
@@ -10863,7 +10877,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2020-03-21T20:08:13+00:00"
+            "time": "2020-03-22T21:22:21+00:00"
         },
         {
             "name": "phar-io/manifest",
