@@ -1281,16 +1281,18 @@ class ProcessAdditional
             // Get all the compressed files in the temp folder.
             $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1)($|[^a-z0-9])/i');
 
-            foreach ($files as $file) {
+            if ($files !== false) {
+                foreach ($files as $file) {
 
-                // Check if the file exists.
-                if (File::isFile($file[0])) {
-                    $rarData = @File::get($file[0]);
-                    if ($rarData !== false) {
-                        $this->_processCompressedData($rarData);
-                        $foundCompressedFile = true;
+                    // Check if the file exists.
+                    if (File::isFile($file[0])) {
+                        $rarData = @File::get($file[0]);
+                        if ($rarData !== false) {
+                            $this->_processCompressedData($rarData);
+                            $foundCompressedFile = true;
+                        }
+                        File::delete($file[0]);
                     }
-                    File::delete($file[0]);
                 }
             }
 
