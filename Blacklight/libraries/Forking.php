@@ -26,7 +26,6 @@ use Symfony\Component\Process\Process;
  */
 class Forking
 {
-
     /**
      * @var \Blacklight\ColorCLI
      */
