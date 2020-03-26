@@ -196,7 +196,7 @@ class Movie
         $this->showPasswords = (new Releases())->showPasswords();
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->imgSavePath = resource_path().'/covers/'.'movies/';
+        $this->imgSavePath = NN_COVERS.'movies/';
         $this->service = '';
     }
 

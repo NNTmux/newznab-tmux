@@ -463,7 +463,7 @@ class ProcessAdditional
             );
         }
 
-        $this->_showCLIReleaseID = (PHP_BINARY.' '.__DIR__.'/ProcessAdditional.php ReleaseID: ');
+        $this->_showCLIReleaseID = (PHP_BINARY.' '.__DIR__.DS.'ProcessAdditional.php ReleaseID: ');
 
         // Maximum amount of releases to fetch per run.
         $this->_queryLimit =
@@ -512,7 +512,7 @@ class ProcessAdditional
         $this->_processAudioInfo = $this->_processMediaInfo;
         $this->_processPasswords = ! empty(Settings::settingValue('..checkpasswordedrar')) && ! empty(Settings::settingValue('apps..unrarpath'));
 
-        $this->_audioSavePath = resource_path().'/covers/'.'audiosample/';
+        $this->_audioSavePath = NN_COVERS.'audiosample'.DS;
 
         $this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
         $this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
@@ -573,7 +573,7 @@ class ProcessAdditional
 
         // Check if it ends with a dir separator.
         if (! preg_match('/[\/\\\\]$/', $this->_mainTmpPath)) {
-            $this->_mainTmpPath .= '/';
+            $this->_mainTmpPath .= DS;
         }
 
         // If we are doing per group, use the groupID has a inner path, so other scripts don't delete the files we are working on.
@@ -782,7 +782,7 @@ class ProcessAdditional
     protected function _createTempFolder(): bool
     {
         // Per release defaults.
-        $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.'/';
+        $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
         if (! File::isDirectory($this->tmpPath)) {
             if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');

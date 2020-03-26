@@ -263,7 +263,7 @@ class NZB
         $nzbPath = '';
 
         for ($i = 0; $i < $levelsToSplit && $i < 32; $i++) {
-            $nzbPath .= $releaseGuid[$i].'/';
+            $nzbPath .= $releaseGuid[$i].DS;
         }
 
         $nzbPath = $this->siteNzbPath.$nzbPath;

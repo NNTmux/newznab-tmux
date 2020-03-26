@@ -94,7 +94,7 @@ class Music
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
         $this->musicqty = Settings::settingValue('..maxmusicprocessed') !== '' ? (int) Settings::settingValue('..maxmusicprocessed') : 150;
         $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
-        $this->imgSavePath = resource_path().'/covers/'.'music/';
+        $this->imgSavePath = NN_COVERS.'music'.DS;
         $this->renamed = (int) Settings::settingValue('..lookupmusic') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];

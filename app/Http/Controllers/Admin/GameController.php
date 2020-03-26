@@ -57,7 +57,7 @@ class GameController extends BasePageController
 
             switch ($action) {
                 case 'submit':
-                    $coverLoc = resource_path().'/covers/'.'games/'.$id.'.jpg';
+                    $coverLoc = NN_COVERS.'games/'.$id.'.jpg';
 
                     if ($_FILES['cover']['size'] > 0) {
                         $tmpName = $_FILES['cover']['tmp_name'];

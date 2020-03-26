@@ -31,10 +31,10 @@ class Utility
     public static function canExecuteRead($path)
     {
         $paths = explode('#/#', $path);
-        $fullPath = '/';
+        $fullPath = DS;
         foreach ($paths as $singlePath) {
             if ($singlePath !== '') {
-                $fullPath .= $singlePath.'/';
+                $fullPath .= $singlePath.DS;
                 if (! is_readable($fullPath) || ! is_executable($fullPath)) {
                     return "The '$fullPath' directory must be readable and executable by all .".PHP_EOL;
                 }
@@ -245,6 +245,26 @@ class Utility
     }
 
     /**
+     * @param $path
+     */
+    public static function setCoversConstant($path): void
+    {
+        if (! \defined('NN_COVERS')) {
+            switch (true) {
+                case $path[0] === '/' || $path[1] === ':' || $path[0] === '\\':
+                    \define('NN_COVERS', Str::finish($path, '/'));
+                    break;
+                case $path !== '' && $path[0] !== '/' && $path[1] !== ':' && $path[0] !== '\\':
+                    \define('NN_COVERS', realpath(NN_ROOT.Str::finish($path, '/')));
+                    break;
+                case empty($path): // Default to resources location.
+                default:
+                    \define('NN_COVERS', NN_RES.'covers/');
+            }
+        }
+    }
+
+    /**
      * Creates an array to be used with stream_context_create() to verify openssl certificates
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
@@ -337,7 +357,7 @@ class Utility
             )
         ) {
             $fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
-            $fileSpec = file_exists(resource_path().'/covers/'.$fileSpec) ? $fileSpec :
+            $fileSpec = file_exists(NN_COVERS.$fileSpec) ? $fileSpec :
                 sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
         }
 

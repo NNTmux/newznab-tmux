@@ -264,7 +264,7 @@ class Tmux
      */
     public function writelog($pane): ?string
     {
-        $path = storage_path().'/logs/';
+        $path = NN_LOGS;
         $getdate = gmdate('Ymd');
         $logs = Settings::settingValue('site.tmux.write_logs') ?? 0;
         if ($logs === 1) {

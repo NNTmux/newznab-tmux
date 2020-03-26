@@ -1,5 +1,3 @@
-2020-03-22 DariusIII
-	* Chg: Remove option to set covers path in database, it is hardcoded now to resources/covers/
 2020-03-01 DariusIII
 	* Chg: Move all third party api keys from database to .env file
 2020-02-27 DariusIII

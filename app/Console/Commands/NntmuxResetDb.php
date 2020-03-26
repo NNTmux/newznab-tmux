@@ -177,7 +177,7 @@ class NntmuxResetDb extends Command
 
             $this->info('Deleting all images, previews and samples that still remain.');
 
-            $files = File::allFiles(resource_path().'/covers/');
+            $files = File::allFiles(NN_COVERS);
             foreach ($files as $file) {
                 if (basename($file) !== '.gitignore' && basename($file) !== 'no-cover.jpg' && basename($file) !== 'no-backdrop.jpg') {
                     File::delete($file);

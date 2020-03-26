@@ -14,8 +14,14 @@ class RemoveTextHash extends Migration
     public function up()
     {
         Schema::table('release_comments', function (Blueprint $table) {
-            $table->dropUnique('ix_release_comments_hash_releases_id');
-            $table->dropColumn('text_hash');
+            $sm = Schema::getConnection()->getDoctrineSchemaManager();
+            $indexesFound = $sm->listTableIndexes('release_comments');
+
+            if (array_key_exists('ix_release_comments_hash_releases_id', $indexesFound)) {
+                $table->dropUnique("ix_release_comments_hash_releases_id");
+            }
+
+            $table->dropIfExists('text_hash');
         });
     }
 

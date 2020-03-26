@@ -9,7 +9,7 @@ use Blacklight\ReleaseImage;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
 
-$dir = resource_path().'/'.'movednzbs/';
+$dir = NN_RES.'movednzbs/';
 $colorCli = new ColorCLI();
 
 if (! isset($argv[1]) || ! in_array($argv[1], ['true', 'move'])) {

@@ -76,8 +76,8 @@ class NZBExport
         $path = $params[0];
 
         // Check if the path ends with dir separator.
-        if (substr($path, -1) !== '/') {
-            $path .= '/';
+        if (substr($path, -1) !== DS) {
+            $path .= DS;
         }
 
         // Check if it's a directory.
@@ -145,7 +145,7 @@ class NZBExport
             }
 
             // Create a path to store the new NZB files.
-            $currentPath = $path.$this->safeFilename($group['name']).'/';
+            $currentPath = $path.$this->safeFilename($group['name']).DS;
             if (! File::isDirectory($currentPath) && ! File::makeDirectory($currentPath) && ! File::isDirectory($currentPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $currentPath));
             }

@@ -3,7 +3,9 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\MovieInfo;
+use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
@@ -14,7 +16,13 @@ if ($argc === 1 || $argv[1] !== 'true') {
     exit();
 }
 
-$path2covers = resource_path().'/covers/movies/';
+$row = Settings::settingValue('site.main.coverspath');
+if ($row !== null) {
+    Utility::setCoversConstant($row);
+} else {
+    die("Unable to set Covers' constant!\n");
+}
+$path2covers = NN_COVERS.'movies'.DS;
 
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {

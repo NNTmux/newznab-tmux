@@ -14,7 +14,7 @@ if ($argc === 1 || $argv[1] !== 'true') {
     exit();
 }
 
-$path2covers = resource_path().'/covers/'.'xxx/';
+$path2covers = NN_COVERS.'xxx'.DS;
 
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {

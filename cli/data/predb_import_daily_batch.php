@@ -24,12 +24,12 @@ use Blacklight\ColorCLI;
 use Blacklight\db\PreDb;
 use Illuminate\Support\Facades\File;
 
-if (! File::isReadable(resource_path().'/')) {
-    exit('The  '.resource_path().'/'.' folder must be readable.'.PHP_EOL);
+if (! File::isReadable(NN_RES)) {
+    exit('The  '.NN_RES.' folder must be readable.'.PHP_EOL);
 }
 
-if (! File::isWritable(resource_path().'/')) {
-    exit('The ('.resource_path().'/'.') folder must be writable.'.PHP_EOL);
+if (! File::isWritable(NN_RES)) {
+    exit('The ('.NN_RES.') folder must be writable.'.PHP_EOL);
 }
 
 if (! isset($argv[1]) || (! is_numeric($argv[1]) && $argv[1] !== 'progress') || ! isset($argv[2]) ||
@@ -122,10 +122,10 @@ foreach ($data as $dir => $files) {
                 }
 
                 // Store the dump.
-                $dumpFile = resource_path().'/'.$match[2].'_predb_dump.csv';
+                $dumpFile = NN_RES.$match[2].'_predb_dump.csv';
                 $fetched = File::put($dumpFile, $dump);
                 if (! $fetched) {
-                    echo "Error storing dump file {$match[2]} in (".resource_path().'/'.').'.
+                    echo "Error storing dump file {$match[2]} in (".NN_RES.').'.
                         PHP_EOL;
                     continue;
                 }

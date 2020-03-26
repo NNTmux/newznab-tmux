@@ -49,7 +49,7 @@ class Git extends GitRepository
         $defaults = [
             'create'        => false,
             'initialise'    => false,
-            'filepath'        => base_path().'/',
+            'filepath'        => NN_ROOT,
         ];
         $options += $defaults;
 

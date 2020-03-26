@@ -9,7 +9,7 @@ use Blacklight\ReleaseImage;
 $pdo = DB::connection()->getPdo();
 $colorCli = new ColorCLI();
 
-$path2cover = resource_path().'/covers/'.'samples/';
+$path2cover = NN_COVERS.'samples'.DS;
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $releaseImage = new ReleaseImage();

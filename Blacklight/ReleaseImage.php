@@ -63,11 +63,11 @@ class ReleaseImage
     public function __construct()
     {
         $this->colorCli = new ColorCLI();
-        $this->audSavePath = resource_path().'/covers/'.'audiosample/';
-        $this->imgSavePath = resource_path().'/covers/'.'preview/';
-        $this->jpgSavePath = resource_path().'/covers/'.'sample/';
-        $this->movieImgSavePath = resource_path().'/covers/'.'movies/';
-        $this->vidSavePath = resource_path().'/covers/'.'video/';
+        $this->audSavePath = NN_COVERS.'audiosample'.DS;
+        $this->imgSavePath = NN_COVERS.'preview'.DS;
+        $this->jpgSavePath = NN_COVERS.'sample'.DS;
+        $this->movieImgSavePath = NN_COVERS.'movies'.DS;
+        $this->vidSavePath = NN_COVERS.'video'.DS;
     }
 
     /**

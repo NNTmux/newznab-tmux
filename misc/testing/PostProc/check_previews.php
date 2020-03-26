@@ -5,17 +5,26 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $colorCli = new ColorCLI();
 
-$path2preview = resource_path().'/covers/preview/';
+$row = Settings::settingValue('site.main.coverspath');
+if ($row !== null) {
+    Utility::setCoversConstant($row);
+} else {
+    die("Unable to determine covers path!\n");
+}
+
+$path2preview = NN_COVERS.'preview'.DS;
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $releases = new Releases();
