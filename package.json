@@ -40,6 +40,6 @@
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.1",
-        "tinymce": "^5.2.0"
+        "tinymce": "^5.2.1"
     }
 }
