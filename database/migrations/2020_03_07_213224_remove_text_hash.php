@@ -21,7 +21,7 @@ class RemoveTextHash extends Migration
                 $table->dropUnique('ix_release_comments_hash_releases_id');
             }
 
-            $table->dropIfExists('text_hash');
+            $table->dropColumn('text_hash');
         });
     }
 
