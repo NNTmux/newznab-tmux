@@ -18,7 +18,7 @@ class RemoveTextHash extends Migration
             $indexesFound = $sm->listTableIndexes('release_comments');
 
             if (array_key_exists('ix_release_comments_hash_releases_id', $indexesFound)) {
-                $table->dropUnique("ix_release_comments_hash_releases_id");
+                $table->dropUnique('ix_release_comments_hash_releases_id');
             }
 
             $table->dropIfExists('text_hash');
