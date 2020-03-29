@@ -255,7 +255,7 @@ class Utility
                     \define('NN_COVERS', Str::finish($path, '/'));
                     break;
                 case $path !== '' && $path[0] !== '/' && $path[1] !== ':' && $path[0] !== '\\':
-                    \define('NN_COVERS', realpath(NN_ROOT.Str::finish($path, '/')));
+                    \define('NN_COVERS', realpath(base_path().Str::finish($path, '/')));
                     break;
                 case empty($path): // Default to resources location.
                 default:

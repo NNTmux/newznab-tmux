@@ -62,7 +62,7 @@ class Git
                     'dev',
                 ],
             ],
-            'filepath' => NN_ROOT,
+            'filepath' => base_path().'/',
         ];
 
         $config += $defaults;
