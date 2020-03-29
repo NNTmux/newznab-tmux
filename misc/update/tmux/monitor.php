@@ -26,9 +26,9 @@ try {
     echo $e;
 }
 
-$runVar['paths']['misc'] = NN_MISC;
-$runVar['paths']['cli'] = NN_ROOT.'cli/';
-$runVar['paths']['scraper'] = NN_MISC.'IRCScraper'.DS.'scrape.php';
+$runVar['paths']['misc'] = base_path().'/misc/';
+$runVar['paths']['cli'] = base_path().'/cli/';
+$runVar['paths']['scraper'] = base_path().'/misc/IRCScraper/scrape.php';
 
 $db_name = config('nntmux.db_name');
 
