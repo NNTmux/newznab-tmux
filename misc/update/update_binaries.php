@@ -25,12 +25,20 @@ if (isset($argv[1]) && ! is_numeric($argv[1])) {
 
     $group = UsenetGroup::getByName($groupName);
     if (is_array($group)) {
-        $binaries->updateGroup(
-            $group,
-            (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : $maxHeaders)
-        );
+        try {
+            $binaries->updateGroup(
+                $group,
+                (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : $maxHeaders)
+            );
+        } catch (Throwable $e) {
+            \Illuminate\Support\Facades\Log::error($e->getMessage());
+        }
     }
 } else {
-    $binaries->updateAllGroups((isset($argv[1]) && is_numeric($argv[1]) && $argv[1] > 0 ? $argv[1] :
-        $maxHeaders));
+    try {
+        $binaries->updateAllGroups((isset($argv[1]) && is_numeric($argv[1]) && $argv[1] > 0 ? $argv[1] :
+            $maxHeaders));
+    } catch (Throwable $e) {
+        \Illuminate\Support\Facades\Log::error($e->getMessage());
+    }
 }
