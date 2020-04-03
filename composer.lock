@@ -2017,16 +2017,16 @@
         },
         {
             "name": "google/recaptcha",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/recaptcha.git",
-                "reference": "98c4a6573b27e8b0990ea8789c74ea378795134c"
+                "reference": "614f25a9038be4f3f2da7cbfd778dc5b357d2419"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/recaptcha/zipball/98c4a6573b27e8b0990ea8789c74ea378795134c",
-                "reference": "98c4a6573b27e8b0990ea8789c74ea378795134c",
+                "url": "https://api.github.com/repos/google/recaptcha/zipball/614f25a9038be4f3f2da7cbfd778dc5b357d2419",
+                "reference": "614f25a9038be4f3f2da7cbfd778dc5b357d2419",
                 "shasum": ""
             },
             "require": {
@@ -2060,7 +2060,7 @@
                 "recaptcha",
                 "spam"
             ],
-            "time": "2019-08-16T15:48:25+00:00"
+            "time": "2020-03-31T17:50:54+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2456,6 +2456,7 @@
                     "email": "jakub.onderka@gmail.com"
                 }
             ],
+            "abandoned": "php-parallel-lint/php-console-color",
             "time": "2018-09-29T17:23:10+00:00"
         },
         {
@@ -2502,6 +2503,7 @@
                 }
             ],
             "description": "Highlight PHP code in terminal",
+            "abandoned": "php-parallel-lint/php-console-highlighter",
             "time": "2018-09-29T18:48:56+00:00"
         },
         {
@@ -2724,6 +2726,7 @@
                 "serialize",
                 "tokenizer"
             ],
+            "abandoned": "opis/closure",
             "time": "2018-03-21T22:21:57+00:00"
         },
         {
@@ -9533,16 +9536,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.13",
+            "version": "4.7.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "301e41cb38df258d3e8749a7ee514d37845fe54e"
+                "reference": "eed633604e7fec922a4af5ccd306762ef4a2bdac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/301e41cb38df258d3e8749a7ee514d37845fe54e",
-                "reference": "301e41cb38df258d3e8749a7ee514d37845fe54e",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/eed633604e7fec922a4af5ccd306762ef4a2bdac",
+                "reference": "eed633604e7fec922a4af5ccd306762ef4a2bdac",
                 "shasum": ""
             },
             "require": {
@@ -9588,7 +9591,25 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2020-02-17T15:47:33+00:00"
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/moelleken",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/voku",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/voku",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/voku/simple_html_dom",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-04-02T00:34:59+00:00"
         },
         {
             "name": "wildbit/swiftmailer-postmark",
@@ -10320,20 +10341,21 @@
         },
         {
             "name": "doctrine/annotations",
-            "version": "v1.8.0",
+            "version": "1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "904dca4eb10715b92569fbcd79e201d5c349b6bc"
+                "reference": "5eb79f3dbdffed6544e1fc287572c0f462bd29bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/904dca4eb10715b92569fbcd79e201d5c349b6bc",
-                "reference": "904dca4eb10715b92569fbcd79e201d5c349b6bc",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/5eb79f3dbdffed6544e1fc287572c0f462bd29bb",
+                "reference": "5eb79f3dbdffed6544e1fc287572c0f462bd29bb",
                 "shasum": ""
             },
             "require": {
                 "doctrine/lexer": "1.*",
+                "ext-tokenizer": "*",
                 "php": "^7.1"
             },
             "require-dev": {
@@ -10343,7 +10365,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.7.x-dev"
+                    "dev-master": "1.9.x-dev"
                 }
             },
             "autoload": {
@@ -10384,7 +10406,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2019-10-01T18:55:10+00:00"
+            "time": "2020-04-02T12:33:25+00:00"
         },
         {
             "name": "doctrine/instantiator",
