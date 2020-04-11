@@ -33,20 +33,20 @@ class Handler extends ExceptionHandler
      * @param  \Exception $exception
      *
      * @return void
-     * @throws \Exception
+     * @throws \Throwable
      */
-    public function report(Exception $exception)
+    public function report(\Throwable $exception)
     {
         parent::report($exception);
     }
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param Exception $exception
+     * @param \Throwable $exception
      * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws Exception
+     * @throws \Throwable
      */
-    public function render($request, Exception $exception)
+    public function render($request, \Throwable $exception)
     {
         if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
             abort(401);

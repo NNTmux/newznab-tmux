@@ -929,7 +929,7 @@ class Forking
      */
     protected function _executeCommand($command)
     {
-        $process = new Process($command);
+        $process = Process::fromShellCommandline('exec '.$command);
         $process->setTimeout(360);
         $process->run(function ($type, $buffer) {
             if (Process::ERR === $type) {
