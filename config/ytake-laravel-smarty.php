@@ -14,7 +14,7 @@
  * Copyright (c) 2014-2017 Yuuki Takezawa
  */
 
-/**
+/*
  * Smarty configure.
  * @author  yuuki.takezawa<yuuki.takezawa@comnect.jp.net>
  * @license http://opensource.org/licenses/MIT MIT
