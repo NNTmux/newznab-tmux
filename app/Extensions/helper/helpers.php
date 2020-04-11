@@ -260,7 +260,7 @@ if (! function_exists('runCmd')) {
             echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
         }
 
-        $process = new Process($command);
+        $process = Process::fromShellCommandline('exec '.$command);
         $process->run();
         $output = $process->getOutput();
 
