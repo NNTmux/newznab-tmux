@@ -580,49 +580,7 @@ class Releases extends Release
         }
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $search = [
-                'scroll' => '30s',
-                'index' => 'releases',
-                'body' => [
-                    'query' => [
-                        'query_string' => [
-                            'query' => implode(' ', $phrases),
-                            'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
-                            'analyze_wildcard' => true,
-                            'default_operator' => 'and',
-                        ],
-                    ],
-                    'size' => $limit,
-                    'sort' => [
-                        'add_date' => [
-                            'order' =>'desc',
-                        ],
-                        'post_date' => [
-                            'order' => 'desc',
-                        ],
-                    ],
-                ],
-            ];
-
-            $results = \Elasticsearch::search($search);
-
-            $searchResult = [];
-            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                foreach ($results['hits']['hits'] as $result) {
-                    $searchResult[] = $result['_source']['id'];
-                }
-
-                // When done, get the new scroll_id
-                // You must always refresh your _scroll_id!  It can change sometimes
-                $scroll_id = $results['_scroll_id'];
-
-                // Execute a Scroll request and repeat
-                $results = \Elasticsearch::scroll([
-                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                    'scroll'    => '30s',        // and the same timeout window
-                ]
-                );
-            }
+            $searchResult = (new ElasticSearchSiteSearch())->indexSearch($phrases, $limit);
         } else {
             $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
 
@@ -727,49 +685,7 @@ class Releases extends Release
     {
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $search = [
-                    'scroll' => '30s',
-                    'index' => 'releases',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $searchName,
-                                'fields' => ['searchname', 'plainsearchname'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                        'size' => $limit,
-                        'sort' => [
-                            'add_date' => [
-                                'order' =>'desc',
-                            ],
-                            'post_date' => [
-                                'order' => 'desc',
-                            ],
-                        ],
-                    ],
-                ];
-
-                $results = \Elasticsearch::search($search);
-
-                $searchResult = [];
-                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-
-                    // When done, get the new scroll_id
-                    // You must always refresh your _scroll_id!  It can change sometimes
-                    $scroll_id = $results['_scroll_id'];
-
-                    // Execute a Scroll request and repeat
-                    $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '30s',        // and the same timeout window
-                    ]
-                    );
-                }
+                $searchResult = (new ElasticSearchSiteSearch())->indexSearchApi($searchName, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
             }
@@ -918,49 +834,7 @@ class Releases extends Release
         }
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $search = [
-                    'scroll' => '30s',
-                    'index' => 'releases',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $name,
-                                'fields' => ['searchname', 'plainsearchname'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                        'size' => $limit,
-                        'sort' => [
-                            'add_date' => [
-                                'order' =>'desc',
-                            ],
-                            'post_date' => [
-                                'order' => 'desc',
-                            ],
-                        ],
-                    ],
-                ];
-
-                $results = \Elasticsearch::search($search);
-
-                $searchResult = [];
-                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-
-                    // When done, get the new scroll_id
-                    // You must always refresh your _scroll_id!  It can change sometimes
-                    $scroll_id = $results['_scroll_id'];
-
-                    // Execute a Scroll request and repeat
-                    $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '30s',        // and the same timeout window
-                    ]
-                    );
-                }
+                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }
@@ -1109,49 +983,7 @@ class Releases extends Release
         }
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $search = [
-                    'scroll' => '30s',
-                    'index' => 'releases',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $name,
-                                'fields' => ['searchname', 'plainsearchname'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                        'size' => $limit,
-                        'sort' => [
-                            'add_date' => [
-                                'order' =>'desc',
-                            ],
-                            'post_date' => [
-                                'order' => 'desc',
-                            ],
-                        ],
-                    ],
-                ];
-
-                $results = \Elasticsearch::search($search);
-
-                $searchResult = [];
-                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-
-                    // When done, get the new scroll_id
-                    // You must always refresh your _scroll_id!  It can change sometimes
-                    $scroll_id = $results['_scroll_id'];
-
-                    // Execute a Scroll request and repeat
-                    $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '30s',        // and the same timeout window
-                    ]
-                    );
-                }
+                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }
@@ -1235,49 +1067,7 @@ class Releases extends Release
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $search = [
-                    'scroll' => '30s',
-                    'index' => 'releases',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $name,
-                                'fields' => ['searchname', 'plainsearchname'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                        'size' => $limit,
-                        'sort' => [
-                            'add_date' => [
-                                'order' =>'desc',
-                            ],
-                            'post_date' => [
-                                'order' => 'desc',
-                            ],
-                        ],
-                    ],
-                ];
-
-                $results = \Elasticsearch::search($search);
-
-                $searchResult = [];
-                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-
-                    // When done, get the new scroll_id
-                    // You must always refresh your _scroll_id!  It can change sometimes
-                    $scroll_id = $results['_scroll_id'];
-
-                    // Execute a Scroll request and repeat
-                    $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '30s',        // and the same timeout window
-                    ]
-                    );
-                }
+                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }
@@ -1360,47 +1150,7 @@ class Releases extends Release
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $search = [
-                    'scroll' => '30s',
-                    'index' => 'releases',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $name,
-                                'fields' => ['searchname', 'plainsearchname'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                        'size' => $limit,
-                        'sort' => [
-                            'add_date' => [
-                                'order' =>'desc',
-                            ],
-                            'post_date' => [
-                                'order' => 'desc',
-                            ],
-                        ],
-                    ],
-                ];
-
-                $results = \Elasticsearch::search($search);
-                $searchResult = [];
-                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-                    // When done, get the new scroll_id
-                    // You must always refresh your _scroll_id!  It can change sometimes
-                    $scroll_id = $results['_scroll_id'];
-
-                    // Execute a Scroll request and repeat
-                    $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '30s',        // and the same timeout window
-                    ]
-                    );
-                }
+                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }

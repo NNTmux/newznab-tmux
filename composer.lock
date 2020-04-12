@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "66f7b69036a5df3341c1941dce950208",
+    "content-hash": "1b46b87c2a5d08182648fac021190c52",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -6681,6 +6681,51 @@
                 "spatie"
             ],
             "time": "2020-03-03T21:31:02+00:00"
+        },
+        {
+            "name": "sspat/es-query-sanitizer",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sspat/es-query-sanitizer.git",
+                "reference": "6834625675f50aa9598bbded86a330333b665059"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sspat/es-query-sanitizer/zipball/6834625675f50aa9598bbded86a330333b665059",
+                "reference": "6834625675f50aa9598bbded86a330333b665059",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "sspat\\ESQuerySanitizer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Patrik Foldes",
+                    "email": "studio22@mail.ru"
+                }
+            ],
+            "description": "Simple helper class to sanitize ElasticSearch reserved characters from query strings",
+            "keywords": [
+                "Escape",
+                "elasticsearch",
+                "query",
+                "sanitize"
+            ],
+            "time": "2018-01-22T19:50:50+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

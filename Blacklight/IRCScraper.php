@@ -291,30 +291,7 @@ class IRCScraper extends IRCClient
     protected function _insertNewPre()
     {
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $search = [
-                'index' => 'predb',
-                'body' => [
-                    'query' => [
-                        'query_string' => [
-                            'query' => $this->_curPre['title'],
-                            'fields' => ['title'],
-                            'analyze_wildcard' => true,
-                            'default_operator' => 'and',
-                        ],
-                    ],
-                ],
-            ];
-
-            try {
-                $results = \Elasticsearch::search($search);
-
-                $indexData = [];
-                foreach ($results['hits']['hits'] as $result) {
-                    $indexData[] = $result['_source'];
-                }
-            } catch (BadRequest400Exception $badRequest400Exception) {
-                return;
-            }
+            $indexData = (new ElasticSearchSiteSearch())->predbIndexSearch($this->_curPre['title']);
         } else {
             $indexData = $this->sphinxsearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
         }
