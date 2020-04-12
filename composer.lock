@@ -853,16 +853,16 @@
         },
         {
             "name": "dariusiii/tmdb-laravel",
-            "version": "v3.0.1",
+            "version": "v3.0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/tmdb-laravel.git",
-                "reference": "81bdf3175de54910e9286b63bd5acf045ff36bbd"
+                "reference": "8275f455e06c20030b2cc800f5eafcdd9a1ba5aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/81bdf3175de54910e9286b63bd5acf045ff36bbd",
-                "reference": "81bdf3175de54910e9286b63bd5acf045ff36bbd",
+                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/8275f455e06c20030b2cc800f5eafcdd9a1ba5aa",
+                "reference": "8275f455e06c20030b2cc800f5eafcdd9a1ba5aa",
                 "shasum": ""
             },
             "require": {
@@ -920,7 +920,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2020-04-11T13:24:13+00:00"
+            "time": "2020-04-12T11:11:02+00:00"
         },
         {
             "name": "dariusiii/token",
@@ -2268,16 +2268,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.3.0",
+            "version": "v6.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "b45c4c1c9e9d6e84c0083e00f9c34ed6f8364275"
+                "reference": "23ff96cf073010a9d34a86d5aaba79ce98266735"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/b45c4c1c9e9d6e84c0083e00f9c34ed6f8364275",
-                "reference": "b45c4c1c9e9d6e84c0083e00f9c34ed6f8364275",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/23ff96cf073010a9d34a86d5aaba79ce98266735",
+                "reference": "23ff96cf073010a9d34a86d5aaba79ce98266735",
                 "shasum": ""
             },
             "require": {
@@ -2305,7 +2305,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2019-09-13T17:38:18+00:00"
+            "time": "2020-04-11T19:32:22+00:00"
         },
         {
             "name": "intervention/image",
