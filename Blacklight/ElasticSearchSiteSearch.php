@@ -6,7 +6,6 @@ use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 
 class ElasticSearchSiteSearch
 {
-
     /**
      * @param $phrases
      * @param $limit
@@ -116,6 +115,7 @@ class ElasticSearchSiteSearch
                     ]
                 );
             }
+
             return $searchResult;
         } catch (BadRequest400Exception $request400Exception) {
             return [];
@@ -123,7 +123,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * Search function used in TV, TV API, Movies and Anime searches
+     * Search function used in TV, TV API, Movies and Anime searches.
      * @param $name
      * @param $limit
      * @return array
@@ -174,6 +174,7 @@ class ElasticSearchSiteSearch
                     ]
                 );
             }
+
             return $searchResult;
         } catch (BadRequest400Exception $request400Exception) {
             return [];
@@ -224,10 +225,10 @@ class ElasticSearchSiteSearch
                     ]
                 );
             }
+
             return $ids;
         } catch (BadRequest400Exception $request400Exception) {
             return [];
         }
     }
 }
-
