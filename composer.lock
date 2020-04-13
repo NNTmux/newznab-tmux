@@ -4017,16 +4017,16 @@
         },
         {
             "name": "mhor/php-mediainfo",
-            "version": "5.0.0",
+            "version": "5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mhor/php-mediainfo.git",
-                "reference": "27f9d9ce60bc2511fdde8e62fb397eaa74fe40f3"
+                "reference": "36be70b6559b515b0302c81ae11088cedacab8e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mhor/php-mediainfo/zipball/27f9d9ce60bc2511fdde8e62fb397eaa74fe40f3",
-                "reference": "27f9d9ce60bc2511fdde8e62fb397eaa74fe40f3",
+                "url": "https://api.github.com/repos/mhor/php-mediainfo/zipball/36be70b6559b515b0302c81ae11088cedacab8e0",
+                "reference": "36be70b6559b515b0302c81ae11088cedacab8e0",
                 "shasum": ""
             },
             "require": {
@@ -4065,7 +4065,7 @@
                 "metadata",
                 "wrapper"
             ],
-            "time": "2020-03-31T21:34:14+00:00"
+            "time": "2020-04-13T13:40:01+00:00"
         },
         {
             "name": "monicahq/laravel-cloudflare",
@@ -9148,16 +9148,16 @@
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v4.1.3",
+            "version": "v4.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "88f7acc95150bca002a498899f8b52f318e444c2"
+                "reference": "feb6dad5ae24b1380827aee1629b730080fde500"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/88f7acc95150bca002a498899f8b52f318e444c2",
-                "reference": "88f7acc95150bca002a498899f8b52f318e444c2",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/feb6dad5ae24b1380827aee1629b730080fde500",
+                "reference": "feb6dad5ae24b1380827aee1629b730080fde500",
                 "shasum": ""
             },
             "require": {
@@ -9208,7 +9208,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2020-03-27T23:37:15+00:00"
+            "time": "2020-04-12T15:20:09+00:00"
         },
         {
             "name": "voku/portable-ascii",
