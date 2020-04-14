@@ -3,6 +3,8 @@
 namespace Blacklight;
 
 use Elasticsearch\Common\Exceptions\BadRequest400Exception;
+use Illuminate\Support\Str;
+use sspat\ESQuerySanitizer\Sanitizer;
 
 class ElasticSearchSiteSearch
 {
@@ -13,6 +15,7 @@ class ElasticSearchSiteSearch
      */
     public function indexSearch($phrases, $limit)
     {
+        $keywords = $this->sanitize($phrases);
         try {
             $search = [
                 'scroll' => '30s',
@@ -20,7 +23,7 @@ class ElasticSearchSiteSearch
                 'body' => [
                     'query' => [
                         'query_string' => [
-                            'query' => implode(' ', $phrases),
+                            'query' => $keywords,
                             'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
@@ -71,6 +74,7 @@ class ElasticSearchSiteSearch
      */
     public function indexSearchApi($searchName, $limit)
     {
+        $keywords = $this->sanitize($searchName);
         try {
             $search = [
                 'scroll' => '30s',
@@ -78,7 +82,7 @@ class ElasticSearchSiteSearch
                 'body' => [
                     'query' => [
                         'query_string' => [
-                            'query' => $searchName,
+                            'query' => $keywords,
                             'fields' => ['searchname', 'plainsearchname'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
@@ -130,6 +134,7 @@ class ElasticSearchSiteSearch
      */
     public function indexSearchTMA($name, $limit)
     {
+        $keywords = $this->sanitize($name);
         try {
             $search = [
                 'scroll' => '30s',
@@ -137,7 +142,7 @@ class ElasticSearchSiteSearch
                 'body' => [
                     'query' => [
                         'query_string' => [
-                            'query' => $name,
+                            'query' => $keywords,
                             'fields' => ['searchname', 'plainsearchname'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
@@ -187,6 +192,7 @@ class ElasticSearchSiteSearch
      */
     public function predbIndexSearch($search)
     {
+        $keywords = $this->sanitize($search);
         try {
             $search = [
                 'scroll' => '30s',
@@ -194,7 +200,7 @@ class ElasticSearchSiteSearch
                 'body' => [
                     'query' => [
                         'query_string' => [
-                            'query' => $search,
+                            'query' => $keywords,
                             'fields' => ['title'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
@@ -230,5 +236,32 @@ class ElasticSearchSiteSearch
         } catch (BadRequest400Exception $request400Exception) {
             return [];
         }
+    }
+
+
+    /**
+     * @param array|string $phrases
+     * @return string
+     */
+    private function sanitize ($phrases): string
+    {
+        if (! is_array($phrases)) {
+            $wordArray = explode(' ', str_replace('.', ' ', $phrases));
+        } else {
+            $wordArray = $phrases;
+        }
+        $words = [];
+        foreach ($wordArray as $st) {
+            if (Str::startsWith($st, ['!','+','-', '?', '*'])) {
+                $str = $st;
+            } elseif (Str::endsWith($st, ['+','-', '?', '*'])) {
+                $str = $st;
+            }else {
+                $str = Sanitizer::escape($st);
+            }
+            $words[] = $str;
+        }
+
+        return implode(' ', $words);
     }
 }
