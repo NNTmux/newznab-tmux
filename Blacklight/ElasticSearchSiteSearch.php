@@ -238,12 +238,11 @@ class ElasticSearchSiteSearch
         }
     }
 
-
     /**
      * @param array|string $phrases
      * @return string
      */
-    private function sanitize ($phrases): string
+    private function sanitize($phrases): string
     {
         if (! is_array($phrases)) {
             $wordArray = explode(' ', str_replace('.', ' ', $phrases));
@@ -252,11 +251,11 @@ class ElasticSearchSiteSearch
         }
         $words = [];
         foreach ($wordArray as $st) {
-            if (Str::startsWith($st, ['!','+','-', '?', '*'])) {
+            if (Str::startsWith($st, ['!', '+', '-', '?', '*'])) {
                 $str = $st;
-            } elseif (Str::endsWith($st, ['+','-', '?', '*'])) {
+            } elseif (Str::endsWith($st, ['+', '-', '?', '*'])) {
                 $str = $st;
-            }else {
+            } else {
                 $str = Sanitizer::escape($st);
             }
             $words[] = $str;
