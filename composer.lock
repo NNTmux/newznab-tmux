@@ -308,26 +308,25 @@
         },
         {
             "name": "cakephp/chronos",
-            "version": "1.3.0",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/chronos.git",
-                "reference": "ba2bab98849e7bf29b02dd634ada49ab36472959"
+                "reference": "0b176c8e8abb18b552b789f60250188a74d534ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/chronos/zipball/ba2bab98849e7bf29b02dd634ada49ab36472959",
-                "reference": "ba2bab98849e7bf29b02dd634ada49ab36472959",
+                "url": "https://api.github.com/repos/cakephp/chronos/zipball/0b176c8e8abb18b552b789f60250188a74d534ab",
+                "reference": "0b176c8e8abb18b552b789f60250188a74d534ab",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6"
+                "php": ">=7.2"
             },
             "require-dev": {
-                "athletic/athletic": "~0.1",
-                "cakephp/cakephp-codesniffer": "^3.0",
-                "phpbench/phpbench": "@dev",
-                "phpunit/phpunit": "<6.0 || ^7.0"
+                "cakephp/cakephp-codesniffer": "^4.0",
+                "phpbench/phpbench": "^1.0@dev",
+                "phpunit/phpunit": "^8.0"
             },
             "type": "library",
             "autoload": {
@@ -360,7 +359,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-11-30T02:33:19+00:00"
+            "time": "2020-02-26T20:24:12+00:00"
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
@@ -2496,16 +2495,16 @@
         },
         {
             "name": "jamesmills/laravel-timezone",
-            "version": "1.9.1",
+            "version": "1.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jamesmills/laravel-timezone.git",
-                "reference": "91c1b1d0c5202565c1b2c41a1d0cdfc2de6c672b"
+                "reference": "06b9a7cd76002eb4db873c6d77bb46317dd98f20"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/91c1b1d0c5202565c1b2c41a1d0cdfc2de6c672b",
-                "reference": "91c1b1d0c5202565c1b2c41a1d0cdfc2de6c672b",
+                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/06b9a7cd76002eb4db873c6d77bb46317dd98f20",
+                "reference": "06b9a7cd76002eb4db873c6d77bb46317dd98f20",
                 "shasum": ""
             },
             "require": {
@@ -2546,7 +2545,7 @@
                 "laravel",
                 "timezone"
             ],
-            "time": "2020-04-08T08:05:19+00:00"
+            "time": "2020-04-14T16:27:03+00:00"
         },
         {
             "name": "jenssegers/model",
@@ -2938,16 +2937,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v7.5.2",
+            "version": "v7.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "3a3b3f7fea69813f5a03449c6314bfb42c3ccf78"
+                "reference": "8299b6dc0ff00b94d15f3d305b577addbb0d359f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/3a3b3f7fea69813f5a03449c6314bfb42c3ccf78",
-                "reference": "3a3b3f7fea69813f5a03449c6314bfb42c3ccf78",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/8299b6dc0ff00b94d15f3d305b577addbb0d359f",
+                "reference": "8299b6dc0ff00b94d15f3d305b577addbb0d359f",
                 "shasum": ""
             },
             "require": {
@@ -3085,24 +3084,24 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-04-08T15:54:18+00:00"
+            "time": "2020-04-14T14:21:25+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v4.2.1",
+            "version": "v4.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "fdfbd5b2f7bb1dfdf2e40518b263337c07b6b22c"
+                "reference": "fda753c79ddef7ee4f16fb34cd3fc3fd64d4f114"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/fdfbd5b2f7bb1dfdf2e40518b263337c07b6b22c",
-                "reference": "fdfbd5b2f7bb1dfdf2e40518b263337c07b6b22c",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/fda753c79ddef7ee4f16fb34cd3fc3fd64d4f114",
+                "reference": "fda753c79ddef7ee4f16fb34cd3fc3fd64d4f114",
                 "shasum": ""
             },
             "require": {
-                "cakephp/chronos": "^1.0",
+                "cakephp/chronos": "^2.0",
                 "ext-json": "*",
                 "ext-pcntl": "*",
                 "ext-posix": "*",
@@ -3158,7 +3157,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2020-04-02T12:32:01+00:00"
+            "time": "2020-04-14T15:42:35+00:00"
         },
         {
             "name": "laravel/scout",
@@ -3227,16 +3226,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v3.2.0",
+            "version": "v3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "10992faf0b22c0ff6432d45a7410c1a3bf53227d"
+                "reference": "63c4d7ff3ff19c6fa222df73117faedbb72f776d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/10992faf0b22c0ff6432d45a7410c1a3bf53227d",
-                "reference": "10992faf0b22c0ff6432d45a7410c1a3bf53227d",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/63c4d7ff3ff19c6fa222df73117faedbb72f776d",
+                "reference": "63c4d7ff3ff19c6fa222df73117faedbb72f776d",
                 "shasum": ""
             },
             "require": {
@@ -3286,7 +3285,7 @@
                 "laravel",
                 "monitoring"
             ],
-            "time": "2020-03-17T17:55:57+00:00"
+            "time": "2020-04-14T15:36:29+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -6307,16 +6306,16 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.35",
+            "version": "v3.1.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "97f700971f7df65f66564b4ce14801f1059bcd8a"
+                "reference": "fd148f7ade295014fff77f89ee3d5b20d9d55451"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/97f700971f7df65f66564b4ce14801f1059bcd8a",
-                "reference": "97f700971f7df65f66564b4ce14801f1059bcd8a",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/fd148f7ade295014fff77f89ee3d5b20d9d55451",
+                "reference": "fd148f7ade295014fff77f89ee3d5b20d9d55451",
                 "shasum": ""
             },
             "require": {
@@ -6360,20 +6359,20 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2020-04-13T22:02:48+00:00"
+            "time": "2020-04-14T14:44:26+00:00"
         },
         {
             "name": "spatie/async",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "4deae48d4a3bb36da83c5556163f8d3472a73de9"
+                "reference": "e778fbe6f84da6b87d5bb737dfee28453d5c6fe4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/4deae48d4a3bb36da83c5556163f8d3472a73de9",
-                "reference": "4deae48d4a3bb36da83c5556163f8d3472a73de9",
+                "url": "https://api.github.com/repos/spatie/async/zipball/e778fbe6f84da6b87d5bb737dfee28453d5c6fe4",
+                "reference": "e778fbe6f84da6b87d5bb737dfee28453d5c6fe4",
                 "shasum": ""
             },
             "require": {
@@ -6417,7 +6416,7 @@
                 "async",
                 "spatie"
             ],
-            "time": "2020-03-17T07:13:43+00:00"
+            "time": "2020-04-15T05:50:42+00:00"
         },
         {
             "name": "spatie/fractalistic",
