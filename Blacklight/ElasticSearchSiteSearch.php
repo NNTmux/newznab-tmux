@@ -249,18 +249,24 @@ class ElasticSearchSiteSearch
         } else {
             $wordArray = $phrases;
         }
-        $words = [];
-        foreach ($wordArray as $st) {
-            if (Str::startsWith($st, ['!', '+', '-', '?', '*'])) {
-                $str = $st;
-            } elseif (Str::endsWith($st, ['+', '-', '?', '*'])) {
-                $str = $st;
-            } else {
-                $str = Sanitizer::escape($st);
+        $keywords = [];
+        foreach ($wordArray as $words) {
+            $tempWords = [];
+            $words = preg_split('/\s+/', $words);
+            foreach ($words as $st) {
+                if (Str::startsWith($st, ['!', '+', '-', '?', '*'])) {
+                    $str = $st;
+                } elseif (Str::endsWith($st, ['+', '-', '?', '*'])) {
+                    $str = $st;
+                } else {
+                    $str = Sanitizer::escape($st);
+                }
+                $tempWords[] = $str;
             }
-            $words[] = $str;
+
+            $keywords = $tempWords;
         }
 
-        return implode(' ', $words);
+        return implode(' ', $keywords);
     }
 }
