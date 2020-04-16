@@ -194,7 +194,6 @@ class ElasticSearchSiteSearch
      */
     public function predbIndexSearch($search)
     {
-        $keywords = $this->sanitize($search);
         try {
             $search = [
                 'scroll' => '30s',
@@ -202,7 +201,7 @@ class ElasticSearchSiteSearch
                 'body' => [
                     'query' => [
                         'query_string' => [
-                            'query' => $keywords,
+                            'query' => $search,
                             'fields' => ['title'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
@@ -304,13 +303,12 @@ class ElasticSearchSiteSearch
      */
     public function searchPreDb($searchTerm)
     {
-        $keywords = $this->sanitize($searchTerm);
         $search = [
             'index' => 'predb',
             'body' => [
                 'query' => [
                     'query_string' => [
-                        'query' => $keywords,
+                        'query' => $searchTerm,
                         'fields' => ['title', 'filename'],
                         'analyze_wildcard' => true,
                         'default_operator' => 'and',
