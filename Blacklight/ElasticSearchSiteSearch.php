@@ -9,11 +9,9 @@ use sspat\ESQuerySanitizer\Sanitizer;
 
 class ElasticSearchSiteSearch
 {
-
-
     /**
      * @param string|array $phrases
-     * @param integer $limit
+     * @param int $limit
      * @return mixed
      */
     public function indexSearch($phrases, int $limit)
@@ -244,7 +242,7 @@ class ElasticSearchSiteSearch
     /**
      * @param array $parameters
      */
-    public function insertRelease (array $parameters): void
+    public function insertRelease(array $parameters): void
     {
         $searchNameDotless = str_replace(['.', '-'], ' ', $parameters['searchname']);
         $data = [
@@ -268,7 +266,7 @@ class ElasticSearchSiteSearch
     /**
      * @param int $id
      */
-    public function updateRelease (int $id)
+    public function updateRelease(int $id)
     {
         $new = Release::query()
             ->where('releases.id', $id)
