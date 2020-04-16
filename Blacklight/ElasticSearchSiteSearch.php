@@ -303,12 +303,13 @@ class ElasticSearchSiteSearch
      */
     public function searchPreDb($searchTerm)
     {
+        $keywords = $this->sanitize($searchTerm);
         $search = [
             'index' => 'predb',
             'body' => [
                 'query' => [
                     'query_string' => [
-                        'query' => $this->sanitize($searchTerm),
+                        'query' => $keywords,
                         'fields' => ['title', 'filename'],
                         'analyze_wildcard' => true,
                         'default_operator' => 'and',
