@@ -298,6 +298,82 @@ class ElasticSearchSiteSearch
     }
 
     /**
+     * @param $searchTerm
+     * @return array
+     */
+    public function searchPreDb($searchTerm)
+    {
+        $search = [
+            'index' => 'predb',
+            'body' => [
+                'query' => [
+                    'query_string' => [
+                        'query' => $this->sanitize($searchTerm),
+                        'fields' => ['title', 'filename'],
+                        'analyze_wildcard' => true,
+                        'default_operator' => 'and',
+                    ],
+                ],
+            ],
+        ];
+
+        try {
+            $primaryResults = \Elasticsearch::search($search);
+
+            $results = [];
+            foreach ($primaryResults['hits']['hits'] as $primaryResult) {
+                $results[] = $primaryResult['_source'];
+            }
+        } catch (BadRequest400Exception $badRequest400Exception) {
+            return [];
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param $parameters
+     */
+    public function insertPreDb($parameters)
+    {
+        $data = [
+            'body' => [
+                'id' => $parameters['id'],
+                'title' => $parameters['title'],
+                'source' => $parameters['source'],
+                'filename' => $parameters['filename'],
+            ],
+            'index' => 'predb',
+            'id' => $parameters['id'],
+        ];
+
+        \Elasticsearch::index($data);
+    }
+
+    /**
+     * @param $parameters
+     */
+    public function updatePreDb($parameters)
+    {
+        $data = [
+            'body' => [
+                'doc' => [
+                    'id' => $parameters['id'],
+                    'title' => $parameters['title'],
+                    'filename' => $parameters['filename'],
+                    'source' => $parameters['source'],
+                ],
+                'doc_as_upsert' => true,
+            ],
+
+            'index' => 'predb',
+            'id' => $parameters['id'],
+        ];
+
+        \Elasticsearch::update($data);
+    }
+
+    /**
      * @param array|string $phrases
      * @return string
      */
