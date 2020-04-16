@@ -30,6 +30,10 @@ class Releases extends Release
      * @var int
      */
     public $passwordStatus;
+    /**
+     * @var ElasticSearchSiteSearch
+     */
+    private $elasticSearch;
 
     /**
      * @var array Class instances.
@@ -39,6 +43,7 @@ class Releases extends Release
     {
         parent::__construct();
         $this->sphinxSearch = new SphinxSearch();
+        $this->elasticSearch = new ElasticSearchSiteSearch();
     }
 
     /**
@@ -580,7 +585,7 @@ class Releases extends Release
         }
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $searchResult = (new ElasticSearchSiteSearch())->indexSearch($phrases, $limit);
+            $searchResult = $this->elasticSearch->indexSearch($phrases, $limit);
         } else {
             $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
 
@@ -685,7 +690,7 @@ class Releases extends Release
     {
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch())->indexSearchApi($searchName, $limit);
+                $searchResult = $this->elasticSearch->indexSearchApi($searchName, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
             }
@@ -834,7 +839,7 @@ class Releases extends Release
         }
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
+                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }
@@ -983,7 +988,7 @@ class Releases extends Release
         }
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
+                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }
@@ -1067,7 +1072,7 @@ class Releases extends Release
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
+                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }
@@ -1150,7 +1155,7 @@ class Releases extends Release
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch())->indexSearchTMA($name, $limit);
+                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
             }

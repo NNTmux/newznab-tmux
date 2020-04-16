@@ -8,12 +8,14 @@ use sspat\ESQuerySanitizer\Sanitizer;
 
 class ElasticSearchSiteSearch
 {
+
+
     /**
-     * @param $phrases
-     * @param $limit
+     * @param string|array $phrases
+     * @param integer $limit
      * @return mixed
      */
-    public function indexSearch($phrases, $limit)
+    public function indexSearch($phrases, int $limit)
     {
         $keywords = $this->sanitize($phrases);
         try {
@@ -68,11 +70,11 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param $searchName
-     * @param $limit
+     * @param string|array $searchName
+     * @param int $limit
      * @return array
      */
-    public function indexSearchApi($searchName, $limit)
+    public function indexSearchApi($searchName, int $limit)
     {
         $keywords = $this->sanitize($searchName);
         try {
@@ -128,8 +130,8 @@ class ElasticSearchSiteSearch
 
     /**
      * Search function used in TV, TV API, Movies and Anime searches.
-     * @param $name
-     * @param $limit
+     * @param string|array $name
+     * @param int $limit
      * @return array
      */
     public function indexSearchTMA($name, $limit)
@@ -187,7 +189,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param $search
+     * @param string|array $search
      * @return array|\Illuminate\Support\Collection
      */
     public function predbIndexSearch($search)
