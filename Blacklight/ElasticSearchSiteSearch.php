@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Release;
 use Elasticsearch\Common\Exceptions\BadRequest400Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use sspat\ESQuerySanitizer\Sanitizer;
 
