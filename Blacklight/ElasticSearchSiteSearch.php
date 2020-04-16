@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use App\Models\Release;
 use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 use Illuminate\Support\Str;
 use sspat\ESQuerySanitizer\Sanitizer;
@@ -237,6 +238,64 @@ class ElasticSearchSiteSearch
             return $ids;
         } catch (BadRequest400Exception $request400Exception) {
             return [];
+        }
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function insertRelease (array $parameters): void
+    {
+        $searchNameDotless = str_replace(['.', '-'], ' ', $parameters['searchname']);
+        $data = [
+            'body' => [
+                'id' => $parameters['id'],
+                'name' => $parameters['name'],
+                'searchname' => $parameters['searchname'],
+                'plainsearchname' => $searchNameDotless,
+                'fromname' => $parameters['fromname'],
+                'filename' => $parameters['filename'] ?? '',
+                'add_date' => now()->format('Y-m-d H:i:s'),
+                'post_date' => $parameters['postdate'],
+            ],
+            'index' => 'releases',
+            'id' => $parameters['id'],
+        ];
+
+        \Elasticsearch::index($data);
+    }
+
+    /**
+     * @param int $id
+     */
+    public function updateRelease (int $id)
+    {
+        $new = Release::query()
+            ->where('releases.id', $id)
+            ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
+            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
+            ->groupBy('releases.id')
+            ->first();
+        if ($new !== null) {
+            $searchNameDotless = str_replace(['.', '-'], ' ', $new->searchname);
+            $data = [
+                'body' => [
+                    'doc' => [
+                        'id' => $new->id,
+                        'name' => $new->name,
+                        'searchname' => $new->searchname,
+                        'plainsearchname' => $searchNameDotless,
+                        'fromname' => $new->fromname,
+                        'filename' => $new->filename,
+                    ],
+                    'doc_as_upsert' => true,
+                ],
+
+                'index' => 'releases',
+                'id' => $new->id,
+            ];
+
+            \Elasticsearch::update($data);
         }
     }
 
