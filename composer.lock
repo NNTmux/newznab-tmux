@@ -3538,16 +3538,16 @@
         },
         {
             "name": "league/commonmark",
-            "version": "1.3.4",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "dd3261eb9a322e009fa5d96d19b9ae19708ce04b"
+                "reference": "517cbe1c6faf90afeb38a0e917c73acc6d3051ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/dd3261eb9a322e009fa5d96d19b9ae19708ce04b",
-                "reference": "dd3261eb9a322e009fa5d96d19b9ae19708ce04b",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/517cbe1c6faf90afeb38a0e917c73acc6d3051ce",
+                "reference": "517cbe1c6faf90afeb38a0e917c73acc6d3051ce",
                 "shasum": ""
             },
             "require": {
@@ -3565,7 +3565,7 @@
                 "github/gfm": "0.29.0",
                 "michelf/php-markdown": "~1.4",
                 "mikehaertl/php-shellcommand": "^1.4",
-                "phpstan/phpstan-shim": "^0.11.5",
+                "phpstan/phpstan": "^0.12",
                 "phpunit/phpunit": "^7.5",
                 "scrutinizer/ocular": "^1.5",
                 "symfony/finder": "^4.2"
@@ -3608,7 +3608,7 @@
                 "md",
                 "parser"
             ],
-            "time": "2020-04-13T20:52:18+00:00"
+            "time": "2020-04-18T20:46:13+00:00"
         },
         {
             "name": "league/csv",
@@ -4637,16 +4637,16 @@
         },
         {
             "name": "pear/pear",
-            "version": "v1.10.11",
+            "version": "v1.10.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core.git",
-                "reference": "f0f16689347c65f4992a00e59ead7dcd4133fc7b"
+                "reference": "6162562db95379bcfa906b569ecd0c85d4ee7364"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core/zipball/f0f16689347c65f4992a00e59ead7dcd4133fc7b",
-                "reference": "f0f16689347c65f4992a00e59ead7dcd4133fc7b",
+                "url": "https://api.github.com/repos/pear/pear-core/zipball/6162562db95379bcfa906b569ecd0c85d4ee7364",
+                "reference": "6162562db95379bcfa906b569ecd0c85d4ee7364",
                 "shasum": ""
             },
             "require": {
@@ -4728,7 +4728,7 @@
                 }
             ],
             "description": "This is the definitive source of PEAR's core files.",
-            "time": "2020-04-10T19:38:15+00:00"
+            "time": "2020-04-19T18:01:13+00:00"
         },
         {
             "name": "pear/structures_graph",
@@ -4769,16 +4769,16 @@
         },
         {
             "name": "pear/xml_util",
-            "version": "v1.4.4",
+            "version": "v1.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/XML_Util.git",
-                "reference": "49cffb77aee118484cd55b9c5c1fd5323e9ceb9a"
+                "reference": "90052e3e7c099ffce3bc83ec4210f88a40b8419a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/XML_Util/zipball/49cffb77aee118484cd55b9c5c1fd5323e9ceb9a",
-                "reference": "49cffb77aee118484cd55b9c5c1fd5323e9ceb9a",
+                "url": "https://api.github.com/repos/pear/XML_Util/zipball/90052e3e7c099ffce3bc83ec4210f88a40b8419a",
+                "reference": "90052e3e7c099ffce3bc83ec4210f88a40b8419a",
                 "shasum": ""
             },
             "require": {
@@ -4820,7 +4820,7 @@
             ],
             "description": "Methods to work with XML documents",
             "homepage": "http://pear.php.net/package/XML_Util",
-            "time": "2019-12-05T19:08:39+00:00"
+            "time": "2020-04-19T15:08:27+00:00"
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",
