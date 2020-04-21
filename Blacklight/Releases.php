@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use function GuzzleHttp\Psr7\str;
 
 /**
  * Class Releases.
@@ -454,7 +455,7 @@ class Releases extends Release
                     $identifiers['i'] = $identifiers['i']['id'];
                 }
             }
-            if ($identifiers['i'] !== false) {
+            if ($identifiers['i'] !== null) {
                 $params = [
                     'index' => 'releases',
                     'id' => $identifiers['i'],
