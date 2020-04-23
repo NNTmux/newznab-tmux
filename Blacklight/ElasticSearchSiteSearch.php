@@ -18,9 +18,9 @@ class ElasticSearchSiteSearch
     public function indexSearch($phrases, int $limit)
     {
         $keywords = $this->sanitize($phrases);
-        if (Str::length($phrases) === 1)
-        try {
-            $search = [
+        if (Str::length($phrases) === 1) {
+            try {
+                $search = [
                 'scroll' => '30s',
                 'index' => 'releases',
                 'body' => [
@@ -44,29 +44,30 @@ class ElasticSearchSiteSearch
                 ],
             ];
 
-            $results = \Elasticsearch::search($search);
+                $results = \Elasticsearch::search($search);
 
-            $searchResult = [];
-            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                foreach ($results['hits']['hits'] as $result) {
-                    $searchResult[] = $result['_source']['id'];
-                }
+                $searchResult = [];
+                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
+                    foreach ($results['hits']['hits'] as $result) {
+                        $searchResult[] = $result['_source']['id'];
+                    }
 
-                // When done, get the new scroll_id
-                // You must always refresh your _scroll_id!  It can change sometimes
-                $scroll_id = $results['_scroll_id'];
+                    // When done, get the new scroll_id
+                    // You must always refresh your _scroll_id!  It can change sometimes
+                    $scroll_id = $results['_scroll_id'];
 
-                // Execute a Scroll request and repeat
-                $results = \Elasticsearch::scroll([
+                    // Execute a Scroll request and repeat
+                    $results = \Elasticsearch::scroll([
                     'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
                     'scroll' => '30s',        // and the same timeout window
                 ]
                 );
-            }
+                }
 
-            return $searchResult;
-        } catch (BadRequest400Exception $request400Exception) {
-            return [];
+                return $searchResult;
+            } catch (BadRequest400Exception $request400Exception) {
+                return [];
+            }
         }
     }
 
@@ -392,7 +393,7 @@ class ElasticSearchSiteSearch
             foreach ($words as $st) {
                 if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
                     $str = $st;
-                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st))  {
+                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
                     $str = $st;
                 } else {
                     $str = Sanitizer::escape($st);
