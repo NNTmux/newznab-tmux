@@ -18,56 +18,54 @@ class ElasticSearchSiteSearch
     public function indexSearch($phrases, int $limit)
     {
         $keywords = $this->sanitize($phrases);
-        if (Str::length($phrases) === 1) {
-            try {
-                $search = [
-                    'scroll' => '30s',
-                    'index' => 'releases',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $keywords,
-                                'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                        'size' => $limit,
-                        'sort' => [
-                            'add_date' => [
-                                'order' => 'desc',
-                            ],
-                            'post_date' => [
-                                'order' => 'desc',
-                            ],
+        try {
+            $search = [
+                'scroll' => '30s',
+                'index' => 'releases',
+                'body' => [
+                    'query' => [
+                        'query_string' => [
+                            'query' => $keywords,
+                            'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
+                            'analyze_wildcard' => true,
+                            'default_operator' => 'and',
                         ],
                     ],
-                ];
+                    'size' => $limit,
+                    'sort' => [
+                        'add_date' => [
+                            'order' => 'desc',
+                        ],
+                        'post_date' => [
+                            'order' => 'desc',
+                        ],
+                    ],
+                ],
+            ];
 
-                $results = \Elasticsearch::search($search);
+            $results = \Elasticsearch::search($search);
 
-                $searchResult = [];
-                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                    foreach ($results['hits']['hits'] as $result) {
-                        $searchResult[] = $result['_source']['id'];
-                    }
-
-                    // When done, get the new scroll_id
-                    // You must always refresh your _scroll_id!  It can change sometimes
-                    $scroll_id = $results['_scroll_id'];
-
-                    // Execute a Scroll request and repeat
-                    $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll' => '30s',        // and the same timeout window
-                    ]
-                );
+            $searchResult = [];
+            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
+                foreach ($results['hits']['hits'] as $result) {
+                    $searchResult[] = $result['_source']['id'];
                 }
 
-                return $searchResult;
-            } catch (BadRequest400Exception $request400Exception) {
-                return [];
+                // When done, get the new scroll_id
+                // You must always refresh your _scroll_id!  It can change sometimes
+                $scroll_id = $results['_scroll_id'];
+
+                // Execute a Scroll request and repeat
+                $results = \Elasticsearch::scroll([
+                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                    'scroll' => '30s',        // and the same timeout window
+                ]
+            );
             }
+
+            return $searchResult;
+        } catch (BadRequest400Exception $request400Exception) {
+            return [];
         }
     }
 
