@@ -21,28 +21,28 @@ class ElasticSearchSiteSearch
         if (Str::length($phrases) === 1) {
             try {
                 $search = [
-                'scroll' => '30s',
-                'index' => 'releases',
-                'body' => [
-                    'query' => [
-                        'query_string' => [
-                            'query' => $keywords,
-                            'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
-                            'analyze_wildcard' => true,
-                            'default_operator' => 'and',
+                    'scroll' => '30s',
+                    'index' => 'releases',
+                    'body' => [
+                        'query' => [
+                            'query_string' => [
+                                'query' => $keywords,
+                                'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
+                                'analyze_wildcard' => true,
+                                'default_operator' => 'and',
+                            ],
+                        ],
+                        'size' => $limit,
+                        'sort' => [
+                            'add_date' => [
+                                'order' => 'desc',
+                            ],
+                            'post_date' => [
+                                'order' => 'desc',
+                            ],
                         ],
                     ],
-                    'size' => $limit,
-                    'sort' => [
-                        'add_date' => [
-                            'order' => 'desc',
-                        ],
-                        'post_date' => [
-                            'order' => 'desc',
-                        ],
-                    ],
-                ],
-            ];
+                ];
 
                 $results = \Elasticsearch::search($search);
 
@@ -58,9 +58,9 @@ class ElasticSearchSiteSearch
 
                     // Execute a Scroll request and repeat
                     $results = \Elasticsearch::scroll([
-                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                    'scroll' => '30s',        // and the same timeout window
-                ]
+                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                        'scroll' => '30s',        // and the same timeout window
+                    ]
                 );
                 }
 
