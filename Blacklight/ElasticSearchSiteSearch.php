@@ -18,6 +18,7 @@ class ElasticSearchSiteSearch
     public function indexSearch($phrases, int $limit)
     {
         $keywords = $this->sanitize($phrases);
+        if (Str::length($phrases) === 1)
         try {
             $search = [
                 'scroll' => '30s',
@@ -389,9 +390,9 @@ class ElasticSearchSiteSearch
             $tempWords = [];
             $words = preg_split('/\s+/', $words);
             foreach ($words as $st) {
-                if (Str::startsWith($st, ['!', '+', '-', '?', '*'])) {
+                if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
                     $str = $st;
-                } elseif (Str::endsWith($st, ['+', '-', '?', '*'])) {
+                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st))  {
                     $str = $st;
                 } else {
                     $str = Sanitizer::escape($st);
