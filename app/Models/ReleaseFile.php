@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\SphinxSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -134,33 +134,7 @@ class ReleaseFile extends Model
                 ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $new = Release::query()
-                    ->where('releases.id', $id)
-                    ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-                    ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
-                    ->groupBy('releases.id')
-                    ->first();
-                if ($new !== null) {
-                    $searchName = str_replace(['.', '-'], ' ', $new->searchname);
-                    $data = [
-                        'body' => [
-                            'doc' => [
-                                'id' => $id,
-                                'name' => $new->name,
-                                'searchname' => $new->searchname,
-                                'plainsearchname' => $searchName,
-                                'fromname' => $new->fromname,
-                                'filename' => ! empty($new->filename) ? $new->filename : '',
-                            ],
-                            'doc_as_upsert' => true,
-                        ],
-
-                        'index' => 'releases',
-                        'id' => $id,
-                    ];
-
-                    \Elasticsearch::update($data);
-                }
+                (new ElasticSearchSiteSearch())->updateRelease($id);
             } else {
                 (new SphinxSearch())->updateRelease($id);
             }

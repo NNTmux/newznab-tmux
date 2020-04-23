@@ -8,7 +8,6 @@ use App\Models\Release;
 use App\Models\UsenetGroup;
 use Blacklight\processing\PostProcess;
 use Blacklight\utility\Utility;
-use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 use Illuminate\Support\Arr;
 
 /**
@@ -143,6 +142,10 @@ class NameFixer
      * @var \Blacklight\ColorCLI
      */
     protected $colorCli;
+    /**
+     * @var ElasticSearchSiteSearch
+     */
+    private $elasticsearch;
 
     /**
      * @param array $options Class instances / Echo to cli.
@@ -173,6 +176,7 @@ class NameFixer
         $this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => null]));
         $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
+        $this->elasticsearch = new ElasticSearchSiteSearch();
     }
 
     /**
@@ -1034,24 +1038,7 @@ class NameFixer
                         $taggedRelease->update($updateColumns);
                         $taggedRelease->retag($determinedCategory['tags']);
                         if (config('nntmux.elasticsearch_enabled') === true) {
-                            $newTitleDotless = str_replace(['.', '-'], ' ', $newTitle);
-                            $data = [
-                                'body' => [
-                                    'doc' => [
-                                        'id' => $release->releases_id,
-                                        'name' => $release->name,
-                                        'searchname' => $newTitle,
-                                        'plainsearchname' => $newTitleDotless,
-                                        'fromname' => $release->fromname,
-                                    ],
-                                    'doc_as_upsert' => true,
-                                ],
-
-                                'index' => 'releases',
-                                'id' => $release->releases_id,
-                            ];
-
-                            \Elasticsearch::update($data);
+                            $this->elasticsearch->updateRelease($release->releases_id);
                         } else {
                             $this->sphinx->updateRelease($release->releases_id);
                         }
@@ -1075,33 +1062,7 @@ class NameFixer
                             );
                         $taggedRelease->retag($determinedCategory['tags']);
                         if (config('nntmux.elasticsearch_enabled') === true) {
-                            $new = Release::query()
-                                ->where('releases.id', $release->releases_id)
-                                ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-                                ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
-                                ->groupBy('releases.id')
-                                ->first();
-                            if ($new !== null) {
-                                $newTitleDotless = str_replace(['.', '-'], ' ', $newTitle);
-                                $data = [
-                                    'body' => [
-                                        'doc' => [
-                                            'id' => $release->releases_id,
-                                            'name' => $new->name,
-                                            'searchname' => $newTitle,
-                                            'plainsearchname' => $newTitleDotless,
-                                            'fromname' => $new->fromname,
-                                            'filename' => ! empty($new->filename) ? $new->filename : '',
-                                        ],
-                                        'doc_as_upsert' => true,
-                                    ],
-
-                                    'index' => 'releases',
-                                    'id' => $release->releases_id,
-                                ];
-
-                                \Elasticsearch::update($data);
-                            }
+                            $this->elasticsearch->updateRelease($release->_releases_id);
                         } else {
                             $this->sphinx->updateRelease($release->releases_id);
                         }
@@ -1314,32 +1275,8 @@ class NameFixer
             $this->_cleanMatchFiles();
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
-                $preMatch[1] = $this->escapeString($preMatch[1]);
                 if (config('nntmux.elasticsearch_enabled') === true) {
-                    $search = [
-                        'index' => 'predb',
-                        'body' => [
-                            'query' => [
-                                'query_string' => [
-                                    'query' => $preMatch[1],
-                                    'fields' => ['title', 'filename'],
-                                    'analyze_wildcard' => true,
-                                    'default_operator' => 'and',
-                                ],
-                            ],
-                        ],
-                    ];
-
-                    try {
-                        $primaryResults = \Elasticsearch::search($search);
-
-                        $results = [];
-                        foreach ($primaryResults['hits']['hits'] as $primaryResult) {
-                            $results[] = $primaryResult['_source'];
-                        }
-                    } catch (BadRequest400Exception $badRequest400Exception) {
-                        return false;
-                    }
+                    $results = $this->elasticsearch->searchPreDb($preMatch[1]);
                 } else {
                     $results = $this->sphinx->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
                 }
@@ -2518,37 +2455,13 @@ class NameFixer
         $this->cleanFileNames();
         if (! empty($this->_fileName)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $this->_fileName = $this->escapeString($this->_fileName);
-                $search = [
-                    'index' => 'predb',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $this->_fileName,
-                                'fields' => ['title', 'filename'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                    ],
-                ];
+                $results = $this->elasticsearch->searchPreDb($this->_fileName);
+                foreach ($results as $match) {
+                    if (! empty($match)) {
+                        $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
 
-                try {
-                    $primaryResults = \Elasticsearch::search($search);
-                    $results = [];
-                    foreach ($primaryResults['hits']['hits'] as $primaryResult) {
-                        $results[] = $primaryResult['_source'];
+                        return true;
                     }
-
-                    foreach ($results as $match) {
-                        if (! empty($match)) {
-                            $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
-
-                            return true;
-                        }
-                    }
-                } catch (BadRequest400Exception $badRequest400Exception) {
-                    return false;
                 }
             } else {
                 foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $match) {
@@ -2580,38 +2493,13 @@ class NameFixer
         $this->cleanFileNames();
         if (! empty($this->_fileName)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $this->_fileName = $this->escapeString($this->_fileName);
-                $search = [
-                    'index' => 'predb',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $this->_fileName,
-                                'fields' => ['title', 'filename'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                    ],
-                ];
+                $results = $this->elasticsearch->searchPreDb($this->_fileName);
+                foreach ($results as $match) {
+                    if (! empty($match)) {
+                        $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
 
-                try {
-                    $primaryResults = \Elasticsearch::search($search);
-
-                    $results = [];
-                    foreach ($primaryResults['hits']['hits'] as $primaryResult) {
-                        $results[] = $primaryResult['_source'];
+                        return true;
                     }
-
-                    foreach ($results as $match) {
-                        if (! empty($match)) {
-                            $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
-
-                            return true;
-                        }
-                    }
-                } catch (BadRequest400Exception $badRequest400Exception) {
-                    return false;
                 }
             } else {
                 foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {

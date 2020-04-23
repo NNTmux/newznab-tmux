@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Opis\Closure\SerializableClosure;
 use Spatie\Async\Pool;
+use Symfony\Component\Process\Process;
 
 /**
  * Class Forking.
@@ -25,10 +26,6 @@ use Spatie\Async\Pool;
  */
 class Forking
 {
-    private const OUTPUT_NONE = 0; // Don't display child output.
-    private const OUTPUT_REALTIME = 1; // Display child output in real time.
-    private const OUTPUT_SERIALLY = 2; // Display child output when child is done.
-
     /**
      * @var \Blacklight\ColorCLI
      */
@@ -124,22 +121,6 @@ class Forking
     {
         SerializableClosure::removeSecurityProvider();
         $this->colorCli = new ColorCLI();
-
-        $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
-
-        switch (config('nntmux.multiprocessing_child_output_type')) {
-                case 0:
-                    $this->outputType = self::OUTPUT_NONE;
-                    break;
-                case 1:
-                    $this->outputType = self::OUTPUT_REALTIME;
-                    break;
-                case 2:
-                    $this->outputType = self::OUTPUT_SERIALLY;
-                    break;
-                default:
-                    $this->outputType = self::OUTPUT_REALTIME;
-            }
 
         $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
@@ -653,16 +634,16 @@ class Forking
     {
         $type = $desc = '';
         if ($this->processAdditional) {
-            $type = 'pp_additional  ';
+            $type = 'additional true ';
             $desc = 'additional postprocessing';
         } elseif ($this->processNFO) {
-            $type = 'pp_nfo  ';
+            $type = 'nfo true ';
             $desc = 'nfo postprocessing';
         } elseif ($this->processMovies) {
-            $type = 'pp_movie  ';
+            $type = 'movies true ';
             $desc = 'movies postprocessing';
         } elseif ($this->processTV) {
-            $type = 'pp_tv  ';
+            $type = 'tv true ';
             $desc = 'tv postprocessing';
         }
         $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
@@ -671,7 +652,7 @@ class Forking
         foreach ($releases as $release) {
             if ($type !== '') {
                 $pool->add(function () use ($release, $type) {
-                    $this->_executeCommand($this->dnr_path.$type.$release->id.(isset($release->renamed) ? ('  '.$release->renamed) : '').'"');
+                    $this->_executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
                 }, 100000)->then(function () use ($desc, $count) {
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
@@ -944,20 +925,19 @@ class Forking
      * Execute a shell command.
      *
      * @param string $command
+     * @return string
      */
     protected function _executeCommand($command)
     {
-        switch ($this->outputType) {
-            case self::OUTPUT_NONE:
-                exec($command);
-                break;
-            case self::OUTPUT_REALTIME:
-                passthru($command);
-                break;
-            case self::OUTPUT_SERIALLY:
-                echo shell_exec($command);
-                break;
-        }
+        $process = Process::fromShellCommandline('exec '.$command);
+        $process->setTimeout(360);
+        $process->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                echo $buffer;
+            }
+        });
+
+        return $process->getOutput();
     }
 
     /**

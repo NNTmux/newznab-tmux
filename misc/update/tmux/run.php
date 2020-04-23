@@ -7,7 +7,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
 
-$DIR = NN_TMUX;
+$DIR = base_path().'/misc/update/tmux/';
 $import = Settings::settingValue('site.tmux.import') ?? 0;
 $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $seq = Settings::settingValue('site.tmux.sequential') ?? 0;

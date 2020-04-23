@@ -91,9 +91,9 @@ class ApiV2Controller extends BasePageController
         );
 
         $time = UserRequest::whereUsersId($user->id)->min('timestamp');
-        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
         $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
-        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
@@ -160,9 +160,9 @@ class ApiV2Controller extends BasePageController
         }
 
         $time = UserRequest::whereUsersId($user->id)->min('timestamp');
-        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
         $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
-        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
@@ -242,9 +242,9 @@ class ApiV2Controller extends BasePageController
         );
 
         $time = UserRequest::whereUsersId($user->id)->min('timestamp');
-        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
         $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
-        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,

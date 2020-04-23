@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use App\Models\Predb;
 use App\Models\UsenetGroup;
-use Elasticsearch\Common\Exceptions\BadRequest400Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -64,6 +63,10 @@ class IRCScraper extends IRCClient
      * @var \Blacklight\SphinxSearch
      */
     protected $sphinxsearch;
+    /**
+     * @var ElasticSearchSiteSearch
+     */
+    private $elasticsearch;
 
     /**
      * Construct.
@@ -135,6 +138,7 @@ class IRCScraper extends IRCClient
             $this->_titleIgnoreRegex = config('irc_settings.scrape_irc_title_ignore');
         }
 
+        $this->elasticsearch = new ElasticSearchSiteSearch();
         $this->sphinxsearch = new SphinxSearch();
 
         $this->_groupList = [];
@@ -291,30 +295,7 @@ class IRCScraper extends IRCClient
     protected function _insertNewPre()
     {
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $search = [
-                'index' => 'predb',
-                'body' => [
-                    'query' => [
-                        'query_string' => [
-                            'query' => $this->_curPre['title'],
-                            'fields' => ['title'],
-                            'analyze_wildcard' => true,
-                            'default_operator' => 'and',
-                        ],
-                    ],
-                ],
-            ];
-
-            try {
-                $results = \Elasticsearch::search($search);
-
-                $indexData = [];
-                foreach ($results['hits']['hits'] as $result) {
-                    $indexData[] = $result['_source'];
-                }
-            } catch (BadRequest400Exception $badRequest400Exception) {
-                return;
-            }
+            $indexData = (new ElasticSearchSiteSearch())->predbIndexSearch($this->_curPre['title']);
         } else {
             $indexData = $this->sphinxsearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
         }
@@ -364,18 +345,7 @@ class IRCScraper extends IRCClient
         ];
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $data = [
-                'body' => [
-                    'id' => $parameters['id'],
-                    'title' => $parameters['title'],
-                    'source' => $parameters['source'],
-                    'filename' => $parameters['filename'],
-                ],
-                'index' => 'predb',
-                'id' => $parameters['id'],
-            ];
-
-            \Elasticsearch::index($data);
+            $this->elasticsearch->insertPreDb($parameters);
         } else {
             $this->sphinxsearch->insertPredb($parameters);
         }
@@ -429,22 +399,7 @@ class IRCScraper extends IRCClient
         ];
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $data = [
-                'body' => [
-                    'doc' => [
-                        'id' => $parameters['id'],
-                        'title' => $parameters['title'],
-                        'filename' => $parameters['filename'],
-                        'source' => $parameters['source'],
-                    ],
-                    'doc_as_upsert' => true,
-                ],
-
-                'index' => 'predb',
-                'id' => $parameters['id'],
-            ];
-
-            \Elasticsearch::update($data);
+            $this->elasticsearch->updatePreDb($parameters);
         } else {
             $this->sphinxsearch->updatePreDb($parameters);
         }

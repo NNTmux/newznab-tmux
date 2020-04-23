@@ -220,9 +220,9 @@ class RssController extends BasePageController
         $maxDownloads = $res->role->downloadrequests;
         $usedRequests = UserRequest::getApiRequests($uid);
         $time = UserRequest::whereUsersId($uid)->min('timestamp');
-        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
         $grabTime = UserDownload::whereUsersId($uid)->min('timestamp');
-        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
 
         if ($res->hasRole('Disabled')) {
             return response()->json(['error' => 'Your account is disabled'], 403);

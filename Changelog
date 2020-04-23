@@ -1,3 +1,10 @@
+2020-04-12 DariusIII
+	* Chg: Update ElasticSearch search handling
+2020-04-11 DariusIII
+	* Chg: Remove PayPal support
+	* Chg: Use Laravel 7 and remove omnipay for now
+2020-03-29 DariusIII
+	* Chg: Start replacing constants with laravel equivalents
 2020-03-01 DariusIII
 	* Chg: Move all third party api keys from database to .env file
 2020-02-27 DariusIII

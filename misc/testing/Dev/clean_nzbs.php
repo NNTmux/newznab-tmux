@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NZB;
@@ -9,7 +10,7 @@ use Blacklight\ReleaseImage;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
 
-$dir = NN_RES.'movednzbs/';
+$dir = resource_path().'/movednzbs/';
 $colorCli = new ColorCLI();
 
 if (! isset($argv[1]) || ! in_array($argv[1], ['true', 'move'])) {
@@ -19,7 +20,7 @@ if (! isset($argv[1]) || ! in_array($argv[1], ['true', 'move'])) {
     exit();
 }
 
-if (! is_dir($dir) && ! mkdir($dir) && ! is_dir($dir)) {
+if (! File::isDirectory($dir) && ! File::makeDirectory($dir)) {
     exit("ERROR: Could not create folder [$dir].".PHP_EOL);
 }
 
@@ -27,7 +28,7 @@ $releases = new Releases();
 $nzb = new NZB();
 $releaseImage = new ReleaseImage();
 
-$timestart = date('r');
+$timestart = now()->toRfc2822String();
 $checked = $moved = 0;
 $couldbe = ($argv[1] === 'true') ? 'could be ' : '';
 
@@ -39,7 +40,7 @@ $itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVE
 
 foreach ($itr as $filePath) {
     $guid = stristr($filePath->getFilename(), '.nzb.gz', true);
-    if (is_file($filePath) && $guid) {
+    if (File::isFile($filePath) && $guid) {
         $nzbfile = Utility::unzipGzipFile($filePath);
         $nzbContents = $nzb->nzbFileList($nzbfile, ['no-file-key' => false, 'strip-count' => true]);
         if (! $nzbfile || ! @simplexml_load_string($nzbfile) || count($nzbContents) === 0) {
@@ -60,17 +61,17 @@ $colorCli->header("Checked / releases deleted\n");
 
 $checked = $deleted = 0;
 
-$res = DB::select('SELECT id, guid, nzbstatus FROM releases');
+$res = Release::query()->select(['id', 'guid', 'nzbstatus'])->get();
     foreach ($res as $row) {
         $nzbpath = $nzb->getNZBPath($row->guid);
-        if (! is_file($nzbpath)) {
+        if (! File::isFile($nzbpath)) {
             $deleted++;
             $releases->deleteSingle(['g' => $row->guid, 'i' => $row->id], $nzb, $releaseImage);
         } elseif ($row->nzbstatus !== 1) {
-            DB::update(sprintf('UPDATE releases SET nzbstatus = 1 WHERE id = %d', $row->id));
+            Release::where('id', $row->id)->update(['nzbstatus' => 1]);
         }
         $checked++;
         echo "$checked / $deleted\r";
     }
 $colorCli->header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
-$colorCli->header("Script started at [$timestart], finished at [".date('r').']');
+$colorCli->header("Script started at [$timestart], finished at [".now()->toRfc2822String().']');

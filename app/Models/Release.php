@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Conner\Tagging\Taggable;
@@ -296,21 +297,7 @@ class Release extends Model
             );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $data = [
-                'body' => [
-                    'id' => $parameters['id'],
-                    'name' => $parameters['name'],
-                    'searchname' => $parameters['searchname'],
-                    'fromname' => $parameters['fromname'],
-                    'filename' => $parameters['filename'] ?? '',
-                    'add_date' => now()->format('Y-m-d H:i:s'),
-                    'post_date' => $parameters['postdate'],
-                ],
-                'index' => 'releases',
-                'id' => $parameters['id'],
-            ];
-
-            \Elasticsearch::index($data);
+            (new ElasticSearchSiteSearch())->insertRelease($parameters);
         } else {
             (new SphinxSearch())->insertRelease($parameters);
         }
@@ -321,11 +308,11 @@ class Release extends Model
     /**
      * Used for release edit page on site.
      *
-     * @param int $ID
+     * @param int $id
      * @param string $name
      * @param string $searchName
      * @param string $fromName
-     * @param int $categoryID
+     * @param int $categoryId
      * @param int $parts
      * @param int $grabs
      * @param int $size
@@ -333,23 +320,23 @@ class Release extends Model
      * @param string $addedDate
      * @param        $videoId
      * @param        $episodeId
-     * @param int $imDbID
-     * @param int $aniDbID
+     * @param int $imDbId
+     * @param int $aniDbId
      * @param string $tags
      * @throws \Exception
      */
-    public static function updateRelease($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID, string $tags = ''): void
+    public static function updateRelease($id, $name, $searchName, $fromName, $categoryId, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbId, $aniDbId, string $tags = ''): void
     {
         $movieInfoId = null;
-        if (! empty($imDbID)) {
-            $movieInfoId = MovieInfo::whereImdbid($imDbID)->first(['id']);
+        if (! empty($imDbId)) {
+            $movieInfoId = MovieInfo::whereImdbid($imDbId)->first(['id']);
         }
-        self::whereId($ID)->update(
+        self::whereId($id)->update(
             [
                 'name' => $name,
                 'searchname' => $searchName,
                 'fromname' => $fromName,
-                'categories_id' => $categoryID,
+                'categories_id' => $categoryId,
                 'totalpart' => $parts,
                 'grabs' => $grabs,
                 'size' => $size,
@@ -357,37 +344,20 @@ class Release extends Model
                 'adddate' => $addedDate,
                 'videos_id' => $videoId,
                 'tv_episodes_id' => $episodeId,
-                'imdbid' => $imDbID,
-                'anidbid' => $aniDbID,
+                'imdbid' => $imDbId,
+                'anidbid' => $aniDbId,
                 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId->id : $movieInfoId,
             ]
         );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $searchNameDotless = str_replace(['.', '-'], ' ', $searchName);
-            $data = [
-                'body' => [
-                    'doc' => [
-                        'id' => $ID,
-                        'name' => $name,
-                        'searchname' => $searchName,
-                        'plainsearchname' => $searchNameDotless,
-                        'fromname' => $fromName,
-                    ],
-                    'doc_as_upsert' => true,
-                ],
-
-                'index' => 'releases',
-                'id' => $ID,
-            ];
-
-            \Elasticsearch::update($data);
+            (new ElasticSearchSiteSearch())->updateRelease($id);
         } else {
-            (new SphinxSearch())->updateRelease($ID);
+            (new SphinxSearch())->updateRelease($id);
         }
         if (! empty($tags)) {
             $newTags = explode(',', $tags);
-            self::find($ID)->retag($newTags);
+            self::find($id)->retag($newTags);
         }
     }
 

@@ -9,6 +9,7 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\Categorize;
 use Blacklight\ColorCLI;
+use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\NameFixer;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
@@ -391,6 +392,10 @@ class ProcessAdditional
      * @var \Mhor\MediaInfo\MediaInfo
      */
     private $mediaInfo;
+    /**
+     * @var ElasticSearchSiteSearch
+     */
+    private $elasticsearch;
 
     /**
      * ProcessAdditional constructor.
@@ -428,6 +433,7 @@ class ProcessAdditional
         $this->_par2Info = new Par2Info();
         $this->_nfo = $options['Nfo'] ?? new Nfo();
         $this->sphinx = $options['SphinxSearch'] ?? new SphinxSearch();
+        $this->elasticsearch = new ElasticSearchSiteSearch();
         $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
         $this->mediaInfo = new MediaInfo();
@@ -1176,33 +1182,7 @@ class ProcessAdditional
         }
         if ($this->_addedFileInfo > 0) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $new = Release::query()
-                    ->where('releases.id', $this->_release->id)
-                    ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-                    ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
-                    ->groupBy('releases.id')
-                    ->first();
-                if ($new !== null) {
-                    $searchName = str_replace(['.', '-'], ' ', $new->searchname);
-                    $data = [
-                        'body' => [
-                            'doc' => [
-                                'id' => $this->_release->id,
-                                'name' => $new->name,
-                                'searchname' => $new->searchname,
-                                'plainsearchname' => $searchName,
-                                'fromname' => $new->fromname,
-                                'filename' => ! empty($new->filename) ? $new->filename : '',
-                            ],
-                            'doc_as_upsert' => true,
-                        ],
-
-                        'index' => 'releases',
-                        'id' => $this->_release->id,
-                    ];
-
-                    \Elasticsearch::update($data);
-                }
+                $this->elasticsearch->updateRelease($this->_release->id);
             } else {
                 $this->sphinx->updateRelease($this->_release->id);
             }
@@ -1281,16 +1261,18 @@ class ProcessAdditional
             // Get all the compressed files in the temp folder.
             $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1)($|[^a-z0-9])/i');
 
-            foreach ($files as $file) {
+            if ($files !== false) {
+                foreach ($files as $file) {
 
-                // Check if the file exists.
-                if (File::isFile($file[0])) {
-                    $rarData = @File::get($file[0]);
-                    if ($rarData !== false) {
-                        $this->_processCompressedData($rarData);
-                        $foundCompressedFile = true;
+                    // Check if the file exists.
+                    if (File::isFile($file[0])) {
+                        $rarData = @File::get($file[0]);
+                        if ($rarData !== false) {
+                            $this->_processCompressedData($rarData);
+                            $foundCompressedFile = true;
+                        }
+                        File::delete($file[0]);
                     }
-                    File::delete($file[0]);
                 }
             }
 
@@ -1766,24 +1748,7 @@ class ProcessAdditional
                                     $release->retag($newCat['tags']);
 
                                     if (config('nntmux.elasticsearch_enabled') === true) {
-                                        $newTitleDotless = str_replace(['.', '-'], ' ', $newTitle);
-                                        $data = [
-                                            'body' => [
-                                                'doc' => [
-                                                    'id' => $this->_release->id,
-                                                    'name' => $this->_release->name,
-                                                    'searchname' => $newTitle,
-                                                    'plainsearchname' => $newTitleDotless,
-                                                    'fromname' => $this->_release->fromname,
-                                                ],
-                                                'doc_as_upsert' => true,
-                                            ],
-
-                                            'index' => 'releases',
-                                            'id' => $this->_release->id,
-                                        ];
-
-                                        \Elasticsearch::update($data);
+                                        $this->elasticsearch->updateRelease($this->_release->id);
                                     } else {
                                         $this->sphinx->updateRelease($this->_release->id);
                                     }

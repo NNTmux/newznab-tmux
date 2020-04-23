@@ -64,7 +64,7 @@ class UpdateNNTmuxComposer extends Command
             $command .= ' --prefer-dist';
         }
         $this->output->writeln('<comment>Running composer install process...</comment>');
-        $process = new Process($command);
+        $process = Process::fromShellCommandline('exec '.$command);
         $process->setTimeout(360);
         $process->run(function ($type, $buffer) {
             if (Process::ERR === $type) {

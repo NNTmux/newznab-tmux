@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
+use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\SphinxSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -191,43 +192,7 @@ class Predb extends Model
         $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if (! empty($search)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $search = [
-                    'scroll' => '30s',
-                    'index' => 'predb',
-                    'body' => [
-                        'query' => [
-                            'query_string' => [
-                                'query' => $search,
-                                'fields' => ['title'],
-                                'analyze_wildcard' => true,
-                                'default_operator' => 'and',
-                            ],
-                        ],
-                        'size' => 1000,
-                    ],
-                ];
-
-                $results = \Elasticsearch::search($search);
-
-                $ids = [];
-                while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                    foreach ($results['hits']['hits'] as $result) {
-                        $ids[] = $result['_source']['id'];
-                    }
-                    if (empty($ids)) {
-                        return collect();
-                    }
-                    // When done, get the new scroll_id
-                    // You must always refresh your _scroll_id!  It can change sometimes
-                    $scroll_id = $results['_scroll_id'];
-
-                    // Execute a Scroll request and repeat
-                    $results = \Elasticsearch::scroll([
-                        'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                        'scroll'    => '30s',        // and the same timeout window
-                    ]
-                    );
-                }
+                $ids = (new ElasticSearchSiteSearch())->predbIndexSearch($search);
             } else {
                 $sphinx = new SphinxSearch();
                 $ids = Arr::pluck($sphinx->searchIndexes('predb_rt', $search, ['title']), 'id');
