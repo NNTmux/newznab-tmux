@@ -33,7 +33,7 @@ return [
                     base_path('/storage/framework/cache/data'),
                     base_path('storage/framework/sessions'),
                     base_path('storage/framework/views'),
-                    resource_path('nzbs'),
+                    resource_path('nzb'),
                 ],
 
                 /*
