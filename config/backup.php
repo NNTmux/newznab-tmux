@@ -31,8 +31,9 @@ return [
                     base_path('/node_modules'),
                     storage_path('/app/backup-temp'),
                     base_path('/storage/framework/cache/data'),
-                    base_path('/storage/framework/sessions'),
-                    base_path('/storage/framework/views'),
+                    base_path('storage/framework/sessions'),
+                    base_path('storage/framework/views'),
+                    resource_path('nzbs'),
                 ],
 
                 /*
