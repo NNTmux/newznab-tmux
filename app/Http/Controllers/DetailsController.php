@@ -43,7 +43,10 @@ class DetailsController extends BasePageController
             $user = User::find(Auth::id());
             $cpapi = $user['cp_api'];
             $cpurl = $user['cp_url'];
-            $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
+            $releaseRegex = '';
+            if (! empty($data)) {
+                $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
+            }
 
             if (! $data) {
                 return redirect()->back();
