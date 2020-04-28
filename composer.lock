@@ -2940,16 +2940,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v7.8.1",
+            "version": "v7.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "cdc6d7e6c744f4d8f7d61102aea9b111550cd297"
+                "reference": "757b155658ae6da429065ba8f22242fe599824f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/cdc6d7e6c744f4d8f7d61102aea9b111550cd297",
-                "reference": "cdc6d7e6c744f4d8f7d61102aea9b111550cd297",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/757b155658ae6da429065ba8f22242fe599824f7",
+                "reference": "757b155658ae6da429065ba8f22242fe599824f7",
                 "shasum": ""
             },
             "require": {
@@ -3088,20 +3088,20 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-04-24T17:21:56+00:00"
+            "time": "2020-04-28T16:09:20+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v4.3.1",
+            "version": "v4.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "03feeb6379b26371575400c4a3fd659b094ee4c6"
+                "reference": "203e1a75a8811dcb0285ca00c51cba042e752f3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/03feeb6379b26371575400c4a3fd659b094ee4c6",
-                "reference": "03feeb6379b26371575400c4a3fd659b094ee4c6",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/203e1a75a8811dcb0285ca00c51cba042e752f3e",
+                "reference": "203e1a75a8811dcb0285ca00c51cba042e752f3e",
                 "shasum": ""
             },
             "require": {
@@ -3161,7 +3161,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2020-04-21T12:54:49+00:00"
+            "time": "2020-04-28T15:54:04+00:00"
         },
         {
             "name": "laravel/scout",
@@ -3230,16 +3230,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v3.2.2",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "419b288555ca7821f6448aab6d1db9dd3a370af5"
+                "reference": "503242109c4756af6f23c63a59294a76ef9a774f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/419b288555ca7821f6448aab6d1db9dd3a370af5",
-                "reference": "419b288555ca7821f6448aab6d1db9dd3a370af5",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/503242109c4756af6f23c63a59294a76ef9a774f",
+                "reference": "503242109c4756af6f23c63a59294a76ef9a774f",
                 "shasum": ""
             },
             "require": {
@@ -3289,7 +3289,7 @@
                 "laravel",
                 "monitoring"
             ],
-            "time": "2020-04-21T19:37:10+00:00"
+            "time": "2020-04-28T16:03:44+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -3357,16 +3357,16 @@
         },
         {
             "name": "laravel/ui",
-            "version": "v2.0.1",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/ui.git",
-                "reference": "47a0a1dac76f5e73803c86e1f38b2c7e0ae7fa83"
+                "reference": "cacae405a781e4dc6956b9db96aedbc2fc0d404e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/ui/zipball/47a0a1dac76f5e73803c86e1f38b2c7e0ae7fa83",
-                "reference": "47a0a1dac76f5e73803c86e1f38b2c7e0ae7fa83",
+                "url": "https://api.github.com/repos/laravel/ui/zipball/cacae405a781e4dc6956b9db96aedbc2fc0d404e",
+                "reference": "cacae405a781e4dc6956b9db96aedbc2fc0d404e",
                 "shasum": ""
             },
             "require": {
@@ -3408,7 +3408,7 @@
                 "laravel",
                 "ui"
             ],
-            "time": "2020-03-03T20:16:46+00:00"
+            "time": "2020-04-28T16:06:57+00:00"
         },
         {
             "name": "laravelcollective/html",
@@ -11173,16 +11173,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.5.6",
+            "version": "v0.5.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "b9aefca4fbfe9b67abefbf57e2532bea09530c8b"
+                "reference": "12af69f657b88182fa5608e137b7c47fba386b7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/b9aefca4fbfe9b67abefbf57e2532bea09530c8b",
-                "reference": "b9aefca4fbfe9b67abefbf57e2532bea09530c8b",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/12af69f657b88182fa5608e137b7c47fba386b7e",
+                "reference": "12af69f657b88182fa5608e137b7c47fba386b7e",
                 "shasum": ""
             },
             "require": {
@@ -11255,7 +11255,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2020-04-26T19:11:12+00:00"
+            "time": "2020-04-28T15:19:01+00:00"
         },
         {
             "name": "paragonie/random_compat",
