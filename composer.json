@@ -141,6 +141,7 @@
     "rtconner/laravel-tagging": "^4.0",
     "smarty/smarty": "^3.1",
     "spatie/async": "^1.0",
+    "spatie/laravel-backup": "^6.9",
     "spatie/laravel-directory-cleanup": "^1.2",
     "spatie/laravel-fractal": "^5.3",
     "spatie/laravel-permission": "^3.0",
