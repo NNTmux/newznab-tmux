@@ -1035,8 +1035,10 @@ class NameFixer
                             }
                         }
 
-                        $taggedRelease->update($updateColumns);
-                        $taggedRelease->retag($determinedCategory['tags']);
+                        if ($taggedRelease !== null) {
+                            $taggedRelease->update($updateColumns);
+                            $taggedRelease->retag($determinedCategory['tags']);
+                        }
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->releases_id);
                         } else {
@@ -1060,7 +1062,9 @@ class NameFixer
                                     'iscategorized' => 1,
                                 ]
                             );
-                        $taggedRelease->retag($determinedCategory['tags']);
+                        if ($taggedRelease !== null) {
+                            $taggedRelease->retag($determinedCategory['tags']);
+                        }
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->_releases_id);
                         } else {
