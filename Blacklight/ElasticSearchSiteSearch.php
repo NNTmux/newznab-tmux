@@ -384,9 +384,10 @@ class ElasticSearchSiteSearch
         } else {
             $wordArray = $phrases;
         }
+
         $keywords = [];
+        $tempWords = [];
         foreach ($wordArray as $words) {
-            $tempWords = [];
             $words = preg_split('/\s+/', $words);
             foreach ($words as $st) {
                 if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
