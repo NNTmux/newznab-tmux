@@ -23,10 +23,14 @@ jobs:
       run: chmod -R 777 storage bootstrap/cache
     - name: Create Database
       run: |
-        mkdir -p database
-        touch database/database.sqlite
+         mysql -u root -e "SET GLOBAL innodb_file_per_table = 1;"
+         mysql -u root -e "SET GLOBAL innodb_file_format = BARRACUDA;"
+         mysql -u root -e "SET GLOBAL innodb_large_prefix = 1;"
+         mysql -u root -e "CREATE DATABASE TEST;"
+         mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
+         if [[ -f /etc/mysql/my.cnf ]]; then sudo sed -i "s/\[mysqld\]/\[mysqld\]\ngroup_concat_max_len = 8192/" /etc/mysql/my.cnf; fi
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
-        DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
+        DB_CONNECTION: mysql
+        DB_DATABASE: TEST
       run: vendor/bin/phpunit
