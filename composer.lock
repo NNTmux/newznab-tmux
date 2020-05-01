@@ -9904,16 +9904,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.1.3",
+            "version": "5.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/captainhook.git",
-                "reference": "e83f83633f5c9dbb7abe22b7d7a9dd4a41f67889"
+                "reference": "85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/e83f83633f5c9dbb7abe22b7d7a9dd4a41f67889",
-                "reference": "e83f83633f5c9dbb7abe22b7d7a9dd4a41f67889",
+                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31",
+                "reference": "85012ee7cbbe3847d9fdae95a5d208cdc5ddfe31",
                 "shasum": ""
             },
             "require": {
@@ -9972,7 +9972,13 @@
                 "pre-push",
                 "prepare-commit-msg"
             ],
-            "time": "2020-04-21T21:45:55+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/sebastianfeldmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-05-01T15:25:44+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -12969,20 +12975,20 @@
         },
         {
             "name": "seld/jsonlint",
-            "version": "1.7.2",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/jsonlint.git",
-                "reference": "e2e5d290e4d2a4f0eb449f510071392e00e10d19"
+                "reference": "ff2aa5420bfbc296cf6a0bc785fa5b35736de7c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/e2e5d290e4d2a4f0eb449f510071392e00e10d19",
-                "reference": "e2e5d290e4d2a4f0eb449f510071392e00e10d19",
+                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/ff2aa5420bfbc296cf6a0bc785fa5b35736de7c1",
+                "reference": "ff2aa5420bfbc296cf6a0bc785fa5b35736de7c1",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3 || ^7.0"
+                "php": "^5.3 || ^7.0 || ^8.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
@@ -13014,7 +13020,17 @@
                 "parser",
                 "validator"
             ],
-            "time": "2019-10-24T14:27:39+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/Seldaek",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/seld/jsonlint",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-04-30T19:05:18+00:00"
         },
         {
             "name": "seld/phar-utils",
