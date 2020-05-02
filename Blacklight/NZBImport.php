@@ -6,6 +6,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 
 /**
@@ -134,7 +135,7 @@ class NZBImport
             return false;
         }
 
-        $start = date('Y-m-d H:i:s');
+        $start = now()->toImmutable()->format('Y-m-d H:i:s');
         $nzbsImported = $nzbsSkipped = 0;
 
         // Loop over the file names.
@@ -222,8 +223,7 @@ class NZBImport
             'Proccessed '.
             $nzbsImported.
             ' NZBs in '.
-            (strtotime(date('Y-m-d H:i:s')) - strtotime($start)).
-            ' seconds, '.
+            now()->diffForHumans($start).
             $nzbsSkipped.
             ' NZBs were skipped.'
         );
@@ -261,7 +261,7 @@ class NZBImport
                 $posterName = (string) $file->attributes()->poster;
             }
             if ($postDate === false) {
-                $postDate = date('Y-m-d H:i:s', (string) $file->attributes()->date);
+                $postDate = Carbon::createFromTimeString((string) $file->attributes()->date)->format('Y-m-d H:i:s');
             }
 
             // Make a fake message array to use to check the blacklist.
@@ -346,7 +346,7 @@ class NZBImport
             [
                 'subject'    => $firstName,
                 'useFName'   => $useNzbName,
-                'postDate'   => empty($postDate) ? date('Y-m-d H:i:s') : $postDate,
+                'postDate'   => empty($postDate) ? now()->format('Y-m-d H:i:s') : $postDate,
                 'from'       => empty($posterName) ? '' : $posterName,
                 'groups_id'   => $groupID,
                 'groupName'  => $groupName,
@@ -401,7 +401,7 @@ class NZBImport
             $relID = Release::insertRelease(
                 [
                     'name'            => $escapedSubject,
-                    'searchname'    => $escapedSearchName,
+                    'searchname'    => $escapedSearchName ?? $escapedSubject,
                     'totalpart'        => $nzbDetails['totalFiles'],
                     'groups_id'        => $nzbDetails['groups_id'],
                     'guid'            => $this->relGuid,
