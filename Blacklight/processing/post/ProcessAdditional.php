@@ -1783,6 +1783,9 @@ class ProcessAdditional
                     }
                 } catch (\RuntimeException $e) {
                     Log::debug($e->getMessage());
+
+                } catch (\TypeError $e) {
+                    Log::debug($e->getMessage());
                 }
             }
 
@@ -2103,7 +2106,7 @@ class ProcessAdditional
         // Look for the video file.
         if (File::isFile($fileLocation)) {
             try {
-                $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
+                $xmlArray = $this->mediaInfo->getInfo($fileLocation, true);
 
                 // Check if we got it.
 
@@ -2121,6 +2124,10 @@ class ProcessAdditional
 
                 return true;
             } catch (\RuntimeException $e) {
+                Log::debug($e->getMessage());
+
+                return false;
+            } catch (\TypeError $e) {
                 Log::debug($e->getMessage());
 
                 return false;
