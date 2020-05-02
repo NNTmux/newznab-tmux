@@ -1783,7 +1783,6 @@ class ProcessAdditional
                     }
                 } catch (\RuntimeException $e) {
                     Log::debug($e->getMessage());
-
                 } catch (\TypeError $e) {
                     Log::debug($e->getMessage());
                 }
