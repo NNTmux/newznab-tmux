@@ -1,10 +1,10 @@
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get -q update && \
-    apt-get -q upgrade && \
+RUN apt-get -qy update && \
+    apt-get -qy upgrade && \
     apt-get install -qy screen time sudo unzip software-properties-common nano git make automake build-essential pkg-config libevent-dev libncurses5-dev fonts-powerline powerline mariadb-client libmysqlclient-dev unrar p7zip-full mediainfo lame ffmpeg && \
     add-apt-repository ppa:ondrej/php && \
-    apt-get -q update && \
+    apt-get -qy update && \
     apt-get install -qy apache2 libapache2-mod-php7.3 php-pear php7.3 php7.3-cli php7.3-dev php7.3-common php7.3-curl php7.3-json php7.3-gd php7.3-mysql php7.3-mbstring php7.3-xml php7.3-intl php7.3-fpm php7.3-bcmath php7.3-zip php-imagick
 
 RUN git clone https://github.com/tmux/tmux.git && \
