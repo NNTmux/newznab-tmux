@@ -169,9 +169,11 @@ class Releases extends Release
         $setting = $show ?? 0;
         switch ($setting) {
             case 1: // Shows everything.
+
                     return '<= '.self::PASSWD_RAR;
             case 0:
             default:// Hide releases with a password.
+
                 return '= '.self::PASSWD_NONE;
         }
     }
