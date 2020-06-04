@@ -2992,16 +2992,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v7.14.0",
+            "version": "v7.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "abe085c497851c4e22f56b22ed1cdc2ff2de3342"
+                "reference": "469b7719a8dca40841a74f59f2e9f30f01d3a106"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/abe085c497851c4e22f56b22ed1cdc2ff2de3342",
-                "reference": "abe085c497851c4e22f56b22ed1cdc2ff2de3342",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/469b7719a8dca40841a74f59f2e9f30f01d3a106",
+                "reference": "469b7719a8dca40841a74f59f2e9f30f01d3a106",
                 "shasum": ""
             },
             "require": {
@@ -3144,7 +3144,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-06-02T14:25:23+00:00"
+            "time": "2020-06-02T22:34:18+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -4475,16 +4475,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.4.0",
+            "version": "v4.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "bd43ec7152eaaab3bd8c6d0aa95ceeb1df8ee120"
+                "reference": "53c2753d756f5adb586dca79c2ec0e2654dd9463"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/bd43ec7152eaaab3bd8c6d0aa95ceeb1df8ee120",
-                "reference": "bd43ec7152eaaab3bd8c6d0aa95ceeb1df8ee120",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/53c2753d756f5adb586dca79c2ec0e2654dd9463",
+                "reference": "53c2753d756f5adb586dca79c2ec0e2654dd9463",
                 "shasum": ""
             },
             "require": {
@@ -4523,7 +4523,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2020-04-10T16:34:50+00:00"
+            "time": "2020-06-03T07:24:19+00:00"
         },
         {
             "name": "opis/closure",
@@ -10574,16 +10574,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "1.10.6",
+            "version": "1.10.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "be81b9c4735362c26876bdbfd3b5bc7e7f711c88"
+                "reference": "956608ea4f7de9e58c53dfb019d85ae62b193c39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/be81b9c4735362c26876bdbfd3b5bc7e7f711c88",
-                "reference": "be81b9c4735362c26876bdbfd3b5bc7e7f711c88",
+                "url": "https://api.github.com/repos/composer/composer/zipball/956608ea4f7de9e58c53dfb019d85ae62b193c39",
+                "reference": "956608ea4f7de9e58c53dfb019d85ae62b193c39",
                 "shasum": ""
             },
             "require": {
@@ -10591,7 +10591,7 @@
                 "composer/semver": "^1.0",
                 "composer/spdx-licenses": "^1.2",
                 "composer/xdebug-handler": "^1.1",
-                "justinrainbow/json-schema": "^3.0 || ^4.0 || ^5.0",
+                "justinrainbow/json-schema": "^5.2.10",
                 "php": "^5.3.2 || ^7.0",
                 "psr/log": "^1.0",
                 "seld/jsonlint": "^1.4",
@@ -10657,11 +10657,15 @@
                     "type": "custom"
                 },
                 {
+                    "url": "https://github.com/composer",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/composer/composer",
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-05-06T08:28:10+00:00"
+            "time": "2020-06-03T08:03:56+00:00"
         },
         {
             "name": "composer/semver",
@@ -10786,16 +10790,16 @@
         },
         {
             "name": "composer/xdebug-handler",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/xdebug-handler.git",
-                "reference": "1ab9842d69e64fb3a01be6b656501032d1b78cb7"
+                "reference": "fa2aaf99e2087f013a14f7432c1cd2dd7d8f1f51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/1ab9842d69e64fb3a01be6b656501032d1b78cb7",
-                "reference": "1ab9842d69e64fb3a01be6b656501032d1b78cb7",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/fa2aaf99e2087f013a14f7432c1cd2dd7d8f1f51",
+                "reference": "fa2aaf99e2087f013a14f7432c1cd2dd7d8f1f51",
                 "shasum": ""
             },
             "require": {
@@ -10826,7 +10830,21 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2020-03-01T12:26:26+00:00"
+            "funding": [
+                {
+                    "url": "https://packagist.com",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/composer",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-06-04T11:16:35+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -13476,16 +13494,16 @@
         },
         {
             "name": "sebastianfeldmann/cli",
-            "version": "3.2.6",
+            "version": "3.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/cli.git",
-                "reference": "bc2efd8d2f2ab7135b25662ded62210196b4ab5b"
+                "reference": "070dace40a16a9dcd5e04f5cc756e1006e91a6ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/bc2efd8d2f2ab7135b25662ded62210196b4ab5b",
-                "reference": "bc2efd8d2f2ab7135b25662ded62210196b4ab5b",
+                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/070dace40a16a9dcd5e04f5cc756e1006e91a6ed",
+                "reference": "070dace40a16a9dcd5e04f5cc756e1006e91a6ed",
                 "shasum": ""
             },
             "require": {
@@ -13516,26 +13534,32 @@
             "keywords": [
                 "cli"
             ],
-            "time": "2020-04-20T10:39:04+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/sebastianfeldmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-06-03T16:04:40+00:00"
         },
         {
             "name": "sebastianfeldmann/git",
-            "version": "3.2.1",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/git.git",
-                "reference": "e7a939afe33eb1a8f9af478b9e9fe9f15410709d"
+                "reference": "0a7486cff7adbfb462799240c4cd183c3937af4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/e7a939afe33eb1a8f9af478b9e9fe9f15410709d",
-                "reference": "e7a939afe33eb1a8f9af478b9e9fe9f15410709d",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/0a7486cff7adbfb462799240c4cd183c3937af4a",
+                "reference": "0a7486cff7adbfb462799240c4cd183c3937af4a",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-xml": "*",
-                "php": "^7.1",
+                "php": "^7.2",
                 "sebastianfeldmann/cli": "^3.0"
             },
             "type": "library",
@@ -13564,7 +13588,13 @@
             "keywords": [
                 "git"
             ],
-            "time": "2020-02-07T11:47:04+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/sebastianfeldmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-06-03T14:40:24+00:00"
         },
         {
             "name": "seld/jsonlint",
