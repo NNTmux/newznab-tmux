@@ -86,13 +86,13 @@ foreach ($data as $dir => $files) {
     foreach ($files as $file) {
         if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#", $file['download_url'])) {
             if (preg_match("#^$filePattern$#", $file['name'], $match)) {
-                $timematch = $progress['last'];
+                $timeMatch = max($progress['last'], $argv[1]);
 
                 // Skip patches the user does not want.
-                if ($match[1] < $timematch) {
+                if ($match[1] < $timeMatch) {
                     echo 'Skipping dump '.$match[2].
                         ', as your minimum unix time argument is '.
-                        $timematch.PHP_EOL;
+                        $timeMatch.PHP_EOL;
                     $total--;
                     continue;
                 }
