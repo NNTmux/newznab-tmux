@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -q update && \
-    apt-get -q upgrade && \
+    apt-get -qy upgrade && \
     apt-get install -qy screen time sudo unzip software-properties-common nano git make automake build-essential pkg-config libevent-dev libncurses5-dev fonts-powerline powerline mariadb-client libmysqlclient-dev unrar p7zip-full mediainfo lame ffmpeg && \
     add-apt-repository ppa:ondrej/php && \
     apt-get -q update && \
