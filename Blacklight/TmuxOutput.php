@@ -186,7 +186,7 @@ class TmuxOutput extends Tmux
             $this->tmpMasks[1],
             'Predb Updated:',
             sprintf(
-                '%s ago',
+                '%s',
                 (isset($this->runVar['timers']['newOld']['newestpre'])
                     ? $this->relativeTime($this->runVar['timers']['newOld']['newestpre'])
                     : 0)
