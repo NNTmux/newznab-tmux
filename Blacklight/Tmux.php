@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Category;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -326,28 +327,9 @@ class Tmux
      */
     public function relativeTime($_time): string
     {
-        $d = [];
-        $d[0] = [1, 'sec'];
-        $d[1] = [60, 'min'];
-        $d[2] = [3600, 'hr'];
-        $d[3] = [86400, 'day'];
-        $d[4] = [31104000, 'yr'];
+        $time = Carbon::createFromTimestamp($_time);
 
-        $w = [];
-
-        $return = '';
-        $now = time();
-        $secondsLeft = $now - ($_time >= $now ? $_time - 1 : $_time);
-
-        for ($i = 4; $i > -1; $i--) {
-            $w[$i] = (int) ($secondsLeft / $d[$i][0]);
-            $secondsLeft -= ($w[$i] * $d[$i][0]);
-            if ($w[$i] !== 0) {
-                $return .= $w[$i].' '.$d[$i][1].(($w[$i] > 1) ? 's' : '').' ';
-            }
-        }
-
-        return $return;
+        return $time->ago();
     }
 
     /**
