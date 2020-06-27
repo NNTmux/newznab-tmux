@@ -176,7 +176,7 @@ class TmuxOutput extends Tmux
             $this->tmpMasks[1],
             'Release Added:',
             sprintf(
-                '%s ago',
+                '%s',
                 (isset($this->runVar['timers']['newOld']['newestrelease'])
                     ? $this->relativeTime($this->runVar['timers']['newOld']['newestrelease'])
                     : 0)
@@ -199,7 +199,7 @@ class TmuxOutput extends Tmux
                 $this->runVar['constants']['delaytime']
             ),
             sprintf(
-                '%s ago',
+                '%s',
                 (isset($this->runVar['timers']['newOld']['oldestcollection'])
                     ? $this->relativeTime($this->runVar['timers']['newOld']['oldestcollection'])
                     : 0)
