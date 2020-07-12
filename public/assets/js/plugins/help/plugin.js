@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.4.0 (2020-06-30)
+ * Version: 5.4.1 (2020-07-08)
  */
 (function () {
     'use strict';
@@ -585,8 +585,9 @@
         name: 'PowerPaste*'
       },
       {
-        key: 'drive',
-        name: 'Tiny Drive*'
+        key: 'tinydrive',
+        name: 'Tiny Drive*',
+        slug: 'drive'
       },
       {
         key: 'tinymcespellchecker',
@@ -625,8 +626,9 @@
         name: 'Page Embed*'
       },
       {
-        key: 'comments',
-        name: 'Tiny Comments*'
+        key: 'tinycomments',
+        name: 'Tiny Comments*',
+        slug: 'comments'
       },
       {
         key: 'advtable',
@@ -673,9 +675,10 @@
           var getMetadata = editor.plugins[key].getMetadata;
           return typeof getMetadata === 'function' ? makeLink(getMetadata()) : key;
         }, function (x) {
+          var urlSlug = x.slug || x.key;
           return makeLink({
             name: x.name,
-            url: 'https://www.tiny.cloud/docs/plugins/' + x.key
+            url: 'https://www.tiny.cloud/docs/plugins/' + urlSlug
           });
         });
       };

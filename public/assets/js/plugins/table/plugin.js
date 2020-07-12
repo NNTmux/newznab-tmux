@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.4.0 (2020-06-30)
+ * Version: 5.4.1 (2020-07-08)
  */
 (function (domGlobals) {
     'use strict';
@@ -5856,9 +5856,10 @@
         }
       }
     };
-    var switchCellType = function (dom, cells, newCellType) {
-      each(cells, function (c) {
-        return getNodeName(c) !== newCellType ? dom.rename(c, newCellType) : c;
+    var switchCellType = function (dom, cells, newCellType, scope) {
+      return each(cells, function (c) {
+        var newCell = getNodeName(c) !== newCellType ? dom.rename(c, newCellType) : c;
+        dom.setAttrib(newCell, 'scope', scope);
       });
     };
     var switchSectionType = function (editor, rowElm, newType) {
@@ -5880,10 +5881,10 @@
       if (newType === 'header') {
         var headerRowTypeSetting = getTableHeaderType(editor);
         var headerRowType = headerRowTypeSetting === 'auto' ? determineHeaderRowType() : headerRowTypeSetting;
-        switchCellType(dom, rowElm.cells, headerRowType === 'section' ? 'td' : 'th');
+        switchCellType(dom, rowElm.cells, headerRowType === 'section' ? 'td' : 'th', 'col');
         switchRowSection(dom, rowElm, headerRowType === 'cells' ? 'tbody' : 'thead');
       } else {
-        switchCellType(dom, rowElm.cells, 'td');
+        switchCellType(dom, rowElm.cells, 'td', null);
         switchRowSection(dom, rowElm, newType === 'footer' ? 'tfoot' : 'tbody');
       }
     };
@@ -6001,7 +6002,7 @@
           'td',
           'th'
         ]).each(function (type) {
-          switchCellType(editor.dom, getCellsFromSelection(editor), type);
+          switchCellType(editor.dom, getCellsFromSelection(editor), type, null);
         });
       };
       var setTableRowType = function (editor, args) {

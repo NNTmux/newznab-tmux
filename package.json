@@ -15,7 +15,7 @@
         "cross-env": "^7.0.2",
         "jquery": "3.5.1",
         "laravel-mix": "^5.0.4",
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.19",
         "popper.js": "^1.16.1",
         "resolve-url-loader": "^3.1.1",
         "prettier": "^2.0.5",
@@ -41,6 +41,6 @@
         "npm-check-updates": "^7.0.1",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.1",
-        "tinymce": "^5.4.0"
+        "tinymce": "^5.4.1"
     }
 }
