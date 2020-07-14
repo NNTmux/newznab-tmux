@@ -394,8 +394,12 @@ class TVDB extends TV
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
 
-        $imdbid = $this->client->series()->getById($show->id);
-        preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbid->imdbId, $imdb);
+        try {
+            $imdbid = $this->client->series()->getById($show->id);
+            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbid->imdbId, $imdb);
+        } catch (ResourceNotFoundException $e) {
+            $this->colorCli->notice('Show ID not found on TVDB', true);
+        }
 
         return [
             'type'      => parent::TYPE_TV,

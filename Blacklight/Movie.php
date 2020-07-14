@@ -683,7 +683,7 @@ class Movie
 
         if (! empty($imdb['language'])) {
             $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
-        } elseif (! empty($omdb['language'])) {
+        } elseif (! empty($omdb['language']) && ! is_bool($omdb['language'])) {
             $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
         }
 

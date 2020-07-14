@@ -1019,11 +1019,11 @@ class NameFixer
                         $updateColumns = [
                             'videos_id' => 0,
                             'tv_episodes_id' => 0,
-                            'imdbid' => null,
-                            'musicinfo_id' => null,
-                            'consoleinfo_id' => null,
-                            'bookinfo_id' => null,
-                            'anidbid' => null,
+                            'imdbid' => '',
+                            'musicinfo_id' => '',
+                            'consoleinfo_id' => '',
+                            'bookinfo_id' => '',
+                            'anidbid' => '',
                             'predb_id' => $preId,
                             'searchname' => $newTitle,
                             'categories_id' => $determinedCategory['categories_id'],
@@ -1035,8 +1035,10 @@ class NameFixer
                             }
                         }
 
-                        $taggedRelease->update($updateColumns);
-                        $taggedRelease->retag($determinedCategory['tags']);
+                        if ($taggedRelease !== null) {
+                            $taggedRelease->update($updateColumns);
+                            $taggedRelease->retag($determinedCategory['tags']);
+                        }
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->releases_id);
                         } else {
@@ -1060,7 +1062,9 @@ class NameFixer
                                     'iscategorized' => 1,
                                 ]
                             );
-                        $taggedRelease->retag($determinedCategory['tags']);
+                        if ($taggedRelease !== null) {
+                            $taggedRelease->retag($determinedCategory['tags']);
+                        }
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->_releases_id);
                         } else {

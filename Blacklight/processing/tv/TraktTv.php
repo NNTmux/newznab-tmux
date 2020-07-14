@@ -287,20 +287,22 @@ class TraktTv extends TV
 
         if (\is_array($response)) {
             foreach ($response as $show) {
+                if (! is_bool($show)) {
 
-                // Check for exact title match first and then terminate if found
-                if ($show['show']['title'] === $name) {
-                    $highest = $show;
-                    break;
-                }
+                    // Check for exact title match first and then terminate if found
+                    if ($show['show']['title'] === $name) {
+                        $highest = $show;
+                        break;
+                    }
 
-                // Check each show title for similarity and then find the highest similar value
-                $matchPercent = $this->checkMatch($show['show']['title'], $name, self::MATCH_PROBABILITY);
+                    // Check each show title for similarity and then find the highest similar value
+                    $matchPercent = $this->checkMatch($show['show']['title'], $name, self::MATCH_PROBABILITY);
 
-                // If new match has a higher percentage, set as new matched title
-                if ($matchPercent > $highestMatch) {
-                    $highestMatch = $matchPercent;
-                    $highest = $show;
+                    // If new match has a higher percentage, set as new matched title
+                    if ($matchPercent > $highestMatch) {
+                        $highestMatch = $matchPercent;
+                        $highest = $show;
+                    }
                 }
             }
             if ($highest !== null) {

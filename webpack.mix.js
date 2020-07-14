@@ -15,6 +15,7 @@ mix
     .copyDirectory('node_modules/tinymce/themes/', 'public/assets/js/themes/')
     .copyDirectory('node_modules/tinymce/skins/', 'public/assets/js/skins/')
     .copyDirectory('node_modules/tinymce/plugins/', 'public/assets/js/plugins/')
+    .copyDirectory('node_modules/tinymce/icons/', 'public/assets/js/icons/')
     .copyDirectory('vendor/bhuvidya/laravel-countries/flags/', 'public/assets/images/flags/')
     .copy('node_modules/icheck/skins/flat/green.png', 'public/assets/css/green.png')
     .copy('node_modules/icheck/skins/flat/green@2x.png', 'public/assets/css/green@2x.png')

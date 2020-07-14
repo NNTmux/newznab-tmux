@@ -60,7 +60,7 @@ class ElasticSearchSiteSearch
                     'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
                     'scroll' => '30s',        // and the same timeout window
                 ]
-                );
+            );
             }
 
             return $searchResult;
@@ -384,14 +384,15 @@ class ElasticSearchSiteSearch
         } else {
             $wordArray = $phrases;
         }
+
         $keywords = [];
+        $tempWords = [];
         foreach ($wordArray as $words) {
-            $tempWords = [];
             $words = preg_split('/\s+/', $words);
             foreach ($words as $st) {
-                if (Str::startsWith($st, ['!', '+', '-', '?', '*'])) {
+                if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
                     $str = $st;
-                } elseif (Str::endsWith($st, ['+', '-', '?', '*'])) {
+                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
                     $str = $st;
                 } else {
                     $str = Sanitizer::escape($st);

@@ -34,6 +34,11 @@ Route::group(['prefix' => 'v2', 'namespace' => 'Api', 'middleware' => ['auth:api
     Route::post('details', 'ApiV2Controller@details');
 });
 
+Route::group(['prefix' => 'inform', 'namespace' => 'Api', 'middleware' => ['auth:api']], function () {
+    Route::get('release', 'ApiInformController@release');
+    Route::post('release', 'ApiInformController@release');
+});
+
 Route::fallback(function () {
     return response()->json(['message' => 'Not Found!'], 404);
 });
