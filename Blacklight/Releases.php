@@ -539,11 +539,11 @@ class Releases extends Release
      *
      *
      * @param array $searchArr
-     * @param              $groupName
-     * @param              $sizeFrom
-     * @param              $sizeTo
-     * @param              $daysNew
-     * @param              $daysOld
+     * @param int|string $groupName
+     * @param int $sizeFrom
+     * @param int $sizeTo
+     * @param int $daysNew
+     * @param int $daysOld
      * @param int $offset
      * @param int $limit
      * @param string|array $orderBy
@@ -559,7 +559,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function search($searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
+    public function search($searchArr, $groupName = -1, $sizeFrom = -1, $sizeTo = -1, $daysNew = -1, $daysOld = -1, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
         $sizeRange = [
             1 => 1,

@@ -113,7 +113,9 @@ class SearchController extends BasePageController
         ];
 
         foreach ($searchVars as $searchVarKey => $searchVar) {
-            $searchVars[$searchVarKey] = ($request->has($searchVarKey) ? (string) $request->input($searchVarKey) : '');
+            if ($request->filled($searchVarKey)) {
+                $searchVars[$searchVarKey] = (string) $request->input($searchVarKey);
+            }
         }
 
         $searchVars['selectedgroup'] = $searchVars['searchadvgroups'];
@@ -124,10 +126,12 @@ class SearchController extends BasePageController
             $this->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
         }
 
-        if ($searchType !== 'basic' && $request->missing('id') && $request->has('searchadvr') && $request->missing('subject')) {
+        if ($searchType !== 'basic' && $request->missing('id') && $request->missing('subject') && $request->anyFilled(['searchadvr', 'searchadvsubject', 'searchadvfilename', 'searchadvposter'])) {
             $orderByString = '';
             foreach ($searchVars as $searchVarKey => $searchVar) {
-                $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);
+                if ($request->filled($searchVarKey)) {
+                    $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);
+                }
             }
             $orderByString = ltrim($orderByString, '&');
 
@@ -139,10 +143,10 @@ class SearchController extends BasePageController
             }
 
             $searchArr = [
-                'searchname' => $searchVars['searchadvr'] === '' ? -1 : $searchVars['searchadvr'],
-                'name' => $searchVars['searchadvsubject'] === '' ? -1 : $searchVars['searchadvsubject'],
-                'fromname' => $searchVars['searchadvposter'] === '' ? -1 : $searchVars['searchadvposter'],
-                'filename' => $searchVars['searchadvfilename'] === '' ? -1 : $searchVars['searchadvfilename'],
+                'searchname' => $searchVars['searchadvr'],
+                'name' => $searchVars['searchadvsubject'],
+                'fromname' => $searchVars['searchadvposter'],
+                'filename' => $searchVars['searchadvfilename'],
             ];
 
             $rslt = $releases->search(
@@ -150,15 +154,15 @@ class SearchController extends BasePageController
                 $searchVars['searchadvgroups'],
                 $searchVars['searchadvsizefrom'],
                 $searchVars['searchadvsizeto'],
-                ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
-                ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
+                $searchVars['searchadvdaysnew'],
+                $searchVars['searchadvdaysold'],
                 $offset,
                 config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
                 $this->userdata->categoryexclusions ?? [],
                 'advanced',
-                [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
+                [$searchVars['searchadvcat']]
             );
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());

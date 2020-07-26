@@ -46,9 +46,7 @@
 						<a
 								class="requestid"
 								title="{$result.requestid}"
-								href="{{URL("/search?searchadvr=&searchadvsubject={$result.requestid}
-															&searchadvposter=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1
-															&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv")}}"
+								href="{{URL("/search?searchadvsubject={$result.requestid}&search_type=adv")}}"
 						>
 							{$result.requestid}
 						</a>
