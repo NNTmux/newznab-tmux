@@ -566,7 +566,7 @@
 														<tr>
 															<th width="140">Poster</th>
 															<td><a title="Find releases by this poster"
-																   href="{{url("/search?searchadvposter={$release.fromname|escape:"htmlall"}&search_type=adv")}}">{$release.fromname|escape:"htmlall"}</a>
+																   href="{{url("/search?searchadvr=&searchadvsubject=&searchadvposter={$release.fromname|escape:"htmlall"}&searchadvfilename=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv")}}">{$release.fromname|escape:"htmlall"}</a>
 															</td>
 														</tr>
 														<tr>
