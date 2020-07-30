@@ -23,7 +23,7 @@ $row = Settings::settingValue('site.main.coverspath');
 if ($row !== null) {
     Utility::setCoversConstant($row);
 } else {
-    die("Unable to set Covers' constant!\n");
+    exit("Unable to set Covers' constant!\n");
 }
 $path2covers = NN_COVERS.'games'.DS;
 

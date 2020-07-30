@@ -18,7 +18,7 @@ $row = Settings::settingValue('site.main.coverspath');
 if ($row !== null) {
     Utility::setCoversConstant($row);
 } else {
-    die('Unable to determine covers path!'.PHP_EOL);
+    exit('Unable to determine covers path!'.PHP_EOL);
 }
 
 $path2cover = NN_COVERS.'movies'.DS;
