@@ -21,7 +21,7 @@ $row = Settings::settingValue('site.main.coverspath');
 if ($row !== null) {
     Utility::setCoversConstant($row);
 } else {
-    die("Unable to determine covers path!\n");
+    exit("Unable to determine covers path!\n");
 }
 
 $path2preview = NN_COVERS.'preview'.DS;
