@@ -112,20 +112,20 @@
         },
         {
             "name": "anhskohbo/no-captcha",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/anhskohbo/no-captcha.git",
-                "reference": "c14dd67024f30fd28f38ac9faa44cc47e1d4bddf"
+                "reference": "6386365b76cfa6a6043dc2783a2a615c8574faf9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/c14dd67024f30fd28f38ac9faa44cc47e1d4bddf",
-                "reference": "c14dd67024f30fd28f38ac9faa44cc47e1d4bddf",
+                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/6386365b76cfa6a6043dc2783a2a615c8574faf9",
+                "reference": "6386365b76cfa6a6043dc2783a2a615c8574faf9",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "^6.2",
+                "guzzlehttp/guzzle": "^6.2|^7.0",
                 "illuminate/support": "^5.0|^6.0|^7.0",
                 "php": ">=5.5.5"
             },
@@ -168,7 +168,7 @@
                 "no-captcha",
                 "recaptcha"
             ],
-            "time": "2020-03-04T03:27:38+00:00"
+            "time": "2020-08-06T05:45:09+00:00"
         },
         {
             "name": "b3rs3rk/steamfront",
@@ -3006,16 +3006,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v7.23.0",
+            "version": "v7.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "17cbce101f2fc78e61a6135861823563c7cfb50b"
+                "reference": "71bfb1f2f89e4e31fba539d43fe287143e635e68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/17cbce101f2fc78e61a6135861823563c7cfb50b",
-                "reference": "17cbce101f2fc78e61a6135861823563c7cfb50b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/71bfb1f2f89e4e31fba539d43fe287143e635e68",
+                "reference": "71bfb1f2f89e4e31fba539d43fe287143e635e68",
                 "shasum": ""
             },
             "require": {
@@ -3159,7 +3159,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-08-04T14:36:37+00:00"
+            "time": "2020-08-07T15:13:57+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -3236,16 +3236,16 @@
         },
         {
             "name": "laravel/scout",
-            "version": "v8.2.0",
+            "version": "v8.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "ef9905160f53663acd63b7558ec1f5af62113a29"
+                "reference": "74e2d6a3859579dd7b246478d0bb62f13583d6c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/ef9905160f53663acd63b7558ec1f5af62113a29",
-                "reference": "ef9905160f53663acd63b7558ec1f5af62113a29",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/74e2d6a3859579dd7b246478d0bb62f13583d6c4",
+                "reference": "74e2d6a3859579dd7b246478d0bb62f13583d6c4",
                 "shasum": ""
             },
             "require": {
@@ -3298,7 +3298,7 @@
                 "laravel",
                 "search"
             ],
-            "time": "2020-08-04T16:30:07+00:00"
+            "time": "2020-08-06T11:13:20+00:00"
         },
         {
             "name": "laravel/telescope",
@@ -3993,29 +3993,29 @@
         },
         {
             "name": "maxmind-db/reader",
-            "version": "v1.6.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maxmind/MaxMind-DB-Reader-php.git",
-                "reference": "febd4920bf17c1da84cef58e56a8227dfb37fbe4"
+                "reference": "942553da239f12051275f9c666538b5dd09e2908"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxmind/MaxMind-DB-Reader-php/zipball/febd4920bf17c1da84cef58e56a8227dfb37fbe4",
-                "reference": "febd4920bf17c1da84cef58e56a8227dfb37fbe4",
+                "url": "https://api.github.com/repos/maxmind/MaxMind-DB-Reader-php/zipball/942553da239f12051275f9c666538b5dd09e2908",
+                "reference": "942553da239f12051275f9c666538b5dd09e2908",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6"
+                "php": ">=7.2"
             },
             "conflict": {
-                "ext-maxminddb": "<1.6.0,>=2.0.0"
+                "ext-maxminddb": "<1.7.0,>=2.0.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "2.*",
                 "php-coveralls/php-coveralls": "^2.1",
-                "phpunit/phpcov": "^3.0",
-                "phpunit/phpunit": "5.*",
+                "phpunit/phpcov": ">=6.0.0",
+                "phpunit/phpunit": ">=8.0.0,<10.0.0",
                 "squizlabs/php_codesniffer": "3.*"
             },
             "suggest": {
@@ -4049,7 +4049,7 @@
                 "geolocation",
                 "maxmind"
             ],
-            "time": "2019-12-19T22:59:03+00:00"
+            "time": "2020-08-07T22:10:05+00:00"
         },
         {
             "name": "maxmind/web-service-common",
@@ -10257,16 +10257,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.17",
+            "version": "4.7.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "804aca422f1fe0104b1320ca09fd06cd0062782c"
+                "reference": "eb8cc890864920b716ade6c5a8713cd4110bd744"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/804aca422f1fe0104b1320ca09fd06cd0062782c",
-                "reference": "804aca422f1fe0104b1320ca09fd06cd0062782c",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/eb8cc890864920b716ade6c5a8713cd4110bd744",
+                "reference": "eb8cc890864920b716ade6c5a8713cd4110bd744",
                 "shasum": ""
             },
             "require": {
@@ -10312,7 +10312,25 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2020-04-09T21:20:43+00:00"
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/moelleken",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/voku",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/voku",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/voku/simple_html_dom",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-08-06T23:16:40+00:00"
         },
         {
             "name": "wildbit/swiftmailer-postmark",
