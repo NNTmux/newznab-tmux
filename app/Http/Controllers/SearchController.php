@@ -124,7 +124,7 @@ class SearchController extends BasePageController
             $this->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
         }
 
-        if ($searchType !== 'basic' && $request->missing('id') && $request->has('searchadvr') && $request->missing('subject')) {
+        if ($searchType !== 'basic' && $request->missing('id') && $request->missing('subject') && $request->anyFilled(['searchadvr', 'searchadvsubject', 'searchadvfilename', 'searchadvposter'])) {
             $orderByString = '';
             foreach ($searchVars as $searchVarKey => $searchVar) {
                 $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);
