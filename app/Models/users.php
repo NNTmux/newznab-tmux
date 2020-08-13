@@ -693,7 +693,7 @@ class User extends Authenticatable
      */
     public static function generatePassword($length = 15): string
     {
-        return Token::random($length, true);
+        return \Token::random($length, true);
     }
 
     /**
