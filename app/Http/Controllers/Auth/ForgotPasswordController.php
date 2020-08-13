@@ -64,7 +64,7 @@ class ForgotPasswordController extends Controller
                 //
                 // Generate a forgottenpassword guid, store it in the user table
                 //
-                $guid = Token::random(32);
+                $guid = /Token::random(32);
                 User::updatePassResetGuid($ret['id'], $guid);
                 //
                 // Send the email
