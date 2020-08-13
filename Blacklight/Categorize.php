@@ -1003,7 +1003,7 @@ class Categorize
     public function isGamePS4(): bool
     {
         if (preg_match('/[ \(_.-]PS4[ \)_.-]/i', $this->releaseName)) {
-            if (preg_match('/ANTiDOTE|DLC|DUPLEX|EUR?|Googlecus|GOTY|\-HR|iNSOMNi|JAP|JPN|KONDIOS|\[PS4\]/i', $this->releaseName)) {
+            if (preg_match('/ANTiDOTE|DLC|DUPLEX|\-DUPLEX|EUR?|Googlecus|GOTY|\-HR|iNSOMNi|JAP|JPN|KONDIOS|\[PS4\]/i', $this->releaseName)) {
                 $this->tmpCat = Category::GAME_PS4;
                 $this->tmpTag[] = Category::TAG_GAME_PS4;
 
