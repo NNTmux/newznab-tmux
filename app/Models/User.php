@@ -6,7 +6,7 @@ use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Jobs\SendInviteEmail;
 use Carbon\CarbonImmutable;
-use DariusIII\Token\Token;
+use DariusIII\Token\Facades\Token;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
