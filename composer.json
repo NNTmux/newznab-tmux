@@ -167,7 +167,7 @@
     "nunomaduro/collision": "^4.2.0",
     "nunomaduro/larastan": "^0.5",
     "php-coveralls/php-coveralls": "^2.0",
-    "phpunit/phpunit": "^8.0"
+    "phpunit/phpunit": "^8.0|^9.0"
   },
 
   "scripts": {
