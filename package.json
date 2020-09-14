@@ -24,7 +24,7 @@
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
         "@fortawesome/fontawesome-free": "^5.14.0",
-        "animate.css": "^4.1.0",
+        "animate.css": "^4.1.1",
         "autosize": "^4.0.2",
         "bootstrap": "^4.5.2",
         "bootstrap-datepicker": "^1.9.0",
