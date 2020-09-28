@@ -11,6 +11,13 @@
 |
 */
 
+use App\Http\Controllers\Admin\AdminAnidbController;
+use App\Http\Controllers\Admin\AdminBlacklistController;
+use App\Http\Controllers\Admin\AdminBookController;
+use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminCategoryRegexesController;
+use App\Http\Controllers\Admin\AdminCollectionRegexesController;
+use App\Http\Controllers\Admin\AdminCommentsController;
 use App\Http\Controllers\Admin\AdminConsoleController;
 use App\Http\Controllers\Admin\AdminFailedReleasesController;
 use App\Http\Controllers\Admin\AdminGameController;
@@ -19,13 +26,6 @@ use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
 use App\Http\Controllers\Admin\AdminNzbController;
 use App\Http\Controllers\Admin\AdminPageController;
-use App\Http\Controllers\Admin\AdminAnidbController;
-use App\Http\Controllers\Admin\AdminBlacklistController;
-use App\Http\Controllers\Admin\AdminBookController;
-use App\Http\Controllers\Admin\AdminCategoryController;
-use App\Http\Controllers\Admin\AdminCategoryRegexesController;
-use App\Http\Controllers\Admin\AdminCollectionRegexesController;
-use App\Http\Controllers\Admin\AdminCommentsController;
 use App\Http\Controllers\Admin\AdminPredbController;
 use App\Http\Controllers\Admin\AdminReleaseNamingRegexesController;
 use App\Http\Controllers\Admin\AdminReleasesController;
@@ -74,50 +74,50 @@ Auth::routes();
 
 Route::get('/', [ContentController::class, 'show']);
 
-Route::get('register', [RegisterController::class,'showRegistrationForm']);
-Route::post('register', [RegisterController::class,'register'])->name('register');
+Route::get('register', [RegisterController::class, 'showRegistrationForm']);
+Route::post('register', [RegisterController::class, 'register'])->name('register');
 
-Route::get('forgottenpassword', [ForgotPasswordController::class,'showLinkRequestForm'])->name('forgottenpassword');
-Route::post('forgottenpassword', [ForgotPasswordController::class,'showLinkRequestForm'])->name('forgottenpassword');
+Route::get('forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword');
+Route::post('forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword');
 
-Route::get('terms-and-conditions', [TermsController::class,'terms']);
+Route::get('terms-and-conditions', [TermsController::class, 'terms']);
 
-Route::get('login', [LoginController::class,'showLoginForm']);
-Route::post('login', [LoginController::class,'login'])->name('login');
-Route::get('logout', [LoginController::class,'logout'])->name('logout');
+Route::get('login', [LoginController::class, 'showLoginForm']);
+Route::post('login', [LoginController::class, 'login'])->name('login');
+Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => ['isVerified']], function () {
-    Route::get('resetpassword', [ResetPasswordController::class,'reset']);
-    Route::post('resetpassword', [ResetPasswordController::class,'reset']);
+    Route::get('resetpassword', [ResetPasswordController::class, 'reset']);
+    Route::post('resetpassword', [ResetPasswordController::class, 'reset']);
 
-    Route::get('profile', [ProfileController::class,'show']);
+    Route::get('profile', [ProfileController::class, 'show']);
 
     Route::group(['prefix' => 'browse'], function () {
-        Route::get('tags', [BrowseController::class,'tags']);
-        Route::get('group', [BrowseController::class,'group']);
-        Route::get('All', [BrowseController::class,'index']);
-        Route::get('{parentCategory}/{id?}', [BrowseController::class,'show'])->middleware('clearance');
+        Route::get('tags', [BrowseController::class, 'tags']);
+        Route::get('group', [BrowseController::class, 'group']);
+        Route::get('All', [BrowseController::class, 'index']);
+        Route::get('{parentCategory}/{id?}', [BrowseController::class, 'show'])->middleware('clearance');
     });
 
     Route::prefix('cart')->group(function () {
-        Route::get('index', [CartController::class,'index']);
-        Route::post('index', [CartController::class,'index']);
-        Route::get('add', [CartController::class,'store']);
-        Route::post('add', [CartController::class,'store']);
-        Route::get('delete/{id}', [CartController::class,'destroy']);
-        Route::post('delete/{id}', [CartController::class,'destroy']);
+        Route::get('index', [CartController::class, 'index']);
+        Route::post('index', [CartController::class, 'index']);
+        Route::get('add', [CartController::class, 'store']);
+        Route::post('add', [CartController::class, 'store']);
+        Route::get('delete/{id}', [CartController::class, 'destroy']);
+        Route::post('delete/{id}', [CartController::class, 'destroy']);
     });
 
-    Route::get('details/{guid}', [DetailsController::class,'show']);
-    Route::post('details/{guid}', [DetailsController::class,'show']);
+    Route::get('details/{guid}', [DetailsController::class, 'show']);
+    Route::post('details/{guid}', [DetailsController::class, 'show']);
 
-    Route::get('getnzb', [GetNzbController::class,'getNzb'])->name('getnzb');
-    Route::post('getnzb', [GetNzbController::class,'getNzb'])->name('getnzb');
+    Route::get('getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
+    Route::post('getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
 
-    Route::get('rsshelp', [RssController::class,'showRssDesc'])->name('rsshelp');
-    Route::post('rsshelp', [RssController::class,'showRssDesc'])->name('rsshelp');
+    Route::get('rsshelp', [RssController::class, 'showRssDesc'])->name('rsshelp');
+    Route::post('rsshelp', [RssController::class, 'showRssDesc'])->name('rsshelp');
 
-    Route::get('profile', [ProfileController::class,'show'])->name('profile');
+    Route::get('profile', [ProfileController::class, 'show'])->name('profile');
 
     Route::get('apihelp', [ApiHelpController::class, 'index'])->name('apihelp');
     Route::get('apiv2help', [ApiHelpController::class, 'apiv2'])->name('apiv2help');
