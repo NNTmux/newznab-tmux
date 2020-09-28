@@ -17,30 +17,30 @@ use App\Http\Controllers\Api\ApiV2Controller;
 
 Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
     Route::get('api', [ApiController::class, 'api']);
-    Route::post('api', [ApiController::class,'api']);
+    Route::post('api', [ApiController::class, 'api']);
 });
 
 Route::group(['prefix' => 'v2', 'namespace' => 'Api'], function () {
-    Route::get('capabilities', [ApiV2Controller::class,'capabilities']);
-    Route::post('capabilities', [ApiV2Controller::class,'capabilities']);
+    Route::get('capabilities', [ApiV2Controller::class, 'capabilities']);
+    Route::post('capabilities', [ApiV2Controller::class, 'capabilities']);
 });
 
 Route::group(['prefix' => 'v2', 'namespace' => 'Api', 'middleware' => ['auth:api', 'throttle:rate_limit,1']], function () {
-    Route::get('movies', [ApiV2Controller::class,'movie']);
-    Route::post('movies', [ApiV2Controller::class,'movie']);
-    Route::get('search', [ApiV2Controller::class,'apiSearch']);
-    Route::post('search', [ApiV2Controller::class,'apiSearch']);
-    Route::get('tv', [ApiV2Controller::class,'tv']);
-    Route::post('tv', [ApiV2Controller::class,'tv']);
-    Route::get('getnzb', [ApiV2Controller::class,'getNzb']);
-    Route::post('getnzb', [ApiV2Controller::class,'getNzb']);
-    Route::get('details', [ApiV2Controller::class,'details']);
-    Route::post('details', [ApiV2Controller::class,'details']);
+    Route::get('movies', [ApiV2Controller::class, 'movie']);
+    Route::post('movies', [ApiV2Controller::class, 'movie']);
+    Route::get('search', [ApiV2Controller::class, 'apiSearch']);
+    Route::post('search', [ApiV2Controller::class, 'apiSearch']);
+    Route::get('tv', [ApiV2Controller::class, 'tv']);
+    Route::post('tv', [ApiV2Controller::class, 'tv']);
+    Route::get('getnzb', [ApiV2Controller::class, 'getNzb']);
+    Route::post('getnzb', [ApiV2Controller::class, 'getNzb']);
+    Route::get('details', [ApiV2Controller::class, 'details']);
+    Route::post('details', [ApiV2Controller::class, 'details']);
 });
 
 Route::group(['prefix' => 'inform', 'namespace' => 'Api', 'middleware' => ['auth:api']], function () {
-    Route::get('release', [ApiInformController::class,'release']);
-    Route::post('release', [ApiInformController::class,'release']);
+    Route::get('release', [ApiInformController::class, 'release']);
+    Route::post('release', [ApiInformController::class, 'release']);
 });
 
 Route::fallback(function () {
