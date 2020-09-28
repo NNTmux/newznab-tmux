@@ -11,12 +11,10 @@
     ],
     "psr-4": {
       "Blacklight\\": "Blacklight/",
-      "App\\": "app/"
-    },
-    "classmap": [
-      "database/factories",
-      "database/seeds"
-    ]
+      "App\\": "app/",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/"
+    }
   },
   "autoload-dev": {
     "psr-4": {
@@ -57,6 +55,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/Laravel.Smarty"
         }
 
     ],
@@ -92,7 +94,7 @@
     "bhuvidya/laravel-countries": "^1.0",
     "brick/math": "^0.8.9",
     "canihavesomecoffee/thetvdbapi": "^1.0",
-    "cviebrock/laravel-elasticsearch": "^4.1",
+    "cviebrock/laravel-elasticsearch": "^8.0",
     "czproject/git-php": "^3.14",
     "dariusiii/l5-fixtures": "^2.0.0",
     "dariusiii/laravel-database-trigger": "^2.0",
@@ -105,7 +107,7 @@
     "doctrine/dbal": "^2.7",
     "fideloper/proxy": "^4.2",
     "foolz/sphinxql-query-builder": "^2.0",
-    "genealabs/laravel-caffeine": "^7.0",
+    "genealabs/laravel-caffeine": "^8.0",
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "^1.2",
     "guzzlehttp/guzzle": "^6.3",
@@ -115,15 +117,15 @@
     "james-heinrich/getid3": "1.9.*",
     "jamesmills/laravel-timezone": "^1.9",
     "joshpinkney/tv-maze-php-api": "^1.0",
-    "jrean/laravel-user-verification": "dev-master",
-    "junaidnasir/larainvite": "^3.0",
+    "jrean/laravel-user-verification": "^9.0",
+    "junaidnasir/larainvite": "^4.0",
     "kevinlebrun/colors.php": "^1.0",
-    "laravel/framework": "^7.0",
-    "laravel/horizon": "^4.2",
+    "laravel/framework": "^8.0",
+    "laravel/horizon": "^5.0",
     "laravel/scout": "^8.0.0",
-    "laravel/telescope": "^3.0",
+    "laravel/telescope": "^4.0",
     "laravel/tinker": "^2.0",
-    "laravel/ui": "^2.0",
+    "laravel/ui": "^3.0",
     "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
     "marcreichel/igdb-laravel": "^1.0",
@@ -146,11 +148,11 @@
     "spatie/laravel-fractal": "^5.3",
     "spatie/laravel-permission": "^3.0",
     "sspat/es-query-sanitizer": "^1.0",
-    "vlucas/phpdotenv": "^4.0",
+    "vlucas/phpdotenv": "^5.0",
     "voku/simple_html_dom": "^4.3",
     "wildbit/swiftmailer-postmark": "^3.0",
     "yab/laravel-scout-mysql-driver": "^3.0",
-    "ytake/laravel-smarty": "^4.0"
+    "ytake/laravel-smarty": "dev-master"
   },
 
   "require-dev": {
@@ -162,10 +164,10 @@
     "friendsofphp/php-cs-fixer": "^2.14",
     "fzaninotto/faker": "~1.4",
     "laracasts/generators": "^1.1",
-    "matt-allan/laravel-code-style": "^0.5.0",
+    "matt-allan/laravel-code-style": "^0.6.0",
     "mockery/mockery": "^1.0",
     "nunomaduro/collision": "^4.2.0",
-    "nunomaduro/larastan": "^0.5",
+    "nunomaduro/larastan": "^0.6",
     "php-coveralls/php-coveralls": "^2.0",
     "phpunit/phpunit": "^8.0|^9.0"
   },

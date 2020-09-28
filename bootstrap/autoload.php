@@ -6,19 +6,9 @@ require_once 'constants.php';
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'app/Extensions/util/PhpYenc.php';
 
 use Dotenv\Dotenv;
-use Dotenv\Repository\Adapter\EnvConstAdapter;
-use Dotenv\Repository\Adapter\ServerConstAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 
-$adapters = [
-    new EnvConstAdapter(),
-    new ServerConstAdapter(),
-];
-
-$repository = RepositoryBuilder::create()
-    ->withReaders($adapters)
-    ->withWriters($adapters)
-    ->immutable()
+$repository = RepositoryBuilder::createWithDefaultAdapters()
     ->make();
 
 $dotenv = Dotenv::create($repository, dirname(__DIR__, 1), null)->load();
