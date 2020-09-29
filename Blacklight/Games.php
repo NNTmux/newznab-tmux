@@ -8,7 +8,7 @@ use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
 use DBorsatto\GiantBomb\Client;
-use DBorsatto\GiantBomb\Config;
+use DBorsatto\GiantBomb\Configuration;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -94,7 +94,7 @@ class Games
     public $catWhere;
 
     /**
-     * @var \DBorsatto\GiantBomb\Config
+     * @var \DBorsatto\GiantBomb\Configuration
      */
     protected $config;
 
@@ -134,7 +134,7 @@ class Games
         $this->maxHitRequest = false;
         $this->catWhere = 'AND categories_id = '.Category::PC_GAMES.' ';
         if ($this->publicKey !== '') {
-            $this->config = new Config($this->publicKey);
+            $this->config = new Configuration($this->publicKey);
             $this->giantBomb = new Client($this->config);
         }
     }

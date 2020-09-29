@@ -16,5 +16,5 @@ finder:
       - "resources"
       - "bootstrap"
       - "database/migrations"
-      - "database/seeds"
+      - "database/seeders"
       - "database/fixtures"
