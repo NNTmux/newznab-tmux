@@ -4,9 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.4.2 (2020-08-17)
+ * Version: 5.5.1 (2020-10-01)
  */
-(function (domGlobals) {
+(function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -164,7 +164,7 @@
     var from = function (value) {
       return value === null || value === undefined ? NONE : some(value);
     };
-    var Option = {
+    var Optional = {
       some: some,
       none: none,
       from: from
@@ -246,12 +246,12 @@
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
         if (pred(x, i)) {
-          return Option.some(x);
+          return Optional.some(x);
         } else if (until(x, i)) {
           break;
         }
       }
-      return Option.none();
+      return Optional.none();
     };
     var find = function (xs, pred) {
       return findUntil(xs, pred, never);
@@ -271,7 +271,7 @@
       return copy;
     };
     var head = function (xs) {
-      return xs.length === 0 ? Option.none() : Option.some(xs[0]);
+      return xs.length === 0 ? Optional.none() : Optional.some(xs[0]);
     };
 
     var keys = Object.keys;
@@ -336,7 +336,7 @@
             },
             match: match,
             log: function (label) {
-              domGlobals.console.log(label, {
+              console.log(label, {
                 constructors: constructors,
                 constructor: key,
                 params: args
@@ -422,8 +422,8 @@
       var forall = function (f) {
         return f(o);
       };
-      var toOption = function () {
-        return Option.some(o);
+      var toOptional = function () {
+        return Optional.some(o);
       };
       return {
         is: is,
@@ -441,7 +441,7 @@
         bind: bind,
         exists: exists,
         forall: forall,
-        toOption: toOption
+        toOptional: toOptional
       };
     };
     var error = function (message) {
@@ -485,7 +485,7 @@
         bind: bind,
         exists: never,
         forall: always,
-        toOption: Option.none
+        toOptional: Optional.none
       };
     };
     var fromOption = function (opt, err) {
@@ -671,7 +671,7 @@
       };
     };
 
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+    var Global = typeof window !== 'undefined' ? window : Function('return this;')();
 
     var error$1 = function () {
       var args = [];
@@ -782,7 +782,7 @@
     };
 
     var isText = function (node) {
-      return node.nodeType === domGlobals.Node.TEXT_NODE;
+      return node.nodeType === Node.TEXT_NODE;
     };
     var cleanEmptyNodes = function (dom, node, isRoot) {
       if (node && dom.isEmpty(node) && !isRoot(node)) {
@@ -821,10 +821,10 @@
       return pattern.start.length === 0;
     };
     var getParentBlock = function (editor, rng) {
-      var parentBlockOpt = Option.from(editor.dom.getParent(rng.startContainer, editor.dom.isBlock));
+      var parentBlockOpt = Optional.from(editor.dom.getParent(rng.startContainer, editor.dom.isBlock));
       if (getForcedRootBlock(editor) === '') {
         return parentBlockOpt.orThunk(function () {
-          return Option.some(editor.getBody());
+          return Optional.some(editor.getBody());
         });
       } else {
         return parentBlockOpt;
@@ -849,34 +849,34 @@
     };
     var textBefore = function (node, offset, rootNode) {
       if (isText(node) && offset >= 0) {
-        return Option.some(point(node, offset));
+        return Optional.some(point(node, offset));
       } else {
         var textSeeker = global$5(DOM);
-        return Option.from(textSeeker.backwards(node, offset, alwaysNext(node), rootNode)).map(function (prev) {
+        return Optional.from(textSeeker.backwards(node, offset, alwaysNext(node), rootNode)).map(function (prev) {
           return point(prev.container, prev.container.data.length);
         });
       }
     };
     var textAfter = function (node, offset, rootNode) {
       if (isText(node) && offset >= node.length) {
-        return Option.some(point(node, offset));
+        return Optional.some(point(node, offset));
       } else {
         var textSeeker = global$5(DOM);
-        return Option.from(textSeeker.forwards(node, offset, alwaysNext(node), rootNode)).map(function (prev) {
+        return Optional.from(textSeeker.forwards(node, offset, alwaysNext(node), rootNode)).map(function (prev) {
           return point(prev.container, 0);
         });
       }
     };
     var scanLeft = function (node, offset, rootNode) {
       if (!isText(node)) {
-        return Option.none();
+        return Optional.none();
       }
       var text = node.textContent;
       if (offset >= 0 && offset <= text.length) {
-        return Option.some(point(node, offset));
+        return Optional.some(point(node, offset));
       } else {
         var textSeeker = global$5(DOM);
-        return Option.from(textSeeker.backwards(node, offset, alwaysNext(node), rootNode)).bind(function (prev) {
+        return Optional.from(textSeeker.backwards(node, offset, alwaysNext(node), rootNode)).bind(function (prev) {
           var prevText = prev.container.data;
           return scanLeft(prev.container, offset + prevText.length, rootNode);
         });
@@ -884,21 +884,21 @@
     };
     var scanRight = function (node, offset, rootNode) {
       if (!isText(node)) {
-        return Option.none();
+        return Optional.none();
       }
       var text = node.textContent;
       if (offset <= text.length) {
-        return Option.some(point(node, offset));
+        return Optional.some(point(node, offset));
       } else {
         var textSeeker = global$5(DOM);
-        return Option.from(textSeeker.forwards(node, offset, alwaysNext(node), rootNode)).bind(function (next) {
+        return Optional.from(textSeeker.forwards(node, offset, alwaysNext(node), rootNode)).bind(function (next) {
           return scanRight(next.container, offset - text.length, rootNode);
         });
       }
     };
     var repeatLeft = function (dom, node, offset, process, rootNode) {
       var search = global$5(dom, isBoundary(dom));
-      return Option.from(search.backwards(node, offset, process, rootNode));
+      return Optional.from(search.backwards(node, offset, process, rootNode));
     };
 
     var generatePath = function (root, node, offset) {
@@ -930,18 +930,16 @@
     var resolvePath = function (root, path) {
       var nodePath = path.slice();
       var offset = nodePath.pop();
-      return foldl(nodePath, function (optNode, index) {
+      var resolvedNode = foldl(nodePath, function (optNode, index) {
         return optNode.bind(function (node) {
-          return Option.from(node.childNodes[index]);
+          return Optional.from(node.childNodes[index]);
         });
-      }, Option.some(root)).bind(function (node) {
-        if (isText(node) && offset >= 0 && offset <= node.data.length) {
-          return Option.some({
-            node: node,
-            offset: offset
-          });
+      }, Optional.some(root));
+      return resolvedNode.bind(function (node) {
+        if (isText(node) && (offset < 0 || offset > node.data.length)) {
+          return Optional.none();
         } else {
-          return Option.some({
+          return Optional.some({
             node: node,
             offset: offset
           });
@@ -953,7 +951,7 @@
         var startNode = _a.node, startOffset = _a.offset;
         return resolvePath(root, range.end).map(function (_a) {
           var endNode = _a.node, endOffset = _a.offset;
-          var rng = domGlobals.document.createRange();
+          var rng = document.createRange();
           rng.setStart(startNode, startOffset);
           rng.setEnd(endNode, endOffset);
           return rng;
@@ -1002,10 +1000,7 @@
     var findPattern = function (patterns, text) {
       var nuText = text.replace(nbsp, ' ');
       return find(patterns, function (pattern) {
-        if (text.indexOf(pattern.start) !== 0 && nuText.indexOf(pattern.start) !== 0) {
-          return false;
-        }
-        return true;
+        return text.indexOf(pattern.start) === 0 || nuText.indexOf(pattern.start) === 0;
       });
     };
     var findPatterns = function (editor, patterns) {
@@ -1108,7 +1103,7 @@
           var rng = dom.createRng();
           rng.setStart(spot.container, spot.offset - startPattern.length);
           rng.setEnd(spot.container, spot.offset);
-          return Option.some(rng);
+          return Optional.some(rng);
         } else {
           var offset = spot.offset - startPattern.length;
           return scanLeft(spot.container, offset, block).map(function (nextSpot) {
@@ -1132,19 +1127,19 @@
         var rng = dom.createRng();
         rng.setStart(node, offset);
         rng.setEnd(node, offset);
-        return Option.some(rng);
+        return Optional.some(rng);
       }
       return textBefore(node, offset, block).bind(function (spot) {
         var start = findPatternStartFromSpot(dom, pattern, block, spot);
         return start.bind(function (startRange) {
           if (requireGap) {
             if (startRange.endContainer === spot.container && startRange.endOffset === spot.offset) {
-              return Option.none();
+              return Optional.none();
             } else if (spot.offset === 0 && startRange.endContainer.textContent.length === startRange.endOffset) {
-              return Option.none();
+              return Optional.none();
             }
           }
-          return Option.some(startRange);
+          return Optional.some(startRange);
         });
       });
     };
@@ -1157,7 +1152,7 @@
       return scanLeft(endNode, endOffset - details.pattern.end.length, block).bind(function (spot) {
         var endPathRng = generatePathRange(root, spot.container, spot.offset, endNode, endOffset);
         if (isReplacementPattern(pattern)) {
-          return Option.some({
+          return Optional.some({
             matches: [{
                 pattern: pattern,
                 startRng: endPathRng,
@@ -1210,7 +1205,7 @@
             return result;
           }
         }
-        return Option.none();
+        return Optional.none();
       });
     };
     var applyPattern$1 = function (editor, pattern, patternRange) {
@@ -1389,4 +1384,4 @@
 
     Plugin();
 
-}(window));
+}());

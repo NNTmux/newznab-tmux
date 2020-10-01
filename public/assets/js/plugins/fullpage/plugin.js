@@ -4,9 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.4.2 (2020-08-17)
+ * Version: 5.5.1 (2020-10-01)
  */
-(function (domGlobals) {
+(function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -446,7 +446,7 @@
       var headElm = editor.getDoc().getElementsByTagName('head')[0];
       if (styles) {
         var styleElm = dom.add(headElm, 'style', { id: 'fullpage_styles' });
-        styleElm.appendChild(domGlobals.document.createTextNode(styles));
+        styleElm.appendChild(document.createTextNode(styles));
       }
       var currentStyleSheetsMap = {};
       global$1.each(headElm.getElementsByTagName('link'), function (stylesheet) {
@@ -541,4 +541,4 @@
 
     Plugin();
 
-}(window));
+}());

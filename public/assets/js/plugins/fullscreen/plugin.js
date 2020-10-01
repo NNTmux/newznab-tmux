@@ -4,9 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.4.2 (2020-08-17)
+ * Version: 5.5.1 (2020-10-01)
  */
-(function (domGlobals) {
+(function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -54,6 +54,20 @@
         return value;
       };
     };
+    function curry(fn) {
+      var initialArgs = [];
+      for (var _i = 1; _i < arguments.length; _i++) {
+        initialArgs[_i - 1] = arguments[_i];
+      }
+      return function () {
+        var restArgs = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          restArgs[_i] = arguments[_i];
+        }
+        var all = initialArgs.concat(restArgs);
+        return fn.apply(null, all);
+      };
+    }
     var never = constant(false);
     var always = constant(true);
 
@@ -157,27 +171,27 @@
     var from = function (value) {
       return value === null || value === undefined ? NONE : some(value);
     };
-    var Option = {
+    var Optional = {
       some: some,
       none: none,
       from: from
     };
 
     var revocable = function (doRevoke) {
-      var subject = Cell(Option.none());
+      var subject = Cell(Optional.none());
       var revoke = function () {
-        subject.get().each(doRevoke);
+        return subject.get().each(doRevoke);
       };
       var clear = function () {
         revoke();
-        subject.set(Option.none());
-      };
-      var set = function (s) {
-        revoke();
-        subject.set(Option.some(s));
+        subject.set(Optional.none());
       };
       var isSet = function () {
         return subject.get().isSome();
+      };
+      var set = function (s) {
+        revoke();
+        subject.set(Optional.some(s));
       };
       return {
         clear: clear,
@@ -187,22 +201,22 @@
     };
     var unbindable = function () {
       return revocable(function (s) {
-        s.unbind();
+        return s.unbind();
       });
     };
     var value = function () {
-      var subject = Cell(Option.none());
+      var subject = Cell(Optional.none());
       var clear = function () {
-        subject.set(Option.none());
+        return subject.set(Optional.none());
       };
       var set = function (s) {
-        subject.set(Option.some(s));
-      };
-      var on = function (f) {
-        subject.get().each(f);
+        return subject.set(Optional.some(s));
       };
       var isSet = function () {
         return subject.get().isSome();
+      };
+      var on = function (f) {
+        return subject.get().each(f);
       };
       return {
         clear: clear,
@@ -286,7 +300,7 @@
       return flatten(map(xs, f));
     };
     var head = function (xs) {
-      return xs.length === 0 ? Option.none() : Option.some(xs[0]);
+      return xs.length === 0 ? Optional.none() : Optional.some(xs[0]);
     };
 
     var keys = Object.keys;
@@ -304,22 +318,22 @@
     };
 
     var fromHtml = function (html, scope) {
-      var doc = scope || domGlobals.document;
+      var doc = scope || document;
       var div = doc.createElement('div');
       div.innerHTML = html;
       if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        domGlobals.console.error('HTML does not have a single root node', html);
+        console.error('HTML does not have a single root node', html);
         throw new Error('HTML must have a single root node');
       }
       return fromDom(div.childNodes[0]);
     };
     var fromTag = function (tag, scope) {
-      var doc = scope || domGlobals.document;
+      var doc = scope || document;
       var node = doc.createElement(tag);
       return fromDom(node);
     };
     var fromText = function (text, scope) {
-      var doc = scope || domGlobals.document;
+      var doc = scope || document;
       var node = doc.createTextNode(text);
       return fromDom(node);
     };
@@ -327,13 +341,12 @@
       if (node === null || node === undefined) {
         throw new Error('Node cannot be null or undefined');
       }
-      return { dom: constant(node) };
+      return { dom: node };
     };
     var fromPoint = function (docElm, x, y) {
-      var doc = docElm.dom();
-      return Option.from(doc.elementFromPoint(x, y)).map(fromDom);
+      return Optional.from(docElm.dom.elementFromPoint(x, y)).map(fromDom);
     };
-    var Element = {
+    var SugarElement = {
       fromHtml: fromHtml,
       fromTag: fromTag,
       fromText: fromText,
@@ -341,7 +354,7 @@
       fromPoint: fromPoint
     };
 
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+    var Global = typeof window !== 'undefined' ? window : Function('return this;')();
 
     var DOCUMENT = 9;
     var DOCUMENT_FRAGMENT = 11;
@@ -349,7 +362,7 @@
     var TEXT = 3;
 
     var type = function (element) {
-      return element.dom().nodeType;
+      return element.dom.nodeType;
     };
     var isType$1 = function (t) {
       return function (element) {
@@ -362,7 +375,7 @@
     var isDocumentFragment = isType$1(DOCUMENT_FRAGMENT);
 
     var is = function (element, selector) {
-      var dom = element.dom();
+      var dom = element.dom;
       if (dom.nodeType !== ELEMENT) {
         return false;
       } else {
@@ -384,30 +397,30 @@
       return dom.nodeType !== ELEMENT && dom.nodeType !== DOCUMENT && dom.nodeType !== DOCUMENT_FRAGMENT || dom.childElementCount === 0;
     };
     var all = function (selector, scope) {
-      var base = scope === undefined ? domGlobals.document : scope.dom();
-      return bypassSelector(base) ? [] : map(base.querySelectorAll(selector), Element.fromDom);
+      var base = scope === undefined ? document : scope.dom;
+      return bypassSelector(base) ? [] : map(base.querySelectorAll(selector), SugarElement.fromDom);
     };
 
     var eq = function (e1, e2) {
-      return e1.dom() === e2.dom();
+      return e1.dom === e2.dom;
     };
 
     var owner = function (element) {
-      return Element.fromDom(element.dom().ownerDocument);
+      return SugarElement.fromDom(element.dom.ownerDocument);
     };
     var documentOrOwner = function (dos) {
       return isDocument(dos) ? dos : owner(dos);
     };
     var parent = function (element) {
-      return Option.from(element.dom().parentNode).map(Element.fromDom);
+      return Optional.from(element.dom.parentNode).map(SugarElement.fromDom);
     };
     var parents = function (element, isRoot) {
       var stop = isFunction(isRoot) ? isRoot : never;
-      var dom = element.dom();
+      var dom = element.dom;
       var ret = [];
       while (dom.parentNode !== null && dom.parentNode !== undefined) {
         var rawParent = dom.parentNode;
-        var p = Element.fromDom(rawParent);
+        var p = SugarElement.fromDom(rawParent);
         ret.push(p);
         if (stop(p) === true) {
           break;
@@ -426,75 +439,82 @@
       return parent(element).map(children).map(filterSelf).getOr([]);
     };
     var children = function (element) {
-      return map(element.dom().childNodes, Element.fromDom);
+      return map(element.dom.childNodes, SugarElement.fromDom);
     };
 
     var isShadowRoot = function (dos) {
       return isDocumentFragment(dos);
     };
-    var supported = isFunction(domGlobals.Element.prototype.attachShadow) && isFunction(domGlobals.Node.prototype.getRootNode);
+    var supported = isFunction(Element.prototype.attachShadow) && isFunction(Node.prototype.getRootNode);
     var isSupported$1 = constant(supported);
     var getRootNode = supported ? function (e) {
-      return Element.fromDom(e.dom().getRootNode());
+      return SugarElement.fromDom(e.dom.getRootNode());
     } : documentOrOwner;
     var getShadowRoot = function (e) {
       var r = getRootNode(e);
-      return isShadowRoot(r) ? Option.some(r) : Option.none();
+      return isShadowRoot(r) ? Optional.some(r) : Optional.none();
     };
     var getShadowHost = function (e) {
-      return Element.fromDom(e.dom().host);
+      return SugarElement.fromDom(e.dom.host);
     };
     var getOriginalEventTarget = function (event) {
       if (isSupported$1() && isNonNullable(event.target)) {
-        var el = Element.fromDom(event.target);
-        if (isElement(el) && isOpenShadowHost(Element.fromDom(event.target))) {
-          var eventAny = event;
-          if (eventAny.composed && eventAny.composedPath) {
-            var composedPath = eventAny.composedPath();
+        var el = SugarElement.fromDom(event.target);
+        if (isElement(el) && isOpenShadowHost(el)) {
+          if (event.composed && event.composedPath) {
+            var composedPath = event.composedPath();
             if (composedPath) {
               return head(composedPath);
             }
           }
         }
       }
-      return Option.from(event.target);
+      return Optional.from(event.target);
     };
     var isOpenShadowHost = function (element) {
-      return isNonNullable(element.dom().shadowRoot);
+      return isNonNullable(element.dom.shadowRoot);
     };
 
     var inBody = function (element) {
-      var dom = isText(element) ? element.dom().parentNode : element.dom();
+      var dom = isText(element) ? element.dom.parentNode : element.dom;
       if (dom === undefined || dom === null || dom.ownerDocument === null) {
         return false;
       }
-      return getShadowRoot(Element.fromDom(dom)).fold(function () {
-        return dom.ownerDocument.body.contains(dom);
+      var doc = dom.ownerDocument;
+      return getShadowRoot(SugarElement.fromDom(dom)).fold(function () {
+        return doc.body.contains(dom);
       }, compose1(inBody, getShadowHost));
+    };
+    var getBody = function (doc) {
+      var b = doc.dom.body;
+      if (b === null || b === undefined) {
+        throw new Error('Body is not available yet');
+      }
+      return SugarElement.fromDom(b);
     };
 
     var rawSet = function (dom, key, value) {
       if (isString(value) || isBoolean(value) || isNumber(value)) {
         dom.setAttribute(key, value + '');
       } else {
-        domGlobals.console.error('Invalid call to Attr.set. Key ', key, ':: Value ', value, ':: Element ', dom);
+        console.error('Invalid call to Attribute.set. Key ', key, ':: Value ', value, ':: Element ', dom);
         throw new Error('Attribute value was not simple');
       }
     };
     var set = function (element, key, value) {
-      rawSet(element.dom(), key, value);
+      rawSet(element.dom, key, value);
     };
     var get$1 = function (element, key) {
-      var v = element.dom().getAttribute(key);
+      var v = element.dom.getAttribute(key);
       return v === null ? undefined : v;
     };
     var remove = function (element, key) {
-      element.dom().removeAttribute(key);
+      element.dom.removeAttribute(key);
     };
 
     var internalSet = function (dom, property, value) {
       if (!isString(value)) {
-        domGlobals.console.error('Invalid call to CSS.set. Property ', property, ':: Value ', value, ':: Element ', dom);
+        console.error('Invalid call to CSS.set. Property ', property, ':: Value ', value, ':: Element ', dom);
         throw new Error('CSS value must be a string: ' + value);
       }
       if (isSupported(dom)) {
@@ -502,14 +522,14 @@
       }
     };
     var setAll = function (element, css) {
-      var dom = element.dom();
+      var dom = element.dom;
       each$1(css, function (v, k) {
         internalSet(dom, k, v);
       });
     };
     var get$2 = function (element, property) {
-      var dom = element.dom();
-      var styles = domGlobals.window.getComputedStyle(dom);
+      var dom = element.dom;
+      var styles = window.getComputedStyle(dom);
       var r = styles.getPropertyValue(property);
       return r === '' && !inBody(element) ? getUnsafeProperty(dom, property) : r;
     };
@@ -519,17 +539,17 @@
 
     var mkEvent = function (target, x, y, stop, prevent, kill, raw) {
       return {
-        target: constant(target),
-        x: constant(x),
-        y: constant(y),
+        target: target,
+        x: x,
+        y: y,
         stop: stop,
         prevent: prevent,
         kill: kill,
-        raw: constant(raw)
+        raw: raw
       };
     };
     var fromRawEvent = function (rawEvent) {
-      var target = Element.fromDom(getOriginalEventTarget(rawEvent).getOr(rawEvent.target));
+      var target = SugarElement.fromDom(getOriginalEventTarget(rawEvent).getOr(rawEvent.target));
       var stop = function () {
         return rawEvent.stopPropagation();
       };
@@ -539,29 +559,52 @@
       var kill = compose(prevent, stop);
       return mkEvent(target, rawEvent.clientX, rawEvent.clientY, stop, prevent, kill, rawEvent);
     };
+    var handle = function (filter, handler) {
+      return function (rawEvent) {
+        if (filter(rawEvent)) {
+          handler(fromRawEvent(rawEvent));
+        }
+      };
+    };
+    var binder = function (element, event, filter, handler, useCapture) {
+      var wrapped = handle(filter, handler);
+      element.dom.addEventListener(event, wrapped, useCapture);
+      return { unbind: curry(unbind, element, event, wrapped, useCapture) };
+    };
+    var bind$1 = function (element, event, filter, handler) {
+      return binder(element, event, filter, handler, false);
+    };
+    var unbind = function (element, event, handler, useCapture) {
+      element.dom.removeEventListener(event, handler, useCapture);
+    };
+
+    var filter$1 = always;
+    var bind$2 = function (element, event, handler) {
+      return bind$1(element, event, filter$1, handler);
+    };
 
     var r = function (left, top) {
       var translate = function (x, y) {
         return r(left + x, top + y);
       };
       return {
-        left: constant(left),
-        top: constant(top),
+        left: left,
+        top: top,
         translate: translate
       };
     };
-    var Position = r;
+    var SugarPosition = r;
 
     var get$3 = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+      var doc = _DOC !== undefined ? _DOC.dom : document;
       var x = doc.body.scrollLeft || doc.documentElement.scrollLeft;
       var y = doc.body.scrollTop || doc.documentElement.scrollTop;
-      return Position(x, y);
+      return SugarPosition(x, y);
     };
 
     var get$4 = function (_win) {
-      var win = _win === undefined ? domGlobals.window : _win;
-      return Option.from(win['visualViewport']);
+      var win = _win === undefined ? window : _win;
+      return Optional.from(win['visualViewport']);
     };
     var bounds = function (x, y, width, height) {
       return {
@@ -574,19 +617,19 @@
       };
     };
     var getBounds = function (_win) {
-      var win = _win === undefined ? domGlobals.window : _win;
+      var win = _win === undefined ? window : _win;
       var doc = win.document;
-      var scroll = get$3(Element.fromDom(doc));
+      var scroll = get$3(SugarElement.fromDom(doc));
       return get$4(win).fold(function () {
         var html = win.document.documentElement;
         var width = html.clientWidth;
         var height = html.clientHeight;
-        return bounds(scroll.left(), scroll.top(), width, height);
+        return bounds(scroll.left, scroll.top, width, height);
       }, function (visualViewport) {
-        return bounds(Math.max(visualViewport.pageLeft, scroll.left()), Math.max(visualViewport.pageTop, scroll.top()), visualViewport.width, visualViewport.height);
+        return bounds(Math.max(visualViewport.pageLeft, scroll.left), Math.max(visualViewport.pageTop, scroll.top), visualViewport.width, visualViewport.height);
       });
     };
-    var bind$1 = function (name, callback, _win) {
+    var bind$3 = function (name, callback, _win) {
       return get$4(_win).map(function (visualViewport) {
         var handler = function (e) {
           return callback(fromRawEvent(e));
@@ -610,6 +653,62 @@
 
     var fireFullscreenStateChanged = function (editor, state) {
       editor.fire('FullscreenStateChanged', { state: state });
+    };
+
+    var getFullscreenNative = function (editor) {
+      return editor.getParam('fullscreen_native', false, 'boolean');
+    };
+
+    var getFullscreenRoot = function (editor) {
+      var elem = SugarElement.fromDom(editor.getElement());
+      return getShadowRoot(elem).map(getShadowHost).getOrThunk(function () {
+        return getBody(owner(elem));
+      });
+    };
+    var getFullscreenElement = function (root) {
+      if (root.fullscreenElement !== undefined) {
+        return root.fullscreenElement;
+      } else if (root.msFullscreenElement !== undefined) {
+        return root.msFullscreenElement;
+      } else if (root.webkitFullscreenElement !== undefined) {
+        return root.webkitFullscreenElement;
+      } else {
+        return null;
+      }
+    };
+    var getFullscreenchangeEventName = function () {
+      if (document.fullscreenElement !== undefined) {
+        return 'fullscreenchange';
+      } else if (document.msFullscreenElement !== undefined) {
+        return 'MSFullscreenChange';
+      } else if (document.webkitFullscreenElement !== undefined) {
+        return 'webkitfullscreenchange';
+      } else {
+        return 'fullscreenchange';
+      }
+    };
+    var requestFullscreen = function (sugarElem) {
+      var elem = sugarElem.dom;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      } else if (elem.webkitRequestFullScreen) {
+        elem.webkitRequestFullScreen();
+      }
+    };
+    var exitFullscreen = function (sugarDoc) {
+      var doc = sugarDoc.dom;
+      if (doc.exitFullscreen) {
+        doc.exitFullscreen();
+      } else if (doc.msExitFullscreen) {
+        doc.msExitFullscreen();
+      } else if (doc.webkitCancelFullScreen) {
+        doc.webkitCancelFullScreen();
+      }
+    };
+    var isFullscreenElement = function (elem) {
+      return elem.dom === getFullscreenElement(owner(elem).dom);
     };
 
     var ancestors = function (scope, predicate, isRoot) {
@@ -644,7 +743,7 @@
       return color !== undefined && color !== '' ? 'background-color:' + color + '!important' : bgFallback;
     };
     var clobberStyles = function (dom, container, editorBody) {
-      var gatherSibilings = function (element) {
+      var gatherSiblings = function (element) {
         return siblings$2(element, '*:not(.tox-silver-sink)');
       };
       var clobber = function (clobberStyle) {
@@ -660,7 +759,7 @@
         };
       };
       var ancestors = ancestors$1(container, '*');
-      var siblings = bind(ancestors, gatherSibilings);
+      var siblings = bind(ancestors, gatherSiblings);
       var bgColor = matchColor(editorBody);
       each(siblings, clobber(siblingStyles));
       each(ancestors, clobber(ancestorPosition + ancestorStyles + bgColor));
@@ -682,14 +781,14 @@
 
     var DOM = global$1.DOM;
     var getScrollPos = function () {
-      var vp = getBounds(domGlobals.window);
+      var vp = getBounds(window);
       return {
         x: vp.x,
         y: vp.y
       };
     };
     var setScrollPos = function (pos) {
-      domGlobals.window.scrollTo(pos.x, pos.y);
+      window.scrollTo(pos.x, pos.y);
     };
     var viewportUpdate = get$4().fold(function () {
       return {
@@ -701,11 +800,11 @@
       var resizeBinder = unbindable();
       var scrollBinder = unbindable();
       var refreshScroll = function () {
-        domGlobals.document.body.scrollTop = 0;
-        domGlobals.document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
       };
       var refreshVisualViewport = function () {
-        domGlobals.window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () {
           editorContainer.on(function (container) {
             return setAll(container, {
               top: visualViewport.offsetTop + 'px',
@@ -723,8 +822,8 @@
       var bind = function (element) {
         editorContainer.set(element);
         update();
-        resizeBinder.set(bind$1('resize', update));
-        scrollBinder.set(bind$1('scroll', update));
+        resizeBinder.set(bind$3('resize', update));
+        scrollBinder.set(bind$3('scroll', update));
       };
       var unbind = function () {
         editorContainer.on(function () {
@@ -739,12 +838,13 @@
       };
     });
     var toggleFullscreen = function (editor, fullscreenState) {
-      var body = domGlobals.document.body;
-      var documentElement = domGlobals.document.documentElement;
+      var body = document.body;
+      var documentElement = document.documentElement;
       var editorContainer = editor.getContainer();
-      var editorContainerS = Element.fromDom(editorContainer);
+      var editorContainerS = SugarElement.fromDom(editorContainer);
+      var fullscreenRoot = getFullscreenRoot(editor);
       var fullscreenInfo = fullscreenState.get();
-      var editorBody = Element.fromDom(editor.getBody());
+      var editorBody = SugarElement.fromDom(editor.getBody());
       var isTouch = global$2.deviceType.isTouch();
       var editorContainerStyle = editorContainer.style;
       var iframe = editor.iframeElement;
@@ -757,8 +857,18 @@
         DOM.removeClass(documentElement, 'tox-fullscreen');
         DOM.removeClass(editorContainer, 'tox-fullscreen');
         viewportUpdate.unbind();
+        Optional.from(fullscreenState.get()).each(function (info) {
+          return info.fullscreenChangeHandler.unbind();
+        });
       };
       if (!fullscreenInfo) {
+        var fullscreenChangeHandler = bind$2(owner(fullscreenRoot), getFullscreenchangeEventName(), function (_evt) {
+          if (getFullscreenNative(editor)) {
+            if (!isFullscreenElement(fullscreenRoot) && fullscreenState.get() !== null) {
+              toggleFullscreen(editor, fullscreenState);
+            }
+          }
+        });
         var newFullScreenInfo = {
           scrollPos: getScrollPos(),
           containerWidth: editorContainerStyle.width,
@@ -766,7 +876,8 @@
           containerTop: editorContainerStyle.top,
           containerLeft: editorContainerStyle.left,
           iframeWidth: iframeStyle.width,
-          iframeHeight: iframeStyle.height
+          iframeHeight: iframeStyle.height,
+          fullscreenChangeHandler: fullscreenChangeHandler
         };
         if (isTouch) {
           clobberStyles(editor.dom, editorContainerS, editorBody);
@@ -779,8 +890,15 @@
         viewportUpdate.bind(editorContainerS);
         editor.on('remove', cleanup);
         fullscreenState.set(newFullScreenInfo);
+        if (getFullscreenNative(editor)) {
+          requestFullscreen(fullscreenRoot);
+        }
         fireFullscreenStateChanged(editor, true);
       } else {
+        fullscreenInfo.fullscreenChangeHandler.unbind();
+        if (getFullscreenNative(editor) && isFullscreenElement(fullscreenRoot)) {
+          exitFullscreen(owner(fullscreenRoot));
+        }
         iframeStyle.width = fullscreenInfo.iframeWidth;
         iframeStyle.height = fullscreenInfo.iframeHeight;
         editorContainerStyle.width = fullscreenInfo.containerWidth;
@@ -848,4 +966,4 @@
 
     Plugin();
 
-}(window));
+}());

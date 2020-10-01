@@ -4,9 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.4.2 (2020-08-17)
+ * Version: 5.5.1 (2020-10-01)
  */
-(function (domGlobals) {
+(function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -26,9 +26,9 @@
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
     var hasProPlugin = function (editor) {
-      if (/(^|[ ,])powerpaste([, ]|$)/.test(editor.getParam('plugins')) && global.get('powerpaste')) {
-        if (typeof domGlobals.window.console !== 'undefined' && domGlobals.window.console.log) {
-          domGlobals.window.console.log('PowerPaste is incompatible with Paste plugin! Remove \'paste\' from the \'plugins\' option.');
+      if (editor.hasPlugin('powerpaste', true)) {
+        if (typeof window.console !== 'undefined' && window.console.log) {
+          window.console.log('PowerPaste is incompatible with Paste plugin! Remove \'paste\' from the \'plugins\' option.');
         }
         return true;
       } else {
@@ -41,52 +41,6 @@
         clipboard: clipboard,
         quirks: quirks
       };
-    };
-
-    var firePastePreProcess = function (editor, html, internal, isWordHtml) {
-      return editor.fire('PastePreProcess', {
-        content: html,
-        internal: internal,
-        wordContent: isWordHtml
-      });
-    };
-    var firePastePostProcess = function (editor, node, internal, isWordHtml) {
-      return editor.fire('PastePostProcess', {
-        node: node,
-        internal: internal,
-        wordContent: isWordHtml
-      });
-    };
-    var firePastePlainTextToggle = function (editor, state) {
-      return editor.fire('PastePlainTextToggle', { state: state });
-    };
-    var firePaste = function (editor, ieFake) {
-      return editor.fire('paste', { ieFake: ieFake });
-    };
-
-    var togglePlainTextPaste = function (editor, clipboard) {
-      if (clipboard.pasteFormat.get() === 'text') {
-        clipboard.pasteFormat.set('html');
-        firePastePlainTextToggle(editor, false);
-      } else {
-        clipboard.pasteFormat.set('text');
-        firePastePlainTextToggle(editor, true);
-      }
-      editor.focus();
-    };
-
-    var register = function (editor, clipboard) {
-      editor.addCommand('mceTogglePlainTextPaste', function () {
-        togglePlainTextPaste(editor, clipboard);
-      });
-      editor.addCommand('mceInsertClipboardContent', function (ui, value) {
-        if (value.content) {
-          clipboard.pasteHtml(value.content, value.internal);
-        }
-        if (value.text) {
-          clipboard.pasteText(value.text);
-        }
-      });
     };
 
     var noop = function () {
@@ -199,7 +153,7 @@
     var from = function (value) {
       return value === null || value === undefined ? NONE : some(value);
     };
-    var Option = {
+    var Optional = {
       some: some,
       none: none,
       from: from
@@ -249,18 +203,18 @@
     };
 
     var value = function () {
-      var subject = Cell(Option.none());
+      var subject = Cell(Optional.none());
       var clear = function () {
-        subject.set(Option.none());
+        return subject.set(Optional.none());
       };
       var set = function (s) {
-        subject.set(Option.some(s));
-      };
-      var on = function (f) {
-        subject.get().each(f);
+        return subject.set(Optional.some(s));
       };
       var isSet = function () {
         return subject.get().isSome();
+      };
+      var on = function (f) {
+        return subject.get().each(f);
       };
       return {
         clear: clear,
@@ -277,6 +231,27 @@
     var global$3 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
     var global$4 = tinymce.util.Tools.resolve('tinymce.util.VK');
+
+    var firePastePreProcess = function (editor, html, internal, isWordHtml) {
+      return editor.fire('PastePreProcess', {
+        content: html,
+        internal: internal,
+        wordContent: isWordHtml
+      });
+    };
+    var firePastePostProcess = function (editor, node, internal, isWordHtml) {
+      return editor.fire('PastePostProcess', {
+        node: node,
+        internal: internal,
+        wordContent: isWordHtml
+      });
+    };
+    var firePastePlainTextToggle = function (editor, state) {
+      return editor.fire('PastePlainTextToggle', { state: state });
+    };
+    var firePaste = function (editor, ieFake) {
+      return editor.fire('paste', { ieFake: ieFake });
+    };
 
     var shouldBlockDrop = function (editor) {
       return editor.getParam('paste_block_drop', false);
@@ -361,9 +336,9 @@
       return internalMimeType;
     };
 
-    var global$5 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+    var global$5 = tinymce.util.Tools.resolve('tinymce.html.Entities');
 
-    var global$6 = tinymce.util.Tools.resolve('tinymce.html.Entities');
+    var global$6 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
     var isPlainText = function (text) {
       return !/<(?:\/?(?!(?:div|p|br|span)>)\w+|(?:(?!(?:span style="white-space:\s?pre;?">)|br\s?\/>))\w+\s[^>]+)>/i.test(text);
@@ -378,7 +353,7 @@
       if (typeof rootAttrs === 'object') {
         for (key in rootAttrs) {
           if (rootAttrs.hasOwnProperty(key)) {
-            attrs.push(key + '="' + global$6.encodeAllRaw(rootAttrs[key]) + '"');
+            attrs.push(key + '="' + global$5.encodeAllRaw(rootAttrs[key]) + '"');
           }
         }
         if (attrs.length) {
@@ -391,13 +366,13 @@
       var blocks = text.split(/\n\n/);
       var tagOpen = openContainer(rootTag, rootAttrs);
       var tagClose = '</' + rootTag + '>';
-      var paragraphs = global$5.map(blocks, function (p) {
+      var paragraphs = global$6.map(blocks, function (p) {
         return p.split(/\n/).join('<br />');
       });
       var stitch = function (p) {
         return tagOpen + p + tagClose;
       };
-      return paragraphs.length === 1 ? paragraphs[0] : global$5.map(paragraphs, stitch).join('');
+      return paragraphs.length === 1 ? paragraphs[0] : global$6.map(paragraphs, stitch).join('');
     };
     var convert = function (text, rootTag, rootAttrs) {
       return rootTag ? toBlockElements(text, rootTag === true ? 'p' : rootTag, rootAttrs) : toBRs(text);
@@ -414,7 +389,7 @@
     var global$a = tinymce.util.Tools.resolve('tinymce.html.Schema');
 
     function filter$1(content, items) {
-      global$5.each(items, function (v) {
+      global$6.each(items, function (v) {
         if (v.constructor === RegExp) {
           content = content.replace(v, '');
         } else {
@@ -428,7 +403,7 @@
       var domParser = global$7({}, schema);
       var text = '';
       var shortEndedElements = schema.getShortEndedElements();
-      var ignoreElements = global$5.makeMap('script noscript style textarea video audio iframe object', ' ');
+      var ignoreElements = global$6.makeMap('script noscript style textarea video audio iframe object', ' ');
       var blockElements = schema.getBlockElements();
       function walk(node) {
         var name = node.name, currentNode = node;
@@ -494,7 +469,7 @@
     }
 
     function isWordContent(content) {
-      return /<font face="Times New Roman"|class="?Mso|style="[^"]*\bmso-|style='[^'']*\bmso-|w:WordDocument/i.test(content) || /class="OutlineElement/.test(content) || /id="?docs\-internal\-guid\-/.test(content);
+      return /<font face="Times New Roman"|class="?Mso|style="[^"]*\bmso-|style='[^']*\bmso-|w:WordDocument/i.test(content) || /class="OutlineElement/.test(content) || /id="?docs\-internal\-guid\-/.test(content);
     }
     function isNumericList(text) {
       var found;
@@ -508,7 +483,7 @@
         /^[\u58f1\u5f10\u53c2\u56db\u4f0d\u516d\u4e03\u516b\u4e5d\u62fe]+\.[ \u00a0]/
       ];
       text = text.replace(/^[\u00a0 ]+/, '');
-      global$5.each(patterns, function (pattern) {
+      global$6.each(patterns, function (pattern) {
         if (pattern.test(text)) {
           found = true;
           return false;
@@ -634,7 +609,7 @@
     function filterStyles(editor, validStyles, node, styleValue) {
       var outputStyles = {}, matches;
       var styles = editor.dom.parseStyle(styleValue);
-      global$5.each(styles, function (value, name) {
+      global$6.each(styles, function (value, name) {
         switch (name) {
         case 'mso-list':
           matches = /\w+ \w+([0-9]+)/i.exec(styleValue);
@@ -702,7 +677,7 @@
       var validStyles;
       var retainStyleProperties = getRetainStyleProps(editor);
       if (retainStyleProperties) {
-        validStyles = global$5.makeMap(retainStyleProperties.split(/[, ]/));
+        validStyles = global$6.makeMap(retainStyleProperties.split(/[, ]/));
       }
       content = filter$1(content, [
         /<br class="?Apple-interchange-newline"?>/gi,
@@ -729,7 +704,7 @@
         valid_elements: validElements,
         valid_children: '-li[p]'
       });
-      global$5.each(schema.elements, function (rule) {
+      global$6.each(schema.elements, function (rule) {
         if (!rule.attributes.class) {
           rule.attributes.class = {};
           rule.attributesOrder.push('class');
@@ -811,8 +786,8 @@
     var preProcess$1 = function (editor, html) {
       var parser = global$7({}, editor.schema);
       parser.addNodeFilter('meta', function (nodes) {
-        global$5.each(nodes, function (node) {
-          return node.remove();
+        global$6.each(nodes, function (node) {
+          node.remove();
         });
       });
       var fragment = parser.parse(html, {
@@ -883,7 +858,7 @@
       return isImageUrl(html) ? createImage(editor, html, pasteHtmlFn) : false;
     };
     var smartInsertContent = function (editor, html) {
-      global$5.each([
+      global$6.each([
         linkSelection,
         insertImage,
         pasteHtml
@@ -1018,7 +993,7 @@
       var _a = parseDataUri(imageItem.uri), base64 = _a.data, type = _a.type;
       var id = uniqueId();
       var name = getImagesReuseFilename(editor) && imageItem.blob.name ? extractFilename(editor, imageItem.blob.name) : id;
-      var img = new domGlobals.Image();
+      var img = new Image();
       img.src = imageItem.uri;
       if (isValidDataUriImage(editor, img)) {
         var blobCache = editor.editorUpload.blobCache;
@@ -1084,7 +1059,7 @@
     };
     var isBrokenAndroidClipboardEvent = function (e) {
       var clipboardData = e.clipboardData;
-      return domGlobals.navigator.userAgent.indexOf('Android') !== -1 && clipboardData && clipboardData.items && clipboardData.items.length === 0;
+      return navigator.userAgent.indexOf('Android') !== -1 && clipboardData && clipboardData.items && clipboardData.items.length === 0;
     };
     var isKeyboardPasteEvent = function (e) {
       return global$4.metaKeyPressed(e) && e.keyCode === 86 || e.shiftKey && e.keyCode === 45;
@@ -1100,7 +1075,7 @@
         }
         if (isKeyboardPasteEvent(e) && !e.isDefaultPrevented()) {
           keyboardPastePlainTextState = e.shiftKey && e.keyCode === 86;
-          if (keyboardPastePlainTextState && global$1.webkit && domGlobals.navigator.userAgent.indexOf('Version/') !== -1) {
+          if (keyboardPastePlainTextState && global$1.webkit && navigator.userAgent.indexOf('Version/') !== -1) {
             return;
           }
           e.stopImmediatePropagation();
@@ -1235,7 +1210,7 @@
     };
 
     var getPasteBinParent = function (editor) {
-      return global$1.ie && editor.inline ? domGlobals.document.body : editor.getBody();
+      return global$1.ie && editor.inline ? document.body : editor.getBody();
     };
     var isExternalPasteBin = function (editor) {
       return getPasteBinParent(editor) !== editor.getBody();
@@ -1291,11 +1266,11 @@
         toElm.appendChild(fromElm);
         editor.dom.remove(fromElm, true);
       };
-      var pasteBinClones = global$5.grep(getPasteBinParent(editor).childNodes, function (elm) {
+      var pasteBinClones = global$6.grep(getPasteBinParent(editor).childNodes, function (elm) {
         return elm.id === 'mcepastebin';
       });
       var pasteBinElm = pasteBinClones.shift();
-      global$5.each(pasteBinClones, function (pasteBinClone) {
+      global$6.each(pasteBinClones, function (pasteBinClone) {
         copyAndRemove(pasteBinElm, pasteBinClone);
       });
       var dirtyWrappers = editor.dom.select('div[id=mcepastebin]', pasteBinElm);
@@ -1367,6 +1342,31 @@
         hasHtmlOrText: hasHtmlOrText,
         hasContentType: hasContentType
       };
+    };
+
+    var togglePlainTextPaste = function (editor, clipboard) {
+      if (clipboard.pasteFormat.get() === 'text') {
+        clipboard.pasteFormat.set('html');
+        firePastePlainTextToggle(editor, false);
+      } else {
+        clipboard.pasteFormat.set('text');
+        firePastePlainTextToggle(editor, true);
+      }
+      editor.focus();
+    };
+
+    var register = function (editor, clipboard) {
+      editor.addCommand('mceTogglePlainTextPaste', function () {
+        togglePlainTextPaste(editor, clipboard);
+      });
+      editor.addCommand('mceInsertClipboardContent', function (ui, value) {
+        if (value.content) {
+          clipboard.pasteHtml(value.content, value.internal);
+        }
+        if (value.text) {
+          clipboard.pasteText(value.text);
+        }
+      });
     };
 
     var hasWorkingClipboardApi = function (clipboardData) {
@@ -1570,7 +1570,7 @@
         return html;
       }
       var blockElements = [];
-      global$5.each(editor.schema.getBlockElements(), function (block, blockName) {
+      global$6.each(editor.schema.getBlockElements(), function (block, blockName) {
         blockElements.push(blockName);
       });
       var explorerBlocksRegExp = new RegExp('(?:<br>&nbsp;[\\s\\r\\n]+|<br>)*(<\\/?(' + blockElements.join('|') + ')[^>]*>)(?:<br>&nbsp;[\\s\\r\\n]+|<br>)*', 'g');
@@ -1704,4 +1704,4 @@
 
     Plugin();
 
-}(window));
+}());

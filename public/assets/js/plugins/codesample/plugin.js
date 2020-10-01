@@ -4,9 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.4.2 (2020-08-17)
+ * Version: 5.5.1 (2020-10-01)
  */
-(function (domGlobals) {
+(function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -121,14 +121,14 @@
     var from = function (value) {
       return value === null || value === undefined ? NONE : some(value);
     };
-    var Option = {
+    var Optional = {
       some: some,
       none: none,
       from: from
     };
 
     var head = function (xs) {
-      return xs.length === 0 ? Option.none() : Option.some(xs[0]);
+      return xs.length === 0 ? Optional.none() : Optional.some(xs[0]);
     };
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
@@ -142,7 +142,7 @@
       };
     }
 
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+    var Global = typeof window !== 'undefined' ? window : Function('return this;')();
 
     var exports$1 = {}, module = { exports: exports$1 }, global$2 = {};
     (function (define, exports, module, require) {
@@ -1489,9 +1489,9 @@
     var getSelectedCodeSample = function (editor) {
       var node = editor.selection ? editor.selection.getNode() : null;
       if (isCodeSample(node)) {
-        return Option.some(node);
+        return Optional.some(node);
       }
-      return Option.none();
+      return Optional.none();
     };
     var insertCodeSample = function (editor, language, code) {
       editor.undoManager.transact(function () {
@@ -1714,4 +1714,4 @@
 
     Plugin();
 
-}(window));
+}());
