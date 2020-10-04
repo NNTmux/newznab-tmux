@@ -11,6 +11,7 @@
 |
 */
 
+use App\Http\Controllers\Admin\AdminAjaxController;
 use App\Http\Controllers\Admin\AdminAnidbController;
 use App\Http\Controllers\Admin\AdminBlacklistController;
 use App\Http\Controllers\Admin\AdminBookController;
@@ -338,8 +339,8 @@ Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' =
     Route::post('release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit']);
     Route::get('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex']);
     Route::post('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex']);
-    Route::get('ajax', [AdminAnidbController::class, 'ajaxAction']);
-    Route::post('ajax', [AdminAnidbController::class, 'ajaxAction']);
+    Route::get('ajax', [AdminAjaxController::class, 'ajaxAction']);
+    Route::post('ajax', [AdminAjaxController::class, 'ajaxAction']);
     Route::get('tmux-edit', [AdminTmuxController::class, 'edit']);
     Route::post('tmux-edit', [AdminTmuxController::class, 'edit']);
     Route::get('release-list', [AdminReleasesController::class, 'index']);
