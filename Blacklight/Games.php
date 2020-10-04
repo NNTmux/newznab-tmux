@@ -511,8 +511,7 @@ class Games
                 if (! \is_object($result)) {
                     foreach ($result as $res) {
                         similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
-                        similar_text(strtolower($gameInfo['title']), strtolower($res->aliases), $percent2);
-                        if ($percent1 >= self::GAME_MATCH_PERCENTAGE || $percent2 >= self::GAME_MATCH_PERCENTAGE) {
+                        if ($percent1 >= self::GAME_MATCH_PERCENTAGE) {
                             $bestMatch = $res->id;
                         }
                     }
