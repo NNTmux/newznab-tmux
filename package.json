@@ -14,7 +14,7 @@
         "axios": "^0.20",
         "cross-env": "^7.0.2",
         "jquery": "3.5.1",
-        "laravel-mix": "^5.0.5",
+        "laravel-mix": "^5.0.6",
         "lodash": "^4.17.20",
         "popper.js": "^1.16.1",
         "resolve-url-loader": "^3.1.1",
@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
-        "@fortawesome/fontawesome-free": "^5.15.0",
+        "@fortawesome/fontawesome-free": "^5.15.1",
         "animate.css": "^4.1.1",
         "autosize": "^4.0.2",
         "bootstrap": "^4.5.2",
