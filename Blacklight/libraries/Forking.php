@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Opis\Closure\SerializableClosure;
+use Spatie\Async\Output\SerializableException;
 use Spatie\Async\Pool;
 use Symfony\Component\Process\Process;
 
@@ -309,7 +310,9 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            });
+            })->catch(function (SerializableException $serializableException) {
+                //we do nothing here just catch the error and move on
+            });;
             $maxWork--;
         }
         $pool->wait();
@@ -401,7 +404,9 @@ class Forking
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
-                });
+                })->catch(function (SerializableException $serializableException) {
+                    //we do nothing here just catch the error and move on
+                });;
             }
             $pool->wait();
         }
@@ -434,7 +439,9 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            });
+            })->catch(function (SerializableException $serializableException) {
+                //we do nothing here just catch the error and move on
+            });;
             $maxWork--;
         }
 
@@ -502,7 +509,9 @@ class Forking
                     }
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
-                });
+                })->catch(function (SerializableException $serializableException) {
+                    //we do nothing here just catch the error and move on
+                });;
             }
 
             $pool->wait();
@@ -569,7 +578,9 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            });
+            })->catch(function (SerializableException $serializableException) {
+                //we do nothing here just catch the error and move on
+            });;
             $maxWork--;
         }
         $pool->wait();
@@ -612,6 +623,8 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
+            })->catch(function (SerializableException $serializableException) {
+                //we do nothing here just catch the error and move on
             });
             $maxWork--;
         }
@@ -657,6 +670,8 @@ class Forking
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
+                })->catch(function (SerializableException $serializableException) {
+                    //we do nothing here just catch the error and move on
                 })->timeout(function () use ($count) {
                     $this->colorCli->notice('Task #'.$count.': Timeout occurred.');
                 });
@@ -911,7 +926,9 @@ class Forking
                 $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            });
+            })->catch(function (SerializableException $serializableException) {
+                //we do nothing here just catch the error and move on
+            });;
         }
 
         $pool->wait();
