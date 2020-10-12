@@ -312,7 +312,7 @@ class Forking
                 echo $exception->getMessage();
             })->catch(function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
-            });;
+            });
             $maxWork--;
         }
         $pool->wait();
@@ -406,7 +406,7 @@ class Forking
                     echo $exception->getMessage();
                 })->catch(function (SerializableException $serializableException) {
                     //we do nothing here just catch the error and move on
-                });;
+                });
             }
             $pool->wait();
         }
@@ -441,7 +441,7 @@ class Forking
                 echo $exception->getMessage();
             })->catch(function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
-            });;
+            });
             $maxWork--;
         }
 
@@ -511,7 +511,7 @@ class Forking
                     echo $exception->getMessage();
                 })->catch(function (SerializableException $serializableException) {
                     //we do nothing here just catch the error and move on
-                });;
+                });
             }
 
             $pool->wait();
@@ -580,7 +580,7 @@ class Forking
                 echo $exception->getMessage();
             })->catch(function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
-            });;
+            });
             $maxWork--;
         }
         $pool->wait();
@@ -928,7 +928,7 @@ class Forking
                 echo $exception->getMessage();
             })->catch(function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
-            });;
+            });
         }
 
         $pool->wait();
