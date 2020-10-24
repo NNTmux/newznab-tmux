@@ -315,11 +315,11 @@ class Category extends Model
             }
         }
         foreach ($cat as $category) {
-            if ($category !== -1 && self::isParent($category)) {
+            if (is_numeric($category) && $category !== -1 && self::isParent($category)) {
                 foreach (RootCategory::find($category)->categories as $child) {
                     $categories[] = $child['id'];
                 }
-            } elseif ($category > 0) {
+            } elseif (is_numeric($category) && $category > 0) {
                 $categories[] = $category;
             }
         }
