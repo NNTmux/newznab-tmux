@@ -55,10 +55,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/Laravel.Smarty"
         }
 
     ],
@@ -152,7 +148,7 @@
     "voku/simple_html_dom": "^4.3",
     "wildbit/swiftmailer-postmark": "^3.0",
     "yab/laravel-scout-mysql-driver": "^3.0",
-    "ytake/laravel-smarty": "dev-master"
+    "ytake/laravel-smarty": "^5.0"
   },
 
   "require-dev": {
