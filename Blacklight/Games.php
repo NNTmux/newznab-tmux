@@ -517,7 +517,7 @@ class Games
                     }
 
                     if ($bestMatch !== false) {
-                        $this->_gameResults = $this->giantBomb->findOne('Game', '3030-'.$bestMatch);
+                        $this->_gameResults = $this->giantBomb->findWithResourceID('Game', '3030-'.$bestMatch);
 
                         if (! empty($this->_gameResults->image['medium_url'])) {
                             $game['coverurl'] = (string) $this->_gameResults->image['medium_url'];
