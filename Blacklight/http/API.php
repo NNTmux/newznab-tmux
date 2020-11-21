@@ -23,6 +23,7 @@ namespace Blacklight\http;
 
 use App\Models\AudioData;
 use App\Models\Category;
+use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\utility\Utility;
 
@@ -63,7 +64,7 @@ class API extends Capabilities
                 if (isset($release->id)) {
                     $language = AudioData::query()->where('releases_id', $release->id)->first(['audiolanguage']);
                     if ($language !== null) {
-                        $releases[$key]->searchname = $releases[$key]->searchname.' '.$language['audiolanguage'];
+                        $releases[$key]->searchname .= ' '.$language['audiolanguage'];
                     }
                 }
             }
@@ -101,8 +102,7 @@ class API extends Capabilities
         if (request()->has('cat')) {
             $categoryIDs = urldecode(request()->input('cat'));
             // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
-            if (strpos($categoryIDs, (string) Category::TV_HD) !== false &&
-                strpos($categoryIDs, (string) Category::TV_WEBDL) === false) {
+            if (strpos($categoryIDs, (string) Category::TV_HD) !== false && strpos($categoryIDs, (string) Category::TV_WEBDL) === false && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
                 $categoryIDs .= (','.Category::TV_WEBDL);
             }
             $categoryID = explode(',', $categoryIDs);
