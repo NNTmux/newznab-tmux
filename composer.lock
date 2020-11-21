@@ -4809,16 +4809,16 @@
         },
         {
             "name": "pear/archive_tar",
-            "version": "1.4.10",
+            "version": "1.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Archive_Tar.git",
-                "reference": "bbb4f10f71a1da2715ec6d9a683f4f23c507a49b"
+                "reference": "17d355cb7d3c4ff08e5729f29cd7660145208d9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/bbb4f10f71a1da2715ec6d9a683f4f23c507a49b",
-                "reference": "bbb4f10f71a1da2715ec6d9a683f4f23c507a49b",
+                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/17d355cb7d3c4ff08e5729f29cd7660145208d9d",
+                "reference": "17d355cb7d3c4ff08e5729f29cd7660145208d9d",
                 "shasum": ""
             },
             "require": {
@@ -4871,7 +4871,7 @@
                 "archive",
                 "tar"
             ],
-            "time": "2020-09-15T14:13:23+00:00"
+            "time": "2020-11-19T22:10:24+00:00"
         },
         {
             "name": "pear/console_getopt",
@@ -6621,26 +6621,26 @@
         },
         {
             "name": "spatie/async",
-            "version": "1.5.0",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "460eab39cff180141e052db8e68617278d571d97"
+                "reference": "e410c38a93b93589dfd8046b4b93cdaa6a9b7de2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/460eab39cff180141e052db8e68617278d571d97",
-                "reference": "460eab39cff180141e052db8e68617278d571d97",
+                "url": "https://api.github.com/repos/spatie/async/zipball/e410c38a93b93589dfd8046b4b93cdaa6a9b7de2",
+                "reference": "e410c38a93b93589dfd8046b4b93cdaa6a9b7de2",
                 "shasum": ""
             },
             "require": {
                 "opis/closure": "^3.4.2",
-                "php": "^7.1",
+                "php": "^7.1 || ^8.0",
                 "symfony/process": "^3.3 || ^4.0 || ^5.0"
             },
             "require-dev": {
                 "larapack/dd": "^1.1",
-                "phpunit/phpunit": "^6.5",
+                "phpunit/phpunit": "^7.5 || ^8.0 || ^9.0",
                 "symfony/stopwatch": "^4.0 || ^5.0"
             },
             "suggest": {
@@ -6674,7 +6674,13 @@
                 "async",
                 "spatie"
             ],
-            "time": "2020-09-18T08:36:28+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-11-20T06:05:35+00:00"
         },
         {
             "name": "spatie/db-dumper",
@@ -6791,16 +6797,16 @@
         },
         {
             "name": "spatie/laravel-backup",
-            "version": "6.11.6",
+            "version": "6.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-backup.git",
-                "reference": "3ab6fa26eeed1552571ed06d5be91dfa20477962"
+                "reference": "0690862ae2c64e1a2f03fa9990925313696db71d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/3ab6fa26eeed1552571ed06d5be91dfa20477962",
-                "reference": "3ab6fa26eeed1552571ed06d5be91dfa20477962",
+                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/0690862ae2c64e1a2f03fa9990925313696db71d",
+                "reference": "0690862ae2c64e1a2f03fa9990925313696db71d",
                 "shasum": ""
             },
             "require": {
@@ -6873,7 +6879,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2020-10-19T06:58:51+00:00"
+            "time": "2020-11-19T14:35:13+00:00"
         },
         {
             "name": "spatie/laravel-directory-cleanup",
@@ -10105,16 +10111,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.7.26",
+            "version": "4.7.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "0ddfa4d5e97ea88319624af12ba3deb40963c255"
+                "reference": "78d5894c7f0facfb4fb6369af15b1a87baea958c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/0ddfa4d5e97ea88319624af12ba3deb40963c255",
-                "reference": "0ddfa4d5e97ea88319624af12ba3deb40963c255",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/78d5894c7f0facfb4fb6369af15b1a87baea958c",
+                "reference": "78d5894c7f0facfb4fb6369af15b1a87baea958c",
                 "shasum": ""
             },
             "require": {
@@ -10178,7 +10184,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-11-15T01:24:40+00:00"
+            "time": "2020-11-17T23:30:43+00:00"
         },
         {
             "name": "wildbit/swiftmailer-postmark",
@@ -11168,16 +11174,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "2.5.1",
+            "version": "2.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "3b3403f18bbdc0aeadf1ffaddf11a1588b12ec7a"
+                "reference": "08668034beb185fa2ac6f09b1034eaa440952ace"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/3b3403f18bbdc0aeadf1ffaddf11a1588b12ec7a",
-                "reference": "3b3403f18bbdc0aeadf1ffaddf11a1588b12ec7a",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/08668034beb185fa2ac6f09b1034eaa440952ace",
+                "reference": "08668034beb185fa2ac6f09b1034eaa440952ace",
                 "shasum": ""
             },
             "require": {
@@ -11235,7 +11241,7 @@
                 "laravel",
                 "page"
             ],
-            "time": "2020-11-13T13:36:24+00:00"
+            "time": "2020-11-17T09:18:51+00:00"
         },
         {
             "name": "facade/ignition-contracts",
@@ -12411,16 +12417,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.55",
+            "version": "0.12.57",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "4382b2b2059ec7e5135d07685ec1e3e16ae32d16"
+                "reference": "f9909d1d0c44b4cbaf72babcf80e8f14d6fdd55b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4382b2b2059ec7e5135d07685ec1e3e16ae32d16",
-                "reference": "4382b2b2059ec7e5135d07685ec1e3e16ae32d16",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/f9909d1d0c44b4cbaf72babcf80e8f14d6fdd55b",
+                "reference": "f9909d1d0c44b4cbaf72babcf80e8f14d6fdd55b",
                 "shasum": ""
             },
             "require": {
@@ -12463,7 +12469,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-11-14T10:20:35+00:00"
+            "time": "2020-11-21T12:53:28+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
