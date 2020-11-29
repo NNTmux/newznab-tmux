@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.0 (2020-11-18)
+ * Version: 5.6.1 (2020-11-25)
  */
 (function () {
     'use strict';
@@ -29620,6 +29620,7 @@
       var touchPlatformClass = 'tox-platform-touch';
       var deviceClasses = isTouch ? [touchPlatformClass] : [];
       var isToolbarBottom = isToolbarLocationBottom(editor);
+      var isUiContainerInBody = eq$1(body(), getUiContainer(editor));
       var dirAttributes = global$6.isRtl() ? { attributes: { dir: 'rtl' } } : {};
       var verticalDirAttributes = { attributes: (_a = {}, _a[Attribute] = isToolbarBottom ? AttributeValue.BottomToTop : AttributeValue.TopToBottom, _a) };
       var lazyHeader = function () {
@@ -29631,23 +29632,29 @@
       var resizeUiMothership = function () {
         set$2(uiMothership.element, 'width', document.body.clientWidth + 'px');
       };
-      var sink = build$1({
-        dom: __assign({
-          tag: 'div',
-          classes: [
-            'tox',
-            'tox-silver-sink',
-            'tox-tinymce-aux'
-          ].concat(platformClasses).concat(deviceClasses),
-          styles: { width: document.body.clientWidth + 'px' }
-        }, dirAttributes),
-        behaviours: derive$1([Positioning.config({
-            useFixed: function () {
-              return isHeaderDocked();
-            }
-          })]),
-        events: derive([run(windowResize(), resizeUiMothership)])
-      });
+      var makeSinkDefinition = function () {
+        var sinkSpec = {
+          dom: __assign({
+            tag: 'div',
+            classes: [
+              'tox',
+              'tox-silver-sink',
+              'tox-tinymce-aux'
+            ].concat(platformClasses).concat(deviceClasses)
+          }, dirAttributes),
+          behaviours: derive$1([Positioning.config({
+              useFixed: function () {
+                return isHeaderDocked();
+              }
+            })])
+        };
+        var reactiveWidthSpec = {
+          dom: { styles: { width: document.body.clientWidth + 'px' } },
+          events: derive([run(windowResize(), resizeUiMothership)])
+        };
+        return deepMerge(sinkSpec, isUiContainerInBody ? reactiveWidthSpec : {});
+      };
+      var sink = build$1(makeSinkDefinition());
       var lazySink = function () {
         return Result.value(sink);
       };

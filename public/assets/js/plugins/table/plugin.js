@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.0 (2020-11-18)
+ * Version: 5.6.1 (2020-11-25)
  */
 (function () {
     'use strict';
@@ -188,10 +188,16 @@
         return typeof value === type;
       };
     };
+    var eq = function (t) {
+      return function (a) {
+        return t === a;
+      };
+    };
     var isString = isType('string');
     var isObject = isType('object');
     var isArray = isType('array');
     var isBoolean = isSimpleType('boolean');
+    var isUndefined = eq(undefined);
     var isNullable = function (a) {
       return a === null || a === undefined;
     };
@@ -814,7 +820,7 @@
       return bypassSelector(base) ? Optional.none() : Optional.from(base.querySelector(selector)).map(SugarElement.fromDom);
     };
 
-    var eq = function (e1, e2) {
+    var eq$1 = function (e1, e2) {
       return e1.dom === e2.dom;
     };
     var regularContains = function (e1, e2) {
@@ -1385,9 +1391,13 @@
       return firstLayer(ancestor, 'th,td');
     };
     var columns = function (ancestor) {
-      return bind(columnGroups(ancestor), function (columnGroup) {
-        return children$2(columnGroup, 'col');
-      });
+      if (is(ancestor, 'colgroup')) {
+        return children$2(ancestor, 'col');
+      } else {
+        return bind(columnGroups(ancestor), function (columnGroup) {
+          return children$2(columnGroup, 'col');
+        });
+      }
     };
     var table = function (element, isRoot) {
       return closest$1(element, 'table', isRoot);
@@ -1566,8 +1576,8 @@
       return bounds(Math.min(detailA.row, detailB.row), Math.min(detailA.column, detailB.column), Math.max(detailA.row + detailA.rowspan - 1, detailB.row + detailB.rowspan - 1), Math.max(detailA.column + detailA.colspan - 1, detailB.column + detailB.colspan - 1));
     };
     var getAnyBox = function (warehouse, startCell, finishCell) {
-      var startCoords = Warehouse.findItem(warehouse, startCell, eq);
-      var finishCoords = Warehouse.findItem(warehouse, finishCell, eq);
+      var startCoords = Warehouse.findItem(warehouse, startCell, eq$1);
+      var finishCoords = Warehouse.findItem(warehouse, finishCell, eq$1);
       return startCoords.bind(function (sc) {
         return finishCoords.map(function (fc) {
           return getBounds(sc, fc);
@@ -1581,7 +1591,7 @@
     };
 
     var moveBy = function (warehouse, cell, row, column) {
-      return Warehouse.findItem(warehouse, cell, eq).bind(function (detail) {
+      return Warehouse.findItem(warehouse, cell, eq$1).bind(function (detail) {
         var startRow = row > 0 ? detail.row + detail.rowspan - 1 : detail.row;
         var startCol = column > 0 ? detail.column + detail.colspan - 1 : detail.column;
         var dest = Warehouse.getAt(warehouse, startRow + row, startCol + column);
@@ -1619,8 +1629,8 @@
     };
     var nestedIntercepts = function (table, first, firstTable, last, lastTable) {
       var warehouse = getWarehouse(table);
-      var optStartCell = eq(table, firstTable) ? Optional.some(first) : parentCell(warehouse, first);
-      var optLastCell = eq(table, lastTable) ? Optional.some(last) : parentCell(warehouse, last);
+      var optStartCell = eq$1(table, firstTable) ? Optional.some(first) : parentCell(warehouse, first);
+      var optLastCell = eq$1(table, lastTable) ? Optional.some(last) : parentCell(warehouse, last);
       return optStartCell.bind(function (startCell) {
         return optLastCell.bind(function (lastCell) {
           return intercepts(warehouse, startCell, lastCell);
@@ -1868,7 +1878,7 @@
           isEmptyTag: isEmptyTag,
           isNonEditable: isNonEditable
         }),
-        eq: eq,
+        eq: eq$1,
         is: is$1
       };
     }
@@ -1894,7 +1904,7 @@
       });
     };
 
-    var eq$1 = function (universe, item) {
+    var eq$2 = function (universe, item) {
       return curry(universe.eq, item);
     };
     var ancestors$2 = function (universe, start, end, isRoot) {
@@ -1914,7 +1924,7 @@
       var pruned1 = prune(ps1);
       var pruned2 = prune(ps2);
       var shared = find(pruned1, function (x) {
-        return exists(pruned2, eq$1(universe, x));
+        return exists(pruned2, eq$2(universe, x));
       });
       return {
         firstpath: pruned1,
@@ -1942,10 +1952,10 @@
     var identify = function (start, finish, isRoot) {
       var getIsRoot = function (rootTable) {
         return function (element) {
-          return isRoot !== undefined && isRoot(element) || eq(element, rootTable);
+          return isRoot !== undefined && isRoot(element) || eq$1(element, rootTable);
         };
       };
-      if (eq(start, finish)) {
+      if (eq$1(start, finish)) {
         return Optional.some({
           boxes: Optional.some([start]),
           start: start,
@@ -1954,7 +1964,7 @@
       } else {
         return lookupTable(start).bind(function (startTable) {
           return lookupTable(finish).bind(function (finishTable) {
-            if (eq(startTable, finishTable)) {
+            if (eq$1(startTable, finishTable)) {
               return Optional.some({
                 boxes: intercepts$1(startTable, start, finish),
                 start: start,
@@ -2049,14 +2059,14 @@
     var retrieveBox = function (container, firstSelectedSelector, lastSelectedSelector) {
       return getEdges(container, firstSelectedSelector, lastSelectedSelector).bind(function (edges) {
         var isRoot = function (ancestor) {
-          return eq(container, ancestor);
+          return eq$1(container, ancestor);
         };
         var sectionSelector = 'thead,tfoot,tbody,table';
         var firstAncestor = ancestor$1(edges.first, sectionSelector, isRoot);
         var lastAncestor = ancestor$1(edges.last, sectionSelector, isRoot);
         return firstAncestor.bind(function (fA) {
           return lastAncestor.bind(function (lA) {
-            return eq(fA, lA) ? getBox$1(edges.table, edges.first, edges.last) : Optional.none();
+            return eq$1(fA, lA) ? getBox$1(edges.table, edges.first, edges.last) : Optional.none();
           });
         });
       });
@@ -2358,7 +2368,7 @@
       return first$1.map(function (firstText) {
         var formatSelector = formats.join(',');
         var parents = ancestors$1(firstText, formatSelector, function (element) {
-          return eq(element, oldCell);
+          return eq$1(element, oldCell);
         });
         return foldr(parents, function (last, parent) {
           var clonedFormat = shallow(parent);
@@ -4490,7 +4500,7 @@
         }
       });
       var isRoot = function (e) {
-        return eq(e, wire.view());
+        return eq$1(e, wire.view());
       };
       var findClosestEditableTable = function (target) {
         return closest$1(target, 'table', isRoot).filter(function (table) {
@@ -4757,7 +4767,7 @@
     };
     var getIsRoot = function (editor) {
       return function (element) {
-        return eq(element, getBody$1(editor));
+        return eq$1(element, getBody$1(editor));
       };
     };
     var removePxSuffix = function (size) {
@@ -5432,13 +5442,13 @@
       });
     };
     var toDetailList = function (grid, generators) {
-      var rendered = toDetails(grid, eq);
+      var rendered = toDetails(grid, eq$1);
       return deriveRows(rendered, generators);
     };
     var findInWarehouse = function (warehouse, element) {
       return findMap(warehouse.all, function (r) {
         return find(r.cells, function (e) {
-          return eq(element, e.element);
+          return eq$1(element, e.element);
         });
       });
     };
@@ -5447,7 +5457,7 @@
         var warehouse = Warehouse.fromTable(table);
         var output = extract(warehouse, target).map(function (info) {
           var model = fromWarehouse(warehouse, generators);
-          var result = operation(model, info, eq, genWrappers(generators));
+          var result = operation(model, info, eq$1, genWrappers(generators));
           var grid = toDetailList(result.grid, generators);
           return {
             grid: grid,
@@ -6099,7 +6109,7 @@
         return last$1(cell).bind(function (rightEdge) {
           var rightSiblingIsBlock = siblingIsBlock(rightEdge);
           return parent(rightEdge).map(function (parent) {
-            return rightSiblingIsBlock === true || isListItem(parent) || isBr(rightEdge) || isBlock$1(parent) && !eq(cell, parent) ? [] : [SugarElement.fromTag('br')];
+            return rightSiblingIsBlock === true || isListItem(parent) || isBr(rightEdge) || isBlock$1(parent) && !eq$1(cell, parent) ? [] : [SugarElement.fromTag('br')];
           });
         }).getOr([]);
       };
@@ -6439,10 +6449,26 @@
         }
       }
     };
-    var switchCellType = function (dom, cells, newCellType, scope) {
-      return each(cells, function (c) {
-        var newCell = getNodeName(c) !== newCellType ? dom.rename(c, newCellType) : c;
+    var renameCell = function (editor, cell, newCellType) {
+      if (isNonNullable(newCellType) && getNodeName(cell) !== newCellType) {
+        var newCellElm = editor.dom.rename(cell, newCellType);
+        fireNewCell(editor, newCellElm);
+        return newCellElm;
+      } else {
+        return cell;
+      }
+    };
+    var switchCellType = function (editor, cell, newCellType, scope) {
+      var dom = editor.dom;
+      var newCell = renameCell(editor, cell, newCellType);
+      if (!isUndefined(scope)) {
         dom.setAttrib(newCell, 'scope', scope);
+      }
+      return newCell;
+    };
+    var switchCellsType = function (editor, cells, newCellType, scope) {
+      return each(cells, function (c) {
+        return switchCellType(editor, c, newCellType, scope);
       });
     };
     var switchSectionType = function (editor, rowElm, newType) {
@@ -6464,10 +6490,10 @@
       if (newType === 'header') {
         var headerRowTypeSetting = getTableHeaderType(editor);
         var headerRowType = headerRowTypeSetting === 'auto' ? determineHeaderRowType() : headerRowTypeSetting;
-        switchCellType(dom, rowElm.cells, headerRowType === 'section' ? 'td' : 'th', 'col');
+        switchCellsType(editor, rowElm.cells, headerRowType === 'section' ? 'td' : 'th', 'col');
         switchRowSection(dom, rowElm, headerRowType === 'cells' ? 'tbody' : 'thead');
       } else {
-        switchCellType(dom, rowElm.cells, 'td', null);
+        switchCellsType(editor, rowElm.cells, 'td', null);
         switchRowSection(dom, rowElm, newType === 'footer' ? 'tfoot' : 'tbody');
       }
     };
@@ -6505,7 +6531,7 @@
       return lift2(cellOpt, rowsOpt, function (cell, rows) {
         return filter(rows, function (row) {
           return exists(fromDom$1(row.dom.cells), function (rowCell) {
-            return get$2(rowCell, selector) === '1' || eq(rowCell, cell);
+            return get$2(rowCell, selector) === '1' || eq$1(rowCell, cell);
           });
         });
       }).getOr([]);
@@ -6572,7 +6598,7 @@
           var cells = map(getCellsFromSelection(getSelectionStart(editor), selections), function (c) {
             return c.dom;
           });
-          switchCellType(editor.dom, cells, type, null);
+          switchCellsType(editor, cells, type, null);
         });
       };
       var setTableRowType = function (editor, args) {
@@ -7325,7 +7351,7 @@
         var allCells = Warehouse.justCells(warehouse);
         var filtered = filter(allCells, function (cellA) {
           return exists(cells, function (cellB) {
-            return eq(cellA.element, cellB);
+            return eq$1(cellA.element, cellB);
           });
         });
         return map(filtered, function (cell) {
@@ -7351,14 +7377,12 @@
       modifier.setFormat('tablecellborderwidth', addPxSuffix(data.borderwidth));
     };
     var applyCellData = function (editor, cells, data) {
-      var dom = editor.dom;
       var isSingleCell = cells.length === 1;
       if (cells.length >= 1) {
         var tableOpt = table(cells[0]);
         getSelectedCells(cells).each(function (selectedCells) {
           each(selectedCells, function (item) {
-            var cellElement = item.element;
-            var cellElm = data.celltype && getNodeName(cellElement) !== data.celltype ? dom.rename(cellElement, data.celltype) : cellElement;
+            var cellElm = switchCellType(editor, item.element, data.celltype);
             var modifier = isSingleCell ? DomModifier.normal(editor, cellElm) : DomModifier.ifTruthy(editor, cellElm);
             var colModifier = item.column.map(function (col) {
               return isSingleCell ? DomModifier.normal(editor, col) : DomModifier.ifTruthy(editor, col);
@@ -8188,7 +8212,7 @@
       return table(current, isRoot).bind(function (table) {
         var all = cells(table);
         var index = findIndex(all, function (x) {
-          return eq(current, x);
+          return eq$1(current, x);
         });
         return index.map(function (index) {
           return {
@@ -8638,7 +8662,7 @@
     };
     var after$3 = function (start, soffset, finish, foffset) {
       var r = makeRange(start, soffset, finish, foffset);
-      var same = eq(start, finish) && soffset === foffset;
+      var same = eq$1(start, finish) && soffset === foffset;
       return r.collapsed && !same;
     };
 
@@ -8790,7 +8814,7 @@
         var body_1 = getBody$1(editor);
         var isRoot_1 = function (element) {
           var name$1 = name(element);
-          return eq(element, body_1) || contains(rootElements, name$1);
+          return eq$1(element, body_1) || contains(rootElements, name$1);
         };
         var rng = editor.selection.getRng();
         if (rng.collapsed) {
@@ -8830,7 +8854,7 @@
     var makeSitus = Situs.create;
 
     var sync = function (container, isRoot, start, soffset, finish, foffset, selectRange) {
-      if (!(eq(start, finish) && soffset === foffset)) {
+      if (!(eq$1(start, finish) && soffset === foffset)) {
         return closest$1(start, 'td,th', isRoot).bind(function (s) {
           return closest$1(finish, 'td,th', isRoot).bind(function (f) {
             return detect$6(container, isRoot, s, f, selectRange);
@@ -8841,7 +8865,7 @@
       }
     };
     var detect$6 = function (container, isRoot, start, finish, selectRange) {
-      if (!eq(start, finish)) {
+      if (!eq$1(start, finish)) {
         return identify(start, finish, isRoot).bind(function (cellSel) {
           var boxes = cellSel.boxes.getOr([]);
           if (boxes.length > 0) {
@@ -9024,7 +9048,7 @@
     var verify = function (bridge, before, beforeOffset, after, afterOffset, failure, isRoot) {
       return closest$1(after, 'td,th', isRoot).bind(function (afterCell) {
         return closest$1(before, 'td,th', isRoot).map(function (beforeCell) {
-          if (!eq(afterCell, beforeCell)) {
+          if (!eq$1(afterCell, beforeCell)) {
             return sharedOne$1(isRow, [
               afterCell,
               beforeCell
@@ -9034,7 +9058,7 @@
               return failure(beforeCell);
             });
           } else {
-            return eq(after, afterCell) && getEnd(afterCell) === afterOffset ? failure(beforeCell) : adt$6.none('in same cell');
+            return eq$1(after, afterCell) && getEnd(afterCell) === afterOffset ? failure(beforeCell) : adt$6.none('in same cell');
           }
         });
       }).getOr(adt$6.none('default'));
@@ -9064,7 +9088,7 @@
       });
     };
     var indexOf = function (elements, element) {
-      return findIndex(elements, curry(eq, element));
+      return findIndex(elements, curry(eq$1, element));
     };
 
     var isBr = function (elem) {
@@ -9322,13 +9346,13 @@
         }, function () {
           return Optional.some(situs);
         }, function (cell) {
-          if (eq(element, cell) && offset === 0) {
+          if (eq$1(element, cell) && offset === 0) {
             return tryAgain(bridge, element, offset, moveUp, direction);
           } else {
             return scan$1(bridge, isRoot, cell, 0, direction, numRetries - 1);
           }
         }, function (cell) {
-          if (eq(element, cell) && offset === getEnd(cell)) {
+          if (eq$1(element, cell) && offset === getEnd(cell)) {
             return tryAgain(bridge, element, offset, moveDown, direction);
           } else {
             return scan$1(bridge, isRoot, cell, getEnd(cell), direction, numRetries - 1);
@@ -9365,7 +9389,7 @@
     var inSameTable = function (elem, table) {
       return ancestor$2(elem, function (e) {
         return parent(e).exists(function (p) {
-          return eq(p, table);
+          return eq$1(p, table);
         });
       });
     };
@@ -9403,7 +9427,7 @@
       return closest$1(initial, 'tr', isRoot).bind(function (startRow) {
         return closest$1(startRow, 'table', isRoot).bind(function (table) {
           var rows = descendants$1(table, 'tr');
-          if (eq(startRow, rows[0])) {
+          if (eq$1(startRow, rows[0])) {
             return seekLeft$1(table, function (element) {
               return last$1(element).isSome();
             }, isRoot).map(function (last) {
@@ -9420,7 +9444,7 @@
       return closest$1(initial, 'tr', isRoot).bind(function (startRow) {
         return closest$1(startRow, 'table', isRoot).bind(function (table) {
           var rows = descendants$1(table, 'tr');
-          if (eq(startRow, rows[rows.length - 1])) {
+          if (eq$1(startRow, rows[rows.length - 1])) {
             return seekRight$1(table, function (element) {
               return first(element).isSome();
             }, isRoot).map(function (first) {
@@ -9476,7 +9500,7 @@
           findCell(event.target, isRoot).each(function (finish) {
             identify(start, finish, isRoot).each(function (cellSel) {
               var boxes = cellSel.boxes.getOr([]);
-              if (boxes.length > 1 || boxes.length === 1 && !eq(start, finish)) {
+              if (boxes.length > 1 || boxes.length === 1 && !eq$1(start, finish)) {
                 annotations.selectRange(container, boxes, cellSel.start, cellSel.finish);
                 bridge.selectContents(finish);
               }
@@ -9975,7 +9999,7 @@
             if (name(target) === 'td' || name(target) === 'th') {
               var lT = lastTarget.get();
               var lTS = lastTimeStamp.get();
-              if (eq(lT, target) && t.timeStamp - lTS < 300) {
+              if (eq$1(lT, target) && t.timeStamp - lTS < 300) {
                 t.preventDefault();
                 external$1(target, target);
               }
