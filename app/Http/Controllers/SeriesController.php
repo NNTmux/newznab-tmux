@@ -55,7 +55,7 @@ class SeriesController extends BasePageController
                     $episode[$rlk] = $rlv->episode;
                     $posted[$rlk] = $rlv->postdate;
                 }
-                array_multisort($series, SORT_DESC, '', $episode, SORT_DESC, $posted, SORT_DESC, $rel->toArray());
+                Arr::sort($series, [[$episode, false], [$posted, false], $rel]);
 
                 $series = [];
                 foreach ($rel as $r) {
