@@ -71,13 +71,13 @@ class ADM extends AdultMovies
     {
         $baseUrl = 'http://www.adultdvdmarketplace.com/';
         if ($ret = $this->_html->find('a[rel=fancybox-button]', 0)) {
-            if (isset($ret->href) && preg_match('/images\/.*[\d]+\.jpg$/i', $ret->href, $matches)) {
-                $this->_res['boxcover'] = $baseUrl.$matches[0];
-                $this->_res['backcover'] = $baseUrl.str_ireplace('/front/i', 'back', $matches[0]);
+            if (isset($ret->href) && preg_match('/images\/.*[\d]+\.jpg$/i', $ret->href, $hits)) {
+                $this->_res['boxcover'] = $baseUrl.$hits[0];
+                $this->_res['backcover'] = $baseUrl.str_ireplace('/front/i', 'back', $hits[0]);
             }
         } elseif ($ret = $this->_html->find('img[rel=license]', 0)) {
-            if (preg_match('/images\/.*[\d]+\.jpg$/i', $ret->src, $matches)) {
-                $this->_res['boxcover'] = $baseUrl.$matches[0];
+            if (preg_match('/images\/.*[\d]+\.jpg$/i', $ret->src, $hits)) {
+                $this->_res['boxcover'] = $baseUrl.$hits[0];
             }
         }
 
@@ -141,7 +141,7 @@ class ADM extends AdultMovies
                     if (! $next instanceof SimpleHtmlDomNodeBlank && $next->nodeName !== 'h3') {
                         $next = $next->nextSibling();
                     }
-                    if (preg_match_all('/search_performerid/', $next->href, $matches)) {
+                    if (preg_match_all('/search_performerid/', $next->href, $hits)) {
                         $cast[] = trim($next->plaintext);
                     }
                 }
@@ -195,9 +195,9 @@ class ADM extends AdultMovies
                             $comparetitle = preg_replace('/[\W]/', '', $title);
                             $comparesearch = preg_replace('/[\W]/', '', $movie);
                             similar_text($comparetitle, $comparesearch, $p);
-                            if ($p >= 90 && preg_match('/\/(?<sku>\d+)\.jpg$/i', $ret->src, $matches)) {
+                            if ($p >= 90 && preg_match('/\/(?<sku>\d+)\.jpg$/i', $ret->src, $hits)) {
                                 $this->_title = trim($title);
-                                $this->_trailUrl = '/dvd_view_'.$matches['sku'].'.html';
+                                $this->_trailUrl = '/dvd_view_'.$hits['sku'].'.html';
                                 $this->_directUrl = self::ADMURL.$this->_trailUrl;
                                 unset($this->_response);
                                 $this->_response = getRawHtml($this->_directUrl, $this->cookie);

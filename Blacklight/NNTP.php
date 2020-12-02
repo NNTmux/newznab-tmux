@@ -742,9 +742,9 @@ class NNTP extends \Net_NNTP_Client
                 if (preg_match('/([A-Z-]+?): (.*)/i', $line, $hits)) {
                     // If the line type takes more than 1 line, re-use the same array key.
                     if (array_key_exists($hits[1], $ret)) {
-                        $ret[$hits[1]] .= $matches[2];
+                        $ret[$hits[1]] .= $hits[2];
                     } else {
-                        $ret[$matches[1]] = $matches[2];
+                        $ret[$hits[1]] = $hits[2];
                     }
                 }
             }

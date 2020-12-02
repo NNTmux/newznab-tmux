@@ -211,45 +211,45 @@ class IRCScraper extends IRCClient
             '/^(NEW|UPD|NUK): \[DT: (?P<time>.+?)\]\s?\[TT: (?P<title>.+?)\]\s?\[SC: (?P<source>.+?)\]\s?\[CT: (?P<category>.+?)\]\s?\[RQ: (?P<req>.+?)\]'.
             '\s?\[SZ: (?P<size>.+?)\]\s?\[FL: (?P<files>.+?)\]\s?(\[FN: (?P<filename>.+?)\]\s?)?(\[(?P<nuked>(UN|MOD|RE|OLD)?NUKED?): (?P<reason>.+?)\])?$/i',
             $this->_channelData['message'],
-            $matches
+            $hits
         )) {
-            if (isset($this->_ignoredChannels[$matches['source']]) && $this->_ignoredChannels[$matches['source']] === true) {
+            if (isset($this->_ignoredChannels[$hits['source']]) && $this->_ignoredChannels[$hits['source']] === true) {
                 return;
             }
 
-            if ($this->_categoryIgnoreRegex !== false && preg_match((string) $this->_categoryIgnoreRegex, $matches['category'])) {
+            if ($this->_categoryIgnoreRegex !== false && preg_match((string) $this->_categoryIgnoreRegex, $hits['category'])) {
                 return;
             }
 
-            if ($this->_titleIgnoreRegex !== false && preg_match((string) $this->_titleIgnoreRegex, $matches['title'])) {
+            if ($this->_titleIgnoreRegex !== false && preg_match((string) $this->_titleIgnoreRegex, $hits['title'])) {
                 return;
             }
 
-            $utime = Carbon::createFromTimeString($matches['time'], 'UTC')->timestamp;
+            $utime = Carbon::createFromTimeString($hits['time'], 'UTC')->timestamp;
 
             $this->_curPre['predate'] = 'FROM_UNIXTIME('.$utime.')';
-            $this->_curPre['title'] = $matches['title'];
-            $this->_curPre['source'] = $matches['source'];
-            if ($matches['category'] !== 'N/A') {
-                $this->_curPre['category'] = $matches['category'];
+            $this->_curPre['title'] = $hits['title'];
+            $this->_curPre['source'] = $hits['source'];
+            if ($hits['category'] !== 'N/A') {
+                $this->_curPre['category'] = $hits['category'];
             }
-            if ($matches['req'] !== 'N/A' && preg_match('/^(?P<req>\d+):(?P<group>.+)$/i', $matches['req'], $matches2)) {
+            if ($hits['req'] !== 'N/A' && preg_match('/^(?P<req>\d+):(?P<group>.+)$/i', $hits['req'], $matches2)) {
                 $this->_curPre['reqid'] = $matches2['req'];
                 $this->_curPre['group_id'] = $this->_getGroupID($matches2['group']);
             }
-            if ($matches['size'] !== 'N/A') {
-                $this->_curPre['size'] = $matches['size'];
+            if ($hits['size'] !== 'N/A') {
+                $this->_curPre['size'] = $hits['size'];
             }
-            if ($matches['files'] !== 'N/A') {
-                $this->_curPre['files'] = substr($matches['files'], 0, 50);
-            }
-
-            if (isset($matches['filename']) && $matches['filename'] !== 'N/A') {
-                $this->_curPre['filename'] = $matches['filename'];
+            if ($hits['files'] !== 'N/A') {
+                $this->_curPre['files'] = substr($hits['files'], 0, 50);
             }
 
-            if (isset($matches['nuked'])) {
-                switch ($matches['nuked']) {
+            if (isset($hits['filename']) && $hits['filename'] !== 'N/A') {
+                $this->_curPre['filename'] = $hits['filename'];
+            }
+
+            if (isset($hits['nuked'])) {
+                switch ($hits['nuked']) {
                     case 'NUKED':
                         $this->_curPre['nuked'] = Predb::PRE_NUKED;
                         break;
@@ -266,7 +266,7 @@ class IRCScraper extends IRCClient
                         $this->_curPre['nuked'] = Predb::PRE_OLDNUKE;
                         break;
                 }
-                $this->_curPre['reason'] = (isset($matches['reason']) ? substr($matches['reason'], 0, 255) : '');
+                $this->_curPre['reason'] = (isset($hits['reason']) ? substr($hits['reason'], 0, 255) : '');
             }
             $this->_checkForDupe();
         }

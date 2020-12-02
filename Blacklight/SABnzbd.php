@@ -133,16 +133,16 @@ class SABnzbd
                 break;
         }
         // Verify the URL is good, fix it if not.
-        if ($this->url !== '' && preg_match('/(?P<first>\/)?(?P<sab>[a-z]+)?(?P<last>\/)?$/i', $this->url, $matches)) {
-            if (! isset($matches['first'])) {
+        if ($this->url !== '' && preg_match('/(?P<first>\/)?(?P<sab>[a-z]+)?(?P<last>\/)?$/i', $this->url, $hits)) {
+            if (! isset($hits['first'])) {
                 $this->url .= '/';
             }
-            if (! isset($matches['sab'])) {
+            if (! isset($hits['sab'])) {
                 $this->url .= 'sabnzbd';
-            } elseif ($matches['sab'] !== 'sabnzbd') {
+            } elseif ($hits['sab'] !== 'sabnzbd') {
                 $this->url .= 'sabnzbd';
             }
-            if (! isset($matches['last'])) {
+            if (! isset($hits['last'])) {
                 $this->url .= '/';
             }
         }
