@@ -508,7 +508,7 @@ class Forking
             foreach ($queues as $queue) {
                 preg_match('/alt\..+/i', $queue, $hit);
                 $pool->add(function () use ($queue) {
-                   return $this->_executeCommand($this->dnr_path.$queue.'"');
+                    return $this->_executeCommand($this->dnr_path.$queue.'"');
                 }, 100000)->then(function ($output) use ($hit) {
                     if (! empty($hit)) {
                         echo $output;
