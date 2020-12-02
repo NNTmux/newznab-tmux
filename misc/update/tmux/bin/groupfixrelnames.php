@@ -32,7 +32,7 @@ switch (true) {
 
         // Find releases to process.  We only want releases that have no PreDB match, have not been renamed, exist
         // in Other Categories, have already been PP Add/NFO processed, and haven't been fully fixRelName processed
-        $releases = Release::fromQuery(sprintf("
+        $releases = Release::fromRaw(sprintf("
 					SELECT
 						r.id AS releases_id, r.fromname, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
 						r.proc_uid, r.proc_files, r.proc_par2, r.ishashed, r.dehashstatus, r.nfostatus,
@@ -219,7 +219,7 @@ switch (true) {
         break;
 
     case $type === 'predbft' && isset($maxPerRun) && is_numeric($maxPerRun) && isset($thread) && is_numeric($thread):
-        $pres = Predb::fromQuery(
+        $pres = Predb::fromRaw(
             sprintf(
                 '
 					SELECT p.id AS predb_id, p.title, p.source, p.searched

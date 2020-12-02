@@ -264,7 +264,7 @@ class Movie
         if ($movieCache !== null) {
             $movies = $movieCache;
         } else {
-            $data = MovieInfo::fromQuery($moviesSql);
+            $data = MovieInfo::fromRaw($moviesSql);
             $movies = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($moviesSql.$page), $movies, $expiresAt);
         }
@@ -318,7 +318,7 @@ class Movie
         if ($return !== null) {
             return $return;
         }
-        $return = Release::fromQuery($sql);
+        $return = Release::fromRaw($sql);
         if (\count($return) > 0) {
             $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
         }
@@ -541,7 +541,7 @@ class Movie
             $query[$key] = rtrim($value, ', ');
         }
 
-        MovieInfo::fromQuery($query[0].') '.$query[1].') '.$query[2]);
+        MovieInfo::fromRaw($query[0].') '.$query[1].') '.$query[2]);
 
         return true;
     }
