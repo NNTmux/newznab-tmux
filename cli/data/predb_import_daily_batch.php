@@ -85,12 +85,12 @@ $progress = $predb->progress(settings_array());
 foreach ($data as $dir => $files) {
     foreach ($files as $file) {
         if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#", $file['download_url'])) {
-            if (preg_match("#^$filePattern$#", $file['name'], $match)) {
+            if (preg_match("#^$filePattern$#", $file['name'], $hit)) {
                 $timeMatch = max($progress['last'], $argv[1]);
 
                 // Skip patches the user does not want.
-                if ($match[1] < $timeMatch) {
-                    echo 'Skipping dump '.$match[2].
+                if ($hit[1] < $timeMatch) {
+                    echo 'Skipping dump '.$hit[2].
                         ', as your minimum unix time argument is '.
                         $timeMatch.PHP_EOL;
                     $total--;
@@ -102,14 +102,14 @@ foreach ($data as $dir => $files) {
                 echo "Downloading: {$file['download_url']}\n";
 
                 if (! $dump) {
-                    echo "Error downloading dump {$match[2]} you can try manually importing it.".
+                    echo "Error downloading dump {$hit[2]} you can try manually importing it.".
                         PHP_EOL;
                     continue;
                 }
 
                 // Make sure we didn't get an HTML page.
                 if (strpos($dump, '<!DOCTYPE html>') !== false) {
-                    echo "The dump file {$match[2]} might be missing from GitHub.".PHP_EOL;
+                    echo "The dump file {$hit[2]} might be missing from GitHub.".PHP_EOL;
                     continue;
                 }
 
@@ -117,15 +117,15 @@ foreach ($data as $dir => $files) {
                 $dump = gzdecode($dump);
 
                 if (! $dump) {
-                    echo "Error decompressing dump {$match[2]}.".PHP_EOL;
+                    echo "Error decompressing dump {$hit[2]}.".PHP_EOL;
                     continue;
                 }
 
                 // Store the dump.
-                $dumpFile = NN_RES.$match[2].'_predb_dump.csv';
+                $dumpFile = NN_RES.$hit[2].'_predb_dump.csv';
                 $fetched = File::put($dumpFile, $dump);
                 if (! $fetched) {
-                    echo "Error storing dump file {$match[2]} in (".NN_RES.').'.
+                    echo "Error storing dump file {$hit[2]} in (".NN_RES.').'.
                         PHP_EOL;
                     continue;
                 }
@@ -179,11 +179,11 @@ foreach ($data as $dir => $files) {
                 unlink($dumpFile);
 
                 $progress = $predb->progress(
-                    settings_array($match[2] + 1, $progress),
+                    settings_array($hit[2] + 1, $progress),
                     ['read' => false]
                 );
                 if ($inserted > 0) {
-                    echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n", $match[2], date('Y-m-d', $match[2]), --$total);
+                    echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n", $hit[2], date('Y-m-d', $hit[2]), --$total);
                 }
             } else {
                 echo "Ignoring: {$file['download_url']}\n";
