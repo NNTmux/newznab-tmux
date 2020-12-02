@@ -227,7 +227,7 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        $total = \count($releases);
+        $total = $releases->count();
 
         if ($total > 0) {
             $this->_totalReleases = $total;
@@ -312,7 +312,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' file names to process.');
@@ -378,7 +378,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' CRC32\'s to process.');
@@ -442,7 +442,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' xxx file names to process.');
@@ -507,7 +507,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' srr file extensions to process.');
@@ -566,7 +566,7 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
 
@@ -652,7 +652,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' unique ids to process.');
@@ -717,7 +717,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' mediainfo movie names to process.');
@@ -791,7 +791,7 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' hash_16K to process.');
@@ -1153,7 +1153,7 @@ class NameFixer
         );
 
         if (! empty($res)) {
-            $total = \count($res);
+            $total = $res->count();
         }
 
         // Run if row count is positive, but do not run if row count exceeds 10 (as this is likely a failed title match)
@@ -1238,7 +1238,7 @@ class NameFixer
         );
 
         if (! empty($query)) {
-            $total = \count($query);
+            $total = $query->count();
 
             if ($total > 0) {
                 $this->consoletools->header(PHP_EOL.number_format($total).' releases to process.');
@@ -1451,7 +1451,7 @@ class NameFixer
         }
 
         $res = Release::fromRaw($query);
-        $total = \count($res);
+        $total = $res->count();
         $this->consoletools->primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
             if (preg_match('/[a-fA-F0-9]{32,40}/i', $row->name, $hits)) {
