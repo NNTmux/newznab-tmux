@@ -20,7 +20,7 @@ use Symfony\Component\Process\Process;
 /**
  * Class Forking.
  *
- * This forks various newznab scripts.
+ * This forks various scripts.
  *
  * For example, you get all the ID's of the active groups in the groups table, you then iterate over them and spawn
  * processes of misc/update_binaries.php passing the group ID's.
@@ -30,88 +30,91 @@ class Forking
     /**
      * @var \Blacklight\ColorCLI
      */
-    public $colorCli;
+    public ColorCLI $colorCli;
 
     /**
      * @var int The type of output
      */
-    protected $outputType;
+    protected int $outputType;
 
     /**
      * Path to do not run folder.
      *
      * @var string
      */
-    private $dnr_path;
+    private string $dnr_path;
 
     /**
      * Work to work on.
      *
      * @var array
      */
-    private $work = [];
+    private array $work = [];
 
     /**
      * How much work do we have to do?
      *
      * @var int
      */
-    public $_workCount = 0;
+    public int $_workCount = 0;
 
     /**
      * The type of work we want to work on.
      *
      * @var string
      */
-    private $workType = '';
+    private string $workType = '';
 
     /**
      * List of passed in options for the current work type.
      *
      * @var array
      */
-    private $workTypeOptions = [];
+    private array $workTypeOptions = [];
 
     /**
      * Max amount of child processes to do work at a time.
      *
      * @var int
      */
-    private $maxProcesses = 1;
+    private int $maxProcesses = 1;
 
     /**
      * Group used for safe backfill.
      *
      * @var string
      */
-    private $safeBackfillGroup = '';
+    private string $safeBackfillGroup = '';
     /**
      * @var int
      */
-    protected $maxSize;
+    protected int $maxSize;
 
     /**
      * @var int
      */
-    protected $minSize;
+    protected int $minSize;
 
     /**
      * @var int
      */
-    protected $maxRetries;
+    protected int $maxRetries;
 
     /**
      * @var int
      */
-    protected $dummy;
+    protected int $dummy;
 
     /**
      * @var bool
      */
-    private $processAdditional = false; // Should we process additional?
-    private $processNFO = false; // Should we process NFOs?
-    private $processMovies = false; // Should we process Movies?
-    private $processTV = false; // Should we process TV?
+    private bool $processAdditional = false; // Should we process additional?
+
+    private bool $processNFO = false; // Should we process NFOs?
+
+    private bool $processMovies = false; // Should we process Movies?
+
+    private bool $processTV = false; // Should we process TV?
 
     /**
      * Setup required parent / self vars.
@@ -140,7 +143,7 @@ class Forking
      *
      * @throws \Exception
      */
-    public function processWorkType($type, array $options = [])
+    public function processWorkType(string $type, array $options = []): void
     {
         // Set/reset some variables.
         $startTime = now()->timestamp;
@@ -171,14 +174,14 @@ class Forking
      *
      * @var bool
      */
-    private $ppRenamedOnly;
+    private bool $ppRenamedOnly;
 
     /**
      * Get work for our workers to work on, set the max child processes here.
      *
      * @throws \Exception
      */
-    private function getWork()
+    private function getWork(): void
     {
         $this->maxProcesses = 0;
 
@@ -244,7 +247,7 @@ class Forking
     /**
      * Process work if we have any.
      */
-    private function processWork()
+    private function processWork(): void
     {
         $this->_workCount = \count($this->work);
         if ($this->_workCount > 0 && config('nntmux.echocli') === true) {
@@ -261,7 +264,7 @@ class Forking
     /**
      * Process any work that does not need to be forked, but needs to run at the start.
      */
-    private function processStartWork()
+    private function processStartWork(): void
     {
         switch ($this->workType) {
             case 'safe_backfill':
@@ -274,7 +277,7 @@ class Forking
     /**
      * Process any work that does not need to be forked, but needs to run at the end.
      */
-    private function processEndWork()
+    private function processEndWork(): void
     {
         switch ($this->workType) {
             case 'update_per_group':
@@ -290,7 +293,7 @@ class Forking
     //////////////////////////////////////// All backFill code here ////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private function backfill()
+    private function backfill(): void
     {
         // The option for backFill is for doing up to x articles. Else it's done by date.
         $this->work = DB::select(
@@ -305,8 +308,9 @@ class Forking
         $maxWork = \count($this->work);
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
-            }, 100000)->then(function () use ($group, $maxWork) {
+                return $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
+            }, 100000)->then(function ($output) use ($group, $maxWork) {
+                echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -399,8 +403,9 @@ class Forking
             $this->processWork();
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
-                    $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 100000)->then(function () use ($data) {
+                    return $this->_executeCommand($this->dnr_path.$queue.'"');
+                }, 100000)->then(function ($output) use ($data) {
+                    echo $output;
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
@@ -434,8 +439,9 @@ class Forking
         $this->processWork();
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
-            }, 100000)->then(function () use ($group, $maxWork) {
+                return $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
+            }, 100000)->then(function ($output) use ($group, $maxWork) {
+                echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -502,9 +508,10 @@ class Forking
             foreach ($queues as $queue) {
                 preg_match('/alt\..+/i', $queue, $hit);
                 $pool->add(function () use ($queue) {
-                    $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 100000)->then(function () use ($hit) {
+                   return $this->_executeCommand($this->dnr_path.$queue.'"');
+                }, 100000)->then(function ($output) use ($hit) {
                     if (! empty($hit)) {
+                        echo $output;
                         $this->colorCli->primary('Updated group '.$hit[0]);
                     }
                 })->catch(function (\Throwable $exception) {
@@ -573,8 +580,9 @@ class Forking
         $this->processWork();
         foreach ($this->work as $queue) {
             $pool->add(function () use ($queue) {
-                $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
-            }, 100000)->then(function () use ($maxWork) {
+                return $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
+            }, 100000)->then(function ($output) use ($maxWork) {
+                echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -618,8 +626,9 @@ class Forking
         $this->processWork();
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
-            }, 100000)->then(function () use ($maxWork) {
+                return $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
+            }, 100000)->then(function ($output) use ($maxWork) {
+                echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
@@ -665,8 +674,9 @@ class Forking
         foreach ($releases as $release) {
             if ($type !== '') {
                 $pool->add(function () use ($release, $type) {
-                    $this->_executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
-                }, 100000)->then(function () use ($desc, $count) {
+                    return $this->_executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
+                }, 100000)->then(function ($output) use ($desc, $count) {
+                    echo $output;
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
@@ -920,8 +930,9 @@ class Forking
         $this->processWork();
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
-            }, 100000)->then(function () use ($group) {
+                return $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
+            }, 100000)->then(function ($output) use ($group) {
+                echo $output;
                 $name = UsenetGroup::getNameByID($group->id);
                 $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
             })->catch(function (\Throwable $exception) {
@@ -947,7 +958,7 @@ class Forking
     protected function _executeCommand($command)
     {
         $process = Process::fromShellCommandline('exec '.$command);
-        $process->setTimeout(360);
+        $process->setTimeout(config('nntmux.multiprocessing_max_child_time'));
         $process->run(function ($type, $buffer) {
             if (Process::ERR === $type) {
                 echo $buffer;
