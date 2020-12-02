@@ -234,7 +234,7 @@ class NameFixer
             $this->consoletools->primary(number_format($total).' releases to process.');
 
             foreach ($releases as $rel) {
-                $releaseRow = Release::fromRaw(
+                $releaseRow = Release::fromQuery(
                         sprintf(
                             '
 							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
@@ -821,16 +821,16 @@ class NameFixer
         $queryLimit = ($limit === '') ? '' : ' LIMIT '.$limit;
         // 24 hours, other cats
         if ($time === 1 && $cats === 1) {
-            $releases = Release::fromRaw($query.$this->timeother.$queryLimit);
+            $releases = Release::fromQuery($query.$this->timeother.$queryLimit);
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
-            $releases = Release::fromRaw($query.$this->timeall.$queryLimit);
+            $releases = Release::fromQuery($query.$this->timeall.$queryLimit);
         } //other cats
         if ($time === 2 && $cats === 1) {
-            $releases = Release::fromRaw($query.$this->fullother.$queryLimit);
+            $releases = Release::fromQuery($query.$this->fullother.$queryLimit);
         } // all cats
         if ($time === 2 && $cats === 2) {
-            $releases = Release::fromRaw($query.$this->fullall.$queryLimit);
+            $releases = Release::fromQuery($query.$this->fullall.$queryLimit);
         }
 
         return $releases;
@@ -1140,7 +1140,7 @@ class NameFixer
         }
 
         //Find release matches with fulltext and then identify exact matches with cleaned LIKE string
-        $res = Release::fromRaw(
+        $res = Release::fromQuery(
             sprintf(
                 '
 				SELECT r.id AS releases_id, r.name, r.searchname,
@@ -1217,7 +1217,7 @@ class NameFixer
         $counter = $counted = 0;
         $timestart = now();
 
-        $query = Release::fromRaw(
+        $query = Release::fromQuery(
             sprintf(
                 "
 					SELECT r.id AS releases_id, r.name, r.searchname,
@@ -1379,7 +1379,7 @@ class NameFixer
             $hashtype = 'MD5, ';
         }
 
-        $row = Predb::fromRaw(
+        $row = Predb::fromQuery(
             sprintf(
                 '
 						SELECT p.id AS predb_id, p.title, p.source
@@ -1450,7 +1450,7 @@ class NameFixer
                 .'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
         }
 
-        $res = Release::fromRaw($query);
+        $res = Release::fromQuery($query);
         $total = $res->count();
         $this->consoletools->primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
@@ -2138,7 +2138,7 @@ class NameFixer
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if (! empty($release->uid) && ! $this->done && $this->relid !== (int) $release->releases_id) {
-            $result = Release::fromRaw(sprintf(
+            $result = Release::fromQuery(sprintf(
                 '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
@@ -2230,7 +2230,7 @@ class NameFixer
     public function xxxNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
-            $result = Release::fromRaw(
+            $result = Release::fromQuery(
                 sprintf(
                     "
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -2283,7 +2283,7 @@ class NameFixer
     public function srrNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
-            $result = Release::fromRaw(
+            $result = Release::fromQuery(
                 sprintf(
                     "
 				    SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -2336,7 +2336,7 @@ class NameFixer
     public function hashCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
-            $result = Release::fromRaw(sprintf(
+            $result = Release::fromQuery(sprintf(
                 '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
@@ -2387,7 +2387,7 @@ class NameFixer
     public function crcCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if (! $this->done && $this->relid !== (int) $release->releases_id && $release->textstring !== '') {
-            $result = Release::fromRaw(
+            $result = Release::fromQuery(
                 sprintf(
                     '
 				    SELECT rf.crc32, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.predb_id as predb_id,
