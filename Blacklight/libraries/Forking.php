@@ -957,8 +957,8 @@ class Forking
      */
     protected function _executeCommand($command)
     {
-        $process = Process::fromShellCommandline('exec '.$command);
-        $process->setTimeout(config('nntmux.multiprocessing_max_child_time'));
+        $process = Process::fromShellCommandline($command);
+        $process->setTimeout(1800);
         $process->run(function ($type, $buffer) {
             if (Process::ERR === $type) {
                 echo $buffer;
