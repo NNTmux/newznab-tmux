@@ -684,7 +684,7 @@ class Movie
         if (! empty($imdb['language'])) {
             $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
         } elseif (! empty($omdb['language']) && ! is_bool($omdb['language'])) {
-            $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
+            $mov['language'] = \is_array($omdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
         }
 
         if (\is_array($mov['genre'])) {
