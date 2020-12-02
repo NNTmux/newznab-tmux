@@ -27,13 +27,13 @@ $path2covers = NN_COVERS.'movies'.DS;
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
     if (is_file($filePath->getPathname()) && preg_match('/-cover\.jpg$/', $filePath->getPathname())) {
-        preg_match('/(\d+)-cover\.jpg$/', $filePath->getPathname(), $match);
-        if (isset($match[1])) {
-            $run = MovieInfo::query()->where('cover', '=', 0)->where('imdbid', $match[1])->update(['cover' => 1]);
+        preg_match('/(\d+)-cover\.jpg$/', $filePath->getPathname(), $hit);
+        if (isset($hit[1])) {
+            $run = MovieInfo::query()->where('cover', '=', 0)->where('imdbid', $hit[1])->update(['cover' => 1]);
             if ($run >= 1) {
                 $covers++;
             } else {
-                $run = MovieInfo::query()->where('imdbid', '=', $match[1])->select(['imdbid'])->get();
+                $run = MovieInfo::query()->where('imdbid', '=', $hit[1])->select(['imdbid'])->get();
                 if ($run->count() === 0) {
                     $colorCli->info($filePath.' not found in db.');
                 }

@@ -91,12 +91,12 @@ switch (true) {
 
             if ((int) $release->ishashed === 1 && (int) $release->dehashstatus >= -6 && (int) $release->dehashstatus <= 0) {
                 $colorCli->primaryOver('d');
-                if (preg_match('/[a-fA-F0-9]{32,40}/i', $release->name, $matches)) {
-                    $nameFixer->matchPredbHash($matches[0], $release, true, 1, true);
+                if (preg_match('/[a-fA-F0-9]{32,40}/i', $release->name, $hits)) {
+                    $nameFixer->matchPredbHash($hits[0], $release, true, 1, true);
                 }
-                if ($nameFixer->matched === false && ! empty($release->filehash) && preg_match('/[a-fA-F0-9]{32,40}/i', $release->filehash, $matches)) {
+                if ($nameFixer->matched === false && ! empty($release->filehash) && preg_match('/[a-fA-F0-9]{32,40}/i', $release->filehash, $hits)) {
                     $colorCli->primaryOver('h');
-                    $nameFixer->matchPredbHash($matches[0], $release, true, 1, true);
+                    $nameFixer->matchPredbHash($hits[0], $release, true, 1, true);
                 }
             }
 

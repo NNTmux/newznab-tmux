@@ -60,23 +60,23 @@ class ADE extends AdultMovies
     {
         $this->_response = getRawHtml(self::ADE.$this->_trailers.$this->_directUrl);
         $this->_html->loadHtml($this->_response);
-        if (preg_match("/([\"|'])(?P<swf>[^\"']+.swf)([\"|'])/i", $this->_response, $matches)) {
-            $this->_res['trailers']['url'] = self::ADE.trim(trim($matches['swf']), '"');
+        if (preg_match("/([\"|'])(?P<swf>[^\"']+.swf)([\"|'])/i", $this->_response, $hits)) {
+            $this->_res['trailers']['url'] = self::ADE.trim(trim($hits['swf']), '"');
             if (preg_match(
                 '#(?:streamID:\s\")(?P<streamid>[0-9A-Z]+)(?:\")#',
                 $this->_response,
-                $matches
+                $hits
             )
             ) {
-                $this->_res['trailers']['streamid'] = trim($matches['streamid']);
+                $this->_res['trailers']['streamid'] = trim($hits['streamid']);
             }
             if (preg_match(
                 '#(?:BaseStreamingUrl:\s\")(?P<baseurl>[\d]+.[\d]+.[\d]+.[\d]+)(?:\")#',
                 $this->_response,
-                $matches
+                $hits
             )
             ) {
-                $this->_res['trailers']['baseurl'] = $matches['baseurl'];
+                $this->_res['trailers']['baseurl'] = $hits['baseurl'];
             }
         }
 

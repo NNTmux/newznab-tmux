@@ -546,8 +546,8 @@ class ProcessReleases
                         'naming_regex_id'        => $cleanedName['id'] ?? 0,
                     ]);
 
-                    if (preg_match_all('#(\S+):\S+#', $collection->xref, $matches)) {
-                        foreach ($matches[1] as $grp) {
+                    if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
+                        foreach ($hits[1] as $grp) {
                             //check if the group name is in a valid format
                             $grpTmp = UsenetGroup::isValidGroup($grp);
                             if ($grpTmp !== false) {

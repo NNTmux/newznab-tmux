@@ -90,26 +90,26 @@ class Nfo
     {
         $return = false;
 
-        if (preg_match('/tvmaze\.com\/shows\/(\d{1,6})/i', $str, $matches)) {
+        if (preg_match('/tvmaze\.com\/shows\/(\d{1,6})/i', $str, $hits)) {
             $return =
             [
-                'showid' => trim($matches[1]),
+                'showid' => trim($hits[1]),
                 'site'   => 'tvmaze',
             ];
         }
 
-        if (preg_match('/imdb\.com\/title\/(tt\d{1,8})/i', $str, $matches)) {
+        if (preg_match('/imdb\.com\/title\/(tt\d{1,8})/i', $str, $hits)) {
             $return =
                 [
-                    'showid' => trim($matches[1]),
+                    'showid' => trim($hits[1]),
                     'site'   => 'imdb',
                 ];
         }
 
-        if (preg_match('/thetvdb\.com\/\?tab=series&id=(\d{1,8})/i', $str, $matches)) {
+        if (preg_match('/thetvdb\.com\/\?tab=series&id=(\d{1,8})/i', $str, $hits)) {
             $return =
                 [
-                    'showid' => trim($matches[1]),
+                    'showid' => trim($hits[1]),
                     'site'   => 'thetvdb',
                 ];
         }

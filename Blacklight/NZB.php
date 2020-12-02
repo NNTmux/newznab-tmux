@@ -186,14 +186,14 @@ class NZB
                 $XMLWriter->writeAttribute('date', $collection->udate);
                 $XMLWriter->writeAttribute('subject', $subject);
                 $XMLWriter->startElement('groups');
-                if (preg_match_all('#(\S+):\S+#', $collection->xref, $matches)) {
-                    $matches = array_values(array_unique($matches[1]));
-                    foreach ($matches as $group) {
+                if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
+                    $hits = array_values(array_unique($hits[1]));
+                    foreach ($hits as $group) {
                         $XMLWriter->writeElement('group', $group);
                     }
-                } elseif (preg_match_all('#(\S+)#', $collection->xref, $matches)) {
-                    $matches = array_values(array_unique($matches[1]));
-                    foreach ($matches as $group) {
+                } elseif (preg_match_all('#(\S+)#', $collection->xref, $hits)) {
+                    $hits = array_values(array_unique($hits[1]));
+                    foreach ($hits as $group) {
                         $XMLWriter->writeElement('group', $group);
                     }
                 } else {

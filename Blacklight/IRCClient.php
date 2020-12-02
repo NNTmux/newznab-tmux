@@ -340,18 +340,18 @@ class IRCClient
             $this->_readSocket();
 
             // We got pinged, reply with a pong.
-            if (preg_match('/^PING\s*:(.+?)$/', $this->_buffer, $matches)) {
-                $this->_pong($matches[1]);
-            } elseif (preg_match('/^:(.*?)\s+(\d+).*?(:.+?)?$/', $this->_buffer, $matches)) {
+            if (preg_match('/^PING\s*:(.+?)$/', $this->_buffer, $hits)) {
+                $this->_pong($hits[1]);
+            } elseif (preg_match('/^:(.*?)\s+(\d+).*?(:.+?)?$/', $this->_buffer, $hits)) {
                 // We found 001, which means we are logged in.
-                if ((int) $matches[2] === 1) {
-                    $this->_remote_host_received = $matches[1];
+                if ((int) $hits[2] === 1) {
+                    $this->_remote_host_received = $hits[1];
                     break;
 
                     // We got 464, which means we need to send a password.
                 }
 
-                if ((int) $matches[2] === 464) {
+                if ((int) $hits[2] === 464) {
                     // Before the lower check, set the password : username:password
                     $tempPass = $userName.':'.$password;
 
@@ -364,7 +364,7 @@ class IRCClient
                         return false;
                     }
 
-                    if (isset($matches[3]) && stripos($matches[3], 'invalid password') !== false) {
+                    if (isset($hits[3]) && stripos($hits[3], 'invalid password') !== false) {
                         echo 'Invalid password or username for ('.$this->_remote_host.').';
 
                         return false;
@@ -407,23 +407,23 @@ class IRCClient
             $this->_readSocket();
 
             // If the server pings us, return it a pong.
-            if (preg_match('/^PING\s*:(.+?)$/', $this->_buffer, $matches)) {
-                if ($matches[1] === $this->_remote_host_received) {
-                    $this->_pong($matches[1]);
+            if (preg_match('/^PING\s*:(.+?)$/', $this->_buffer, $hits)) {
+                if ($hits[1] === $this->_remote_host_received) {
+                    $this->_pong($hits[1]);
                 }
 
                 // Check for a channel message.
             } elseif (preg_match(
                 '/^:(?P<nickname>.+?)\!.+?\s+PRIVMSG\s+(?P<channel>#.+?)\s+:\s*(?P<message>.+?)\s*$/',
                 $this->_stripControlCharacters($this->_buffer),
-                $matches
+                $hits
             )
             ) {
                 $this->_channelData =
                     [
-                        'nickname' => $matches['nickname'],
-                        'channel'  => $matches['channel'],
-                        'message'  => $matches['message'],
+                        'nickname' => $hits['nickname'],
+                        'channel'  => $hits['channel'],
+                        'message'  => $hits['message'],
                     ];
 
                 $this->processChannelMessages();

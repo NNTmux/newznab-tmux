@@ -69,8 +69,8 @@ class AEBN extends AdultMovies
     protected function trailers()
     {
         $ret = $this->_html->find('a[itemprop=trailer]', 0);
-        if (! empty($ret) && preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $matches)) {
-            $movieid = $matches['movieid'];
+        if (! empty($ret) && preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $hits)) {
+            $movieid = $hits['movieid'];
             $this->_res['trailers']['url'] = self::AEBNSURL.self::TRAILERURL.$movieid;
         }
 

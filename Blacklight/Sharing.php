@@ -397,13 +397,13 @@ class Sharing
                 break;
             }
 
-            $matches = [];
+            $hits = [];
             //(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
             if ($header['From'] === '<anon@anon.com>' &&
-                preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $matches)) {
+                preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $hits)) {
 
                 // Check if this is from our own site.
-                if ($matches['guid'] === $this->siteSettings->site_guid) {
+                if ($hits['guid'] === $this->siteSettings->site_guid) {
                     continue;
                 }
 
@@ -411,7 +411,7 @@ class Sharing
                 $check = DB::selectOne(
                     sprintf(
                         'SELECT id FROM release_comments WHERE shareid = %s',
-                        escapeString($matches['sid'])
+                        escapeString($hits['sid'])
                     )
                 );
 
@@ -422,7 +422,7 @@ class Sharing
                     $check = DB::selectOne(
                         sprintf(
                             'SELECT enabled FROM sharing_sites WHERE site_guid = %s',
-                            escapeString($matches['guid'])
+                            escapeString($hits['guid'])
                         )
                     );
 
@@ -436,8 +436,8 @@ class Sharing
 									INSERT INTO sharing_sites
 									(site_name, site_guid, last_time, first_time, enabled, comments)
 									VALUES (%s, %s, NOW(), NOW(), 0, 0)',
-                                    escapeString($matches['site']),
-                                    escapeString($matches['guid'])
+                                    escapeString($hits['site']),
+                                    escapeString($hits['guid'])
                                 )
                             );
                             continue;
@@ -450,8 +450,8 @@ class Sharing
                                 INSERT INTO sharing_sites
                                 (site_name, site_guid, last_time, first_time, enabled, comments)
                                 VALUES (%s, %s, NOW(), NOW(), 1, 0)',
-                                escapeString($matches['site']),
-                                escapeString($matches['guid'])
+                                escapeString($hits['site']),
+                                escapeString($hits['guid'])
                             )
                         );
                     } elseif ((int) $check->enabled === 0) {
@@ -459,13 +459,13 @@ class Sharing
                     }
 
                     // Insert the comment, if we got it, update the site to increment comment count.
-                    if ($this->insertNewComment($header['Message-ID'], $matches['guid'])) {
+                    if ($this->insertNewComment($header['Message-ID'], $hits['guid'])) {
                         DB::update(
                             sprintf(
                                 '
 								UPDATE sharing_sites SET comments = comments + 1, last_time = NOW(), site_name = %s WHERE site_guid = %s',
-                                escapeString($matches['site']),
-                                escapeString($matches['guid'])
+                                escapeString($hits['site']),
+                                escapeString($hits['guid'])
                             )
                         );
                         $found++;

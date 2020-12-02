@@ -205,13 +205,13 @@ class Regexes
             $limit--;
             $hashes = [];
             foreach ($rows as $row) {
-                if (preg_match($regex, $row->name, $matches)) {
-                    ksort($matches);
+                if (preg_match($regex, $row->name, $hits)) {
+                    ksort($hits);
                     $string = $string2 = '';
-                    foreach ($matches as $key => $match) {
+                    foreach ($hits as $key => $hit) {
                         if (! \is_int($key)) {
-                            $string .= $match;
-                            $string2 .= '<br/>'.$key.': '.$match;
+                            $string .= $hit;
+                            $string2 .= '<br/>'.$key.': '.$hit;
                         }
                     }
                     $files = 0;
@@ -268,12 +268,12 @@ class Regexes
         if ($rows !== null) {
             $limit = 1;
             foreach ($rows as $row) {
-                $match = $this->_matchRegex($regex, $row['name']);
-                if ($match) {
+                $hit = $this->_matchRegex($regex, $row['name']);
+                if ($hit) {
                     $data[$row['id']] = [
                         'subject'  => $row['name'],
                         'old_name' => $row['searchname'],
-                        'new_name' => $match,
+                        'new_name' => $hit,
                     ];
                     if ((int) $displayLimit > 0 && $limit++ >= (int) $displayLimit) {
                         break;
@@ -360,10 +360,10 @@ class Regexes
     protected function _matchRegex($regex, $subject): string
     {
         $returnString = '';
-        if (preg_match($regex, $subject, $matches) && \count($matches) > 0) {
+        if (preg_match($regex, $subject, $hits) && \count($hits) > 0) {
             // Sort the keys, the named key matches will be concatenated in this order.
-            ksort($matches);
-            foreach ($matches as $key => $value) {
+            ksort($hits);
+            foreach ($hits as $key => $value) {
                 switch ($this->tableName) {
                     case 'collection_regexes': // Put this at the top since it's the most important for performance.
                     case 'release_naming_regexes':

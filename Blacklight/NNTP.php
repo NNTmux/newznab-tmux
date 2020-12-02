@@ -672,12 +672,12 @@ class NNTP extends \Net_NNTP_Client
                     }
 
                     // Use the line type of the article as the array key (From, Subject, etc..).
-                    if (preg_match('/([A-Z-]+?): (.*)/i', $line, $matches)) {
+                    if (preg_match('/([A-Z-]+?): (.*)/i', $line, $hits)) {
                         // If the line type takes more than 1 line, append the rest of the content to the same key.
-                        if (array_key_exists($matches[1], $ret)) {
-                            $ret[$matches[1]] .= $matches[2];
+                        if (array_key_exists($hits[1], $ret)) {
+                            $ret[$hits[1]] .= $hits[2];
                         } else {
-                            $ret[$matches[1]] = $matches[2];
+                            $ret[$hits[1]] = $hits[2];
                         }
                     }
 
@@ -739,10 +739,10 @@ class NNTP extends \Net_NNTP_Client
             $ret = [];
             // Use the line types of the header as array keys (From, Subject, etc).
             foreach ($header as $line) {
-                if (preg_match('/([A-Z-]+?): (.*)/i', $line, $matches)) {
+                if (preg_match('/([A-Z-]+?): (.*)/i', $line, $hits)) {
                     // If the line type takes more than 1 line, re-use the same array key.
-                    if (array_key_exists($matches[1], $ret)) {
-                        $ret[$matches[1]] .= $matches[2];
+                    if (array_key_exists($hits[1], $ret)) {
+                        $ret[$hits[1]] .= $matches[2];
                     } else {
                         $ret[$matches[1]] = $matches[2];
                     }

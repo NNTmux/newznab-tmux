@@ -153,7 +153,7 @@ class AniDB
      *
      * @param string $cleanName
      *
-     * @return array $matches
+     * @return array $hits
      */
     private function extractTitleEpisode($cleanName = ''): array
     {
@@ -162,31 +162,31 @@ class AniDB
         if (preg_match(
             '/(^|.*\")(\[[a-zA-Z\.\!?-]+\][\s_]*)?(\[BD\][\s_]*)?(\[\d{3,4}[ip]\][\s_]*)?(?P<title>[\w\s_.+!?\'\-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?([ _]\-[ _]|([ ._-]Epi?(sode)?[ ._-]?0?)?[ ._-]?|[ ._-]Vol\.|[ ._-]E)(?P<epno>\d{1,3}|Movie|OVA|Complete Series)(v\d|-\d+)?[\-_. ].*[\[\(\"]/i',
             $cleanName,
-            $matches
+            $hits
         )
         ) {
-            $matches['epno'] = (int) $matches['epno'];
-            if (\in_array($matches['epno'], ['Movie', 'OVA'], false)) {
-                $matches['epno'] = 1;
+            $hits['epno'] = (int) $hits['epno'];
+            if (\in_array($hits['epno'], ['Movie', 'OVA'], false)) {
+                $hits['epno'] = 1;
             }
         } elseif (preg_match(
             '/^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(\[BD\])?(\[\d{3,4}[ip]\])?(?P<title>[\w\s_.+!?\'\-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?\s*[\(\[](BD|\d{3,4}[ipx])/i',
             $cleanName,
-            $matches
+            $hits
         )
         ) {
-            $matches['epno'] = 1;
-        } elseif (preg_match('#^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(?P<title>[\w -]+)?\s+-\s+(?P<epno>\d+)\s*(\[\d+p\])?$#', $cleanName, $matches)) {
-            $matches['epno'] = (int) $matches['epno'];
+            $hits['epno'] = 1;
+        } elseif (preg_match('#^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(?P<title>[\w -]+)?\s+-\s+(?P<epno>\d+)\s*(\[\d+p\])?$#', $cleanName, $hits)) {
+            $hits['epno'] = (int) $hits['epno'];
         } else {
             $this->status = self::PROC_EXTFAIL;
         }
 
-        if (! empty($matches['title'])) {
-            $matches['title'] = trim(str_replace(['_', '.'], ' ', $matches['title']));
+        if (! empty($hits['title'])) {
+            $hits['title'] = trim(str_replace(['_', '.'], ' ', $hits['title']));
         }
 
-        return $matches;
+        return $hits;
     }
 
     /**

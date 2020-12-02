@@ -30,14 +30,14 @@ $path2covers = NN_COVERS.'games'.DS;
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
     if (is_file($filePath->getPathname()) && preg_match('/\d+\.jpg$/', $filePath->getPathname())) {
-        preg_match('/(\d+)\.jpg$/', basename($filePath->getPathname()), $match);
-        if (isset($match[1])) {
-            $run = GamesInfo::query()->where('cover', '=', 0)->where('id', $match[1])->update(['cover' => 1]);
+        preg_match('/(\d+)\.jpg$/', basename($filePath->getPathname()), $hit);
+        if (isset($hit[1])) {
+            $run = GamesInfo::query()->where('cover', '=', 0)->where('id', $hit[1])->update(['cover' => 1]);
             if ($run !== false) {
                 if ($run >= 1) {
                     $covers++;
                 } else {
-                    $run = GamesInfo::query()->where('id', $match[1])->select(['id'])->get();
+                    $run = GamesInfo::query()->where('id', $hit[1])->select(['id'])->get();
                     if ($run !== null && $run === 0) {
                         $colorCli->info($filePath->getPathname().' not found in db.');
                     }

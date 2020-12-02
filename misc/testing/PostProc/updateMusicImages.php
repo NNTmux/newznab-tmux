@@ -19,13 +19,13 @@ $path2covers = NN_COVERS.'music'.DS;
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
     if (is_file($filePath->getPathname()) && preg_match('/\d+\.jpg$/', $filePath->getPathname())) {
-        preg_match('/(\d+)\.jpg$/', $filePath->getPathname(), $match);
-        if (isset($match[1])) {
-            $run = MusicInfo::query()->where('cover', '=', 0)->where('id', $match[1])->update(['cover' => 1]);
+        preg_match('/(\d+)\.jpg$/', $filePath->getPathname(), $hit);
+        if (isset($hit[1])) {
+            $run = MusicInfo::query()->where('cover', '=', 0)->where('id', $hit[1])->update(['cover' => 1]);
             if ($run >= 1) {
                 $covers++;
             } else {
-                $run = MusicInfo::query()->where('id', $match[1])->select(['id'])->get();
+                $run = MusicInfo::query()->where('id', $hit[1])->select(['id'])->get();
                 if ($run->count() === 0) {
                     $colorCli->info($filePath->getPathname().' not found in db.');
                 }

@@ -120,8 +120,8 @@ class Popporn extends AdultMovies
             $ret->value = str_replace('..', '', $ret->value);
             $tmprsp = $this->_response;
             $this->_trailUrl = $ret->value;
-            if (preg_match_all('/productID="\+(?<id>\d+),/', $this->_response, $matches)) {
-                $productid = $matches['id'][0];
+            if (preg_match_all('/productID="\+(?<id>\d+),/', $this->_response, $hits)) {
+                $productid = $hits['id'][0];
                 $random = ((float) mt_rand() / (float) mt_getrandmax()) * 5400000000000000;
                 $this->_trailUrl = '/com/tlavideo/vod/FlvAjaxSupportService.cfc?random='.$random;
                 $this->_postParams = 'method=pipeStreamLoc&productID='.$productid;

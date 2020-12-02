@@ -795,8 +795,8 @@ class Binaries
 
                     $tempHeaderXrefs = [];
                     foreach (explode(' ', $this->header['Xref']) as $headerXref) {
-                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $headerXref, $match) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $match)) {
-                            $tempHeaderXrefs[] = $match[0];
+                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $headerXref, $hit) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $hit)) {
+                            $tempHeaderXrefs[] = $hit[0];
                         }
                     }
 

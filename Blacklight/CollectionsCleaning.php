@@ -166,8 +166,8 @@ class CollectionsCleaning
         // If the subject is too similar to another because it is so short, try to extract info from the subject.
         if (\strlen($cleanSubject) <= 10 || preg_match('/^[\-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
             $x = '';
-            if (preg_match('/.*("[A-Z0-9]+).*?"/i', $this->subject, $match)) {
-                $x = $match[1];
+            if (preg_match('/.*("[A-Z0-9]+).*?"/i', $this->subject, $hit)) {
+                $x = $hit[1];
             }
             if (preg_match_all('/[^A-Z0-9]/i', $this->subject, $match1)) {
                 $start = 0;
@@ -200,8 +200,8 @@ class CollectionsCleaning
     protected function musicSubject()
     {
         //Broderick_Smith-Unknown_Country-2009-404 "00-broderick_smith-unknown_country-2009.sfv" yEnc
-        if (preg_match('/^(\w{10,}-[a-zA-Z0-9]+ ")\d\d-.+?" yEnc$/', $this->subject, $match)) {
-            return $match[1];
+        if (preg_match('/^(\w{10,}-[a-zA-Z0-9]+ ")\d\d-.+?" yEnc$/', $this->subject, $hit)) {
+            return $hit[1];
         }
 
         return false;

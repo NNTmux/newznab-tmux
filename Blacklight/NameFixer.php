@@ -927,8 +927,8 @@ class NameFixer
 
                 if ($type === 'PAR2, ') {
                     $newName = ucwords($newName);
-                    if (preg_match('/(.+?)\.[a-z0-9]{2,3}(PAR2)?$/i', $name, $match)) {
-                        $newName = $match[1];
+                    if (preg_match('/(.+?)\.[a-z0-9]{2,3}(PAR2)?$/i', $name, $hit)) {
+                        $newName = $hit[1];
                     }
                 }
 
@@ -1454,10 +1454,10 @@ class NameFixer
         $total = \count($res);
         $this->consoletools->primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
-            if (preg_match('/[a-fA-F0-9]{32,40}/i', $row->name, $matches)) {
-                $updated += $this->matchPredbHash($matches[0], $row, $echo, $nameStatus, $show);
-            } elseif (preg_match('/[a-fA-F0-9]{32,40}/i', $row->filename, $matches)) {
-                $updated += $this->matchPredbHash($matches[0], $row, $echo, $nameStatus, $show);
+            if (preg_match('/[a-fA-F0-9]{32,40}/i', $row->name, $hits)) {
+                $updated += $this->matchPredbHash($hits[0], $row, $echo, $nameStatus, $show);
+            } elseif (preg_match('/[a-fA-F0-9]{32,40}/i', $row->filename, $hits)) {
+                $updated += $this->matchPredbHash($hits[0], $row, $echo, $nameStatus, $show);
             }
             if ($show === 2) {
                 $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($updated).'] '.$this->consoletools->percentString($checked++, $total));
@@ -1488,9 +1488,9 @@ class NameFixer
     public function checkName($release, $echo, $type, $nameStatus, $show, $preid = false): bool
     {
         // Get pre style name from releases.name
-        if (preg_match_all(self::PREDB_REGEX, $release->textstring, $matches) && ! preg_match('/Source\s\:/i', $release->textstring)) {
-            foreach ($matches as $match) {
-                foreach ($match as $val) {
+        if (preg_match_all(self::PREDB_REGEX, $release->textstring, $hits) && ! preg_match('/Source\s\:/i', $release->textstring)) {
+            foreach ($hits as $hit) {
+                foreach ($hit as $val) {
                     $title = Predb::query()->where('title', trim($val))->select(['title', 'id'])->first();
                     if ($title !== null) {
                         $this->updateRelease($release, $title['title'], 'preDB: Match', $echo, $type, $nameStatus, $show, $title['id']);
@@ -2192,12 +2192,12 @@ class NameFixer
     {
         $newName = '';
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
-            if (preg_match('/<Movie_name>(.+)<\/Movie_name>/i', $release->mediainfo, $match)) {
-                $media = $match[1];
-                if (preg_match(self::PREDB_REGEX, $media, $match)) {
-                    $newName = $match[1];
-                } elseif (preg_match('/(.+)[\,](\sRMZ\.cr)?$/i', $media, $match)) {
-                    $newName = $match[1];
+            if (preg_match('/<Movie_name>(.+)<\/Movie_name>/i', $release->mediainfo, $hit)) {
+                $media = $hit[1];
+                if (preg_match(self::PREDB_REGEX, $media, $hit)) {
+                    $newName = $hit[1];
+                } elseif (preg_match('/(.+)[\,](\sRMZ\.cr)?$/i', $media, $hit)) {
+                    $newName = $hit[1];
                 } else {
                     $newName = $media;
                 }
@@ -2247,10 +2247,10 @@ class NameFixer
             );
 
             foreach ($result as $res) {
-                if (preg_match('/^.+?SDPORN/i', $res->textstring, $match)) {
+                if (preg_match('/^.+?SDPORN/i', $res->textstring, $hit)) {
                     $this->updateRelease(
                             $release,
-                            $match['0'],
+                            $hit['0'],
                             'fileCheck: XXX SDPORN',
                             $echo,
                             $type,
@@ -2300,10 +2300,10 @@ class NameFixer
             );
 
             foreach ($result as $res) {
-                if (preg_match('/^(.*)\.srr$/i', $res->textstring, $match)) {
+                if (preg_match('/^(.*)\.srr$/i', $res->textstring, $hit)) {
                     $this->updateRelease(
                             $release,
-                            $match['1'],
+                            $hit['1'],
                             'fileCheck: SRR extension',
                             $echo,
                             $type,
@@ -2438,9 +2438,9 @@ class NameFixer
      */
     private function preMatch($fileName): array
     {
-        $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+([\w\-.]+[\w]$)/i', $fileName, $match);
+        $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+([\w\-.]+[\w]$)/i', $fileName, $hit);
 
-        return [$result === 1, $match[0] ?? ''];
+        return [$result === 1, $hit[0] ?? ''];
     }
 
     /**
@@ -2460,17 +2460,17 @@ class NameFixer
         if (! empty($this->_fileName)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $results = $this->elasticsearch->searchPreDb($this->_fileName);
-                foreach ($results as $match) {
-                    if (! empty($match)) {
-                        $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
+                foreach ($results as $hit) {
+                    if (! empty($hit)) {
+                        $this->updateRelease($release, $hit['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $hit['id']);
 
                         return true;
                     }
                 }
             } else {
-                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $match) {
-                    if (! empty($match)) {
-                        $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
+                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $hit) {
+                    if (! empty($hit)) {
+                        $this->updateRelease($release, $hit['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $hit['id']);
 
                         return true;
                     }
@@ -2498,9 +2498,9 @@ class NameFixer
         if (! empty($this->_fileName)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $results = $this->elasticsearch->searchPreDb($this->_fileName);
-                foreach ($results as $match) {
-                    if (! empty($match)) {
-                        $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
+                foreach ($results as $hit) {
+                    if (! empty($hit)) {
+                        $this->updateRelease($release, $hit['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $hit['id']);
 
                         return true;
                     }

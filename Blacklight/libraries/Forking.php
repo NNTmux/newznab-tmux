@@ -500,12 +500,12 @@ class Forking
 
             $this->processWork();
             foreach ($queues as $queue) {
-                preg_match('/alt\..+/i', $queue, $match);
+                preg_match('/alt\..+/i', $queue, $hit);
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 100000)->then(function () use ($match) {
-                    if (! empty($match)) {
-                        $this->colorCli->primary('Updated group '.$match[0]);
+                }, 100000)->then(function () use ($hit) {
+                    if (! empty($hit)) {
+                        $this->colorCli->primary('Updated group '.$hit[0]);
                     }
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();

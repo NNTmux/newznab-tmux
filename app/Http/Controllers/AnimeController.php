@@ -110,8 +110,8 @@ class AnimeController extends BasePageController
             if (preg_match('/^[0-9]/', $s->title)) {
                 $thisrange = '0-9';
             } else {
-                preg_match('/([A-Z]).*/i', $s->title, $matches);
-                $thisrange = strtoupper($matches[1]);
+                preg_match('/([A-Z]).*/i', $s->title, $hits);
+                $thisrange = strtoupper($hits[1]);
             }
             $animelist[$thisrange][] = $s;
         }

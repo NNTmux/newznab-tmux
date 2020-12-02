@@ -411,8 +411,8 @@ class NZBGet
      */
     public function verifyURL($url)
     {
-        if (preg_match('/(?P<protocol>https?):\/\/(?P<url>.+?)(:(?P<port>\d+\/)|\/)$/i', $url, $matches)) {
-            return $matches['protocol'].'://'.$this->userName.':'.$this->password.'@'.$matches['url'].(isset($matches['port']) ? ':'.$matches['port'] : (substr($matches['url'], -1) === '/' ? '' : '/')).'xmlrpc/';
+        if (preg_match('/(?P<protocol>https?):\/\/(?P<url>.+?)(:(?P<port>\d+\/)|\/)$/i', $url, $hits)) {
+            return $hits['protocol'].'://'.$this->userName.':'.$this->password.'@'.$hits['url'].(isset($hits['port']) ? ':'.$hits['port'] : (substr($hits['url'], -1) === '/' ? '' : '/')).'xmlrpc/';
         }
 
         return false;

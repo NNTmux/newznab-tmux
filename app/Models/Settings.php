@@ -168,12 +168,12 @@ class Settings extends Model
      */
     public static function settingValue($setting)
     {
-        preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $match);
+        preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $hit);
         $result = self::query()->where(
             [
-                'section' => $match[1] ?? '',
-                'subsection' => $match[2] ?? '',
-                'name' => $match[3] ?? '',
+                'section' => $hit[1] ?? '',
+                'subsection' => $hit[2] ?? '',
+                'name' => $hit[3] ?? '',
             ]
         )->value('value');
 
