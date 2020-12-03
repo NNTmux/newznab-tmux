@@ -46,22 +46,18 @@ class ProcessAdditional
     /**
      * @var bool
      */
-    protected $_echoDebug;
+    protected bool $_echoDebug;
 
-    /**
-     * @var
-     */
+
     protected $_releases;
 
     /**
      * Count of releases to work on.
      * @var int
      */
-    protected $_totalReleases;
+    protected int $_totalReleases;
 
-    /**
-     * @var
-     */
+
     protected $_release;
 
     /**
@@ -73,17 +69,17 @@ class ProcessAdditional
      * List of files with sizes/etc contained in the NZB.
      * @var array
      */
-    protected $_nzbContents;
+    protected array $_nzbContents;
 
     /**
      * @var \dariusiii\rarinfo\Par2Info
      */
-    protected $_par2Info;
+    protected Par2Info $_par2Info;
 
     /**
      * @var \dariusiii\rarinfo\ArchiveInfo
      */
-    protected $_archiveInfo;
+    protected ArchiveInfo $_archiveInfo;
 
     /**
      * @var bool|null|string
@@ -93,7 +89,7 @@ class ProcessAdditional
     /**
      * @var int
      */
-    protected $_maxNestedLevels;
+    protected int $_maxNestedLevels;
 
     /**
      * @var null|string
@@ -108,7 +104,7 @@ class ProcessAdditional
     /**
      * @var string
      */
-    protected $_killString;
+    protected string $_killString;
 
     /**
      * @var bool|string
@@ -118,52 +114,52 @@ class ProcessAdditional
     /**
      * @var int
      */
-    protected $_queryLimit;
+    protected int $_queryLimit;
 
     /**
      * @var int
      */
-    protected $_segmentsToDownload;
+    protected int $_segmentsToDownload;
 
     /**
      * @var int
      */
-    protected $_maximumRarSegments;
+    protected int $_maximumRarSegments;
 
     /**
      * @var int
      */
-    protected $_maximumRarPasswordChecks;
+    protected int $_maximumRarPasswordChecks;
 
     /**
      * @var string
      */
-    protected $_maxSize;
+    protected string $_maxSize;
 
     /**
      * @var string
      */
-    protected $_minSize;
+    protected string $_minSize;
 
     /**
      * @var bool
      */
-    protected $_processThumbnails;
+    protected bool $_processThumbnails;
 
     /**
      * @var string
      */
-    protected $_audioSavePath;
+    protected string $_audioSavePath;
 
     /**
      * @var string
      */
-    protected $_supportFileRegex;
+    protected string $_supportFileRegex;
 
     /**
      * @var bool
      */
-    protected $_echoCLI;
+    protected bool $_echoCLI;
 
     /**
      * @var \Blacklight\NNTP
@@ -198,121 +194,121 @@ class ProcessAdditional
     /**
      * @var bool
      */
-    protected $_extractUsingRarInfo;
+    protected bool $_extractUsingRarInfo;
 
     /**
      * @var bool
      */
-    protected $_alternateNNTP;
+    protected bool $_alternateNNTP;
 
     /**
      * @var int
      */
-    protected $_ffMPEGDuration;
+    protected int $_ffMPEGDuration;
 
     /**
      * @var bool
      */
-    protected $_addPAR2Files;
+    protected bool $_addPAR2Files;
 
     /**
      * @var bool
      */
-    protected $_processVideo;
+    protected bool $_processVideo;
 
     /**
      * @var bool
      */
-    protected $_processJPGSample;
+    protected bool $_processJPGSample;
 
     /**
      * @var bool
      */
-    protected $_processAudioSample;
+    protected bool $_processAudioSample;
 
     /**
      * @var bool
      */
-    protected $_processMediaInfo;
+    protected bool $_processMediaInfo;
 
     /**
      * @var bool
      */
-    protected $_processAudioInfo;
+    protected bool $_processAudioInfo;
 
     /**
      * @var bool
      */
-    protected $_processPasswords;
+    protected bool $_processPasswords;
 
     /**
      * @var string
      */
-    protected $_audioFileRegex;
+    protected string $_audioFileRegex;
 
     /**
      * @var string
      */
-    protected $_ignoreBookRegex;
+    protected string $_ignoreBookRegex;
 
     /**
      * @var string
      */
-    protected $_videoFileRegex;
+    protected string $_videoFileRegex;
 
     /**
      * Have we created a video file for the current release?
      * @var bool
      */
-    protected $_foundVideo;
+    protected bool $_foundVideo;
 
     /**
      * Have we found MediaInfo data for a Video for the current release?
      * @var bool
      */
-    protected $_foundMediaInfo;
+    protected bool $_foundMediaInfo;
 
     /**
      * Have we found MediaInfo data for a Audio file for the current release?
      * @var bool
      */
-    protected $_foundAudioInfo;
+    protected bool $_foundAudioInfo;
 
     /**
      * Have we created a short Audio file sample for the current release?
      * @var bool
      */
-    protected $_foundAudioSample;
+    protected bool $_foundAudioSample;
 
     /**
      * Extension of the found audio file (MP3/FLAC/etc).
      * @var string
      */
-    protected $_AudioInfoExtension;
+    protected string $_AudioInfoExtension;
 
     /**
      * Have we downloaded a JPG file for the current release?
      * @var bool
      */
-    protected $_foundJPGSample;
+    protected bool $_foundJPGSample;
 
     /**
      * Have we created a Video JPG image sample for the current release?
      * @var bool
      */
-    protected $_foundSample;
+    protected bool $_foundSample;
 
     /**
      * Have we found PAR2 info on this release?
      * @var bool
      */
-    protected $_foundPAR2Info;
+    protected bool $_foundPAR2Info;
 
     /**
      * Message ID's for found content to download.
      * @var array
      */
-    protected $_sampleMessageIDs;
+    protected array $_sampleMessageIDs;
     protected $_JPGMessageIDs;
     protected $_MediaInfoMessageIDs;
     protected $_AudioInfoMessageIDs;
@@ -322,56 +318,56 @@ class ProcessAdditional
      * Password status of the current release.
      * @var array
      */
-    protected $_passwordStatus = [];
+    protected array $_passwordStatus = [];
 
     /**
      * Does the current release have a password?
      * @var bool
      */
-    protected $_releaseHasPassword;
+    protected bool $_releaseHasPassword;
 
     /**
      * Does the current release have an NFO file?
      * @var bool
      */
-    protected $_releaseHasNoNFO;
+    protected bool $_releaseHasNoNFO;
 
     /**
      * Name of the current release's usenet group.
      * @var string
      */
-    protected $_releaseGroupName;
+    protected string $_releaseGroupName;
 
     /**
      * Number of file information added to DB (from rar/zip/par2 contents).
      * @var int
      */
-    protected $_addedFileInfo;
+    protected int $_addedFileInfo;
 
     /**
      * Number of file information we found from RAR/ZIP.
      * (if some of it was already in DB, this count goes up, while the count above does not).
      * @var int
      */
-    protected $_totalFileInfo;
+    protected int $_totalFileInfo;
 
     /**
      * How many compressed (rar/zip) files have we checked.
      * @var int
      */
-    protected $_compressedFilesChecked;
+    protected int $_compressedFilesChecked;
 
     /**
      * Should we download the last rar?
      * @var bool
      */
-    protected $_fetchLastFiles;
+    protected bool $_fetchLastFiles;
 
     /**
      * Are we downloading the last rar?
      * @var bool
      */
-    protected $_reverse;
+    protected bool $_reverse;
 
     /**
      * @var \Blacklight\SphinxSearch
@@ -381,21 +377,21 @@ class ProcessAdditional
     /**
      * @var \FFMpeg\FFMpeg
      */
-    private $ffmpeg;
+    private FFMpeg $ffmpeg;
 
     /**
      * @var \FFMpeg\FFProbe
      */
-    private $ffprobe;
+    private FFProbe $ffprobe;
 
     /**
      * @var \Mhor\MediaInfo\MediaInfo
      */
-    private $mediaInfo;
+    private MediaInfo $mediaInfo;
     /**
      * @var ElasticSearchSiteSearch
      */
-    private $elasticsearch;
+    private ElasticSearchSiteSearch $elasticsearch;
 
     /**
      * ProcessAdditional constructor.
