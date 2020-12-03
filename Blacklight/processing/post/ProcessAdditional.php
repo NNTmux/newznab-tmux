@@ -48,7 +48,6 @@ class ProcessAdditional
      */
     protected bool $_echoDebug;
 
-
     protected $_releases;
 
     /**
@@ -56,7 +55,6 @@ class ProcessAdditional
      * @var int
      */
     protected int $_totalReleases;
-
 
     protected $_release;
 
