@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ebfbda9d9879b9b8f31776b6cc77d0f",
+    "content-hash": "6f13adce07c83b25e82e85fd0f403ef9",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -6986,27 +6986,27 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "4e615690f80ad1661465aff900916311bd2fbd8c"
+                "reference": "73c0d953a788e5262d2d520cf5529301ecf67344"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/4e615690f80ad1661465aff900916311bd2fbd8c",
-                "reference": "4e615690f80ad1661465aff900916311bd2fbd8c",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/73c0d953a788e5262d2d520cf5529301ecf67344",
+                "reference": "73c0d953a788e5262d2d520cf5529301ecf67344",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "~5.8.0|^6.0|^7.0|^8.0",
-                "nesbot/carbon": "^1.0|^2.0",
-                "php": "^7.2"
+                "illuminate/support": "^6.0|^7.0|^8.0",
+                "nesbot/carbon": "^2.0",
+                "php": "^7.2|8.0"
             },
             "require-dev": {
-                "mockery/mockery": "^1.3",
-                "orchestra/testbench": "~3.8.0|^4.0|^5.0|^6.0",
-                "phpunit/phpunit": "^8.0|^9.0"
+                "mockery/mockery": "^1.4",
+                "orchestra/testbench": "^4.0|^5.0|^6.0",
+                "phpunit/phpunit": "^9.0"
             },
             "type": "library",
             "extra": {
@@ -7051,7 +7051,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2020-09-08T21:03:23+00:00"
+            "time": "2020-12-02T20:34:22+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
@@ -14456,7 +14456,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.3.0",
+        "php": ">=7.4.0",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-curl": "*",
