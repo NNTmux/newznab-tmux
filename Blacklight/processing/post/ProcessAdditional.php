@@ -1632,7 +1632,7 @@ class ProcessAdditional
             );
         }
 
-        Release::fromRaw($query);
+        Release::fromQuery($query);
     }
 
     /**

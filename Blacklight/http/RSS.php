@@ -112,7 +112,7 @@ class RSS extends Capabilities
             return $result;
         }
 
-        $result = Release::fromRaw($sql);
+        $result = Release::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -146,7 +146,7 @@ class RSS extends Capabilities
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
             $this->releases->uSQL(
-                UserSerie::fromRaw(
+                UserSerie::fromQuery(
                     sprintf(
                         '
 							SELECT videos_id, categories
@@ -172,7 +172,7 @@ class RSS extends Capabilities
             return $result;
         }
 
-        $result = Release::fromRaw($sql);
+        $result = Release::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -207,7 +207,7 @@ class RSS extends Capabilities
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
             $this->releases->uSQL(
-                UserMovie::fromRaw(
+                UserMovie::fromQuery(
                     sprintf(
                         '
 							SELECT imdbid, categories
@@ -232,7 +232,7 @@ class RSS extends Capabilities
             return $result;
         }
 
-        $result = Release::fromRaw($sql);
+        $result = Release::fromQuery($sql);
 
         Cache::put(md5($sql), $result, $expiresAt);
 

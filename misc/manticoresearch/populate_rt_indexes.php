@@ -38,7 +38,7 @@ function populate_rt($table, $max)
 				ORDER BY r.id ASC
 				LIMIT %d';
 
-            $totals = Release::fromRaw('SELECT COUNT(id) AS c, MIN(id) AS min FROM releases')->first();
+            $totals = Release::fromQuery('SELECT COUNT(id) AS c, MIN(id) AS min FROM releases')->first();
             if (! $totals) {
                 exit("Could not get database information for releases table.\n");
             }
@@ -55,7 +55,7 @@ function populate_rt($table, $max)
 				ORDER BY id ASC
 				LIMIT %d';
 
-            $totals = Predb::fromRaw('SELECT COUNT(id) AS c, MIN(id) AS min FROM predb')->first();
+            $totals = Predb::fromQuery('SELECT COUNT(id) AS c, MIN(id) AS min FROM predb')->first();
             if (! $totals) {
                 exit("Could not get database information for predb table.\n");
             }
