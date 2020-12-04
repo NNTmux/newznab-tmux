@@ -510,11 +510,11 @@ abstract class TV extends Videos
                 'S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[\-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
 
         // For names that don't start with the title.
-        if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $matches)) {
-            $showName = $matches['name'];
-        } elseif (preg_match('/^(?P<name>[a-z0-9][\w\' .-]*?)'.$following.'/i', $relname, $matches)) {
+        if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $hits)) {
+            $showName = $hits['name'];
+        } elseif (preg_match('/^(?P<name>[a-z0-9][\w\' .-]*?)'.$following.'/i', $relname, $hits)) {
             // For names that start with the title.
-            $showName = $matches['name'];
+            $showName = $hits['name'];
         }
         // If we still have any of the words in $following, remove them.
         $showName = preg_replace('/'.$following.'/i', ' ', $showName);
@@ -540,79 +540,79 @@ abstract class TV extends Videos
         $episodeArr = [];
 
         // S01E01-E02 and S01E01-02
-        if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})(?:[e-])(\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = (int) $matches[2];
-            $episodeArr['episode'] = [(int) $matches[3], (int) $matches[4]];
+        if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})(?:[e-])(\d{1,3})[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
+            $episodeArr['episode'] = [(int) $hits[3], (int) $hits[4]];
         }
         //S01E0102 and S01E01E02 - lame no delimit numbering, regex would collide if there was ever 1000 ep season.
-        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{2})[^a-z0-9]?e(\d{2})e?(\d{2})[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = (int) $matches[2];
-            $episodeArr['episode'] = (int) $matches[3];
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{2})[^a-z0-9]?e(\d{2})e?(\d{2})[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
+            $episodeArr['episode'] = (int) $hits[3];
         }
         // S01E01 and S01.E01
-        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[abr]?[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = (int) $matches[2];
-            $episodeArr['episode'] = (int) $matches[3];
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[abr]?[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
+            $episodeArr['episode'] = (int) $hits[3];
         }
         // S01
-        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = (int) $matches[2];
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = 'all';
         }
         // S01D1 and S1D1
-        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?d\d{1}[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = (int) $matches[2];
+        elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?d\d{1}[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = 'all';
         }
         // 1x01 and 101
-        elseif (preg_match('/^(.*?)[^a-z0-9](\d{1,2})x(\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = (int) $matches[2];
-            $episodeArr['episode'] = (int) $matches[3];
+        elseif (preg_match('/^(.*?)[^a-z0-9](\d{1,2})x(\d{1,3})[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
+            $episodeArr['episode'] = (int) $hits[3];
         }
         // 2009.01.01 and 2009-01-01
-        elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = $matches[4].$matches[5];
-            $episodeArr['episode'] = $matches[5].'/'.$matches[6];
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $matches['airdate']))); //yyyy-mm-dd
+        elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = $hits[4].$hits[5];
+            $episodeArr['episode'] = $hits[5].'/'.$hits[6];
+            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); //yyyy-mm-dd
         }
         // 01.01.2009
-        elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = $matches[5].$matches[6];
-            $episodeArr['episode'] = $matches[3].'/'.$matches[4];
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $matches['airdate']))); //yyyy-mm-dd
+        elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = $hits[5].$hits[6];
+            $episodeArr['episode'] = $hits[3].'/'.$hits[4];
+            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); //yyyy-mm-dd
         }
         // 01.01.09
-        elseif (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]/i', $relname, $matches)) {
+        elseif (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]/i', $relname, $hits)) {
             // Add extra logic to capture the proper YYYY year
-            $episodeArr['season'] = $matches[4] = ($matches[4] <= 99 && $matches[4] > 15) ? '19'.$matches[4] : '20'.$matches[4];
-            $episodeArr['episode'] = $matches[2].'/'.$matches[3];
+            $episodeArr['season'] = $hits[4] = ($hits[4] <= 99 && $hits[4] > 15) ? '19'.$hits[4] : '20'.$hits[4];
+            $episodeArr['episode'] = $hits[2].'/'.$hits[3];
             $tmpAirdate = $episodeArr['season'].'/'.$episodeArr['episode'];
             $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); //yyyy-mm-dd
         }
         // 2009.E01
-        elseif (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = '20'.$matches[2];
-            $episodeArr['episode'] = (int) $matches[3];
+        elseif (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = '20'.$hits[2];
+            $episodeArr['episode'] = (int) $hits[3];
         }
         // 2009.Part1
-        elseif (preg_match('/^(.*?)[^a-z0-9](19|20)(\d{2})[^a-z0-9]Part(\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
-            $episodeArr['season'] = $matches[2].$matches[3];
-            $episodeArr['episode'] = (int) $matches[4];
+        elseif (preg_match('/^(.*?)[^a-z0-9](19|20)(\d{2})[^a-z0-9]Part(\d{1,2})[^a-z0-9]/i', $relname, $hits)) {
+            $episodeArr['season'] = $hits[2].$hits[3];
+            $episodeArr['episode'] = (int) $hits[4];
         }
         // Part1/Pt1
-        elseif (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9](\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
+        elseif (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9](\d{1,2})[^a-z0-9]/i', $relname, $hits)) {
             $episodeArr['season'] = 1;
-            $episodeArr['episode'] = (int) $matches[2];
+            $episodeArr['episode'] = (int) $hits[2];
         }
 
         // Band.Of.Brothers.EP06.Bastogne.DVDRiP.XviD-DEiTY
-        elseif (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $matches)) {
+        elseif (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $hits)) {
             $episodeArr['season'] = 1;
-            $episodeArr['episode'] = (int) $matches[2];
+            $episodeArr['episode'] = (int) $hits[2];
         }
         // Season.1
-        elseif (preg_match('/^(.*?)[^a-z0-9]Seasons?[^a-z0-9]?(\d{1,2})/i', $relname, $matches)) {
-            $episodeArr['season'] = (int) $matches[2];
+        elseif (preg_match('/^(.*?)[^a-z0-9]Seasons?[^a-z0-9]?(\d{1,2})/i', $relname, $hits)) {
+            $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = 'all';
         }
 

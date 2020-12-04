@@ -227,7 +227,7 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        $total = \count($releases);
+        $total = $releases->count();
 
         if ($total > 0) {
             $this->_totalReleases = $total;
@@ -312,7 +312,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' file names to process.');
@@ -378,7 +378,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' CRC32\'s to process.');
@@ -442,7 +442,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' xxx file names to process.');
@@ -507,7 +507,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' srr file extensions to process.');
@@ -566,7 +566,7 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
 
@@ -652,7 +652,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' unique ids to process.');
@@ -717,7 +717,7 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' mediainfo movie names to process.');
@@ -791,7 +791,7 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        $total = \count($releases);
+        $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->consoletools->primary(number_format($total).' hash_16K to process.');
@@ -1153,7 +1153,7 @@ class NameFixer
         );
 
         if (! empty($res)) {
-            $total = \count($res);
+            $total = $res->count();
         }
 
         // Run if row count is positive, but do not run if row count exceeds 10 (as this is likely a failed title match)
@@ -1238,7 +1238,7 @@ class NameFixer
         );
 
         if (! empty($query)) {
-            $total = \count($query);
+            $total = $query->count();
 
             if ($total > 0) {
                 $this->consoletools->header(PHP_EOL.number_format($total).' releases to process.');
@@ -1451,7 +1451,7 @@ class NameFixer
         }
 
         $res = Release::fromQuery($query);
-        $total = \count($res);
+        $total = $res->count();
         $this->consoletools->primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
             if (preg_match('/[a-fA-F0-9]{32,40}/i', $row->name, $hits)) {
@@ -2506,9 +2506,9 @@ class NameFixer
                     }
                 }
             } else {
-                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {
-                    if (! empty($match)) {
-                        $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
+                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $hit) {
+                    if (! empty($hit)) {
+                        $this->updateRelease($release, $hit['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $hit['id']);
 
                         return true;
                     }
@@ -2527,24 +2527,24 @@ class NameFixer
      */
     private function cleanFileNames()
     {
-        if (preg_match('/(\.[a-zA-Z]{2})?(\.4k|\.fullhd|\.hd|\.int|\.\d+)?$/i', $this->_fileName, $match)) {
-            if (! empty($match[1]) && preg_match('/\.[a-zA-Z]{2}/i', $match[1])) {
+        if (preg_match('/(\.[a-zA-Z]{2})?(\.4k|\.fullhd|\.hd|\.int|\.\d+)?$/i', $this->_fileName, $hit)) {
+            if (! empty($hit[1]) && preg_match('/\.[a-zA-Z]{2}/i', $hit[1])) {
                 $this->_fileName = preg_replace('/\.[a-zA-Z]{2}\./i', '.', $this->_fileName);
             }
-            if (! empty($match[2])) {
-                if (preg_match('/\.4k$/', $match[2])) {
+            if (! empty($hit[2])) {
+                if (preg_match('/\.4k$/', $hit[2])) {
                     $this->_fileName = preg_replace('/\.4k$/', '.2160p', $this->_fileName);
                 }
-                if (preg_match('/\.fullhd$/i', $match[2])) {
+                if (preg_match('/\.fullhd$/i', $hit[2])) {
                     $this->_fileName = preg_replace('/\.fullhd$/i', '.1080p', $this->_fileName);
                 }
-                if (preg_match('/\.hd$/i', $match[2])) {
+                if (preg_match('/\.hd$/i', $hit[2])) {
                     $this->_fileName = preg_replace('/\.hd$/i', '.720p', $this->_fileName);
                 }
-                if (preg_match('/\.int$/i', $match[2])) {
+                if (preg_match('/\.int$/i', $hit[2])) {
                     $this->_fileName = preg_replace('/\.int$/i', '.INTERNAL', $this->_fileName);
                 }
-                if (preg_match('/\.\d+/', $match[2])) {
+                if (preg_match('/\.\d+/', $hit[2])) {
                     $this->_fileName = preg_replace('/\.\d+$/', '', $this->_fileName);
                 }
             }

@@ -684,7 +684,7 @@ class Movie
         if (! empty($imdb['language'])) {
             $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
         } elseif (! empty($omdb['language']) && ! is_bool($omdb['language'])) {
-            $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
+            $mov['language'] = \is_array($omdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
         }
 
         if (\is_array($mov['genre'])) {
@@ -1101,8 +1101,8 @@ class Movie
     public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
     {
         $imdbID = false;
-        if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $matches)) {
-            $imdbID = $matches['imdbid'];
+        if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $hits)) {
+            $imdbID = $hits['imdbid'];
         }
 
         if ($imdbID !== false) {
@@ -1331,17 +1331,17 @@ class Movie
         /* Initial scan of getting a year/name.
          * [\w. -]+ Gets 0-9a-z. - characters, most scene movie titles contain these chars.
          * ie: [61420]-[FULL]-[a.b.foreignEFNet]-[ Coraline.2009.DUTCH.INTERNAL.1080p.BluRay.x264-VeDeTT ]-[21/85] - "vedett-coralien-1080p.r04" yEnc
-         * Then we look up the year, (19|20)\d\d, so $matches[1] would be Coraline $matches[2] 2009
+         * Then we look up the year, (19|20)\d\d, so $hits[1] would be Coraline $hits[2] 2009
          */
-        if (preg_match('/(?P<name>[\w. -]+)[^\w](?P<year>(19|20)\d\d)/i', $releaseName, $matches)) {
-            $name = $matches['name'];
-            $year = $matches['year'];
+        if (preg_match('/(?P<name>[\w. -]+)[^\w](?P<year>(19|20)\d\d)/i', $releaseName, $hits)) {
+            $name = $hits['name'];
+            $year = $hits['year'];
 
         /* If we didn't find a year, try to get a name anyways.
          * Try to look for a title before the $followingList and after anything but a-z0-9 two times or more (-[ for example)
          */
-        } elseif (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $matches)) {
-            $name = $matches['name'];
+        } elseif (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $hits)) {
+            $name = $hits['name'];
         }
 
         // Check if we got something.
