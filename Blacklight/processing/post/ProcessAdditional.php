@@ -314,9 +314,9 @@ class ProcessAdditional
 
     /**
      * Password status of the current release.
-     * @var array
+     * @var int
      */
-    protected array $_passwordStatus = [];
+    protected int $_passwordStatus;
 
     /**
      * Does the current release have a password?
@@ -1075,7 +1075,7 @@ class ProcessAdditional
                 $this->_debug('ArchiveInfo: Compressed file has a password.');
             }
             $this->_releaseHasPassword = true;
-            $this->_passwordStatus = [Releases::PASSWD_RAR];
+            $this->_passwordStatus = Releases::PASSWD_RAR;
 
             return false;
         }
@@ -1142,13 +1142,13 @@ class ProcessAdditional
 
                 if (isset($file['pass']) && $file['pass'] === true) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = [Releases::PASSWD_RAR];
+                    $this->_passwordStatus = Releases::PASSWD_RAR;
                     break;
                 }
 
                 if ($this->_innerFileBlacklist !== false && preg_match($this->_innerFileBlacklist, $file['name'])) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = [Releases::PASSWD_RAR];
+                    $this->_passwordStatus = Releases::PASSWD_RAR;
                     break;
                 }
 
@@ -1221,7 +1221,7 @@ class ProcessAdditional
                             $this->_debug('Codec spam found, setting release to potentially passworded.');
                         }
                         $this->_releaseHasPassword = true;
-                        $this->_passwordStatus = [Releases::PASSWD_RAR];
+                        $this->_passwordStatus = Releases::PASSWD_RAR;
                     } //Run a PreDB filename check on insert to try and match the release
                     elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
                         $this->_release['filename'] = $file['name'];
@@ -2311,7 +2311,7 @@ class ProcessAdditional
         $this->_foundSample = $this->_processThumbnails ? false : true;
         $this->_foundPAR2Info = false;
 
-        $this->_passwordStatus = [Releases::PASSWD_NONE];
+        $this->_passwordStatus = Releases::PASSWD_NONE;
         $this->_releaseHasPassword = false;
 
         $this->_releaseGroupName = UsenetGroup::getNameByID($this->_release->groups_id);
