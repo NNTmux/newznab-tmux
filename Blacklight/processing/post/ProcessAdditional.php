@@ -1592,7 +1592,7 @@ class ProcessAdditional
             $releaseFilesCount = 0;
         }
 
-        $this->_passwordStatus = max($this->_passwordStatus);
+        $this->_passwordStatus = max([$this->_passwordStatus]);
 
         // Set the release to no password if password processing is off.
         if (! $this->_processPasswords) {
