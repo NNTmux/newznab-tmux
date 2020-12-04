@@ -541,7 +541,7 @@ class Movie
             $query[$key] = rtrim($value, ', ');
         }
 
-        MovieInfo::fromQuery($query[0].') '.$query[1].') '.$query[2]);
+        MovieInfo::fromRaw($query[0].') '.$query[1].') '.$query[2]);
 
         return true;
     }
