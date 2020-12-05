@@ -1607,7 +1607,7 @@ class ProcessAdditional
         } // Else update the release with the password status (if the admin enabled the setting).
         else {
             $updateRows += ['passwordstatus' => $this->_processPasswords ? $this->_passwordStatus : Releases::PASSWD_NONE,
-                'rarinnerfilecount' => $releaseFilesCount];
+                'rarinnerfilecount' => $releaseFilesCount, ];
             Release::query()->where('id', $this->_release->id)->update(
                 $updateRows
             );
