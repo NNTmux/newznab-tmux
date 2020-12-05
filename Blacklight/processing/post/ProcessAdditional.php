@@ -1580,7 +1580,7 @@ class ProcessAdditional
         }
 
         if (File::isFile($this->_releaseImage->jpgSavePath.$this->_release->guid.'_thumb.jpg')) {
-            $updateRows += ['jpegstatus' => 1];
+            $updateRows += ['jpgstatus' => 1];
         }
 
         // Get the amount of files we found inside the RAR/ZIP files.
