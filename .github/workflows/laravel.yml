@@ -35,7 +35,6 @@ jobs:
     - name: Create Database
       run: |
          mysql -h 127.0.0.1 -u root -e "SET GLOBAL innodb_file_per_table = 1;"
-         mysql -h 127.0.0.1 -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
          if [[ -f /etc/mysql/my.cnf ]]; then sudo sed -i "s/\[mysqld\]/\[mysqld\]\ngroup_concat_max_len = 8192/" /etc/mysql/my.cnf; fi
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
@@ -43,5 +42,5 @@ jobs:
         DB_DATABASE: TEST
       run: |
         mkdir -p /home/runner/work/newznab-tmux/newznab-tmux/tests/Unit
-        mkdir -p /home/runner/work/newznab-tmux/newznab-tmux/build/logs
+        mkdir -p /home/runner/work/newznab-tmux/newznab-tmux/tests/build/logs
         vendor/bin/phpunit
