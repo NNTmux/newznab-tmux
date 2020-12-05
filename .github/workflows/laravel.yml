@@ -42,5 +42,6 @@ jobs:
         DB_CONNECTION: mysql
         DB_DATABASE: TEST
       run: |
-        mkdir -p /home/runner/work/newznab-tmux/newznab-tmux/./tests/Unit
+        mkdir -p /home/runner/work/newznab-tmux/newznab-tmux/tests/Unit
+        mkdir -p /home/runner/work/newznab-tmux/newznab-tmux/build/logs
         vendor/bin/phpunit
