@@ -515,7 +515,7 @@ class Movie
         }
 
         $query = [];
-        $onDuplicateKey = ['created_at' => now(), ];
+        $onDuplicateKey = ['created_at' => now()];
         $found = 0;
         foreach ($values as $key => $value) {
             if (! empty($value)) {
@@ -524,7 +524,7 @@ class Movie
                     $value = substr($value, 0, 64);
                 }
                 $query += [$key => $value];
-                $onDuplicateKey += [$key => $value, ];
+                $onDuplicateKey += [$key => $value];
             }
         }
         if (! $found) {
@@ -711,7 +711,7 @@ class Movie
         ]);
 
         if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
-            PHP_EOL . $this->colorCli->headerOver('Added/updated movie: ').
+            PHP_EOL.$this->colorCli->headerOver('Added/updated movie: ').
                 $this->colorCli->primary(
                     $mov['title'].
                     ' ('.
@@ -759,7 +759,7 @@ class Movie
                         $ret['title'] = $art['name'];
                     }
                     if ($this->echooutput && Utility::isCLI()) {
-                        PHP_EOL . $this->colorCli->alternateOver('Fanart Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                        PHP_EOL.$this->colorCli->alternateOver('Fanart Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                     }
 
                     return $ret;
@@ -871,7 +871,7 @@ class Movie
                 $ret['backdrop'] = '';
             }
             if ($this->echooutput && Utility::isCLI()) {
-                PHP_EOL . $this->colorCli->primaryOver('TMDb Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                PHP_EOL.$this->colorCli->primaryOver('TMDb Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
             }
 
             return $ret;
@@ -909,7 +909,7 @@ class Movie
                         ];
 
                         if ($this->echooutput && Utility::isCLI()) {
-                            PHP_EOL . $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($title).PHP_EOL;
+                            PHP_EOL.$this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($title).PHP_EOL;
                         }
 
                         return $ret;
@@ -973,7 +973,7 @@ class Movie
                         }
 
                         if ($this->echooutput && Utility::isCLI()) {
-                            PHP_EOL . $this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                            PHP_EOL.$this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
 
                         return $ret;
@@ -1024,7 +1024,7 @@ class Movie
                         ];
 
                         if ($this->echooutput && Utility::isCLI()) {
-                            PHP_EOL . $this->colorCli->alternateOver('OMDbAPI Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                            PHP_EOL.$this->colorCli->alternateOver('OMDbAPI Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
 
                         return $ret;
@@ -1101,7 +1101,7 @@ class Movie
         if ($imdbID !== false) {
             $this->service = $service;
             if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
-                PHP_EOL . $this->colorCli->primary($this->service.' found IMDBid: tt'.$imdbID, true);
+                PHP_EOL.$this->colorCli->primary($this->service.' found IMDBid: tt'.$imdbID, true);
             }
 
             $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
