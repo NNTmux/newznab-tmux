@@ -3309,16 +3309,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.19.0",
+            "version": "v8.20.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "f5f331cee60f1bbe672503b7eb9ba5b22b2ceacb"
+                "reference": "b5d8573ab16027867eaa1ac148893833434f9b02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/f5f331cee60f1bbe672503b7eb9ba5b22b2ceacb",
-                "reference": "f5f331cee60f1bbe672503b7eb9ba5b22b2ceacb",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/b5d8573ab16027867eaa1ac148893833434f9b02",
+                "reference": "b5d8573ab16027867eaa1ac148893833434f9b02",
                 "shasum": ""
             },
             "require": {
@@ -3468,20 +3468,20 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-12-15T16:16:31+00:00"
+            "time": "2020-12-22T21:21:19+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.6.2",
+            "version": "v5.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "26b737da35fd3eaa478f4e7572added44c31fb73"
+                "reference": "f91245c1b32289da8dfdd3f66f13fe79dde347fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/26b737da35fd3eaa478f4e7572added44c31fb73",
-                "reference": "26b737da35fd3eaa478f4e7572added44c31fb73",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/f91245c1b32289da8dfdd3f66f13fe79dde347fd",
+                "reference": "f91245c1b32289da8dfdd3f66f13fe79dde347fd",
                 "shasum": ""
             },
             "require": {
@@ -3541,20 +3541,20 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2020-12-15T19:04:00+00:00"
+            "time": "2020-12-22T17:03:05+00:00"
         },
         {
             "name": "laravel/scout",
-            "version": "v8.5.0",
+            "version": "v8.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "2f528597910f1c68e577a283afd99a9af51c9d26"
+                "reference": "b8b8a35cc3ac82cbc07dfa83955492d2ef6e237b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/2f528597910f1c68e577a283afd99a9af51c9d26",
-                "reference": "2f528597910f1c68e577a283afd99a9af51c9d26",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/b8b8a35cc3ac82cbc07dfa83955492d2ef6e237b",
+                "reference": "b8b8a35cc3ac82cbc07dfa83955492d2ef6e237b",
                 "shasum": ""
             },
             "require": {
@@ -3606,7 +3606,7 @@
                 "laravel",
                 "search"
             ],
-            "time": "2020-12-10T14:58:57+00:00"
+            "time": "2020-12-22T17:29:20+00:00"
         },
         {
             "name": "laravel/telescope",
@@ -6909,16 +6909,16 @@
         },
         {
             "name": "spatie/laravel-backup",
-            "version": "6.14.1",
+            "version": "6.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-backup.git",
-                "reference": "f8bd2e719a76bd197c5cdec0172b2c9a7b6436da"
+                "reference": "3374e1eeb09ef32c6bfd495ae1f2f4de4b594922"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/f8bd2e719a76bd197c5cdec0172b2c9a7b6436da",
-                "reference": "f8bd2e719a76bd197c5cdec0172b2c9a7b6436da",
+                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/3374e1eeb09ef32c6bfd495ae1f2f4de4b594922",
+                "reference": "3374e1eeb09ef32c6bfd495ae1f2f4de4b594922",
                 "shasum": ""
             },
             "require": {
@@ -6990,7 +6990,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2020-12-16T07:40:24+00:00"
+            "time": "2020-12-23T10:13:12+00:00"
         },
         {
             "name": "spatie/laravel-directory-cleanup",
@@ -11540,16 +11540,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.17.2",
+            "version": "v2.17.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "aaee4f3d16a996fc0b570be0c69d3b80c909c507"
+                "reference": "bd32f5dd72cdfc7b53f54077f980e144bfa2f595"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/aaee4f3d16a996fc0b570be0c69d3b80c909c507",
-                "reference": "aaee4f3d16a996fc0b570be0c69d3b80c909c507",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/bd32f5dd72cdfc7b53f54077f980e144bfa2f595",
+                "reference": "bd32f5dd72cdfc7b53f54077f980e144bfa2f595",
                 "shasum": ""
             },
             "require": {
@@ -11575,7 +11575,7 @@
                 "justinrainbow/json-schema": "^5.0",
                 "keradus/cli-executor": "^1.4",
                 "mikey179/vfsstream": "^1.6",
-                "php-coveralls/php-coveralls": "^2.4.1",
+                "php-coveralls/php-coveralls": "^2.4.2",
                 "php-cs-fixer/accessible-object": "^1.0",
                 "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.2",
                 "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.2.1",
@@ -11636,7 +11636,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-12-17T16:41:55+00:00"
+            "time": "2020-12-24T11:14:44+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -12266,16 +12266,16 @@
         },
         {
             "name": "php-coveralls/php-coveralls",
-            "version": "v2.4.2",
+            "version": "v2.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-coveralls/php-coveralls.git",
-                "reference": "8a33ae229da63a0bd22dadae1512af663ce5e559"
+                "reference": "909381bd40a17ae6e9076051f0d73293c1c091af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-coveralls/php-coveralls/zipball/8a33ae229da63a0bd22dadae1512af663ce5e559",
-                "reference": "8a33ae229da63a0bd22dadae1512af663ce5e559",
+                "url": "https://api.github.com/repos/php-coveralls/php-coveralls/zipball/909381bd40a17ae6e9076051f0d73293c1c091af",
+                "reference": "909381bd40a17ae6e9076051f0d73293c1c091af",
                 "shasum": ""
             },
             "require": {
@@ -12341,7 +12341,7 @@
                 "github",
                 "test"
             ],
-            "time": "2020-10-23T16:34:35+00:00"
+            "time": "2020-12-24T09:17:03+00:00"
         },
         {
             "name": "php-cs-fixer/diff",
@@ -12605,16 +12605,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.63",
+            "version": "0.12.64",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "c97ec4754bd53099a06c24847bd2870b99966b6a"
+                "reference": "23eb1cb7ae125f45f1d0e48051bcf67a9a9b08aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c97ec4754bd53099a06c24847bd2870b99966b6a",
-                "reference": "c97ec4754bd53099a06c24847bd2870b99966b6a",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/23eb1cb7ae125f45f1d0e48051bcf67a9a9b08aa",
+                "reference": "23eb1cb7ae125f45f1d0e48051bcf67a9a9b08aa",
                 "shasum": ""
             },
             "require": {
@@ -12657,7 +12657,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-12-15T16:37:16+00:00"
+            "time": "2020-12-21T11:59:02+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
