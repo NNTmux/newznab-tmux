@@ -63,5 +63,6 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         'clearance' => \App\Http\Middleware\ClearanceMiddleware::class,
+        '2fa' => \App\Http\Middleware\Google2FAMiddleware::class,
     ];
 }
