@@ -43,14 +43,6 @@ jobs:
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
 
-    - name: Create Database
-      run: |
-       mysql -h 127.0.0.1 -u root -e "SET GLOBAL innodb_file_per_table = 1;"
-
-       if [[ -f /etc/mysql/my.cnf ]]; then
-         sudo sed -i "s/\[mysqld\]/\[mysqld\]\ngroup_concat_max_len = 8192/" /etc/mysql/my.cnf;
-       fi
-
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
         DB_CONNECTION: mysql
