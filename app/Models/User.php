@@ -946,4 +946,12 @@ class User extends Authenticatable
     {
         static::whereVerified(0)->where('created_at', '<', now()->subDays(3))->delete();
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function passwordSecurity(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PasswordSecurity::class);
+    }
 }

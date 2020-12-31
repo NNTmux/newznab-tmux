@@ -134,6 +134,7 @@
     "php-ffmpeg/php-ffmpeg": "^0.14",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
+    "pragmarx/google2fa-laravel": "^1.4",
     "predis/predis": "^1.1",
     "propaganistas/laravel-disposable-email": "^2.0",
     "ramsey/uuid": "^4.0",
