@@ -61,7 +61,6 @@ foreach ($releases as $release) {
         $newName = $newName['cleansubject'];
     }
     if ($newName !== $release['searchname']) {
-        PHP_EOL;
         echo 'Old name: '.$release->searchname.PHP_EOL;
         echo 'New name: '.$newName.PHP_EOL.PHP_EOL;
 

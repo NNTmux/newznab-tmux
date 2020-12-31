@@ -204,6 +204,16 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                <table class="data table table-striped">
+                                    <tbody>
+                                    <tr class="bg-aqua-active">
+                                        <td colspan="2" style="padding-left: 8px;"><strong>Enable or disable 2FA: </strong>
+                                            <a href="{{url("{'2fa'}")}}"> Here</a></td>
+                                    </tr>
+                                    <br>
+
+                                    </tbody>
+                                </table>
                                 {if {{App\Models\Settings::settingValue('site.main.userselstyle')}} == 1}
                                     <table class="data table table-striped">
                                         <tbody>

@@ -64,6 +64,7 @@ use App\Http\Controllers\MusicController;
 use App\Http\Controllers\MyMoviesController;
 use App\Http\Controllers\MyShowsController;
 use App\Http\Controllers\NfoController;
+use App\Http\Controllers\PasswordSecurityController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RssController;
@@ -270,13 +271,18 @@ Route::group(['middleware' => ['isVerified']], function () {
     Route::get('ajax_profile', [AjaxController::class, 'profile']);
 
     Route::post('ajax_profile', [AjaxController::class, 'profile']);
+
+    Route::get('2fa', [PasswordSecurityController::class, 'show2faForm']);
+    Route::post('generate2faSecret', [PasswordSecurityController::class, 'generate2faSecret'])->name('generate2faSecret');
+    Route::post('2fa', [PasswordSecurityController::class, 'enable2fa'])->name('enable2fa');
+    Route::post('disable2fa', [PasswordSecurityController::class, 'disable2fa'])->name('disable2fa');
 });
 
 Route::get('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware('role:Admin');
 
 Route::post('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware('role:Admin');
 
-Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
+Route::group(['middleware' => ['role:Admin', '2fa'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
     Route::get('index', [AdminPageController::class, 'index']);
     Route::get('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
     Route::post('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
@@ -401,3 +407,7 @@ Route::group(['middleware' => ['role_or_permission:Admin|Moderator|edit release'
     Route::get('release-edit', [AdminReleasesController::class, 'edit']);
     Route::post('release-edit', [AdminReleasesController::class, 'edit']);
 });
+
+Route::post('2faVerify', function () {
+    return redirect(URL()->previous());
+})->name('2faVerify')->middleware('2fa');

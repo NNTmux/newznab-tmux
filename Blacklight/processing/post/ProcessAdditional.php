@@ -314,9 +314,9 @@ class ProcessAdditional
 
     /**
      * Password status of the current release.
-     * @var array
+     * @var int
      */
-    protected array $_passwordStatus = [];
+    protected int $_passwordStatus;
 
     /**
      * Does the current release have a password?
@@ -1075,7 +1075,7 @@ class ProcessAdditional
                 $this->_debug('ArchiveInfo: Compressed file has a password.');
             }
             $this->_releaseHasPassword = true;
-            $this->_passwordStatus = [Releases::PASSWD_RAR];
+            $this->_passwordStatus = Releases::PASSWD_RAR;
 
             return false;
         }
@@ -1142,13 +1142,13 @@ class ProcessAdditional
 
                 if (isset($file['pass']) && $file['pass'] === true) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = [Releases::PASSWD_RAR];
+                    $this->_passwordStatus = Releases::PASSWD_RAR;
                     break;
                 }
 
                 if ($this->_innerFileBlacklist !== false && preg_match($this->_innerFileBlacklist, $file['name'])) {
                     $this->_releaseHasPassword = true;
-                    $this->_passwordStatus = [Releases::PASSWD_RAR];
+                    $this->_passwordStatus = Releases::PASSWD_RAR;
                     break;
                 }
 
@@ -1221,7 +1221,7 @@ class ProcessAdditional
                             $this->_debug('Codec spam found, setting release to potentially passworded.');
                         }
                         $this->_releaseHasPassword = true;
-                        $this->_passwordStatus = [Releases::PASSWD_RAR];
+                        $this->_passwordStatus = Releases::PASSWD_RAR;
                     } //Run a PreDB filename check on insert to try and match the release
                     elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
                         $this->_release['filename'] = $file['name'];
@@ -1568,20 +1568,19 @@ class ProcessAdditional
      */
     protected function _finalizeRelease(): void
     {
-        $vSQL = $jSQL = '';
-        $iSQL = ', haspreview = 0';
+        $updateRows = ['haspreview' => 0];
 
         // If samples exist from previous runs, set flags.
         if (File::isFile($this->_releaseImage->imgSavePath.$this->_release->guid.'_thumb.jpg')) {
-            $iSQL = ', haspreview = 1';
+            $updateRows = ['haspreview' => 1];
         }
 
         if (File::isFile($this->_releaseImage->vidSavePath.$this->_release->guid.'.ogv')) {
-            $vSQL = ', videostatus = 1';
+            $updateRows += ['videostatus' => 1];
         }
 
         if (File::isFile($this->_releaseImage->jpgSavePath.$this->_release->guid.'_thumb.jpg')) {
-            $jSQL = ', jpgstatus = 1';
+            $updateRows += ['jpgstatus' => 1];
         }
 
         // Get the amount of files we found inside the RAR/ZIP files.
@@ -1592,7 +1591,7 @@ class ProcessAdditional
             $releaseFilesCount = 0;
         }
 
-        $this->_passwordStatus = max($this->_passwordStatus);
+        $this->_passwordStatus = max([$this->_passwordStatus]);
 
         // Set the release to no password if password processing is off.
         if (! $this->_processPasswords) {
@@ -1601,32 +1600,18 @@ class ProcessAdditional
 
         // If we failed to get anything from the RAR/ZIPs, decrement the passwordstatus, if the rar/zip has no password.
         if (! $this->_releaseHasPassword && $this->_NZBHasCompressedFile && $releaseFilesCount === 0) {
-            $query = sprintf(
-                'UPDATE releases
-				SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
-				WHERE id = %d',
-                $releaseFilesCount,
-                $iSQL,
-                $vSQL,
-                $jSQL,
-                $this->_release->id
+            Release::query()->where('id', $this->_release->id)->decrement('passwordstatus');
+            Release::query()->where('id', $this->_release->id)->update(
+               $updateRows
             );
         } // Else update the release with the password status (if the admin enabled the setting).
         else {
-            $query = sprintf(
-                'UPDATE releases
-				SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
-				WHERE id = %d',
-                ($this->_processPasswords ? $this->_passwordStatus : Releases::PASSWD_NONE),
-                $releaseFilesCount,
-                $iSQL,
-                $vSQL,
-                $jSQL,
-                $this->_release->id
+            $updateRows += ['passwordstatus' => $this->_processPasswords ? $this->_passwordStatus : Releases::PASSWD_NONE,
+                'rarinnerfilecount' => $releaseFilesCount, ];
+            Release::query()->where('id', $this->_release->id)->update(
+                $updateRows
             );
         }
-
-        Release::fromQuery($query);
     }
 
     /**
@@ -2311,7 +2296,7 @@ class ProcessAdditional
         $this->_foundSample = $this->_processThumbnails ? false : true;
         $this->_foundPAR2Info = false;
 
-        $this->_passwordStatus = [Releases::PASSWD_NONE];
+        $this->_passwordStatus = Releases::PASSWD_NONE;
         $this->_releaseHasPassword = false;
 
         $this->_releaseGroupName = UsenetGroup::getNameByID($this->_release->groups_id);

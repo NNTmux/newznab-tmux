@@ -84,18 +84,18 @@ class ResetPasswordController extends Controller
         $content = app('smarty.view')->fetch($theme.'/forgottenpassword.tpl');
 
         app('smarty.view')->assign(
-                [
-                    'content' => $content,
-                    'title' => $title,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                    'email' => $ret['email'] ?? '',
-                    'confirmed' => $confirmed,
-                    'error' => $error,
-                    'notice' => $onscreen,
-                ]
-            );
+            [
+                'content' => $content,
+                'title' => $title,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+                'email' => $ret['email'] ?? '',
+                'confirmed' => $confirmed,
+                'error' => $error,
+                'notice' => $onscreen,
+            ]
+        );
         app('smarty.view')->display($theme.'/basepage.tpl');
     }
 }

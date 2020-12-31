@@ -159,12 +159,12 @@ class RegisterController extends Controller
                 $confirmPassword = $request->input('password_confirmation');
                 $email = $request->input('email');
 
-                    // Get the default user role.
-                    $userDefault = Role::query()->where('isdefault', '=', 1)->first();
+                // Get the default user role.
+                $userDefault = Role::query()->where('isdefault', '=', 1)->first();
 
-                    if (! empty($error)) {
-                        return $this->showRegistrationForm($request, $error);
-                    }
+                if (! empty($error)) {
+                    return $this->showRegistrationForm($request, $error);
+                }
 
                 if (Invite::isAllowed($inviteCode, $email) || Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
                     $user = $this->create(

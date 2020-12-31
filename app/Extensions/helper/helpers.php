@@ -261,6 +261,7 @@ if (! function_exists('runCmd')) {
         }
 
         $process = Process::fromShellCommandline('exec '.$command);
+        $process->setTimeout(1800);
         $process->run();
         $output = $process->getOutput();
 
