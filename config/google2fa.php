@@ -5,7 +5,7 @@ return [
     /*
      * Enable / disable Google2FA.
      */
-    'enabled' => env('OTP_ENABLED', true),
+    'enabled' => env('OTP_ENABLED', false),
 
     /*
      * Lifetime in minutes.
@@ -48,7 +48,7 @@ return [
     /*
      * Forbid user to reuse One Time Passwords.
      */
-    'forbid_old_passwords' => true,
+    'forbid_old_passwords' => false,
 
     /*
      * User's table column for google2fa secret.
