@@ -1,7 +1,6 @@
 language: php
 sudo: required
-dist: xenial
-group: edge
+dist: bionic
 
 branches:
   only:
@@ -20,11 +19,10 @@ notifications:
       - "\x030[\x0310Travis-ci\x030]\x03 Commit \x0314{%{commit}}\x03 by \x0315(%{author})\x03@\x0313%{repository_name}/%{branch}\x03 has \x037%{result}\x03: \x032%{build_url}\x03"
 
 php:
-  - '7.3'
   - '7.4'
 
 addons:
-  mariadb: '10.2'
+  mariadb: '10.4'
   apt:
       packages:
       - curl
@@ -41,7 +39,6 @@ install:
     # Configure environment settings
     - cp .env.travis .env
     # Install composer packages.
-    - composer global require hirak/prestissimo
     - composer install --prefer-dist
 
 before_script:

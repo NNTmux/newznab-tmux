@@ -31,12 +31,6 @@
     "optimize-autoloader": true
   },
   "description": "A Usenet Indexer",
-  "extra": {
-    "branch-alias": {
-      "dev-dev": "1.x-dev"
-    }
-
-  },
   "keywords": [
     "NNTmux",
     "newznab-tmux",
