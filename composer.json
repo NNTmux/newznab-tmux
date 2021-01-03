@@ -31,12 +31,6 @@
     "optimize-autoloader": true
   },
   "description": "A Usenet Indexer",
-  "extra": {
-    "branch-alias": {
-      "dev-dev": "1.x-dev"
-    }
-
-  },
   "keywords": [
     "NNTmux",
     "newznab-tmux",
@@ -100,7 +94,7 @@
     "dariusiii/token": "^3.0",
     "dariusiii/zipper": "^2.0",
     "dborsatto/php-giantbomb": "^2.0",
-    "doctrine/dbal": "^2.7",
+    "doctrine/dbal": "^3.0",
     "fakerphp/faker": "^1.12",
     "fideloper/proxy": "^4.2",
     "foolz/sphinxql-query-builder": "^2.0",
