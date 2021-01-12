@@ -895,6 +895,9 @@ class Binaries
                 $binariesUpdate[$binaryID]['Parts']++;
             }
 
+            // In case there are quotes in the message id
+            $this->header['Message-ID'] = addslashes($this->header['Message-ID']);
+
             // Strip the < and >, saves space in DB.
             $this->header['Message-ID'][0] = "'";
 
