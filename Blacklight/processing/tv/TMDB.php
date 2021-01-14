@@ -55,7 +55,7 @@ class TMDB extends TV
                     'cache' => [
                         'enabled' => false,
                     ],
-                ]
+                ],
             ]
         );
         $this->configRepository = new ConfigurationRepository($this->client);
