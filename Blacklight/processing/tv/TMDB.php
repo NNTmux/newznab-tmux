@@ -51,12 +51,12 @@ class TMDB extends TV
         parent::__construct($options);
         $this->token = new ApiToken(config('tmdb.api_key'));
         $this->client = new Client([$this->token,
-                [
-                    'cache' => [
-                        'enabled' => false,
-                    ],
+            [
+                'cache' => [
+                    'enabled' => false,
                 ],
-            ]
+            ],
+        ]
         );
         $this->configRepository = new ConfigurationRepository($this->client);
         $this->config = $this->configRepository->load();
