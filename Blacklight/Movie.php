@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Imdb\Config;
 use Imdb\Title;
 use Imdb\TitleSearch;
@@ -1003,7 +1004,7 @@ class Movie
         if ($this->omdbapikey !== null) {
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
 
-            if (\is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
+            if (\is_object($resp) && $resp->message === 'OK' && !Str::contains($resp->data, 'Error:') && $resp->data->Response !== 'False') {
                 similar_text($this->currentTitle, $resp->data->Title, $percent);
                 if ($percent >= self::MATCH_PERCENT) {
                     similar_text($this->currentYear, $resp->data->Year, $percent);
@@ -1230,7 +1231,7 @@ class Movie
                             $buffer = $this->omdbApi->search($omdbTitle, 'movie');
                         }
 
-                        if (\is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response === 'True') {
+                        if (\is_object($buffer) && $buffer->message === 'OK' && !Str::contains($buffer->data, 'Error:') && $buffer->data->Response === 'True') {
                             $getIMDBid = $buffer->data->Search[0]->imdbID;
 
                             if (! empty($getIMDBid)) {
