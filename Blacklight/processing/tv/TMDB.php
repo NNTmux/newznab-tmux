@@ -55,7 +55,7 @@ class TMDB extends TV
                 [
                     'api_token' => $this->token,
                     'event_dispatcher' => [
-                        'adapter' => new EventDispatcher()
+                        'adapter' => new EventDispatcher(),
                     ],
                 ],
             ]
