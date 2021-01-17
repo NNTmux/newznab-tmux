@@ -3,7 +3,6 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tmdb\Client;
 use Tmdb\Exception\TmdbApiException;
 use Tmdb\Helper\ImageHelper;

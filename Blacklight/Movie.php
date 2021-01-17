@@ -1256,30 +1256,30 @@ class Movie
                 // Check on The Movie Database.
                 if ($movieUpdated === false) {
                     try {
-                    $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
-                    if (($data['total_results'] > 0) && ! empty($data['results'])) {
-                        foreach ($data['results'] as $result) {
-                            if (! empty($result['id']) && ! empty($result['release_date'])) {
-                                similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
-                                if ($percent >= self::YEAR_MATCH_PERCENT) {
-                                    $ret = $this->fetchTMDBProperties($result['id'], true);
-                                    if ($ret !== false && ! empty($ret['imdbid'])) {
-                                        $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
-                                        if ($imdbID !== false) {
-                                            $movieUpdated = true;
+                        $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
+                        if (($data['total_results'] > 0) && ! empty($data['results'])) {
+                            foreach ($data['results'] as $result) {
+                                if (! empty($result['id']) && ! empty($result['release_date'])) {
+                                    similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
+                                    if ($percent >= self::YEAR_MATCH_PERCENT) {
+                                        $ret = $this->fetchTMDBProperties($result['id'], true);
+                                        if ($ret !== false && ! empty($ret['imdbid'])) {
+                                            $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
+                                            if ($imdbID !== false) {
+                                                $movieUpdated = true;
+                                            }
                                         }
                                     }
+                                } else {
+                                    $movieUpdated = false;
                                 }
-                            } else {
-                                $movieUpdated = false;
                             }
+                        } else {
+                            $movieUpdated = false;
                         }
-                    } else {
-                        $movieUpdated = false;
-                    } } catch (TmdbApiException | \ErrorException $error) {
+                    } catch (TmdbApiException | \ErrorException $error) {
                         $movieUpdated = false;
                     }
-
                 }
 
                 // We failed to get an IMDB id from all sources.

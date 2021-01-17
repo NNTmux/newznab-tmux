@@ -3,9 +3,7 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\ColorCLI;
-use Tmdb\Helper\ImageHelper;
 use Tmdb\Laravel\Facades\Tmdb;
-use Tmdb\Repository\ConfigurationRepository;
 
 $colorCli = new ColorCLI();
 
