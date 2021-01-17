@@ -50,18 +50,6 @@ class TMDB extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->token = new ApiToken(config('tmdb.api_key'));
-        $this->client = new Client(
-                [
-                    'api_token' => $this->token,
-                    'event_dispatcher' => [
-                        'adapter' => new EventDispatcher(),
-                    ],
-                ]
-        );
-        $this->configRepository = new ConfigurationRepository($this->client);
-        $this->config = $this->configRepository->load();
-        $this->helper = new ImageHelper($this->config);
     }
 
     /**
@@ -233,7 +221,7 @@ class TMDB extends TV
 
         try {
             $response = TmdbClient::getSearchApi()->searchTv($cleanName);
-        } catch (TmdbApiException $e) {
+        } catch (TmdbApiException | \ErrorException $e) {
             return false;
         }
 
@@ -368,7 +356,7 @@ class TMDB extends TV
      */
     protected function formatShowInfo($show): array
     {
-        $this->posterUrl = isset($show['poster_path']) ? 'https:'.$this->helper->getUrl($show['poster_path']) : '';
+        $this->posterUrl = isset($show['poster_path']) ? 'https://image.tmdb.org/t/p'.$show['poster_path'] : '';
 
         if (isset($show['external_ids']['imdb_id'])) {
             preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['external_ids']['imdb_id'], $imdb);

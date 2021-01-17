@@ -1185,16 +1185,16 @@
         },
         {
             "name": "dariusiii/tmdb-laravel",
-            "version": "v4.0.3.1",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/tmdb-laravel.git",
-                "reference": "8f9ba23e7ae197087fb47379187ab39e323a893e"
+                "reference": "c913673c0322494acee01a6c244d7b71912560ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/8f9ba23e7ae197087fb47379187ab39e323a893e",
-                "reference": "8f9ba23e7ae197087fb47379187ab39e323a893e",
+                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/c913673c0322494acee01a6c244d7b71912560ad",
+                "reference": "c913673c0322494acee01a6c244d7b71912560ad",
                 "shasum": ""
             },
             "require": {
@@ -1254,7 +1254,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2021-01-15T22:40:05+00:00"
+            "time": "2021-01-17T21:10:08+00:00"
         },
         {
             "name": "dariusiii/token",
@@ -13526,16 +13526,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.0",
+            "version": "9.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8e16c225d57c3d6808014df6b1dd7598d0a5bbbe"
+                "reference": "e7bdf4085de85a825f4424eae52c99a1cec2f360"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8e16c225d57c3d6808014df6b1dd7598d0a5bbbe",
-                "reference": "8e16c225d57c3d6808014df6b1dd7598d0a5bbbe",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e7bdf4085de85a825f4424eae52c99a1cec2f360",
+                "reference": "e7bdf4085de85a825f4424eae52c99a1cec2f360",
                 "shasum": ""
             },
             "require": {
@@ -13621,7 +13621,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-12-04T05:05:53+00:00"
+            "time": "2021-01-17T07:42:25+00:00"
         },
         {
             "name": "sebastian/cli-parser",

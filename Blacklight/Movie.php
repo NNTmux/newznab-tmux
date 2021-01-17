@@ -71,11 +71,6 @@ class Movie
     protected $releaseImage;
 
     /**
-     * @var \Tmdb\Client
-     */
-    protected $tmdbclient;
-
-    /**
      * @var \GuzzleHttp\Client
      */
     protected $client;
@@ -786,7 +781,7 @@ class Movie
 
         try {
             $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
-        } catch (TmdbApiException $error) {
+        } catch (TmdbApiException | \ErrorException $error) {
             if (Utility::isCLI()) {
                 $this->colorCli->error($error->getMessage());
             }
@@ -1260,6 +1255,7 @@ class Movie
 
                 // Check on The Movie Database.
                 if ($movieUpdated === false) {
+                    try {
                     $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
                     if (($data['total_results'] > 0) && ! empty($data['results'])) {
                         foreach ($data['results'] as $result) {
@@ -1280,7 +1276,10 @@ class Movie
                         }
                     } else {
                         $movieUpdated = false;
+                    } } catch (TmdbApiException | \ErrorException $error) {
+                        $movieUpdated = false;
                     }
+
                 }
 
                 // We failed to get an IMDB id from all sources.
