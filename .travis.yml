@@ -40,8 +40,8 @@ install:
 
 before_script:
      # Create mysql database and user.
-     - mysql -u root -e "CREATE DATABASE TEST;"
-     - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
+     - sudo mysql -e "CREATE DATABASE TEST;"
+     - sudo mysql -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
      # Disable apparmor.
      - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
      # Change MySQL settings.
