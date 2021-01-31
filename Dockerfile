@@ -1,43 +1,102 @@
-FROM ubuntu:18.04
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get -q update && \
-    apt-get -qy upgrade && \
-    apt-get install -qy screen time sudo unzip software-properties-common nano git make automake build-essential pkg-config libevent-dev libncurses5-dev fonts-powerline powerline mariadb-client libmysqlclient-dev unrar p7zip-full mediainfo lame ffmpeg && \
-    add-apt-repository ppa:ondrej/php && \
-    apt-get -q update && \
-    apt-get install -qy apache2 libapache2-mod-php7.3 php-pear php7.3 php7.3-cli php7.3-dev php7.3-common php7.3-curl php7.3-json php7.3-gd php7.3-mysql php7.3-mbstring php7.3-xml php7.3-intl php7.3-fpm php7.3-bcmath php7.3-zip php-imagick
+FROM archlinux
 
-RUN git clone https://github.com/tmux/tmux.git && \
-    cd tmux && \
-    git fetch --all --tags --prune && \
-    git checkout 2.9 && \
-    sh autogen.sh && \
-    ./configure && make && \
-    make install && \
-    cd .. && \
-    rm -rf tmux
+ENV SHELL=/bin/zsh
+ENV TERM=xterm-256color
 
-ENV HASH e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a
-RUN cd ~ && curl -sS https://getcomposer.org/installer -o composer-setup.php && php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
-    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && composer global require hirak/prestissimo
-COPY docker/php.ini /etc/php/7.3/apache2/conf.d/99-nn-tmux.ini
-COPY docker/php.ini /etc/php/7.3/cli/conf.d/99-nn-tmux.ini
-COPY docker/NNTmux.conf /etc/apache2/sites-available/NNTmux.conf
-RUN ln -sf /dev/stdout /var/log/apache2/access.log
-RUN ln -sf /dev/stdout /var/log/apache2/other_vhosts_access.log
-RUN ln -sf /dev/stderr /var/log/apache2/error.log
-RUN a2dissite 000-default && a2ensite NNTmux && a2enmod rewrite && service apache2 restart
-RUN chown -R www-data:www-data /var/www
-RUN useradd -ms /bin/bash notroot && usermod -aG www-data notroot && usermod -aG notroot www-data
+RUN echo "[multilib]" >> /etc/pacman.conf && \
+    echo "Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf && \
+    sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$(nproc)\"/" /etc/makepkg.conf
 
-USER www-data
-RUN mkdir /var/www/NNTmux/ && chmod 775 /var/www/NNTmux/
-WORKDIR /var/www/NNTmux
-COPY composer.json composer.lock /var/www/NNTmux/
-RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader
-COPY . ./
-RUN composer dump-autoload
+RUN pacman --noconfirm -Syu \
+    git \
+    vim \
+    tmux \
+    zsh
 
-USER root
-COPY docker/install.sh /tmp/install.sh
-EXPOSE 80
+RUN chsh -s /bin/zsh root && \
+    curl -Lo- http://bit.ly/2pztvLf | bash
+
+RUN pacman --noconfirm -Syu \
+    bc \
+    binutils \
+    bwm-ng \
+    composer \
+    fakeroot \
+    ffmpeg \
+    gcc \
+    htop \
+    jq \
+    lame \
+    make \
+    mariadb-clients \
+    mariadb \
+    mediainfo \
+    mytop \
+    nginx \
+    nmon \
+    p7zip \
+    php7-fpm \
+    php7-gd \
+    php7-intl \
+    powerline-fonts \
+    sudo \
+    supervisor \
+    the_silver_searcher \
+    time \
+    unrar \
+    unzip \
+    vnstat \
+    wget \
+    which
+
+# Temporary, until nntmux is ready for php8
+RUN mv /usr/sbin/php /usr/sbin/php8 && \
+    mv /usr/sbin/php7 /usr/sbin/php
+
+RUN wget http://pear.php.net/go-pear.phar -O /tmp/go-pear.phar && \
+    php /tmp/go-pear.phar && \
+    rm /tmp/go-pear.phar
+
+RUN mkdir -p /var/log/php7 && \
+    ln -sf /dev/stderr /var/log/php7/php-fpm.error.log && \
+    ln -sf /dev/stdout /var/log/php7/php-fpm.access.log
+
+RUN sed -i  \
+        -e "s/user = http/user = nntmux/" \
+        -e "s/group = http/group = nntmux/" \
+        -e "s#;access.log = log/\$pool.access.log#access.log = /var/log/php7/php-fpm.access.log#" \
+        /etc/php7/php-fpm.d/www.conf && \
+    sed -i "s#error_log = syslog#error_log = /var/log/php7/php-fpm.error.log#" /etc/php7/php-fpm.conf
+
+RUN groupadd --gid 1000 nntmux && \
+    useradd --create-home --system --shell /usr/sbin/zsh --uid 1000 --gid 1000 nntmux && \
+    passwd -d nntmux && \
+    chsh -s /bin/zsh nntmux && \
+    echo 'nntmux ALL=(ALL) ALL' > /etc/sudoers.d/nntmux && \
+    mkdir -p /home/nntmux/.gnupg && \
+    echo 'standard-resolver' > /home/nntmux/.gnupg/dirmngr.conf && \
+    chown -R nntmux:nntmux /home/nntmux
+
+USER nntmux
+
+RUN git clone --depth 1 https://aur.archlinux.org/yay.git /tmp/yay && \
+    cd /tmp/yay && \
+    makepkg --noconfirm -si && \
+    yay --afterclean --removemake --save && \
+    rm -rf /tmp/yay
+
+RUN yay --noconfirm -Sy \
+    php7-imagick \
+    php7-memcached \
+    php7-sodium \
+    tcptrack
+
+RUN curl -Lo- http://bit.ly/2pztvLf | bash
+
+# We disable it here because we enable it in the overrides file which affects
+# both php7-fpm as well as cli
+RUN sudo sed -i 's/^extension=curl/;extension=curl/' /etc/php7/php.ini
+
+WORKDIR /site
+
+CMD ["sudo", "/usr/sbin/supervisord", "--nodaemon"]
