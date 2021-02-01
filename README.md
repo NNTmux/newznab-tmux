@@ -70,41 +70,59 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
 
 ## Docker
 
- Copy .env.example -> .env, configure .env, mandatory fields:
- - DB_*
- - SPHINX_HOST=manticore
- - SPHINX_PORT=9306
- - NNTP_*
- - ADMIN_*
- - APP_TZ
- - APP_KEY=base64:wbvPP9pBOwifnwu84BeKAVzmwM4TLvcVFowLcPAi6nA= # or generate one!!!
- - REDIS_HOST=redis
- - REDIS_PASSWORD=null
- - REDIS_PORT=6379
+Run the docker init command
+```bash
+./cli/docker init
+```
 
-Start installation script and configuration
+Copy .env.example -> .env, configure .env, mandatory fields:
+- DB_*
+- SPHINX_HOST=manticore
+- SPHINX_PORT=9306
+- NNTP_*
+- ADMIN_*
+- APP_TZ
+- APP_KEY=base64:wbvPP9pBOwifnwu84BeKAVzmwM4TLvcVFowLcPAi6nA= # or generate one!!!
+- REDIS_HOST=redis
+- REDIS_PASSWORD=null
+- REDIS_PORT=6379
+
+Copy docker-compose.override.yml.dist to docker-compose.override.yml and remove any services that you don't want to run locally. Make any other adjustments to suit your needs.
+
+Copy over localized configuration from docker/php-overrides.ini to docker/php-overrides.local.ini and any other adjustments you'd like to make.
+
+Copy your composer's auth.json file (can probably be found in ~/.composer/auth.json) to docker/composer-auth.json.
+
+Run the installation script
 ```bash
-  docker-compose run --rm nn-tmux sh /tmp/install.sh
-  # answer the questions, since this will fetch predb entries this takes an hour or two, just press ctrl + c if you dont like it ;)
-  docker-compose run --rm --service-ports -T nn-tmux apachectl -D FOREGROUND 
+docker-compose run --rm web docker/install.sh
 ```
- Open http://localhost:8089
- sign in as admin (username, password from .env) and configure side settings and tmux settings
+
+For routing, you can use a proxy container like [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy). The default configuration is to route the indexer to nntmux.local. You'll also need to add the following to your `/etc/hosts` file:
+```
+127.0.0.1  nntmux.local
+```
+
+Now, you can start the web container:
 ```bash
-  # ctrl + c
-  docker-compose up nn-tmux
-  # check the logs, if everything is working fine ctrl + c
-  # start and run in background
-  docker-compose up -d nn-tmux
-  # start the automatic import
-  docker-compose up -d nn-tmux-ui
-  # check the monitor tmux
-  docker exec -it nn-tmux-ui bash
-  # attach
-  root@:/var/www/NNTmux# sudo -E -u notroot tmux attach -d
-  # stop
-  root@:/var/www/NNTmux# sudo -E -u notroot php artisan tmux-ui:stop --kill
+docker-compose up -d web
+
+# Tail the logs starting with the most recent 15 lines. Look for errors and resolve any issues.
+docker-compose logs --tail=15 --follow web
 ```
+
+Open http://nntmux.local and sign in as the admin user with the credentials configured in the .env file. Configure site and tmux settings.
+
+Start the tmux container:
+```
+docker-compose up -d tmux
+
+# Attach to tmux
+./cli/docker tmux-attach
+```
+
+There are other commands available in cli/docker (i.e. to stop the tmux session -- you should do this before stopping the tmux container!).
+
 ### Support
 
  Support is given on irc.synirc.net #tmux channel.

@@ -12,8 +12,10 @@
 
 *.ai			eol=crlf -whitespace
 *.bat			-binary text eol=crlf
+*.conf			-binary text eol=lf
 *.css			-binary text eol=lf -whitespace
 *.html			-binary text eol=lf
+*.ini			-binary text eol=lf
 *.js			-binary text -whitespace
 *.json			-binary text eol=lf
 *.less			-binary text eol=lf
@@ -28,6 +30,7 @@
 *.vcproj		-binary text eol=crlf
 *.xml			-binary text eol=lf
 *.yml			-binary text eol=lf
+*.yml.dist		-binary text eol=lf
 
 libs/*			-whitespace
 
@@ -36,3 +39,9 @@ Changelog		-binary text eol=lf
 .gitattributes	-binary text
 .gitmodules		-binary text
 composer.lock	-binary text
+
+# Docker specific
+.dockerignore	-binary text
+docker			-binary text
+Dockerfile		-binary text
+.mytop			-binary text

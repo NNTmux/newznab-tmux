@@ -1,5 +1,9 @@
 .DS_Store
 config.php
+docker/.zsh_history
+docker/composer-auth.json
+docker/php-overrides.local.ini
+docker-compose.override.yml
 .env
 install.lock
 error_log
