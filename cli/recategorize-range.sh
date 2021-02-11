@@ -42,7 +42,7 @@ for batch in $(seq $start $stop); do
         php misc/testing/Releases/recategorize.php all notest $offset $batchSize
         if [[ $? != 27 ]]; then
             echo -e "${M}${offset}${D}"
-            exit
+            break
         else
             date
             sleep 3
