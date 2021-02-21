@@ -5,6 +5,7 @@
  * For commercial licenses see https://www.tiny.cloud/
  */
 .tox {
+  box-shadow: none;
   box-sizing: content-box;
   color: #2A3746;
   cursor: auto;
@@ -42,6 +43,7 @@
   /* stylelint-disable-line no-duplicate-selectors */
   background: transparent;
   border: 0;
+  box-shadow: none;
   float: none;
   height: auto;
   margin: 0;
@@ -76,6 +78,7 @@
   box-shadow: none;
 }
 .tox-tinymce-inline .tox-editor-header {
+  background-color: transparent;
   border: 1px solid #000000;
   border-radius: 0;
   box-shadow: none;
@@ -1530,6 +1533,7 @@ body.tox-dialog__disable-scroll {
   margin-bottom: -1px;
 }
 .tox.tox-tinymce--toolbar-sticky-on .tox-editor-header {
+  background-color: transparent;
   box-shadow: 0 4px 4px -3px rgba(0, 0, 0, 0.25);
 }
 .tox-editor-dock-fadeout {
@@ -1931,6 +1935,7 @@ body.tox-dialog__disable-scroll {
   display: none;
 }
 .tox.tox-tinymce.tox-fullscreen {
+  background-color: transparent;
   z-index: 1200;
 }
 .tox-shadowhost.tox-fullscreen {
@@ -2637,7 +2642,7 @@ body.tox-dialog__disable-scroll {
   margin-left: 4px;
 }
 .tox .tox-throbber {
-  z-index: 1400;
+  z-index: 1299;
 }
 .tox .tox-throbber__busy-spinner {
   align-items: center;

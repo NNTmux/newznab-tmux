@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -417,7 +417,9 @@
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.util.I18n');
 
-    var urls = [
+    var premiumType = 'premium';
+    var openSourceType = 'opensource';
+    var urls = map([
       {
         key: 'advlist',
         name: 'Advanced List'
@@ -588,71 +590,96 @@
       },
       {
         key: 'advcode',
-        name: 'Advanced Code Editor*'
+        name: 'Advanced Code Editor*',
+        type: premiumType
       },
       {
         key: 'formatpainter',
-        name: 'Format Painter*'
+        name: 'Format Painter*',
+        type: premiumType
       },
       {
         key: 'powerpaste',
-        name: 'PowerPaste*'
+        name: 'PowerPaste*',
+        type: premiumType
       },
       {
         key: 'tinydrive',
         name: 'Tiny Drive*',
-        slug: 'drive'
+        type: premiumType
       },
       {
         key: 'tinymcespellchecker',
-        name: 'Spell Checker Pro*'
+        name: 'Spell Checker Pro*',
+        type: premiumType
       },
       {
         key: 'a11ychecker',
-        name: 'Accessibility Checker*'
+        name: 'Accessibility Checker*',
+        type: premiumType
       },
       {
         key: 'linkchecker',
-        name: 'Link Checker*'
+        name: 'Link Checker*',
+        type: premiumType
       },
       {
         key: 'mentions',
-        name: 'Mentions*'
+        name: 'Mentions*',
+        type: premiumType
       },
       {
         key: 'mediaembed',
-        name: 'Enhanced Media Embed*'
+        name: 'Enhanced Media Embed*',
+        type: premiumType
       },
       {
         key: 'checklist',
-        name: 'Checklist*'
+        name: 'Checklist*',
+        type: premiumType
       },
       {
         key: 'casechange',
-        name: 'Case Change*'
+        name: 'Case Change*',
+        type: premiumType
       },
       {
         key: 'permanentpen',
-        name: 'Permanent Pen*'
+        name: 'Permanent Pen*',
+        type: premiumType
       },
       {
         key: 'pageembed',
-        name: 'Page Embed*'
+        name: 'Page Embed*',
+        type: premiumType
       },
       {
         key: 'tinycomments',
         name: 'Tiny Comments*',
+        type: premiumType,
         slug: 'comments'
       },
       {
         key: 'advtable',
-        name: 'Advanced Tables*'
+        name: 'Advanced Tables*',
+        type: premiumType
       },
       {
         key: 'autocorrect',
-        name: 'Autocorrect*'
+        name: 'Autocorrect*',
+        type: premiumType
+      },
+      {
+        key: 'export',
+        name: 'Export*',
+        type: premiumType
       }
-    ];
+    ], function (item) {
+      return __assign(__assign({}, item), {
+        type: item.type || openSourceType,
+        slug: item.slug || item.key
+      });
+    });
 
     var tab$2 = function (editor) {
       var availablePlugins = function () {
@@ -662,6 +689,7 @@
           'Advanced Tables',
           'Case Change',
           'Checklist',
+          'Export',
           'Tiny Comments',
           'Tiny Drive',
           'Enhanced Media Embed',
@@ -689,10 +717,9 @@
           var getMetadata = editor.plugins[key].getMetadata;
           return typeof getMetadata === 'function' ? makeLink(getMetadata()) : key;
         }, function (x) {
-          var urlSlug = x.slug || x.key;
           return makeLink({
             name: x.name,
-            url: 'https://www.tiny.cloud/docs/plugins/' + urlSlug
+            url: 'https://www.tiny.cloud/docs/plugins/' + x.type + '/' + x.slug
           });
         });
       };

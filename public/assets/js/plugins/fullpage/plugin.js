@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -84,10 +84,10 @@
       var headerFragment = parseHeader(head);
       var data = {};
       var elm, matches;
-      function getAttr(elm, name) {
+      var getAttr = function (elm, name) {
         var value = elm.attr(name);
         return value || '';
-      }
+      };
       data.fontface = getDefaultFontFamily(editor);
       data.fontsize = getDefaultFontSize(editor);
       elm = headerFragment.firstChild;
@@ -142,16 +142,16 @@
     var dataToHtml = function (editor, data, head) {
       var headElement, elm, value;
       var dom = editor.dom;
-      function setAttr(elm, name, value) {
+      var setAttr = function (elm, name, value) {
         elm.attr(name, value ? value : undefined);
-      }
-      function addHeadNode(node) {
+      };
+      var addHeadNode = function (node) {
         if (headElement.firstChild) {
           headElement.insert(node, headElement.firstChild);
         } else {
           headElement.append(node);
         }
-      }
+      };
       var headerFragment = parseHeader(head);
       headElement = headerFragment.getAll('head')[0];
       if (!headElement) {

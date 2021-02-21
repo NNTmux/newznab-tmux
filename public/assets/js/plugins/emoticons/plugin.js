@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -62,9 +62,9 @@
     };
     var baseMerge = function (merger) {
       return function () {
-        var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++) {
-          objects[i] = arguments[i];
+        var objects = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          objects[_i] = arguments[_i];
         }
         if (objects.length === 0) {
           throw new Error('Can\'t merge zero objects');

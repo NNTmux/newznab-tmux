@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -377,7 +377,7 @@
       append(wrapper, element);
     };
 
-    function NodeValue (is, name) {
+    var NodeValue = function (is, name) {
       var get = function (element) {
         if (!is(element)) {
           throw new Error('Can only get ' + name + ' value of a ' + name + ' node');
@@ -398,7 +398,7 @@
         getOption: getOption,
         set: set
       };
-    }
+    };
 
     var api = NodeValue(isText, 'text');
     var get = function (element) {
@@ -474,7 +474,7 @@
       }
       var rootBlock = dom.getParent(rootNode, dom.isBlock);
       var walker = new global$2(node, rootBlock);
-      var walkerFn = forwards ? walker.next : walker.prev;
+      var walkerFn = forwards ? walker.next.bind(walker) : walker.prev.bind(walker);
       walk(dom, walkerFn, node, {
         boundary: always,
         cef: always,
@@ -503,7 +503,7 @@
         }
         return false;
       };
-      walk(dom, walker.next, startNode, {
+      walk(dom, walker.next.bind(walker), startNode, {
         boundary: finishSection,
         cef: function (node) {
           finishSection();
@@ -911,12 +911,12 @@
       var dialogApi = value();
       editor.undoManager.add();
       var selectedText = global$1.trim(editor.selection.getContent({ format: 'text' }));
-      function updateButtonStates(api) {
+      var updateButtonStates = function (api) {
         var updateNext = hasNext(editor, currentSearchState) ? api.enable : api.disable;
         updateNext('next');
         var updatePrev = hasPrev(editor, currentSearchState) ? api.enable : api.disable;
         updatePrev('prev');
-      }
+      };
       var updateSearchState = function (api) {
         var data = api.getData();
         var current = currentSearchState.get();
@@ -936,11 +936,11 @@
         var toggle = disable ? api.disable : api.enable;
         each(buttons, toggle);
       };
-      function notFoundAlert(api) {
+      var notFoundAlert = function (api) {
         editor.windowManager.alert('Could not find the specified string.', function () {
           api.focus('findtext');
         });
-      }
+      };
       var focusButtonIfRequired = function (api, name) {
         if (global$3.browser.isSafari() && global$3.deviceType.isTouch() && (name === 'find' || name === 'replace' || name === 'replaceall')) {
           api.focus(name);

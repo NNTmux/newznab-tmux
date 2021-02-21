@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -439,9 +439,7 @@
               return closest(sugarNode, function (elem) {
                 return name(elem) in textBlockElementsMap && editor.dom.isEmpty(elem.dom);
               }, isRoot).isSome();
-            }, function () {
-              return false;
-            });
+            }, never);
           },
           items: insertToolbarItems,
           position: 'line',

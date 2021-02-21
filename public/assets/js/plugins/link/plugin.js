@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -910,8 +910,7 @@
         };
         var attachState = {
           href: data.url.value,
-          attach: data.url.meta !== undefined && data.url.meta.attach ? data.url.meta.attach : function () {
-          }
+          attach: data.url.meta !== undefined && data.url.meta.attach ? data.url.meta.attach : noop
         };
         DialogConfirms.preprocess(editor, changedData).then(function (pData) {
           link(editor, attachState, pData);
@@ -1189,8 +1188,7 @@
       var onSetupLink = function (buttonApi) {
         var node = editor.selection.getNode();
         buttonApi.setDisabled(!getAnchorElement(editor, node));
-        return function () {
-        };
+        return noop;
       };
       editor.ui.registry.addContextForm('quicklink', {
         launch: {
@@ -1224,8 +1222,7 @@
               if (!anchor) {
                 var attachState = {
                   href: value,
-                  attach: function () {
-                  }
+                  attach: noop
                 };
                 var onlyText = isOnlyTextSelected(editor);
                 var text = onlyText ? Optional.some(getAnchorText(editor.selection, anchor)).filter(function (t) {

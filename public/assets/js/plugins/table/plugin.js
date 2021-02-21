@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -338,8 +338,21 @@
       r.reverse();
       return r;
     };
+    var mapToObject = function (xs, f) {
+      var r = {};
+      for (var i = 0, len = xs.length; i < len; i++) {
+        var x = xs[i];
+        r[String(x)] = f(x, i);
+      }
+      return r;
+    };
     var pure = function (x) {
       return [x];
+    };
+    var sort = function (xs, comparator) {
+      var copy = nativeSlice.call(xs, 0);
+      copy.sort(comparator);
+      return copy;
     };
     var get = function (xs, i) {
       return i >= 0 && i < xs.length ? Optional.some(xs[i]) : Optional.none();
@@ -891,6 +904,9 @@
         return v;
       });
     };
+    var size = function (obj) {
+      return keys(obj).length;
+    };
     var get$1 = function (obj, key) {
       return has(obj, key) ? Optional.from(obj[key]) : Optional.none();
     };
@@ -945,13 +961,14 @@
         isNew: isNew
       };
     };
-    var extended = function (element, rowspan, colspan, row, column) {
+    var extended = function (element, rowspan, colspan, row, column, isLocked) {
       return {
         element: element,
         rowspan: rowspan,
         colspan: colspan,
         row: row,
-        column: column
+        column: column,
+        isLocked: isLocked
       };
     };
     var rowdata = function (element, cells, section) {
@@ -961,10 +978,11 @@
         section: section
       };
     };
-    var elementnew = function (element, isNew) {
+    var elementnew = function (element, isNew, isLocked) {
       return {
         element: element,
-        isNew: isNew
+        isNew: isNew,
+        isLocked: isLocked
       };
     };
     var rowdatanew = function (element, cells, section, isNew) {
@@ -1079,7 +1097,7 @@
     };
 
     var isShadowRoot = function (dos) {
-      return isDocumentFragment(dos);
+      return isDocumentFragment(dos) && isNonNullable(dos.dom.host);
     };
     var supported = isFunction(Element.prototype.attachShadow) && isFunction(Node.prototype.getRootNode);
     var isSupported = constant(supported);
@@ -1447,6 +1465,70 @@
       });
     };
 
+    var addCells = function (gridRow, index, cells) {
+      var existingCells = gridRow.cells;
+      var before = existingCells.slice(0, index);
+      var after = existingCells.slice(index);
+      var newCells = before.concat(cells).concat(after);
+      return setCells(gridRow, newCells);
+    };
+    var addCell = function (gridRow, index, cell) {
+      return addCells(gridRow, index, [cell]);
+    };
+    var mutateCell = function (gridRow, index, cell) {
+      var cells = gridRow.cells;
+      cells[index] = cell;
+    };
+    var setCells = function (gridRow, cells) {
+      return rowcells(cells, gridRow.section);
+    };
+    var mapCells = function (gridRow, f) {
+      var cells = gridRow.cells;
+      var r = map(cells, f);
+      return rowcells(r, gridRow.section);
+    };
+    var getCell = function (gridRow, index) {
+      return gridRow.cells[index];
+    };
+    var getCellElement = function (gridRow, index) {
+      return getCell(gridRow, index).element;
+    };
+    var cellLength = function (gridRow) {
+      return gridRow.cells.length;
+    };
+    var extractGridDetails = function (grid) {
+      var result = partition(grid, function (row) {
+        return row.section === 'colgroup';
+      });
+      return {
+        rows: result.fail,
+        cols: result.pass
+      };
+    };
+
+    var LOCKED_COL_ATTR = 'data-snooker-locked-cols';
+    var getLockedColumnsFromTable = function (table) {
+      return getOpt(table, LOCKED_COL_ATTR).bind(function (lockedColStr) {
+        return Optional.from(lockedColStr.match(/\d+/g));
+      }).map(function (lockedCols) {
+        return mapToObject(lockedCols, always);
+      });
+    };
+    var getLockedColumnsFromGrid = function (grid) {
+      var locked = foldl(extractGridDetails(grid).rows, function (acc, row) {
+        each(row.cells, function (cell, idx) {
+          if (cell.isLocked) {
+            acc[idx] = true;
+          }
+        });
+        return acc;
+      }, {});
+      var lockedArr = mapToArray(locked, function (_val, key) {
+        return parseInt(key, 10);
+      });
+      return sort(lockedArr);
+    };
+
     var key = function (row, column) {
       return row + ',' + column;
     };
@@ -1483,6 +1565,10 @@
       var access = {};
       var cells = [];
       var columns = {};
+      var tableOpt = head(list).map(function (rowData) {
+        return rowData.element;
+      }).bind(table);
+      var lockedColumns = tableOpt.bind(getLockedColumnsFromTable).getOr({});
       var maxRows = 0;
       var maxColumns = 0;
       var rowCount = 0;
@@ -1496,7 +1582,8 @@
             while (access[key(rowCount, start)] !== undefined) {
               start++;
             }
-            var current = extended(rowCell.element, rowCell.rowspan, rowCell.colspan, rowCount, start);
+            var isLocked = hasNonNullableKey(lockedColumns, start.toString());
+            var current = extended(rowCell.element, rowCell.rowspan, rowCell.colspan, rowCount, start, isLocked);
             for (var occupiedColumnPosition = 0; occupiedColumnPosition < rowCell.colspan; occupiedColumnPosition++) {
               for (var occupiedRowPosition = 0; occupiedRowPosition < rowCell.rowspan; occupiedRowPosition++) {
                 var rowPosition = rowCount + occupiedRowPosition;
@@ -1713,7 +1800,7 @@
       remove$2(wrapper);
     };
 
-    function NodeValue (is, name) {
+    var NodeValue = function (is, name) {
       var get = function (element) {
         if (!is(element)) {
           throw new Error('Can only get ' + name + ' value of a ' + name + ' node');
@@ -1734,7 +1821,7 @@
         getOption: getOption,
         set: set
       };
-    }
+    };
 
     var api = NodeValue(isText, 'text');
     var get$4 = function (element) {
@@ -1818,6 +1905,20 @@
         var as = clone(source);
         setAll(destination, as);
       };
+      var isSpecial = function (element) {
+        var tag = name(element);
+        return contains([
+          'script',
+          'noscript',
+          'iframe',
+          'noframes',
+          'noembed',
+          'title',
+          'style',
+          'textarea',
+          'xmp'
+        ], tag);
+      };
       return {
         up: constant({
           selector: ancestor$1,
@@ -1872,6 +1973,7 @@
           isText: isText,
           isComment: isComment,
           isElement: isElement,
+          isSpecial: isSpecial,
           getText: get$4,
           setText: set$2,
           isBoundary: isBoundary,
@@ -2097,13 +2199,13 @@
         }
         constructors.push(key);
         adt[key] = function () {
-          var argLength = arguments.length;
+          var args = [];
+          for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+          }
+          var argLength = args.length;
           if (argLength !== value.length) {
             throw new Error('Wrong number of arguments to case ' + key + '. Expected ' + value.length + ' (' + value + '), got ' + argLength);
-          }
-          var args = new Array(argLength);
-          for (var i = 0; i < args.length; i++) {
-            args[i] = arguments[i];
           }
           var match = function (branches) {
             var branchKeys = keys(branches);
@@ -2120,10 +2222,14 @@
           };
           return {
             fold: function () {
-              if (arguments.length !== cases.length) {
-                throw new Error('Wrong number of arguments to fold. Expected ' + cases.length + ', got ' + arguments.length);
+              var foldArgs = [];
+              for (var _i = 0; _i < arguments.length; _i++) {
+                foldArgs[_i] = arguments[_i];
               }
-              var target = arguments[count];
+              if (foldArgs.length !== cases.length) {
+                throw new Error('Wrong number of arguments to fold. Expected ' + cases.length + ', got ' + foldArgs.length);
+              }
+              var target = foldArgs[count];
               return target.apply(null, args);
             },
             match: match,
@@ -2166,145 +2272,6 @@
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-    var statsStruct = function (minRow, minCol, maxRow, maxCol) {
-      return {
-        minRow: minRow,
-        minCol: minCol,
-        maxRow: maxRow,
-        maxCol: maxCol
-      };
-    };
-    var findSelectedStats = function (house, isSelected) {
-      var totalColumns = house.grid.columns;
-      var totalRows = house.grid.rows;
-      var minRow = totalRows;
-      var minCol = totalColumns;
-      var maxRow = 0;
-      var maxCol = 0;
-      each$1(house.access, function (detail) {
-        if (isSelected(detail)) {
-          var startRow = detail.row;
-          var endRow = startRow + detail.rowspan - 1;
-          var startCol = detail.column;
-          var endCol = startCol + detail.colspan - 1;
-          if (startRow < minRow) {
-            minRow = startRow;
-          } else if (endRow > maxRow) {
-            maxRow = endRow;
-          }
-          if (startCol < minCol) {
-            minCol = startCol;
-          } else if (endCol > maxCol) {
-            maxCol = endCol;
-          }
-        }
-      });
-      return statsStruct(minRow, minCol, maxRow, maxCol);
-    };
-    var makeCell = function (list, seenSelected, rowIndex) {
-      var row = list[rowIndex].element;
-      var td = SugarElement.fromTag('td');
-      append(td, SugarElement.fromTag('br'));
-      var f = seenSelected ? append : prepend;
-      f(row, td);
-    };
-    var fillInGaps = function (list, house, stats, isSelected) {
-      var totalColumns = house.grid.columns;
-      var totalRows = house.grid.rows;
-      for (var i = 0; i < totalRows; i++) {
-        var seenSelected = false;
-        for (var j = 0; j < totalColumns; j++) {
-          if (!(i < stats.minRow || i > stats.maxRow || j < stats.minCol || j > stats.maxCol)) {
-            var needCell = Warehouse.getAt(house, i, j).filter(isSelected).isNone();
-            if (needCell) {
-              makeCell(list, seenSelected, i);
-            } else {
-              seenSelected = true;
-            }
-          }
-        }
-      }
-    };
-    var clean = function (table, stats) {
-      var emptyRows = filter(firstLayer(table, 'tr'), function (row) {
-        return row.dom.childElementCount === 0;
-      });
-      each(emptyRows, remove$2);
-      if (stats.minCol === stats.maxCol || stats.minRow === stats.maxRow) {
-        each(firstLayer(table, 'th,td'), function (cell) {
-          remove(cell, 'rowspan');
-          remove(cell, 'colspan');
-        });
-      }
-      remove(table, 'width');
-      remove(table, 'height');
-      remove$1(table, 'width');
-      remove$1(table, 'height');
-    };
-    var extract = function (table, selectedSelector) {
-      var isSelected = function (detail) {
-        return is(detail.element, selectedSelector);
-      };
-      var list = fromTable(table);
-      var house = Warehouse.generate(list);
-      var stats = findSelectedStats(house, isSelected);
-      var selector = 'th:not(' + selectedSelector + ')' + ',td:not(' + selectedSelector + ')';
-      var unselectedCells = filterFirstLayer(table, 'th,td', function (cell) {
-        return is(cell, selector);
-      });
-      each(unselectedCells, remove$2);
-      fillInGaps(list, house, stats, isSelected);
-      clean(table, stats);
-      return table;
-    };
-
-    var nbsp = '\xA0';
-
-    var getEnd = function (element) {
-      return name(element) === 'img' ? 1 : getOption(element).fold(function () {
-        return children(element).length;
-      }, function (v) {
-        return v.length;
-      });
-    };
-    var isTextNodeWithCursorPosition = function (el) {
-      return getOption(el).filter(function (text) {
-        return text.trim().length !== 0 || text.indexOf(nbsp) > -1;
-      }).isSome();
-    };
-    var elementsWithCursorPosition = [
-      'img',
-      'br'
-    ];
-    var isCursorPosition = function (elem) {
-      var hasCursorPosition = isTextNodeWithCursorPosition(elem);
-      return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
-    };
-
-    var first = function (element) {
-      return descendant(element, isCursorPosition);
-    };
-    var last$1 = function (element) {
-      return descendantRtl(element, isCursorPosition);
-    };
-    var descendantRtl = function (scope, predicate) {
-      var descend = function (element) {
-        var children$1 = children(element);
-        for (var i = children$1.length - 1; i >= 0; i--) {
-          var child = children$1[i];
-          if (predicate(child)) {
-            return Optional.some(child);
-          }
-          var res = descend(child);
-          if (res.isSome()) {
-            return res;
-          }
-        }
-        return Optional.none();
-      };
-      return descend(scope);
-    };
-
     var clone$1 = function (original, isDeep) {
       return SugarElement.fromDom(original.dom.cloneNode(isDeep));
     };
@@ -2327,333 +2294,6 @@
       return nu;
     };
 
-    var transferableAttributes = {
-      scope: [
-        'row',
-        'col'
-      ]
-    };
-    var createCell = function () {
-      var td = SugarElement.fromTag('td');
-      append(td, SugarElement.fromTag('br'));
-      return td;
-    };
-    var createCol = function () {
-      return SugarElement.fromTag('col');
-    };
-    var createColgroup = function () {
-      return SugarElement.fromTag('colgroup');
-    };
-    var replace = function (cell, tag, attrs) {
-      var replica = copy$1(cell, tag);
-      each$1(attrs, function (v, k) {
-        if (v === null) {
-          remove(replica, k);
-        } else {
-          set(replica, k, v);
-        }
-      });
-      return replica;
-    };
-    var pasteReplace = function (cell) {
-      return cell;
-    };
-    var newRow = function (doc) {
-      return function () {
-        return SugarElement.fromTag('tr', doc.dom);
-      };
-    };
-    var cloneFormats = function (oldCell, newCell, formats) {
-      var first$1 = first(oldCell);
-      return first$1.map(function (firstText) {
-        var formatSelector = formats.join(',');
-        var parents = ancestors$1(firstText, formatSelector, function (element) {
-          return eq$1(element, oldCell);
-        });
-        return foldr(parents, function (last, parent) {
-          var clonedFormat = shallow(parent);
-          remove(clonedFormat, 'contenteditable');
-          append(last, clonedFormat);
-          return clonedFormat;
-        }, newCell);
-      }).getOr(newCell);
-    };
-    var cloneAppropriateAttributes = function (original, clone) {
-      each$1(transferableAttributes, function (validAttributes, attributeName) {
-        return getOpt(original, attributeName).filter(function (attribute) {
-          return contains(validAttributes, attribute);
-        }).each(function (attribute) {
-          return set(clone, attributeName, attribute);
-        });
-      });
-    };
-    var cellOperations = function (mutate, doc, formatsToClone) {
-      var cloneCss = function (prev, clone) {
-        copy(prev.element, clone);
-        remove$1(clone, 'height');
-        if (prev.colspan !== 1) {
-          remove$1(prev.element, 'width');
-        }
-      };
-      var newCell = function (prev) {
-        var docu = owner(prev.element);
-        var td = SugarElement.fromTag(name(prev.element), docu.dom);
-        var formats = formatsToClone.getOr([
-          'strong',
-          'em',
-          'b',
-          'i',
-          'span',
-          'font',
-          'h1',
-          'h2',
-          'h3',
-          'h4',
-          'h5',
-          'h6',
-          'p',
-          'div'
-        ]);
-        var lastNode = formats.length > 0 ? cloneFormats(prev.element, td, formats) : td;
-        append(lastNode, SugarElement.fromTag('br'));
-        cloneCss(prev, td);
-        cloneAppropriateAttributes(prev.element, td);
-        mutate(prev.element, td);
-        return td;
-      };
-      var newCol = function (prev) {
-        var doc = owner(prev.element);
-        var col = SugarElement.fromTag(name(prev.element), doc.dom);
-        cloneCss(prev, col);
-        mutate(prev.element, col);
-        return col;
-      };
-      return {
-        col: newCol,
-        colgroup: createColgroup,
-        row: newRow(doc),
-        cell: newCell,
-        replace: replace,
-        gap: createCell
-      };
-    };
-    var paste = function (doc) {
-      return {
-        col: createCol,
-        colgroup: createColgroup,
-        row: newRow(doc),
-        cell: createCell,
-        replace: pasteReplace,
-        gap: createCell
-      };
-    };
-
-    var fromHtml$1 = function (html, scope) {
-      var doc = scope || document;
-      var div = doc.createElement('div');
-      div.innerHTML = html;
-      return children(SugarElement.fromDom(div));
-    };
-    var fromDom$1 = function (nodes) {
-      return map(nodes, SugarElement.fromDom);
-    };
-
-    var selection = function (selections) {
-      return cata(selections.get(), constant([]), identity, pure);
-    };
-    var unmergable = function (selections) {
-      var hasSpan = function (elem, type) {
-        return getOpt(elem, type).exists(function (span) {
-          return parseInt(span, 10) > 1;
-        });
-      };
-      var hasRowOrColSpan = function (elem) {
-        return hasSpan(elem, 'rowspan') || hasSpan(elem, 'colspan');
-      };
-      var candidates = selection(selections);
-      return candidates.length > 0 && forall(candidates, hasRowOrColSpan) ? Optional.some(candidates) : Optional.none();
-    };
-    var mergable = function (table, selections, ephemera) {
-      return cata(selections.get(), Optional.none, function (cells) {
-        if (cells.length <= 1) {
-          return Optional.none();
-        } else {
-          return retrieveBox(table, ephemera.firstSelectedSelector, ephemera.lastSelectedSelector).map(function (bounds) {
-            return {
-              bounds: bounds,
-              cells: cells
-            };
-          });
-        }
-      }, Optional.none);
-    };
-
-    var strSelected = 'data-mce-selected';
-    var strSelectedSelector = 'td[' + strSelected + '],th[' + strSelected + ']';
-    var strAttributeSelector = '[' + strSelected + ']';
-    var strFirstSelected = 'data-mce-first-selected';
-    var strFirstSelectedSelector = 'td[' + strFirstSelected + '],th[' + strFirstSelected + ']';
-    var strLastSelected = 'data-mce-last-selected';
-    var strLastSelectedSelector = 'td[' + strLastSelected + '],th[' + strLastSelected + ']';
-    var attributeSelector = strAttributeSelector;
-    var ephemera = {
-      selected: strSelected,
-      selectedSelector: strSelectedSelector,
-      firstSelected: strFirstSelected,
-      firstSelectedSelector: strFirstSelectedSelector,
-      lastSelected: strLastSelected,
-      lastSelectedSelector: strLastSelectedSelector
-    };
-
-    var noMenu = function (cell) {
-      return {
-        element: cell,
-        mergable: Optional.none(),
-        unmergable: Optional.none(),
-        selection: [cell]
-      };
-    };
-    var forMenu = function (selections, table, cell) {
-      return {
-        element: cell,
-        mergable: mergable(table, selections, ephemera),
-        unmergable: unmergable(selections),
-        selection: selection(selections)
-      };
-    };
-    var paste$1 = function (element, clipboard, generators) {
-      return {
-        element: element,
-        clipboard: clipboard,
-        generators: generators
-      };
-    };
-    var pasteRows = function (selections, cell, clipboard, generators) {
-      return {
-        selection: selection(selections),
-        clipboard: clipboard,
-        generators: generators
-      };
-    };
-
-    var extractSelected = function (cells) {
-      return table(cells[0]).map(deep).map(function (replica) {
-        return [extract(replica, attributeSelector)];
-      });
-    };
-    var serializeElements = function (editor, elements) {
-      return map(elements, function (elm) {
-        return editor.selection.serializer.serialize(elm.dom, {});
-      }).join('');
-    };
-    var getTextContent = function (elements) {
-      return map(elements, function (element) {
-        return element.dom.innerText;
-      }).join('');
-    };
-    var registerEvents = function (editor, selections, actions, cellSelection) {
-      editor.on('BeforeGetContent', function (e) {
-        var multiCellContext = function (cells) {
-          e.preventDefault();
-          extractSelected(cells).each(function (elements) {
-            e.content = e.format === 'text' ? getTextContent(elements) : serializeElements(editor, elements);
-          });
-        };
-        if (e.selection === true) {
-          cata(selections.get(), noop, multiCellContext, noop);
-        }
-      });
-      editor.on('BeforeSetContent', function (e) {
-        if (e.selection === true && e.paste === true) {
-          var cellOpt = Optional.from(editor.dom.getParent(editor.selection.getStart(), 'th,td'));
-          cellOpt.each(function (domCell) {
-            var cell = SugarElement.fromDom(domCell);
-            table(cell).each(function (table) {
-              var elements = filter(fromHtml$1(e.content), function (content) {
-                return name(content) !== 'meta';
-              });
-              var isTable = function (elm) {
-                return name(elm) === 'table';
-              };
-              if (elements.length === 1 && isTable(elements[0])) {
-                e.preventDefault();
-                var doc = SugarElement.fromDom(editor.getDoc());
-                var generators = paste(doc);
-                var targets = paste$1(cell, elements[0], generators);
-                actions.pasteCells(table, targets).each(function (rng) {
-                  editor.selection.setRng(rng);
-                  editor.focus();
-                  cellSelection.clear(table);
-                });
-              }
-            });
-          });
-        }
-      });
-    };
-
-    var adt = Adt.generate([
-      { none: [] },
-      { only: ['index'] },
-      {
-        left: [
-          'index',
-          'next'
-        ]
-      },
-      {
-        middle: [
-          'prev',
-          'index',
-          'next'
-        ]
-      },
-      {
-        right: [
-          'prev',
-          'index'
-        ]
-      }
-    ]);
-    var ColumnContext = __assign({}, adt);
-
-    var neighbours = function (input, index) {
-      if (input.length === 0) {
-        return ColumnContext.none();
-      }
-      if (input.length === 1) {
-        return ColumnContext.only(0);
-      }
-      if (index === 0) {
-        return ColumnContext.left(0, 1);
-      }
-      if (index === input.length - 1) {
-        return ColumnContext.right(index - 1, index);
-      }
-      if (index > 0 && index < input.length - 1) {
-        return ColumnContext.middle(index - 1, index, index + 1);
-      }
-      return ColumnContext.none();
-    };
-    var determine = function (input, column, step, tableSize, resize) {
-      var result = input.slice(0);
-      var context = neighbours(input, column);
-      var onNone = constant(map(result, constant(0)));
-      var onOnly = function (index) {
-        return tableSize.singleColumnWidth(result[index], step);
-      };
-      var onLeft = function (index, next) {
-        return resize.calcLeftEdgeDeltas(result, index, next, step, tableSize.minCellWidth(), tableSize.isRelative);
-      };
-      var onMiddle = function (prev, index, next) {
-        return resize.calcMiddleDeltas(result, prev, index, next, step, tableSize.minCellWidth(), tableSize.isRelative);
-      };
-      var onRight = function (prev, index) {
-        return resize.calcRightEdgeDeltas(result, prev, index, step, tableSize.minCellWidth(), tableSize.isRelative);
-      };
-      return context.fold(onNone, onOnly, onLeft, onMiddle, onRight);
-    };
-
     var cat = function (arr) {
       var r = [];
       var push = function (x) {
@@ -2670,8 +2310,11 @@
     var bindFrom = function (a, f) {
       return a !== undefined && a !== null ? f(a) : Optional.none();
     };
+    var someIf = function (b, a) {
+      return b ? Optional.some(a) : Optional.none();
+    };
 
-    function Dimension (name, getOffset) {
+    var Dimension = function (name, getOffset) {
       var set = function (element, h) {
         if (!isNumber(h) && !h.match(/^[0-9]+$/)) {
           throw new Error(name + '.set accepts only positive integer values. Value was ' + h);
@@ -2709,7 +2352,7 @@
         aggregate: aggregate,
         max: max
       };
-    }
+    };
 
     var api$1 = Dimension('width', function (element) {
       return element.dom.offsetWidth;
@@ -2721,7 +2364,10 @@
       return api$1.getOuter(element);
     };
 
-    var columns$1 = function (warehouse) {
+    var columns$1 = function (warehouse, isValidCell) {
+      if (isValidCell === void 0) {
+        isValidCell = always;
+      }
       var grid = warehouse.grid;
       var cols = range(grid.columns, identity);
       var rowsArr = range(grid.rows, identity);
@@ -2733,19 +2379,19 @@
             }).toArray();
           });
         };
-        var isSingle = function (detail) {
-          return detail.colspan === 1;
+        var isValid = function (detail) {
+          return detail.colspan === 1 && isValidCell(detail.element);
         };
         var getFallback = function () {
           return Warehouse.getAt(warehouse, 0, col);
         };
-        return decide(getBlock, isSingle, getFallback);
+        return decide(getBlock, isValid, getFallback);
       });
     };
-    var decide = function (getBlock, isSingle, getFallback) {
+    var decide = function (getBlock, isValid, getFallback) {
       var inBlock = getBlock();
-      var singleInBlock = find(inBlock, isSingle);
-      var detailOption = singleInBlock.orThunk(function () {
+      var validInBlock = find(inBlock, isValid);
+      var detailOption = validInBlock.orThunk(function () {
         return Optional.from(inBlock[0]).orThunk(getFallback);
       });
       return detailOption.map(function (detail) {
@@ -3248,8 +2894,11 @@
         return Optional.from(column.element);
       });
     };
+    var hasRawStyle = function (cell, prop) {
+      return getRaw(cell, prop).isSome();
+    };
     var isValidColumn = function (cell) {
-      return !isCol(cell) || getRaw(cell, 'width').isSome();
+      return !isCol(cell) || hasRawStyle(cell, 'width');
     };
     var getDimension = function (cellOpt, index, backups, filter, getter, fallback) {
       return cellOpt.filter(filter).fold(function () {
@@ -3259,7 +2908,9 @@
       });
     };
     var getWidthFrom = function (warehouse, table, getWidth, fallback, tableSize) {
-      var columnCells = columns$1(warehouse);
+      var columnCells = columns$1(warehouse, function (cell) {
+        return hasRawStyle(cell, 'width');
+      });
       var columns = Warehouse.hasColumns(warehouse) ? justCols(warehouse) : columnCells;
       var backups = [Optional.some(width.edge(table))].concat(map(width.positions(columnCells, table), function (pos) {
         return pos.map(function (p) {
@@ -3320,6 +2971,677 @@
     };
     var getRawHeights = function (warehouse, table, direction) {
       return getHeightFrom(warehouse, table, direction, getRawH, getDeduced);
+    };
+
+    var Cell = function (initial) {
+      var value = initial;
+      var get = function () {
+        return value;
+      };
+      var set = function (v) {
+        value = v;
+      };
+      return {
+        get: get,
+        set: set
+      };
+    };
+
+    var noneSize = function (table) {
+      var getWidth = function () {
+        return get$5(table);
+      };
+      var zero = constant(0);
+      var getWidths = function (warehouse, tableSize) {
+        return getPixelWidths(warehouse, table, tableSize);
+      };
+      return {
+        width: getWidth,
+        pixelWidth: getWidth,
+        getWidths: getWidths,
+        getCellDelta: zero,
+        singleColumnWidth: constant([0]),
+        minCellWidth: zero,
+        setElementWidth: noop,
+        adjustTableWidth: noop,
+        isRelative: true,
+        label: 'none'
+      };
+    };
+    var percentageSize = function (initialWidth, table) {
+      var floatWidth = Cell(parseFloat(initialWidth));
+      var pixelWidth = Cell(get$5(table));
+      var getCellDelta = function (delta) {
+        return delta / pixelWidth.get() * 100;
+      };
+      var singleColumnWidth = function (w, _delta) {
+        return [100 - w];
+      };
+      var minCellWidth = function () {
+        return minWidth() / pixelWidth.get() * 100;
+      };
+      var adjustTableWidth = function (delta) {
+        var currentWidth = floatWidth.get();
+        var change = delta / 100 * currentWidth;
+        var newWidth = currentWidth + change;
+        setPercentageWidth(table, newWidth);
+        floatWidth.set(newWidth);
+        pixelWidth.set(get$5(table));
+      };
+      var getWidths = function (warehouse, tableSize) {
+        return getPercentageWidths(warehouse, table, tableSize);
+      };
+      return {
+        width: floatWidth.get,
+        pixelWidth: pixelWidth.get,
+        getWidths: getWidths,
+        getCellDelta: getCellDelta,
+        singleColumnWidth: singleColumnWidth,
+        minCellWidth: minCellWidth,
+        setElementWidth: setPercentageWidth,
+        adjustTableWidth: adjustTableWidth,
+        isRelative: true,
+        label: 'percent'
+      };
+    };
+    var pixelSize = function (initialWidth, table) {
+      var width = Cell(initialWidth);
+      var getWidth = width.get;
+      var getCellDelta = identity;
+      var singleColumnWidth = function (w, delta) {
+        var newNext = Math.max(minWidth(), w + delta);
+        return [newNext - w];
+      };
+      var adjustTableWidth = function (delta) {
+        var newWidth = getWidth() + delta;
+        setPixelWidth(table, newWidth);
+        width.set(newWidth);
+      };
+      var getWidths = function (warehouse, tableSize) {
+        return getPixelWidths(warehouse, table, tableSize);
+      };
+      return {
+        width: getWidth,
+        pixelWidth: getWidth,
+        getWidths: getWidths,
+        getCellDelta: getCellDelta,
+        singleColumnWidth: singleColumnWidth,
+        minCellWidth: minWidth,
+        setElementWidth: setPixelWidth,
+        adjustTableWidth: adjustTableWidth,
+        isRelative: false,
+        label: 'pixel'
+      };
+    };
+    var chooseSize = function (element, width) {
+      var percentMatch = percentageBasedSizeRegex().exec(width);
+      if (percentMatch !== null) {
+        return percentageSize(percentMatch[1], element);
+      }
+      var pixelMatch = pixelBasedSizeRegex().exec(width);
+      if (pixelMatch !== null) {
+        var intWidth = parseInt(pixelMatch[1], 10);
+        return pixelSize(intWidth, element);
+      }
+      var fallbackWidth = get$5(element);
+      return pixelSize(fallbackWidth, element);
+    };
+    var getTableSize = function (table) {
+      var width = getRawWidth(table);
+      return width.fold(function () {
+        return noneSize(table);
+      }, function (w) {
+        return chooseSize(table, w);
+      });
+    };
+    var TableSize = {
+      getTableSize: getTableSize,
+      pixelSize: pixelSize,
+      percentageSize: percentageSize,
+      noneSize: noneSize
+    };
+
+    var statsStruct = function (minRow, minCol, maxRow, maxCol, allCells, selectedCells) {
+      return {
+        minRow: minRow,
+        minCol: minCol,
+        maxRow: maxRow,
+        maxCol: maxCol,
+        allCells: allCells,
+        selectedCells: selectedCells
+      };
+    };
+    var findSelectedStats = function (house, isSelected) {
+      var totalColumns = house.grid.columns;
+      var totalRows = house.grid.rows;
+      var minRow = totalRows;
+      var minCol = totalColumns;
+      var maxRow = 0;
+      var maxCol = 0;
+      var allCells = [];
+      var selectedCells = [];
+      each$1(house.access, function (detail) {
+        allCells.push(detail);
+        if (isSelected(detail)) {
+          selectedCells.push(detail);
+          var startRow = detail.row;
+          var endRow = startRow + detail.rowspan - 1;
+          var startCol = detail.column;
+          var endCol = startCol + detail.colspan - 1;
+          if (startRow < minRow) {
+            minRow = startRow;
+          } else if (endRow > maxRow) {
+            maxRow = endRow;
+          }
+          if (startCol < minCol) {
+            minCol = startCol;
+          } else if (endCol > maxCol) {
+            maxCol = endCol;
+          }
+        }
+      });
+      return statsStruct(minRow, minCol, maxRow, maxCol, allCells, selectedCells);
+    };
+    var makeCell = function (list, seenSelected, rowIndex) {
+      var row = list[rowIndex].element;
+      var td = SugarElement.fromTag('td');
+      append(td, SugarElement.fromTag('br'));
+      var f = seenSelected ? append : prepend;
+      f(row, td);
+    };
+    var fillInGaps = function (list, house, stats, isSelected) {
+      var totalColumns = house.grid.columns;
+      var totalRows = house.grid.rows;
+      for (var i = 0; i < totalRows; i++) {
+        var seenSelected = false;
+        for (var j = 0; j < totalColumns; j++) {
+          if (!(i < stats.minRow || i > stats.maxRow || j < stats.minCol || j > stats.maxCol)) {
+            var needCell = Warehouse.getAt(house, i, j).filter(isSelected).isNone();
+            if (needCell) {
+              makeCell(list, seenSelected, i);
+            } else {
+              seenSelected = true;
+            }
+          }
+        }
+      }
+    };
+    var clean = function (replica, stats, house, widthDelta) {
+      each$1(house.columns, function (col) {
+        if (col.column < stats.minCol || col.column > stats.maxCol) {
+          remove$2(col.element);
+        }
+      });
+      var emptyRows = filter(firstLayer(replica, 'tr'), function (row) {
+        return row.dom.childElementCount === 0;
+      });
+      each(emptyRows, remove$2);
+      if (stats.minCol === stats.maxCol || stats.minRow === stats.maxRow) {
+        each(firstLayer(replica, 'th,td'), function (cell) {
+          remove(cell, 'rowspan');
+          remove(cell, 'colspan');
+        });
+      }
+      remove(replica, LOCKED_COL_ATTR);
+      remove(replica, 'data-snooker-col-series');
+      var tableSize = TableSize.getTableSize(replica);
+      tableSize.adjustTableWidth(widthDelta);
+    };
+    var getTableWidthDelta = function (table, warehouse, tableSize, stats) {
+      if (stats.minCol === 0 && warehouse.grid.columns === stats.maxCol + 1) {
+        return 0;
+      }
+      var colWidths = getPixelWidths(warehouse, table, tableSize);
+      var allColsWidth = foldl(colWidths, function (acc, width) {
+        return acc + width;
+      }, 0);
+      var selectedColsWidth = foldl(colWidths.slice(stats.minCol, stats.maxCol + 1), function (acc, width) {
+        return acc + width;
+      }, 0);
+      var newWidth = selectedColsWidth / allColsWidth * tableSize.pixelWidth();
+      var delta = newWidth - tableSize.pixelWidth();
+      return tableSize.getCellDelta(delta);
+    };
+    var extract = function (table, selectedSelector) {
+      var isSelected = function (detail) {
+        return is(detail.element, selectedSelector);
+      };
+      var replica = deep(table);
+      var list = fromTable(replica);
+      var tableSize = TableSize.getTableSize(table);
+      var replicaHouse = Warehouse.generate(list);
+      var replicaStats = findSelectedStats(replicaHouse, isSelected);
+      var selector = 'th:not(' + selectedSelector + ')' + ',td:not(' + selectedSelector + ')';
+      var unselectedCells = filterFirstLayer(replica, 'th,td', function (cell) {
+        return is(cell, selector);
+      });
+      each(unselectedCells, remove$2);
+      fillInGaps(list, replicaHouse, replicaStats, isSelected);
+      var house = Warehouse.fromTable(table);
+      var widthDelta = getTableWidthDelta(table, house, tableSize, replicaStats);
+      clean(replica, replicaStats, replicaHouse, widthDelta);
+      return replica;
+    };
+
+    var nbsp = '\xA0';
+
+    var getEnd = function (element) {
+      return name(element) === 'img' ? 1 : getOption(element).fold(function () {
+        return children(element).length;
+      }, function (v) {
+        return v.length;
+      });
+    };
+    var isTextNodeWithCursorPosition = function (el) {
+      return getOption(el).filter(function (text) {
+        return text.trim().length !== 0 || text.indexOf(nbsp) > -1;
+      }).isSome();
+    };
+    var elementsWithCursorPosition = [
+      'img',
+      'br'
+    ];
+    var isCursorPosition = function (elem) {
+      var hasCursorPosition = isTextNodeWithCursorPosition(elem);
+      return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
+    };
+
+    var first = function (element) {
+      return descendant(element, isCursorPosition);
+    };
+    var last$1 = function (element) {
+      return descendantRtl(element, isCursorPosition);
+    };
+    var descendantRtl = function (scope, predicate) {
+      var descend = function (element) {
+        var children$1 = children(element);
+        for (var i = children$1.length - 1; i >= 0; i--) {
+          var child = children$1[i];
+          if (predicate(child)) {
+            return Optional.some(child);
+          }
+          var res = descend(child);
+          if (res.isSome()) {
+            return res;
+          }
+        }
+        return Optional.none();
+      };
+      return descend(scope);
+    };
+
+    var transferableAttributes = {
+      scope: [
+        'row',
+        'col'
+      ]
+    };
+    var createCell = function () {
+      var td = SugarElement.fromTag('td');
+      append(td, SugarElement.fromTag('br'));
+      return td;
+    };
+    var createCol = function () {
+      return SugarElement.fromTag('col');
+    };
+    var createColgroup = function () {
+      return SugarElement.fromTag('colgroup');
+    };
+    var replace = function (cell, tag, attrs) {
+      var replica = copy$1(cell, tag);
+      each$1(attrs, function (v, k) {
+        if (v === null) {
+          remove(replica, k);
+        } else {
+          set(replica, k, v);
+        }
+      });
+      return replica;
+    };
+    var pasteReplace = function (cell) {
+      return cell;
+    };
+    var newRow = function (doc) {
+      return function () {
+        return SugarElement.fromTag('tr', doc.dom);
+      };
+    };
+    var cloneFormats = function (oldCell, newCell, formats) {
+      var first$1 = first(oldCell);
+      return first$1.map(function (firstText) {
+        var formatSelector = formats.join(',');
+        var parents = ancestors$1(firstText, formatSelector, function (element) {
+          return eq$1(element, oldCell);
+        });
+        return foldr(parents, function (last, parent) {
+          var clonedFormat = shallow(parent);
+          remove(clonedFormat, 'contenteditable');
+          append(last, clonedFormat);
+          return clonedFormat;
+        }, newCell);
+      }).getOr(newCell);
+    };
+    var cloneAppropriateAttributes = function (original, clone) {
+      each$1(transferableAttributes, function (validAttributes, attributeName) {
+        return getOpt(original, attributeName).filter(function (attribute) {
+          return contains(validAttributes, attribute);
+        }).each(function (attribute) {
+          return set(clone, attributeName, attribute);
+        });
+      });
+    };
+    var cellOperations = function (mutate, doc, formatsToClone) {
+      var cloneCss = function (prev, clone) {
+        copy(prev.element, clone);
+        remove$1(clone, 'height');
+        if (prev.colspan !== 1) {
+          remove$1(clone, 'width');
+        }
+      };
+      var newCell = function (prev) {
+        var docu = owner(prev.element);
+        var td = SugarElement.fromTag(name(prev.element), docu.dom);
+        var formats = formatsToClone.getOr([
+          'strong',
+          'em',
+          'b',
+          'i',
+          'span',
+          'font',
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'h5',
+          'h6',
+          'p',
+          'div'
+        ]);
+        var lastNode = formats.length > 0 ? cloneFormats(prev.element, td, formats) : td;
+        append(lastNode, SugarElement.fromTag('br'));
+        cloneCss(prev, td);
+        cloneAppropriateAttributes(prev.element, td);
+        mutate(prev.element, td);
+        return td;
+      };
+      var newCol = function (prev) {
+        var doc = owner(prev.element);
+        var col = SugarElement.fromTag(name(prev.element), doc.dom);
+        cloneCss(prev, col);
+        mutate(prev.element, col);
+        return col;
+      };
+      return {
+        col: newCol,
+        colgroup: createColgroup,
+        row: newRow(doc),
+        cell: newCell,
+        replace: replace,
+        gap: createCell
+      };
+    };
+    var paste = function (doc) {
+      return {
+        col: createCol,
+        colgroup: createColgroup,
+        row: newRow(doc),
+        cell: createCell,
+        replace: pasteReplace,
+        gap: createCell
+      };
+    };
+
+    var fromHtml$1 = function (html, scope) {
+      var doc = scope || document;
+      var div = doc.createElement('div');
+      div.innerHTML = html;
+      return children(SugarElement.fromDom(div));
+    };
+    var fromDom$1 = function (nodes) {
+      return map(nodes, SugarElement.fromDom);
+    };
+
+    var getNodeName = function (elm) {
+      return elm.nodeName.toLowerCase();
+    };
+    var getBody$1 = function (editor) {
+      return SugarElement.fromDom(editor.getBody());
+    };
+    var getPixelWidth$1 = function (elm) {
+      return elm.getBoundingClientRect().width;
+    };
+    var getPixelHeight = function (elm) {
+      return elm.getBoundingClientRect().height;
+    };
+    var getIsRoot = function (editor) {
+      return function (element) {
+        return eq$1(element, getBody$1(editor));
+      };
+    };
+    var removePxSuffix = function (size) {
+      return size ? size.replace(/px$/, '') : '';
+    };
+    var addPxSuffix = function (size) {
+      return /^\d+(\.\d+)?$/.test(size) ? size + 'px' : size;
+    };
+    var removeDataStyle = function (table) {
+      remove(table, 'data-mce-style');
+      var removeStyleAttribute = function (element) {
+        return remove(element, 'data-mce-style');
+      };
+      each(cells(table), removeStyleAttribute);
+      each(columns(table), removeStyleAttribute);
+    };
+    var getRawWidth$1 = function (editor, elm) {
+      var raw = editor.dom.getStyle(elm, 'width') || editor.dom.getAttrib(elm, 'width');
+      return Optional.from(raw).filter(isNotEmpty);
+    };
+    var isPercentage = function (value) {
+      return /^(\d+(\.\d+)?)%$/.test(value);
+    };
+    var isPixel = function (value) {
+      return /^(\d+(\.\d+)?)px$/.test(value);
+    };
+    var getSelectionStart = function (editor) {
+      return SugarElement.fromDom(editor.selection.getStart());
+    };
+
+    var selection = function (selections) {
+      return cata(selections.get(), constant([]), identity, pure);
+    };
+    var unmergable = function (selections) {
+      var hasSpan = function (elem, type) {
+        return getOpt(elem, type).exists(function (span) {
+          return parseInt(span, 10) > 1;
+        });
+      };
+      var hasRowOrColSpan = function (elem) {
+        return hasSpan(elem, 'rowspan') || hasSpan(elem, 'colspan');
+      };
+      var candidates = selection(selections);
+      return candidates.length > 0 && forall(candidates, hasRowOrColSpan) ? Optional.some(candidates) : Optional.none();
+    };
+    var mergable = function (table, selections, ephemera) {
+      return cata(selections.get(), Optional.none, function (cells) {
+        if (cells.length <= 1) {
+          return Optional.none();
+        } else {
+          return retrieveBox(table, ephemera.firstSelectedSelector, ephemera.lastSelectedSelector).map(function (bounds) {
+            return {
+              bounds: bounds,
+              cells: cells
+            };
+          });
+        }
+      }, Optional.none);
+    };
+
+    var strSelected = 'data-mce-selected';
+    var strSelectedSelector = 'td[' + strSelected + '],th[' + strSelected + ']';
+    var strAttributeSelector = '[' + strSelected + ']';
+    var strFirstSelected = 'data-mce-first-selected';
+    var strFirstSelectedSelector = 'td[' + strFirstSelected + '],th[' + strFirstSelected + ']';
+    var strLastSelected = 'data-mce-last-selected';
+    var strLastSelectedSelector = 'td[' + strLastSelected + '],th[' + strLastSelected + ']';
+    var attributeSelector = strAttributeSelector;
+    var ephemera = {
+      selected: strSelected,
+      selectedSelector: strSelectedSelector,
+      firstSelected: strFirstSelected,
+      firstSelectedSelector: strFirstSelectedSelector,
+      lastSelected: strLastSelected,
+      lastSelectedSelector: strLastSelectedSelector
+    };
+
+    var noMenu = function (cell) {
+      return {
+        element: cell,
+        mergable: Optional.none(),
+        unmergable: Optional.none(),
+        selection: [cell]
+      };
+    };
+    var forMenu = function (selections, table, cell) {
+      return {
+        element: cell,
+        mergable: mergable(table, selections, ephemera),
+        unmergable: unmergable(selections),
+        selection: selection(selections)
+      };
+    };
+    var paste$1 = function (element, clipboard, generators) {
+      return {
+        element: element,
+        clipboard: clipboard,
+        generators: generators
+      };
+    };
+    var pasteRows = function (selections, cell, clipboard, generators) {
+      return {
+        selection: selection(selections),
+        clipboard: clipboard,
+        generators: generators
+      };
+    };
+
+    var extractSelected = function (cells) {
+      return table(cells[0]).map(function (table) {
+        var replica = extract(table, attributeSelector);
+        removeDataStyle(replica);
+        return [replica];
+      });
+    };
+    var serializeElements = function (editor, elements) {
+      return map(elements, function (elm) {
+        return editor.selection.serializer.serialize(elm.dom, {});
+      }).join('');
+    };
+    var getTextContent = function (elements) {
+      return map(elements, function (element) {
+        return element.dom.innerText;
+      }).join('');
+    };
+    var registerEvents = function (editor, selections, actions, cellSelection) {
+      editor.on('BeforeGetContent', function (e) {
+        var multiCellContext = function (cells) {
+          e.preventDefault();
+          extractSelected(cells).each(function (elements) {
+            e.content = e.format === 'text' ? getTextContent(elements) : serializeElements(editor, elements);
+          });
+        };
+        if (e.selection === true) {
+          cata(selections.get(), noop, multiCellContext, noop);
+        }
+      });
+      editor.on('BeforeSetContent', function (e) {
+        if (e.selection === true && e.paste === true) {
+          var cellOpt = Optional.from(editor.dom.getParent(editor.selection.getStart(), 'th,td'));
+          cellOpt.each(function (domCell) {
+            var cell = SugarElement.fromDom(domCell);
+            table(cell).each(function (table) {
+              var elements = filter(fromHtml$1(e.content), function (content) {
+                return name(content) !== 'meta';
+              });
+              var isTable = function (elm) {
+                return name(elm) === 'table';
+              };
+              if (elements.length === 1 && isTable(elements[0])) {
+                e.preventDefault();
+                var doc = SugarElement.fromDom(editor.getDoc());
+                var generators = paste(doc);
+                var targets = paste$1(cell, elements[0], generators);
+                actions.pasteCells(table, targets).each(function (data) {
+                  editor.selection.setRng(data.rng);
+                  editor.focus();
+                  cellSelection.clear(table);
+                });
+              }
+            });
+          });
+        }
+      });
+    };
+
+    var adt = Adt.generate([
+      { none: [] },
+      { only: ['index'] },
+      {
+        left: [
+          'index',
+          'next'
+        ]
+      },
+      {
+        middle: [
+          'prev',
+          'index',
+          'next'
+        ]
+      },
+      {
+        right: [
+          'prev',
+          'index'
+        ]
+      }
+    ]);
+    var ColumnContext = __assign({}, adt);
+
+    var neighbours = function (input, index) {
+      if (input.length === 0) {
+        return ColumnContext.none();
+      }
+      if (input.length === 1) {
+        return ColumnContext.only(0);
+      }
+      if (index === 0) {
+        return ColumnContext.left(0, 1);
+      }
+      if (index === input.length - 1) {
+        return ColumnContext.right(index - 1, index);
+      }
+      if (index > 0 && index < input.length - 1) {
+        return ColumnContext.middle(index - 1, index, index + 1);
+      }
+      return ColumnContext.none();
+    };
+    var determine = function (input, column, step, tableSize, resize) {
+      var result = input.slice(0);
+      var context = neighbours(input, column);
+      var onNone = constant(map(result, constant(0)));
+      var onOnly = function (index) {
+        return tableSize.singleColumnWidth(result[index], step);
+      };
+      var onLeft = function (index, next) {
+        return resize.calcLeftEdgeDeltas(result, index, next, step, tableSize.minCellWidth(), tableSize.isRelative);
+      };
+      var onMiddle = function (prev, index, next) {
+        return resize.calcMiddleDeltas(result, prev, index, next, step, tableSize.minCellWidth(), tableSize.isRelative);
+      };
+      var onRight = function (prev, index) {
+        return resize.calcRightEdgeDeltas(result, prev, index, step, tableSize.minCellWidth(), tableSize.isRelative);
+      };
+      return context.fold(onNone, onOnly, onLeft, onMiddle, onRight);
     };
 
     var total = function (start, end, measures) {
@@ -3418,7 +3740,15 @@
       var total = sumUp(newHeights);
       setHeight(table, total);
     };
-    var adjustWidthTo = function (table, list, tableSize) {
+    var adjustAndRedistributeWidths = function (_table, list, details, tableSize, resizeBehaviour) {
+      var warehouse = Warehouse.generate(list);
+      var sizes = tableSize.getWidths(warehouse, tableSize);
+      var tablePixelWidth = tableSize.pixelWidth();
+      var _a = resizeBehaviour.calcRedestributedWidths(sizes, tablePixelWidth, details.pixelDelta, tableSize.isRelative), newSizes = _a.newSizes, delta = _a.delta;
+      recalculateAndApply(warehouse, newSizes, tableSize);
+      tableSize.adjustTableWidth(delta);
+    };
+    var adjustWidthTo = function (_table, list, _info, tableSize) {
       var warehouse = Warehouse.generate(list);
       var widths = tableSize.getWidths(warehouse, tableSize);
       recalculateAndApply(warehouse, widths, tableSize);
@@ -3461,25 +3791,43 @@
           return newSize - size;
         });
       };
-      var calcLeftEdgeDeltas = function (sizes, index, next, delta, minCellSize, relativeSizing) {
-        if (relativeSizing) {
+      var calcLeftEdgeDeltas = function (sizes, index, next, delta, minCellSize, isRelative) {
+        if (isRelative) {
           return calcRelativeDeltas(sizes, index, delta, minCellSize);
         } else {
           return calcFixedDeltas(sizes, index, next, delta, minCellSize);
         }
       };
-      var calcMiddleDeltas = function (sizes, _prev, index, next, delta, minCellSize, relativeSizing) {
-        return calcLeftEdgeDeltas(sizes, index, next, delta, minCellSize, relativeSizing);
+      var calcMiddleDeltas = function (sizes, _prev, index, next, delta, minCellSize, isRelative) {
+        return calcLeftEdgeDeltas(sizes, index, next, delta, minCellSize, isRelative);
       };
       var resizeTable = function (resizer, delta) {
         return resizer(delta);
       };
-      var calcRightEdgeDeltas = function (sizes, _prev, index, delta, minCellSize, relativeSizing) {
-        if (relativeSizing) {
+      var calcRightEdgeDeltas = function (sizes, _prev, index, delta, minCellSize, isRelative) {
+        if (isRelative) {
           return calcRelativeDeltas(sizes, index, delta, minCellSize);
         } else {
           var clampedDelta = clampNegativeDelta(sizes, index, delta, minCellSize);
           return zero(sizes.slice(0, index)).concat([clampedDelta]);
+        }
+      };
+      var calcRedestributedWidths = function (sizes, totalWidth, pixelDelta, isRelative) {
+        if (isRelative) {
+          var tableWidth = totalWidth + pixelDelta;
+          var ratio_1 = tableWidth / totalWidth;
+          var newSizes = map(sizes, function (size) {
+            return size / ratio_1;
+          });
+          return {
+            delta: ratio_1 * 100 - 100,
+            newSizes: newSizes
+          };
+        } else {
+          return {
+            delta: pixelDelta,
+            newSizes: sizes
+          };
         }
       };
       return {
@@ -3487,7 +3835,8 @@
         clampTableDelta: clampNegativeDelta,
         calcLeftEdgeDeltas: calcLeftEdgeDeltas,
         calcMiddleDeltas: calcMiddleDeltas,
-        calcRightEdgeDeltas: calcRightEdgeDeltas
+        calcRightEdgeDeltas: calcRightEdgeDeltas,
+        calcRedestributedWidths: calcRedestributedWidths
       };
     };
     var preserveTable = function () {
@@ -3507,8 +3856,8 @@
           resizer(delta);
         }
       };
-      var calcRightEdgeDeltas = function (sizes, _prev, _index, delta, _minCellSize, relativeSizing) {
-        if (relativeSizing) {
+      var calcRightEdgeDeltas = function (sizes, _prev, _index, delta, _minCellSize, isRelative) {
+        if (isRelative) {
           return zero(sizes);
         } else {
           var diff = delta / sizes.length;
@@ -3529,12 +3878,19 @@
           return clampNegativeDelta(sizes, index, delta, minCellSize);
         }
       };
+      var calcRedestributedWidths = function (sizes, _totalWidth, _pixelDelta, _isRelative) {
+        return {
+          delta: 0,
+          newSizes: sizes
+        };
+      };
       return {
         resizeTable: resizeTable,
         clampTableDelta: clampTableDelta,
         calcLeftEdgeDeltas: calcLeftEdgeDeltas,
         calcMiddleDeltas: calcMiddleDeltas,
-        calcRightEdgeDeltas: calcRightEdgeDeltas
+        calcRightEdgeDeltas: calcRightEdgeDeltas,
+        calcRedestributedWidths: calcRedestributedWidths
       };
     };
 
@@ -3838,14 +4194,14 @@
       };
     };
 
-    var sort = function (arr) {
+    var sort$1 = function (arr) {
       return arr.slice(0).sort();
     };
     var reqMessage = function (required, keys) {
-      throw new Error('All required keys (' + sort(required).join(', ') + ') were not specified. Specified keys were: ' + sort(keys).join(', ') + '.');
+      throw new Error('All required keys (' + sort$1(required).join(', ') + ') were not specified. Specified keys were: ' + sort$1(keys).join(', ') + '.');
     };
     var unsuppMessage = function (unsupported) {
-      throw new Error('Unsupported keys for object: ' + sort(unsupported).join(', '));
+      throw new Error('Unsupported keys for object: ' + sort$1(unsupported).join(', '));
     };
     var validateStrArr = function (label, array) {
       if (!isArray(array)) {
@@ -3858,10 +4214,10 @@
       });
     };
     var invalidTypeMessage = function (incorrect, type) {
-      throw new Error('All values need to be of type: ' + type + '. Keys (' + sort(incorrect).join(', ') + ') were not.');
+      throw new Error('All values need to be of type: ' + type + '. Keys (' + sort$1(incorrect).join(', ') + ') were not.');
     };
     var checkDupes = function (everything) {
-      var sorted = sort(everything);
+      var sorted = sort$1(everything);
       var dupe = find(sorted, function (s, i) {
         return i < sorted.length - 1 && s === sorted[i + 1];
       });
@@ -3931,7 +4287,7 @@
       'delayDrop'
     ]);
 
-    function InDrag () {
+    var InDrag = function () {
       var previous = Optional.none();
       var reset = function () {
         previous = Optional.none();
@@ -3958,16 +4314,18 @@
         reset: reset,
         events: events.registry
       };
-    }
+    };
 
-    function NoDrag () {
+    var NoDrag = function () {
+      var events = create({ move: Event(['info']) });
       return {
         onEvent: noop,
-        reset: noop
+        reset: noop,
+        events: events.registry
       };
-    }
+    };
 
-    function Movement () {
+    var Movement = function () {
       var noDragState = NoDrag();
       var inDragState = InDrag();
       var dragState = noDragState;
@@ -3992,7 +4350,7 @@
         onEvent: onEvent,
         events: inDragState.events
       };
-    }
+    };
 
     var setup = function (mutation, mode, settings) {
       var active = false;
@@ -4630,6 +4988,14 @@
     var fireTableModified = function (editor, table, data) {
       editor.fire('TableModified', __assign(__assign({}, data), { table: table }));
     };
+    var styleModified = {
+      structure: false,
+      style: true
+    };
+    var structureModified = {
+      structure: true,
+      style: false
+    };
 
     var defaultTableToolbar = 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol';
     var defaultStyles = {
@@ -4738,6 +5104,9 @@
     var isPreserveTableColumnResizing = function (editor) {
       return getColumnResizingBehaviour(editor) === 'preservetable';
     };
+    var isResizeTableColumnResizing = function (editor) {
+      return getColumnResizingBehaviour(editor) === 'resizetable';
+    };
     var getCloneElements = function (editor) {
       var cloneElements = editor.getParam('table_clone_elements');
       if (isString(cloneElements)) {
@@ -4751,179 +5120,6 @@
     var hasObjectResizing = function (editor) {
       var objectResizing = editor.getParam('object_resizing', true);
       return isString(objectResizing) ? objectResizing === 'table' : objectResizing;
-    };
-
-    var getNodeName = function (elm) {
-      return elm.nodeName.toLowerCase();
-    };
-    var getBody$1 = function (editor) {
-      return SugarElement.fromDom(editor.getBody());
-    };
-    var getPixelWidth$1 = function (elm) {
-      return elm.getBoundingClientRect().width;
-    };
-    var getPixelHeight = function (elm) {
-      return elm.getBoundingClientRect().height;
-    };
-    var getIsRoot = function (editor) {
-      return function (element) {
-        return eq$1(element, getBody$1(editor));
-      };
-    };
-    var removePxSuffix = function (size) {
-      return size ? size.replace(/px$/, '') : '';
-    };
-    var addPxSuffix = function (size) {
-      return /^\d+(\.\d+)?$/.test(size) ? size + 'px' : size;
-    };
-    var removeDataStyle = function (table) {
-      remove(table, 'data-mce-style');
-      var removeStyleAttribute = function (element) {
-        return remove(element, 'data-mce-style');
-      };
-      each(cells(table), removeStyleAttribute);
-      each(columns(table), removeStyleAttribute);
-    };
-    var getRawWidth$1 = function (editor, elm) {
-      var raw = editor.dom.getStyle(elm, 'width') || editor.dom.getAttrib(elm, 'width');
-      return Optional.from(raw).filter(isNotEmpty);
-    };
-    var isPercentage = function (value) {
-      return /^(\d+(\.\d+)?)%$/.test(value);
-    };
-    var isPixel = function (value) {
-      return /^(\d+(\.\d+)?)px$/.test(value);
-    };
-    var getSelectionStart = function (editor) {
-      return SugarElement.fromDom(editor.selection.getStart());
-    };
-
-    var Cell = function (initial) {
-      var value = initial;
-      var get = function () {
-        return value;
-      };
-      var set = function (v) {
-        value = v;
-      };
-      return {
-        get: get,
-        set: set
-      };
-    };
-
-    var noneSize = function (table) {
-      var getWidth = function () {
-        return get$5(table);
-      };
-      var zero = constant(0);
-      var getWidths = function (warehouse, tableSize) {
-        return getPixelWidths(warehouse, table, tableSize);
-      };
-      return {
-        width: getWidth,
-        pixelWidth: getWidth,
-        getWidths: getWidths,
-        getCellDelta: zero,
-        singleColumnWidth: constant([0]),
-        minCellWidth: zero,
-        setElementWidth: noop,
-        adjustTableWidth: noop,
-        isRelative: true,
-        label: 'none'
-      };
-    };
-    var percentageSize = function (initialWidth, table) {
-      var floatWidth = Cell(parseFloat(initialWidth));
-      var pixelWidth = Cell(get$5(table));
-      var getCellDelta = function (delta) {
-        return delta / pixelWidth.get() * 100;
-      };
-      var singleColumnWidth = function (w, _delta) {
-        return [100 - w];
-      };
-      var minCellWidth = function () {
-        return minWidth() / pixelWidth.get() * 100;
-      };
-      var adjustTableWidth = function (delta) {
-        var currentWidth = floatWidth.get();
-        var change = delta / 100 * currentWidth;
-        var newWidth = currentWidth + change;
-        setPercentageWidth(table, newWidth);
-        floatWidth.set(newWidth);
-        pixelWidth.set(get$5(table));
-      };
-      var getWidths = function (warehouse, tableSize) {
-        return getPercentageWidths(warehouse, table, tableSize);
-      };
-      return {
-        width: floatWidth.get,
-        pixelWidth: pixelWidth.get,
-        getWidths: getWidths,
-        getCellDelta: getCellDelta,
-        singleColumnWidth: singleColumnWidth,
-        minCellWidth: minCellWidth,
-        setElementWidth: setPercentageWidth,
-        adjustTableWidth: adjustTableWidth,
-        isRelative: true,
-        label: 'percent'
-      };
-    };
-    var pixelSize = function (initialWidth, table) {
-      var width = Cell(initialWidth);
-      var getWidth = width.get;
-      var getCellDelta = identity;
-      var singleColumnWidth = function (w, delta) {
-        var newNext = Math.max(minWidth(), w + delta);
-        return [newNext - w];
-      };
-      var adjustTableWidth = function (delta) {
-        var newWidth = getWidth() + delta;
-        setPixelWidth(table, newWidth);
-        width.set(newWidth);
-      };
-      var getWidths = function (warehouse, tableSize) {
-        return getPixelWidths(warehouse, table, tableSize);
-      };
-      return {
-        width: getWidth,
-        pixelWidth: getWidth,
-        getWidths: getWidths,
-        getCellDelta: getCellDelta,
-        singleColumnWidth: singleColumnWidth,
-        minCellWidth: minWidth,
-        setElementWidth: setPixelWidth,
-        adjustTableWidth: adjustTableWidth,
-        isRelative: false,
-        label: 'pixel'
-      };
-    };
-    var chooseSize = function (element, width) {
-      var percentMatch = percentageBasedSizeRegex().exec(width);
-      if (percentMatch !== null) {
-        return percentageSize(percentMatch[1], element);
-      }
-      var pixelMatch = pixelBasedSizeRegex().exec(width);
-      if (pixelMatch !== null) {
-        var intWidth = parseInt(pixelMatch[1], 10);
-        return pixelSize(intWidth, element);
-      }
-      var fallbackWidth = get$5(element);
-      return pixelSize(fallbackWidth, element);
-    };
-    var getTableSize = function (table) {
-      var width = getRawWidth(table);
-      return width.fold(function () {
-        return noneSize(table);
-      }, function (w) {
-        return chooseSize(table, w);
-      });
-    };
-    var TableSize = {
-      getTableSize: getTableSize,
-      pixelSize: pixelSize,
-      percentageSize: percentageSize,
-      noneSize: noneSize
     };
 
     var get$9 = function (editor, table) {
@@ -5117,7 +5313,7 @@
             afterCornerResize(table, origin_1, e.width);
           }
           removeDataStyle(table);
-          fireTableModified(editor, table.dom);
+          fireTableModified(editor, table.dom, styleModified);
         }
       });
       editor.on('SwitchMode', function () {
@@ -5178,50 +5374,15 @@
     };
 
     var halve = function (main, other) {
-      var width = getGenericWidth(main);
-      width.each(function (w) {
-        var newWidth = w.value / 2;
-        setGenericWidth(main, newWidth, w.unit);
-        setGenericWidth(other, newWidth, w.unit);
-      });
-    };
-
-    var addCell = function (gridRow, index, cell) {
-      var cells = gridRow.cells;
-      var before = cells.slice(0, index);
-      var after = cells.slice(index);
-      var newCells = before.concat([cell]).concat(after);
-      return setCells(gridRow, newCells);
-    };
-    var mutateCell = function (gridRow, index, cell) {
-      var cells = gridRow.cells;
-      cells[index] = cell;
-    };
-    var setCells = function (gridRow, cells) {
-      return rowcells(cells, gridRow.section);
-    };
-    var mapCells = function (gridRow, f) {
-      var cells = gridRow.cells;
-      var r = map(cells, f);
-      return rowcells(r, gridRow.section);
-    };
-    var getCell = function (gridRow, index) {
-      return gridRow.cells[index];
-    };
-    var getCellElement = function (gridRow, index) {
-      return getCell(gridRow, index).element;
-    };
-    var cellLength = function (gridRow) {
-      return gridRow.cells.length;
-    };
-    var extractGridDetails = function (grid) {
-      var result = partition(grid, function (row) {
-        return row.section === 'colgroup';
-      });
-      return {
-        rows: result.fail,
-        cols: result.pass
-      };
+      var colspan = getSpan(main, 'colspan');
+      if (colspan === 1) {
+        var width = getGenericWidth(main);
+        width.each(function (w) {
+          var newWidth = w.value / 2;
+          setGenericWidth(main, newWidth, w.unit);
+          setGenericWidth(other, newWidth, w.unit);
+        });
+      }
     };
 
     var setIfNot = function (element, property, value, ignore) {
@@ -5401,7 +5562,7 @@
       var grid = [];
       if (Warehouse.hasColumns(warehouse)) {
         var groupElementNew = map(Warehouse.justColumns(warehouse), function (column) {
-          return elementnew(column.element, isNew);
+          return elementnew(column.element, isNew, false);
         });
         grid.push(rowcells(groupElementNew, 'colgroup'));
       }
@@ -5409,9 +5570,9 @@
         var rowCells = [];
         for (var columnIndex = 0; columnIndex < warehouse.grid.columns; columnIndex++) {
           var element = Warehouse.getAt(warehouse, rowIndex, columnIndex).map(function (item) {
-            return elementnew(item.element, isNew);
+            return elementnew(item.element, isNew, item.isLocked);
           }).getOrThunk(function () {
-            return elementnew(generators.gap(), true);
+            return elementnew(generators.gap(), true, false);
           });
           rowCells.push(element);
         }
@@ -5429,11 +5590,11 @@
         var rowOfCells = findMap(details, function (detail) {
           return parent(detail.element).map(function (row) {
             var isNew = parent(row).isNone();
-            return elementnew(row, isNew);
+            return elementnew(row, isNew, false);
           });
         });
         return rowOfCells.getOrThunk(function () {
-          return elementnew(generators.row(), true);
+          return elementnew(generators.row(), true, false);
         });
       };
       return map(rendered, function (details) {
@@ -5452,28 +5613,43 @@
         });
       });
     };
+    var extractCells = function (warehouse, target, predicate) {
+      var details = map(target.selection, function (cell$1) {
+        return cell(cell$1).bind(function (lc) {
+          return findInWarehouse(warehouse, lc);
+        }).filter(predicate);
+      });
+      var cells = cat(details);
+      return someIf(cells.length > 0, cells);
+    };
     var run = function (operation, extract, adjustment, postAction, genWrappers) {
-      return function (wire, table, target, generators, sizing) {
+      return function (wire, table, target, generators, sizing, resizeBehaviour) {
         var warehouse = Warehouse.fromTable(table);
         var output = extract(warehouse, target).map(function (info) {
           var model = fromWarehouse(warehouse, generators);
           var result = operation(model, info, eq$1, genWrappers(generators));
+          var lockedColumns = getLockedColumnsFromGrid(result.grid);
           var grid = toDetailList(result.grid, generators);
           return {
+            info: info,
             grid: grid,
-            cursor: result.cursor
+            cursor: result.cursor,
+            lockedColumns: lockedColumns
           };
         });
-        return output.fold(function () {
-          return Optional.none();
-        }, function (out) {
+        return output.bind(function (out) {
           var newElements = render(table, out.grid);
           var tableSizing = Optional.from(sizing).getOrThunk(function () {
             return TableSize.getTableSize(table);
           });
-          adjustment(table, out.grid, tableSizing);
+          var resizing = Optional.from(resizeBehaviour).getOrThunk(preserveTable);
+          adjustment(table, out.grid, out.info, tableSizing, resizing);
           postAction(table);
           refresh(wire, table);
+          remove(table, LOCKED_COL_ATTR);
+          if (out.lockedColumns.length > 0) {
+            set(table, LOCKED_COL_ATTR, out.lockedColumns.join(','));
+          }
           return Optional.some({
             cursor: out.cursor,
             newRows: newElements.newRows,
@@ -5499,17 +5675,13 @@
       });
     };
     var onPasteByEditor = function (warehouse, target) {
-      var details = map(target.selection, function (cell$1) {
-        return cell(cell$1).bind(function (lc) {
-          return findInWarehouse(warehouse, lc);
-        });
+      return extractCells(warehouse, target, always).map(function (cells) {
+        return {
+          cells: cells,
+          generators: target.generators,
+          clipboard: target.clipboard
+        };
       });
-      var cells = cat(details);
-      return cells.length > 0 ? Optional.some({
-        cells: cells,
-        generators: target.generators,
-        clipboard: target.clipboard
-      }) : Optional.none();
     };
     var onMergable = function (_warehouse, target) {
       return target.mergable;
@@ -5518,13 +5690,37 @@
       return target.unmergable;
     };
     var onCells = function (warehouse, target) {
-      var details = map(target.selection, function (cell$1) {
-        return cell(cell$1).bind(function (lc) {
-          return findInWarehouse(warehouse, lc);
-        });
+      return extractCells(warehouse, target, always);
+    };
+    var onUnlockedCell = function (warehouse, target) {
+      return onCell(warehouse, target).filter(function (detail) {
+        return !detail.isLocked;
       });
-      var cells = cat(details);
-      return cells.length > 0 ? Optional.some(cells) : Optional.none();
+    };
+    var onUnlockedCells = function (warehouse, target) {
+      return extractCells(warehouse, target, function (detail) {
+        return !detail.isLocked;
+      });
+    };
+    var isUnlockedTableCell = function (warehouse, cell) {
+      return findInWarehouse(warehouse, cell).exists(function (detail) {
+        return !detail.isLocked;
+      });
+    };
+    var allUnlocked = function (warehouse, cells) {
+      return forall(cells, function (cell) {
+        return isUnlockedTableCell(warehouse, cell);
+      });
+    };
+    var onUnlockedMergable = function (warehouse, target) {
+      return onMergable(warehouse, target).filter(function (mergeable) {
+        return allUnlocked(warehouse, mergeable.cells);
+      });
+    };
+    var onUnlockedUnmergable = function (warehouse, target) {
+      return onUnmergable(warehouse, target).filter(function (cells) {
+        return allUnlocked(warehouse, cells);
+      });
     };
 
     var merge = function (grid, bounds, comparator, substitution) {
@@ -5534,7 +5730,9 @@
       }
       for (var i = bounds.startRow; i <= bounds.finishRow; i++) {
         for (var j = bounds.startCol; j <= bounds.finishCol; j++) {
-          mutateCell(rows[i], j, elementnew(substitution(), false));
+          var row = rows[i];
+          var isLocked = getCell(row, j).isLocked;
+          mutateCell(row, j, elementnew(substitution(), false, isLocked));
         }
       }
       return grid;
@@ -5544,10 +5742,12 @@
       var first = true;
       for (var i = 0; i < rows.length; i++) {
         for (var j = 0; j < cellLength(rows[0]); j++) {
-          var current = getCellElement(rows[i], j);
-          var isToReplace = comparator(current, target);
+          var row = rows[i];
+          var currentCell = getCell(row, j);
+          var currentCellElm = currentCell.element;
+          var isToReplace = comparator(currentCellElm, target);
           if (isToReplace === true && first === false) {
-            mutateCell(rows[i], j, elementnew(substitution(), true));
+            mutateCell(row, j, elementnew(substitution(), true, currentCell.isLocked));
           } else if (isToReplace === true) {
             first = false;
           }
@@ -5569,7 +5769,7 @@
           var current = row.cells[index];
           var isToReplace = comparator(current.element, prevCell.element);
           if (isToReplace) {
-            mutateCell(row, index, elementnew(substitution(), true));
+            mutateCell(row, index, elementnew(substitution(), true, current.isLocked));
           }
         });
       }
@@ -5582,25 +5782,23 @@
         var cells = uniqueCells(rowPrevCells, comparator);
         each(cells, function (cell) {
           var replacement = Optional.none();
-          var _loop_1 = function (i) {
-            var _loop_2 = function (j) {
-              var current = rows[i].cells[j];
+          for (var i = index; i < rows.length; i++) {
+            var _loop_1 = function (j) {
+              var row = rows[i];
+              var current = getCell(row, j);
               var isToReplace = comparator(current.element, cell.element);
               if (isToReplace) {
                 if (replacement.isNone()) {
                   replacement = Optional.some(substitution());
                 }
                 replacement.each(function (sub) {
-                  mutateCell(rows[i], j, elementnew(sub, true));
+                  mutateCell(row, j, elementnew(sub, true, current.isLocked));
                 });
               }
             };
             for (var j = 0; j < cellLength(rows[0]); j++) {
-              _loop_2(j);
+              _loop_1(j);
             }
-          };
-          for (var i = index; i < rows.length; i++) {
-            _loop_1(i);
           }
         });
       }
@@ -5744,29 +5942,46 @@
         colDelta: 0
       };
     };
-    var generateElements = function (cells, row, generators) {
-      var getGenerator = row.section === 'colgroup' ? generators.col : generators.cell;
-      return map(cells, function () {
-        return elementnew(getGenerator(), true);
+    var generateElements = function (amount, row, generators, isLocked) {
+      var generator = row.section === 'colgroup' ? generators.col : generators.cell;
+      return range(amount, function (idx) {
+        return elementnew(generator(), true, isLocked(idx));
       });
     };
-    var rowFill = function (grid, amount, generators) {
+    var rowFill = function (grid, amount, generators, lockedColumns) {
       return grid.concat(range(amount, function () {
         var row = grid[grid.length - 1];
-        return setCells(row, generateElements(row.cells, row, generators));
+        var elements = generateElements(row.cells.length, row, generators, function (idx) {
+          return has(lockedColumns, idx.toString());
+        });
+        return setCells(row, elements);
       }));
     };
-    var colFill = function (grid, amount, generators) {
+    var colFill = function (grid, amount, generators, startIndex) {
       return map(grid, function (row) {
-        var newChildren = generateElements(range(amount, identity), row, generators);
-        return setCells(row, row.cells.concat(newChildren));
+        var newChildren = generateElements(amount, row, generators, never);
+        return addCells(row, startIndex, newChildren);
+      });
+    };
+    var lockedColFill = function (grid, generators, lockedColumns) {
+      return map(grid, function (row) {
+        return foldl(lockedColumns, function (acc, colNum) {
+          var newChild = generateElements(1, row, generators, always)[0];
+          return addCell(acc, colNum, newChild);
+        }, row);
       });
     };
     var tailor = function (gridA, delta, generators) {
       var fillCols = delta.colDelta < 0 ? colFill : identity;
       var fillRows = delta.rowDelta < 0 ? rowFill : identity;
-      var modifiedCols = fillCols(gridA, Math.abs(delta.colDelta), generators);
-      return fillRows(modifiedCols, Math.abs(delta.rowDelta), generators);
+      var lockedColumns = getLockedColumnsFromGrid(gridA);
+      var gridWidth = cellLength(gridA[0]);
+      var isLastColLocked = exists(lockedColumns, function (locked) {
+        return locked === gridWidth - 1;
+      });
+      var modifiedCols = fillCols(gridA, Math.abs(delta.colDelta), generators, isLastColLocked ? gridWidth - 1 : gridWidth);
+      var newLockedColumns = getLockedColumnsFromGrid(modifiedCols);
+      return fillRows(modifiedCols, Math.abs(delta.rowDelta), generators, mapToObject(newLockedColumns, always));
     };
 
     var isSpanning = function (grid, row, col, comparator) {
@@ -5775,30 +5990,61 @@
       var currentRow = grid[row];
       return grid.length > 1 && cellLength(currentRow) > 1 && (col > 0 && matching(getCellElement(currentRow, col - 1)) || col < currentRow.cells.length - 1 && matching(getCellElement(currentRow, col + 1)) || row > 0 && matching(getCellElement(grid[row - 1], col)) || row < grid.length - 1 && matching(getCellElement(grid[row + 1], col)));
     };
-    var mergeTables = function (startAddress, gridA, gridB, generator, comparator) {
+    var mergeTables = function (startAddress, gridA, gridB, generator, comparator, lockedColumns) {
       var startRow = startAddress.row;
       var startCol = startAddress.column;
       var mergeHeight = gridB.length;
       var mergeWidth = cellLength(gridB[0]);
       var endRow = startRow + mergeHeight;
-      var endCol = startCol + mergeWidth;
+      var endCol = startCol + mergeWidth + lockedColumns.length;
+      var lockedColumnObj = mapToObject(lockedColumns, always);
       for (var r = startRow; r < endRow; r++) {
+        var skippedCol = 0;
         for (var c = startCol; c < endCol; c++) {
+          if (lockedColumnObj[c]) {
+            skippedCol++;
+            continue;
+          }
           if (isSpanning(gridA, r, c, comparator)) {
             unmerge(gridA, getCellElement(gridA[r], c), comparator, generator.cell);
           }
-          var newCell = getCellElement(gridB[r - startRow], c - startCol);
-          var replacement = generator.replace(newCell);
-          mutateCell(gridA[r], c, elementnew(replacement, true));
+          var gridBColIndex = c - startCol - skippedCol;
+          var newCell = getCell(gridB[r - startRow], gridBColIndex);
+          var newCellElm = newCell.element;
+          var replacement = generator.replace(newCellElm);
+          mutateCell(gridA[r], c, elementnew(replacement, true, newCell.isLocked));
         }
       }
       return gridA;
     };
+    var getValidStartAddress = function (currentStartAddress, grid, lockedColumns) {
+      var gridColLength = cellLength(grid[0]);
+      var possibleColAddresses = range(gridColLength - currentStartAddress.column, function (num) {
+        return num + currentStartAddress.column;
+      });
+      var validColAddress = find(possibleColAddresses, function (num) {
+        return forall(lockedColumns, function (col) {
+          return col !== num;
+        });
+      }).getOr(gridColLength - 1);
+      return __assign(__assign({}, currentStartAddress), { column: validColAddress });
+    };
+    var getLockedColumnsWithinBounds = function (startAddress, grid, lockedColumns) {
+      return filter(lockedColumns, function (colNum) {
+        return colNum >= startAddress.column && colNum <= cellLength(grid[0]) + startAddress.column;
+      });
+    };
     var merge$1 = function (startAddress, gridA, gridB, generator, comparator) {
-      var result = measure(startAddress, gridA, gridB);
-      return result.map(function (delta) {
+      var lockedColumns = getLockedColumnsFromGrid(gridA);
+      var validStartAddress = getValidStartAddress(startAddress, gridA, lockedColumns);
+      var lockedColumnsWithinBounds = getLockedColumnsWithinBounds(validStartAddress, gridB, lockedColumns);
+      var result = measure(validStartAddress, gridA, gridB);
+      return result.map(function (diff) {
+        var delta = __assign(__assign({}, diff), { colDelta: diff.colDelta - lockedColumnsWithinBounds.length });
         var fittedGrid = tailor(gridA, delta, generator);
-        return mergeTables(startAddress, fittedGrid, gridB, generator, comparator);
+        var newLockedColumns = getLockedColumnsFromGrid(fittedGrid);
+        var newLockedColumnsWithinBounds = getLockedColumnsWithinBounds(validStartAddress, gridB, newLockedColumns);
+        return mergeTables(validStartAddress, fittedGrid, gridB, generator, comparator, newLockedColumnsWithinBounds);
       });
     };
     var insertCols = function (index, gridA, gridB, generator, comparator) {
@@ -5808,17 +6054,21 @@
       var secondDelta = measureHeight(gridA, fittedNewGrid);
       var fittedOldGrid = tailor(gridA, secondDelta, generator);
       return map(fittedOldGrid, function (gridRow, i) {
-        var newCells = gridRow.cells.slice(0, index).concat(fittedNewGrid[i].cells).concat(gridRow.cells.slice(index, gridRow.cells.length));
-        return setCells(gridRow, newCells);
+        return addCells(gridRow, index, fittedNewGrid[i].cells);
       });
     };
     var insertRows = function (index, gridA, gridB, generator, comparator) {
       splitRows(gridA, index, comparator, generator.cell);
-      var delta = measureWidth(gridB, gridA);
-      var fittedNewGrid = tailor(gridB, delta, generator);
-      var secondDelta = measureWidth(gridA, fittedNewGrid);
-      var fittedOldGrid = tailor(gridA, secondDelta, generator);
+      var locked = getLockedColumnsFromGrid(gridA);
+      var diff = measureWidth(gridA, gridB);
+      var delta = __assign(__assign({}, diff), { colDelta: diff.colDelta - locked.length });
+      var fittedOldGrid = tailor(gridA, delta, generator);
       var _a = extractGridDetails(fittedOldGrid), oldCols = _a.cols, oldRows = _a.rows;
+      var newLocked = getLockedColumnsFromGrid(fittedOldGrid);
+      var secondDiff = measureWidth(gridB, gridA);
+      var secondDelta = __assign(__assign({}, secondDiff), { colDelta: secondDiff.colDelta + newLocked.length });
+      var fittedGridB = lockedColFill(gridB, generator, newLocked);
+      var fittedNewGrid = tailor(fittedGridB, secondDelta, generator);
       return oldCols.concat(oldRows.slice(0, index)).concat(fittedNewGrid).concat(oldRows.slice(index, oldRows.length));
     };
 
@@ -5828,14 +6078,15 @@
       var after = rows.slice(index);
       var between = mapCells(rows[example], function (ex, c) {
         var withinSpan = index > 0 && index < rows.length && comparator(getCellElement(rows[index - 1], c), getCellElement(rows[index], c));
-        var ret = withinSpan ? getCell(rows[index], c) : elementnew(substitution(ex.element, comparator), true);
+        var ret = withinSpan ? getCell(rows[index], c) : elementnew(substitution(ex.element, comparator), true, ex.isLocked);
         return ret;
       });
       return cols.concat(before).concat([between]).concat(after);
     };
     var getElementFor = function (row, column, section, withinSpan, example, comparator, substitution) {
       if (section === 'colgroup' || !withinSpan) {
-        return elementnew(substitution(getCellElement(row, example), comparator), true);
+        var cell = getCell(row, example);
+        return elementnew(substitution(cell.element, comparator), true, false);
       } else {
         return getCell(row, column);
       }
@@ -5847,13 +6098,13 @@
         return addCell(row, index, sub);
       });
     };
-    var deleteColumnsAt = function (grid, start, finish) {
-      var rows = map(grid, function (row) {
-        var cells = row.cells.slice(0, start).concat(row.cells.slice(finish + 1));
-        return rowcells(cells, row.section);
-      });
-      return filter(rows, function (row) {
-        return row.cells.length > 0;
+    var deleteColumnsAt = function (grid, columns) {
+      return bind(grid, function (row) {
+        var existingCells = row.cells;
+        var cells = foldr(columns, function (acc, column) {
+          return column >= 0 && column < acc.length ? acc.slice(0, column).concat(acc.slice(column + 1)) : acc;
+        }, existingCells);
+        return cells.length > 0 ? [rowcells(cells, row.section)] : [];
       });
     };
     var deleteRowsAt = function (grid, start, finish) {
@@ -5869,7 +6120,7 @@
       };
       return map(grid, function (row) {
         return mapCells(row, function (cell) {
-          return isTarget(cell) ? elementnew(substitution(cell.element, comparator), true) : cell;
+          return isTarget(cell) ? elementnew(substitution(cell.element, comparator), true, cell.isLocked) : cell;
         });
       });
     };
@@ -5880,7 +6131,8 @@
       return index > 0 && comparator(getCellElement(row, index - 1), getCellElement(row, index));
     };
     var replaceColumn = function (grid, index, comparator, substitution) {
-      var targets = bind(grid, function (row, i) {
+      var rows = extractGridDetails(grid).rows;
+      var targets = bind(rows, function (row, i) {
         var alreadyAdded = notStartRow(grid, i, index, comparator) || notStartColumn(row, index, comparator);
         return alreadyAdded ? [] : [getCell(row, index)];
       });
@@ -5896,14 +6148,18 @@
       return replaceIn(grid, targets, comparator, substitution);
     };
 
-    var verifyGenerators = exactly([
-      'cell',
-      'row',
-      'replace',
-      'gap',
-      'col',
-      'colgroup'
-    ]);
+    var uniqueColumns = function (details) {
+      var uniqueCheck = function (rest, detail) {
+        var columnExists = exists(rest, function (currentDetail) {
+          return currentDetail.column === detail.column;
+        });
+        return columnExists ? rest : rest.concat([detail]);
+      };
+      return foldl(details, uniqueCheck, []).sort(function (detailA, detailB) {
+        return detailA.column - detailB.column;
+      });
+    };
+
     var elementToData = function (element) {
       var colspan = getAttrValue(element, 'colspan', 1);
       var rowspan = getAttrValue(element, 'rowspan', 1);
@@ -5917,7 +6173,6 @@
       if (toData === void 0) {
         toData = elementToData;
       }
-      verifyGenerators(generators);
       var position = Cell(Optional.none());
       var nu = function (data) {
         switch (name(data.element)) {
@@ -5958,7 +6213,6 @@
     var transform$1 = function (scope, tag) {
       return function (generators) {
         var position = Cell(Optional.none());
-        verifyGenerators(generators);
         var list = [];
         var find$1 = function (element, comparator) {
           return find(list, function (x) {
@@ -5978,11 +6232,15 @@
           return cell;
         };
         var replaceOrInit = function (element, comparator) {
-          return find$1(element, comparator).fold(function () {
-            return makeNew(element);
-          }, function (p) {
-            return comparator(element, p.item) ? p.sub : makeNew(element);
-          });
+          if (name(element) === 'col') {
+            return element;
+          } else {
+            return find$1(element, comparator).fold(function () {
+              return makeNew(element);
+            }, function (p) {
+              return comparator(element, p.item) ? p.sub : makeNew(element);
+            });
+          }
         };
         return {
           replaceOrInit: replaceOrInit,
@@ -5990,13 +6248,21 @@
         };
       };
     };
+    var getScopeAttribute = function (cell) {
+      return getOpt(cell, 'scope').map(function (attribute) {
+        return attribute.substr(0, 3);
+      });
+    };
     var merging = function (generators) {
-      verifyGenerators(generators);
       var position = Cell(Optional.none());
-      var combine = function (cell) {
+      var unmerge = function (cell) {
         if (position.get().isNone()) {
           position.set(Optional.some(cell));
         }
+        var scope = getScopeAttribute(cell);
+        scope.each(function (attribute) {
+          return set(cell, 'scope', attribute);
+        });
         return function () {
           var raw = generators.cell({
             element: cell,
@@ -6005,11 +6271,40 @@
           });
           remove$1(raw, 'width');
           remove$1(cell, 'width');
+          scope.each(function (attribute) {
+            return set(raw, 'scope', attribute);
+          });
           return raw;
         };
       };
+      var merge = function (cells) {
+        var getScopeProperty = function () {
+          var stringAttributes = cat(map(cells, getScopeAttribute));
+          if (stringAttributes.length === 0) {
+            return Optional.none();
+          } else {
+            var baseScope_1 = stringAttributes[0];
+            var scopes_1 = [
+              'row',
+              'col'
+            ];
+            var isMixed = exists(stringAttributes, function (attribute) {
+              return attribute !== baseScope_1 && contains(scopes_1, attribute);
+            });
+            return isMixed ? Optional.none() : Optional.from(baseScope_1);
+          }
+        };
+        remove$1(cells[0], 'width');
+        getScopeProperty().fold(function () {
+          return remove(cells[0], 'scope');
+        }, function (attribute) {
+          return set(cells[0], 'scope', attribute + 'group');
+        });
+        return constant(cells[0]);
+      };
       return {
-        combine: combine,
+        unmerge: unmerge,
+        merge: merge,
         cursor: position.get
       };
     };
@@ -6165,50 +6460,53 @@
         return detailA.row - detailB.row;
       });
     };
-    var uniqueColumns = function (details) {
-      var uniqueCheck = function (rest, detail) {
-        var columnExists = exists(rest, function (currentDetail) {
-          return currentDetail.column === detail.column;
-        });
-        return columnExists ? rest : rest.concat([detail]);
-      };
-      return foldl(details, uniqueCheck, []).sort(function (detailA, detailB) {
-        return detailA.column - detailB.column;
-      });
-    };
     var opInsertRowsBefore = function (grid, details, comparator, genWrappers) {
-      var example = details[0].row;
       var targetIndex = details[0].row;
       var rows = uniqueRows(details);
-      var newGrid = foldl(rows, function (newG, _row) {
-        return insertRowAt(newG, targetIndex, example, comparator, genWrappers.getOrInit);
-      }, grid);
+      var newGrid = foldr(rows, function (acc, row) {
+        var newG = insertRowAt(acc.grid, targetIndex, row.row + acc.delta, comparator, genWrappers.getOrInit);
+        return {
+          grid: newG,
+          delta: acc.delta + 1
+        };
+      }, {
+        grid: grid,
+        delta: 0
+      }).grid;
       return bundle(newGrid, targetIndex, details[0].column);
     };
     var opInsertRowsAfter = function (grid, details, comparator, genWrappers) {
       var rows = uniqueRows(details);
-      var example = rows[rows.length - 1].row;
-      var targetIndex = rows[rows.length - 1].row + rows[rows.length - 1].rowspan;
-      var newGrid = foldl(rows, function (newG, _row) {
-        return insertRowAt(newG, targetIndex, example, comparator, genWrappers.getOrInit);
+      var target = rows[rows.length - 1];
+      var targetIndex = target.row + target.rowspan;
+      var newGrid = foldr(rows, function (newG, row) {
+        return insertRowAt(newG, targetIndex, row.row, comparator, genWrappers.getOrInit);
       }, grid);
       return bundle(newGrid, targetIndex, details[0].column);
     };
-    var opInsertColumnsBefore = function (grid, details, comparator, genWrappers) {
+    var opInsertColumnsBefore = function (grid, extractDetail, comparator, genWrappers) {
+      var details = extractDetail.details;
       var columns = uniqueColumns(details);
-      var example = columns[0].column;
       var targetIndex = columns[0].column;
-      var newGrid = foldl(columns, function (newG, _row) {
-        return insertColumnAt(newG, targetIndex, example, comparator, genWrappers.getOrInit);
-      }, grid);
+      var newGrid = foldr(columns, function (acc, col) {
+        var newG = insertColumnAt(acc.grid, targetIndex, col.column + acc.delta, comparator, genWrappers.getOrInit);
+        return {
+          grid: newG,
+          delta: acc.delta + 1
+        };
+      }, {
+        grid: grid,
+        delta: 0
+      }).grid;
       return bundle(newGrid, details[0].row, targetIndex);
     };
-    var opInsertColumnsAfter = function (grid, details, comparator, genWrappers) {
-      var example = details[details.length - 1].column;
-      var targetIndex = details[details.length - 1].column + details[details.length - 1].colspan;
+    var opInsertColumnsAfter = function (grid, extractDetail, comparator, genWrappers) {
+      var details = extractDetail.details;
+      var target = details[details.length - 1];
+      var targetIndex = target.column + target.colspan;
       var columns = uniqueColumns(details);
-      var newGrid = foldl(columns, function (newG, _row) {
-        return insertColumnAt(newG, targetIndex, example, comparator, genWrappers.getOrInit);
+      var newGrid = foldr(columns, function (newG, col) {
+        return insertColumnAt(newG, targetIndex, col.column, comparator, genWrappers.getOrInit);
       }, grid);
       return bundle(newGrid, details[0].row, targetIndex);
     };
@@ -6260,10 +6558,12 @@
       var newGrid = foldl(columns, replacer, initialGrid);
       return bundle(newGrid, details[0].row, details[0].column);
     };
-    var opEraseColumns = function (grid, details, _comparator, _genWrappers) {
-      var columns = uniqueColumns(details);
-      var newGrid = deleteColumnsAt(grid, columns[0].column, columns[columns.length - 1].column);
-      var cursor = elementFromGrid(newGrid, details[0].row, details[0].column);
+    var opEraseColumns = function (grid, extractDetail, _comparator, _genWrappers) {
+      var columns = uniqueColumns(extractDetail.details);
+      var newGrid = deleteColumnsAt(grid, map(columns, function (column) {
+        return column.column;
+      }));
+      var cursor = elementFromGrid(newGrid, columns[0].row, columns[0].column);
       return outcome(newGrid, cursor);
     };
     var opEraseRows = function (grid, details, _comparator, _genWrappers) {
@@ -6272,16 +6572,17 @@
       var cursor = elementFromGrid(newGrid, details[0].row, details[0].column);
       return outcome(newGrid, cursor);
     };
-    var opMergeCells = function (grid, mergable, comparator, _genWrappers) {
+    var opMergeCells = function (grid, mergable, comparator, genWrappers) {
       var cells = mergable.cells;
       merge$2(cells);
-      var newGrid = merge(grid, mergable.bounds, comparator, constant(cells[0]));
+      var newGrid = merge(grid, mergable.bounds, comparator, genWrappers.merge(cells));
       return outcome(newGrid, Optional.from(cells[0]));
     };
     var opUnmergeCells = function (grid, unmergable, comparator, genWrappers) {
-      var newGrid = foldr(unmergable, function (b, cell) {
-        return unmerge(b, cell, comparator, genWrappers.combine(cell));
-      }, grid);
+      var unmerge$1 = function (b, cell) {
+        return unmerge(b, cell, comparator, genWrappers.unmerge(cell));
+      };
+      var newGrid = foldr(unmergable, unmerge$1, grid);
       return outcome(newGrid, Optional.from(unmergable[0]));
     };
     var opPasteCells = function (grid, pasteDetails, comparator, _genWrappers) {
@@ -6368,25 +6669,74 @@
       }
     };
     var resize = adjustWidthTo;
+    var adjustAndRedistributeWidths$1 = adjustAndRedistributeWidths;
+    var firstColumnIsLocked = function (_warehouse, details) {
+      return exists(details, function (detail) {
+        return detail.column === 0 && detail.isLocked;
+      });
+    };
+    var lastColumnIsLocked = function (warehouse, details) {
+      return exists(details, function (detail) {
+        return detail.column + detail.colspan >= warehouse.grid.columns && detail.isLocked;
+      });
+    };
+    var getColumnsWidth = function (warehouse, details) {
+      var columns = columns$1(warehouse);
+      var uniqueCols = uniqueColumns(details);
+      return foldl(uniqueCols, function (acc, detail) {
+        var column = columns[detail.column];
+        var colWidth = column.map(getOuter).getOr(0);
+        return acc + colWidth;
+      }, 0);
+    };
+    var insertColumnsExtractor = function (before) {
+      return function (warehouse, target) {
+        return onCells(warehouse, target).filter(function (details) {
+          var checkLocked = before ? firstColumnIsLocked : lastColumnIsLocked;
+          return !checkLocked(warehouse, details);
+        }).map(function (details) {
+          return {
+            details: details,
+            pixelDelta: getColumnsWidth(warehouse, details)
+          };
+        });
+      };
+    };
+    var eraseColumnsExtractor = function (warehouse, target) {
+      return onUnlockedCells(warehouse, target).map(function (details) {
+        return {
+          details: details,
+          pixelDelta: -getColumnsWidth(warehouse, details)
+        };
+      });
+    };
+    var pasteColumnsExtractor = function (before) {
+      return function (warehouse, target) {
+        return onPasteByEditor(warehouse, target).filter(function (details) {
+          var checkLocked = before ? firstColumnIsLocked : lastColumnIsLocked;
+          return !checkLocked(warehouse, details.cells);
+        });
+      };
+    };
     var insertRowsBefore = run(opInsertRowsBefore, onCells, noop, noop, Generators.modification);
     var insertRowsAfter = run(opInsertRowsAfter, onCells, noop, noop, Generators.modification);
-    var insertColumnsBefore = run(opInsertColumnsBefore, onCells, resize, noop, Generators.modification);
-    var insertColumnsAfter = run(opInsertColumnsAfter, onCells, resize, noop, Generators.modification);
-    var eraseColumns = run(opEraseColumns, onCells, resize, prune, Generators.modification);
+    var insertColumnsBefore = run(opInsertColumnsBefore, insertColumnsExtractor(true), adjustAndRedistributeWidths$1, noop, Generators.modification);
+    var insertColumnsAfter = run(opInsertColumnsAfter, insertColumnsExtractor(false), adjustAndRedistributeWidths$1, noop, Generators.modification);
+    var eraseColumns = run(opEraseColumns, eraseColumnsExtractor, adjustAndRedistributeWidths$1, prune, Generators.modification);
     var eraseRows = run(opEraseRows, onCells, noop, prune, Generators.modification);
-    var makeColumnHeader = run(opMakeColumnHeader, onCell, noop, noop, Generators.transform('row', 'th'));
-    var makeColumnsHeader = run(opMakeColumnsHeader, onCells, noop, noop, Generators.transform('row', 'th'));
-    var unmakeColumnHeader = run(opUnmakeColumnHeader, onCell, noop, noop, Generators.transform(null, 'td'));
-    var unmakeColumnsHeader = run(opUnmakeColumnsHeader, onCells, noop, noop, Generators.transform(null, 'td'));
+    var makeColumnHeader = run(opMakeColumnHeader, onUnlockedCell, noop, noop, Generators.transform('row', 'th'));
+    var makeColumnsHeader = run(opMakeColumnsHeader, onUnlockedCells, noop, noop, Generators.transform('row', 'th'));
+    var unmakeColumnHeader = run(opUnmakeColumnHeader, onUnlockedCell, noop, noop, Generators.transform(null, 'td'));
+    var unmakeColumnsHeader = run(opUnmakeColumnsHeader, onUnlockedCells, noop, noop, Generators.transform(null, 'td'));
     var makeRowHeader = run(opMakeRowHeader, onCell, noop, noop, Generators.transform('col', 'th'));
     var makeRowsHeader = run(opMakeRowsHeader, onCells, noop, noop, Generators.transform('col', 'th'));
     var unmakeRowHeader = run(opUnmakeRowHeader, onCell, noop, noop, Generators.transform(null, 'td'));
     var unmakeRowsHeader = run(opUnmakeRowsHeader, onCells, noop, noop, Generators.transform(null, 'td'));
-    var mergeCells = run(opMergeCells, onMergable, noop, noop, Generators.merging);
-    var unmergeCells = run(opUnmergeCells, onUnmergable, resize, noop, Generators.merging);
+    var mergeCells = run(opMergeCells, onUnlockedMergable, resize, noop, Generators.merging);
+    var unmergeCells = run(opUnmergeCells, onUnlockedUnmergable, resize, noop, Generators.merging);
     var pasteCells = run(opPasteCells, onPaste, resize, noop, Generators.modification);
-    var pasteColsBefore = run(opPasteColsBefore, onPasteByEditor, noop, noop, Generators.modification);
-    var pasteColsAfter = run(opPasteColsAfter, onPasteByEditor, noop, noop, Generators.modification);
+    var pasteColsBefore = run(opPasteColsBefore, pasteColumnsExtractor(true), noop, noop, Generators.modification);
+    var pasteColsAfter = run(opPasteColsAfter, pasteColumnsExtractor(false), noop, noop, Generators.modification);
     var pasteRowsBefore = run(opPasteRowsBefore, onPasteByEditor, noop, noop, Generators.modification);
     var pasteRowsAfter = run(opPasteRowsAfter, onPasteByEditor, noop, noop, Generators.modification);
     var getColumnType = opGetColumnType;
@@ -6548,14 +6898,16 @@
         return isTableBody(editor) === false || getGridSize(table).columns > 1;
       };
       var cloneFormats = getCloneElements(editor);
-      var execute = function (operation, guard, mutate, lazyWire) {
+      var colMutationOp = isResizeTableColumnResizing(editor) ? noop : halve;
+      var execute = function (operation, guard, mutate, lazyWire, effect) {
         return function (table, target) {
           removeDataStyle(table);
           var wire = lazyWire();
           var doc = SugarElement.fromDom(editor.getDoc());
           var generators = cellOperations(mutate, doc, cloneFormats);
           var sizing = get$9(editor, table);
-          return guard(table) ? operation(wire, table, target, generators, sizing).bind(function (result) {
+          var resizeBehaviour = isResizeTableColumnResizing(editor) ? resizeTable() : preserveTable();
+          return guard(table) ? operation(wire, table, target, generators, sizing, resizeBehaviour).bind(function (result) {
             each(result.newRows, function (row) {
               fireNewRow(editor, row.dom);
             });
@@ -6567,24 +6919,27 @@
               var rng = editor.dom.createRng();
               rng.setStart(des.element.dom, des.offset);
               rng.setEnd(des.element.dom, des.offset);
-              return rng;
+              return {
+                rng: rng,
+                effect: effect
+              };
             });
           }) : Optional.none();
         };
       };
-      var deleteRow = execute(eraseRows, lastRowGuard, noop, lazyWire);
-      var deleteColumn = execute(eraseColumns, lastColumnGuard, noop, lazyWire);
-      var insertRowsBefore$1 = execute(insertRowsBefore, always, noop, lazyWire);
-      var insertRowsAfter$1 = execute(insertRowsAfter, always, noop, lazyWire);
-      var insertColumnsBefore$1 = execute(insertColumnsBefore, always, halve, lazyWire);
-      var insertColumnsAfter$1 = execute(insertColumnsAfter, always, halve, lazyWire);
-      var mergeCells$1 = execute(mergeCells, always, noop, lazyWire);
-      var unmergeCells$1 = execute(unmergeCells, always, noop, lazyWire);
-      var pasteColsBefore$1 = execute(pasteColsBefore, always, noop, lazyWire);
-      var pasteColsAfter$1 = execute(pasteColsAfter, always, noop, lazyWire);
-      var pasteRowsBefore$1 = execute(pasteRowsBefore, always, noop, lazyWire);
-      var pasteRowsAfter$1 = execute(pasteRowsAfter, always, noop, lazyWire);
-      var pasteCells$1 = execute(pasteCells, always, noop, lazyWire);
+      var deleteRow = execute(eraseRows, lastRowGuard, noop, lazyWire, structureModified);
+      var deleteColumn = execute(eraseColumns, lastColumnGuard, noop, lazyWire, structureModified);
+      var insertRowsBefore$1 = execute(insertRowsBefore, always, noop, lazyWire, structureModified);
+      var insertRowsAfter$1 = execute(insertRowsAfter, always, noop, lazyWire, structureModified);
+      var insertColumnsBefore$1 = execute(insertColumnsBefore, always, colMutationOp, lazyWire, structureModified);
+      var insertColumnsAfter$1 = execute(insertColumnsAfter, always, colMutationOp, lazyWire, structureModified);
+      var mergeCells$1 = execute(mergeCells, always, noop, lazyWire, structureModified);
+      var unmergeCells$1 = execute(unmergeCells, always, noop, lazyWire, structureModified);
+      var pasteColsBefore$1 = execute(pasteColsBefore, always, noop, lazyWire, structureModified);
+      var pasteColsAfter$1 = execute(pasteColsAfter, always, noop, lazyWire, structureModified);
+      var pasteRowsBefore$1 = execute(pasteRowsBefore, always, noop, lazyWire, structureModified);
+      var pasteRowsAfter$1 = execute(pasteRowsAfter, always, noop, lazyWire, structureModified);
+      var pasteCells$1 = execute(pasteCells, always, noop, lazyWire, structureModified);
       var extractType = function (args, validTypes) {
         return get$1(args, 'type').filter(function (type) {
           return contains(validTypes, type);
@@ -6612,8 +6967,8 @@
           });
         });
       };
-      var makeColumnsHeader$1 = execute(makeColumnsHeader, always, noop, lazyWire);
-      var unmakeColumnsHeader$1 = execute(unmakeColumnsHeader, always, noop, lazyWire);
+      var makeColumnsHeader$1 = execute(makeColumnsHeader, always, noop, lazyWire, structureModified);
+      var unmakeColumnsHeader$1 = execute(unmakeColumnsHeader, always, noop, lazyWire, structureModified);
       var getTableRowType = function (editor) {
         var rows = getRowsFromSelection(getSelectionStart(editor), ephemera.selected);
         if (rows.length > 0) {
@@ -6893,7 +7248,7 @@
     };
     var copyCols = function (table, target) {
       var house = Warehouse.fromTable(table);
-      var details = onCells(house, target);
+      var details = onUnlockedCells(house, target);
       return details.map(function (selectedCells) {
         var lastSelectedCell = selectedCells[selectedCells.length - 1];
         var minColRange = selectedCells[0].column;
@@ -6907,11 +7262,19 @@
     var copyRows = function (table, target, generators) {
       var warehouse = Warehouse.fromTable(table);
       var details = onCells(warehouse, target);
-      return details.map(function (selectedCells) {
+      return details.bind(function (selectedCells) {
         var grid = toGrid(warehouse, generators, false);
         var rows = extractGridDetails(grid).rows;
         var slicedGrid = rows.slice(selectedCells[0].row, selectedCells[selectedCells.length - 1].row + selectedCells[selectedCells.length - 1].rowspan);
-        var slicedDetails = toDetailList(slicedGrid, generators);
+        var filteredGrid = bind(slicedGrid, function (row) {
+          var newCells = filter(row.cells, function (cell) {
+            return !cell.isLocked;
+          });
+          return newCells.length > 0 ? [__assign(__assign({}, row), { cells: newCells })] : [];
+        });
+        var slicedDetails = toDetailList(filteredGrid, generators);
+        return someIf(slicedDetails.length > 0, slicedDetails);
+      }).map(function (slicedDetails) {
         return copy$2(slicedDetails);
       });
     };
@@ -7172,7 +7535,6 @@
       var dom = editor.dom;
       return __assign({
         height: dom.getStyle(elm, 'height') || dom.getAttrib(elm, 'height'),
-        scope: dom.getAttrib(elm, 'scope'),
         class: dom.getAttrib(elm, 'class', ''),
         type: getRowType(editor, elm),
         align: getHAlignment(editor, elm)
@@ -7376,9 +7738,12 @@
       modifier.setFormat('tablecellborderstyle', data.borderstyle);
       modifier.setFormat('tablecellborderwidth', addPxSuffix(data.borderwidth));
     };
-    var applyCellData = function (editor, cells, data) {
+    var applyCellData = function (editor, cells, oldData, data) {
       var isSingleCell = cells.length === 1;
-      if (cells.length >= 1) {
+      var modifiedData = filter$1(data, function (value, key) {
+        return oldData[key] !== value;
+      });
+      if (size(modifiedData) > 0 && cells.length >= 1) {
         var tableOpt = table(cells[0]);
         getSelectedCells(cells).each(function (selectedCells) {
           each(selectedCells, function (item) {
@@ -7403,16 +7768,22 @@
             }
           });
         });
+        var styleModified_1 = size(filter$1(modifiedData, function (_value, key) {
+          return key !== 'scope' && key !== 'celltype';
+        })) > 0;
         tableOpt.each(function (table) {
-          return fireTableModified(editor, table.dom);
+          return fireTableModified(editor, table.dom, {
+            structure: has(modifiedData, 'celltype'),
+            style: styleModified_1
+          });
         });
       }
     };
-    var onSubmitCellForm = function (editor, cells, api) {
+    var onSubmitCellForm = function (editor, cells, oldData, api) {
       var data = api.getData();
       api.close();
       editor.undoManager.transact(function () {
-        applyCellData(editor, cells, data);
+        applyCellData(editor, cells, oldData, data);
         editor.focus();
       });
     };
@@ -7467,7 +7838,7 @@
           }
         ],
         initialData: data,
-        onSubmit: curry(onSubmitCellForm, editor, cells)
+        onSubmit: curry(onSubmitCellForm, editor, cells, data)
       });
     };
 
@@ -7537,7 +7908,6 @@
     };
 
     var updateSimpleProps$1 = function (modifier, data) {
-      modifier.setAttrib('scope', data.scope);
       modifier.setAttrib('class', data.class);
       modifier.setStyle('height', addPxSuffix(data.height));
     };
@@ -7548,23 +7918,33 @@
     };
     var applyRowData = function (editor, rows, oldData, data) {
       var isSingleRow = rows.length === 1;
-      each(rows, function (rowElm) {
-        if (data.type !== getNodeName(rowElm.parentNode)) {
-          switchSectionType(editor, rowElm, data.type);
-        }
-        var modifier = isSingleRow ? DomModifier.normal(editor, rowElm) : DomModifier.ifTruthy(editor, rowElm);
-        updateSimpleProps$1(modifier, data);
-        if (hasAdvancedRowTab(editor)) {
-          updateAdvancedProps$1(modifier, data);
-        }
-        if (data.align !== oldData.align) {
-          unApplyAlign(editor, rowElm);
-          applyAlign(editor, rowElm, data.align);
-        }
+      var modifiedData = filter$1(data, function (value, key) {
+        return oldData[key] !== value;
       });
-      table(SugarElement.fromDom(rows[0])).each(function (table) {
-        return fireTableModified(editor, table.dom);
-      });
+      if (size(modifiedData) > 0) {
+        each(rows, function (rowElm) {
+          if (data.type !== getNodeName(rowElm.parentNode)) {
+            switchSectionType(editor, rowElm, data.type);
+          }
+          var modifier = isSingleRow ? DomModifier.normal(editor, rowElm) : DomModifier.ifTruthy(editor, rowElm);
+          updateSimpleProps$1(modifier, data);
+          if (hasAdvancedRowTab(editor)) {
+            updateAdvancedProps$1(modifier, data);
+          }
+          if (data.align !== oldData.align) {
+            unApplyAlign(editor, rowElm);
+            applyAlign(editor, rowElm, data.align);
+          }
+        });
+        var typeModified_1 = has(modifiedData, 'type');
+        var styleModified_1 = typeModified_1 ? size(modifiedData) > 1 : true;
+        table(SugarElement.fromDom(rows[0])).each(function (table) {
+          return fireTableModified(editor, table.dom, {
+            structure: typeModified_1,
+            style: styleModified_1
+          });
+        });
+      }
     };
     var onSubmitRowForm = function (editor, rows, oldData, api) {
       var data = api.getData();
@@ -7767,12 +8147,14 @@
       }
       attrs.style = dom.serializeStyle(__assign(__assign({}, getDefaultStyles(editor)), styles));
       dom.setAttribs(tableElm, __assign(__assign({}, getDefaultAttributes(editor)), attrs));
-      fireTableModified(editor, tableElm);
     };
-    var onSubmitTableForm = function (editor, tableElm, api) {
+    var onSubmitTableForm = function (editor, tableElm, oldData, api) {
       var dom = editor.dom;
       var captionElm;
       var data = api.getData();
+      var modifiedData = filter$1(data, function (value, key) {
+        return oldData[key] !== value;
+      });
       api.close();
       if (data.class === '') {
         delete data.class;
@@ -7783,23 +8165,33 @@
           var rows = parseInt(data.rows, 10) || 1;
           tableElm = insert$1(editor, cols, rows, 0, 0);
         }
-        applyDataToElement(editor, tableElm, data);
-        captionElm = dom.select('caption', tableElm)[0];
-        if (captionElm && !data.caption) {
-          dom.remove(captionElm);
-        }
-        if (!captionElm && data.caption) {
-          captionElm = dom.create('caption');
-          captionElm.innerHTML = !global$2.ie ? '<br data-mce-bogus="1"/>' : nbsp;
-          tableElm.insertBefore(captionElm, tableElm.firstChild);
-        }
-        if (data.align === '') {
-          unApplyAlign(editor, tableElm);
-        } else {
-          applyAlign(editor, tableElm, data.align);
+        if (size(modifiedData) > 0) {
+          applyDataToElement(editor, tableElm, data);
+          captionElm = dom.select('caption', tableElm)[0];
+          if (captionElm && !data.caption) {
+            dom.remove(captionElm);
+          }
+          if (!captionElm && data.caption) {
+            captionElm = dom.create('caption');
+            captionElm.innerHTML = !global$2.ie ? '<br data-mce-bogus="1"/>' : nbsp;
+            tableElm.insertBefore(captionElm, tableElm.firstChild);
+          }
+          if (data.align === '') {
+            unApplyAlign(editor, tableElm);
+          } else {
+            applyAlign(editor, tableElm, data.align);
+          }
         }
         editor.focus();
         editor.addVisual();
+        if (size(modifiedData) > 0) {
+          var captionModified = has(modifiedData, 'caption');
+          var styleModified = captionModified ? size(modifiedData) > 1 : true;
+          fireTableModified(editor, tableElm, {
+            structure: captionModified,
+            style: styleModified
+          });
+        }
       });
     };
     var open$2 = function (editor, insertNewTable) {
@@ -7861,7 +8253,7 @@
         title: 'Table Properties',
         size: 'normal',
         body: dialogBody,
-        onSubmit: curry(onSubmitTableForm, editor, tableElm),
+        onSubmit: curry(onSubmitTableForm, editor, tableElm, data),
         buttons: [
           {
             type: 'cancel',
@@ -7919,7 +8311,7 @@
                 enforceNone(table);
               }
               removeDataStyle(table);
-              fireTableModified(editor, table.dom);
+              fireTableModified(editor, table.dom, structureModified);
             });
           }
         });
@@ -7928,12 +8320,12 @@
         return table(cell, isRoot);
       };
       var postExecute = function (table) {
-        return function (rng) {
-          editor.selection.setRng(rng);
+        return function (data) {
+          editor.selection.setRng(data.rng);
           editor.focus();
           cellSelection.clear(table);
           removeDataStyle(table);
-          fireTableModified(editor, table.dom);
+          fireTableModified(editor, table.dom, data.effect);
         };
       };
       var actOnSelection = function (execute) {
@@ -8043,7 +8435,7 @@
       });
       var fireTableModifiedForSelection = function (editor, tableOpt) {
         tableOpt.each(function (table) {
-          fireTableModified(editor, table.dom);
+          fireTableModified(editor, table.dom, structureModified);
         });
       };
       each$1({
@@ -8104,10 +8496,7 @@
           });
         });
         getTableFromCell(cells[0]).each(function (table) {
-          return fireTableModified(editor, table.dom, {
-            structure: false,
-            style: true
-          });
+          return fireTableModified(editor, table.dom, styleModified);
         });
       });
     };
@@ -9487,14 +9876,10 @@
     var findCell = function (target, isRoot) {
       return closest$1(target, 'td,th', isRoot);
     };
-    function MouseSelection (bridge, container, isRoot, annotations) {
+    var MouseSelection = function (bridge, container, isRoot, annotations) {
       var cursor = value$1();
       var clearstate = cursor.clear;
-      var mousedown = function (event) {
-        annotations.clear(container);
-        findCell(event.target, isRoot).each(cursor.set);
-      };
-      var mouseover = function (event) {
+      var applySelection = function (event) {
         cursor.on(function (start) {
           annotations.clearBeforeUpdate(container);
           findCell(event.target, isRoot).each(function (finish) {
@@ -9508,7 +9893,15 @@
           });
         });
       };
-      var mouseup = function (_event) {
+      var mousedown = function (event) {
+        annotations.clear(container);
+        findCell(event.target, isRoot).each(cursor.set);
+      };
+      var mouseover = function (event) {
+        applySelection(event);
+      };
+      var mouseup = function (event) {
+        applySelection(event);
         clearstate();
       };
       return {
@@ -9517,7 +9910,7 @@
         mouseover: mouseover,
         mouseup: mouseup
       };
-    }
+    };
 
     var down = {
       traverse: nextSibling,
@@ -10025,12 +10418,16 @@
     var getSelectionTargets = function (editor, selections) {
       var targets = Cell(Optional.none());
       var changeHandlers = Cell([]);
+      var selectionDetails = Optional.none();
+      var isCaption = isTag('caption');
+      var isDisabledForSelection = function (key) {
+        return selectionDetails.forall(function (details) {
+          return !details[key];
+        });
+      };
       var findTargets = function () {
         return getSelectionStartCellOrCaption(getSelectionStart(editor)).bind(function (cellOrCaption) {
           var table$1 = table(cellOrCaption);
-          var isCaption = function (elem) {
-            return name(elem) === 'caption';
-          };
           return table$1.map(function (table) {
             if (isCaption(cellOrCaption)) {
               return noMenu(cellOrCaption);
@@ -10040,8 +10437,36 @@
           });
         });
       };
+      var getExtractedDetails = function (targets) {
+        var tableOpt = table(targets.element);
+        return tableOpt.map(function (table) {
+          var warehouse = Warehouse.fromTable(table);
+          var selectedCells = onCells(warehouse, targets).getOr([]);
+          var locked = foldl(selectedCells, function (acc, cell) {
+            if (cell.isLocked) {
+              acc.onAny = true;
+              if (cell.column === 0) {
+                acc.onFirst = true;
+              } else if (cell.column + cell.colspan >= warehouse.grid.columns) {
+                acc.onLast = true;
+              }
+            }
+            return acc;
+          }, {
+            onAny: false,
+            onFirst: false,
+            onLast: false
+          });
+          return {
+            mergeable: onUnlockedMergable(warehouse, targets).isSome(),
+            unmergeable: onUnlockedUnmergable(warehouse, targets).isSome(),
+            locked: locked
+          };
+        });
+      };
       var resetTargets = function () {
         targets.set(cached(findTargets)());
+        selectionDetails = targets.get().bind(getExtractedDetails);
         each(changeHandlers.get(), function (handler) {
           return handler();
         });
@@ -10062,6 +10487,11 @@
           }));
         };
       };
+      var isDisabledFromLocked = function (lockedDisable) {
+        return selectionDetails.exists(function (details) {
+          return details.locked[lockedDisable];
+        });
+      };
       var onSetupTable = function (api) {
         return onSetup(api, function (_) {
           return false;
@@ -10069,31 +10499,47 @@
       };
       var onSetupCellOrRow = function (api) {
         return onSetup(api, function (targets) {
-          return name(targets.element) === 'caption';
+          return isCaption(targets.element);
         });
+      };
+      var onSetupColumn = function (lockedDisable) {
+        return function (api) {
+          return onSetup(api, function (targets) {
+            return isCaption(targets.element) || isDisabledFromLocked(lockedDisable);
+          });
+        };
       };
       var onSetupPasteable = function (getClipboardData) {
         return function (api) {
           return onSetup(api, function (targets) {
-            return name(targets.element) === 'caption' || getClipboardData().isNone();
+            return isCaption(targets.element) || getClipboardData().isNone();
+          });
+        };
+      };
+      var onSetupPasteableColumn = function (getClipboardData, lockedDisable) {
+        return function (api) {
+          return onSetup(api, function (targets) {
+            return isCaption(targets.element) || getClipboardData().isNone() || isDisabledFromLocked(lockedDisable);
           });
         };
       };
       var onSetupMergeable = function (api) {
-        return onSetup(api, function (targets) {
-          return targets.mergable.isNone();
+        return onSetup(api, function (_targets) {
+          return isDisabledForSelection('mergeable');
         });
       };
       var onSetupUnmergeable = function (api) {
-        return onSetup(api, function (targets) {
-          return targets.unmergable.isNone();
+        return onSetup(api, function (_targets) {
+          return isDisabledForSelection('unmergeable');
         });
       };
       editor.on('NodeChange ExecCommand TableSelectorChange', resetTargets);
       return {
         onSetupTable: onSetupTable,
         onSetupCellOrRow: onSetupCellOrRow,
+        onSetupColumn: onSetupColumn,
         onSetupPasteable: onSetupPasteable,
+        onSetupPasteableColumn: onSetupPasteableColumn,
         onSetupMergeable: onSetupMergeable,
         onSetupUnmergeable: onSetupUnmergeable,
         resetTargets: resetTargets,
@@ -10174,19 +10620,19 @@
         tooltip: 'Insert column before',
         onAction: cmd('mceTableInsertColBefore'),
         icon: 'table-insert-column-before',
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onFirst')
       });
       editor.ui.registry.addButton('tableinsertcolafter', {
         tooltip: 'Insert column after',
         onAction: cmd('mceTableInsertColAfter'),
         icon: 'table-insert-column-after',
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onLast')
       });
       editor.ui.registry.addButton('tabledeletecol', {
         tooltip: 'Delete column',
         onAction: cmd('mceTableDeleteCol'),
         icon: 'table-delete-column',
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onAny')
       });
       editor.ui.registry.addButton('tablecutrow', {
         tooltip: 'Cut row',
@@ -10216,25 +10662,25 @@
         tooltip: 'Cut column',
         icon: 'cut-column',
         onAction: cmd('mceTableCutCol'),
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onAny')
       });
       editor.ui.registry.addButton('tablecopycol', {
         tooltip: 'Copy column',
         icon: 'duplicate-column',
         onAction: cmd('mceTableCopyCol'),
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onAny')
       });
       editor.ui.registry.addButton('tablepastecolbefore', {
         tooltip: 'Paste column before',
         icon: 'paste-column-before',
         onAction: cmd('mceTablePasteColBefore'),
-        onSetup: selectionTargets.onSetupPasteable(clipboard.getColumns)
+        onSetup: selectionTargets.onSetupPasteableColumn(clipboard.getColumns, 'onFirst')
       });
       editor.ui.registry.addButton('tablepastecolafter', {
         tooltip: 'Paste column after',
         icon: 'paste-column-after',
         onAction: cmd('mceTablePasteColAfter'),
-        onSetup: selectionTargets.onSetupPasteable(clipboard.getColumns)
+        onSetup: selectionTargets.onSetupPasteableColumn(clipboard.getColumns, 'onLast')
       });
       editor.ui.registry.addButton('tableinsertdialog', {
         tooltip: 'Insert table',
@@ -10339,43 +10785,43 @@
         text: 'Insert column before',
         icon: 'table-insert-column-before',
         onAction: cmd('mceTableInsertColBefore'),
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onFirst')
       });
       editor.ui.registry.addMenuItem('tableinsertcolumnafter', {
         text: 'Insert column after',
         icon: 'table-insert-column-after',
         onAction: cmd('mceTableInsertColAfter'),
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onLast')
       });
       editor.ui.registry.addMenuItem('tabledeletecolumn', {
         text: 'Delete column',
         icon: 'table-delete-column',
         onAction: cmd('mceTableDeleteCol'),
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onAny')
       });
       editor.ui.registry.addMenuItem('tablecutcolumn', {
         text: 'Cut column',
         icon: 'cut-column',
         onAction: cmd('mceTableCutCol'),
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onAny')
       });
       editor.ui.registry.addMenuItem('tablecopycolumn', {
         text: 'Copy column',
         icon: 'duplicate-column',
         onAction: cmd('mceTableCopyCol'),
-        onSetup: selectionTargets.onSetupCellOrRow
+        onSetup: selectionTargets.onSetupColumn('onAny')
       });
       editor.ui.registry.addMenuItem('tablepastecolumnbefore', {
         text: 'Paste column before',
         icon: 'paste-column-before',
         onAction: cmd('mceTablePasteColBefore'),
-        onSetup: selectionTargets.onSetupPasteable(clipboard.getColumns)
+        onSetup: selectionTargets.onSetupPasteableColumn(clipboard.getColumns, 'onFirst')
       });
       editor.ui.registry.addMenuItem('tablepastecolumnafter', {
         text: 'Paste column after',
         icon: 'paste-column-after',
         onAction: cmd('mceTablePasteColAfter'),
-        onSetup: selectionTargets.onSetupPasteable(clipboard.getColumns)
+        onSetup: selectionTargets.onSetupPasteableColumn(clipboard.getColumns, 'onLast')
       });
       var column = {
         type: 'nestedmenuitem',
@@ -10454,7 +10900,7 @@
       });
     };
 
-    function Plugin(editor) {
+    var Plugin = function (editor) {
       var selections = Selections(function () {
         return getBody$1(editor);
       }, function () {
@@ -10485,7 +10931,7 @@
         resizeHandler.destroy();
       });
       return getApi(editor, clipboard, resizeHandler, selectionTargets);
-    }
+    };
     function Plugin$1 () {
       global.add('table', Plugin);
     }

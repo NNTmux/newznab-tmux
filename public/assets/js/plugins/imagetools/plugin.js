@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.6.2 (2020-12-08)
+ * Version: 5.7.0 (2021-02-10)
  */
 (function () {
     'use strict';
@@ -156,30 +156,30 @@
     };
     var isFunction = isSimpleType('function');
 
-    function create(width, height) {
+    var create = function (width, height) {
       return resize(document.createElement('canvas'), width, height);
-    }
-    function clone(canvas) {
+    };
+    var clone = function (canvas) {
       var tCanvas = create(canvas.width, canvas.height);
       var ctx = get2dContext(tCanvas);
       ctx.drawImage(canvas, 0, 0);
       return tCanvas;
-    }
-    function get2dContext(canvas) {
+    };
+    var get2dContext = function (canvas) {
       return canvas.getContext('2d');
-    }
-    function resize(canvas, width, height) {
+    };
+    var resize = function (canvas, width, height) {
       canvas.width = width;
       canvas.height = height;
       return canvas;
-    }
+    };
 
-    function getWidth(image) {
+    var getWidth = function (image) {
       return image.naturalWidth || image.width;
-    }
-    function getHeight(image) {
+    };
+    var getHeight = function (image) {
       return image.naturalHeight || image.height;
-    }
+    };
 
     var promise = function () {
       var Promise = function (fn) {
@@ -196,13 +196,17 @@
       };
       var anyWindow = window;
       var asap = Promise.immediateFn || typeof anyWindow.setImmediate === 'function' && anyWindow.setImmediate || function (fn) {
-        setTimeout(fn, 1);
+        return setTimeout(fn, 1);
       };
-      function bind(fn, thisArg) {
+      var bind = function (fn, thisArg) {
         return function () {
-          return fn.apply(thisArg, arguments);
+          var args = [];
+          for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+          }
+          return fn.apply(thisArg, args);
         };
-      }
+      };
       var isArray = Array.isArray || function (value) {
         return Object.prototype.toString.call(value) === '[object Array]';
       };
@@ -265,7 +269,7 @@
         this.resolve = resolve;
         this.reject = reject;
       }
-      function doResolve(fn, onFulfilled, onRejected) {
+      var doResolve = function (fn, onFulfilled, onRejected) {
         var done = false;
         try {
           fn(function (value) {
@@ -288,7 +292,7 @@
           done = true;
           onRejected(ex);
         }
-      }
+      };
       Promise.prototype.catch = function (onRejected) {
         return this.then(null, onRejected);
       };
@@ -309,7 +313,7 @@
             return resolve([]);
           }
           var remaining = args.length;
-          function res(i, val) {
+          var res = function (i, val) {
             try {
               if (val && (typeof val === 'object' || typeof val === 'function')) {
                 var then = val.then;
@@ -327,7 +331,7 @@
             } catch (ex) {
               reject(ex);
             }
-          }
+          };
           for (var i = 0; i < args.length; i++) {
             res(i, args[i]);
           }
@@ -358,14 +362,14 @@
     };
     var Promise = window.Promise ? window.Promise : promise();
 
-    function imageToBlob(image) {
+    var imageToBlob = function (image) {
       var src = image.src;
       if (src.indexOf('data:') === 0) {
         return dataUriToBlob(src);
       }
       return anyUriToBlob(src);
-    }
-    function blobToImage(blob) {
+    };
+    var blobToImage = function (blob) {
       return new Promise(function (resolve, reject) {
         var blobUrl = URL.createObjectURL(blob);
         var image = new Image();
@@ -373,23 +377,23 @@
           image.removeEventListener('load', loaded);
           image.removeEventListener('error', error);
         };
-        function loaded() {
+        var loaded = function () {
           removeListeners();
           resolve(image);
-        }
-        function error() {
+        };
+        var error = function () {
           removeListeners();
           reject('Unable to load data of type ' + blob.type + ': ' + blobUrl);
-        }
+        };
         image.addEventListener('load', loaded);
         image.addEventListener('error', error);
         image.src = blobUrl;
         if (image.complete) {
-          loaded();
+          setTimeout(loaded, 0);
         }
       });
-    }
-    function anyUriToBlob(url) {
+    };
+    var anyUriToBlob = function (url) {
       return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
@@ -414,8 +418,8 @@
         };
         xhr.send();
       });
-    }
-    function dataUriToBlobSync(uri) {
+    };
+    var dataUriToBlobSync = function (uri) {
       var data = uri.split(',');
       var matches = /data:([^;]+)/.exec(data[0]);
       if (!matches) {
@@ -438,15 +442,15 @@
         byteArrays[sliceIndex] = new Uint8Array(bytes);
       }
       return Optional.some(new Blob(byteArrays, { type: mimetype }));
-    }
-    function dataUriToBlob(uri) {
+    };
+    var dataUriToBlob = function (uri) {
       return new Promise(function (resolve, reject) {
         dataUriToBlobSync(uri).fold(function () {
           reject('uri is not base64: ' + uri);
         }, resolve);
       });
-    }
-    function canvasToBlob(canvas, type, quality) {
+    };
+    var canvasToBlob = function (canvas, type, quality) {
       type = type || 'image/png';
       if (isFunction(HTMLCanvasElement.prototype.toBlob)) {
         return new Promise(function (resolve, reject) {
@@ -461,12 +465,12 @@
       } else {
         return dataUriToBlob(canvas.toDataURL(type, quality));
       }
-    }
-    function canvasToDataURL(canvas, type, quality) {
+    };
+    var canvasToDataURL = function (canvas, type, quality) {
       type = type || 'image/png';
       return canvas.toDataURL(type, quality);
-    }
-    function blobToCanvas(blob) {
+    };
+    var blobToCanvas = function (blob) {
       return blobToImage(blob).then(function (image) {
         revokeImageUrl(image);
         var canvas = create(getWidth(image), getHeight(image));
@@ -474,8 +478,8 @@
         context.drawImage(image, 0, 0);
         return canvas;
       });
-    }
-    function blobToDataUri(blob) {
+    };
+    var blobToDataUri = function (blob) {
       return new Promise(function (resolve) {
         var reader = new FileReader();
         reader.onloadend = function () {
@@ -483,10 +487,10 @@
         };
         reader.readAsDataURL(blob);
       });
-    }
-    function revokeImageUrl(image) {
+    };
+    var revokeImageUrl = function (image) {
       URL.revokeObjectURL(image.src);
-    }
+    };
 
     var blobToImage$1 = function (blob) {
       return blobToImage(blob);
@@ -522,34 +526,34 @@
       return findUntil(xs, pred, never);
     };
 
-    function create$1(getCanvas, blob, uri) {
+    var create$1 = function (getCanvas, blob, uri) {
       var initialType = blob.type;
       var getType = constant(initialType);
-      function toBlob() {
+      var toBlob = function () {
         return Promise.resolve(blob);
-      }
+      };
       var toDataURL = constant(uri);
-      function toBase64() {
+      var toBase64 = function () {
         return uri.split(',')[1];
-      }
-      function toAdjustedBlob(type, quality) {
+      };
+      var toAdjustedBlob = function (type, quality) {
         return getCanvas.then(function (canvas) {
           return canvasToBlob(canvas, type, quality);
         });
-      }
-      function toAdjustedDataURL(type, quality) {
+      };
+      var toAdjustedDataURL = function (type, quality) {
         return getCanvas.then(function (canvas) {
           return canvasToDataURL(canvas, type, quality);
         });
-      }
-      function toAdjustedBase64(type, quality) {
+      };
+      var toAdjustedBase64 = function (type, quality) {
         return toAdjustedDataURL(type, quality).then(function (dataurl) {
           return dataurl.split(',')[1];
         });
-      }
-      function toCanvas() {
+      };
+      var toCanvas = function () {
         return getCanvas.then(clone);
-      }
+      };
       return {
         getType: getType,
         toBlob: toBlob,
@@ -560,24 +564,24 @@
         toAdjustedBase64: toAdjustedBase64,
         toCanvas: toCanvas
       };
-    }
-    function fromBlob(blob) {
+    };
+    var fromBlob = function (blob) {
       return blobToDataUri(blob).then(function (uri) {
         return create$1(blobToCanvas(blob), blob, uri);
       });
-    }
-    function fromCanvas(canvas, type) {
+    };
+    var fromCanvas = function (canvas, type) {
       return canvasToBlob(canvas, type).then(function (blob) {
         return create$1(Promise.resolve(canvas), blob, canvas.toDataURL());
       });
-    }
+    };
 
-    function rotate(ir, angle) {
+    var rotate = function (ir, angle) {
       return ir.toCanvas().then(function (canvas) {
         return applyRotate(canvas, ir.getType(), angle);
       });
-    }
-    function applyRotate(image, type, angle) {
+    };
+    var applyRotate = function (image, type, angle) {
       var canvas = create(image.width, image.height);
       var context = get2dContext(canvas);
       var translateX = 0;
@@ -596,13 +600,13 @@
       context.rotate(angle * Math.PI / 180);
       context.drawImage(image, 0, 0);
       return fromCanvas(canvas, type);
-    }
-    function flip(ir, axis) {
+    };
+    var flip = function (ir, axis) {
       return ir.toCanvas().then(function (canvas) {
         return applyFlip(canvas, ir.getType(), axis);
       });
-    }
-    function applyFlip(image, type, axis) {
+    };
+    var applyFlip = function (image, type, axis) {
       var canvas = create(image.width, image.height);
       var context = get2dContext(canvas);
       if (axis === 'v') {
@@ -613,7 +617,7 @@
         context.drawImage(image, -canvas.width, 0);
       }
       return fromCanvas(canvas, type);
-    }
+    };
 
     var flip$1 = function (ir, axis) {
       return flip(ir, axis);
@@ -897,11 +901,11 @@
       return editor.getParam('images_reuse_filename', false, 'boolean');
     };
 
-    function getImageSize(img) {
+    var getImageSize = function (img) {
       var width, height;
-      function isPxValue(value) {
+      var isPxValue = function (value) {
         return /^[0-9\.]+px$/.test(value);
-      }
+      };
       width = img.style.width;
       height = img.style.height;
       if (width || height) {
@@ -922,8 +926,8 @@
         };
       }
       return null;
-    }
-    function setImageSize(img, size) {
+    };
+    var setImageSize = function (img, size) {
       var width, height;
       if (size) {
         width = img.style.width;
@@ -940,13 +944,13 @@
           img.setAttribute('height', String(size.h));
         }
       }
-    }
-    function getNaturalImageSize(img) {
+    };
+    var getNaturalImageSize = function (img) {
       return {
         w: img.naturalWidth,
         h: img.naturalHeight
       };
-    }
+    };
 
     var count = 0;
     var getFigureImg = function (elem) {
@@ -1066,7 +1070,7 @@
         });
         blobCache.add(blobInfo);
         editor.undoManager.transact(function () {
-          function imageLoadedHandler() {
+          var imageLoadedHandler = function () {
             editor.$(selectedImage).off('load', imageLoadedHandler);
             editor.nodeChanged();
             if (uploadImmediately) {
@@ -1075,7 +1079,7 @@
               cancelTimedUpload(imageUploadTimerState);
               startTimedUpload(editor, imageUploadTimerState);
             }
-          }
+          };
           editor.$(selectedImage).on('load', imageLoadedHandler);
           if (size) {
             editor.$(selectedImage).attr({
@@ -1142,7 +1146,6 @@
         return blob;
       }).then(blobToImageResult).then(function (imageResult) {
         return updateSelectedImage(editor, blob, imageResult, true, imageUploadTimerState, img);
-      }).catch(function () {
       });
     };
 
@@ -1194,8 +1197,7 @@
               });
               api.close();
             },
-            onCancel: function () {
-            },
+            onCancel: noop,
             onAction: function (api, details) {
               switch (details.name) {
               case saveState:
