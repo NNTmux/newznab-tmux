@@ -2000,7 +2000,7 @@ class ProcessAdditional
                             $video = $this->ffmpeg->open($fileLocation);
                             $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($this->_ffMPEGDuration));
                             $format = new Ogg();
-                            $format->setAudioCodec(new Vorbis());
+                            $format->setAudioCodec('libvorbis');
                             $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                             $videoSample->save($format, $fileName);
                         } catch (\InvalidArgumentException $e) {
@@ -2020,7 +2020,7 @@ class ProcessAdditional
                         $video = $this->ffmpeg->open($fileLocation);
                         $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
                         $format = new Ogg();
-                        $format->setAudioCodec(new Vorbis());
+                        $format->setAudioCodec('libvorbis');
                         $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                         $videoSample->save($format, $fileName);
                     } catch (\InvalidArgumentException $e) {
