@@ -706,10 +706,12 @@ class Console
             try {
                 $result = Game::where('name', $gameInfo)->get();
                 if (! empty($result)) {
+                    $bestMatchPct = 0;
                     foreach ($result as $res) {
                         similar_text(strtolower($gameInfo), strtolower($res->name), $percent);
-                        if ($percent >= 90) {
+                        if ($percent >= 90 && $percent > $bestMatchPct) {
                             $bestMatch = $res->id;
+                            $bestMatchPct = $percent;
                         }
                     }
                     if ($bestMatch !== false) {
@@ -744,10 +746,12 @@ class Console
 
                         if (! empty($game->platforms)) {
                             foreach ($game->platforms as $platforms) {
+                                $percentCurrent = 0;
                                 $gamePlatforms = Platform::where('id', $platforms)->get();
                                 foreach ($gamePlatforms as $gamePlat) {
                                     similar_text($gamePlat->name, $gamePlatform, $percent);
-                                    if ($percent >= 85) {
+                                    if ($percent >= 85 && $percent > $percentCurrent) {
+                                        $percentCurrent = $percent;
                                         $platform = $gamePlat->name;
                                         break;
                                     }
