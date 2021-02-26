@@ -385,7 +385,7 @@ class UsenetGroup extends Model
                 'first_record' => 0,
                 'first_record_postdate' => null,
                 'last_record' => 0,
-                'člast_record_postdate' => null,
+                'last_record_postdate' => null,
                 'last_updated' => null,
                 'active' => 0,
             ]
