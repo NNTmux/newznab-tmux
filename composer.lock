@@ -915,29 +915,30 @@
         },
         {
             "name": "cviebrock/laravel-elasticsearch",
-            "version": "8.0.3",
+            "version": "8.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cviebrock/laravel-elasticsearch.git",
-                "reference": "32ad18b0ad2315b3f0c3438a2c455e6cf383738a"
+                "reference": "bb3bc03ed186f15826a0d06516767894336c63d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cviebrock/laravel-elasticsearch/zipball/32ad18b0ad2315b3f0c3438a2c455e6cf383738a",
-                "reference": "32ad18b0ad2315b3f0c3438a2c455e6cf383738a",
+                "url": "https://api.github.com/repos/cviebrock/laravel-elasticsearch/zipball/bb3bc03ed186f15826a0d06516767894336c63d1",
+                "reference": "bb3bc03ed186f15826a0d06516767894336c63d1",
                 "shasum": ""
             },
             "require": {
-                "elasticsearch/elasticsearch": "^7.10",
+                "elasticsearch/elasticsearch": "^7.11",
                 "ext-json": "*",
                 "guzzlehttp/psr7": "^1.7",
                 "illuminate/contracts": "^8.0",
                 "illuminate/support": "^8.0",
-                "php": "^7.3",
+                "php": "^7.3||^8.0",
                 "psr/http-message": "^1.0"
             },
             "require-dev": {
                 "limedeck/phpunit-detailed-printer": "^6.0",
+                "mockery/mockery": "^1.4.3",
                 "orchestra/testbench": "^6.5",
                 "phpunit/phpunit": "^9.4"
             },
@@ -980,9 +981,9 @@
             ],
             "support": {
                 "issues": "https://github.com/cviebrock/laravel-elasticsearch/issues",
-                "source": "https://github.com/cviebrock/laravel-elasticsearch/tree/8.0.3"
+                "source": "https://github.com/cviebrock/laravel-elasticsearch/tree/8.0.4"
             },
-            "time": "2020-12-28T18:49:27+00:00"
+            "time": "2021-02-28T20:19:38+00:00"
         },
         {
             "name": "czproject/git-php",
@@ -6781,7 +6782,7 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.0.16",
+            "version": "2.0.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
@@ -6843,7 +6844,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.0.16"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.0.17"
             },
             "time": "2021-02-02T14:10:30+00:00"
         },
@@ -13971,16 +13972,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.79",
+            "version": "0.12.80",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "dd7769915648b704b9bd12925994457f1c2c8442"
+                "reference": "c6a1b17f22ecf708d434d6bee05092647ec7e686"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/dd7769915648b704b9bd12925994457f1c2c8442",
-                "reference": "dd7769915648b704b9bd12925994457f1c2c8442",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c6a1b17f22ecf708d434d6bee05092647ec7e686",
+                "reference": "c6a1b17f22ecf708d434d6bee05092647ec7e686",
                 "shasum": ""
             },
             "require": {
@@ -14011,7 +14012,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.79"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.80"
             },
             "funding": [
                 {
@@ -14027,7 +14028,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-25T16:44:57+00:00"
+            "time": "2021-02-28T20:22:43+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
