@@ -164,7 +164,7 @@ class Predb extends Model
         }
 
         // Check if clean name matches a PreDB filename.
-        $fileCheck = self::query()->where('filename', $cleanerName)->first(['id', 'title']);
+        $fileCheck = self::query()->where('filename_crc', dechex(crc32($cleanerName)))->where('filename', $cleanerName)->first(['id', 'title']);
 
         if ($fileCheck !== null) {
             return [
