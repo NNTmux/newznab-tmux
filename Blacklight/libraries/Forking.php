@@ -126,7 +126,7 @@ class Forking
         SerializableClosure::removeSecurityProvider();
         $this->colorCli = new ColorCLI();
 
-        $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
+        $this->dnr_path = PHP_BINARY.' /var/www/nntmux/misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
@@ -674,7 +674,7 @@ class Forking
         foreach ($releases as $release) {
             if ($type !== '') {
                 $pool->add(function () use ($release, $type) {
-                    return $this->_executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
+                    return $this->_executeCommand(PHP_BINARY.' /var/www/nntmux/misc/update/postprocess.php '.$type.$release->id);
                 }, 500000)->then(function ($output) use ($desc, $count) {
                     echo $output;
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
