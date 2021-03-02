@@ -19,8 +19,9 @@ test.php
 
 /.idea/
 /vendor/*
-/resources/nzb/*
-/resources/tmp/*
+/resources/covers
+/resources/nzb
+/resources/tmp
 !/resources/tmp/unrar/
 !/resources/tmp/unzip/
 !/resources/tmp/imdb_cache/
