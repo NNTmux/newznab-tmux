@@ -374,7 +374,7 @@ class ReleaseExtra
      */
     public function addUID($releaseID, $uniqueId): void
     {
-        $dupecheck = ReleaseUnique::query()->where('releases_id', $releaseID)->orWhere([
+        $dupecheck = ReleaseUnique::query()->orWhere([
             'releases_id' => $releaseID,
             'uniqueid' => $uniqueId,
         ])->first(['releases_id']);
