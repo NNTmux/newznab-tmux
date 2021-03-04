@@ -707,13 +707,13 @@ class NameFixer
 				AND rf.mediainfo REGEXP '\<Movie_name\>'
 				AND rel.nzbstatus = %d
                 AND rel.isrenamed = %d
-                AND rel.predb_id = 0
-				AND rel.categories_id IN (%d, %d)",
+                AND rel.predb_id = 0",
                 NZB::NZB_ADDED,
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED
+                self::IS_RENAMED_NONE
             );
+            if ($cats == 2) {
+                $query .= PHP_EOL.sprintf('AND rel.categories_id IN (%s)', [Category::OTHER_MISC, Category::OTHER_HASHED]);
+            }
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
@@ -757,10 +757,10 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					IFNULL(ph.hash, "") AS hash
+					IFNULL(ph.hash, \'\') AS hash
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
-				WHERE ph.hash != ""
+				WHERE ph.hash != \'\'
 				AND rel.nzbstatus = %d
 				AND rel.predb_id = 0',
                 NZB::NZB_ADDED
@@ -773,13 +773,13 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					IFNULL(ph.hash, "") AS hash
+					IFNULL(ph.hash, \'\') AS hash
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
 				WHERE rel.nzbstatus = %d
 				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 				AND rel.predb_id = 0
-				AND ph.hash != ""
+				AND ph.hash != \'\'
 				AND rel.proc_hash16k = %d',
                 NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE,
@@ -1229,13 +1229,11 @@ class NameFixer
 					AND r.predb_id = 0
 					AND r.categories_id IN (%s)
 					AND r.isrenamed = 0
-					GROUP BY r.id
-					%s %s",
-                implode(',', Category::OTHERS_GROUP),
-                $orderby,
-                $limit
+					GROUP BY r.id",
+                implode(',', Category::OTHERS_GROUP)
             )
         );
+        $query .= $orderby.$limit;
 
         if (! empty($query)) {
             $total = $query->count();

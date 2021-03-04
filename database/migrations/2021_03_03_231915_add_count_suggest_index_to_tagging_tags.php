@@ -6,7 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddUniqueIdIndexToReleaseUnique extends Migration
+class AddCountSuggestIndexToTaggingTags extends Migration
 {
     /**
      * Run the migrations.
@@ -15,8 +15,8 @@ class AddUniqueIdIndexToReleaseUnique extends Migration
      */
     public function up()
     {
-        Schema::table('release_unique', function (Blueprint $table) {
-            $table->index('uniqueid', 'ix_release_unique_uniqueid');
+        Schema::table('tagging_tags', function (Blueprint $table) {
+            $table->index(['count', 'suggest'], 'ix_tagging_tags_count_suggest');
         });
     }
 
@@ -27,8 +27,8 @@ class AddUniqueIdIndexToReleaseUnique extends Migration
      */
     public function down()
     {
-        Schema::table('release_unique', function (Blueprint $table) {
-            $table->dropIndex('ix_release_unique_uniqueid');
+        Schema::table('tagging_tags', function (Blueprint $table) {
+            $table->dropIndex('ix_tagging_tags_count_suggest');
         });
     }
 }
