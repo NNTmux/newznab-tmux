@@ -1217,9 +1217,8 @@ class NameFixer
         $counter = $counted = 0;
         $timestart = now();
 
-        $query = Release::fromQuery(
-            sprintf(
-                "
+        $sql = sprintf(
+            "
 					SELECT r.id AS releases_id, r.name, r.searchname,
 						r.fromname, r.groups_id, r.categories_id,
 						GROUP_CONCAT(rf.name ORDER BY LENGTH(rf.name) DESC SEPARATOR '||') AS filename
@@ -1230,10 +1229,10 @@ class NameFixer
 					AND r.categories_id IN (%s)
 					AND r.isrenamed = 0
 					GROUP BY r.id",
-                implode(',', Category::OTHERS_GROUP)
-            )
+            implode(',', Category::OTHERS_GROUP)
         );
-        $query .= $orderby.$limit;
+        $sql .= $orderby.$limit;
+        $query = Release::fromQuery($sql);
 
         if (! empty($query)) {
             $total = $query->count();
