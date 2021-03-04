@@ -1231,7 +1231,7 @@ class NameFixer
 					GROUP BY r.id",
             implode(',', Category::OTHERS_GROUP)
         );
-        $sql .= $orderby.$limit;
+        $sql .= PHP_EOL.$orderby.PHP_EOL.$limit;
         $query = Release::fromQuery($sql);
 
         if (! empty($query)) {
