@@ -28,7 +28,7 @@ class AddCountSuggestIndexToTaggingTags extends Migration
     public function down()
     {
         Schema::table('tagging_tags', function (Blueprint $table) {
-            $table->dropUnique('ix_tagging_tags_count_suggest');
+            $table->dropIndex('ix_tagging_tags_count_suggest');
         });
     }
 }

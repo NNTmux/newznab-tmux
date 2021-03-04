@@ -28,7 +28,7 @@ class AddReleasesFilesJoinIndexToReleases extends Migration
     public function down()
     {
         Schema::table('releases', function (Blueprint $table) {
-            $table->dropUnique('ix_releases_rf_join');
+            $table->dropIndex('ix_releases_rf_join');
         });
     }
 }

@@ -28,7 +28,7 @@ class AddUniqueIdIndexToReleaseUnique extends Migration
     public function down()
     {
         Schema::table('release_unique', function (Blueprint $table) {
-            $table->dropUnique('ix_release_unique_uniqueid');
+            $table->dropIndex('ix_release_unique_uniqueid');
         });
     }
 }
