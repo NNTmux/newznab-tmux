@@ -3437,7 +3437,7 @@
             "version": "v1.0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
+                "url": "git@github.com:DariusIII/TVMaze-PHP-API-Wrapper.git",
                 "reference": "69090718ea87c8f6cd48aeaae4c11c266782d6da"
             },
             "dist": {
@@ -3462,9 +3462,6 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/v1.0.2"
-            },
             "time": "2019-12-17T11:46:44+00:00"
         },
         {
@@ -5642,7 +5639,7 @@
             "version": "v1.6.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/Net_NNTP.git",
+                "url": "git@github.com:DariusIII/Net_NNTP.git",
                 "reference": "07f2784500683ac127b66f029da2dd4b4fff5e14"
             },
             "dist": {
