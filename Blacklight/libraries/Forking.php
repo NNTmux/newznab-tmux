@@ -674,7 +674,7 @@ class Forking
         foreach ($releases as $release) {
             if ($type !== '') {
                 $pool->add(function () use ($release, $type) {
-                    return $this->_executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
+                    return $this->_executeCommand(PHP_BINARY.' /var/www/nntmux/misc/update/postprocess.php '.$type.$release->id);
                 }, 2000000)->then(function ($output) use ($desc, $count) {
                     echo $output;
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
