@@ -1,0 +1,40 @@
+<?php
+
+/** @noinspection PhpUnused, SpellCheckingInspection */
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class UpdateIndicesOnReleases extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('releases', function (Blueprint $table) {
+            $table->dropIndex('ix_releases_name');
+            $table->index(['name', 'adddate', 'guid'], 'ix_releases_name_adddate_guid');
+            $table->dropIndex('ix_releases_passwordstatus');
+            $table->index(['passwordstatus', 'postdate'], 'ix_releases_passwordstatus_postdate');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('releases', function (Blueprint $table) {
+            $table->dropIndex('ix_releases_name_adddate_guid');
+            $table->index(['name'], 'ix_releases_name');
+            $table->dropIndex('ix_releases_passwordstatus_postdate');
+            $table->index(['name'], 'ix_releases_passwordstatus');
+        });
+    }
+}
