@@ -309,7 +309,7 @@ class Forking
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 return $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
-            }, 500000)->then(function ($output) use ($group, $maxWork) {
+            }, 2000000)->then(function ($output) use ($group, $maxWork) {
                 echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
@@ -404,7 +404,7 @@ class Forking
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
                     return $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 500000)->then(function ($output) use ($data) {
+                }, 2000000)->then(function ($output) use ($data) {
                     echo $output;
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
@@ -440,7 +440,7 @@ class Forking
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 return $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
-            }, 500000)->then(function ($output) use ($group, $maxWork) {
+            }, 2000000)->then(function ($output) use ($group, $maxWork) {
                 echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
@@ -509,7 +509,7 @@ class Forking
                 preg_match('/alt\..+/i', $queue, $hit);
                 $pool->add(function () use ($queue) {
                     return $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 500000)->then(function ($output) use ($hit) {
+                }, 2000000)->then(function ($output) use ($hit) {
                     if (! empty($hit)) {
                         echo $output;
                         $this->colorCli->primary('Updated group '.$hit[0]);
@@ -581,7 +581,7 @@ class Forking
         foreach ($this->work as $queue) {
             $pool->add(function () use ($queue) {
                 return $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
-            }, 500000)->then(function ($output) use ($maxWork) {
+            }, 2000000)->then(function ($output) use ($maxWork) {
                 echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
@@ -627,7 +627,7 @@ class Forking
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
                 return $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
-            }, 500000)->then(function ($output) use ($maxWork) {
+            }, 2000000)->then(function ($output) use ($maxWork) {
                 echo $output;
                 $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
             })->catch(function (\Throwable $exception) {
@@ -675,7 +675,7 @@ class Forking
             if ($type !== '') {
                 $pool->add(function () use ($release, $type) {
                     return $this->_executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
-                }, 500000)->then(function ($output) use ($desc, $count) {
+                }, 2000000)->then(function ($output) use ($desc, $count) {
                     echo $output;
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
@@ -931,7 +931,7 @@ class Forking
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 return $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
-            }, 500000)->then(function ($output) use ($group) {
+            }, 2000000)->then(function ($output) use ($group) {
                 echo $output;
                 $name = UsenetGroup::getNameByID($group->id);
                 $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
