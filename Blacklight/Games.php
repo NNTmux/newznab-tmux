@@ -509,12 +509,12 @@ class Games
                 $result = $this->giantBomb->search($gameInfo['title'], 'Game');
 
                 if (! \is_object($result)) {
-                    $percentCurrent = 0;
+                    $bestMatchPct = 0;
                     foreach ($result as $res) {
                         similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
-                        if ($percent1 >= self::GAME_MATCH_PERCENTAGE && $percent1 > $percentCurrent) {
-                            $percentCurrent = $percent1;
+                        if ($percent1 >= self::GAME_MATCH_PERCENTAGE && $percent1 > $bestMatchPct) {
                             $bestMatch = $res->id;
+                            $bestMatchPct = $percent1;
                         }
                     }
 
@@ -578,12 +578,12 @@ class Games
                     $this->_classUsed = 'IGDB';
                     $result = Game::where('name', $gameInfo['title'])->get();
                     if (! empty($result)) {
-                        $percentCurrent = 0;
+                        $bestMatchPct = 0;
                         foreach ($result as $res) {
                             similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
-                            if ($percent1 >= self::GAME_MATCH_PERCENTAGE && $percent1 > $percentCurrent) {
-                                $percentCurrent = $percent1;
+                            if ($percent1 >= self::GAME_MATCH_PERCENTAGE && $percent1 > $bestMatchPct) {
                                 $bestMatch = $res->id;
+                                $bestMatchPct = $percent1;
                             }
                         }
                         if ($bestMatch !== false) {

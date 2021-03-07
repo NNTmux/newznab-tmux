@@ -506,17 +506,19 @@ class TmuxOutput extends Tmux
             )
         );
 
-        $pieces = explode(' ', $this->pdo->getAttribute(\PDO::ATTR_SERVER_INFO));
-        $buffer .= color("\nThreads = ")->green.
-            color($pieces[4])->yellow.
-            color(', Opens = ')->green.
-            color($pieces[14])->yellow.
-            color(', Tables = ')->green.
-            color($pieces[22])->yellow.
-            color(', Slow = ')->green.
-            color($pieces[11])->yellow.
-            color(', QPS = ')->green.
-            color($pieces[28])->yellow.PHP_EOL;
+        $info = $this->pdo->getAttribute(\PDO::ATTR_SERVER_INFO);
+        $pieces = [];
+        foreach ([
+            ['Threads', '/.*\bThreads: (\d+)\b.*/'],
+            ['Opens', '/.*\bOpens[^:]*?: (\d+)\b.*/'],
+            ['Tables', '/.* tables: (\d+)\b.*/'],
+            ['Slow', '/.*\bSlow[^:]*?: (\d+)\b.*/'],
+            ['QPS', '/.*\bQueries[^:]*?: (\d+)\b.*/'],
+                 ] as $v) {
+            $pieces[] = color($v[0].' = ')->green.
+                color(preg_replace($v[1], '$1', $info))->yellow;
+        }
+        $buffer .= PHP_EOL.implode(', ', $pieces).PHP_EOL;
 
         return $buffer;
     }
