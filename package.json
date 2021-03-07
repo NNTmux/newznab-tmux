@@ -14,7 +14,7 @@
     "devDependencies": {
         "axios": "^0.21.1",
         "cross-env": "^7.0.3",
-        "jquery": "3.5.1",
+        "jquery": "3.6.0",
         "laravel-mix": "^6.0.13",
         "lodash": "^4.17.21",
         "popper.js": "^1.16.1",
@@ -39,7 +39,7 @@
         "jquery-migrate": "3.3.2",
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
-        "pace-js": "^1.2.3",
+        "pace-js": "^1.2.4",
         "pnotify": "^4.0.1",
         "tinymce": "^5.7.0"
     }
