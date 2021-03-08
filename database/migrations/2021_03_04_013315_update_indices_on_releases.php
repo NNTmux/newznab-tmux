@@ -20,6 +20,7 @@ class UpdateIndicesOnReleases extends Migration
             $table->index(['name', 'adddate', 'guid'], 'ix_releases_name_adddate_guid');
             $table->dropIndex('ix_releases_passwordstatus');
             $table->index(['passwordstatus', 'postdate'], 'ix_releases_passwordstatus_postdate');
+            $table->index(['categories_id', 'nzbstatus', 'musicinfo_id', 'postdate'], 'ix_releases_categories_id_nzbstatus_musicinfo_id_postdate');
         });
     }
 
@@ -35,6 +36,7 @@ class UpdateIndicesOnReleases extends Migration
             $table->index(['name'], 'ix_releases_name');
             $table->dropIndex('ix_releases_passwordstatus_postdate');
             $table->index(['name'], 'ix_releases_passwordstatus');
+            $table->dropIndex('ix_releases_categories_id_nzbstatus_musicinfo_id_postdate');
         });
     }
 }
