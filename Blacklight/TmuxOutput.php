@@ -514,7 +514,7 @@ class TmuxOutput extends Tmux
             ['Tables', '/.* tables: (\d+)\b.*/'],
             ['Slow', '/.*\bSlow[^:]*?: (\d+)\b.*/'],
             ['QPS', '/.*\bQueries[^:]*?: (\d+)\b.*/'],
-                 ] as $v) {
+        ] as $v) {
             $pieces[] = color($v[0].' = ')->green.
                 color(preg_replace($v[1], '$1', $info))->yellow;
         }
