@@ -964,7 +964,7 @@ return [
     120 => [
         'id' => 121,
         'group_regex' => '^alt\\.binaries\\.blu-ray$',
-        'regex' => '/^[\\w\-\\. ]+[ _-]{0,3}[\\(\\[]\\d+\\/\\d+[\\)\\]][ _-]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\\w\\-\\. ]+[ _-]{0,3}[\\(\\[]\\d+\\/\\d+[\\)\\]][ _-]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//THE_PAC',
         'ordinal' => 50,
@@ -972,7 +972,7 @@ return [
     121 => [
         'id' => 122,
         'group_regex' => '^alt\\.binaries\\.blu-ray$',
-        'regex' => '/^[\\w\-\\. ]+[ _-]{0,3}[\\(\\[]\\d+\\/\\d+[\\)\\]][ _-]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\\w\\-\\. ]+[ _-]{0,3}[\\(\\[]\\d+\\/\\d+[\\)\\]][ _-]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//LOST SEASON1 DISC4 REENCODED BD25 DJMASTURBEAT (151/154) "LOST SEASON1 DISC4 BD25 DJMASTURBEAT.vol3312+131.par2" - 26.91 GB - yEnc',
         'ordinal' => 55,
@@ -2268,7 +2268,7 @@ return [
     283 => [
         'id' => 284,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/^\\[(?P<match0>[\\w\- ]+)\\]-\\[\\d+\\/\\d+\\] - "([\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[(?P<match0>[\\w\\- ]+)\\]-\\[\\d+\\/\\d+\\] - "([\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[Walmart - The High Cost of Low Prices]-[28/59] - "wthcolp.part26.rar" yEnc',
         'ordinal' => 130,
@@ -2276,7 +2276,7 @@ return [
     284 => [
         'id' => 285,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/^\\[[\\w\- ]+\\] - "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[[\\w\\- ]+\\] - "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[SR09-0013] - "America Revealed E02 Nation On The Move (2012) x264 720p AC3 5.1.nfo" yEnc',
         'ordinal' => 135,
@@ -2284,7 +2284,7 @@ return [
     285 => [
         'id' => 286,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/^(?P<match0>[\\w\- ]+.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[\\w\\- ]+.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Panzer III - Medium Tank The German War Files - Panzer III - Germany\'s WWII Medium Tank.part05.rar" yEnc',
         'ordinal' => 140,
@@ -4508,7 +4508,7 @@ return [
     563 => [
         'id' => 564,
         'group_regex' => '^alt\\.binaries\\.hdtv$',
-        'regex' => '/^[\\w\-\\.]+ "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\\w\\-\\.]+ "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Bad.Penny.2013.720p.HDTV.x264-GBL "bad.penny.2013.720p.hdtv.x264-gbl.par2" yEnc',
         'ordinal' => 75,
@@ -4516,7 +4516,7 @@ return [
     564 => [
         'id' => 565,
         'group_regex' => '^alt\\.binaries\\.hdtv$',
-        'regex' => '/^[\\w\-\\. ]+\\[\\d+\\/\\d+\\][\-_\\s]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\\w\\-\\. ]+\\[\\d+\\/\\d+\\][\-_\\s]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//The.Colbert.Report.2013.07.29.The.Lumineers.WEBRip.AAC2.0.H.264-DCK [01/11] - "The.Colbert.Report.2013.07.29.The.Lumineers.WEBRip.AAC2.0.H.264-DCK.mp4"  yEnc',
         'ordinal' => 80,
@@ -8325,7 +8325,7 @@ return [
     1040 => [
         'id' => 1041,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/\\Israeli.+\\[\\d+\\/\\d+\\] - "(?P<match0>.+)\\.(mp4|mkv|ts|vol.+|)" yEnc$/',
+        'regex' => '/\Israeli.+\\[\\d+\\/\\d+\\] - "(?P<match0>.+)\\.(mp4|mkv|ts|vol.+|)" yEnc$/',
         'status' => 1,
         'description' => '//Israeli AutoRarPar0002  [54/55] - "Hameofefim.Hanoazim.E02.PDTV.XviD-Sweet-Star.vol063+64.par2" yEnc',
         'ordinal' => 40,
@@ -8333,7 +8333,7 @@ return [
     1041 => [
         'id' => 1042,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/\\Israeli.+\\[\\d+\\/\\d+\\] - "(?P<match0>.+)\\.(mp4|mkv|ts|par.+)" yEnc$/',
+        'regex' => '/\Israeli.+\\[\\d+\\/\\d+\\] - "(?P<match0>.+)\\.(mp4|mkv|ts|par.+)" yEnc$/',
         'status' => 1,
         'description' => '//Israeli AutoRarPar0021  [07/44] - "Hameofefim.Hanoazim.E23.PDTV.XviD-Sweet-Star.part06.rar" yEnc',
         'ordinal' => 45,
