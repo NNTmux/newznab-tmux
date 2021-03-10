@@ -1443,7 +1443,7 @@ Q1;
 SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id,
 dehashstatus, rf.name AS filename FROM releases r
 LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id AND rf.ishashed = 1
-WHERE nzbstatus = 1 AND isrenamed = 0 AND (dehashstatus BETWEEN -6 AND 0) AND r.ishashed = 1 %s %s
+WHERE nzbstatus = 1 AND isrenamed = 0 AND (dehashstatus BETWEEN -6 AND 0) AND r.ishashed = 1
 Q2
                 .' '.$ct.' '.$tq;
         }
