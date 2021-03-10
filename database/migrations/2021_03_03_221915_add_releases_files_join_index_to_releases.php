@@ -16,7 +16,7 @@ class AddReleasesFilesJoinIndexToReleases extends Migration
     public function up()
     {
         Schema::table('releases', function (Blueprint $table) {
-            $table->index(['categories_id', 'adddate'], 'ix_releases_rf_join');
+            $table->index(['categories_id', 'adddate', 'isrenamed'], 'ix_releases_rf_join');
         });
     }
 
