@@ -51,6 +51,7 @@ before_script:
      - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
      # Set permissions, can't use newgrp with travis so we need to do it this way.
      - sudo chmod -R 777 /home/travis/
+     - mkdir tests/Unit
 
 
 script:
