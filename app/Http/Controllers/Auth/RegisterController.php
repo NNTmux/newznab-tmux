@@ -12,9 +12,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Password as PasswordFacade;
 use Illuminate\Validation\ValidationException;
 use Jrean\UserVerification\Traits\VerifiesUsers;
 use Junaidnasir\Larainvite\Facades\Invite;
@@ -72,7 +73,7 @@ class RegisterController extends Controller
             'roles_id' => $data['roles_id'],
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
-            'api_token' => md5(Password::getRepository()->createNewToken()),
+            'api_token' => md5(PasswordFacade::getRepository()->createNewToken()),
             'userseed' => md5(Str::uuid()->toString()),
         ]);
 
@@ -135,7 +136,7 @@ class RegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
+            'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
         ]);
 
         if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
