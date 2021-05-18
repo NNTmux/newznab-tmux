@@ -9,7 +9,7 @@
         <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
             <small>ADMIN FUNCTIONS</small>
         </li>
-        <a href="#submenu1" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu1" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-sitemap fa-fw mr-3"></span>
                 <span class="menu-collapsed">Edit Site</span>
@@ -21,7 +21,7 @@
                 <span class="menu-collapsed">Edit Site</span>
             </a>
         </div>
-        <a href="#submenu2" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu2" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-plus-square-o fa-fw mr-3"></span>
                 <span class="menu-collapsed">Content</span>
@@ -36,7 +36,7 @@
             <span class="menu-collapsed">Edit Content</span>
             </a>
         </div>
-        <a href="#submenu3" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu3" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-tint fa-fw mr-3"></span>
                 <span class="menu-collapsed">Categories</span>
@@ -48,7 +48,7 @@
                 <span class="menu-collapsed">Edit Categories</span>
             </a>
         </div>
-        <a href="#submenu4" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu4" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-object-group fa-fw mr-3"></span>
                 <span class="menu-collapsed">Groups</span>
@@ -66,7 +66,7 @@
                 <span class="menu-collapsed">Bulk Add Groups</span>
             </a>
         </div>
-        <a href="#submenu5" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu5" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-registered fa-fw mr-3"></span>
                 <span class="menu-collapsed">Regexess</span>
@@ -99,7 +99,7 @@
                 <span class="menu-collapsed">View Release Naming Regexes</span>
             </a>
         </div>
-        <a href="#submenu6" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu6" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-stop fa-fw mr-3"></span>
                 <span class="menu-collapsed">Blacklist</span>
@@ -114,7 +114,7 @@
                 <span class="menu-collapsed">Add Blacklist</span>
             </a>
         </div>
-        <a href="#submenu7" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu7" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-recycle fa-fw mr-3"></span>
                 <span class="menu-collapsed">Releases</span>
@@ -153,7 +153,7 @@
                 <span class="menu-collapsed">View Book List</span>
             </a>
         </div>
-        <a href="#submenu9" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu9" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-download fa-fw mr-3"></span>
                 <span class="menu-collapsed">NZB</span>
@@ -168,7 +168,7 @@
                 <span class="menu-collapsed">Export NZBs</span>
             </a>
         </div>
-        <a href="#submenu10" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu10" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-hourglass-start fa-fw mr-3"></span>
                 <span class="menu-collapsed">Stats</span>
@@ -180,7 +180,7 @@
                 <span class="menu-collapsed">Site Stats</span>
             </a>
         </div>
-        <a href="#submenu11" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu11" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-comment fa-fw mr-3"></span>
                 <span class="menu-collapsed">Comments & Sharing</span>
@@ -195,7 +195,7 @@
                 <span class="menu-collapsed">Comment Sharing Settings</span>
             </a>
         </div>
-        <a href="#submenu12" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu12" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-users fa-fw mr-3"></span>
                 <span class="menu-collapsed">Users & Roles</span>
@@ -216,7 +216,7 @@
                 <span class="menu-collapsed">Add User Roles</span>
             </a>
         </div>
-        <a href="#submenu13" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu13" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-linux fa-fw mr-3"></span>
                 <span class="menu-collapsed">Tmux</span>
@@ -228,7 +228,7 @@
                 <span class="menu-collapsed">Tmux Settings</span>
             </a>
         </div>
-        <a href="#submenu14" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu14" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-database fa-fw mr-3"></span>
                 <span class="menu-collapsed">Pre Database</span>
@@ -240,7 +240,7 @@
                 <span class="menu-collapsed">View Pre Database</span>
             </a>
         </div>
-        <a href="#submenu15" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu15" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-database fa-fw mr-3"></span>
                 <span class="menu-collapsed">Laravel Telescope</span>
@@ -252,7 +252,7 @@
                 <span class="menu-collapsed">View Telescope Monitoring tool</span>
             </a>
         </div>
-        <a href="#submenu16" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+        <a href="#submenu16" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-database fa-fw mr-3"></span>
                 <span class="menu-collapsed">Laravel Horizon</span>

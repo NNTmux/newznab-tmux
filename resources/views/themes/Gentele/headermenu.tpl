@@ -1,5 +1,5 @@
 <div class="navbar navbar-expand navbar-expand-md navbar-expand-lg navbar-expand-sm navbar-expand-xl navbar-dark bg-dark" role="navigation">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -8,7 +8,7 @@
                 {if $parentcat.id == {$catClass::TV_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true" data-delay="30">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true" data-delay="30">
                                 <i class="fa fa-television"></i> {$parentcat.title}
                             </a>
                             <ul class="dropdown-menu">
@@ -35,7 +35,7 @@
                 {if $parentcat.id == {$catClass::MOVIE_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true" data-delay="30">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true" data-delay="30">
                                 <i class="fa fa-film"></i> {$parentcat.title}
                             </a>
                             <ul class="dropdown-menu">
@@ -73,7 +73,7 @@
                 {if $parentcat.id == {$catClass::GAME_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true"
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true"
                                data-delay="30">
                                 <i class="fa fa-gamepad"></i> {$parentcat.title}
                             </a>
@@ -108,7 +108,7 @@
                 {if $parentcat.id == {$catClass::PC_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true"
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true"
                                data-delay="30">
                                 <i class="fa fa-gamepad"></i> {$parentcat.title}
                             </a>
@@ -147,7 +147,7 @@
                 {if $parentcat.id == {$catClass::MUSIC_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true"
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true"
                                data-delay="30">
                                 <i class="fa fa-music"></i> {$parentcat.title}
                             </a>
@@ -179,7 +179,7 @@
                 {if $parentcat.id == {$catClass::BOOKS_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true"
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true"
                                data-delay="30">
                                 <i class="fa fa-book"></i> Books
                             </a>
@@ -211,7 +211,7 @@
                 {if $parentcat.id == {$catClass::XXX_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true"
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true"
                                data-delay="30">
                                 <i class="fa fa-venus-mars"></i> Adult
                             </a>
@@ -250,7 +250,7 @@
                 {if $parentcat.id == {$catClass::OTHER_ROOT}}
                     <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" data-close-others="true"
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-close-others="true"
                                data-delay="30">
                                 <i class="fa fa-bolt"></i> Other</a>
                             <ul class="dropdown-menu">
@@ -268,7 +268,7 @@
         {/if}
         <ul class="navbar-nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
                    data-close-others="true" data-delay="30" aria-expanded="false">
                     {if $loggedin == "true"}
                     <i class="fa fa-id-badge"></i>

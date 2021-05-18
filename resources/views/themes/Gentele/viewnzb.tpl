@@ -140,34 +140,34 @@
 						<div class role="tabpanel">
 							<ul class="nav nav-tabs bar-tabs" role="tablist">
 								<li role="presentation" class="active"><a href="#pane1"
-																		  data-toggle="tab">Info</a></li>
+																		  data-bs-toggle="tab">Info</a></li>
 								{if $movie && $release.videos_id <= 0}{if $movie.trailer != ""}
-									<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
+									<li><a href="#pane2" data-bs-toggle="tab">Trailer</a></li>
 								{/if}{/if}
 								{if isset($xxx.trailers) && $xxx.trailers != ''}
-									<li role="presentation"><a href="#pane2" data-toggle="tab">Trailer</a></li>
+									<li role="presentation"><a href="#pane2" data-bs-toggle="tab">Trailer</a></li>
 								{/if}
 								{if !empty($nfo.nfo)}
-									<li role="presentation"><a href="#pane3" data-toggle="tab">NFO</a></li>
+									<li role="presentation"><a href="#pane3" data-bs-toggle="tab">NFO</a></li>
 								{/if}
 								{if isset($similars) && $similars|@count > 1}
-									<li role="presentation"><a href="#pane4" data-toggle="tab">Similar</a></li>
+									<li role="presentation"><a href="#pane4" data-bs-toggle="tab">Similar</a></li>
 								{/if}
 								{if $release.jpgstatus == 1 && $userdata->can('preview') == true}
-									<li role="presentation"><a href="#pane6" data-toggle="tab">Sample</a></li>
+									<li role="presentation"><a href="#pane6" data-bs-toggle="tab">Sample</a></li>
 								{/if}
-								<li role="presentation"><a href="#comments" data-toggle="tab">Comments</a></li>
+								<li role="presentation"><a href="#comments" data-bs-toggle="tab">Comments</a></li>
 								{if ($release.haspreview == 1 && $userdata->can('preview') == true) || ($release.haspreview == 2 && $userdata->can('preview') == true)}
-									<li role="presentation"><a href="#pane7" data-toggle="tab">Preview</a></li>
+									<li role="presentation"><a href="#pane7" data-bs-toggle="tab">Preview</a></li>
 								{/if}
 								{if $reVideo != false || $reAudio != false}
-									<li role="presentation"><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
+									<li role="presentation"><a href="#pane8" data-bs-toggle="tab">MediaInfo</a></li>
 								{/if}
 								{if isset($xxx.backdrop) && $xxx.backdrop == 1}
-									<li role="presentation"><a href="#pane9" data-toggle="tab">Back Cover</a></li>
+									<li role="presentation"><a href="#pane9" data-bs-toggle="tab">Back Cover</a></li>
 								{/if}
 								{if isset($game.backdrop) && $game.backdrop == 1}
-									<li role="presentation"><a href="#pane10" data-toggle="tab">Screenshot</a></li>
+									<li role="presentation"><a href="#pane10" data-bs-toggle="tab">Screenshot</a></li>
 								{/if}
 							</ul>
 						</div>
@@ -179,49 +179,49 @@
 											<img src="{{url("/covers/movies/{$movie.imdbid}-cover.jpg")}}"
 												 width="185"
 												 alt="{$movie.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $show && $release.videos_id > 0 && $show.image != "0"}
 											<img src="{{url("/covers/tvshows/{$release.videos_id}.jpg")}}"
 												 width="185"
 												 alt="{$show.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}
 											<img src="{{url("/covers/anime/{$anidb.anidbid}.jpg")}}"
 												 width="185"
 												 alt="{$anidb.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $con && $con.cover == 1}
 											<img src="{{url("/covers/console/{$con.id}.jpg")}}"
 												 width="185"
 												 alt="{$con.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $game && $game.cover == 1}
 											<img src="{{url("/covers/games/{$game.id}.jpg")}}"
 												 width="185"
 												 alt="{$con.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $music && $music.cover == 1}
 											<img src="{{url("/covers/music/{$music.id}.jpg")}}"
 												 width="185"
 												 alt="{$music.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $book && $book.cover == 1}
 											<img src="{{url("/covers/book/{$book.id}.jpg")}}"
 												 width="185"
 												 alt="{$book.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $xxx && $xxx.cover == 1}
@@ -231,7 +231,7 @@
 														src="{{url("/covers/xxx/{$xxx.id}-cover.jpg")}}"
 														width="185"
 														alt="{$xxx.title|escape:"htmlall"}"
-														data-toggle="modal"
+														data-bs-toggle="modal"
 														data-target="#modal-image"/></a>
 										{/if}
 										<br/><br/>
@@ -682,7 +682,7 @@
 								<div id="pane6" class="tab-pane">
 									<img src="{{url("/covers/sample/{$release.guid}_thumb.jpg")}}"
 										 alt="{$release.searchname|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
@@ -690,7 +690,7 @@
 								<div id="pane7" class="tab-pane">
 									<img src="{{url("/covers/preview/{$release.guid}_thumb.jpg")}}"
 										 alt="{$release.searchname|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
@@ -844,7 +844,7 @@
 								<div id="pane9" class="tab-pane">
 									<img src="{{url("/covers/xxx/{$xxx.id}-backdrop.jpg")}}"
 										 alt="{$xxx.title|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
@@ -854,7 +854,7 @@
 										 src="{{url("/covers/games/{$game.id}-backdrop.jpg")}}"
 										 width="500" border="0"
 										 alt="{$game.title|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}

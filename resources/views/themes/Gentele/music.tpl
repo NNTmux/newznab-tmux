@@ -25,19 +25,19 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-placement="top" title
 											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-toggle="tooltip" data-placement="top" title
+												data-bs-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
 									{/if}
@@ -133,7 +133,7 @@
 													{/if}
 													<div>
 														<a role="button" class="btn btn-light btn-xs"
-														   data-toggle="tooltip" data-placement="top" title
+														   data-bs-toggle="tooltip" data-placement="top" title
 														   data-original-title="Download NZB"
 														   href="{{url("/getnzb?id={$result->guid}")}}"><i
 																	class="fa fa-cloud-download"></i><span
@@ -146,14 +146,14 @@
 																Comment{if $result->comments != 1}s{/if}</span></a>
 														<span class="btn btn-hover btn-light btn-xs icon icon_cart text-muted"
 															  id="guid{$result->guid}"
-															  data-toggle="tooltip" data-placement="top"
+															  data-bs-toggle="tooltip" data-placement="top"
 															  title
 															  data-original-title="Send to my download basket"><i
 																	class="fa fa-shopping-basket"></i></span>
 														{if isset($sabintegrated) && $sabintegrated !=""}
 															<span class="btn btn-hover btn-light btn-xs icon icon_sab text-muted"
 																  id="guid{$result->guid}"
-																  data-toggle="tooltip" data-placement="top"
+																  data-bs-toggle="tooltip" data-placement="top"
 																  title
 																  data-original-title="Send to my Queue"><i
 																		class="fa fa-share"></i></span>
@@ -185,19 +185,19 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-placement="top" title
 											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-toggle="tooltip" data-placement="top" title
+												data-bs-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
 									{/if}

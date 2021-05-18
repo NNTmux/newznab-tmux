@@ -1,4 +1,4 @@
-<a href="#submenu1" data-toggle="collapse" aria-expanded="false"
+<a href="#submenu1" data-bs-toggle="collapse" aria-expanded="false"
    class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
     <div class="d-flex w-100 justify-content-start align-items-center">
         <span class="fa fa-dashboard fa-fw mr-3"></span>
@@ -58,7 +58,7 @@
         <span class="menu-collapsed">Browse Groups</span>
     </a>
 </div>
-<a href="#submenu2" data-toggle="collapse" aria-expanded="false"
+<a href="#submenu2" data-bs-toggle="collapse" aria-expanded="false"
    class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
     <div class="d-flex w-100 justify-content-start align-items-center">
         <span class="fa fa-edit fa-fw mr-3"></span>

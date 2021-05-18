@@ -28,7 +28,7 @@
 						{if $result.locked == 1}
 							<button type="button"
 									class="btn btn-sm btn-warning"
-									data-toggle="tooltip" data-placement="top" title
+									data-bs-toggle="tooltip" data-placement="top" title
 									data-original-title="Topic Locked">
 								<i class="fa fa-lock"></i></button>
 						{/if}

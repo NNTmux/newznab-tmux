@@ -70,18 +70,18 @@
 				<div class="btn-group">
 					<button type="button"
 							class="nzb_multi_operations_download btn btn-sm btn-success"
-							data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+							data-bs-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
 						<i class="fa fa-cloud-download"></i></button>
 					<button type="button"
 							class="nzb_multi_operations_cart btn btn-sm btn-info"
-							data-toggle="tooltip" data-placement="top" title
+							data-bs-toggle="tooltip" data-placement="top" title
 							data-original-title="Send to my Download Basket">
 						<i class="fa fa-shopping-basket"></i></button>
 
 					{if isset($sabintegrated) && $sabintegrated !=""}
 						<button type="button"
 								class="nzb_multi_operations_sab btn btn-sm btn-success"
-								data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+								data-bs-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
 							<i class="fa fa-share"></i></button>
 					{/if}
 					{if isset($isadmin)}
@@ -140,17 +140,17 @@
 										<td>{$result->size|filesize}</td>
 										<td class="icon_nzb"><a
 													href="{{url("/getnzb?id={$result->guid}")}}"><i
-														class="fa fa-cloud-download text-muted" data-toggle="tooltip"
+														class="fa fa-cloud-download text-muted" data-bs-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Download NZB"></i></a>
 											<a href="{{url("/details/{$result->guid}/#comments")}}"><i
-														class="fa fa-comments-o text-muted" data-toggle="tooltip"
+														class="fa fa-comments-o text-muted" data-bs-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Comments"></i></a>
 											<a href="#">
 												<i
 														id="guid{$result->guid}" class="icon_cart fa fa-shopping-basket"
-														data-toggle="tooltip"
+														data-bs-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Send to my Download Basket">
 												</i>
@@ -160,7 +160,7 @@
 													<i
 															id="guid{$result->guid}"
 															class="fa fa-share"
-															data-toggle="tooltip"
+															data-bs-toggle="tooltip"
 															data-placement="top" title
 															data-original-title="Send to My Queue">
 													</i>
@@ -168,7 +168,7 @@
 											{/if}
 											{if $weHasVortex}
 												<a href="#" class="icon_vortex text-muted"><i
-															class="fa fa-share" data-toggle="tooltip"
+															class="fa fa-share" data-bs-toggle="tooltip"
 															data-placement="top" title
 															data-original-title="Send to NZBVortex"></i></a>
 											{/if}

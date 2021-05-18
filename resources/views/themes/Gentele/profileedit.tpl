@@ -19,11 +19,11 @@
                         {{Form::open(['url' => 'profileedit?action=submit'])}}
                         <ul class="nav nav-tabs" id="profileTab" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" href="#settings" id="settings-tab" data-toggle="tab" role="tab" aria-controls="settings" aria-selected="true"><i class="fa fa-cogs fa-spin"></i>
+                                <a class="nav-link active" href="#settings" id="settings-tab" data-bs-toggle="tab" role="tab" aria-controls="settings" aria-selected="true"><i class="fa fa-cogs fa-spin"></i>
                                     Settings</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#downloaders" id="downloaders-tab" data-toggle="tab" role="tab" aria-controls="downloaders" aria-selected="false"><i class="fa fa-cogs fa-spin"></i>Downloaders</a>
+                                <a class="nav-link" href="#downloaders" id="downloaders-tab" data-bs-toggle="tab" role="tab" aria-controls="downloaders" aria-selected="false"><i class="fa fa-cogs fa-spin"></i>Downloaders</a>
                             </li>
                         </ul>
                         <div class="tab-content" id="profileTabContent">
