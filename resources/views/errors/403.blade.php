@@ -5,6 +5,6 @@
 @endsection
 
 @section('content')
-    {{ \App\Models\config('app.name') }} <br><br><br>
+    {{ config('app.name') }} <br><br><br>
     <b>You are not logged in!</b> <br>Please <a href='{!! url('/login'); !!}'>login</a>
 @endsection
