@@ -38,7 +38,7 @@
 							<input type="hidden" name="t" value="{if $category[0]!=""}{$category[0]}{else}-1{/if}"
 								   id="search_cat"/>
 							<input type="hidden" name="search_type" value="basic" id="search_type"/>
-							<input id="search_search_button" class="btn btn-success" type="submit" value="Search"/>
+                            {{Form::submit('Search', ['class' => 'btn btn-success', 'id' => 'search_search_button'])}}
 						</div>
 					</div>
 				{{Form::close()}}
@@ -101,7 +101,7 @@
 							<tr>
 								<td>
 									<div style="float:right;"><input type="hidden" name="search_type" value="adv" id="search_type">
-										<input id="search_adv_button" class="btn btn-success" type="submit" value="Search">
+                                        {{Form::submit('Search', ['class' => 'btn btn-success', 'id' => 'search_adv_button'])}}
 									</div>
 								</td>
 							</tr>
