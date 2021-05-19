@@ -154,13 +154,13 @@
 																	   class="btn btn-light btn-xs"
 																	   href="{{url("/getnzb?id={$result->guid}")}}"><i
 																				class="fa fa-cloud-download"></i><span
-																				class="badge">{$result->grabs}
+																				class="badge bg-info">{$result->grabs}
 																			Grab{if $result->grabs != 1}s{/if}</span></a>
 																	<a role="button"
 																	   class="btn btn-light btn-xs"
 																	   href="{{url("/details/{$result->guid}#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
-																				class="badge">{$result->comments}
+																				class="badge bg-info">{$result->comments}
 																			Comment{if $result->comments != 1}s{/if}</span></a>
 																	<span
 																			id="guid{$result->guid}"

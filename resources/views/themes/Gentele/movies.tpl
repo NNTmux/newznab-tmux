@@ -160,12 +160,12 @@
 																	   data-original-title="Download NZB"
 																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
-																				class="badge"> {$mgrabs[$m@index]}
+																				class="badge bg-info"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
-																				class="badge"> {$mcomments[$m@index]}
+																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 																	<span class="btn btn-hover btn-light btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
@@ -305,12 +305,12 @@
 																	   data-original-title="Download NZB"
 																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
-																				class="badge"> {$mgrabs[$m@index]}
+																				class="badge bg-info"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
-																				class="badge"> {$mcomments[$m@index]}
+																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 																	<span class="btn btn-hover btn-light btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
