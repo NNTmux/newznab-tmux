@@ -1,4 +1,5 @@
 <div class="navbar navbar-expand navbar-expand-md navbar-expand-lg navbar-expand-sm navbar-expand-xl navbar-dark bg-dark" role="navigation">
+     <div class="container-fluid">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -332,4 +333,5 @@
             </div>
         </li>
     </div>
+     </div>
 </div>
