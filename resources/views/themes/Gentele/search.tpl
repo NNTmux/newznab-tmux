@@ -250,7 +250,7 @@
 												{/if}
 												{if $result->videostatus > 0}
 													<a
-															class="model_prev badge badge-info"
+															class="model_prev badge bg-info"
 															href="{{url("/details/{$result->guid}")}}"
 															title="This release has a video preview."
 															rel="preview"
@@ -260,56 +260,56 @@
 												{if $result->nfoid > 0}
 													<a href="{{url("/nfo/{$result->guid}")}}"
 													   title="View Nfo"
-													   class="modal_nfo badge badge-info" rel="nfo">Nfo</a>
+													   class="modal_nfo badge bg-info" rel="nfo">Nfo</a>
 												{/if}
 												{if $result->imdbid > 0}
 													<a href="#" name="name{$result->imdbid}" title="View movie info"
-													   class="modal_imdb badge badge-info" rel="movie">Cover</a>
+													   class="modal_imdb badge bg-info" rel="movie">Cover</a>
 												{/if}
 												{if $result->haspreview == 1 && $userdata->can('preview') == true}
 												<a href="{{url("/covers/preview/{$result->guid}_thumb.jpg")}}"
 												   name="name{$result->guid}"
 												   data-fancybox
 												   title="Screenshot of {$result->searchname|escape:"htmlall"}"
-												   class="badge badge-info" rel="preview">Preview</a>{/if}
+												   class="badge bg-info" rel="preview">Preview</a>{/if}
 												{if $result->jpgstatus == 1 && $userdata->can('preview') == true}
 												<a href="{{url("/covers/sample/{$result->guid}_thumb.jpg")}}"
 												   name="name{$result->guid}"
 												   data-fancybox
 												   title="Sample of {$result->searchname|escape:"htmlall"}"
-												   class="badge badge-info" rel="preview">Sample</a>{/if}
+												   class="badge bg-info" rel="preview">Sample</a>{/if}
 												{if $result->musicinfo_id > 0}
 													<a href="#" name="name{$result->musicinfo_id}"
 													   title="View music info"
-													   class="modal_music badge badge-info" rel="music">Cover</a>
+													   class="modal_music badge bg-info" rel="music">Cover</a>
 												{/if}
 												{if $result->consoleinfo_id > 0}
 													<a href="#" name="name{$result->consoleinfo_id}"
 													   title="View console info"
-													   class="modal_console badge badge-info" rel="console">Cover</a>
+													   class="modal_console badge bg-info" rel="console">Cover</a>
 												{/if}
 												{if $result->videos_id > 0}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/series/{$result->videos_id}")}}"
 													   title="View all episodes">View
 														Series</a>
 												{/if}
 												{if $result->anidbid > 0}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/anime?id={$result->anidbid}")}}"
 													   title="View all episodes">View
 														Anime</a>
 												{/if}
 												{if isset($result->firstaired) && $result->firstaired != ''}
-													<span class="seriesinfo badge badge-info"
+													<span class="seriesinfo badge bg-info"
 														  title="{$result->guid}">Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>
 												{/if}
 												{if $result->group_name != ""}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/browse/group?g={$result->group_name|escape:"htmlall"}")}}"
 													   title="Browse {$result->group_name}">{$result->group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 												{/if}
-												{if !empty($result->failed)}<span class="badge badge-info">
+												{if !empty($result->failed)}<span class="badge bg-info">
 													<i class="fa fa-thumbs-o-up"></i>
 													{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 													<i class="fa fa-thumbs-o-down"></i>

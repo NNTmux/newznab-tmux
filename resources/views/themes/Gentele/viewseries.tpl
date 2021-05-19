@@ -176,7 +176,7 @@
                                                 <div>
                                                     {if $result->nfoid > 0}<span>
                                                         <a href="{{url("/nfo/{$result->guid}")}}"
-                                                           class="modal_nfo badge badge-info text-muted">NFO</a>
+                                                           class="modal_nfo badge bg-info text-muted">NFO</a>
                                                         </span>{/if}
                                                     {if $result->image == 1 && $userdata->can('preview') == true}
                                                     <a
@@ -184,16 +184,16 @@
                                                         name="name{$result->guid}"
                                                         data-fancybox
                                                         title="View Screenshot"
-                                                        class="badge badge-info"
+                                                        class="badge bg-info"
                                                         rel="preview">Preview</a>{/if}
-                                                    <span class="badge badge-info">{$result->grabs}
+                                                    <span class="badge bg-info">{$result->grabs}
 																		Grab{if $result->grabs != 1}s{/if}</span>
                                                     {if $result->firstaired != ""}<span
-                                                        class="badge badge-success"
+                                                        class="badge bg-success"
                                                         title="{$result->title} Aired on {$result->firstaired|date_format}">
                                                         Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
                                                     {if $result->reid > 0}<span
-                                                        class="mediainfo badge badge-info"
+                                                        class="mediainfo badge bg-info"
                                                         title="{$result->guid}">Media</span>{/if}
                                                 </div>
                                             </td>
@@ -203,7 +203,7 @@
                                                     class="flat" name="table_data{$seasonnum}"
                                                     value="{$result->guid}"/></td>
                                             <td>
-                                                <span class="badge badge-info">{$result->category_name}</span>
+                                                <span class="badge bg-info">{$result->category_name}</span>
                                             </td>
                                             <td width="40"
                                                 title="{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}">{{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate), 'Y-m-d h:i:s')}}|timeago}</td>

@@ -73,15 +73,15 @@
 													   title="This release has failed to download for some users"></i>{/if}
 												</a>
 												{if isset($result->url) && $result->url != ""}<a
-													class="badge badge-info" target="_blank"
+													class="badge bg-info" target="_blank"
 													href="{$site->dereferrer_link}{$result->url}"
 													name="amazon{$result->bookinfo_id}" title="View amazon/iTunes page">
 														Amazon/iTunes</a>{/if}
 												{if isset($result->nfoid) && $result->nfoid > 0}<a
 													href="{{url("/nfo/{$result->guid}")}}"
-													title="View Nfo" class="badge badge-info" rel="nfo">
+													title="View Nfo" class="badge bg-info" rel="nfo">
 														NFO</a>{/if}
-												<a class="badge badge-info"
+												<a class="badge bg-info"
 												   href="{{url("/browse/group?g={$result->group_name}")}}"
 												   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 												{if isset($result->failed) && $result->failed > 0}
@@ -104,8 +104,8 @@
 																	   value="{$result->guid}"
 																	   id="chksingle"/>
 															</label>
-															<span class="badge badge-info">{$result->size|filesize}</span>
-															<span class="badge badge-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+															<span class="badge bg-info">{$result->size|filesize}</span>
+															<span class="badge bg-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
 																ago</span>
 															<br/>
 															{if isset($result->review) && $result->review != ""}<span

@@ -1,6 +1,7 @@
 {if isset($covgroup)}
-	<div class="form-group">
+	<div class="row">
 	{if $covgroup == "movies"}
+        <div class="col">
         {{Form::open(['name' => 'browseby', 'url' => 'Movies', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="movietitle" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -35,8 +36,10 @@
 			</select>
             {{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 		{{Form::close()}}
+        </div>
 	{/if}
 	{if $covgroup == "xxx"}
+        <div class="col">
         {{Form::open(['name' => 'browseby', 'url' => 'XXX', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm"
 				   style="width: 150px;"
@@ -78,8 +81,10 @@
 			</select>
 		{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 		{{Form::close()}}
+        </div>
 	{/if}
 	{if $covgroup == "books"}
+        <div class="col">
         {{Form::open(['name' => 'browseby', 'url' => 'Books', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="author" type="text" name="author" value="{$author}"
 				   placeholder="Author">
@@ -87,8 +92,10 @@
 				   placeholder="Title">
 		{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 		{{Form::close()}}
+        </div>
 	{/if}
 	{if $covgroup == "music"}
+        <div class="col">
         {{Form::open(['name' => 'browseby', 'url' => 'Audio', 'class' => 'form-inline'])}}
 			<input class="form-control form-control-sm" id="musicartist" type="text" name="artist"
 				   value="{$artist}"
@@ -116,8 +123,10 @@
 			</select>
 		{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 		{{Form::close()}}
+        </div>
 	{/if}
 	{if $covgroup == "console"}
+        <div class="col">
         {{Form::open(['name' => 'browseby', 'url' => 'Console', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -138,8 +147,10 @@
 			</select>
 		{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 		{{Form::close()}}
+        </div>
 	{/if}
 	{if $covgroup == "games"}
+        <div class="col">
         {{Form::open(['name' => 'browseby', 'url' => 'Games', 'class' => 'form-inline', 'method' => 'get'])}}
 			<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -157,9 +168,11 @@
 			</select>
 		{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 		{{Form::close()}}
+        </div>
 	{/if}
 {/if}
 {if {$smarty.get.page} == "console"}
+    <div class="col">
     {{Form::open(['name' => 'browseby', 'url' => 'Console', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 			   placeholder="Title">
@@ -179,8 +192,10 @@
 		</select>
 	{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 	{{Form::close()}}
+    </div>
 {/if}
 {if {$smarty.get.page} == "games"}
+    <div class="col">
     {{Form::open(['name' => 'browseby', 'url' => 'Games', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="title" type="text" name="title" value="{$title}"
 			   placeholder="Title">
@@ -198,8 +213,10 @@
 		</select>
 	{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 	{{Form::close()}}
+    </div>
 {/if}
 {if {$smarty.get.page} == "books"}
+    <div class="col">
     {{Form::open(['name' => 'browseby', 'url' => 'Books', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="author" type="text" name="author" value="{$author}"
 			   placeholder="Author">
@@ -207,8 +224,10 @@
 			   placeholder="Title">
 	{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 	{{Form::close()}}
+    </div>
 {/if}
 {if {$smarty.get.page} == "movies"}
+    <div class="col">
     {{Form::open(['name' => 'browseby', 'url' => 'Movies', 'class' => 'form-inline'])}}
 		<input class="form-control form-control-sm" id="movietitle" type="text" name="title" value="{$title}"
 			   placeholder="Title">
@@ -242,8 +261,10 @@
 		</select>
 	{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 	{{Form::close()}}
+    </div>
 {/if}
 {if {$smarty.get.page} == "xxx"}
+    <div class="col">
     {{Form::open(['name' => 'browseby', 'url' => 'XXX', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm"
 			   style="width: 150px;"
@@ -285,8 +306,10 @@
 		</select>
 	{{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0'])}}
 	{{Form::close()}}
+    </div>
 {/if}
 {if {$smarty.get.page} == "music"}
+        <div class="col">
     {{Form::open(['name' => 'browseby', 'url' => 'Audio', 'class' => 'form-inline', 'method' => 'get'])}}
 		<input class="form-control form-control-sm" id="musicartist" type="text" name="artist" value="{$artist}"
 			   placeholder="Artist">
@@ -313,5 +336,6 @@
 		</select>
 		<input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">
 	{{Form::close()}}
+        </div>
 	</div>
 {/if}

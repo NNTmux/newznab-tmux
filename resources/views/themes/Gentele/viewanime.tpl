@@ -121,21 +121,21 @@
 												<div>
 													{if $result->nfoid > 0}<span><a
 																href="{{url("/nfo/{$result->guid}")}}"
-																class="modal_nfo badge badge-info text-muted">NFO</a>
+																class="modal_nfo badge bg-info text-muted">NFO</a>
 														</span>{/if}
 													{if $result->haspreview == 1 && $userdata->can('preview') == true}<a
 														href="{{url("/covers/preview/{$result->guid}_thumb.jpg")}}"
 														name="name{$result->guid}"
 														title="Screenshot of {$result->searchname|escape:"htmlall"}"
-														class="badge badge-info" rel="preview">Preview</a>{/if}
-													<span class="badge badge-info">{$result->grabs}
+														class="badge bg-info" rel="preview">Preview</a>{/if}
+													<span class="badge bg-info">{$result->grabs}
 														Grab{if $result->grabs != 1}s{/if}</span>
-													{if $result->reid > 0}<span class="mediainfo badge badge-info"
+													{if $result->reid > 0}<span class="mediainfo badge bg-info"
 																			   title="{$result->guid}">Media</span>{/if}
 												</div>
 											</div>
 										</td>
-										<td><span class="badge badge-info">{$result->category_name}</span></td>
+										<td><span class="badge bg-info">{$result->category_name}</span></td>
 										<td width="40" title="{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}">{{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate), 'Y-m-d h:i:s')}}|timeago}</td>
 										<td>{$result->size|filesize}</td>
 										<td class="icon_nzb"><a

@@ -69,7 +69,7 @@
 					<tr>
 						<td><a class="title" title="View series"
 							   href="{{url("/series/{$s.id}")}}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}
-						<br/><span class="badge badge-info">Last: {$s.previnfo|escape:"htmlall"}
+						<br/><span class="badge bg-info">Last: {$s.previnfo|escape:"htmlall"}
 							aired {$s.prevdate|date_format}</span>{/if}</td>
 						<td>{$s.publisher|escape:"htmlall"}</td>
 						<td>{$s.countries_id|escape:"htmlall"}</td>

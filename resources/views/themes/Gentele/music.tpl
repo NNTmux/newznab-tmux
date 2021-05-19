@@ -71,7 +71,7 @@
 											<i class="fa fa-exclamation-circle" style="color: red"
 											   title="This release has failed to download for some users"></i>{/if}
 										</a>
-										{if $result->url != ""}<a class="badge badge-info"
+										{if $result->url != ""}<a class="badge bg-info"
 																 target="_blank"
 																 href="{$site->dereferrer_link}{$result->url}"
 																 name="amazon{$result->musicinfo_id}"
@@ -79,9 +79,9 @@
 												Amazon</a>{/if}
 										{if $result->nfoid > 0}<a
 											href="{{url("/nfo/{$result->guid}")}}"
-											title="View NFO" class="badge badge-info" rel="nfo">
+											title="View NFO" class="badge bg-info" rel="nfo">
 												NFO</a>{/if}
-										<a class="badge badge-info"
+										<a class="badge bg-info"
 										   href="{{url("/browse/group?g={$result->group_name}")}}"
 										   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 										{if !empty($result->failed)}
@@ -108,10 +108,10 @@
 															   class="flat"
 															   value="{$result->guid}" id="chksingle"/>
 													</label>
-													<span class="badge badge-info">{$result->size|filesize}</span>
-													<span class="badge badge-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+													<span class="badge bg-info">{$result->size|filesize}</span>
+													<span class="badge bg-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
 														ago</span>
-													{if isset($isadmin)}<a class="badge badge-warning"
+													{if isset($isadmin)}<a class="badge bg-warning"
 																		   href="{{url("/admin/release-edit?id={$result->guid}")}}"
 																		   title="Edit release">
 															Edit</a>{/if}

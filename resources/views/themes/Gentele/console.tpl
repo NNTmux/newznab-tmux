@@ -78,7 +78,7 @@
 														<i class="fa fa-alarm" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
-													{if $result->url != ""}<a class="badge badge-default"
+													{if $result->url != ""}<a class="badge bg-info"
 																			 target="_blank"
 																			 href="{$site->dereferrer_link}{$result->url}"
 																			 name="game{$result->consoleinfo_id}"
@@ -86,10 +86,10 @@
 															Amazon</a>{/if}
 													{if $result->nfoid > 0}<a
 														href="{{url("/nfo/{$result->guid}")}}"
-														title="View NFO" class="modal_nfo badge badge-default"
+														title="View NFO" class="modal_nfo badge bg-info"
 														rel="nfo">
 															NFO</a>{/if}
-													<a class="badge badge-default"
+													<a class="badge bg-info"
 													   href="{{url("/browse/group?g={$result->group_name}")}}"
 													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($result->failed)}
@@ -114,12 +114,12 @@
 																		   value="{$result->guid}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-default">{$result->size|filesize}</span>
-																<span class="badge badge-default">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+																<span class="badge bg-info">{$result->size|filesize}</span>
+																<span class="badge bg-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
 																	ago</span>
 																{if isset($isadmin)}
 																<a
-																		class="badge badge-warning"
+																		class="badge bg-warning"
 																		href="{{url("/admin/release-edit?id={$result->guid}")}}"
 																		title="Edit release">
 																		Edit</a>{/if}

@@ -102,24 +102,24 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->imdbid}/"
 													   name="imdb{$result->imdbid}" title="View IMDB page"
-													   class="badge badge-info" rel="imdb">IMDB</a>
+													   class="badge bg-info" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result->imdbid}/"
 													   name="trakt{$result->imdbid}" title="View Trakt page"
-													   class="badge badge-info" rel="trakt">TRAKT</a>
+													   class="badge bg-info" rel="trakt">TRAKT</a>
                                                     {if (!empty($result->tmdbid))}
-                                                        <a class="badge badge-info" rel="tmdb" target="_blank"
+                                                        <a class="badge bg-info" rel="tmdb" target="_blank"
                                                            href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{{url("/nfo/{$mguid[$m@index]}")}}"
-															title="View NFO" class="modal_nfo badge badge-info"
+															title="View NFO" class="modal_nfo badge bg-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/browse/group?g={$mgrp[$m@index]}")}}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="badge badge-info" href="{{url("/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
+													<a class="badge bg-info" href="{{url("/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -142,13 +142,13 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-info">{$result->year}</span>
-																<span class="badge badge-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
-																<span class="badge badge-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
-																<span class="badge badge-info">{$msize[$m@index]|filesize}</span>
-																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge bg-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge bg-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge bg-info">{$result->year}</span>
+																<span class="badge bg-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
+																<span class="badge bg-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
+																<span class="badge bg-info">{$msize[$m@index]|filesize}</span>
+																<span class="badge bg-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
@@ -247,24 +247,24 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->imdbid}/"
 													   name="imdb{$result->imdbid}" title="View IMDB page"
-													   class="badge badge-info" rel="imdb">IMDB</a>
+													   class="badge bg-info" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result->imdbid}/"
 													   name="trakt{$result->imdbid}" title="View Trakt page"
-													   class="badge badge-info" rel="trakt">TRAKT</a>
+													   class="badge bg-info" rel="trakt">TRAKT</a>
                                                     {if (!empty($result->tmdbid))}
-                                                        <a class="badge badge-info" rel="tmdb" target="_blank"
+                                                        <a class="badge bg-info" rel="tmdb" target="_blank"
                                                            href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<span><a
 																href="{{url("/nfo/{$mguid[$m@index]}")}}"
-																title="View NFO" class="modal_nfo badge badge-info">NFO</a>
+																title="View NFO" class="modal_nfo badge bg-info">NFO</a>
 														</span>{/if}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/browse/group?g={$mgrp[$m@index]}")}}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="badge badge-info" href="{{url("/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
+													<a class="badge bg-info" href="{{url("/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -287,13 +287,13 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-info">{$result->year}</span>
-																<span class="badge badge-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
-																<span class="badge badge-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
-																<span class="badge badge-info">{$msize[$m@index]|filesize}</span>
-																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge bg-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge bg-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge bg-info">{$result->year}</span>
+																<span class="badge bg-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
+																<span class="badge bg-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
+																<span class="badge bg-info">{$msize[$m@index]|filesize}</span>
+																<span class="badge bg-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a

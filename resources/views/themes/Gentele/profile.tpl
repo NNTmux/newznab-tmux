@@ -141,7 +141,7 @@
                                                             <td>
                                                                 <a href="{{url("/rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}")}}">{$user.api_token}</a>
                                                                 <a href="{{url("profileedit?action=newapikey")}}"
-                                                                   class="badge badge-danger">GENERATE NEW
+                                                                   class="badge bg-danger">GENERATE NEW
                                                                     KEY</a>
                                                             </td>
                                                         </tr>
@@ -151,7 +151,7 @@
                                                                     <br/>
                                                                 {/if}{if (isset($isadmin) && $isadmin === "true")}<a
                                                                     href="{{url("/admin/user-edit.php?id={$user.id}#notes")}}"
-                                                                    class="badge badge-info">Add/Edit</a>{/if}</td>
+                                                                    class="badge bg-info">Add/Edit</a>{/if}</td>
                                                         </tr>
                                                     {/if}
                                                     </tbody>
