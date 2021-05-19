@@ -30,7 +30,7 @@
 				{{Form::open(['url' => 'search', 'method' => 'get'])}}
 					<div id="sbasic" class="row" style="text-align:center;{if $sadvanced} display:none;{/if}">
 						<div class="col-md-6">
-							<input id="search" class="form-control" maxlength="500" name="search"
+							<input id="search" class="form-inline" maxlength="500" name="search"
 								   value="{$search|escape:'htmlall'}"
 								   type="search" placeholder="What are you looking for?"/>
 						</div>

@@ -10,11 +10,11 @@
 			<p class="login-box-msg">Please sign in to access the site</p>
 			{{Form::open(['url' => 'login', 'id' => 'login'])}}
 				<div class="form-group has-feedback">
-					{{Form::text('username', 'Username or email', ['class' => 'form-control'])}}
+					{{Form::text('username', 'Username or email', ['class' => 'form-inline'])}}
 					<span class="fas fa-envelope form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
-					{{Form::password('password', ['class' => 'form-control'])}}
+					{{Form::password('password', ['class' => 'form-inline'])}}
 					<span class="fas fa-lock form-control-feedback"></span>
 				</div>
 				<div class="row">

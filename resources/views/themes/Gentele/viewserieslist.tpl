@@ -29,7 +29,7 @@
 			    {{Form::open(['class' => 'form float-right', 'style' => 'margin-top:-35px;'])}}
                     {{Form::open(['name' => 'showsearch', 'class' => 'navbar-form', 'method' => 'get'])}}
 						<div class="input-group">
-							<input class="form-control" style="width: 150px;"
+							<input class="form-inline" style="width: 150px;"
 								   id="title appendedInputButton"
 								   type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}"{else}{/if}"
 								   placeholder="Search here"/>

@@ -4,7 +4,7 @@
 		  class="form-inline form-horizontal col-4 col-lg-4 float-right">
 		{{csrf_field()}}
 		<div id="search" class="input-group col-12 col-lg-12">
-			<input type="text" class="form-control" placeholder="Search predb" id="presearch" name="presearch"
+			<input type="text" class="form-inline" placeholder="Search predb" id="presearch" name="presearch"
 				   value="{$lastSearch|escape:'html'}">
 			<span class="input-group-btn">
 			<button type="submit" value="Go" class="btn btn-success">

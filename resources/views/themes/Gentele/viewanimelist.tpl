@@ -26,7 +26,7 @@
 						<h2>{$aletter}...</h2>
                         {{Form::open(['class' => 'form float-right', 'method' => 'get', 'name' => 'anidbsearch', 'style' =>'margin-top:-35px;'])}}
 							{{Form::label('title', 'Search:')}}
-                            {{Form::text('title', $animetitle, ['class' => 'form-control', 'style' => 'width: 150px;', 'id'=> 'title appendedInputButton',
+                            {{Form::text('title', $animetitle, ['class' => 'form-inline', 'style' => 'width: 150px;', 'id'=> 'title appendedInputButton',
                             'placeholder' => 'Search here'])}}
                             {{Form::button('Search', ['class' => 'btn btn-success', 'type' => 'submit'])}}
 						{{Form::close()}}

@@ -27,7 +27,7 @@
 				</div>
 				<div class="form-group has-feedback">
 					<input autocomplete="off" id="apikey" name="apikey" value="{$apikey}" type="text"
-						   class="form-control"
+						   class="form-inline"
 						   placeholder="Apikey"/>
 					<span class="glyphicon glyphicon-user form-control-feedback"></span>
 				</div>

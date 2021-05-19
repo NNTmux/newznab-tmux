@@ -311,7 +311,7 @@
             <div class="nav mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                 {{Form::open(['id' => 'headsearch_form', 'class' => 'form-inline mt-2 mt-md-0', 'url' => 'search', 'method' => 'get'])}}
                 <div class="col-md-4">
-                    <select class="form-control mr-sm-2" id="headcat" name="t">
+                    <select class="form-inline mr-sm-2" id="headcat" name="t">
                         <option class="grouping" value="-1">All</option>
                         {foreach $parentcatlist as $parentcat}
                             <option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} class="grouping"
@@ -325,7 +325,7 @@
                 </div>
                 <div class="mr-auto mr-xs-auto mr-lg-auto mr-sm-auto mr-xl-auto">
                     <form class="form-inline mt-2 mt-md-0">
-                        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="headsearch" name="search" value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}">
+                        <input class="form-inline mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="headsearch" name="search" value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}">
                         {{Form::submit('Search', ['class' => 'btn btn-outline-success my-2 my-sm-0', 'id' => 'headsearch_go'])}}
                     </form>
                 </div>
