@@ -77,18 +77,18 @@
         <div class="btn-group">
             <button type="button"
                     class="nzb_multi_operations_download btn btn-sm btn-success"
-                    data-bs-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+                    data-bs-toggle="tooltip" data-bs-placement="top" title data-original-title="Download NZBs">
                 <i class="fa fa-cloud-download"></i></button>
             <button type="button"
                     class="nzb_multi_operations_cart btn btn-sm btn-info"
-                    data-bs-toggle="tooltip" data-placement="top" title
+                    data-bs-toggle="tooltip" data-bs-placement="top" title
                     data-original-title="Send to my Download Basket">
                 <i class="fa fa-shopping-basket"></i></button>
 
             {if isset($sabintegrated) && $sabintegrated !=""}
                 <button type="button"
                         class="nzb_multi_operations_sab btn btn-sm btn-success"
-                        data-bs-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+                        data-bs-toggle="tooltip" data-bs-placement="top" title data-original-title="Send to Queue">
                     <i class="fa fa-share"></i></button>
             {/if}
             {if isset($isadmin)}
@@ -106,20 +106,20 @@
         <a title="Manage your shows" href="{{route('myshows')}}">My Shows</a> :
         <div class="btn-group">
             {if $myshows.id != ''}
-                <a class="myshows btn btn-sm btn-warning" data-bs-toggle="tooltip" data-placement="top" title
+                <a class="myshows btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title
                    data-original-title="Edit Categories for this show"
                    href="{{url("/myshows?action=edit&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="edit" name="series{$show.id}">
                     <i class="fa fa-pencil"></i>
                 </a>
-                <a class="myshows btn btn-sm btn-danger" data-bs-toggle="tooltip" data-placement="top" title
+                <a class="myshows btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title
                    data-original-title="Remove from My Shows"
                    href="{{url("/myshows?action=delete&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="remove" name="series{$show.id}">
                     <i class="fa fa-minus"></i>
                 </a>
             {else}
-                <a class="myshows btn btn-sm btn-success" data-bs-toggle="tooltip" data-placement="top" title
+                <a class="myshows btn btn-sm btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title
                    data-original-title="Add to My Shows"
                    href="{{url("/myshows?action=add&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="add" name="series{$show.id}">
@@ -214,26 +214,26 @@
                                                 <a href="{{url("/getnzb?id={$result->guid}")}}"
                                                    class="icon_nzb text-muted"><i
                                                         class="fa fa-cloud-download text-muted"
-                                                        data-bs-toggle="tooltip" data-placement="top"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                                         title
                                                         data-original-title="Download NZB"></i></a>
                                                 <a href="{{url("/details/{$result->guid}/#comments")}}"><i
                                                         class="fa fa-comments-o text-muted"
-                                                        data-bs-toggle="tooltip" data-placement="top"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                                         title
                                                         data-original-title="Comments"></i></a>
                                                 <a href="#"><i
                                                         id="guid{$result->guid}"
                                                         class="icon_cart text-muted fa fa-shopping-basket"
                                                         data-bs-toggle="tooltip"
-                                                        data-placement="top" title
+                                                        data-bs-placement="top" title
                                                         data-original-title="Send to my download basket"></i></a>
                                                 {if isset($sabintegrated) && $sabintegrated !=""}
                                                     <a href="#">
                                                         <i id="guid{$result->guid}"
                                                            class="icon_sab text-muted fa fa-share"
                                                            data-bs-toggle="tooltip"
-                                                           data-placement="top" title
+                                                           data-bs-placement="top" title
                                                            data-original-title="Send to my Queue">
                                                         </i>
                                                     </a>
@@ -242,7 +242,7 @@
                                                     <a href="#" class="icon_vortex text-muted"><i
                                                             class="fa fa-share"
                                                             data-bs-toggle="tooltip"
-                                                            data-placement="top"
+                                                            data-bs-placement="top"
                                                             title
                                                             data-original-title="Send to NZBVortex"></i></a>
                                                 {/if}
