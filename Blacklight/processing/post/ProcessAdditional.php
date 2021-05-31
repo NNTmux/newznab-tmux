@@ -2013,22 +2013,20 @@ class ProcessAdditional
                 }
             }
 
-            if (! $newMethod) {
-                // If longer than 60 or we could not get the video length, run the old way.
-                if ($this->ffprobe->isValid($fileLocation)) {
-                    try {
-                        $video = $this->ffmpeg->open($fileLocation);
-                        $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
-                        $format = new Ogg();
-                        $format->setAudioCodec('libvorbis');
-                        $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
-                        $videoSample->save($format, $fileName);
-                    } catch (\InvalidArgumentException $e) {
-                        if (config('app.debug') === true) {
-                            Log::error($e->getTraceAsString());
-                        }
-                        //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+            // If longer than 60 or we could not get the video length, run the old way.
+            if (! $newMethod && $this->ffprobe->isValid($fileLocation)) {
+                try {
+                    $video = $this->ffmpeg->open($fileLocation);
+                    $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
+                    $format = new Ogg();
+                    $format->setAudioCodec('libvorbis');
+                    $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
+                    $videoSample->save($format, $fileName);
+                } catch (\InvalidArgumentException $e) {
+                    if (config('app.debug') === true) {
+                        Log::error($e->getTraceAsString());
                     }
+                    //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                 }
             }
 
