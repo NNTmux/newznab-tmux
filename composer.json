@@ -125,7 +125,7 @@
     "monolog/monolog": "^2.0",
     "nesbot/carbon": "^2.14",
     "pear/net_nntp": "^1.6.0",
-    "php-ffmpeg/php-ffmpeg": "^0.14",
+    "php-ffmpeg/php-ffmpeg": "^0.18",
     "php-http/guzzle7-adapter": "^0.1",
     "php-http/message": "^1.6",
     "pragmarx/google2fa-laravel": "^1.4",
