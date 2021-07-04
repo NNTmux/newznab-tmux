@@ -15,10 +15,10 @@
         "axios": "^0.21.1",
         "cross-env": "^7.0.3",
         "jquery": "3.6.0",
-        "laravel-mix": "^6.0.20",
+        "laravel-mix": "^6.0.25",
         "lodash": "^4.17.21",
         "popper.js": "^1.16.1",
-        "prettier": "^2.3.1",
+        "prettier": "^2.3.2",
         "resolve-url-loader": "^4.0.0",
         "vue": "^2.6.14"
     },
@@ -26,8 +26,8 @@
         "@fancyapps/fancybox": "^3.5.7",
         "@fortawesome/fontawesome-free": "^5.15.3",
         "animate.css": "^4.1.1",
-        "autosize": "^5.0.0",
-        "bootstrap": "^5.0.1",
+        "autosize": "^5.0.1",
+        "bootstrap": "^5.0.2",
         "bootstrap-datepicker": "^1.9.0",
         "bootstrap-hover-dropdown": "^2.2.1",
         "bootstrap-progressbar": "^0.9.0",
@@ -41,6 +41,6 @@
         "normalize.css": "^8.0.1",
         "pace-js": "^1.2.4",
         "pnotify": "^4.0.1",
-        "tinymce": "^5.8.1"
+        "tinymce": "^5.8.2"
     }
 }
