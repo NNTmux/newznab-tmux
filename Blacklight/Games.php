@@ -597,9 +597,9 @@ class Games
                             $publishers = [];
                             if (! empty($this->_gameResults->involved_companies)) {
                                 foreach ($this->_gameResults->involved_companies as $publisher) {
-                                    if ($publisher->publisher === true) {
-                                        $company = Company::find($publisher->company);
-                                        $publishers[] = $company->name;
+                                    if ($publisher['publisher'] === true) {
+                                        $company = Company::find($publisher['company']);
+                                        $publishers[] = $company['name'];
                                     }
                                 }
                             }
@@ -608,7 +608,7 @@ class Games
 
                             if (! empty($this->_gameResults->themes)) {
                                 foreach ($this->_gameResults->themes as $theme) {
-                                    $genres[] = $theme->name;
+                                    $genres[] = $theme['name'];
                                 }
                             }
 
