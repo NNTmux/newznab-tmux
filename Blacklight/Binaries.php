@@ -665,7 +665,7 @@ class Binaries
                 continue;
             }
 
-            if (! isset($header['Bytes'])) {
+            if (! isset($header['Bytes']) || ! $header('Bytes')) {
                 $header['Bytes'] = (isset($this->header[':bytes']) ? $header[':bytes'] : 0);
             }
 
