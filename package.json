@@ -24,7 +24,7 @@
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
-        "@fortawesome/fontawesome-free": "^5.15.3",
+        "@fortawesome/fontawesome-free": "^5.15.4",
         "animate.css": "^4.1.1",
         "autosize": "^5.0.1",
         "bootstrap": "^5.1.0",
