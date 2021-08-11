@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7648ef682a80fac49ffed9f87f4c9c61",
+    "content-hash": "ea0f34af782c56920798d4b9b8ab2a2b",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -279,16 +279,16 @@
         },
         {
             "name": "bhuvidya/laravel-countries",
-            "version": "v1.0.7",
+            "version": "v8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bhuvidya/laravel-countries.git",
-                "reference": "f1ca893c9f87f4189cb71c3574604229b5c5a645"
+                "reference": "2002f8e8954b558a22f623eda641d467a97c67d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/f1ca893c9f87f4189cb71c3574604229b5c5a645",
-                "reference": "f1ca893c9f87f4189cb71c3574604229b5c5a645",
+                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/2002f8e8954b558a22f623eda641d467a97c67d0",
+                "reference": "2002f8e8954b558a22f623eda641d467a97c67d0",
                 "shasum": ""
             },
             "require": {
@@ -332,7 +332,7 @@
                 "issues": "https://github.com/bhuvidya/laravel-countries/issues",
                 "source": "https://github.com/bhuvidya/laravel-countries"
             },
-            "time": "2020-09-07T03:09:18+00:00"
+            "time": "2020-09-17T12:02:06+00:00"
         },
         {
             "name": "brick/math",

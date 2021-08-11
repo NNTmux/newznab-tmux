@@ -81,7 +81,7 @@
     "aharen/omdbapi": "^2.0",
     "anhskohbo/no-captcha": "^3.0",
     "b3rs3rk/steamfront": "dev-master",
-    "bhuvidya/laravel-countries": "^1.0",
+    "bhuvidya/laravel-countries": "^8.0",
     "brick/math": "^0.8.9",
     "canihavesomecoffee/thetvdbapi": "^1.0",
     "cviebrock/laravel-elasticsearch": "^8.0",
