@@ -85,7 +85,7 @@
     "brick/math": "^0.8.9",
     "canihavesomecoffee/thetvdbapi": "^1.0",
     "cviebrock/laravel-elasticsearch": "^8.0",
-    "czproject/git-php": "^3.14",
+    "czproject/git-php": "^4.0",
     "dariusiii/l5-fixtures": "^2.2.0",
     "dariusiii/laravel-database-trigger": "^2.0",
     "dariusiii/php-itunes-api": "^1.0",

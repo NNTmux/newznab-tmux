@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea0f34af782c56920798d4b9b8ab2a2b",
+    "content-hash": "f29327408a67856a49c0468b961b6b12",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -987,23 +987,23 @@
         },
         {
             "name": "czproject/git-php",
-            "version": "v3.18.2",
+            "version": "v4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/czproject/git-php.git",
-                "reference": "cb3bfc6f1e487e572870afae5d52ef3c7d250d8a"
+                "reference": "32505124ef2a8651f10a5afebace58f85eff2f93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/czproject/git-php/zipball/cb3bfc6f1e487e572870afae5d52ef3c7d250d8a",
-                "reference": "cb3bfc6f1e487e572870afae5d52ef3c7d250d8a",
+                "url": "https://api.github.com/repos/czproject/git-php/zipball/32505124ef2a8651f10a5afebace58f85eff2f93",
+                "reference": "32505124ef2a8651f10a5afebace58f85eff2f93",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.6.0"
             },
             "require-dev": {
-                "nette/tester": "^1.1"
+                "nette/tester": "^2.0"
             },
             "type": "library",
             "autoload": {
@@ -1027,9 +1027,15 @@
             ],
             "support": {
                 "issues": "https://github.com/czproject/git-php/issues",
-                "source": "https://github.com/czproject/git-php/tree/v3.18.2"
+                "source": "https://github.com/czproject/git-php/tree/v4.0.2"
             },
-            "time": "2021-02-15T11:41:33+00:00"
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/donate?hosted_button_id=EPSKR7MGVV7KC",
+                    "type": "custom"
+                }
+            ],
+            "time": "2021-06-15T09:39:16+00:00"
         },
         {
             "name": "dariusiii/l5-fixtures",
