@@ -41,15 +41,21 @@ class SearchController extends BasePageController
             ]
         );
 
-        if ($searchType === 'basic' && $request->missing('searchadvr') && ($request->has('id') || $request->has('subject'))) {
+        dump($request->all());
+
+        if ($searchType === 'basic' && $request->missing('searchadvr') && ($request->has('id') || $request->has('subject') || $request->has('search'))) {
             $searchString = [];
             switch (true) {
-                case $request->has('subject'):
+                case $request->filled('subject'):
                     $searchString['searchname'] = (string) $request->input('subject');
                     $this->smarty->assign('subject', $searchString['searchname']);
                     break;
-                case $request->has('id'):
+                case $request->filled('id'):
                     $searchString['searchname'] = (string) $request->input('id');
+                    $this->smarty->assign('id', $searchString['searchname']);
+                    break;
+                case $request->filled('search'):
+                    $searchString['searchname'] = (string) $request->input('search');
                     $this->smarty->assign('search', $searchString['searchname']);
                     break;
             }
