@@ -41,8 +41,6 @@ class SearchController extends BasePageController
             ]
         );
 
-        dump($request->all());
-
         if ($searchType === 'basic' && $request->missing('searchadvr') && ($request->has('id') || $request->has('subject') || $request->has('search'))) {
             $searchString = [];
             switch (true) {
