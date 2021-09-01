@@ -623,11 +623,11 @@ class Games
                                 'title' => $this->_gameResults->name,
                                 'asin' => $this->_gameResults->id,
                                 'review' => $this->_gameResults->summary ?? '',
-                                'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover->url : '',
+                                'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover['url'] : '',
                                 'releasedate' => $releaseDate,
                                 'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating).'%' : 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',
-                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]->url) : '',
+                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]['url']) : '',
                                 'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             ];
                         } else {
