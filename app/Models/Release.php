@@ -6,6 +6,7 @@ use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Conner\Tagging\Taggable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -144,6 +145,7 @@ use Illuminate\Support\Facades\DB;
 class Release extends Model
 {
     use Taggable;
+    use HasFactory;
 
     /**
      * @var bool

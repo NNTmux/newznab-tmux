@@ -199,11 +199,10 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-light btn-xs icon_cart text-muted"
-																		  id="guid{$mguid[$m@index]}"
+                                                                    <a href="{{url("/cart/add?id={$mguid[$m@index]}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs text-muted"
 																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
-																				class="fa fa-shopping-basket"></i></span>
+                                                                                class="fa fa-shopping-basket"></i></span></a>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
@@ -366,11 +365,10 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-success btn-xs icon_cart text-muted"
-																		  id="guid{$mguid[$m@index]}"
+                                                                    <a href="{{url("/cart/add?id={$mguid[$m@index]}")}}" target="_blank"><span class="btn btn-hover btn-success btn-xs text-muted"
 																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
-																				class="fa fa-shopping-basket"></i></span>
+                                                                                class="fa fa-shopping-basket"></i></span></a>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"

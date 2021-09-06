@@ -239,11 +239,9 @@
 											<a class="btn btn-light btn-sm btn-success btn-transparent"
 											   href="{{url("/getnzb?id={$release.guid}")}}"><i
 														class="fa fa-cloud-download"></i> Download</a>
-											<button type="button"
-													class="btn btn-success btn-sm btn-info btn-transparent cartadd">
-												<i class="icon_cart fa fa-shopping-basket guid"
-												   id="guid{$release.guid}"></i> Add to Cart
-											</button>
+                                            <a class="btn btn-success btn-sm btn-info btn-transparent"
+                                                href="{{url("/cart/add?id={$release.guid}")}}" target="_blank">
+                                                        <i class="fa fa-shopping-basket guid"></i> Add to Cart</a>
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
 														class="btn btn-success btn-sm btn-transparent sabsend">

@@ -175,12 +175,10 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge bg-info"> {$result->comments}
 																			Comment{if $result->comments != 1}s{/if}</span></a>
-																	<span
-																			id="guid{$result->guid}"
-																			class="btn btn-hover btn-light btn-xs icon_cart text-muted"
+                                                                    <a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs text-muted"
 																			title="Send to my Download Basket">
 																	<i class="fa fa-shopping-basket"></i>
-															</span>
+                                                                        </span></a>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span
 																				id="guid{$result->guid}"

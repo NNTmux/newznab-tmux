@@ -182,9 +182,9 @@
 															class="fa fa-comments-o text-muted"
 															data-bs-toggle="tooltip" data-bs-placement="top" title
 															data-original-title="Comments"></i></a>
-												<a href="#"><i
+												<a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><i
 															id="guid{$result->guid}"
-															class="icon_cart text-muted fa fa-shopping-basket"
+															class="text-muted fa fa-shopping-basket"
 															data-bs-toggle="tooltip"
 															data-bs-placement="top" title
 															data-original-title="Send to my download basket"></i></a>
