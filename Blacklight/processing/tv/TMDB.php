@@ -220,7 +220,7 @@ class TMDB extends TV
 
         try {
             $response = TmdbClient::getSearchApi()->searchTv($cleanName);
-        } catch (TmdbApiException | \ErrorException $e) {
+        } catch (TmdbApiException|\ErrorException $e) {
             return false;
         }
 
