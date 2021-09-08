@@ -781,7 +781,7 @@ class Movie
 
         try {
             $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
-        } catch (TmdbApiException | \ErrorException $error) {
+        } catch (TmdbApiException|\ErrorException $error) {
             if (Utility::isCLI()) {
                 $this->colorCli->error($error->getMessage());
             }
@@ -1277,7 +1277,7 @@ class Movie
                         } else {
                             $movieUpdated = false;
                         }
-                    } catch (TmdbApiException | \ErrorException $error) {
+                    } catch (TmdbApiException|\ErrorException $error) {
                         $movieUpdated = false;
                     }
                 }
