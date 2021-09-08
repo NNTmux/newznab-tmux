@@ -3,6 +3,7 @@
 namespace Blacklight\processing\post;
 
 use App\Models\Category;
+use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Models\Settings;
@@ -28,6 +29,7 @@ use FFMpeg\FFProbe;
 use FFMpeg\Filters\Video\ResizeFilter;
 use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Format\Video\Ogg;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -1078,6 +1080,24 @@ class ProcessAdditional
             $this->_passwordStatus = Releases::PASSWD_RAR;
 
             return false;
+        }
+
+        if ($this->_reverse) {
+            $fileData = $dataSummary['file_list'] ?? [];
+            $rarFileName = Arr::pluck($fileData, 'name');
+            if (preg_match(NameFixer::PREDB_REGEX, $rarFileName[0], $hit)) {
+                $preCheck = Predb::whereTitle($hit[0])->first();
+                $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
+                (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($hit[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', 1, true, $this->_release->preid);
+            } elseif (! empty($dataSummary['archives']) && ! empty($dataSummary['archives'][$rarFileName[0]]['file_list'])) {
+                $archiveData = $dataSummary['archives'][$rarFileName[0]]['file_list'];
+                $archiveFileName = Arr::pluck($archiveData, 'name');
+                if (preg_match(NameFixer::PREDB_REGEX, $archiveFileName[0], $match2)) {
+                    $preCheck = Predb::whereTitle($match2[0])->first();
+                    $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
+                    (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($match2[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', 1, true, $this->_release->preid);
+                }
+            }
         }
 
         switch ($dataSummary['main_type']) {
