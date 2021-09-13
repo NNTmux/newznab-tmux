@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    ruhllatio
  * @copyright 2016 nZEDb
  */
@@ -38,7 +39,8 @@ class API extends Capabilities
     public $getRequest;
 
     /**
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -55,7 +57,8 @@ class API extends Capabilities
 
     /**
      * Add language from media info XML to release search names (Used by API).
-     * @param array $releases
+     *
+     * @param  array  $releases
      */
     public function addLanguage(&$releases): void
     {
@@ -94,6 +97,7 @@ class API extends Capabilities
 
     /**
      * Verify cat parameter.
+     *
      * @return array
      */
     public function categoryID(): array
@@ -115,6 +119,7 @@ class API extends Capabilities
      * Verify groupName parameter.
      *
      * @return mixed
+     *
      * @throws \Exception
      */
     public function group()
@@ -132,6 +137,7 @@ class API extends Capabilities
 
     /**
      * Verify limit parameter.
+     *
      * @return int
      */
     public function limit(): int
@@ -146,6 +152,7 @@ class API extends Capabilities
 
     /**
      * Verify offset parameter.
+     *
      * @return int
      */
     public function offset(): int
@@ -160,7 +167,8 @@ class API extends Capabilities
 
     /**
      * Check if a parameter is empty.
-     * @param string $parameter
+     *
+     * @param  string  $parameter
      */
     public function verifyEmptyParameter($parameter): void
     {
@@ -171,7 +179,7 @@ class API extends Capabilities
 
     /**
      * @param $releases
-     * @param callable $getCoverURL
+     * @param  callable  $getCoverURL
      */
     public function addCoverURL(&$releases, callable $getCoverURL): void
     {

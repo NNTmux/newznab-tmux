@@ -38,6 +38,7 @@ class Releases extends Release
 
     /**
      * @var array Class instances.
+     *
      * @throws \Exception
      */
     public function __construct()
@@ -51,17 +52,16 @@ class Releases extends Release
      * Used for Browse results.
      *
      *
-     * @param       $page
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
-     * @param int   $maxAge
-     * @param array $excludedCats
-     * @param array $tags
-     * @param int   $groupName
-     * @param int   $minSize
-     *
+     * @param  $page
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @param  array  $tags
+     * @param  int  $groupName
+     * @param  int  $minSize
      * @return Collection|mixed
      */
     public function getBrowseRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0, array $tags = [])
@@ -129,13 +129,11 @@ class Releases extends Release
     /**
      * Used for pager on browse page.
      *
-     * @param array      $cat
-     * @param int        $maxAge
-     * @param array      $excludedCats
-     * @param string|int $groupName
-     *
-     * @param array      $tags
-     *
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @param  string|int  $groupName
+     * @param  array  $tags
      * @return int
      */
     public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = '', array $tags = []): int
@@ -181,8 +179,7 @@ class Releases extends Release
     /**
      * Use to order releases on site.
      *
-     * @param string|array $orderBy
-     *
+     * @param  string|array  $orderBy
      * @return array
      */
     public function getBrowseOrder($orderBy): array
@@ -240,10 +237,9 @@ class Releases extends Release
      * Get list of releases available for export.
      *
      *
-     * @param string $postFrom
-     * @param string $postTo
-     * @param string $groupID
-     *
+     * @param  string  $postFrom
+     * @param  string  $postTo
+     * @param  string  $groupID
      * @return Collection|\Illuminate\Support\Collection|static[]
      */
     public function getForExport($postFrom = '', $postTo = '', $groupID = '')
@@ -281,6 +277,7 @@ class Releases extends Release
      * Get date in this format : 01/01/2014 of the oldest release.
      *
      * @note Used for exporting NZBs.
+     *
      * @return mixed
      */
     public function getEarliestUsenetPostDate()
@@ -294,6 +291,7 @@ class Releases extends Release
      * Get date in this format : 01/01/2014 of the newest release.
      *
      * @note Used for exporting NZBs.
+     *
      * @return mixed
      */
     public function getLatestUsenetPostDate()
@@ -306,9 +304,10 @@ class Releases extends Release
     /**
      * Gets all groups for drop down selection on NZB-Export web page.
      *
-     * @param bool $blnIncludeAll
+     * @param  bool  $blnIncludeAll
      *
      * @note Used for exporting NZBs.
+     *
      * @return array
      */
     public function getReleasedGroupsForSelect($blnIncludeAll = true): array
@@ -338,8 +337,8 @@ class Releases extends Release
      * @param $offset
      * @param $limit
      * @param $orderBy
-     * @param int $maxAge
-     * @param array $excludedCats
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
      * @return Collection|mixed
      */
     public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = [])
@@ -383,10 +382,9 @@ class Releases extends Release
     /**
      * Get count for my shows page pagination.
      *
-     * @param       $userShows
-     * @param int   $maxAge
-     * @param array $excludedCats
-     *
+     * @param  $userShows
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
      * @return int
      */
     public function getShowsCount($userShows, $maxAge = -1, array $excludedCats = []): int
@@ -414,7 +412,8 @@ class Releases extends Release
     /**
      * Delete multiple releases, or a single by ID.
      *
-     * @param array|int|string $list   Array of GUID or ID of releases to delete.
+     * @param  array|int|string  $list  Array of GUID or ID of releases to delete.
+     *
      * @throws \Exception
      */
     public function deleteMultiple($list): void
@@ -432,10 +431,10 @@ class Releases extends Release
     /**
      * Deletes a single release by GUID, and all the corresponding files.
      *
-     * @param array                    $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
-     *                                              false)]
-     * @param \Blacklight\NZB          $nzb
-     * @param \Blacklight\ReleaseImage $releaseImage
+     * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
+     *                              false)]
+     * @param  \Blacklight\NZB  $nzb
+     * @param  \Blacklight\ReleaseImage  $releaseImage
      *
      * @throws \Exception
      */
@@ -509,9 +508,8 @@ class Releases extends Release
     /**
      * Creates part of a query for some functions.
      *
-     * @param array|Collection  $userQuery
-     * @param string $type
-     *
+     * @param  array|Collection  $userQuery
+     * @param  string  $type
      * @return string
      */
     public function uSQL($userQuery, $type): string
@@ -538,23 +536,23 @@ class Releases extends Release
      * Function for searching on the site (by subject, searchname or advanced).
      *
      *
-     * @param array $searchArr
-     * @param              $groupName
-     * @param              $sizeFrom
-     * @param              $sizeTo
-     * @param              $daysNew
-     * @param              $daysOld
-     * @param int $offset
-     * @param int $limit
-     * @param string|array $orderBy
-     * @param int $maxAge
-     * @param array $excludedCats
-     * @param string $type
-     * @param array $cat
-     * @param int $minSize
-     * @param array $tags
-     *
+     * @param  array  $searchArr
+     * @param  $groupName
+     * @param  $sizeFrom
+     * @param  $sizeTo
+     * @param  $daysNew
+     * @param  $daysOld
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string|array  $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @param  string  $type
+     * @param  array  $cat
+     * @param  int  $minSize
+     * @param  array  $tags
      * @return array|Collection|mixed
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -678,17 +676,17 @@ class Releases extends Release
      * Search function for API.
      *
      *
-     * @param       $searchName
-     * @param       $groupName
-     * @param int $offset
-     * @param int $limit
-     * @param int $maxAge
-     * @param array $excludedCats
-     * @param array $cat
-     * @param int $minSize
-     * @param array $tags
-     *
+     * @param  $searchName
+     * @param  $groupName
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @param  array  $cat
+     * @param  int  $minSize
+     * @param  array  $tags
      * @return Collection|mixed
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -771,19 +769,20 @@ class Releases extends Release
      * Search TV Shows via API.
      *
      *
-     * @param array $siteIdArr
-     * @param string $series
-     * @param string $episode
-     * @param string $airDate
-     * @param int $offset
-     * @param int $limit
-     * @param string $name
-     * @param array $cat
-     * @param int $maxAge
-     * @param int $minSize
-     * @param array $excludedCategories
-     * @param array $tags
+     * @param  array  $siteIdArr
+     * @param  string  $series
+     * @param  string  $episode
+     * @param  string  $airDate
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  int  $minSize
+     * @param  array  $excludedCategories
+     * @param  array  $tags
      * @return Collection|mixed
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -920,19 +919,20 @@ class Releases extends Release
      * Search TV Shows via APIv2.
      *
      *
-     * @param array $siteIdArr
-     * @param string $series
-     * @param string $episode
-     * @param string $airDate
-     * @param int $offset
-     * @param int $limit
-     * @param string $name
-     * @param array $cat
-     * @param int $maxAge
-     * @param int $minSize
-     * @param array $excludedCategories
-     * @param array $tags
+     * @param  array  $siteIdArr
+     * @param  string  $series
+     * @param  string  $episode
+     * @param  string  $airDate
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  int  $minSize
+     * @param  array  $excludedCategories
+     * @param  array  $tags
      * @return Collection|mixed
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -1064,13 +1064,14 @@ class Releases extends Release
      *
      *
      * @param $aniDbID
-     * @param int $offset
-     * @param int $limit
-     * @param string $name
-     * @param array $cat
-     * @param int $maxAge
-     * @param array $excludedCategories
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  array  $excludedCategories
      * @return Collection|mixed
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -1142,18 +1143,19 @@ class Releases extends Release
      * Movies search through API and site.
      *
      *
-     * @param int $imDbId
-     * @param int $tmDbId
-     * @param int $traktId
-     * @param int $offset
-     * @param int $limit
-     * @param string $name
-     * @param array $cat
-     * @param int $maxAge
-     * @param int $minSize
-     * @param array $excludedCategories
-     * @param array $tags
+     * @param  int  $imDbId
+     * @param  int  $tmDbId
+     * @param  int  $traktId
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  int  $minSize
+     * @param  array  $excludedCategories
+     * @param  array  $tags
      * @return Collection|mixed
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -1230,8 +1232,9 @@ class Releases extends Release
     /**
      * @param $currentID
      * @param $name
-     * @param array $excludedCats
+     * @param  array  $excludedCats
      * @return array|bool
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -1265,8 +1268,7 @@ class Releases extends Release
      * Get count of releases for pager.
      *
      *
-     * @param string $query The query to get the count from.
-     *
+     * @param  string  $query  The query to get the count from.
      * @return int
      */
     private function getPagerCount($query): int

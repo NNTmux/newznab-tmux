@@ -71,8 +71,7 @@ class ReleaseImage
     }
 
     /**
-     * @param        $imgLoc
-     *
+     * @param  $imgLoc
      * @return bool|\Intervention\Image\Image
      */
     protected function fetchImage($imgLoc)
@@ -105,14 +104,12 @@ class ReleaseImage
     /**
      * Save an image to disk, optionally resizing it.
      *
-     * @param string $imgName      What to name the new image.
-     * @param string $imgLoc       URL or location on the disk the original image is in.
-     * @param string $imgSavePath  Folder to save the new image in.
-     * @param string $imgMaxWidth  Max width to resize image to.   (OPTIONAL)
-     * @param string $imgMaxHeight Max height to resize image to.  (OPTIONAL)
-     * @param bool   $saveThumb    Save a thumbnail of this image? (OPTIONAL)
-     *
-     *
+     * @param  string  $imgName  What to name the new image.
+     * @param  string  $imgLoc  URL or location on the disk the original image is in.
+     * @param  string  $imgSavePath  Folder to save the new image in.
+     * @param  string  $imgMaxWidth  Max width to resize image to.   (OPTIONAL)
+     * @param  string  $imgMaxHeight  Max height to resize image to.  (OPTIONAL)
+     * @param  bool  $saveThumb  Save a thumbnail of this image? (OPTIONAL)
      * @return int 1 on success, 0 on failure Used on site to check if there is an image.
      */
     public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false): int
@@ -157,8 +154,7 @@ class ReleaseImage
     /**
      * Delete images for the release.
      *
-     * @param string $guid The GUID of the release.
-     *
+     * @param  string  $guid  The GUID of the release.
      * @return void
      */
     public function delete($guid): void

@@ -13,6 +13,7 @@
  * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    niel
  * @copyright 2016 nZEDb
  */
@@ -47,7 +48,8 @@ class Git
     /**
      * Git constructor.
      *
-     * @param array $config
+     * @param  array  $config
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function __construct(array $config = [])
@@ -76,8 +78,8 @@ class Git
 
     /**
      * @param $options
-     *
      * @return string[]
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function describe($options)
@@ -123,6 +125,7 @@ class Git
 
     /**
      * @return \CzProject\GitPhp\CommitId
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function getHeadHash()
@@ -134,8 +137,8 @@ class Git
      * Determine if the supplied object is commited to the repository or not.
      *
      * @param $gitObject
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function isCommited($gitObject)
@@ -161,7 +164,6 @@ class Git
 
     /**
      * @param $branch
-     *
      * @return bool
      */
     public function isStable($branch)
@@ -180,9 +182,9 @@ class Git
     /**
      * Run the log command.
      *
-     * @param null $options
-     *
+     * @param  null  $options
      * @return string
+     *
      * @throws \Symfony\Component\Process\Exception\LogicException
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
@@ -195,9 +197,9 @@ class Git
     }
 
     /**
-     * @param array $options
-     *
+     * @param  array  $options
      * @return string[]
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function gitPull(array $options = [])
@@ -216,9 +218,9 @@ class Git
      * Accepts a git command to run.
      *
      *
-     * @param string $command Command to run
-     *
+     * @param  string  $command  Command to run
      * @return string|string[]
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function gitRun($command)
@@ -229,9 +231,9 @@ class Git
     /**
      * Run the tag command.
      *
-     * @param string $options
-     *
+     * @param  string  $options
      * @return string
+     *
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      * @throws \Symfony\Component\Process\Exception\LogicException
      */
@@ -244,9 +246,9 @@ class Git
     }
 
     /**
-     * @param bool $cached
-     *
+     * @param  bool  $cached
      * @return string
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function tagLatest($cached = true)

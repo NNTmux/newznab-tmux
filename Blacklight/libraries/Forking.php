@@ -138,8 +138,8 @@ class Forking
      * Setup the class to work on a type of work, then process the work.
      * Valid work types:.
      *
-     * @param string $type The type of multiProcessing to do : backfill, binaries, releases, postprocess
-     * @param array $options Array containing arguments for the type of work.
+     * @param  string  $type  The type of multiProcessing to do : backfill, binaries, releases, postprocess
+     * @param  array  $options  Array containing arguments for the type of work.
      *
      * @throws \Exception
      */
@@ -649,8 +649,8 @@ class Forking
      * Only 1 exit method is used for post process, since they are all similar.
      *
      *
-     * @param array $releases
-     * @param int   $maxProcess
+     * @param  array  $releases
+     * @param  int  $maxProcess
      */
     public function postProcess($releases, $maxProcess)
     {
@@ -734,6 +734,7 @@ class Forking
      * Check if we should process NFO's.
      *
      * @return bool
+     *
      * @throws \Exception
      */
     private function checkProcessNfo(): bool
@@ -774,6 +775,7 @@ class Forking
 
     /**
      * @return bool
+     *
      * @throws \Exception
      */
     private function checkProcessMovies(): bool
@@ -825,7 +827,9 @@ class Forking
 
     /**
      * Check if we should process TV's.
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     private function checkProcessTV()
@@ -879,7 +883,9 @@ class Forking
 
     /**
      * Process sharing.
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     private function processSharing()
@@ -952,7 +958,7 @@ class Forking
     /**
      * Execute a shell command.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     protected function _executeCommand($command)
@@ -971,7 +977,7 @@ class Forking
     /**
      * Echo a message to CLI.
      *
-     * @param string $message
+     * @param  string  $message
      */
     public function logger($message)
     {
@@ -983,7 +989,7 @@ class Forking
     /**
      * This method is executed whenever a child is finished doing work.
      *
-     * @param string $pid        The PID numbers.
+     * @param  string  $pid  The PID numbers.
      */
     public function exit($pid)
     {

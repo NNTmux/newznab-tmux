@@ -14,12 +14,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \App\Models\Release $release
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease query()
@@ -57,7 +59,6 @@ class UsersRelease extends Model
     /**
      * @param $uid
      * @param $releaseid
-     *
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addCart($uid, $releaseid)

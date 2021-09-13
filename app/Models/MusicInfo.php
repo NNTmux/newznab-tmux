@@ -24,6 +24,7 @@ use Laravel\Scout\Searchable;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \App\Models\Genre|null $genre
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereArtist($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereAsin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereCover($value)
@@ -40,6 +41,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereYear($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo query()

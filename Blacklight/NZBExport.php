@@ -39,7 +39,7 @@ class NZBExport
     /**
      * NZBExport constructor.
      *
-     * @param array $options
+     * @param  array  $options
      *
      * @throws \Exception
      */
@@ -62,7 +62,6 @@ class NZBExport
 
     /**
      * @param $params
-     *
      * @return bool|string
      */
     public function beginExport($params)
@@ -214,7 +213,6 @@ class NZBExport
 
     /**
      * @param $date
-     *
      * @return bool
      */
     protected function checkDate($date): bool
@@ -242,7 +240,6 @@ class NZBExport
 
     /**
      * @param $filename
-     *
      * @return string
      */
     protected function safeFilename($filename): string

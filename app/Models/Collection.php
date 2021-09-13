@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $filesize
  * @property int|null $releases_id
  * @property string $noise
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereAdded($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereCollectionRegexesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereCollectionhash($value)
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereTotalfiles($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereXref($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection query()

@@ -101,7 +101,6 @@ class BasePageController extends Controller
      * @param $page
      * @param $path
      * @param $reqQuery
-     *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function paginate($query, $totalCount, $items, $page, $path, $reqQuery): LengthAwarePaginator
@@ -158,7 +157,6 @@ class BasePageController extends Controller
      * Show 404 page.
      *
      * @param $message
-     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show404($message = null)
@@ -211,7 +209,7 @@ class BasePageController extends Controller
     }
 
     /**
-     * @param string $retry
+     * @param  string  $retry
      */
     public function show429($retry = '')
     {

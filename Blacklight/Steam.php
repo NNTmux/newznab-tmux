@@ -41,7 +41,8 @@ class Steam
     /**
      * Steam constructor.
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -62,8 +63,7 @@ class Steam
     /**
      * Gets all Information for the game.
      *
-     * @param int $appID
-     *
+     * @param  int  $appID
      * @return array|false
      */
     public function getAll($appID)
@@ -97,9 +97,9 @@ class Steam
     /**
      * Searches Steam Apps table for best title match -- prefers 100% match but returns highest over 90%.
      *
-     * @param string $searchTerm The parsed game name from the release searchname
-     *
+     * @param  string  $searchTerm  The parsed game name from the release searchname
      * @return false|int $bestMatch The Best match from the given search term
+     *
      * @throws \Exception
      */
     public function search($searchTerm)

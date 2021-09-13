@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class AdminReleaseNamingRegexesController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */
@@ -34,9 +34,9 @@ class AdminReleaseNamingRegexesController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -102,7 +102,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */

@@ -46,7 +46,8 @@ class AniDB
     protected $colorCli;
 
     /**
-     * @param array $options Class instances / Echo to cli.
+     * @param  array  $options  Class instances / Echo to cli.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -117,7 +118,7 @@ class AniDB
      * Selects episode info for a local match.
      *
      * @param $anidbId
-     * @param int $episode
+     * @param  int  $episode
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     private function checkAniDBInfo($anidbId, $episode = -1)
@@ -151,8 +152,7 @@ class AniDB
     /**
      * Extracts anime title and episode info from release searchname.
      *
-     * @param string $cleanName
-     *
+     * @param  string  $cleanName
      * @return array $hits
      */
     private function extractTitleEpisode($cleanName = ''): array
@@ -193,8 +193,7 @@ class AniDB
      * Retrieves AniDB Info using a cleaned name.
      *
      *
-     * @param string $searchName
-     *
+     * @param  string  $searchName
      * @return mixed
      */
     private function getAnidbByName($searchName = '')
@@ -216,8 +215,8 @@ class AniDB
      *
      *
      * @param $release
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     private function matchAnimeRelease($release): bool
@@ -302,7 +301,6 @@ class AniDB
      *
      *
      * @param $anidbId
-     *
      * @return mixed
      */
     private function updateTimeCheck($anidbId)

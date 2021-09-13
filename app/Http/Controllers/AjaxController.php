@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 class AjaxController extends BasePageController
 {
     /**
-     * @param Request $request
+     * @param  Request  $request
+     *
      * @throws \Exception
      */
     public function profile(Request $request)

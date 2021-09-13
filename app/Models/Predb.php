@@ -30,6 +30,7 @@ use Laravel\Scout\Searchable;
  * @property string|null $files How many files does this pre have ?
  * @property string $filename
  * @property bool $searched
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereCategory($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereFilename($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereFiles($value)
@@ -45,6 +46,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereTitle($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb query()
@@ -94,7 +96,8 @@ class Predb extends Model
     /**
      * Attempts to match PreDB titles to releases.
      *
-     * @param string|int|bool $dateLimit
+     * @param  string|int|bool  $dateLimit
+     *
      * @throws \RuntimeException
      */
     public static function checkPre($dateLimit = false): void
@@ -144,8 +147,7 @@ class Predb extends Model
     /**
      * Try to match a single release to a PreDB title when the release is created.
      *
-     * @param string $cleanerName
-     *
+     * @param  string  $cleanerName
      * @return array|false Array with title/id from PreDB if found, false if not found.
      */
     public static function matchPre($cleanerName)
@@ -177,9 +179,9 @@ class Predb extends Model
     }
 
     /**
-     * @param string $search
-     *
+     * @param  string  $search
      * @return mixed
+     *
      * @throws \Exception
      */
     public static function getAll($search = '')

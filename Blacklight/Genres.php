@@ -21,7 +21,8 @@ class Genres
     public const STATUS_DISABLED = 1;
 
     /**
-     * @param array $options Class instances.
+     * @param  array  $options  Class instances.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -33,9 +34,8 @@ class Genres
     }
 
     /**
-     * @param string $type
-     * @param bool   $activeOnly
-     *
+     * @param  string  $type
+     * @param  bool  $activeOnly
      * @return array|mixed
      */
     public function getGenres($type = '', $activeOnly = false)
@@ -54,7 +54,6 @@ class Genres
 
     /**
      * @param $type
-     *
      * @return array
      */
     public function loadGenres($type): array
@@ -69,8 +68,8 @@ class Genres
     }
 
     /**
-     * @param string $type
-     * @param bool $activeOnly
+     * @param  string  $type
+     * @param  bool  $activeOnly
      * @return string
      */
     private function getListQuery($type = '', $activeOnly = false): string
@@ -112,11 +111,10 @@ class Genres
     }
 
     /**
-     * @param string $type
-     * @param bool   $activeOnly
-     * @param int    $start
-     * @param int    $num
-     *
+     * @param  string  $type
+     * @param  bool  $activeOnly
+     * @param  int  $start
+     * @param  int  $num
      * @return array
      */
     public function getRange($type = '', $activeOnly = false, $start, $num): array
@@ -128,8 +126,8 @@ class Genres
     }
 
     /**
-     * @param string $type
-     * @param bool $activeOnly
+     * @param  string  $type
+     * @param  bool  $activeOnly
      * @return mixed
      */
     public function getCount($type = '', $activeOnly = false)

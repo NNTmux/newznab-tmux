@@ -16,24 +16,28 @@ class ADM extends AdultMovies
 
     /**
      * Define a cookie file location for curl.
+     *
      * @var string string
      */
     public $cookie = '';
 
     /**
      * Direct Link given from outside url doesn't do a search.
+     *
      * @var string
      */
     protected $directLink = '';
 
     /**
      * Set this for what you are searching for.
+     *
      * @var string
      */
     protected $searchTerm = '';
 
     /**
      * Sets the directurl for the return results array.
+     *
      * @var string
      */
     protected $_directUrl = '';
@@ -52,6 +56,7 @@ class ADM extends AdultMovies
 
     /**
      * Add this to popurl to get results.
+     *
      * @var string
      */
     protected $_trailUrl = '';
@@ -65,6 +70,7 @@ class ADM extends AdultMovies
 
     /**
      * Get Box Cover Images.
+     *
      * @return array - boxcover,backcover
      */
     protected function covers()
@@ -105,8 +111,7 @@ class ADM extends AdultMovies
      * Get Product Information and Director.
      *
      *
-     * @param bool $extras
-     *
+     * @param  bool  $extras
      * @return array
      */
     protected function productInfo($extras = false): array
@@ -130,6 +135,7 @@ class ADM extends AdultMovies
 
     /**
      * Gets the cast members.
+     *
      * @return array
      */
     protected function cast(): array
@@ -154,6 +160,7 @@ class ADM extends AdultMovies
 
     /**
      * Gets categories.
+     *
      * @return array
      */
     protected function genres(): array
@@ -176,7 +183,6 @@ class ADM extends AdultMovies
      * Searches for match against searchterm.
      *
      * @param $movie
-     *
      * @return bool - true if search = 100%
      */
     public function processSite($movie): bool

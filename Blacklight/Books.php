@@ -73,7 +73,7 @@ class Books
     protected $colorCli;
 
     /**
-     * @param array $options Class instances / Echo to cli.
+     * @param  array  $options  Class instances / Echo to cli.
      *
      * @throws \Exception
      */
@@ -104,7 +104,6 @@ class Books
 
     /**
      * @param $id
-     *
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getBookInfo($id)
@@ -114,7 +113,6 @@ class Books
 
     /**
      * @param $title
-     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function getBookInfoByName($title)
@@ -138,14 +136,14 @@ class Books
     }
 
     /**
-     * @param       $page
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderby
-     * @param array $excludedcats
-     *
+     * @param  $page
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderby
+     * @param  array  $excludedcats
      * @return array
+     *
      * @throws \Exception
      */
     public function getBookRange($page, $cat, $start, $num, $orderby, array $excludedcats = []): array
@@ -236,7 +234,6 @@ class Books
 
     /**
      * @param $orderby
-     *
      * @return array
      */
     public function getBookOrder($orderby): array
@@ -422,7 +419,6 @@ class Books
      * @param $release_name
      * @param $releaseID
      * @param $releasetype
-     *
      * @return bool|string
      */
     public function parseTitle($release_name, $releaseID, $releasetype)
@@ -475,10 +471,10 @@ class Books
     }
 
     /**
-     * @param string $bookInfo
-     * @param null   $amazdata
-     *
+     * @param  string  $bookInfo
+     * @param  null  $amazdata
      * @return false|int|string
+     *
      * @throws \Exception
      */
     public function updateBookInfo($bookInfo = '', $amazdata = null)
@@ -569,8 +565,9 @@ class Books
     }
 
     /**
-     * @param string $bookInfo
+     * @param  string  $bookInfo
      * @return array|bool
+     *
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      */
     public function fetchItunesBookProperties(string $bookInfo)

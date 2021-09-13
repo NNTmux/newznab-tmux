@@ -10,9 +10,8 @@ use Illuminate\Support\Arr;
 class BooksController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     *
-     * @param string                   $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id
      *
      * @throws \Exception
      */

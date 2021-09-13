@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\DB;
  * @property bool $backfill
  * @property string|null $description
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereBackfill($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereBackfillTarget($value)
@@ -41,6 +42,7 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinsizetoformrelease($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereName($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup query()
@@ -184,8 +186,7 @@ class UsenetGroup extends Model
     /**
      * Get a group name using its ID.
      *
-     * @param int|string $id The group ID.
-     *
+     * @param  int|string  $id  The group ID.
      * @return string Empty string on failure, groupName on success.
      */
     public static function getNameByID($id): string
@@ -198,8 +199,7 @@ class UsenetGroup extends Model
     /**
      * Get a group ID using its name.
      *
-     * @param string $name The group name.
-     *
+     * @param  string  $name  The group name.
      * @return false|int false on failure, groups_id on success.
      */
     public static function getIDByName($name)
@@ -212,9 +212,8 @@ class UsenetGroup extends Model
     /**
      * Gets a count of all groups in the table limited by parameters.
      *
-     * @param string $groupname Constrain query to specific group name
-     * @param int    $active    Constrain query to active status
-     *
+     * @param  string  $groupname  Constrain query to specific group name
+     * @param  int  $active  Constrain query to active status
      * @return mixed
      */
     public static function getGroupsCount($groupname = '', $active = -1)
@@ -233,9 +232,8 @@ class UsenetGroup extends Model
     }
 
     /**
-     * @param string $groupname
-     * @param null   $active
-     *
+     * @param  string  $groupname
+     * @param  null  $active
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getGroupsRange($groupname = '', $active = null)
@@ -260,7 +258,6 @@ class UsenetGroup extends Model
      *
      *
      * @param $group
-     *
      * @return int
      */
     public static function updateGroup($group)
@@ -284,8 +281,7 @@ class UsenetGroup extends Model
     /**
      * Checks group name is standard and replaces any shorthand prefixes.
      *
-     * @param string $groupName The full name of the usenet group being evaluated
-     *
+     * @param  string  $groupName  The full name of the usenet group being evaluated
      * @return string|bool The name of the group replacing shorthand prefix or false if groupname was malformed
      */
     public static function isValidGroup($groupName)
@@ -327,9 +323,9 @@ class UsenetGroup extends Model
     /**
      * Delete a group.
      *
-     * @param int|string $id ID of the group.
-     *
+     * @param  int|string  $id  ID of the group.
      * @return bool
+     *
      * @throws \Exception
      */
     public static function deleteGroup($id): bool
@@ -342,9 +338,9 @@ class UsenetGroup extends Model
     /**
      * Reset a group.
      *
-     * @param string|int $id The group ID.
-     *
+     * @param  string|int  $id  The group ID.
      * @return bool
+     *
      * @throws \Exception
      */
     public static function reset($id): bool
@@ -395,7 +391,8 @@ class UsenetGroup extends Model
     /**
      * Purge a single group or all groups.
      *
-     * @param int|string|bool $id The group ID. If false, purge all groups.
+     * @param  int|string|bool  $id  The group ID. If false, purge all groups.
+     *
      * @throws \Exception
      */
     public static function purge($id = false)
@@ -432,11 +429,11 @@ class UsenetGroup extends Model
     /**
      * Adds new newsgroups based on a regular expression match against USP available.
      *
-     * @param string $groupList
-     * @param int $active
-     * @param int $backfill
-     *
+     * @param  string  $groupList
+     * @param  int  $active
+     * @param  int  $backfill
      * @return array|string
+     *
      * @throws \Exception
      */
     public static function addBulk($groupList, $active = 1, $backfill = 1)
@@ -487,10 +484,9 @@ class UsenetGroup extends Model
     /**
      * Updates the group active/backfill status.
      *
-     * @param int    $id     Which group ID
-     * @param string $column Which column active/backfill
-     * @param int    $status Which status we are setting
-     *
+     * @param  int  $id  Which group ID
+     * @param  string  $column  Which column active/backfill
+     * @param  int  $status  Which status we are setting
      * @return string
      */
     public static function updateGroupStatus($id, $column, $status = 0): string
@@ -507,7 +503,7 @@ class UsenetGroup extends Model
     /**
      * Disable group that does not exist on USP server.
      *
-     * @param int $id The Group ID to disable
+     * @param  int  $id  The Group ID to disable
      */
     public static function disableIfNotExist($id): void
     {

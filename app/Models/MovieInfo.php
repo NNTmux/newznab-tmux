@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property string $trailer
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereActors($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereBackdrop($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereCover($value)
@@ -46,7 +47,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereYear($value)
  * @mixin \Eloquent
+ *
  * @property int $traktid
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo query()

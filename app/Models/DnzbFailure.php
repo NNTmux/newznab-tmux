@@ -12,10 +12,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $failed
  * @property-read \App\Models\Release $release
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereFailed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereReleaseId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure query()
@@ -62,7 +64,6 @@ class DnzbFailure extends Model
      *
      *
      * @param $relId
-     *
      * @return bool|mixed
      */
     public static function getFailedCount($relId)

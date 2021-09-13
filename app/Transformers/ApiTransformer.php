@@ -22,7 +22,7 @@ class ApiTransformer extends TransformerAbstract
     }
 
     /**
-     * @param \App\Models\Release $releases
+     * @param  \App\Models\Release  $releases
      * @return array
      */
     public function transform(Release $releases): array

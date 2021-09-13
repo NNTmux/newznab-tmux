@@ -10,9 +10,9 @@ use Illuminate\Support\Arr;
 class MovieController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function showMovie(Request $request)
@@ -51,8 +51,8 @@ class MovieController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string                   $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id
      *
      * @throws \Exception
      */
@@ -169,9 +169,9 @@ class MovieController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function showTrailer(Request $request)

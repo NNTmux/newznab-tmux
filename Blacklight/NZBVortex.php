@@ -23,7 +23,8 @@ final class NZBVortex
 
     /**
      * get text for state.
-     * @param int $code
+     *
+     * @param  int  $code
      * @return string
      */
     public function getState($code = 0)
@@ -62,6 +63,7 @@ final class NZBVortex
 
     /**
      * get overview of NZB's in queue.
+     *
      * @return array
      */
     public function getOverview()
@@ -79,8 +81,9 @@ final class NZBVortex
     /**
      * add NZB to queue.
      *
-     * @param string $nzb
+     * @param  string  $nzb
      * @return void
+     *
      * @throws \Exception
      */
     public function addQueue($nzb = '')
@@ -104,8 +107,9 @@ final class NZBVortex
     /**
      * resume NZB.
      *
-     * @param int $id
+     * @param  int  $id
      * @return void
+     *
      * @throws \Exception
      */
     public function resume($id = 0): void
@@ -120,8 +124,9 @@ final class NZBVortex
     /**
      * pause NZB.
      *
-     * @param int $id
+     * @param  int  $id
      * @return void
+     *
      * @throws \Exception
      */
     public function pause($id = 0)
@@ -136,8 +141,9 @@ final class NZBVortex
     /**
      * move NZB up in queue.
      *
-     * @param int $id
+     * @param  int  $id
      * @return void
+     *
      * @throws \Exception
      */
     public function moveUp($id = 0)
@@ -152,8 +158,9 @@ final class NZBVortex
     /**
      * move NZB down in queue.
      *
-     * @param int $id
+     * @param  int  $id
      * @return void
+     *
      * @throws \Exception
      */
     public function moveDown($id = 0)
@@ -168,8 +175,9 @@ final class NZBVortex
     /**
      * move NZB to bottom of queue.
      *
-     * @param int $id
+     * @param  int  $id
      * @return void
+     *
      * @throws \Exception
      */
     public function moveBottom($id = 0)
@@ -184,8 +192,9 @@ final class NZBVortex
     /**
      * Remove a (ﬁnished/unﬁnished) NZB from queue and delete files.
      *
-     * @param int $id
+     * @param  int  $id
      * @return void
+     *
      * @throws \Exception
      */
     public function delete($id = 0)
@@ -200,8 +209,9 @@ final class NZBVortex
     /**
      * move NZB to top of queue.
      *
-     * @param int $id
+     * @param  int  $id
      * @return void
+     *
      * @throws \Exception
      */
     public function moveTop($id = 0)
@@ -216,8 +226,9 @@ final class NZBVortex
     /**
      * get filelist for nzb.
      *
-     * @param int $id
+     * @param  int  $id
      * @return array|false
+     *
      * @throws \Exception
      */
     public function getFilelist($id = 0)
@@ -236,6 +247,7 @@ final class NZBVortex
      * get /auth/nonce.
      *
      * @return void
+     *
      * @throws \Exception
      */
     protected function getNonce()
@@ -246,6 +258,7 @@ final class NZBVortex
 
     /**
      * @return void
+     *
      * @throws \Exception
      */
     protected function login()
@@ -274,10 +287,10 @@ final class NZBVortex
     /**
      * sendRequest().
      *
-     * @param       $path
-     * @param array $params
-     *
+     * @param  $path
+     * @param  array  $params
      * @return array
+     *
      * @throws \Exception
      */
     protected function sendRequest($path, $params = [])

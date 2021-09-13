@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VideoAlias[] $alias
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TvEpisode[] $episode
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereAnidb($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereCountriesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereId($value)
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvrage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereType($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video query()
@@ -87,7 +89,6 @@ class Video extends Model
      *
      *
      * @param $id
-     *
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByVideoID($id)
@@ -103,7 +104,7 @@ class Video extends Model
      * Retrieves a range of all shows for the show-edit admin list.
      *
      *
-     * @param string $showname
+     * @param  string  $showname
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getRange($showname = '')
@@ -123,7 +124,7 @@ class Video extends Model
      * Returns a count of all shows -- usually used by pager.
      *
      *
-     * @param string $showname
+     * @param  string  $showname
      * @return int
      */
     public static function getCount($showname = ''): int
@@ -140,10 +141,9 @@ class Video extends Model
     /**
      * Retrieves and returns a list of shows with eligible releases.
      *
-     * @param        $uid
-     * @param string $letter
-     * @param string $showname
-     *
+     * @param  $uid
+     * @param  string  $letter
+     * @param  string  $showname
      * @return array
      */
     public static function getSeriesList($uid, $letter = '', $showname = ''): array

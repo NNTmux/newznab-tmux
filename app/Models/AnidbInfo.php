@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\AnidbEpisode $episode
  * @property-read \App\Models\AnidbTitle $title
  * @mixin \Eloquent
+ *
  * @property int $anidbid ID of title from AniDB
  * @property string|null $type
  * @property string|null $startdate
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $picture
  * @property string|null $categories
  * @property string|null $characters
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbInfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbInfo query()

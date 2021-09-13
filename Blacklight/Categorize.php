@@ -39,18 +39,21 @@ class Categorize
 
     /**
      * Release name to sort through.
+     *
      * @var string
      */
     public $releaseName;
 
     /**
      * Release poster to sort through.
+     *
      * @var string
      */
     public $poster;
 
     /**
      * Group id of the releasename we are sorting through.
+     *
      * @var int|string
      */
     public $groupid;
@@ -76,11 +79,11 @@ class Categorize
      * Then work out which category is applicable for either a group or a binary.
      * Returns Category::OTHER_MISC if no category is appropriate.
      *
-     * @param        $groupID
-     * @param string $releaseName
-     * @param string $poster
-     *
+     * @param  $groupID
+     * @param  string  $releaseName
+     * @param  string  $poster
      * @return array
+     *
      * @throws \Exception
      */
     public function determineCategory($groupID, $releaseName = '', $poster = ''): array
@@ -1516,10 +1519,9 @@ class Categorize
     }
 
     /**
-     * @param string $regex     Regex to use for match
-     * @param string $fromName  Poster that needs to be matched by regex
-     * @param string $category  Category to set if there is a match
-     *
+     * @param  string  $regex  Regex to use for match
+     * @param  string  $fromName  Poster that needs to be matched by regex
+     * @param  string  $category  Category to set if there is a match
      * @return bool
      */
     public function checkPoster($regex, $fromName, $category): bool

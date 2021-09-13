@@ -13,12 +13,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $created_at
  * @property string|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereGuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation query()
@@ -49,8 +51,8 @@ class Invitation extends Model
     }
 
     /**
-     * @param int $uid
-     * @param string $inviteToken
+     * @param  int  $uid
+     * @param  string  $inviteToken
      */
     public static function addInvite(int $uid, string $inviteToken)
     {

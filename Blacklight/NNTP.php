@@ -55,42 +55,49 @@ class NNTP extends \Net_NNTP_Client
 
     /**
      * Does the server support XFeature GZip header compression?
+     *
      * @var bool
      */
     protected $_compressionSupported = true;
 
     /**
      * Is header compression enabled for the session?
+     *
      * @var bool
      */
     protected $_compressionEnabled = false;
 
     /**
      * Currently selected group.
+     *
      * @var string
      */
     protected $_currentGroup = '';
 
     /**
      * Port of the current NNTP server.
+     *
      * @var int
      */
     protected $_currentPort = 'NNTP_PORT';
 
     /**
      * Address of the current NNTP server.
+     *
      * @var string
      */
     protected $_currentServer = 'NNTP_SERVER';
 
     /**
      * Are we allowed to post to usenet?
+     *
      * @var bool
      */
     protected $_postingAllowed = false;
 
     /**
      * How many times should we try to reconnect to the NNTP server?
+     *
      * @var int
      */
     protected $_nntpRetries;
@@ -105,7 +112,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Default constructor.
      *
-     * @param array $options Class instances and echo to CLI bool.
+     * @param  array  $options  Class instances and echo to CLI bool.
      *
      * @throws \Exception
      */
@@ -137,12 +144,12 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Connect to a usenet server.
      *
-     * @param bool $compression Should we attempt to enable XFeature Gzip compression on this connection?
-     * @param bool $alternate   Use the alternate NNTP connection.
+     * @param  bool  $compression  Should we attempt to enable XFeature Gzip compression on this connection?
+     * @param  bool  $alternate  Use the alternate NNTP connection.
+     * @return mixed On success = (bool)   Did we successfully connect to the usenet?
      *
-     * @return mixed  On success = (bool)   Did we successfully connect to the usenet?
      * @throws \Exception
-     *                On failure = (object) PEAR_Error.
+     *                    On failure = (object) PEAR_Error.
      */
     public function doConnect($compression = true, $alternate = false)
     {
@@ -285,8 +292,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Disconnect from the current NNTP server.
      *
-     * @param  bool $force Force quit even if not connected?
-     *
+     * @param  bool  $force  Force quit even if not connected?
      * @return mixed On success : (bool)   Did we successfully disconnect from usenet?
      *               On Failure : (object) PEAR_Error.
      */
@@ -334,13 +340,13 @@ class NNTP extends \Net_NNTP_Client
     }
 
     /**
-     * @param string $group    Name of the group to select.
-     * @param bool   $articles (optional) experimental! When true the article numbers is returned in 'articles'.
-     * @param bool   $force    Force a refresh to get updated data from the usenet server.
-     *
+     * @param  string  $group  Name of the group to select.
+     * @param  bool  $articles  (optional) experimental! When true the article numbers is returned in 'articles'.
+     * @param  bool  $force  Force a refresh to get updated data from the usenet server.
      * @return mixed On success : (array)  Group information.
+     *
      * @throws \Exception
-     *               On failure : (object) PEAR_Error.
+     *                    On failure : (object) PEAR_Error.
      */
     public function selectGroup($group, $articles = false, $force = false)
     {
@@ -362,13 +368,13 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Fetch an overview of article(s) in the currently selected group.
      *
-     * @param string $range
-     * @param bool   $names
-     * @param bool   $forceNames
-     *
+     * @param  string  $range
+     * @param  bool  $names
+     * @param  bool  $forceNames
      * @return mixed On success : (array)  Multidimensional array with article headers.
+     *
      * @throws \Exception
-     *               On failure : (object) PEAR_Error.
+     *                    On failure : (object) PEAR_Error.
      */
     public function getOverview($range = null, $names = true, $forceNames = true)
     {
@@ -401,14 +407,14 @@ class NNTP extends \Net_NNTP_Client
      *        'Xref'       => string(66) "e alt.test:679871775"
      *    }
      *
-     * @param string $range Range of articles to get the overview for. Examples follow:
-     *                      Single article number:         "679871775"
-     *                      Range of article numbers:      "679871775-679999999"
-     *                      All newer than article number: "679871775-"
-     *                      All older than article number: "-679871775"
-     *                      Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
-     *
+     * @param  string  $range  Range of articles to get the overview for. Examples follow:
+     *                         Single article number:         "679871775"
+     *                         Range of article numbers:      "679871775-679999999"
+     *                         All newer than article number: "679871775-"
+     *                         All older than article number: "-679871775"
+     *                         Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
      * @return array|string|\Blacklight\NNTP Multi-dimensional Array of headers on success, PEAR object on failure.
+     *
      * @throws \Exception
      */
     public function getXOVER($range)
@@ -489,9 +495,9 @@ class NNTP extends \Net_NNTP_Client
      *
      * Returns a list of valid groups (that the client is permitted to select) and associated information.
      *
-     * @param string $wildMat (optional) http://tools.ietf.org/html/rfc3977#section-4
-     *
+     * @param  string  $wildMat  (optional) http://tools.ietf.org/html/rfc3977#section-4
      * @return array|string Pear error on failure, array with groups on success.
+     *
      * @throws \Exception
      */
     public function getGroups($wildMat = null)
@@ -505,15 +511,15 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download multiple article bodies and string them together.
      *
-     * @param string $groupName   The name of the group the articles are in.
-     * @param mixed  $identifiers (string) Message-ID.
-     *                            (int)    Article number.
-     *                            (array)  Article numbers or Message-ID's (can contain both in the same array)
-     * @param bool   $alternate   Use the alternate NNTP provider?
-     *
+     * @param  string  $groupName  The name of the group the articles are in.
+     * @param  mixed  $identifiers  (string) Message-ID.
+     *                              (int)    Article number.
+     *                              (array)  Article numbers or Message-ID's (can contain both in the same array)
+     * @param  bool  $alternate  Use the alternate NNTP provider?
      * @return mixed On success : (string) The article bodies.
+     *
      * @throws \Exception
-     *               On failure : (object) PEAR_Error.
+     *                    On failure : (object) PEAR_Error.
      */
     public function getMessages($groupName, $identifiers, $alternate = false)
     {
@@ -618,13 +624,13 @@ class NNTP extends \Net_NNTP_Client
      * Download a full article, the body and the header, return an array with named keys and their
      * associated values, optionally decode the body using yEnc.
      *
-     * @param string $groupName The name of the group the article is in.
-     * @param mixed $identifier (string)The message-ID of the article to download.
-     *                           (int) The article number.
-     * @param bool $yEnc Attempt to yEnc decode the body.
+     * @param  string  $groupName  The name of the group the article is in.
+     * @param  mixed  $identifier  (string)The message-ID of the article to download.
+     *                             (int) The article number.
+     * @param  bool  $yEnc  Attempt to yEnc decode the body.
+     * @return mixed On success : (array)  The article.
+     *               On failure : (object) PEAR_Error.
      *
-     * @return mixed  On success : (array)  The article.
-     *                On failure : (object) PEAR_Error.
      * @throws \Exception
      */
     public function get_Article($groupName, $identifier, $yEnc = false)
@@ -696,13 +702,13 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download a full article header.
      *
-     * @param string $groupName  The name of the group the article is in.
-     * @param mixed  $identifier (string) The message-ID of the article to download.
-     *                           (int)    The article number.
-     *
+     * @param  string  $groupName  The name of the group the article is in.
+     * @param  mixed  $identifier  (string) The message-ID of the article to download.
+     *                             (int)    The article number.
      * @return mixed On success : (array)  The header.
+     *
      * @throws \Exception
-     *               On failure : (object) PEAR_Error.
+     *                    On failure : (object) PEAR_Error.
      */
     public function get_Header($groupName, $identifier)
     {
@@ -756,20 +762,19 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Post an article to usenet.
      *
-     * @param string|array $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
-     *                          (string) Group.  ie.: $groups = 'alt.test';
-     * @param string $subject  string  The subject.     ie.: $subject = 'Test article';
-     * @param string|\Exception $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
-     * @param string $from     string  The poster.      ie.: $from = '<anon@anon.com>';
+     * @param  string|array  $groups  mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
+     *                                (string) Group.  ie.: $groups = 'alt.test';
+     * @param  string  $subject  string  The subject.     ie.: $subject = 'Test article';
+     * @param  string|\Exception  $body  string  The message.     ie.: $message = 'This is only a test, please disregard.';
+     * @param  string  $from  string  The poster.      ie.: $from = '<anon@anon.com>';
      * @param $extra    string  Extra, separated by \r\n
      *                                           ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
      * @param $yEnc     bool    Encode the message with yEnc?
      * @param $compress bool    Compress the message with GZip?
+     * @return mixed On success : (bool)   True.
+     *               On failure : (object) PEAR_Error.
      *
      * @throws \Exception
-     *
-     * @return          mixed   On success : (bool)   True.
-     *                          On failure : (object) PEAR_Error.
      */
     public function postArticle($groups, $subject, $body, $from, $yEnc = true, $compress = true, $extra = '')
     {
@@ -825,13 +830,13 @@ class NNTP extends \Net_NNTP_Client
      * Restart the NNTP connection if an error occurs in the selectGroup
      * function, if it does not restart display the error.
      *
-     * @param NNTP   $nntp  Instance of class NNTP.
-     * @param string $group Name of the group.
-     * @param bool   $comp  Use compression or not?
-     *
+     * @param  NNTP  $nntp  Instance of class NNTP.
+     * @param  string  $group  Name of the group.
+     * @param  bool  $comp  Use compression or not?
      * @return mixed On success : (array)  The group summary.
+     *
      * @throws \Exception
-     *               On Failure : (object) PEAR_Error.
+     *                    On Failure : (object) PEAR_Error.
      */
     public function dataError($nntp, $group, $comp = true)
     {
@@ -858,18 +863,21 @@ class NNTP extends \Net_NNTP_Client
 
     /**
      * If on unix, hide yydecode CLI output.
+     *
      * @var string
      */
     protected $_yEncSilence;
 
     /**
      * Path to temp yEnc input storage file.
+     *
      * @var string
      */
     protected $_yEncTempInput;
 
     /**
      * Path to temp yEnc output storage file.
+     *
      * @var string
      */
     protected $_yEncTempOutput;
@@ -878,9 +886,8 @@ class NNTP extends \Net_NNTP_Client
      * Split a string into lines of 510 chars ending with \r\n.
      * Usenet limits lines to 512 chars, with \r\n that leaves us 510.
      *
-     * @param string $string   The string to split.
-     * @param bool   $compress Compress the string with gzip?
-     *
+     * @param  string  $string  The string to split.
+     * @param  bool  $compress  Compress the string with gzip?
      * @return string The split string.
      */
     protected function _splitLines($string, $compress = false): string
@@ -899,10 +906,11 @@ class NNTP extends \Net_NNTP_Client
      * Try to see if the NNTP server implements XFeature GZip Compression,
      * change the compression bool object if so.
      *
-     * @param bool $secondTry This is only used if enabling compression fails, the function will call itself to retry.
+     * @param  bool  $secondTry  This is only used if enabling compression fails, the function will call itself to retry.
      * @return mixed On success : (bool)   True:  The server understood and compression is enabled.
-     *                            (bool)   False: The server did not understand, compression is not enabled.
+     *               (bool)   False: The server did not understand, compression is not enabled.
      *               On failure : (object) PEAR_Error.
+     *
      * @throws \Exception
      */
     protected function _enableCompression($secondTry = false)
@@ -949,8 +957,8 @@ class NNTP extends \Net_NNTP_Client
      * of their _getTextResponse function since it is incompatible at decoding
      * headers when XFeature GZip compression is enabled server side.
      *
-     * @return self|string    Our overridden function when compression is enabled.
-     *         parent  Parent function when no compression.
+     * @return self|string Our overridden function when compression is enabled.
+     *                     parent  Parent function when no compression.
      */
     public function _getTextResponse()
     {
@@ -972,9 +980,10 @@ class NNTP extends \Net_NNTP_Client
      *
      * Have we failed to decompress the data, was there a
      * problem downloading the data, etc..
-     * @return array|string  On success : (array)  The headers.
-     *                       On failure : (object) PEAR_Error.
-     *                       On decompress failure: (string) error message
+     *
+     * @return array|string On success : (array)  The headers.
+     *                      On failure : (object) PEAR_Error.
+     *                      On decompress failure: (string) error message
      */
     protected function &_getXFeatureTextResponse()
     {
@@ -1072,9 +1081,8 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Check if the Message-ID has the required opening and closing brackets.
      *
-     * @param  string $messageID The Message-ID with or without brackets.
-     *
-     * @return string            Message-ID with brackets.
+     * @param  string  $messageID  The Message-ID with or without brackets.
+     * @return string Message-ID with brackets.
      */
     protected function _formatMessageID($messageID): string
     {
@@ -1099,13 +1107,13 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download an article body (an article without the header).
      *
-     * @param string $groupName  The name of the group the article is in.
-     * @param mixed  $identifier (string) The message-ID of the article to download.
-     *                           (int)    The article number.
-     *
+     * @param  string  $groupName  The name of the group the article is in.
+     * @param  mixed  $identifier  (string) The message-ID of the article to download.
+     *                             (int)    The article number.
      * @return string On success : (string) The article's body.
+     *
      * @throws \Exception
-     *               On failure : (object) PEAR_Error.
+     *                    On failure : (object) PEAR_Error.
      */
     protected function _getMessage($groupName, $identifier): ?string
     {
@@ -1171,11 +1179,11 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Check if we are still connected. Reconnect if not.
      *
-     * @param  bool $reSelectGroup Select back the group after connecting?
-     *
+     * @param  bool  $reSelectGroup  Select back the group after connecting?
      * @return mixed On success: (bool)   True;
+     *
      * @throws \Exception
-     *               On failure: (object) PEAR_Error
+     *                    On failure: (object) PEAR_Error
      */
     protected function _checkConnection($reSelectGroup = true)
     {
@@ -1215,8 +1223,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Verify NNTP error code and return PEAR error.
      *
-     * @param int $response NET_NNTP Response code
-     *
+     * @param  int  $response  NET_NNTP Response code
      * @return object PEAR error
      */
     protected function _handleErrorResponse($response)
@@ -1295,15 +1302,14 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Connect to a NNTP server.
      *
-     * @param string $host                   (optional) The address of the NNTP-server to connect to, defaults to 'localhost'.
-     * @param mixed  $encryption             (optional) Use TLS/SSL on the connection?
-     *                                       (string) 'tcp'                 => Use no encryption.
-     *                                       'ssl', 'sslv3', 'tls' => Use encryption.
-     *                                       (null)|(false) Use no encryption.
-     * @param int    $port                   (optional) The port number to connect to, defaults to 119.
-     * @param int    $timeout                (optional) How many seconds to wait before giving up when connecting.
-     * @param int    $socketTimeout          (optional) How many seconds to wait before timing out the (blocked) socket.
-     *
+     * @param  string  $host  (optional) The address of the NNTP-server to connect to, defaults to 'localhost'.
+     * @param  mixed  $encryption  (optional) Use TLS/SSL on the connection?
+     *                             (string) 'tcp'                 => Use no encryption.
+     *                             'ssl', 'sslv3', 'tls' => Use encryption.
+     *                             (null)|(false) Use no encryption.
+     * @param  int  $port  (optional) The port number to connect to, defaults to 119.
+     * @param  int  $timeout  (optional) How many seconds to wait before giving up when connecting.
+     * @param  int  $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
      * @return mixed (bool)   On success: True when posting allowed, otherwise false.
      *               (object) On failure: pear_error
      */
@@ -1394,8 +1400,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Test whether we are connected or not.
      *
-     * @param bool $feof Check for the end of file pointer.
-     *
+     * @param  bool  $feof  Check for the end of file pointer.
      * @return bool true or false
      */
     public function _isConnected($feof = true): bool
