@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class SendReleaseController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */
@@ -37,7 +37,7 @@ class SendReleaseController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */
@@ -64,7 +64,7 @@ class SendReleaseController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */
@@ -95,7 +95,7 @@ class SendReleaseController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */

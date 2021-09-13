@@ -22,8 +22,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param string $message
-     * @param bool   $reset
+     * @param  string  $message
+     * @param  bool  $reset
      */
     public function overWriteHeader($message, $reset = false): void
     {
@@ -40,8 +40,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param string $message
-     * @param bool   $reset
+     * @param  string  $message
+     * @param  bool  $reset
      */
     public function overWritePrimary($message, $reset = false): void
     {
@@ -58,8 +58,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param string $message
-     * @param bool   $reset
+     * @param  string  $message
+     * @param  bool  $reset
      */
     public function overWrite($message, $reset = false): void
     {
@@ -76,7 +76,7 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param string $message
+     * @param  string  $message
      */
     public function appendWrite($message): void
     {
@@ -85,9 +85,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param int $cur
-     * @param int $total
-     *
+     * @param  int  $cur
+     * @param  int  $total
      * @return string
      */
     public function percentString($cur, $total): string
@@ -99,10 +98,9 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param int $first
-     * @param int $last
-     * @param int $total
-     *
+     * @param  int  $first
+     * @param  int  $last
+     * @param  int  $total
      * @return string
      */
     public function percentString2($first, $last, $total): string
@@ -117,8 +115,7 @@ class ConsoleTools extends ColorCLI
     /**
      * Convert seconds to minutes or hours, appending type at the end.
      *
-     * @param int $seconds
-     *
+     * @param  int  $seconds
      * @return string
      */
     public function convertTime($seconds): string
@@ -136,8 +133,7 @@ class ConsoleTools extends ColorCLI
     /**
      * Convert seconds to a timer, 00h:00m:00s.
      *
-     * @param int $seconds
-     *
+     * @param  int  $seconds
      * @return string
      */
     public function convertTimer($seconds): string
@@ -148,7 +144,7 @@ class ConsoleTools extends ColorCLI
     /**
      * Sleep for x seconds, printing timer on screen.
      *
-     * @param int $seconds
+     * @param  int  $seconds
      */
     public function showSleep($seconds): void
     {

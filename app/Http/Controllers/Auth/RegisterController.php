@@ -60,7 +60,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * @param array $data
+     * @param  array  $data
      * @return \App\Models\User
      */
     protected function create(array $data): User
@@ -118,9 +118,9 @@ class RegisterController extends Controller
     }
 
     /**
-     * @param Request $request
-     *
+     * @param  Request  $request
      * @return RedirectResponse|Redirector|void
+     *
      * @throws ValidationException
      */
     public function register(Request $request)
@@ -211,9 +211,9 @@ class RegisterController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param string $error
-     * @param int $showRegister
+     * @param  Request  $request
+     * @param  string  $error
+     * @param  int  $showRegister
      */
     public function showRegistrationForm(Request $request, $error = '', $showRegister = 0)
     {

@@ -13,6 +13,7 @@
  * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    niel
  * @copyright 2016 nZEDb
  */
@@ -25,9 +26,8 @@ namespace App\Extensions\util;
 class PhpYenc
 {
     /**
-     * @param      $text
-     * @param bool $ignore
-     *
+     * @param  $text
+     * @param  bool  $ignore
      * @return bool|string
      */
     public static function decode(&$text, $ignore = false)
@@ -88,8 +88,7 @@ class PhpYenc
     /**
      * Decode a string of text encoded with yEnc. Ignores all errors.
      *
-     * @param  string $text The encoded text to decode.
-     *
+     * @param  string  $text  The encoded text to decode.
      * @return string The decoded yEnc string, or the input string, if it's not yEnc.
      */
     public static function decodeIgnore(&$text): string
@@ -137,11 +136,10 @@ class PhpYenc
     }
 
     /**
-     * @param      $data
-     * @param      $filename
-     * @param int  $lineLength
-     * @param bool $crc32
-     *
+     * @param  $data
+     * @param  $filename
+     * @param  int  $lineLength
+     * @param  bool  $crc32
      * @return string
      */
     public static function encode($data, $filename, $lineLength = 128, $crc32 = true): string

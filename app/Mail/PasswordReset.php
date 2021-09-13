@@ -33,8 +33,8 @@ class PasswordReset extends Mailable
     /**
      * PasswordReset constructor.
      *
-     * @param \App\Models\User $user
-     * @param                  $newPass
+     * @param  \App\Models\User  $user
+     * @param  $newPass
      */
     public function __construct($user, $newPass)
     {
@@ -48,6 +48,7 @@ class PasswordReset extends Mailable
      * Build the message.
      *
      * @return $this
+     *
      * @throws \Exception
      */
     public function build()

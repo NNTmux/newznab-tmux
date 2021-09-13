@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $releases_id FK to releases.id
  * @property mixed|null $nfo
  * @property-read \App\Models\Release $release
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereNfo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereReleasesId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo query()
@@ -43,7 +45,7 @@ class ReleaseNfo extends Model
 
     /**
      * @param $id
-     * @param bool $getNfoString
+     * @param  bool  $getNfoString
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getReleaseNfo($id, $getNfoString = true)

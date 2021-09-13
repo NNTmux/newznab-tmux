@@ -18,8 +18,9 @@ use Illuminate\Support\Carbon;
 class ApiController extends BasePageController
 {
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Symfony\Component\HttpFoundation\StreamedResponse
+     *
      * @throws \Throwable
      */
     public function api(Request $request)

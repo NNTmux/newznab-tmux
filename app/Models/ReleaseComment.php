@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed $nzb_guid
  * @property-read \App\Models\Release $release
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereGid($value)
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment query()
@@ -131,6 +133,7 @@ class ReleaseComment extends Model
      * @param $userid
      * @param $host
      * @return int
+     *
      * @throws \Exception
      */
     public static function addComment($id, $gid, $text, $userid, $host): int

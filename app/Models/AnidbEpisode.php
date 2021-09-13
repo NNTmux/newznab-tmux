@@ -14,12 +14,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $airdate
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbInfo[] $info
  * @property-read \App\Models\AnidbTitle $title
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereAirdate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereAnidbid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeid($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode query()

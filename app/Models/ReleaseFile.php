@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
  * @property \Carbon\Carbon|null $updated_at
  * @property bool $passworded
  * @property-read \App\Models\Release $release
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereIshashed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereName($value)
@@ -27,7 +28,9 @@ use Illuminate\Support\Facades\Log;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereUpdatedAt($value)
  * @mixin \Eloquent
+ *
  * @property string $crc32
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile query()
@@ -86,15 +89,15 @@ class ReleaseFile extends Model
      * Add new files for a release ID.
      *
      *
-     * @param        $id
-     * @param        $name
-     * @param        $size
-     * @param        $createdTime
-     * @param        $hasPassword
-     *
-     * @param string $hash
-     * @param string $crc
+     * @param  $id
+     * @param  $name
+     * @param  $size
+     * @param  $createdTime
+     * @param  $hasPassword
+     * @param  string  $hash
+     * @param  string  $crc
      * @return int
+     *
      * @throws \Exception
      */
     public static function addReleaseFiles($id, $name, $size, $createdTime, $hasPassword, $hash = '', $crc = ''): int

@@ -23,6 +23,7 @@ use Laravel\Scout\Searchable;
  * @property string $classused
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereAsin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereBackdrop($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereClassused($value)
@@ -39,6 +40,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereUrl($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo query()

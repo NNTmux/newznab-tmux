@@ -13,7 +13,7 @@ use Spatie\Permission\Models\Role;
 class AdminUserController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Throwable
      */
@@ -77,8 +77,9 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -214,9 +215,9 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     *
      * @throws \Exception
      */
     public function destroy(Request $request)
@@ -237,8 +238,9 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse
+     *
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
     public function resendVerification(Request $request)

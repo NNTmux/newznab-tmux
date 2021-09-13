@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $children
  * @property-read \App\Models\Category|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $releases
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDisablepreview($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereId($value)
@@ -29,7 +30,9 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereTitle($value)
  * @mixin \Eloquent
+ *
  * @property int|null $root_categories_id
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category query()
@@ -297,8 +300,7 @@ class Category extends Model
     }
 
     /**
-     * @param array $cat
-     *
+     * @param  array  $cat
      * @return string
      */
     public static function getCategorySearch(array $cat = [])
@@ -358,7 +360,6 @@ class Category extends Model
 
     /**
      * @param $category
-     *
      * @return mixed
      */
     public static function getCategoryValue($category)
@@ -370,7 +371,6 @@ class Category extends Model
      * Check if category is parent.
      *
      * @param $cid
-     *
      * @return bool
      */
     public static function isParent($cid): bool
@@ -436,7 +436,6 @@ class Category extends Model
      * Get multiple categories.
      *
      * @param $ids
-     *
      * @return bool|\Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getByIds($ids)
@@ -462,7 +461,6 @@ class Category extends Model
      *
      *
      * @param $categoryId
-     *
      * @return string
      */
     public static function getNameByID($categoryId): string
@@ -510,8 +508,7 @@ class Category extends Model
     }
 
     /**
-     * @param array $excludedCats
-     *
+     * @param  array  $excludedCats
      * @return array
      */
     public static function getForMenu(array $excludedCats = []): array
@@ -554,8 +551,7 @@ class Category extends Model
     /**
      * Return a list of categories for use in a dropdown.
      *
-     * @param bool $blnIncludeNoneSelected
-     *
+     * @param  bool  $blnIncludeNoneSelected
      * @return array
      */
     public static function getForSelect($blnIncludeNoneSelected = true): array
@@ -574,8 +570,8 @@ class Category extends Model
     }
 
     /**
-     * @param bool $activeOnly
-     * @param array $excludedCats
+     * @param  bool  $activeOnly
+     * @param  array  $excludedCats
      * @return array
      */
     public static function getCategories($activeOnly = false, array $excludedCats = [])

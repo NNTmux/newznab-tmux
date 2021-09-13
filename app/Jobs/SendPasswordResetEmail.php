@@ -27,8 +27,8 @@ class SendPasswordResetEmail implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param \App\Models\User $user
-     * @param string $newPass
+     * @param  \App\Models\User  $user
+     * @param  string  $newPass
      */
     public function __construct($user, $newPass)
     {

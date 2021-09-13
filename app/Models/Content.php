@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $status
  * @property int|null $ordinal
  * @property int $role
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereBody($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereContenttype($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereId($value)
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereUrl($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content query()

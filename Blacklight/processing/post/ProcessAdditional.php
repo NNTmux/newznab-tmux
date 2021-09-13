@@ -54,6 +54,7 @@ class ProcessAdditional
 
     /**
      * Count of releases to work on.
+     *
      * @var int
      */
     protected int $_totalReleases;
@@ -67,6 +68,7 @@ class ProcessAdditional
 
     /**
      * List of files with sizes/etc contained in the NZB.
+     *
      * @var array
      */
     protected array $_nzbContents;
@@ -258,54 +260,63 @@ class ProcessAdditional
 
     /**
      * Have we created a video file for the current release?
+     *
      * @var bool
      */
     protected bool $_foundVideo;
 
     /**
      * Have we found MediaInfo data for a Video for the current release?
+     *
      * @var bool
      */
     protected bool $_foundMediaInfo;
 
     /**
      * Have we found MediaInfo data for a Audio file for the current release?
+     *
      * @var bool
      */
     protected bool $_foundAudioInfo;
 
     /**
      * Have we created a short Audio file sample for the current release?
+     *
      * @var bool
      */
     protected bool $_foundAudioSample;
 
     /**
      * Extension of the found audio file (MP3/FLAC/etc).
+     *
      * @var string
      */
     protected string $_AudioInfoExtension;
 
     /**
      * Have we downloaded a JPG file for the current release?
+     *
      * @var bool
      */
     protected bool $_foundJPGSample;
 
     /**
      * Have we created a Video JPG image sample for the current release?
+     *
      * @var bool
      */
     protected bool $_foundSample;
 
     /**
      * Have we found PAR2 info on this release?
+     *
      * @var bool
      */
     protected bool $_foundPAR2Info;
 
     /**
      * Message ID's for found content to download.
+     *
      * @var array
      */
     protected array $_sampleMessageIDs;
@@ -316,30 +327,35 @@ class ProcessAdditional
 
     /**
      * Password status of the current release.
+     *
      * @var int
      */
     protected int $_passwordStatus;
 
     /**
      * Does the current release have a password?
+     *
      * @var bool
      */
     protected bool $_releaseHasPassword;
 
     /**
      * Does the current release have an NFO file?
+     *
      * @var bool
      */
     protected bool $_releaseHasNoNFO;
 
     /**
      * Name of the current release's usenet group.
+     *
      * @var string
      */
     protected string $_releaseGroupName;
 
     /**
      * Number of file information added to DB (from rar/zip/par2 contents).
+     *
      * @var int
      */
     protected int $_addedFileInfo;
@@ -347,24 +363,28 @@ class ProcessAdditional
     /**
      * Number of file information we found from RAR/ZIP.
      * (if some of it was already in DB, this count goes up, while the count above does not).
+     *
      * @var int
      */
     protected int $_totalFileInfo;
 
     /**
      * How many compressed (rar/zip) files have we checked.
+     *
      * @var int
      */
     protected int $_compressedFilesChecked;
 
     /**
      * Should we download the last rar?
+     *
      * @var bool
      */
     protected bool $_fetchLastFiles;
 
     /**
      * Are we downloading the last rar?
+     *
      * @var bool
      */
     protected bool $_reverse;
@@ -396,7 +416,8 @@ class ProcessAdditional
     /**
      * ProcessAdditional constructor.
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -531,8 +552,8 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $groupID
-     * @param string $guidChar
+     * @param  string  $groupID
+     * @param  string  $guidChar
      *
      * @throws \Exception
      */
@@ -564,7 +585,8 @@ class ProcessAdditional
 
     /**
      * @param $guidChar
-     * @param string $groupID
+     * @param  string  $groupID
+     *
      * @throws \RuntimeException
      * @throws \Exception
      */
@@ -620,8 +642,8 @@ class ProcessAdditional
     /**
      * Get all releases that need to be processed.
      *
-     * @param int|string $groupID
-     * @param string     $guidChar
+     * @param  int|string  $groupID
+     * @param  string  $guidChar
      *
      * @void
      */
@@ -753,8 +775,8 @@ class ProcessAdditional
     /**
      * Deletes files and folders recursively.
      *
-     * @param string $path          Path to a folder or file.
-     * @param string[] $ignoredFolders array with paths to folders to ignore.
+     * @param  string  $path  Path to a folder or file.
+     * @param  string[]  $ignoredFolders  array with paths to folders to ignore.
      *
      * @void
      */
@@ -779,6 +801,7 @@ class ProcessAdditional
      *
      *
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _createTempFolder(): bool
@@ -800,6 +823,7 @@ class ProcessAdditional
      * Get list of contents inside a release's NZB file.
      *
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _getNZBContents(): bool
@@ -833,6 +857,7 @@ class ProcessAdditional
 
     /**
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _deleteRelease(): bool
@@ -844,12 +869,14 @@ class ProcessAdditional
 
     /**
      * Current file we are working on inside a NZB.
+     *
      * @var array
      */
     protected $_currentNZBFile;
 
     /**
      * Does the current NZB contain a compressed (RAR/ZIP) file?
+     *
      * @var bool
      */
     protected $_NZBHasCompressedFile;
@@ -933,12 +960,14 @@ class ProcessAdditional
 
     /**
      * List of message-id's we have tried for rar/zip files.
+     *
      * @var array
      */
     protected $_triedCompressedMids = [];
 
     /**
-     * @param bool $reverse
+     * @param  bool  $reverse
+     *
      * @throws \Exception
      */
     protected function _processNZBCompressedFiles($reverse = false): void
@@ -1033,9 +1062,9 @@ class ProcessAdditional
     /**
      * Check if the data is a ZIP / RAR file, extract files, get file info.
      *
-     * @param string $compressedData
-     *
+     * @param  string  $compressedData
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _processCompressedData(&$compressedData): bool
@@ -1136,6 +1165,7 @@ class ProcessAdditional
      * Get a list of all files in the compressed file, add the file info to the DB.
      *
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _processCompressedFileList(): bool
@@ -1207,6 +1237,7 @@ class ProcessAdditional
 
     /**
      * @param $file
+     *
      * @throws \Exception
      */
     protected function _addFileInfo(&$file): void
@@ -1388,6 +1419,7 @@ class ProcessAdditional
      * Download all binaries from usenet and form samples / get media info / etc from them.
      *
      * @void
+     *
      * @throws \Exception
      */
     protected function _processMessageIDDownloads(): void
@@ -1402,6 +1434,7 @@ class ProcessAdditional
      * Download and process binaries for sample videos.
      *
      * @void
+     *
      * @throws \Exception
      */
     protected function _processSampleMessageIDs(): void
@@ -1448,6 +1481,7 @@ class ProcessAdditional
      * Download and process binaries for media info from videos.
      *
      * @void
+     *
      * @throws \Exception
      */
     protected function _processMediaInfoMessageIDs(): void
@@ -1500,6 +1534,7 @@ class ProcessAdditional
      * Download and process binaries for media info from songs.
      *
      * @void
+     *
      * @throws \Exception
      */
     protected function _processAudioInfoMessageIDs(): void
@@ -1535,6 +1570,7 @@ class ProcessAdditional
      * Download and process binaries for JPG pictures.
      *
      * @void
+     *
      * @throws \Exception
      */
     protected function _processJPGMessageIDs(): void
@@ -1635,9 +1671,8 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $pattern
-     * @param string $path
-     *
+     * @param  string  $pattern
+     * @param  string  $path
      * @return bool|string|\Symfony\Component\Finder\SplFileInfo[]
      */
     protected function _getTempDirectoryContents($pattern = '', $path = '')
@@ -1674,6 +1709,7 @@ class ProcessAdditional
      * @param $fileLocation
      * @param $fileExtension
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _getAudioInfo($fileLocation, $fileExtension): bool
@@ -1848,7 +1884,7 @@ class ProcessAdditional
     /**
      * Try to get JPG picture, resize it and store it on disk.
      *
-     * @param string $fileLocation
+     * @param  string  $fileLocation
      */
     protected function _getJPGSample($fileLocation): void
     {
@@ -1870,8 +1906,7 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $videoLocation
-     *
+     * @param  string  $videoLocation
      * @return string
      */
     private function getVideoTime($videoLocation): string
@@ -1898,8 +1933,9 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $fileLocation
+     * @param  string  $fileLocation
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _getSample(string $fileLocation): bool
@@ -1967,8 +2003,9 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $fileLocation
+     * @param  string  $fileLocation
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _getVideo(string $fileLocation): bool
@@ -2091,6 +2128,7 @@ class ProcessAdditional
     /**
      * @param $fileLocation
      * @return bool
+     *
      * @throws \Exception
      */
     protected function _getMediaInfo($fileLocation): bool
@@ -2135,6 +2173,7 @@ class ProcessAdditional
 
     /**
      * @param $fileLocation
+     *
      * @throws \Exception
      */
     protected function _siftPAR2Info($fileLocation): void
@@ -2207,6 +2246,7 @@ class ProcessAdditional
 
     /**
      * @param $fileLocation
+     *
      * @throws \Exception
      */
     protected function _processNfoFile($fileLocation): void
@@ -2219,6 +2259,7 @@ class ProcessAdditional
 
     /**
      * @param $fileLocation
+     *
      * @throws \Exception
      */
     protected function _processVideoFile($fileLocation): void
@@ -2245,9 +2286,8 @@ class ProcessAdditional
     /**
      * Comparison function for uSort, for sorting NZB files.
      *
-     * @param array|null|string $a
-     * @param array|null|string $b
-     *
+     * @param  array|null|string  $a
+     * @param  array|null|string  $b
      * @return int
      */
     protected function _sortNZB($a, $b): int
@@ -2339,8 +2379,8 @@ class ProcessAdditional
     /**
      * Echo a string to CLI.
      *
-     * @param string $string  String to echo.
-     * @param string $type    Method type.
+     * @param  string  $string  String to echo.
+     * @param  string  $type  Method type.
      *
      * @void
      */
@@ -2354,7 +2394,7 @@ class ProcessAdditional
     /**
      * Echo a string to CLI. For debugging.
      *
-     * @param string $string
+     * @param  string  $string
      *
      * @void
      */

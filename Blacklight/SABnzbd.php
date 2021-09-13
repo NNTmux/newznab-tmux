@@ -58,6 +58,7 @@ class SABnzbd
 
     /**
      * Is sab integrated into the site or not.
+     *
      * @var bool
      */
     public $integratedBool = false;
@@ -72,12 +73,14 @@ class SABnzbd
 
     /**
      * User's nntmux API key to send to SAB when downloading a NZB.
+     *
      * @var string
      */
     protected $rsstoken = '';
 
     /**
      * nZEDb Site URL to send to SAB to download the NZB.
+     *
      * @var string
      */
     protected $serverurl = '';
@@ -87,7 +90,7 @@ class SABnzbd
     /**
      * SABnzbd constructor.
      *
-     * @param \App\Http\Controllers\BasePageController $page
+     * @param  \App\Http\Controllers\BasePageController  $page
      *
      * @throws \Exception
      */
@@ -151,6 +154,7 @@ class SABnzbd
     /**
      * @param $guid
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function sendToSab($guid): string
@@ -174,6 +178,7 @@ class SABnzbd
 
     /**
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function getAdvQueue(): string
@@ -188,6 +193,7 @@ class SABnzbd
 
     /**
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function getHistory(): string
@@ -203,6 +209,7 @@ class SABnzbd
     /**
      * @param $id
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function delFromQueue($id): string
@@ -219,6 +226,7 @@ class SABnzbd
     /**
      * @param $id
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function pauseFromQueue($id): string
@@ -235,6 +243,7 @@ class SABnzbd
     /**
      * @param $id
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function resumeFromQueue($id)
@@ -250,6 +259,7 @@ class SABnzbd
 
     /**
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function pauseAll(): string
@@ -266,6 +276,7 @@ class SABnzbd
      * Resume all NZB's in the SAB queue.
      *
      * @return string
+     *
      * @throws \RuntimeException
      */
     public function resumeAll(): string

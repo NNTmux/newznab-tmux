@@ -24,7 +24,6 @@ class ReleaseExtra
 
     /**
      * @param $id
-     *
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function get($id)
@@ -35,7 +34,6 @@ class ReleaseExtra
 
     /**
      * @param $id
-     *
      * @return array|false
      */
     public function getVideo($id)
@@ -51,7 +49,6 @@ class ReleaseExtra
 
     /**
      * @param $id
-     *
      * @return array|false
      */
     public function getAudio($id)
@@ -67,7 +64,6 @@ class ReleaseExtra
 
     /**
      * @param $id
-     *
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getSubs($id)
@@ -76,8 +72,7 @@ class ReleaseExtra
     }
 
     /**
-     * @param string $guid
-     *
+     * @param  string  $guid
      * @return array
      */
     public function getBriefByGuid($guid): array
@@ -98,7 +93,6 @@ class ReleaseExtra
 
     /**
      * @param $guid
-     *
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null|object
      */
     public function getByGuid($guid)
@@ -117,8 +111,8 @@ class ReleaseExtra
     }
 
     /**
-     * @param                                              $releaseID
-     * @param \Mhor\MediaInfo\Container\MediaInfoContainer $arrXml
+     * @param  $releaseID
+     * @param  \Mhor\MediaInfo\Container\MediaInfoContainer  $arrXml
      */
     public function addFromXml($releaseID, MediaInfoContainer $arrXml): void
     {
@@ -369,8 +363,8 @@ class ReleaseExtra
     }
 
     /**
-     * @param int $releaseID
-     * @param string $uniqueId
+     * @param  int  $releaseID
+     * @param  string  $uniqueId
      */
     public function addUID($releaseID, $uniqueId): void
     {
@@ -388,7 +382,6 @@ class ReleaseExtra
 
     /**
      * @param $id
-     *
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getFull($id)
@@ -407,8 +400,8 @@ class ReleaseExtra
     }
 
     /**
-     * @param                                              $id
-     * @param \Mhor\MediaInfo\Container\MediaInfoContainer $xmlArray
+     * @param  $id
+     * @param  \Mhor\MediaInfo\Container\MediaInfoContainer  $xmlArray
      */
     public function addFull($id, MediaInfoContainer $xmlArray): void
     {

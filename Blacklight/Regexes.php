@@ -37,7 +37,8 @@ class Regexes
     protected $_categoriesID = Category::OTHER_MISC;
 
     /**
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -54,8 +55,7 @@ class Regexes
     /**
      * Add a new regex.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return bool
      */
     public function addRegex(array $data): bool
@@ -78,8 +78,7 @@ class Regexes
     /**
      * Update a regex with new info.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return bool
      */
     public function updateRegex(array $data): bool
@@ -104,8 +103,7 @@ class Regexes
     /**
      * Get a single regex using its id.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return array
      */
     public function getRegexByID($id): array
@@ -114,8 +112,7 @@ class Regexes
     }
 
     /**
-     * @param string $group_regex
-     *
+     * @param  string  $group_regex
      * @return mixed
      */
     public function getRegex($group_regex = '')
@@ -140,8 +137,7 @@ class Regexes
     /**
      * Get the count of regex in the DB.
      *
-     * @param string $group_regex Optional, keyword to find a group.
-     *
+     * @param  string  $group_regex  Optional, keyword to find a group.
      * @return int
      */
     public function getCount($group_regex = ''): int
@@ -160,7 +156,7 @@ class Regexes
     /**
      * Delete a regex using its id.
      *
-     * @param int $id
+     * @param  int  $id
      *
      * @throws \Throwable
      */
@@ -176,11 +172,11 @@ class Regexes
      *
      * Requires table per group to be on.
      *
-     * @param string $groupName
-     * @param string $regex
-     * @param int $limit
-     *
+     * @param  string  $groupName
+     * @param  string  $regex
+     * @param  int  $limit
      * @return array
+     *
      * @throws \Exception
      */
     public function testCollectionRegex($groupName, $regex, $limit): array
@@ -247,6 +243,7 @@ class Regexes
      * @param $displayLimit
      * @param $queryLimit
      * @return array
+     *
      * @throws \Exception
      */
     public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
@@ -288,10 +285,10 @@ class Regexes
     /**
      * This will try to find regex in the DB for a group and a usenet subject, attempt to match them and return the matches.
      *
-     * @param string $subject
-     * @param string $groupName
-     *
+     * @param  string  $subject
+     * @param  string  $groupName
      * @return string
+     *
      * @throws \Exception
      */
     public function tryRegex($subject, $groupName): string
@@ -324,7 +321,7 @@ class Regexes
      * Get the regex from the DB, cache them locally for 15 mins.
      * Cache them also in the cache server, as this script might be terminated.
      *
-     * @param string $groupName
+     * @param  string  $groupName
      */
     protected function _fetchRegex($groupName): void
     {
@@ -351,10 +348,10 @@ class Regexes
      *
      * Requires at least 1 named captured group.
      *
-     * @param string $regex
-     * @param string $subject
-     *
+     * @param  string  $regex
+     * @param  string  $subject
      * @return string
+     *
      * @throws \Exception
      */
     protected function _matchRegex($regex, $subject): string
@@ -386,8 +383,7 @@ class Regexes
     /**
      * Format part of a query.
      *
-     * @param string $group_regex
-     *
+     * @param  string  $group_regex
      * @return string
      */
     protected function _groupQueryString($group_regex): string

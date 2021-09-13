@@ -30,6 +30,7 @@ class AccountExpired extends Mailable
      * Build the message.
      *
      * @return $this
+     *
      * @throws \Exception
      */
     public function build()

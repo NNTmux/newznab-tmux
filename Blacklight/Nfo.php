@@ -82,9 +82,8 @@ class Nfo
     /**
      * Look for a TV Show ID in a string.
      *
-     * @param string  $str   The string with a Show ID.
-     *
-     * @return array|false  Return array with show ID and site source or false on failure.
+     * @param  string  $str  The string with a Show ID.
+     * @return array|false Return array with show ID and site source or false on failure.
      */
     public function parseShowId($str)
     {
@@ -120,10 +119,10 @@ class Nfo
     /**
      * Confirm this is an NFO file.
      *
-     * @param string|bool $possibleNFO The nfo.
-     * @param string $guid        The guid of the release.
+     * @param  string|bool  $possibleNFO  The nfo.
+     * @param  string  $guid  The guid of the release.
+     * @return bool True on success, False on failure.
      *
-     * @return bool               True on success, False on failure.
      * @throws \Exception
      */
     public function isNFO(&$possibleNFO, $guid): bool
@@ -189,11 +188,11 @@ class Nfo
     /**
      * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
      *
-     * @param string $nfo     The nfo.
+     * @param  string  $nfo  The nfo.
      * @param $release
-     * @param NNTP   $nntp    Instance of class NNTP.
+     * @param  NNTP  $nntp  Instance of class NNTP.
+     * @return bool True on success, False on failure.
      *
-     * @return bool           True on success, False on failure.
      * @throws \Exception
      */
     public function addAlternateNfo(&$nfo, $release, $nntp): bool
@@ -233,13 +232,13 @@ class Nfo
     /**
      * Attempt to find NFO files inside the NZB's of releases.
      *
-     * @param        $nntp
-     * @param string $groupID     (optional) Group ID.
-     * @param string $guidChar    (optional) First character of the release GUID (used for multi-processing).
-     * @param int    $processImdb (optional) Attempt to find IMDB id's in the NZB?
-     * @param int    $processTv   (optional) Attempt to find Tv id's in the NZB?
-     *
+     * @param  $nntp
+     * @param  string  $groupID  (optional) Group ID.
+     * @param  string  $guidChar  (optional) First character of the release GUID (used for multi-processing).
+     * @param  int  $processImdb  (optional) Attempt to find IMDB id's in the NZB?
+     * @param  int  $processTv  (optional) Attempt to find Tv id's in the NZB?
      * @return int How many NFO's were processed?
+     *
      * @throws \Exception
      */
     public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1): int
@@ -389,6 +388,7 @@ class Nfo
      * To use in a query.
      *
      * @return string
+     *
      * @throws \Exception
      * @static
      */

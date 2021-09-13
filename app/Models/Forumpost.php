@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $replies
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereForumid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereId($value)
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost query()
@@ -56,9 +58,9 @@ class Forumpost extends Model
      * @param $userid
      * @param $subject
      * @param $message
-     * @param int $locked
-     * @param int $sticky
-     * @param int $replies
+     * @param  int  $locked
+     * @param  int  $sticky
+     * @param  int  $replies
      * @return int
      */
     public static function add($parentId, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0): int
@@ -143,7 +145,6 @@ class Forumpost extends Model
      *
      *
      * @param $start
-     *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getBrowseRange()

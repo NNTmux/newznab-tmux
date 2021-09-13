@@ -21,21 +21,21 @@ class AniDB
     /**
      * Updates stored AniDB entries in the database.
      *
-     * @param int    $anidbID
-     * @param string       $title
-     * @param string $type
-     * @param string $startdate
-     * @param string $enddate
-     * @param string $related
-     * @param string $similar
-     * @param string $creators
-     * @param string $description
-     * @param string $rating
-     * @param string $categories
-     * @param string $characters
-     * @param        $epnos
-     * @param        $airdates
-     * @param        $episodetitles
+     * @param  int  $anidbID
+     * @param  string  $title
+     * @param  string  $type
+     * @param  string  $startdate
+     * @param  string  $enddate
+     * @param  string  $related
+     * @param  string  $similar
+     * @param  string  $creators
+     * @param  string  $description
+     * @param  string  $rating
+     * @param  string  $categories
+     * @param  string  $characters
+     * @param  $epnos
+     * @param  $airdates
+     * @param  $episodetitles
      */
     public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles): void
     {
@@ -94,9 +94,8 @@ class AniDB
      * Retrieves a list of Anime titles, optionally filtered by starting character and title.
      *
      *
-     * @param string $letter
-     * @param string $animetitle
-     *
+     * @param  string  $letter
+     * @param  string  $animetitle
      * @return array
      */
     public function getAnimeList($letter = '', $animetitle = ''): array
@@ -137,8 +136,7 @@ class AniDB
      * Retrieves a range of Anime titles for site display.
      *
      *
-     * @param string $animetitle
-     *
+     * @param  string  $animetitle
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function getAnimeRange($animetitle = ''): \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -162,7 +160,6 @@ class AniDB
      *
      *
      * @param $anidbID
-     *
      * @return mixed
      */
     public function getAnimeInfo($anidbID)

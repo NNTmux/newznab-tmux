@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $status 1=ON 0=OFF
  * @property string $description Optional extra details on this regex
  * @property int $ordinal Order to run the regex in
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereGroupRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereId($value)
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereStatus($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex query()

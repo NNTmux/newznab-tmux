@@ -102,7 +102,7 @@ class ProcessReleases
     private $collectionTimeout;
 
     /**
-     * @param array $options Class instances / Echo to cli ?
+     * @param  array  $options  Class instances / Echo to cli ?
      *
      * @throws \Exception
      */
@@ -146,13 +146,13 @@ class ProcessReleases
     /**
      * Main method for creating releases/NZB files from collections.
      *
-     * @param int              $categorize
-     * @param int              $postProcess
-     * @param string           $groupName (optional)
-     * @param \Blacklight\NNTP $nntp
-     * @param bool             $echooutput
-     *
+     * @param  int  $categorize
+     * @param  int  $postProcess
+     * @param  string  $groupName  (optional)
+     * @param  \Blacklight\NNTP  $nntp
+     * @param  bool  $echooutput
      * @return int
+     *
      * @throws \Throwable
      */
     public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput): int
@@ -208,7 +208,7 @@ class ProcessReleases
     /**
      * Return all releases to other->misc category.
      *
-     * @param string $where Optional "where" query parameter.
+     * @param  string  $where  Optional "where" query parameter.
      *
      * @void
      */
@@ -222,9 +222,10 @@ class ProcessReleases
     /**
      * Categorizes releases.
      *
-     * @param string $type name or searchname | Categorize using the search name or subject.
+     * @param  string  $type  name or searchname | Categorize using the search name or subject.
      * @param $groupId
      * @return int Quantity of categorized releases.
+     *
      * @throws \Exception
      */
     public function categorizeRelease($type, $groupId): int
@@ -439,9 +440,9 @@ class ProcessReleases
     }
 
     /**
-     * @param int|string $groupID (optional)
-     *
+     * @param  int|string  $groupID  (optional)
      * @return array
+     *
      * @throws \Throwable
      */
     public function createReleases($groupID): array
@@ -624,9 +625,9 @@ class ProcessReleases
     /**
      * Create NZB files from complete releases.
      *
-     * @param int|string $groupID (optional)
-     *
+     * @param  int|string  $groupID  (optional)
      * @return int
+     *
      * @throws \Throwable
      */
     public function createNZBs($groupID): int
@@ -674,10 +675,11 @@ class ProcessReleases
     /**
      * Categorize releases.
      *
-     * @param int        $categorize
-     * @param int|string $groupID (optional)
+     * @param  int  $categorize
+     * @param  int|string  $groupID  (optional)
      *
      * @void
+     *
      * @throws \Exception
      */
     public function categorizeReleases($categorize, $groupID = ''): void
@@ -710,10 +712,11 @@ class ProcessReleases
     /**
      * Post-process releases.
      *
-     * @param int  $postProcess
-     * @param NNTP $nntp
+     * @param  int  $postProcess
+     * @param  NNTP  $nntp
      *
      * @void
+     *
      * @throws \Exception
      */
     public function postProcessReleases($postProcess, &$nntp): void
@@ -821,9 +824,10 @@ class ProcessReleases
      * Delete unwanted releases based on admin settings.
      * This deletes releases based on group.
      *
-     * @param int|string $groupID (optional)
+     * @param  int|string  $groupID  (optional)
      *
      * @void
+     *
      * @throws \Exception
      */
     public function deletedReleasesByGroup($groupID = ''): void
@@ -883,6 +887,7 @@ class ProcessReleases
      * This deletes releases, regardless of group.
      *
      * @void
+     *
      * @throws \Exception
      */
     public function deleteReleases(): void
@@ -1042,9 +1047,10 @@ class ProcessReleases
      * This means the the binary table has the same count as the file count in the subject, but
      * the collection might not be complete yet since we might not have all the articles in the parts table.
      *
-     * @param int $groupID
+     * @param  int  $groupID
      *
      * @void
+     *
      * @throws \Throwable
      */
     private function collectionFileCheckStage1($groupID): void
@@ -1074,9 +1080,10 @@ class ProcessReleases
      * at 0 then you would never get a complete collection if it starts with 1 and if it starts, you can end up creating
      * a incomplete collection, since you assumed it was complete.
      *
-     * @param int $groupID
+     * @param  int  $groupID
      *
      * @void
+     *
      * @throws \Throwable
      */
     private function collectionFileCheckStage2($groupID): void
@@ -1110,9 +1117,10 @@ class ProcessReleases
      * Check if the files (binaries table) in a complete collection has all the parts.
      * If we have all the parts, set binaries table partcheck to FILE_COMPLETE.
      *
-     * @param string $where
+     * @param  string  $where
      *
      * @void
+     *
      * @throws \Throwable
      */
     private function collectionFileCheckStage3($where): void
@@ -1171,9 +1179,10 @@ class ProcessReleases
      * Set collections filecheck column to COLLFC_COMPPART.
      * This means the collection is complete.
      *
-     * @param string $where
+     * @param  string  $where
      *
      * @void
+     *
      * @throws \Throwable
      */
     private function collectionFileCheckStage4(&$where): void
@@ -1201,9 +1210,10 @@ class ProcessReleases
      * If not all files (binaries table) had their parts on the previous stage,
      * reset the collection filecheck column to COLLFC_COMPCOLL so we reprocess them next time.
      *
-     * @param int $groupId
+     * @param  int  $groupId
      *
      * @void
+     *
      * @throws \Throwable
      */
     private function collectionFileCheckStage5($groupId): void
@@ -1221,9 +1231,10 @@ class ProcessReleases
      * If a collection did not have the file count (ie: [00/12]) or the collection is incomplete after
      * $this->collectionDelayTime hours, set the collection to complete to create it into a release/nzb.
      *
-     * @param string $where
+     * @param  string  $where
      *
      * @void
+     *
      * @throws \Throwable
      */
     private function collectionFileCheckStage6(&$where): void
@@ -1248,9 +1259,10 @@ class ProcessReleases
     /**
      * If a collection has been stuck for $this->collectionTimeout hours, delete it, it's bad.
      *
-     * @param int $groupID
+     * @param  int  $groupID
      *
      * @void
+     *
      * @throws \Exception
      * @throws \Throwable
      */

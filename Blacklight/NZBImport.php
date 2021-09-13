@@ -41,24 +41,28 @@ class NZBImport
 
     /**
      * List of all the group names/ids in the DB.
+     *
      * @var array
      */
     protected $allGroups;
 
     /**
      * Was this run from the browser?
+     *
      * @var bool
      */
     protected $browser;
 
     /**
      * Return value for browser.
+     *
      * @var string
      */
     protected $retVal;
 
     /**
      * Guid of the current releases.
+     *
      * @var string
      */
     protected $relGuid;
@@ -86,7 +90,8 @@ class NZBImport
     /**
      * Construct.
      *
-     * @param array $options Class instances / various options.
+     * @param  array  $options  Class instances / various options.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -116,12 +121,12 @@ class NZBImport
     }
 
     /**
-     * @param array $filesToProcess List of NZB files to import.
-     * @param bool|string $useNzbName Use the NZB file name as release name?
-     * @param bool $delete Delete the NZB when done?
-     * @param bool $deleteFailed Delete the NZB if failed importing?
-     *
+     * @param  array  $filesToProcess  List of NZB files to import.
+     * @param  bool|string  $useNzbName  Use the NZB file name as release name?
+     * @param  bool  $delete  Delete the NZB when done?
+     * @param  bool  $deleteFailed  Delete the NZB if failed importing?
      * @return string|bool
+     *
      * @throws \Exception
      */
     public function beginImport($filesToProcess, $useNzbName = false, $delete = true, $deleteFailed = true)
@@ -237,8 +242,9 @@ class NZBImport
 
     /**
      * @param $nzbXML
-     * @param bool $useNzbName
+     * @param  bool  $useNzbName
      * @return bool
+     *
      * @throws \Exception
      */
     protected function scanNZBFile(&$nzbXML, $useNzbName = false): bool
@@ -360,8 +366,8 @@ class NZBImport
      * Insert the NZB details into the database.
      *
      * @param $nzbDetails
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     protected function insertNZB($nzbDetails): bool
@@ -460,7 +466,7 @@ class NZBImport
     /**
      * Echo message to browser or CLI.
      *
-     * @param string $message
+     * @param  string  $message
      */
     protected function echoOut($message): void
     {

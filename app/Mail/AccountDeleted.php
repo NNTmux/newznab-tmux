@@ -39,6 +39,7 @@ class AccountDeleted extends Mailable
 
     /**
      * @return $this
+     *
      * @throws \Exception
      */
     public function build()

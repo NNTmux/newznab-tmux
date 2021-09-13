@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    ruhllatio
  * @copyright 2016 nZEDb
  */
@@ -43,7 +44,8 @@ abstract class Capabilities
     /**
      * Construct.
      *
-     * @param array $options Class instances.
+     * @param  array  $options  Class instances.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -57,11 +59,11 @@ abstract class Capabilities
     /**
      * Print XML or JSON output.
      *
-     * @param array|\Illuminate\Database\Eloquent\Collection $data   Data to print.
-     * @param array  $params Additional request parameters
-     * @param bool   $xml    True: Print as XML False: Print as JSON.
-     * @param int    $offset How much releases to skip
-     * @param string $type   What type of API query to format if XML
+     * @param  array|\Illuminate\Database\Eloquent\Collection  $data  Data to print.
+     * @param  array  $params  Additional request parameters
+     * @param  bool  $xml  True: Print as XML False: Print as JSON.
+     * @param  int  $offset  How much releases to skip
+     * @param  string  $type  What type of API query to format if XML
      *
      * @throws \Exception
      */
@@ -114,6 +116,7 @@ abstract class Capabilities
      * Collect and return various capability information for usage in API.
      *
      * @return array
+     *
      * @throws \Exception
      */
     public function getForMenu(): array

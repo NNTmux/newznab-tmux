@@ -10,8 +10,8 @@ use Illuminate\Support\Arr;
 class AdultController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string                   $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id
      *
      * @throws \Exception
      */

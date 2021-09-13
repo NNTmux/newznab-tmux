@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $videoaspect
  * @property float|null $videoframerate
  * @property string|null $videolibrary
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData whereContainerformat($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData whereOverallbitrate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData whereReleasesId($value)
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData whereVideolibrary($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData whereVideowidth($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoData query()

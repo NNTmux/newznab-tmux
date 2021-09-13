@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    ruhllatio
  * @copyright 2015 nZEDb
  */
@@ -31,9 +32,7 @@ class Country
     /**
      * Get a country code for a country name.
      *
-     * @param string $country
-     *
-     *
+     * @param  string  $country
      * @return mixed
      */
     public static function countryCode($country)

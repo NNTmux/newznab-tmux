@@ -52,6 +52,7 @@ class UpdateNNTmuxComposer extends Command
      * option is added to the command to prevent development packages being also downloaded.
      *
      * @return string
+     *
      * @throws \Cz\Git\GitException
      */
     protected function composer()

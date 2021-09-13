@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $week
  * @property int $month
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExpirationEmail newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExpirationEmail newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExpirationEmail query()

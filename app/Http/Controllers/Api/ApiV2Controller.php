@@ -56,8 +56,9 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function movie(Request $request): \Illuminate\Http\JsonResponse
@@ -110,9 +111,9 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -179,9 +180,9 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -261,8 +262,7 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function getNzb(Request $request)
@@ -279,8 +279,7 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function details(Request $request): \Illuminate\Http\JsonResponse

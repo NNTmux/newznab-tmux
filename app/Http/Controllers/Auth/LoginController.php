@@ -49,8 +49,9 @@ class LoginController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse|void
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
@@ -133,8 +134,7 @@ class LoginController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function logout(Request $request)

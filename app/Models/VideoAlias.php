@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $videos_id FK to videos.id of the parent title.
  * @property string $title AKA of the video.
  * @property-read \App\Models\Video $video
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoAlias whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoAlias whereVideosId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoAlias newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoAlias newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoAlias query()

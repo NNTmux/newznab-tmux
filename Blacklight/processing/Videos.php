@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    niel
  * @copyright 2015 nZEDb
  */
@@ -43,7 +44,7 @@ abstract class Videos
     public $echooutput;
 
     /**
-     * @var array	sites	The sites that we have an ID columns for in our video table.
+     * @var array sites	The sites that we have an ID columns for in our video table.
      */
     private static $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
 
@@ -68,20 +69,19 @@ abstract class Videos
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param      $groupID
-     * @param      $guidChar
-     * @param      $process
-     * @param bool $local
+     * @param  $groupID
+     * @param  $guidChar
+     * @param  $process
+     * @param  bool  $local
      */
     abstract protected function processSite($groupID, $guidChar, $process, $local = false): void;
 
     /**
      * Get video info from a Video ID and column.
      *
-     * @param string  $siteColumn
-     * @param int $videoID
-     *
-     * @return array|false    False if invalid site, or ID not found; Site id value otherwise.
+     * @param  string  $siteColumn
+     * @param  int  $videoID
+     * @return array|false False if invalid site, or ID not found; Site id value otherwise.
      */
     protected function getSiteIDFromVideoID($siteColumn, $videoID)
     {
@@ -97,8 +97,7 @@ abstract class Videos
     /**
      * Get TV show local timezone from a Video ID.
      *
-     * @param int $videoID
-     *
+     * @param  int  $videoID
      * @return string Empty string if no query return or tz style timezone
      */
     protected function getLocalZoneFromVideoID($videoID): string
@@ -129,7 +128,7 @@ abstract class Videos
     /**
      * @param $title
      * @param $type
-     * @param int $source
+     * @param  int  $source
      * @return $this|array|bool|false|\Illuminate\Database\Eloquent\Model|mixed|null
      */
     public function getByTitle($title, $type, $source = 0)
@@ -204,7 +203,7 @@ abstract class Videos
     /**
      * @param $title
      * @param $type
-     * @param int $source
+     * @param  int  $source
      * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public function getTitleExact($title, $type, $source = 0)
@@ -240,10 +239,9 @@ abstract class Videos
     /**
      * Supplementary function for getByTitle that queries for a like match.
      *
-     * @param        $title
-     * @param        $type
-     * @param int    $source
-     *
+     * @param  $title
+     * @param  $type
+     * @param  int  $source
      * @return array|false
      */
     public function getTitleLoose($title, $type, $source = 0)
@@ -286,7 +284,7 @@ abstract class Videos
      *
      * @param $title
      * @param $type
-     * @param int $source
+     * @param  int  $source
      * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public function getAlternativeTitleExact($title, $type, $source = 0)
@@ -318,8 +316,8 @@ abstract class Videos
     /**
      * Inserts aliases for videos.
      *
-     * @param       $videoId
-     * @param array $aliases
+     * @param  $videoId
+     * @param  array  $aliases
      */
     public function addAliases($videoId, array $aliases = []): void
     {
@@ -343,8 +341,8 @@ abstract class Videos
      * Retrieves all aliases for given VideoID or VideoID for a given alias.
      *
      *
-     * @param int $videoId
-     * @param string $alias
+     * @param  int  $videoId
+     * @param  string  $alias
      * @return VideoAlias[]|bool|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getAliases(int $videoId, string $alias = '')
