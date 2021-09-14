@@ -43,12 +43,14 @@ class Movie
 
     /**
      * Current title being passed through various sites/api's.
+     *
      * @var string
      */
     protected $currentTitle = '';
 
     /**
      * Current year of parsed search name.
+     *
      * @var string
      */
     protected $currentYear = '';
@@ -77,6 +79,7 @@ class Movie
 
     /**
      * Language to fetch from IMDB.
+     *
      * @var string
      */
     protected $lookuplanguage;
@@ -147,7 +150,8 @@ class Movie
     protected $colorCli;
 
     /**
-     * @param array $options Class instances / Echo to CLI.
+     * @param  array  $options  Class instances / Echo to CLI.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -198,7 +202,6 @@ class Movie
 
     /**
      * @param $imdbId
-     *
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
      */
     public function getMovieInfo($imdbId)
@@ -210,14 +213,13 @@ class Movie
      * Get movie releases with covers for movie browse page.
      *
      *
-     * @param       $page
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
-     * @param int   $maxAge
-     * @param array $excludedCats
-     *
+     * @param  $page
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
      * @return array|mixed
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
@@ -327,7 +329,6 @@ class Movie
      * Get the order type the user requested on the movies page.
      *
      * @param $orderBy
-     *
      * @return array
      */
     protected function getMovieOrder($orderBy): array
@@ -389,9 +390,9 @@ class Movie
     /**
      * Get trailer using IMDB Id.
      *
-     * @param int $imdbID
-     *
+     * @param  int  $imdbID
      * @return bool|string
+     *
      * @throws \Exception
      */
     public function getTrailer($imdbID)
@@ -424,8 +425,7 @@ class Movie
     /**
      * Parse trakt info, insert into DB.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return mixed
      */
     public function parseTraktTv(&$data)
@@ -466,8 +466,7 @@ class Movie
     /**
      * Checks if the value is set and not empty, returns it, else empty string.
      *
-     * @param mixed $value
-     *
+     * @param  mixed  $value
      * @return string
      */
     private function checkTraktValue($value): string
@@ -501,7 +500,7 @@ class Movie
     /**
      * Update movie on movie-edit page.
      *
-     * @param array $values Array of keys/values to update. See $validKeys
+     * @param  array  $values  Array of keys/values to update. See $validKeys
      * @return bool
      */
     public function update(array $values): bool
@@ -538,12 +537,11 @@ class Movie
     /**
      * Returns a tmdb, imdb or trakt variable, the one that is set. Empty string if both not set.
      *
-     * @param string $variable1
-     * @param string $variable2
-     * @param string $variable3
-     * @param string $variable4
-     * @param string $variable5
-     *
+     * @param  string  $variable1
+     * @param  string  $variable2
+     * @param  string  $variable3
+     * @param  string  $variable4
+     * @param  string  $variable5
      * @return array|string
      */
     protected function setVariables($variable1, $variable2, $variable3, $variable4, $variable5)
@@ -571,8 +569,8 @@ class Movie
      * Fetch IMDB/TMDB/TRAKT/OMDB/iTunes info for the movie.
      *
      * @param $imdbId
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function updateMovieInfo($imdbId): bool
@@ -724,7 +722,6 @@ class Movie
      * Fetch FanArt.tv backdrop / cover / title.
      *
      * @param $imdbId
-     *
      * @return array|false
      */
     protected function fetchFanartTVProperties($imdbId)
@@ -770,9 +767,8 @@ class Movie
      * Fetch info for IMDB id from TMDB.
      *
      *
-     * @param      $imdbId
-     * @param bool $text
-     *
+     * @param  $imdbId
+     * @param  bool  $text
      * @return array|false
      */
     public function fetchTMDBProperties($imdbId, $text = false)
@@ -878,7 +874,6 @@ class Movie
 
     /**
      * @param $imdbId
-     *
      * @return array|false
      */
     public function fetchIMDBProperties($imdbId)
@@ -939,8 +934,8 @@ class Movie
      * Fetch TraktTV backdrop / cover / title.
      *
      * @param $imdbId
-     *
      * @return array|false
+     *
      * @throws \Exception
      */
     public function fetchTraktTVProperties($imdbId)
@@ -991,7 +986,6 @@ class Movie
      * Fetch OMDb backdrop / cover / title.
      *
      * @param $imdbId
-     *
      * @return array|false
      */
     public function fetchOmdbAPIProperties($imdbId)
@@ -1039,9 +1033,9 @@ class Movie
     }
 
     /**
-     * @param string $title
-     *
+     * @param  string  $title
      * @return array|bool
+     *
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      * @throws \Exception
      */
@@ -1079,12 +1073,12 @@ class Movie
     /**
      * Update a release with a IMDB id.
      *
-     * @param string $buffer Data to parse a IMDB id/Trakt Id from.
-     * @param string $service Method that called this method.
-     * @param int $id id of the release.
-     * @param int $processImdb To get IMDB info on this IMDB id or not.
-     *
+     * @param  string  $buffer  Data to parse a IMDB id/Trakt Id from.
+     * @param  string  $service  Method that called this method.
+     * @param  int  $id  id of the release.
+     * @param  int  $processImdb  To get IMDB info on this IMDB id or not.
      * @return string
+     *
      * @throws \Exception
      */
     public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
@@ -1127,9 +1121,10 @@ class Movie
      * Process releases with no IMDB id's.
      *
      *
-     * @param string $groupID
-     * @param string $guidChar
-     * @param int $lookupIMDB
+     * @param  string  $groupID
+     * @param  string  $guidChar
+     * @param  int  $lookupIMDB
+     *
      * @throws \Exception
      */
     public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1): void
@@ -1312,8 +1307,7 @@ class Movie
     /**
      * Parse a movie name from a release search name.
      *
-     * @param string $releaseName
-     *
+     * @param  string  $releaseName
      * @return bool
      */
     protected function parseMovieSearchName($releaseName): bool

@@ -43,7 +43,8 @@ class TVDB extends TV
     /**
      * TVDB constructor.
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -71,10 +72,10 @@ class TVDB extends TV
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param      $groupID
-     * @param      $guidChar
-     * @param      $process
-     * @param bool $local
+     * @param  $groupID
+     * @param  $guidChar
+     * @param  $process
+     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
     {
@@ -213,7 +214,6 @@ class TVDB extends TV
      *
      * @param $videoID
      * @param $siteId
-     *
      * @return bool
      */
     protected function getBanner($videoID, $siteId): bool
@@ -226,9 +226,8 @@ class TVDB extends TV
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param string $cleanName
-     * @param string $country
-     *
+     * @param  string  $cleanName
+     * @param  string  $country
      * @return array|bool|false
      */
     protected function getShowInfo($cleanName, $country = '')
@@ -294,8 +293,7 @@ class TVDB extends TV
     /**
      * Retrieves the poster art for the processed show.
      *
-     * @param int $videoId -- the local Video ID
-     *
+     * @param  int  $videoId  -- the local Video ID
      * @return int
      */
     public function getPoster($videoId): int
@@ -321,12 +319,11 @@ class TVDB extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param int $tvDbId
-     * @param int $season
-     * @param int $episode
-     * @param string  $airDate
-     * @param int $videoId
-     *
+     * @param  int  $tvDbId
+     * @param  int  $season
+     * @param  int  $episode
+     * @param  string  $airDate
+     * @param  int  $videoId
      * @return array|false
      */
     protected function getEpisodeInfo($tvDbId, $season, $episode, $airDate = '', $videoId = 0)
@@ -375,7 +372,6 @@ class TVDB extends TV
      * Returns the formatted array.
      *
      * @param $show
-     *
      * @return array
      */
     protected function formatShowInfo($show): array
@@ -426,7 +422,6 @@ class TVDB extends TV
      * Returns the formatted array.
      *
      * @param $episode
-     *
      * @return array
      */
     protected function formatEpisodeInfo($episode): array

@@ -58,7 +58,9 @@ class SphinxSearch
 
     /**
      * Insert release into Sphinx RT table.
+     *
      * @param $parameters
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -76,7 +78,9 @@ class SphinxSearch
 
     /**
      * Insert release into Sphinx RT table.
+     *
      * @param $parameters
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -94,7 +98,8 @@ class SphinxSearch
 
     /**
      * Delete release from Sphinx RT tables.
-     * @param array $identifiers ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
+     *
+     * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
      */
     public function deleteRelease($identifiers): void
     {
@@ -112,8 +117,7 @@ class SphinxSearch
     /**
      * Escapes characters that are treated as special operators by the query language parser.
      *
-     * @param string $string unescaped string
-     *
+     * @param  string  $string  unescaped string
      * @return string Escaped string.
      */
     public static function escapeString($string): string
@@ -127,7 +131,8 @@ class SphinxSearch
     /**
      * Update Sphinx Relases index for given releases_id.
      *
-     * @param int $releaseID
+     * @param  int  $releaseID
+     *
      * @throws \Exception
      */
     public function updateRelease($releaseID): void
@@ -147,7 +152,8 @@ class SphinxSearch
     /**
      * Update Sphinx Predb index for given predb_id.
      *
-     * @param array $parameters
+     * @param  array  $parameters
+     *
      * @throws \Exception
      */
     public function updatePreDb($parameters): void
@@ -160,7 +166,7 @@ class SphinxSearch
     /**
      * Truncate the RT index.
      *
-     * @param array $indexes
+     * @param  array  $indexes
      * @return bool
      */
     public function truncateRTIndex($indexes = []): bool
@@ -194,12 +200,12 @@ class SphinxSearch
     }
 
     /**
-     * @param string $rt_index (releases_rt or predb_rt)
-     * @param string $searchString (what are we looking for?)
-     * @param array $column (one or multiple columns from the columns that exist in indexes)
-     * @param array $searchArray
-     *
+     * @param  string  $rt_index  (releases_rt or predb_rt)
+     * @param  string  $searchString  (what are we looking for?)
+     * @param  array  $column  (one or multiple columns from the columns that exist in indexes)
+     * @param  array  $searchArray
      * @return array
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException

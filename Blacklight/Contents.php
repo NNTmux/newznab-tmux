@@ -99,7 +99,6 @@ class Contents
     /**
      * @param $id
      * @param $role
-     *
      * @return array|false
      */
     public function getForMenuByTypeAndRole($id, $role)
@@ -133,7 +132,6 @@ class Contents
     /**
      * @param $id
      * @param $role
-     *
      * @return bool|\Illuminate\Database\Eloquent\Collection|static[]
      */
     public function getByID($id, $role)
@@ -149,7 +147,6 @@ class Contents
 
     /**
      * @param $content
-     *
      * @return mixed
      */
     public function validate($content)
@@ -167,7 +164,6 @@ class Contents
 
     /**
      * @param $form
-     *
      * @return int
      */
     public function add($form)
@@ -181,7 +177,6 @@ class Contents
 
     /**
      * @param $id
-     *
      * @return mixed
      */
     public function delete($id)
@@ -191,7 +186,6 @@ class Contents
 
     /**
      * @param $form
-     *
      * @return mixed|Content
      */
     public function update($form)
@@ -203,7 +197,6 @@ class Contents
 
     /**
      * @param $content
-     *
      * @return int
      */
     public function data_update($content): int
@@ -228,7 +221,6 @@ class Contents
 
     /**
      * @param $content
-     *
      * @return int
      */
     public function data_add($content)
@@ -283,7 +275,6 @@ class Contents
     /**
      * @param $id
      * @param $role
-     *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function data_getByID($id, $role)
@@ -328,7 +319,6 @@ class Contents
     /**
      * @param $id
      * @param $role
-     *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function data_getForMenuByTypeAndRole($id, $role)

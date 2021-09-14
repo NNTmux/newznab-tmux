@@ -11,8 +11,8 @@ use sspat\ESQuerySanitizer\Sanitizer;
 class ElasticSearchSiteSearch
 {
     /**
-     * @param string|array $phrases
-     * @param int $limit
+     * @param  string|array  $phrases
+     * @param  int  $limit
      * @return mixed
      */
     public function indexSearch($phrases, int $limit)
@@ -70,8 +70,8 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param string|array $searchName
-     * @param int $limit
+     * @param  string|array  $searchName
+     * @param  int  $limit
      * @return array
      */
     public function indexSearchApi($searchName, int $limit)
@@ -130,8 +130,9 @@ class ElasticSearchSiteSearch
 
     /**
      * Search function used in TV, TV API, Movies and Anime searches.
-     * @param string|array $name
-     * @param int $limit
+     *
+     * @param  string|array  $name
+     * @param  int  $limit
      * @return array
      */
     public function indexSearchTMA($name, $limit)
@@ -189,7 +190,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param string|array $search
+     * @param  string|array  $search
      * @return array|\Illuminate\Support\Collection
      */
     public function predbIndexSearch($search)
@@ -240,7 +241,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array $parameters
+     * @param  array  $parameters
      */
     public function insertRelease(array $parameters): void
     {
@@ -264,7 +265,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param int $id
+     * @param  int  $id
      */
     public function updateRelease(int $id)
     {
@@ -374,7 +375,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array|string $phrases
+     * @param  array|string  $phrases
      * @return string
      */
     private function sanitize($phrases): string

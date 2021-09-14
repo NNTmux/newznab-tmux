@@ -106,7 +106,8 @@ class ReleaseRemover
     /**
      * Construct.
      *
-     * @param array $options Class instances / various options.
+     * @param  array  $options  Class instances / various options.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -137,13 +138,13 @@ class ReleaseRemover
     /**
      * Remove releases using user criteria.
      *
-     * @param array $arguments Array of criteria used to delete unwanted releases.
-     *                         Criteria must look like this : columnName=modifier="content"
-     *                         columnName is a column name from the releases table.
-     *                         modifiers are : equals,like,bigger,smaller
-     *                         content is what to change the column content to
-     *
+     * @param  array  $arguments  Array of criteria used to delete unwanted releases.
+     *                            Criteria must look like this : columnName=modifier="content"
+     *                            columnName is a column name from the releases table.
+     *                            modifiers are : equals,like,bigger,smaller
+     *                            content is what to change the column content to
      * @return string|bool
+     *
      * @throws \Exception
      */
     public function removeByCriteria($arguments)
@@ -202,13 +203,13 @@ class ReleaseRemover
     /**
      * Delete crap releases.
      *
-     * @param bool $delete Delete the release or just show the result?
-     * @param int|string $time Time in hours (to select old releases) or 'full' for no time limit.
-     * @param string $type Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
-     *                                           passwordurl, sample, scr, short, size, ''] ('' runs against all types)
-     * @param string|int $blacklistID
-     *
+     * @param  bool  $delete  Delete the release or just show the result?
+     * @param  int|string  $time  Time in hours (to select old releases) or 'full' for no time limit.
+     * @param  string  $type  Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
+     *                        passwordurl, sample, scr, short, size, ''] ('' runs against all types)
+     * @param  string|int  $blacklistID
      * @return string|bool
+     *
      * @throws \Exception
      */
     public function removeCrap($delete, $time, $type = '', $blacklistID = '')
@@ -333,6 +334,7 @@ class ReleaseRemover
      * Remove releases with 15 or more letters or numbers, nothing else.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeGibberish()
@@ -362,6 +364,7 @@ class ReleaseRemover
      * Remove releases with 25 or more letters/numbers, probably hashed.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeHashed()
@@ -392,6 +395,7 @@ class ReleaseRemover
      * Remove releases with 5 or less letters/numbers.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeShort()
@@ -421,6 +425,7 @@ class ReleaseRemover
      * Remove releases with an exe file not in other misc or pc apps/games.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeExecutable()
@@ -452,6 +457,7 @@ class ReleaseRemover
      * Remove releases with an install.bin file.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeInstallBin()
@@ -478,6 +484,7 @@ class ReleaseRemover
      * Remove releases with an password.url file.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removePasswordURL()
@@ -504,6 +511,7 @@ class ReleaseRemover
      * Remove releases with password in the search name.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removePassworded()
@@ -553,6 +561,7 @@ class ReleaseRemover
      * Remove releases smaller than 2MB with 1 part not in MP3/books/misc section.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeSize()
@@ -589,6 +598,7 @@ class ReleaseRemover
      * Remove releases bigger than 200MB with just a single file.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeHuge()
@@ -613,6 +623,7 @@ class ReleaseRemover
      * Remove releases that are just a single nzb file.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeSingleNZB()
@@ -639,6 +650,7 @@ class ReleaseRemover
      * Remove releases with more than 1 part, less than 40MB, sample in name. TV/Movie sections.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeSample()
@@ -682,6 +694,7 @@ class ReleaseRemover
      * Remove releases with a scr file in the filename/subject.
      *
      * @return bool|string
+     *
      * @throws \Exception
      */
     protected function removeSCR()
@@ -708,6 +721,7 @@ class ReleaseRemover
      * Remove releases using the site blacklist regexes.
      *
      * @return bool
+     *
      * @throws \Exception
      */
     protected function removeBlacklist(): bool
@@ -841,6 +855,7 @@ class ReleaseRemover
      * Remove releases using the site blacklist regexes against file names.
      *
      * @return bool
+     *
      * @throws \Exception
      */
     protected function removeBlacklistFiles(): bool
@@ -936,6 +951,7 @@ class ReleaseRemover
      * Thanks to dizant from nZEDb forums for the sql query.
      *
      * @return string|bool
+     *
      * @throws \Exception
      */
     protected function removeWMV()
@@ -961,6 +977,7 @@ class ReleaseRemover
      * Thanks to dizant from nZEDb forums for parts of the sql query.
      *
      * @return string|bool
+     *
      * @throws \Exception
      */
     protected function removeCodecPoster()
@@ -1023,6 +1040,7 @@ class ReleaseRemover
      * Delete releases from the database.
      *
      * @return true
+     *
      * @throws \Exception
      */
     protected function deleteReleases(): bool
@@ -1070,8 +1088,7 @@ class ReleaseRemover
     /**
      * Go through user arguments and format part of the query.
      *
-     * @param string $argument User argument.
-     *
+     * @param  string  $argument  User argument.
      * @return string|false
      */
     protected function formatCriteriaQuery($argument)
@@ -1273,8 +1290,7 @@ class ReleaseRemover
     /**
      * Remove multiple spaces and trim leading spaces.
      *
-     * @param string $string
-     *
+     * @param  string  $string
      * @return string
      */
     protected function cleanSpaces($string): string
@@ -1285,9 +1301,8 @@ class ReleaseRemover
     /**
      * Format a "like" string. ie: "name LIKE '%test%' AND name LIKE '%123%'.
      *
-     * @param string $string The string to format.
-     * @param string $type   The column name.
-     *
+     * @param  string  $string  The string to format.
+     * @param  string  $type  The column name.
      * @return string
      */
     protected function formatLike($string, $type): string
@@ -1320,8 +1335,7 @@ class ReleaseRemover
     }
 
     /**
-     * @param string $dbRegex
-     *
+     * @param  string  $dbRegex
      * @return bool|mixed|string
      */
     protected function extractSrchFromRegx($dbRegex = '')

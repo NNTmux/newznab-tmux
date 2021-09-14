@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $backdrop
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereActors($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereBackdrop($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereClassused($value)
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereTrailers($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereUpdatedAt($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo query()

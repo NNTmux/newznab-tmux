@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\ReleaseSearchData.
  *
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSearchData newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSearchData newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSearchData query()

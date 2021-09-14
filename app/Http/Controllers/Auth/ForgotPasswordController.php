@@ -36,7 +36,7 @@ class ForgotPasswordController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */

@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $releases_id FK to releases.id
  * @property int $subsid
  * @property string $subslanguage
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle whereSubsid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle whereSubslanguage($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle query()

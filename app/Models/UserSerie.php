@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCategories($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereId($value)
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUsersId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereVideosId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie query()
@@ -51,7 +53,7 @@ class UserSerie extends Model
      *
      * @param $userId
      * @param $videoId
-     * @param array $catID
+     * @param  array  $catID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addShow($userId, $videoId, array $catID = [])
@@ -137,9 +139,9 @@ class UserSerie extends Model
     /**
      * Update a TV show category ID for a user's "my show" TV show.
      *
-     * @param       $users_id
-     * @param       $videos_id
-     * @param array $catID List of category ID's.
+     * @param  $users_id
+     * @param  $videos_id
+     * @param  array  $catID  List of category ID's.
      */
     public static function updateShow($users_id, $videos_id, array $catID = []): void
     {

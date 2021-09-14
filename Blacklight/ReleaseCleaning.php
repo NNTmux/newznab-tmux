@@ -15,6 +15,7 @@ class ReleaseCleaning
 {
     /**
      * Used for matching endings in article subjects.
+     *
      * @const
      * @string
      */
@@ -22,6 +23,7 @@ class ReleaseCleaning
 
     /**
      * Used for matching file extension endings in article subjects.
+     *
      * @const
      * @string
      */
@@ -29,6 +31,7 @@ class ReleaseCleaning
 
     /**
      * Used for matching size strings in article subjects.
+     *
      * @example ' - 365.15 KB - '
      * @const
      * @string
@@ -90,12 +93,12 @@ class ReleaseCleaning
     }
 
     /**
-     * @param      $subject
-     * @param      $fromName
-     * @param      $groupName
-     * @param bool $usePre
-     *
+     * @param  $subject
+     * @param  $fromName
+     * @param  $groupName
+     * @param  bool  $usePre
      * @return array|false|string
+     *
      * @throws \Exception
      */
     public function releaseCleaner($subject, $fromName, $groupName, $usePre = false)
@@ -424,7 +427,6 @@ class ReleaseCleaning
 
     /**
      * @param $subject
-     *
      * @return string
      */
     public function releaseCleanerHelper($subject): string
@@ -438,7 +440,6 @@ class ReleaseCleaning
      * Cleans release name for the namefixer class.
      *
      * @param $name
-     *
      * @return mixed|string
      */
     public function fixerCleaner($name)

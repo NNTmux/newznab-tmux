@@ -14,30 +14,35 @@ class IRCScraper extends IRCClient
 {
     /**
      * Regex to ignore categories.
+     *
      * @var string|bool
      */
     protected $_categoryIgnoreRegex;
 
     /**
      * Array of current pre info.
+     *
      * @var array
      */
     protected $_curPre;
 
     /**
      * List of groups and their id's.
+     *
      * @var array
      */
     protected $_groupList;
 
     /**
      * Array of ignored channels.
+     *
      * @var array
      */
     protected $_ignoredChannels;
 
     /**
      * Is this pre nuked or un nuked?
+     *
      * @var bool
      */
     protected $_nuked;
@@ -49,12 +54,14 @@ class IRCScraper extends IRCClient
 
     /**
      * Run this in silent mode (no text output).
+     *
      * @var bool
      */
     protected $_silent;
 
     /**
      * Regex to ignore PRE titles.
+     *
      * @var string|bool
      */
     protected $_titleIgnoreRegex;
@@ -71,8 +78,9 @@ class IRCScraper extends IRCClient
     /**
      * Construct.
      *
-     * @param bool $silent Run this in silent mode (no text output).
-     * @param bool $debug Turn on debug? Shows sent/received socket buffer messages.
+     * @param  bool  $silent  Run this in silent mode (no text output).
+     * @param  bool  $debug  Turn on debug? Shows sent/received socket buffer messages.
+     *
      * @throws \Exception
      */
     public function __construct(&$silent, &$debug)
@@ -410,7 +418,7 @@ class IRCScraper extends IRCClient
     /**
      * Echo new or update pre to CLI.
      *
-     * @param bool $new
+     * @param  bool  $new
      */
     protected function _doEcho($new = true)
     {
@@ -466,8 +474,7 @@ class IRCScraper extends IRCClient
     /**
      * Get a group id for a group name.
      *
-     * @param string $groupName
-     *
+     * @param  string  $groupName
      * @return mixed
      */
     protected function _getGroupID($groupName)

@@ -28,7 +28,7 @@ class WelcomeEmail extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param \App\Models\User $user
+     * @param  \App\Models\User  $user
      */
     public function __construct($user)
     {

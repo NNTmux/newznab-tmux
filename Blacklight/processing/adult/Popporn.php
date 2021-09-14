@@ -137,8 +137,7 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * @param bool $extras
-     *
+     * @param  bool  $extras
      * @return array|mixed
      */
     protected function productInfo($extras = false)
@@ -251,8 +250,7 @@ class Popporn extends AdultMovies
     /**
      * Searches for match against searchterm.
      *
-     * @param string $movie
-     *
+     * @param  string  $movie
      * @return bool , true if search >= 90%
      */
     public function processSite($movie): bool

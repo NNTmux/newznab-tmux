@@ -13,6 +13,7 @@
  * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    niel
  * @author    DariusIII
  * @copyright 2016 nZEDb, 2017 NNTmux
@@ -33,6 +34,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $value
  * @property string $hint
  * @property string $setting
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereHint($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSection($value)
@@ -40,6 +42,7 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSubsection($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereValue($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings query()
@@ -115,7 +118,7 @@ class Settings extends Model
     /**
      * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
      *
-     * @param string $key
+     * @param  string  $key
      * @return mixed
      */
     public function __get($key)
@@ -135,9 +138,10 @@ class Settings extends Model
     /**
      * Return a tree-like array of all or selected settings.
      *
-     * @param bool $excludeUnsectioned If rows with empty 'section' field should be excluded.
-     *		Note this doesn't prevent empty 'subsection' fields.
+     * @param  bool  $excludeUnsectioned  If rows with empty 'section' field should be excluded.
+     *                                    Note this doesn't prevent empty 'subsection' fields.
      * @return array
+     *
      * @throws \RuntimeException
      */
     public static function toTree($excludeUnsectioned = true): array
@@ -163,7 +167,6 @@ class Settings extends Model
 
     /**
      * @param $setting
-     *
      * @return mixed
      */
     public static function settingValue($setting)
@@ -191,10 +194,9 @@ class Settings extends Model
     }
 
     /**
-     * @param string $requiredVersion The minimum version to compare against
-     *
-     * @return bool|null       TRUE if Db version is greater than or eaqual to $requiredVersion,
-     * false if not, and null if the version isn't available to check against.
+     * @param  string  $requiredVersion  The minimum version to compare against
+     * @return bool|null TRUE if Db version is greater than or eaqual to $requiredVersion,
+     *                   false if not, and null if the version isn't available to check against.
      */
     public function isDbVersionAtLeast($requiredVersion): ?bool
     {
@@ -220,7 +222,7 @@ class Settings extends Model
     }
 
     /**
-     * @param array $data
+     * @param  array  $data
      */
     public static function settingsUpdate(array $data = [])
     {

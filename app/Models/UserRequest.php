@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\DB;
  * @property string $request
  * @property string $timestamp
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereHosthash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereRequest($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest query()
@@ -69,9 +71,9 @@ class UserRequest extends Model
     /**
      * Get the quantity of API requests in the last day for the users_id.
      *
-     * @param int $userID
-     *
+     * @param  int  $userID
      * @return int
+     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -87,8 +89,8 @@ class UserRequest extends Model
     /**
      * If a user accesses the API, log it.
      *
-     * @param string $token API token of the user
-     * @param string $request The API request.
+     * @param  string  $token  API token of the user
+     * @param  string  $request  The API request.
      */
     public static function addApiRequest($token, $request): void
     {
@@ -99,11 +101,11 @@ class UserRequest extends Model
     /**
      * Delete api requests older than a day.
      *
-     * @param int|bool $userID
-     *                   int The users ID.
-     *                   bool false do all user ID's..
-     *
+     * @param  int|bool  $userID
+     *                            int The users ID.
+     *                            bool false do all user ID's..
      * @return void
+     *
      * @throws \Exception
      * @throws \Throwable
      */

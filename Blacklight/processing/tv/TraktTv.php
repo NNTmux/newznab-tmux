@@ -47,7 +47,8 @@ class TraktTv extends TV
     /**
      * Construct. Set up API key.
      *
-     * @param array $options Class instances.
+     * @param  array  $options  Class instances.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -67,10 +68,10 @@ class TraktTv extends TV
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param      $groupID
-     * @param      $guidChar
-     * @param      $process
-     * @param bool $local
+     * @param  $groupID
+     * @param  $guidChar
+     * @param  $process
+     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
     {
@@ -196,7 +197,6 @@ class TraktTv extends TV
      *
      * @param $videoId
      * @param $siteID
-     *
      * @return bool
      */
     public function getBanner($videoId, $siteID): bool
@@ -207,10 +207,9 @@ class TraktTv extends TV
     /**
      * Retrieve info of TV episode from site using its API.
      *
-     * @param int $siteId
-     * @param int $series
-     * @param int $episode
-     *
+     * @param  int  $siteId
+     * @param  int  $series
+     * @param  int  $episode
      * @return array|false False on failure, an array of information fields otherwise.
      */
     public function getEpisodeInfo($siteId, $series, $episode)
@@ -237,8 +236,7 @@ class TraktTv extends TV
     /**
      * Retrieve poster image for TV episode from site using its API.
      *
-     * @param int $videoId ID from videos table.
-     *
+     * @param  int  $videoId  ID from videos table.
      * @return int
      */
     public function getPoster($videoId): int
@@ -267,9 +265,8 @@ class TraktTv extends TV
     /**
      * Retrieve info of TV programme from site using it's API.
      *
-     * @param string|null|array $name Title of programme to look up. Usually a cleaned up version from releases table.
-     *
-     * @return array|false    False on failure, an array of information fields otherwise.
+     * @param  string|null|array  $name  Title of programme to look up. Usually a cleaned up version from releases table.
+     * @return array|false False on failure, an array of information fields otherwise.
      */
     public function getShowInfo($name)
     {
@@ -321,7 +318,6 @@ class TraktTv extends TV
      * Returns the formatted array.
      *
      * @param $show
-     *
      * @return array
      */
     public function formatShowInfo($show): array
@@ -355,7 +351,6 @@ class TraktTv extends TV
      * Returns the formatted array.
      *
      * @param $episode
-     *
      * @return array
      */
     public function formatEpisodeInfo($episode): array

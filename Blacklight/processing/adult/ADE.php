@@ -9,12 +9,14 @@ class ADE extends AdultMovies
 {
     /**
      * If a direct link is given parse it rather then search.
+     *
      * @var string
      */
     protected $directLink = '';
 
     /**
      * Search keyword.
+     *
      * @var string
      */
     protected $searchTerm = '';
@@ -54,6 +56,7 @@ class ADE extends AdultMovies
 
     /**
      * Gets Trailer Movies.
+     *
      * @return array - url, streamid, basestreamingurl
      */
     protected function trailers()
@@ -85,6 +88,7 @@ class ADE extends AdultMovies
 
     /**
      * Gets cover images for the xxx release.
+     *
      * @return array - Boxcover and backcover
      */
     protected function covers()
@@ -133,6 +137,7 @@ class ADE extends AdultMovies
 
     /**
      * Gets Genres, if exists return array else return false.
+     *
      * @return mixed array - Genres
      */
     protected function genres()
@@ -151,7 +156,7 @@ class ADE extends AdultMovies
     /**
      * Gets Product Information and/or Features.
      *
-     * @param bool $extras
+     * @param  bool  $extras
      * @return array - ProductInfo/Extras = features
      */
     protected function productInfo($extras = false)
@@ -188,8 +193,7 @@ class ADE extends AdultMovies
     /**
      * Searches xxx name.
      *
-     * @param string $movie
-     *
+     * @param  string  $movie
      * @return bool - True if releases has 90% match, else false
      */
     public function processSite($movie): bool

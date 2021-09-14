@@ -17,9 +17,8 @@ use Symfony\Component\Process\Process;
 if (! function_exists('getRawHtml')) {
 
     /**
-     * @param      $url
-     * @param bool $cookie
-     *
+     * @param  $url
+     * @param  bool  $cookie
      * @return bool|mixed|string
      */
     function getRawHtml($url, $cookie = false)
@@ -58,8 +57,8 @@ if (! function_exists('makeFieldLinks')) {
      * @param $data
      * @param $field
      * @param $type
-     *
      * @return string
+     *
      * @throws \Exception
      */
     function makeFieldLinks($data, $field, $type)
@@ -88,8 +87,7 @@ if (! function_exists('makeFieldLinks')) {
 
 if (! function_exists('getUserBrowseOrder')) {
     /**
-     * @param string $orderBy
-     *
+     * @param  string  $orderBy
      * @return array
      */
     function getUserBrowseOrder($orderBy): array
@@ -171,6 +169,7 @@ if (! function_exists('getUserBrowseOrdering')) {
 if (! function_exists('createGUID')) {
     /**
      * @return string
+     *
      * @throws \Exception
      */
     function createGUID(): string
@@ -185,8 +184,7 @@ if (! function_exists('createGUID')) {
 
 if (! function_exists('getSimilarName')) {
     /**
-     * @param string $name
-     *
+     * @param  string  $name
      * @return string
      */
     function getSimilarName($name): string
@@ -197,8 +195,7 @@ if (! function_exists('getSimilarName')) {
 
 if (! function_exists('color')) {
     /**
-     * @param string $string
-     *
+     * @param  string  $string
      * @return \Colors\Color
      */
     function color($string = ''): Color
@@ -210,9 +207,8 @@ if (! function_exists('color')) {
 if (! function_exists('human_filesize')) {
 
     /**
-     * @param     $bytes
-     * @param int $decimals
-     *
+     * @param  $bytes
+     * @param  int  $decimals
      * @return string
      */
     function human_filesize($bytes, $decimals = 0): string
@@ -228,7 +224,6 @@ if (! function_exists('bcdechex')) {
 
     /**
      * @param $dec
-     *
      * @return string
      */
     function bcdechex($dec)
@@ -249,9 +244,8 @@ if (! function_exists('runCmd')) {
      * Run CLI command.
      *
      *
-     * @param string $command
-     * @param bool $debug
-     *
+     * @param  string  $command
+     * @param  bool  $debug
      * @return string
      */
     function runCmd($command, $debug = false)
@@ -277,7 +271,6 @@ if (! function_exists('escapeString')) {
 
     /**
      * @param $string
-     *
      * @return string
      */
     function escapeString($string)
@@ -290,7 +283,6 @@ if (! function_exists('realDuration')) {
 
     /**
      * @param $milliseconds
-     *
      * @return string
      */
     function realDuration($milliseconds)
@@ -304,7 +296,7 @@ if (! function_exists('realDuration')) {
 if (! function_exists('is_it_json')) {
 
     /**
-     * @param array|string $isIt
+     * @param  array|string  $isIt
      * @return bool
      */
     function is_it_json($isIt)
@@ -321,9 +313,9 @@ if (! function_exists('is_it_json')) {
 if (! function_exists('getZipped')) {
 
     /**
-     * @param array $guids
-     *
+     * @param  array  $guids
      * @return string
+     *
      * @throws \Exception
      */
     function getZipped(array $guids = []): string
@@ -359,9 +351,8 @@ if (! function_exists('getZipped')) {
 if (! function_exists('release_flag')) {
     // Function inspired by c0r3@newznabforums adds country flags on the browse page.
     /**
-     * @param string $text Text to match against.
-     * @param string $page Type of page. browse or search.
-     *
+     * @param  string  $text  Text to match against.
+     * @param  string  $page  Type of page. browse or search.
      * @return bool|string
      */
     function release_flag($text, $page)

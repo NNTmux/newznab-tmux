@@ -67,7 +67,8 @@ abstract class TV extends Videos
     /**
      * TV constructor.
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -85,7 +86,6 @@ abstract class TV extends Videos
      *
      * @param $videoID
      * @param $siteId
-     *
      * @return mixed
      */
     abstract protected function getBanner($videoID, $siteId);
@@ -93,19 +93,17 @@ abstract class TV extends Videos
     /**
      * Retrieve info of TV episode from site using its API.
      *
-     * @param int $siteId
-     * @param int $series
-     * @param int $episode
-     *
-     * @return array|false    False on failure, an array of information fields otherwise.
+     * @param  int  $siteId
+     * @param  int  $series
+     * @param  int  $episode
+     * @return array|false False on failure, an array of information fields otherwise.
      */
     abstract protected function getEpisodeInfo($siteId, $series, $episode);
 
     /**
      * Retrieve poster image for TV episode from site using its API.
      *
-     * @param int $videoId ID from videos table.
-     *
+     * @param  int  $videoId  ID from videos table.
      * @return int
      */
     abstract protected function getPoster($videoId): int;
@@ -113,9 +111,8 @@ abstract class TV extends Videos
     /**
      * Retrieve info of TV programme from site using it's API.
      *
-     * @param string $name Title of programme to look up. Usually a cleaned up version from releases table.
-     *
-     * @return array|false    False on failure, an array of information fields otherwise.
+     * @param  string  $name  Title of programme to look up. Usually a cleaned up version from releases table.
+     * @return array|false False on failure, an array of information fields otherwise.
      */
     abstract protected function getShowInfo($name);
 
@@ -124,7 +121,6 @@ abstract class TV extends Videos
      * Returns the formatted array.
      *
      * @param $show
-     *
      * @return array
      */
     abstract protected function formatShowInfo($show): array;
@@ -134,7 +130,6 @@ abstract class TV extends Videos
      * Returns the formatted array.
      *
      * @param $episode
-     *
      * @return array
      */
     abstract protected function formatEpisodeInfo($episode): array;
@@ -143,10 +138,10 @@ abstract class TV extends Videos
      * Retrieve releases for TV processing.
      *
      *
-     * @param string $groupID
-     * @param string $guidChar
-     * @param int $lookupSetting
-     * @param int $status
+     * @param  string  $groupID
+     * @param  string  $guidChar
+     * @param  int  $lookupSetting
+     * @param  int  $status
      * @return \Illuminate\Database\Eloquent\Collection|int|static[]
      */
     public function getTvReleases($groupID = '', $guidChar = '', $lookupSetting = 1, $status = 0)
@@ -179,9 +174,9 @@ abstract class TV extends Videos
     /**
      * Updates the release when match for the current scraper is found.
      *
-     * @param     $videoId
-     * @param     $releaseId
-     * @param int $episodeId
+     * @param  $videoId
+     * @param  $releaseId
+     * @param  int  $episodeId
      */
     public function setVideoIdFound($videoId, $releaseId, $episodeId): void
     {
@@ -207,8 +202,7 @@ abstract class TV extends Videos
      * Inserts a new video ID into the database for TV shows
      * If a duplicate is found it is handle by calling update instead.
      *
-     * @param array $show
-     *
+     * @param  array  $show
      * @return int
      */
     public function add(array $show = []): int
@@ -272,7 +266,7 @@ abstract class TV extends Videos
      * Inserts a new TV episode into the tv_episodes table following a match to a Video ID.
      *
      * @param $videoId
-     * @param array $episode
+     * @param  array  $episode
      * @return false|int
      */
     public function addEpisode($videoId, array $episode = [])
@@ -300,8 +294,8 @@ abstract class TV extends Videos
      * Updates the show info with data from the supplied array
      * Only called when a duplicate show is found during insert.
      *
-     * @param int   $videoId
-     * @param array $show
+     * @param  int  $videoId
+     * @param  array  $show
      */
     public function update($videoId, array $show = []): void
     {
@@ -344,8 +338,8 @@ abstract class TV extends Videos
      *
      *
      * @param $id
-     *
      * @return mixed
+     *
      * @throws \Throwable
      */
     public function delete($id)
@@ -404,11 +398,10 @@ abstract class TV extends Videos
      *
      * Returns the Episode ID or false if not found
      *
-     * @param        $id
-     * @param        $series
-     * @param        $episode
-     * @param string $airdate
-     *
+     * @param  $id
+     * @param  $series
+     * @param  $episode
+     * @param  string  $airdate
      * @return int|false
      */
     public function getBySeasonEp($id, $series, $episode, $airdate = '')
@@ -456,7 +449,6 @@ abstract class TV extends Videos
      * Returns an array of show data.
      *
      * @param $relname
-     *
      * @return array|false
      */
     public function parseInfo($relname)
@@ -497,8 +489,7 @@ abstract class TV extends Videos
     /**
      * Parses the release searchname and returns a show title.
      *
-     * @param string $relname
-     *
+     * @param  string  $relname
      * @return string
      */
     private function parseName($relname)
@@ -532,7 +523,6 @@ abstract class TV extends Videos
      * Parses the release searchname for the season/episode/airdate information.
      *
      * @param $relname
-     *
      * @return array
      */
     private function parseSeasonEp($relname)
@@ -622,8 +612,7 @@ abstract class TV extends Videos
     /**
      * Parses the cleaned release name to determine if it has a country appended.
      *
-     * @param string $showName
-     *
+     * @param  string  $showName
      * @return string
      */
     private function parseCountry($showName): string
@@ -655,7 +644,6 @@ abstract class TV extends Videos
      * Returns the cleaned string.
      *
      * @param $str
-     *
      * @return string
      */
     public function cleanName($str): string
@@ -688,7 +676,6 @@ abstract class TV extends Videos
      * @param $ourName
      * @param $scrapeName
      * @param $probability
-     *
      * @return int|float
      */
     public function checkMatch($ourName, $scrapeName, $probability)
@@ -710,8 +697,7 @@ abstract class TV extends Videos
      * This shouldn't ever happen as I've never heard of a date starting with year being followed by day value.
      * Could this be a mistake? i.e. trying to solve the mm-dd-yyyy/dd-mm-yyyy confusion into a yyyy-mm-dd?
      *
-     * @param string|bool|null $date
-     *
+     * @param  string|bool|null  $date
      * @return string
      */
     public function checkDate($date): string
@@ -734,8 +720,7 @@ abstract class TV extends Videos
      * Returns true or false.
      *
      * @param $array
-     * @param int $type
-     *
+     * @param  int  $type
      * @return bool
      */
     public function checkRequiredAttr($array, $type): bool

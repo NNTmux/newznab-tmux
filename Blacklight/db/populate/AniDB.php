@@ -16,36 +16,42 @@ class AniDB
 
     /**
      * Whether or not to echo message output.
+     *
      * @var bool
      */
     public $echooutput;
 
     /**
      * The directory to store AniDB covers.
+     *
      * @var string
      */
     public $imgSavePath;
 
     /**
      * The name of the nZEDb client for AniDB lookups.
+     *
      * @var string
      */
     private $apiKey;
 
     /**
      * Whether or not AniDB thinks our client is banned.
+     *
      * @var bool
      */
     private $banned;
 
     /**
      * The last unixtime a full AniDB update was run.
+     *
      * @var string
      */
     private $lastUpdate;
 
     /**
      * The number of days between full AniDB updates.
+     *
      * @var string
      */
     private $updateInterval;
@@ -56,7 +62,7 @@ class AniDB
     protected $colorCli;
 
     /**
-     * @param array $options Class instances / Echo to cli.
+     * @param  array  $options  Class instances / Echo to cli.
      *
      * @throws \Exception
      */
@@ -85,8 +91,8 @@ class AniDB
     /**
      * Main switch that initiates AniDB table population.
      *
-     * @param string     $type
-     * @param int|string $anidbId
+     * @param  string  $type
+     * @param  int|string  $anidbId
      *
      * @throws \Exception
      */
@@ -104,7 +110,6 @@ class AniDB
 
     /**
      * @param $anidbId
-     *
      * @return array|false
      */
     private function getAniDbAPI($anidbId)
@@ -182,11 +187,9 @@ class AniDB
     }
 
     /**
-     * @param \SimpleXMLElement $element
-     * @param string            $property
-     *
-     * @param bool              $children
-     *
+     * @param  \SimpleXMLElement  $element
+     * @param  string  $property
+     * @param  bool  $children
      * @return string
      */
     private function processAPIResponseElement(\SimpleXMLElement $element, $property = null, $children = false): string
@@ -238,10 +241,10 @@ class AniDB
     /**
      * Inserts new anime info from AniDB to anidb table.
      *
-     * @param int    $id    The AniDB ID to be inserted
-     * @param string $type  The title type
-     * @param string $lang  The title language
-     * @param string $title The title of the Anime
+     * @param  int  $id  The AniDB ID to be inserted
+     * @param  string  $type  The title type
+     * @param  string  $lang  The title language
+     * @param  string  $title  The title of the Anime
      */
     private function insertAniDb($id, $type, $lang, $title): void
     {
@@ -257,8 +260,7 @@ class AniDB
     /**
      * Inserts new anime info from AniDB to anidb table.
      *
-     * @param array $AniDBInfoArray
-     *
+     * @param  array  $AniDBInfoArray
      * @return string
      */
     private function insertAniDBInfoEps(array $AniDBInfoArray = [], $anidbId): string
@@ -291,7 +293,7 @@ class AniDB
     /**
      * Inserts new anime info from AniDB to anidb table.
      *
-     * @param array $episodeArr
+     * @param  array  $episodeArr
      */
     private function insertAniDBEpisodes(array $episodeArr = [], $anidbId): void
     {
@@ -375,7 +377,7 @@ class AniDB
     /**
      * Directs flow for populating the AniDB Info/Episodes table.
      *
-     * @param string $anidbId
+     * @param  string  $anidbId
      *
      * @throws \Exception
      */
@@ -438,8 +440,7 @@ class AniDB
     /**
      * Updates existing anime info in anidb info/episodes tables.
      *
-     * @param array $AniDBInfoArray
-     *
+     * @param  array  $AniDBInfoArray
      * @return string
      */
     private function updateAniDBInfoEps(array $AniDBInfoArray = [], $anidbId): string
@@ -472,8 +473,8 @@ class AniDB
     /**
      * Directs flow for updating child AniDB tables.
      *
-     * @param array $AniDBInfoArray
-     * @param       $anidbId
+     * @param  array  $AniDBInfoArray
+     * @param  $anidbId
      */
     private function updateAniChildTables(array $AniDBInfoArray = [], $anidbId): void
     {

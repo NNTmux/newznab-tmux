@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $partcheck
  * @property int $partsize
  * @property mixed $binaryhash
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary whereBinaryhash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary whereCollectionsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary whereCurrentparts($value)
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary wherePartsize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary whereTotalparts($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary query()

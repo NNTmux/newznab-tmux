@@ -70,7 +70,7 @@ class XXX
     protected $colorCli;
 
     /**
-     * @param array $options Echo to cli / Class instances.
+     * @param  array  $options  Echo to cli / Class instances.
      *
      * @throws \Exception
      */
@@ -107,13 +107,12 @@ class XXX
      * Get XXX releases with covers for xxx browse page.
      *
      * @param $page
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
-     * @param int $maxAge
-     * @param array $excludedCats
-     *
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
      * @return array
      */
     public function getXXXRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
@@ -231,7 +230,6 @@ class XXX
      * Get the order type the user requested on the xxx page.
      *
      * @param $orderBy
-     *
      * @return array
      */
     protected function getXXXOrder($orderBy): array
@@ -286,20 +284,20 @@ class XXX
     /**
      * Update XXX Information from getXXXCovers.php in misc/testing/PostProc.
      *
-     * @param string $id
-     * @param string $title
-     * @param string $tagLine
-     * @param string $plot
-     * @param string $genre
-     * @param string $director
-     * @param string $actors
-     * @param string $extras
-     * @param string $productInfo
-     * @param string $trailers
-     * @param string $directUrl
-     * @param string $classUsed
-     * @param string $cover
-     * @param string $backdrop
+     * @param  string  $id
+     * @param  string  $title
+     * @param  string  $tagLine
+     * @param  string  $plot
+     * @param  string  $genre
+     * @param  string  $director
+     * @param  string  $actors
+     * @param  string  $extras
+     * @param  string  $productInfo
+     * @param  string  $trailers
+     * @param  string  $directUrl
+     * @param  string  $classUsed
+     * @param  string  $cover
+     * @param  string  $backdrop
      */
     public function update(
         $id = '',
@@ -342,7 +340,7 @@ class XXX
      * Get all genres for search-filter.tpl.
      *
      *
-     * @param bool $activeOnly
+     * @param  bool  $activeOnly
      * @return array
      */
     public function getAllGenres($activeOnly = false): array
@@ -362,8 +360,8 @@ class XXX
     }
 
     /**
-     * @param bool $activeOnly
-     * @param null $gid
+     * @param  bool  $activeOnly
+     * @param  null  $gid
      * @return mixed
      */
     public function getGenres($activeOnly = false, $gid = null)
@@ -383,7 +381,6 @@ class XXX
      * Get Genre id's Of the title.
      *
      * @param $arr - Array or String
-     *
      * @return string - If array .. 1,2,3,4 if string .. 1
      */
     protected function getGenreID($arr): string
@@ -433,7 +430,6 @@ class XXX
      *
      * @param $whichClass
      * @param $res
-     *
      * @return string
      */
     public function insertSwf($whichClass, $res): string
@@ -461,8 +457,8 @@ class XXX
 
     /**
      * @param $movie
-     *
      * @return false|int|string
+     *
      * @throws \Exception
      */
     public function updateXXXInfo($movie)
@@ -690,8 +686,7 @@ class XXX
     /**
      * Cleans up a searchname to make it easier to scrape.
      *
-     * @param string $releaseName
-     *
+     * @param  string  $releaseName
      * @return bool
      */
     protected function parseXXXSearchName($releaseName): bool

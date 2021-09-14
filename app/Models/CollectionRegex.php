@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $status 1=ON 0=OFF
  * @property string $description Optional extra details on this regex
  * @property int $ordinal Order to run the regex in
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereGroupRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereId($value)
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereStatus($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex query()

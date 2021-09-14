@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $filename
  * @property bool $searched
  * @property string|null $groupname
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereCategory($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereFilename($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereFiles($value)
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereTitle($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport query()

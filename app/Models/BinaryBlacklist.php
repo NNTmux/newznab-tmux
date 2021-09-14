@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $status
  * @property string|null $description
  * @property string|null $last_activity
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereGroupname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereId($value)
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereStatus($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist query()

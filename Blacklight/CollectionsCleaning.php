@@ -12,6 +12,7 @@ class CollectionsCleaning
 {
     /**
      * Used for matching endings in article subjects.
+     *
      * @const
      * @string
      */
@@ -19,6 +20,7 @@ class CollectionsCleaning
 
     /**
      * Used for matching file extension endings in article subjects.
+     *
      * @const
      * @string
      */
@@ -26,6 +28,7 @@ class CollectionsCleaning
 
     /**
      * Used for matching size strings in article subjects.
+     *
      * @example ' - 365.15 KB - '
      * @const
      * @string
@@ -93,9 +96,10 @@ class CollectionsCleaning
     }
 
     /**
-     * @param string $subject
-     * @param string $groupName
+     * @param  string  $subject
+     * @param  string  $groupName
      * @return array
+     *
      * @throws \Exception
      */
     public function collectionsCleaner($subject, $groupName = ''): array

@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 class ContentController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function show(Request $request)

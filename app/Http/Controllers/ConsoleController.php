@@ -11,10 +11,10 @@ use Illuminate\Support\Arr;
 class ConsoleController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string                   $id
-     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function show(Request $request, $id = '')

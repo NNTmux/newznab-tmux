@@ -25,6 +25,7 @@ class Google2FAAuthenticator extends Authenticator
 
     /**
      * @return mixed
+     *
      * @throws \PragmaRX\Google2FALaravel\Exceptions\InvalidSecretKey
      */
     protected function getGoogle2FASecretKey()

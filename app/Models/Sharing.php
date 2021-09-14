@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $max_push
  * @property int $max_download
  * @property int $max_pull
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing whereAutoEnable($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing whereEnabled($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing whereFetching($value)
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing whereStartPosition($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing whereUsername($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sharing query()

@@ -9,6 +9,7 @@ class FileListController extends BasePageController
 {
     /**
      * @param $guid
+     *
      * @throws \Exception
      */
     public function show($guid)

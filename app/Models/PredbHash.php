@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $predb_id id, of the predb entry, this hash belongs to
  * @property mixed $hash
  * @property-read \App\Models\Predb $predb
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash whereHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash wherePredbId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbHash query()

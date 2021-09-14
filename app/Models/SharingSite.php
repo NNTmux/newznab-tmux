@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $first_time
  * @property bool $enabled
  * @property int $comments
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite whereComments($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite whereEnabled($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite whereFirstTime($value)
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite whereSiteGuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite whereSiteName($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SharingSite query()

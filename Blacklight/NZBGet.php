@@ -17,42 +17,49 @@ class NZBGet
 {
     /**
      * NZBGet username.
+     *
      * @var string
      */
     public $userName = '';
 
     /**
      * NZBGet password.
+     *
      * @var string
      */
     public $password = '';
 
     /**
      * NZBGet URL.
+     *
      * @var string
      */
     public $url = '';
 
     /**
      * Full URL (containing password/username/etc).
+     *
      * @var string|bool
      */
     protected $fullUrl = '';
 
     /**
      * User id.
+     *
      * @var int
      */
     protected $uid = 0;
 
     /**
      * The users RSS token.
+     *
      * @var string
      */
     protected $rsstoken = '';
 
     /**
      * URL to your NNTmux site.
+     *
      * @var string
      */
     protected $serverurl = '';
@@ -77,6 +84,7 @@ class NZBGet
      * Set up full URL.
      *
      * @var \App\Http\Controllers\BasePageController
+     *
      * @throws \Exception
      */
     public function __construct(&$page)
@@ -141,8 +149,7 @@ class NZBGet
     /**
      * Send a NZB URL to NZBGet.
      *
-     * @param string $guid Release identifier.
-     *
+     * @param  string  $guid  Release identifier.
      * @return bool|mixed
      */
     public function sendURLToNZBGet($guid)
@@ -227,7 +234,7 @@ class NZBGet
     /**
      * Pause a single NZB from the queue.
      *
-     * @param string $id
+     * @param  string  $id
      */
     public function pauseFromQueue($id)
     {
@@ -260,7 +267,7 @@ class NZBGet
     /**
      * Resume a single NZB from the queue.
      *
-     * @param string $id
+     * @param  string  $id
      */
     public function resumeFromQueue($id)
     {
@@ -293,7 +300,7 @@ class NZBGet
     /**
      * Delete a single NZB from the queue.
      *
-     * @param string $id
+     * @param  string  $id
      */
     public function delFromQueue($id)
     {
@@ -326,8 +333,7 @@ class NZBGet
     /**
      * Set download speed limit. This method is equivalent for command "nzbget -R <Limit>".
      *
-     * @param int $limit The speed to limit it to.
-     *
+     * @param  int  $limit  The speed to limit it to.
      * @return void
      */
     public function rate($limit)
@@ -380,6 +386,7 @@ class NZBGet
      * Request for current status (summary) information. Parts of informations returned by this method can be printed by command "nzbget -L".
      *
      * @return array|false The status.
+     *
      * @throws \RuntimeException
      */
     public function status()
@@ -405,8 +412,7 @@ class NZBGet
     /**
      * Verify if the NZBGet URL is correct.
      *
-     * @param string $url NZBGet URL to verify.
-     *
+     * @param  string  $url  NZBGet URL to verify.
      * @return bool|string
      */
     public function verifyURL($url)

@@ -65,7 +65,8 @@ class Sharing
     /**
      * Construct.
      *
-     * @param array $options Class instances.
+     * @param  array  $options  Class instances.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -135,8 +136,7 @@ class Sharing
      * Initialise of reset sharing settings.
      *
      *
-     * @param string $siteGuid Optional hash (must be sha1) we can set the site guid to.
-     *
+     * @param  string  $siteGuid  Optional hash (must be sha1) we can set the site guid to.
      * @return mixed
      */
     public function initSettings(&$siteGuid = '')
@@ -503,10 +503,10 @@ class Sharing
     /**
      * Fetch a comment and insert it.
      *
-     * @param string $messageID Message-ID for the article.
-     * @param string $siteID id of the site.
-     *
+     * @param  string  $messageID  Message-ID for the article.
+     * @param  string  $siteID  id of the site.
      * @return bool
+     *
      * @throws \Exception
      */
     protected function insertNewComment(&$messageID, &$siteID): bool

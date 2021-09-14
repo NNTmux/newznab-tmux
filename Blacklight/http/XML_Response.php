@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    ruhllatio
  * @copyright 2016 nZEDb
  */
@@ -92,7 +93,7 @@ class XML_Response
     /**
      * XMLReturn constructor.
      *
-     * @param array $options
+     * @param  array  $options
      */
     public function __construct(array $options = [])
     {
@@ -207,7 +208,7 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param array $element An array with the name of the element and the attribute data
+     * @param  array  $element  An array with the name of the element and the attribute data
      */
     protected function addNode($element): void
     {
@@ -221,7 +222,7 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param array $element An array with the name of the element and the attribute data
+     * @param  array  $element  An array with the name of the element and the attribute data
      */
     protected function addNodes($element): void
     {
@@ -515,8 +516,8 @@ class XML_Response
     /**
      * Writes individual zed (newznab) type attributes.
      *
-     * @param string $name  The namespaced attribute name tag
-     * @param string $value The namespaced attribute value
+     * @param  string  $name  The namespaced attribute name tag
+     * @param  string  $value  The namespaced attribute value
      */
     protected function writeZedAttr($name, $value): void
     {
@@ -683,8 +684,7 @@ class XML_Response
     /**
      * Accepts an array of values to loop through to build cData from the release info.
      *
-     * @param array $columns The columns in the release we need to insert
-     *
+     * @param  array  $columns  The columns in the release we need to insert
      * @return string The HTML format cData
      */
     protected function buildCdata($columns): string

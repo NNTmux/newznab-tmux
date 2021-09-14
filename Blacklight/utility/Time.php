@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    ruhllatio
  * @copyright 2015 nZEDb
  */
@@ -32,9 +33,8 @@ class Time
      * For a given timestamp, calculate the localized show/episode airdate
      * via the provided local airing timezone.
      *
-     * @param string $time
-     * @param string $zone
-     *
+     * @param  string  $time
+     * @param  string  $zone
      * @return string
      */
     public static function localizeAirdate($time = '', $zone = ''): string

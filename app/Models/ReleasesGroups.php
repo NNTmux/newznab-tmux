@@ -13,6 +13,7 @@
  * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    niel
  * @copyright 2016 nZEDb
  */
@@ -27,9 +28,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $releases_id FK to releases.id
  * @property int $groups_id FK to groups.id
  * @property-read \App\Models\Release $release
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups whereGroupsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups whereReleasesId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroups query()

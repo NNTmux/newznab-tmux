@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link <http://www.gnu.org/licenses/>.
+ *
  * @author niel
  * @copyright 2014 nZEDb
  */
@@ -41,7 +42,8 @@ class Git extends GitRepository
     /**
      * Git constructor.
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Cz\Git\GitException
      */
     public function __construct(array $options = [])
@@ -76,8 +78,9 @@ class Git extends GitRepository
     }
 
     /**
-     * @param null $options
+     * @param  null  $options
      * @return \Cz\Git\GitRepository
+     *
      * @throws \Cz\Git\GitException
      */
     public function describe($options = null): GitRepository
@@ -95,7 +98,6 @@ class Git extends GitRepository
 
     /**
      * @param $gitObject
-     *
      * @return false|bool
      */
     public function isCommited($gitObject): bool
@@ -117,8 +119,9 @@ class Git extends GitRepository
     }
 
     /**
-     * @param null $options
+     * @param  null  $options
      * @return \Cz\Git\GitRepository
+     *
      * @throws \Cz\Git\GitException
      */
     public function log($options = null): GitRepository
@@ -135,8 +138,9 @@ class Git extends GitRepository
     }
 
     /**
-     * @param null $options
+     * @param  null  $options
      * @return \Cz\Git\GitRepository
+     *
      * @throws \Cz\Git\GitException
      */
     public function tag($options = null): GitRepository
@@ -146,6 +150,7 @@ class Git extends GitRepository
 
     /**
      * @return \Cz\Git\GitRepository
+     *
      * @throws \Cz\Git\GitException
      */
     public function tagLatest(): GitRepository

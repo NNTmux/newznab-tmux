@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class AdminPredbController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */

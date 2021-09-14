@@ -24,6 +24,7 @@ use Laravel\Scout\Searchable;
  * @property bool $cover
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereAsin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereAuthor($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereCover($value)
@@ -41,6 +42,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereUrl($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo query()

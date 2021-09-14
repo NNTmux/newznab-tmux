@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link <http://www.gnu.org/licenses/>.
+ *
  * @author niel
  * @copyright 2014 nZEDb
  */
@@ -83,14 +84,13 @@ class PreDb
     }
 
     /**
-     * @param array|null $options array of parameter.
-     *		'enclosedby'	- string for enclosed by clause. default: empty string,
-     *		'fields'		- string for FIELDS SEPARATED BY clause. default: '\t',
-     *		'limit'			- string for LIMIT clause. Zero indicate no clause. Default:  0,
-     *		'lines'			- string for LINES TERMINATED BY. Default: '\r\n' (Windows style EOLs to allow \n to be used in text),
-     *		'path'			- path (including filename) to write data to.
-     *       All parameter will be escaped before use.
-     *
+     * @param  array|null  $options  array of parameter.
+     *                               'enclosedby'	- string for enclosed by clause. default: empty string,
+     *                               'fields'		- string for FIELDS SEPARATED BY clause. default: '\t',
+     *                               'limit'			- string for LIMIT clause. Zero indicate no clause. Default:  0,
+     *                               'lines'			- string for LINES TERMINATED BY. Default: '\r\n' (Windows style EOLs to allow \n to be used in text),
+     *                               'path'			- path (including filename) to write data to.
+     *                               All parameter will be escaped before use.
      * @return false|\PDOStatement
      */
     public function executeExport(array $options = null)
@@ -141,8 +141,7 @@ SQL_EXPORT;
     }
 
     /**
-     * @param array|null $options
-     *
+     * @param  array|null  $options
      * @return null
      */
     public function executeLoadData(array $options = null)
@@ -189,8 +188,8 @@ SQL_EXPORT;
     }
 
     /**
-     * @param      $filespec
-     * @param bool $localDB
+     * @param  $filespec
+     * @param  bool  $localDB
      */
     public function import($filespec, $localDB = false)
     {
@@ -212,10 +211,10 @@ SQL_EXPORT;
     }
 
     /**
-     * @param null $settings
-     * @param array $options
-     *
+     * @param  null  $settings
+     * @param  array  $options
      * @return mixed|null
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function progress($settings = null, array $options = [])
@@ -236,8 +235,8 @@ SQL_EXPORT;
     }
 
     /**
-     * @param bool   $localDB
-     * @param string $enclosedby
+     * @param  bool  $localDB
+     * @param  string  $enclosedby
      */
     protected function prepareImportSQL($localDB = false, $enclosedby = '')
     {
@@ -256,7 +255,7 @@ SQL_EXPORT;
 
     /**
      * @param $sql
-     * @param string $index
+     * @param  string  $index
      */
     protected function prepareSQLStatement($sql, $index): void
     {
@@ -305,7 +304,7 @@ SQL_INSERT;
     }
 
     /**
-     * @param array $options
+     * @param  array  $options
      */
     protected function prepareSQLLoadData(array $options = []): void
     {

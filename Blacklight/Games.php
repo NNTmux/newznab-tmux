@@ -111,7 +111,8 @@ class Games
     /**
      * Games constructor.
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -153,8 +154,7 @@ class Games
     }
 
     /**
-     * @param string $title
-     *
+     * @param  string  $title
      * @return array|false
      */
     public function getGamesInfoByName($title)
@@ -193,6 +193,7 @@ class Games
 
     /**
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     *
      * @throws \InvalidArgumentException
      */
     public function getRange()
@@ -217,14 +218,14 @@ class Games
 
     /**
      * @param $page
-     * @param        $cat
-     * @param        $start
-     * @param        $num
-     * @param string|array $orderBy
-     * @param string $maxAge
-     * @param array $excludedCats
-     *
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  string|array  $orderBy
+     * @param  string  $maxAge
+     * @param  array  $excludedCats
      * @return array
+     *
      * @throws \Exception
      */
     public function getGamesRange($page, $cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
@@ -318,8 +319,7 @@ class Games
     }
 
     /**
-     * @param string|array $orderBy
-     *
+     * @param  string|array  $orderBy
      * @return array
      */
     public function getGamesOrder($orderBy): array
@@ -432,8 +432,8 @@ class Games
      * Process each game, updating game information from Steam and Giantbomb.
      *
      * @param $gameInfo
-     *
      * @return bool
+     *
      * @throws \Exception
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
@@ -832,8 +832,7 @@ class Games
     /**
      * Parse the game release title.
      *
-     * @param string $releaseName
-     *
+     * @param  string  $releaseName
      * @return array|false
      */
     public function parseTitle($releaseName)
@@ -865,7 +864,6 @@ class Games
      * See if genre name exists.
      *
      * @param $gameGenre
-     *
      * @return bool|string
      */
     public function matchGenreName($gameGenre)
@@ -899,8 +897,7 @@ class Games
     /**
      * Matches Genres.
      *
-     * @param string $genre
-     *
+     * @param  string  $genre
      * @return string
      */
     protected function _matchGenre($genre = ''): string
