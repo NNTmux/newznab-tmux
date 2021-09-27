@@ -83,7 +83,7 @@
     "b3rs3rk/steamfront": "dev-master",
     "bhuvidya/laravel-countries": "^8.0",
     "brick/math": "^0.8.9",
-    "canihavesomecoffee/thetvdbapi": "^1.0",
+    "canihavesomecoffee/thetvdbapi": "^2.0",
     "cviebrock/laravel-elasticsearch": "^8.0",
     "czproject/git-php": "^4.0",
     "dariusiii/l5-fixtures": "^2.2.0",
