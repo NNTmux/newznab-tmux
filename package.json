@@ -12,13 +12,13 @@
         "package-update": "ncu -u -x pnotify,laravel-mix"
     },
     "devDependencies": {
-        "axios": "^0.21.4",
+        "axios": "^0.22.0",
         "cross-env": "^7.0.3",
         "jquery": "3.6.0",
         "laravel-mix": "^6.0.31",
         "lodash": "^4.17.21",
         "popper.js": "^1.16.1",
-        "prettier": "^2.4.0",
+        "prettier": "^2.4.1",
         "resolve-url-loader": "^4.0.0",
         "vue": "^2.6.14"
     },

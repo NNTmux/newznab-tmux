@@ -12,7 +12,6 @@ use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
  */
 class TVDB extends TV
 {
-    private const TVDB_POSTER_URL = 'https://artworks.thetvdb.com/banners/';
     private const MATCH_PROBABILITY = 75;
 
     /**
@@ -51,13 +50,12 @@ class TVDB extends TV
     {
         parent::__construct($options);
         $this->client = new TheTVDbAPI();
-        $this->client->setAcceptedLanguages(['en']);
         $this->local = false;
 
         // Check if we can get the time for API status
         // If we can't then we set local to true
         try {
-            $this->token = $this->client->authentication()->login(config('tvdb.api_key'));
+            $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
         } catch (UnauthorizedException $error) {
             $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
             $this->local = true;
@@ -221,7 +219,7 @@ class TVDB extends TV
         return false;
     }
 
-    /**
+    /*
      * Calls the API to perform initial show name match to TVDB title
      * Returns a formatted array of show data or false if no match.
      *
@@ -235,7 +233,7 @@ class TVDB extends TV
         $return = $response = false;
         $highestMatch = 0;
         try {
-            $response = $this->client->search()->searchByName($cleanName);
+            $response = $this->client->search()->search($cleanName);
         } catch (ResourceNotFoundException $e) {
             $response = false;
             $this->colorCli->notice('Show not found on TVDB', true);
@@ -243,7 +241,7 @@ class TVDB extends TV
 
         if ($response === false && $country !== '') {
             try {
-                $response = $this->client->search()->searchByName(rtrim(str_replace($country, '', $cleanName)));
+                $response = $this->client->search()->search(rtrim(str_replace($country, '', $cleanName)));
             } catch (ResourceNotFoundException $e) {
                 $response = false;
                 $this->colorCli->notice('Show not found on TVDB', true);
@@ -315,7 +313,7 @@ class TVDB extends TV
         return $hasCover;
     }
 
-    /**
+    /*
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
@@ -332,19 +330,19 @@ class TVDB extends TV
 
         if ($airDate !== '') {
             try {
-                $response = $this->client->series()->getEpisodesWithQuery($tvDbId, ['firstAired' => $airDate])->getData();
+                $response = $this->client->series()->extended($tvDbId);
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
         } elseif ($videoId > 0) {
             try {
-                $response = $this->client->series()->getAllEpisodes($tvDbId);
+                $response = $this->client->series()->allEpisodes($tvDbId);
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
         } else {
             try {
-                $response = $this->client->series()->getEpisodesWithQuery($tvDbId, ['airedSeason' => $season, 'airedEpisodeNumber' => $episode])->getData();
+                $response = $this->client->series()->extended($tvDbId, ['airedSeason' => $season, 'airedEpisodeNumber' => $episode]);
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
@@ -367,7 +365,7 @@ class TVDB extends TV
         return $return;
     }
 
-    /**
+    /*
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
      *
@@ -377,22 +375,22 @@ class TVDB extends TV
     protected function formatShowInfo($show): array
     {
         try {
-            $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
-            $this->posterUrl = ! empty($poster[0]->thumbnail) ? self::TVDB_POSTER_URL.$poster[0]->thumbnail : '';
+            $poster = $this->client->episodes()->extended($show->id);
+            $this->posterUrl = ! empty($poster[0]->thumbnail) ? $poster[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
-            $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
-            $this->fanartUrl = $fanart[0]->thumbnail ? self::TVDB_POSTER_URL.$fanart[0]->thumbnail : '';
+            $fanart = $this->client->series()->extended($show->id);
+            $this->fanartUrl = ! empty($fanart[0]->thumbnail) ? $fanart[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
 
         try {
-            $imdbid = $this->client->series()->getById($show->id);
-            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbid->imdbId, $imdb);
+            $imdbId = $this->client->series()->extended($show->id);
+            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbId->imdbId, $imdb);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Show ID not found on TVDB', true);
         }
