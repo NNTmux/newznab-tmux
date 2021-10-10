@@ -320,21 +320,14 @@ class TVDB extends TV
      * @param  int  $tvDbId
      * @param  int  $season
      * @param  int  $episode
-     * @param  string  $airDate
      * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tvDbId, $season, $episode, $airDate = '', $videoId = 0)
+    protected function getEpisodeInfo($tvDbId, $season, $episode, $videoId = 0)
     {
         $return = $response = false;
 
-        if ($airDate !== '') {
-            try {
-                $response = $this->client->series()->extended($tvDbId);
-            } catch (ResourceNotFoundException $error) {
-                return false;
-            }
-        } elseif ($videoId > 0) {
+        if ($videoId > 0) {
             try {
                 $response = $this->client->series()->allEpisodes($tvDbId);
             } catch (ResourceNotFoundException $error) {
@@ -342,7 +335,11 @@ class TVDB extends TV
             }
         } else {
             try {
-                $response = $this->client->series()->extended($tvDbId, ['airedSeason' => $season, 'airedEpisodeNumber' => $episode]);
+                foreach ($this->client->series()->episodes($tvDbId) as $episodeBaseRecord) {
+                    if ($episodeBaseRecord->seasonNumber === $season && $episodeBaseRecord->number === $episode) {
+                        $response = $episodeBaseRecord;
+                    }
+                }
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
@@ -382,15 +379,15 @@ class TVDB extends TV
         }
 
         try {
-            $fanart = $this->client->series()->extended($show->id);
-            $this->fanartUrl = ! empty($fanart[0]->thumbnail) ? $fanart[0]->thumbnail : '';
+            $fanArt = $this->client->series()->extended($show->id);
+            $this->fanartUrl = ! empty($fanArt[0]->thumbnail) ? $fanArt[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
 
         try {
             $imdbId = $this->client->series()->extended($show->id);
-            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbId->imdbId, $imdb);
+            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Show ID not found on TVDB', true);
         }
@@ -425,10 +422,10 @@ class TVDB extends TV
     protected function formatEpisodeInfo($episode): array
     {
         return [
-            'title'       => (string) $episode->episodeName,
-            'series'      => (int) $episode->airedSeason,
-            'episode'     => (int) $episode->airedEpisodeNumber,
-            'se_complete' => 'S'.sprintf('%02d', $episode->airedSeason).'E'.sprintf('%02d', $episode->airedEpisodeNumber),
+            'title'       => (string) $episode->name,
+            'series'      => (int) $episode->seasonNumber,
+            'episode'     => (int) $episode->number,
+            'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
             'firstaired'  => $episode->firstAired,
             'summary'     => (string) $episode->overview,
         ];
