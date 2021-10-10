@@ -22,7 +22,7 @@
 
 namespace Blacklight\utility;
 
-use Cz\Git\GitRepository;
+use CzProject\GitPhp\GitRepository;
 
 /**
  * Class Git - Wrapper for various git operations.
@@ -32,19 +32,19 @@ class Git extends GitRepository
     /**
      * @var string
      */
-    private $branch;
+    private string $branch;
 
     /**
      * @var array
      */
-    private $mainBranches = ['dev', 'master'];
+    private array $mainBranches = ['dev', 'master'];
 
     /**
      * Git constructor.
      *
      * @param  array  $options
      *
-     * @throws \Cz\Git\GitException
+     * @throws \CzProject\GitPhp\GitException
      */
     public function __construct(array $options = [])
     {
@@ -62,14 +62,13 @@ class Git extends GitRepository
     /**
      * Return the number of commits made to repo.
      *
-     * @throws \Cz\Git\GitException
+     * @throws \CzProject\GitPhp\GitException
      */
     public function commits(): int
     {
         $count = 0;
-        $log = explode("\n", $this->log());
-        foreach ($log as $line) {
-            if (0 === strpos($line, 'commit')) {
+        foreach (explode("\n", $this->log()) as $line) {
+            if (str_starts_with($line, 'commit')) {
                 $count++;
             }
         }
@@ -78,12 +77,11 @@ class Git extends GitRepository
     }
 
     /**
-     * @param  null  $options
-     * @return \Cz\Git\GitRepository
-     *
-     * @throws \Cz\Git\GitException
+     * @param null $options
+     * @return \CzProject\GitPhp\RunnerResult
+     * @throws \CzProject\GitPhp\GitException
      */
-    public function describe($options = null): GitRepository
+    public function describe($options = null): \CzProject\GitPhp\RunnerResult
     {
         return $this->run("describe $options");
     }
@@ -119,12 +117,11 @@ class Git extends GitRepository
     }
 
     /**
-     * @param  null  $options
-     * @return \Cz\Git\GitRepository
-     *
-     * @throws \Cz\Git\GitException
+     * @param null $options
+     * @return \CzProject\GitPhp\RunnerResult
+     * @throws \CzProject\GitPhp\GitException
      */
-    public function log($options = null): GitRepository
+    public function log($options = null): \CzProject\GitPhp\RunnerResult
     {
         return $this->run("log $options");
     }
@@ -138,22 +135,20 @@ class Git extends GitRepository
     }
 
     /**
-     * @param  null  $options
-     * @return \Cz\Git\GitRepository
-     *
-     * @throws \Cz\Git\GitException
+     * @param null $options
+     * @return \CzProject\GitPhp\RunnerResult
+     * @throws \CzProject\GitPhp\GitException
      */
-    public function tag($options = null): GitRepository
+    public function tag($options = null): \CzProject\GitPhp\RunnerResult
     {
         return $this->run("tag $options");
     }
 
     /**
-     * @return \Cz\Git\GitRepository
-     *
-     * @throws \Cz\Git\GitException
+     * @return \CzProject\GitPhp\RunnerResult
+     * @throws \CzProject\GitPhp\GitException
      */
-    public function tagLatest(): GitRepository
+    public function tagLatest(): \CzProject\GitPhp\RunnerResult
     {
         return $this->describe('--tags --abbrev=0 HEAD');
     }
