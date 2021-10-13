@@ -77,8 +77,9 @@ class Git extends GitRepository
     }
 
     /**
-     * @param null $options
+     * @param  null  $options
      * @return \CzProject\GitPhp\RunnerResult
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function describe($options = null): \CzProject\GitPhp\RunnerResult
@@ -117,8 +118,9 @@ class Git extends GitRepository
     }
 
     /**
-     * @param null $options
+     * @param  null  $options
      * @return \CzProject\GitPhp\RunnerResult
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function log($options = null): \CzProject\GitPhp\RunnerResult
@@ -135,8 +137,9 @@ class Git extends GitRepository
     }
 
     /**
-     * @param null $options
+     * @param  null  $options
      * @return \CzProject\GitPhp\RunnerResult
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function tag($options = null): \CzProject\GitPhp\RunnerResult
@@ -146,6 +149,7 @@ class Git extends GitRepository
 
     /**
      * @return \CzProject\GitPhp\RunnerResult
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     public function tagLatest(): \CzProject\GitPhp\RunnerResult
