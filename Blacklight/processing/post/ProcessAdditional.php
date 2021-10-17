@@ -509,11 +509,11 @@ class ProcessAdditional
         // Maximum size of releases in GB.
         $this->_maxSize =
             (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
-        $this->_maxSize = ($this->_maxSize > 0 ? ('AND r.size < '.($this->_maxSize * 1073741824)) : '');
+        $this->_maxSize = ($this->_maxSize > 0 ? ('AND r.size < '.((int) $this->_maxSize * 1073741824)) : '');
         // Minimum size of releases in MB.
         $this->_minSize =
             (Settings::settingValue('..minsizetopostprocess') !== '') ? (int) Settings::settingValue('..minsizetopostprocess') : 100;
-        $this->_minSize = ($this->_minSize > 0 ? ('AND r.size > '.($this->_minSize * 1048576)) : '');
+        $this->_minSize = ($this->_minSize > 0 ? ('AND r.size > '.((int) $this->_minSize * 1048576)) : '');
 
         // Use the alternate NNTP provider for downloading Message-ID's ?
         $this->_alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
@@ -655,10 +655,10 @@ class ProcessAdditional
             ->where('releases.haspreview', '=', -1)
             ->where('categories.disablepreview', '=', 0);
         if ($this->_maxSize > 0) {
-            $releasesQuery->where('releases.size', '<', $this->_maxSize * 1073741824);
+            $releasesQuery->where('releases.size', '<', (int) $this->_maxSize * 1073741824);
         }
         if ($this->_minSize > 0) {
-            $releasesQuery->where('releases.size', '>', $this->_minSize * 1048576);
+            $releasesQuery->where('releases.size', '>', (int) $this->_minSize * 1048576);
         }
         if (! empty($groupID)) {
             $releasesQuery->where('releases.groups_id', $groupID);
