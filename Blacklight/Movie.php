@@ -448,7 +448,7 @@ class Movie
         }
 
         return $this->update([
-            'genre'   => $this->checkTraktValue($data['genres']),
+            'genre'   => implode(', ', $data['genres']),
             'imdbid'   => $this->checkTraktValue($imdbid),
             'language' => $this->checkTraktValue($data['language']),
             'plot'     => $this->checkTraktValue($data['overview']),
@@ -469,7 +469,7 @@ class Movie
      * @param  mixed  $value
      * @return string
      */
-    private function checkTraktValue($value): string
+    private function checkTraktValue(mixed $value): string
     {
         if (\is_array($value) && ! empty($value)) {
             $temp = '';
