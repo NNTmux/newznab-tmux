@@ -404,11 +404,8 @@ class Movie
 
         if ($this->traktcheck !== null) {
             $data = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
-            if ($data !== false) {
-                $this->parseTraktTv($data);
-                if (! empty($data['trailer'])) {
-                    return $data['trailer'];
-                }
+            if (($data !== false) && ! empty($data['trailer'])) {
+                return $data['trailer'];
             }
         }
 
