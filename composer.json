@@ -52,6 +52,8 @@
         }
 
     ],
+  "minimum-stability": "dev",
+  "prefer-stable" : true,
   "require": {
     "php": ">=7.4.0",
     "ext-bcmath": "*",
@@ -106,7 +108,7 @@
     "intervention/image": "^2.4",
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
-    "jamesmills/laravel-timezone": "dev-master",
+    "jamesmills/laravel-timezone": "^1.10",
     "joshpinkney/tv-maze-php-api": "^1.0",
     "jrean/laravel-user-verification": "^9.0",
     "junaidnasir/larainvite": "^4.0",
