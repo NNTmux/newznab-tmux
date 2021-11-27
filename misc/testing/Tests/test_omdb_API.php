@@ -4,8 +4,9 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use aharen\OMDbAPI;
 use Blacklight\ColorCLI;
+use Illuminate\Support\Str;
 
-$omdb = new OMDbAPI();
+$omdb = new OMDbAPI(config('nntmux_api.omdb_api_key'));
 $colorCli = new ColorCLI();
 
 if (! empty($argv[1]) && ! empty($argv[2]) && ($argv[2] !== 'series' || $argv[2] !== 'movie')) {
