@@ -4,7 +4,6 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use aharen\OMDbAPI;
 use Blacklight\ColorCLI;
-use Illuminate\Support\Str;
 
 $omdb = new OMDbAPI(config('nntmux_api.omdb_api_key'));
 $colorCli = new ColorCLI();
