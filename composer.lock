@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ff74b69cd39ed879860b7fe0b7af3f2",
+    "content-hash": "85dcd99951b69ef4995bbec2e3ce7ea0",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -227,59 +227,6 @@
                 "source": "https://github.com/b3rs3rk/steamfront/tree/master"
             },
             "time": "2017-08-27T15:14:06+00:00"
-        },
-        {
-            "name": "bacon/bacon-qr-code",
-            "version": "2.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Bacon/BaconQrCode.git",
-                "reference": "f73543ac4e1def05f1a70bcd1525c8a157a1ad09"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Bacon/BaconQrCode/zipball/f73543ac4e1def05f1a70bcd1525c8a157a1ad09",
-                "reference": "f73543ac4e1def05f1a70bcd1525c8a157a1ad09",
-                "shasum": ""
-            },
-            "require": {
-                "dasprid/enum": "^1.0.3",
-                "ext-iconv": "*",
-                "php": "^7.1 || ^8.0"
-            },
-            "require-dev": {
-                "phly/keep-a-changelog": "^1.4",
-                "phpunit/phpunit": "^7 | ^8 | ^9",
-                "squizlabs/php_codesniffer": "^3.4"
-            },
-            "suggest": {
-                "ext-imagick": "to generate QR code images"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "BaconQrCode\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Ben Scholzen 'DASPRiD'",
-                    "email": "mail@dasprids.de",
-                    "homepage": "https://dasprids.de/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "BaconQrCode is a QR code generator for PHP.",
-            "homepage": "https://github.com/Bacon/BaconQrCode",
-            "support": {
-                "issues": "https://github.com/Bacon/BaconQrCode/issues",
-                "source": "https://github.com/Bacon/BaconQrCode/tree/2.0.4"
-            },
-            "time": "2021-06-18T13:26:35+00:00"
         },
         {
             "name": "bhuvidya/laravel-countries",
@@ -1479,53 +1426,6 @@
                 "source": "https://github.com/DariusIII/Zipper/tree/v2.2.0"
             },
             "time": "2020-09-22T11:38:01+00:00"
-        },
-        {
-            "name": "dasprid/enum",
-            "version": "1.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DASPRiD/Enum.git",
-                "reference": "5abf82f213618696dda8e3bf6f64dd042d8542b2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DASPRiD/Enum/zipball/5abf82f213618696dda8e3bf6f64dd042d8542b2",
-                "reference": "5abf82f213618696dda8e3bf6f64dd042d8542b2",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7 | ^8 | ^9",
-                "squizlabs/php_codesniffer": "^3.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "DASPRiD\\Enum\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Ben Scholzen 'DASPRiD'",
-                    "email": "mail@dasprids.de",
-                    "homepage": "https://dasprids.de/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP 7.1 enum implementation",
-            "keywords": [
-                "enum",
-                "map"
-            ],
-            "support": {
-                "issues": "https://github.com/DASPRiD/Enum/issues",
-                "source": "https://github.com/DASPRiD/Enum/tree/1.0.3"
-            },
-            "time": "2020-10-02T16:03:48+00:00"
         },
         {
             "name": "dborsatto/php-giantbomb",
@@ -7092,24 +6992,25 @@
         },
         {
             "name": "pragmarx/google2fa-laravel",
-            "version": "v1.4.1",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/antonioribeiro/google2fa-laravel.git",
-                "reference": "f9014fd7ea36a1f7fffa233109cf59b209469647"
+                "reference": "ae2d11600df3db11a0c6bdd33ce8ce3c68cf5987"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/antonioribeiro/google2fa-laravel/zipball/f9014fd7ea36a1f7fffa233109cf59b209469647",
-                "reference": "f9014fd7ea36a1f7fffa233109cf59b209469647",
+                "url": "https://api.github.com/repos/antonioribeiro/google2fa-laravel/zipball/ae2d11600df3db11a0c6bdd33ce8ce3c68cf5987",
+                "reference": "ae2d11600df3db11a0c6bdd33ce8ce3c68cf5987",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": ">=5.4.36|^8.0",
                 "php": ">=7.0",
-                "pragmarx/google2fa-qrcode": "^1.0"
+                "pragmarx/google2fa-qrcode": "^1.0|^2.0|^3.0"
             },
             "require-dev": {
+                "bacon/bacon-qr-code": "^2.0",
                 "orchestra/testbench": "3.4.*|3.5.*|3.6.*|3.7.*|4.*|5.*|6.*",
                 "phpunit/phpunit": "~5|~6|~7|~8"
             },
@@ -7143,7 +7044,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD-3-Clause"
+                "MIT"
             ],
             "authors": [
                 {
@@ -7161,32 +7062,37 @@
             ],
             "support": {
                 "issues": "https://github.com/antonioribeiro/google2fa-laravel/issues",
-                "source": "https://github.com/antonioribeiro/google2fa-laravel/tree/v1.4.1"
+                "source": "https://github.com/antonioribeiro/google2fa-laravel/tree/v2.0.1"
             },
-            "time": "2020-09-20T21:01:48+00:00"
+            "time": "2021-08-17T18:45:39+00:00"
         },
         {
             "name": "pragmarx/google2fa-qrcode",
-            "version": "v1.0.3",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/antonioribeiro/google2fa-qrcode.git",
-                "reference": "fd5ff0531a48b193a659309cc5fb882c14dbd03f"
+                "reference": "ce4d8a729b6c93741c607cfb2217acfffb5bf76b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/antonioribeiro/google2fa-qrcode/zipball/fd5ff0531a48b193a659309cc5fb882c14dbd03f",
-                "reference": "fd5ff0531a48b193a659309cc5fb882c14dbd03f",
+                "url": "https://api.github.com/repos/antonioribeiro/google2fa-qrcode/zipball/ce4d8a729b6c93741c607cfb2217acfffb5bf76b",
+                "reference": "ce4d8a729b6c93741c607cfb2217acfffb5bf76b",
                 "shasum": ""
             },
             "require": {
-                "bacon/bacon-qr-code": "~1.0|~2.0",
-                "php": ">=5.4",
+                "php": ">=7.1",
                 "pragmarx/google2fa": ">=4.0"
             },
             "require-dev": {
+                "bacon/bacon-qr-code": "^2.0",
+                "chillerlan/php-qrcode": "^1.0|^2.0|^3.0|^4.0",
                 "khanamiryan/qrcode-detector-decoder": "^1.0",
-                "phpunit/phpunit": "~4|~5|~6|~7"
+                "phpunit/phpunit": "~4|~5|~6|~7|~8|~9"
+            },
+            "suggest": {
+                "bacon/bacon-qr-code": "For QR Code generation, requires imagick",
+                "chillerlan/php-qrcode": "For QR Code generation"
             },
             "type": "library",
             "extra": {
@@ -7223,9 +7129,9 @@
             ],
             "support": {
                 "issues": "https://github.com/antonioribeiro/google2fa-qrcode/issues",
-                "source": "https://github.com/antonioribeiro/google2fa-qrcode/tree/master"
+                "source": "https://github.com/antonioribeiro/google2fa-qrcode/tree/v3.0.0"
             },
-            "time": "2019-03-20T16:42:58+00:00"
+            "time": "2021-08-15T12:53:48+00:00"
         },
         {
             "name": "predis/predis",
@@ -8239,29 +8145,29 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.40",
+            "version": "v4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "9d4f8309ed49702e0d7152f9983c3a9c4b98eb9d"
+                "reference": "baebd59bb4da9fca89da382811b38c8313949c49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/9d4f8309ed49702e0d7152f9983c3a9c4b98eb9d",
-                "reference": "9d4f8309ed49702e0d7152f9983c3a9c4b98eb9d",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/baebd59bb4da9fca89da382811b38c8313949c49",
+                "reference": "baebd59bb4da9fca89da382811b38c8313949c49",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2"
+                "php": "^7.1 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7.5 || ^6.5 || ^5.7 || ^4.8",
+                "phpunit/phpunit": "^8.5 || ^7.5",
                 "smarty/smarty-lexer": "^3.1"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1.x-dev"
+                    "dev-master": "4.0.x-dev"
                 }
             },
             "autoload": {
@@ -8285,20 +8191,23 @@
                 {
                     "name": "Rodney Rehm",
                     "email": "rodney.rehm@medialize.de"
+                },
+                {
+                    "name": "Simon Wisselink",
+                    "homepage": "https://www.iwink.nl/"
                 }
             ],
             "description": "Smarty - the compiling PHP template engine",
-            "homepage": "http://www.smarty.net",
+            "homepage": "https://www.smarty.net",
             "keywords": [
                 "templating"
             ],
             "support": {
-                "forum": "http://www.smarty.net/forums/",
-                "irc": "irc://irc.freenode.org/smarty",
+                "forum": "https://www.smarty.net/forums/",
                 "issues": "https://github.com/smarty-php/smarty/issues",
-                "source": "https://github.com/smarty-php/smarty/tree/v3.1.40"
+                "source": "https://github.com/smarty-php/smarty/tree/v4.0.0"
             },
-            "time": "2021-10-13T10:04:31+00:00"
+            "time": "2021-11-25T21:18:25+00:00"
         },
         {
             "name": "spatie/async",
@@ -9373,20 +9282,20 @@
         },
         {
             "name": "symfony/event-dispatcher-contracts",
-            "version": "v2.5.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher-contracts.git",
-                "reference": "66bea3b09be61613cd3b4043a65a8ec48cfa6d2a"
+                "reference": "aa5422287b75594b90ee9cd807caf8f0df491385"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/66bea3b09be61613cd3b4043a65a8ec48cfa6d2a",
-                "reference": "66bea3b09be61613cd3b4043a65a8ec48cfa6d2a",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/aa5422287b75594b90ee9cd807caf8f0df491385",
+                "reference": "aa5422287b75594b90ee9cd807caf8f0df491385",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.5",
+                "php": ">=8.0.2",
                 "psr/event-dispatcher": "^1"
             },
             "suggest": {
@@ -9395,7 +9304,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "2.5-dev"
+                    "dev-main": "3.0-dev"
                 },
                 "thanks": {
                     "name": "symfony/contracts",
@@ -9432,7 +9341,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v2.5.0"
+                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.0.0"
             },
             "funding": [
                 {
@@ -9448,7 +9357,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-07-12T14:48:14+00:00"
+            "time": "2021-07-15T12:33:35+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -11233,34 +11142,33 @@
         },
         {
             "name": "symfony/string",
-            "version": "v5.4.0",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "9ffaaba53c61ba75a3c7a3a779051d1e9ec4fd2d"
+                "reference": "ba727797426af0f587f4800566300bdc0cda0777"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/9ffaaba53c61ba75a3c7a3a779051d1e9ec4fd2d",
-                "reference": "9ffaaba53c61ba75a3c7a3a779051d1e9ec4fd2d",
+                "url": "https://api.github.com/repos/symfony/string/zipball/ba727797426af0f587f4800566300bdc0cda0777",
+                "reference": "ba727797426af0f587f4800566300bdc0cda0777",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.5",
+                "php": ">=8.0.2",
                 "symfony/polyfill-ctype": "~1.8",
                 "symfony/polyfill-intl-grapheme": "~1.0",
                 "symfony/polyfill-intl-normalizer": "~1.0",
-                "symfony/polyfill-mbstring": "~1.0",
-                "symfony/polyfill-php80": "~1.15"
+                "symfony/polyfill-mbstring": "~1.0"
             },
             "conflict": {
-                "symfony/translation-contracts": ">=3.0"
+                "symfony/translation-contracts": "<2.0"
             },
             "require-dev": {
-                "symfony/error-handler": "^4.4|^5.0|^6.0",
-                "symfony/http-client": "^4.4|^5.0|^6.0",
-                "symfony/translation-contracts": "^1.1|^2",
-                "symfony/var-exporter": "^4.4|^5.0|^6.0"
+                "symfony/error-handler": "^5.4|^6.0",
+                "symfony/http-client": "^5.4|^6.0",
+                "symfony/translation-contracts": "^2.0|^3.0",
+                "symfony/var-exporter": "^5.4|^6.0"
             },
             "type": "library",
             "autoload": {
@@ -11299,7 +11207,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v5.4.0"
+                "source": "https://github.com/symfony/string/tree/v6.0.0"
             },
             "funding": [
                 {
@@ -11315,7 +11223,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-24T10:02:00+00:00"
+            "time": "2021-10-29T07:35:21+00:00"
         },
         {
             "name": "symfony/translation",
@@ -12225,13 +12133,13 @@
             "version": "5.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ytake/Laravel.Smarty.git",
-                "reference": "df8863f0857cd96558ecf07f003b5191ab686676"
+                "url": "https://github.com/DariusIII/Laravel.Smarty.git",
+                "reference": "ca5fda2257312b3a22ddc702f45b2941b3958a41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/df8863f0857cd96558ecf07f003b5191ab686676",
-                "reference": "df8863f0857cd96558ecf07f003b5191ab686676",
+                "url": "https://api.github.com/repos/DariusIII/Laravel.Smarty/zipball/ca5fda2257312b3a22ddc702f45b2941b3958a41",
+                "reference": "ca5fda2257312b3a22ddc702f45b2941b3958a41",
                 "shasum": ""
             },
             "require": {
@@ -12241,7 +12149,7 @@
                 "illuminate/support": "^8.0",
                 "illuminate/view": "^8.0",
                 "php": "^7.3 | ^8.0",
-                "smarty/smarty": "^3.1.33"
+                "smarty/smarty": "^v4.0.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.15.3",
@@ -12274,7 +12182,35 @@
                     "Ytake\\LaravelSmarty\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "md": [
+                    "php ./vendor/bin/phpmd src text ./phpmd.xml"
+                ],
+                "quality-assurance": [
+                    "php ./vendor/bin/phpunit",
+                    "php ./vendor/bin/phpcpd src/"
+                ],
+                "pdepend": [
+                    "php ./vendor/bin/pdepend  --summary-xml=tests/build/summary.xml --jdepend-chart=tests/quality-assurance/jdepend.svg --overview-pyramid=tests/quality-assurance/pyramid.svg src/"
+                ],
+                "loc": [
+                    "php ./vendor/bin/phploc src/ --log-xml=tests/quality-assurance/phploc.xml"
+                ],
+                "cs": [
+                    "php ./vendor/bin/php-cs-fixer fix"
+                ],
+                "phpcs": [
+                    "./vendor/bin/phpcs src/ --report-full --report-source --standard=PSR2 --colors"
+                ],
+                "sc": [
+                    "security-checker security:check ./composer.lock"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -12294,10 +12230,9 @@
                 "view"
             ],
             "support": {
-                "issues": "https://github.com/ytake/Laravel.Smarty/issues",
-                "source": "https://github.com/ytake/Laravel.Smarty/tree/5.1.0"
+                "source": "https://github.com/DariusIII/Laravel.Smarty/tree/5.1.0"
             },
-            "time": "2021-08-13T15:00:09+00:00"
+            "time": "2021-12-02T20:02:45+00:00"
         }
     ],
     "packages-dev": [
@@ -14729,16 +14664,16 @@
         },
         {
             "name": "phpunit/php-file-iterator",
-            "version": "3.0.5",
+            "version": "3.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-file-iterator.git",
-                "reference": "aa4be8575f26070b100fccb67faabb28f21f66f8"
+                "reference": "cf1c2e7c203ac650e352f4cc675a7021e7d1b3cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/aa4be8575f26070b100fccb67faabb28f21f66f8",
-                "reference": "aa4be8575f26070b100fccb67faabb28f21f66f8",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/cf1c2e7c203ac650e352f4cc675a7021e7d1b3cf",
+                "reference": "cf1c2e7c203ac650e352f4cc675a7021e7d1b3cf",
                 "shasum": ""
             },
             "require": {
@@ -14777,7 +14712,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-file-iterator/issues",
-                "source": "https://github.com/sebastianbergmann/php-file-iterator/tree/3.0.5"
+                "source": "https://github.com/sebastianbergmann/php-file-iterator/tree/3.0.6"
             },
             "funding": [
                 {
@@ -14785,7 +14720,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-09-28T05:57:25+00:00"
+            "time": "2021-12-02T12:48:52+00:00"
         },
         {
             "name": "phpunit/php-invoker",
@@ -16323,35 +16258,34 @@
         },
         {
             "name": "symfony/config",
-            "version": "v5.4.0",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "e39cf688c80fd79ab0a6a2d05a9facac9b2d534b"
+                "reference": "df4871981fd37f953c117b55feac03462be5a2d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/e39cf688c80fd79ab0a6a2d05a9facac9b2d534b",
-                "reference": "e39cf688c80fd79ab0a6a2d05a9facac9b2d534b",
+                "url": "https://api.github.com/repos/symfony/config/zipball/df4871981fd37f953c117b55feac03462be5a2d6",
+                "reference": "df4871981fd37f953c117b55feac03462be5a2d6",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.5",
+                "php": ">=8.0.2",
                 "symfony/deprecation-contracts": "^2.1|^3",
-                "symfony/filesystem": "^4.4|^5.0|^6.0",
+                "symfony/filesystem": "^5.4|^6.0",
                 "symfony/polyfill-ctype": "~1.8",
-                "symfony/polyfill-php80": "^1.16",
                 "symfony/polyfill-php81": "^1.22"
             },
             "conflict": {
                 "symfony/finder": "<4.4"
             },
             "require-dev": {
-                "symfony/event-dispatcher": "^4.4|^5.0|^6.0",
-                "symfony/finder": "^4.4|^5.0|^6.0",
-                "symfony/messenger": "^4.4|^5.0|^6.0",
+                "symfony/event-dispatcher": "^5.4|^6.0",
+                "symfony/finder": "^5.4|^6.0",
+                "symfony/messenger": "^5.4|^6.0",
                 "symfony/service-contracts": "^1.1|^2|^3",
-                "symfony/yaml": "^4.4|^5.0|^6.0"
+                "symfony/yaml": "^5.4|^6.0"
             },
             "suggest": {
                 "symfony/yaml": "To use the yaml reference dumper"
@@ -16382,7 +16316,7 @@
             "description": "Helps you find, load, combine, autofill and validate configuration values of any kind",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/config/tree/v5.4.0"
+                "source": "https://github.com/symfony/config/tree/v6.0.0"
             },
             "funding": [
                 {
@@ -16398,7 +16332,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-28T15:25:38+00:00"
+            "time": "2021-11-23T19:05:29+00:00"
         },
         {
             "name": "symfony/polyfill-php70",
@@ -16589,7 +16523,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.4.0",
+        "php": "^8.0",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-curl": "*",
