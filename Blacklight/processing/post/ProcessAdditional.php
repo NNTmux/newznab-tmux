@@ -652,7 +652,6 @@ class ProcessAdditional
             ->where('categories.disablepreview', '=', 0);
         if ($this->_maxSize > 0) {
             $releasesQuery->where('releases.size', '<', (int) $this->_maxSize * 1073741824);
-
         }
         if ($this->_minSize > 0) {
             $releasesQuery->where('releases.size', '>', (int) $this->_minSize * 1048576);
