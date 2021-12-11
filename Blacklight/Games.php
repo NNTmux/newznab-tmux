@@ -572,8 +572,6 @@ class Games
                 } catch (ApiCallerException $e) {
                     return false;
                 }
-
-
             }
         }
 
