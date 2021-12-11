@@ -2161,6 +2161,10 @@ class ProcessAdditional
                 Log::debug($e->getMessage());
 
                 return false;
+            } catch (\ErrorException) {
+                Log::debug($e->getMessage());
+
+                return false;
             }
         }
 
