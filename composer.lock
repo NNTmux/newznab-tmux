@@ -3763,16 +3763,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.75.0",
+            "version": "v8.76.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "0bb91d3176357da232da69762a64b0e0a0988637"
+                "reference": "83fe447ae964dc5f1f829d25fa2f6042d9099834"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/0bb91d3176357da232da69762a64b0e0a0988637",
-                "reference": "0bb91d3176357da232da69762a64b0e0a0988637",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/83fe447ae964dc5f1f829d25fa2f6042d9099834",
+                "reference": "83fe447ae964dc5f1f829d25fa2f6042d9099834",
                 "shasum": ""
             },
             "require": {
@@ -3931,7 +3931,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-12-07T14:55:46+00:00"
+            "time": "2021-12-14T16:21:19+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -6771,16 +6771,16 @@
         },
         {
             "name": "php-tmdb/api",
-            "version": "4.0.9",
+            "version": "4.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/api.git",
-                "reference": "e330e8f9c74187dc47fdff2cd5b4acef1ffae096"
+                "reference": "3d87c2d1ccb812e57e7c0036996c1e25659b273f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/api/zipball/e330e8f9c74187dc47fdff2cd5b4acef1ffae096",
-                "reference": "e330e8f9c74187dc47fdff2cd5b4acef1ffae096",
+                "url": "https://api.github.com/repos/php-tmdb/api/zipball/3d87c2d1ccb812e57e7c0036996c1e25659b273f",
+                "reference": "3d87c2d1ccb812e57e7c0036996c1e25659b273f",
                 "shasum": ""
             },
             "require": {
@@ -6859,9 +6859,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-tmdb/api/issues",
-                "source": "https://github.com/php-tmdb/api/tree/4.0.9"
+                "source": "https://github.com/php-tmdb/api/tree/4.0.10"
             },
-            "time": "2021-09-10T20:39:39+00:00"
+            "time": "2021-12-11T14:23:32+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -7197,16 +7197,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.1.10",
+            "version": "2.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "2e4a00cd951e6e0e68917b95606965fe9353cb07"
+                "reference": "6477b468919dbb6093090c4875dfe88323f5e3f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/2e4a00cd951e6e0e68917b95606965fe9353cb07",
-                "reference": "2e4a00cd951e6e0e68917b95606965fe9353cb07",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/6477b468919dbb6093090c4875dfe88323f5e3f7",
+                "reference": "6477b468919dbb6093090c4875dfe88323f5e3f7",
                 "shasum": ""
             },
             "require": {
@@ -7260,9 +7260,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.1.10"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.1.11"
             },
-            "time": "2021-11-28T07:35:49+00:00"
+            "time": "2021-12-14T10:02:47+00:00"
         },
         {
             "name": "psr/cache",
@@ -11735,16 +11735,16 @@
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v5.4.0",
+            "version": "v5.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "d4394d044ed69a8f244f3445bcedf8a0d7fe2403"
+                "reference": "264dce589e7ce37a7ba99cb901eed8249fbec92f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/d4394d044ed69a8f244f3445bcedf8a0d7fe2403",
-                "reference": "d4394d044ed69a8f244f3445bcedf8a0d7fe2403",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/264dce589e7ce37a7ba99cb901eed8249fbec92f",
+                "reference": "264dce589e7ce37a7ba99cb901eed8249fbec92f",
                 "shasum": ""
             },
             "require": {
@@ -11782,11 +11782,13 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk"
+                    "email": "hello@gjcampbell.co.uk",
+                    "homepage": "https://github.com/GrahamCampbell"
                 },
                 {
                     "name": "Vance Lucas",
-                    "email": "vance@vancelucas.com"
+                    "email": "vance@vancelucas.com",
+                    "homepage": "https://github.com/vlucas"
                 }
             ],
             "description": "Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.",
@@ -11797,7 +11799,7 @@
             ],
             "support": {
                 "issues": "https://github.com/vlucas/phpdotenv/issues",
-                "source": "https://github.com/vlucas/phpdotenv/tree/v5.4.0"
+                "source": "https://github.com/vlucas/phpdotenv/tree/v5.4.1"
             },
             "funding": [
                 {
@@ -11809,7 +11811,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-10T01:08:39+00:00"
+            "time": "2021-12-12T23:22:04+00:00"
         },
         {
             "name": "voku/portable-ascii",
