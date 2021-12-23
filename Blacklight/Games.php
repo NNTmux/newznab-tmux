@@ -575,7 +575,7 @@ class Games
             }
         }
 
-        if (config('services.igdb.key') !== '') {
+        if (config('config.credentials.client_id') !== '' && config('config.credentials.client_secret') !== '') {
             try {
                 if ($steamGameID === false || $this->_gameResults === false) {
                     $bestMatch = false;
