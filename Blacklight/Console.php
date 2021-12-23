@@ -704,7 +704,7 @@ class Console
         $bestMatch = false;
 
         $gamePlatform = $this->_replacePlatform($gamePlatform);
-        if (config('services.igdb.key') !== '') {
+        if (config('config.credentials.client_id') !== '' && config('config.credentials.client_secret') !== '') {
             try {
                 $result = Game::where('name', $gameInfo)->get();
                 if (! empty($result)) {

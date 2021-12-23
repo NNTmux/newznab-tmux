@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "85dcd99951b69ef4995bbec2e3ce7ea0",
+    "content-hash": "8f1757816e3ec90790a646909157b04a",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -4960,32 +4960,46 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "2.4.6",
+            "version": "3.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "aaaf7da764553f4318688266db0850c5164b25f2"
+                "reference": "aedf47f8968925738413227ee62f48337e404f45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/aaaf7da764553f4318688266db0850c5164b25f2",
-                "reference": "aaaf7da764553f4318688266db0850c5164b25f2",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/aedf47f8968925738413227ee62f48337e404f45",
+                "reference": "aedf47f8968925738413227ee62f48337e404f45",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "~6.0|~7.0",
                 "laravel/framework": "^8.40.0",
-                "php": "^7.3 | ^7.4 | ^8.0"
+                "nesbot/carbon": "^2.53.1",
+                "php": "^8.0"
             },
             "require-dev": {
+                "brainmaestro/composer-git-hooks": "^2.8",
                 "nunomaduro/collision": "^5.3",
+                "nunomaduro/larastan": "^1.0.0",
                 "orchestra/testbench": "^6.0",
                 "phpunit/phpunit": "^9.5.4",
                 "roave/security-advisories": "dev-latest"
             },
             "type": "library",
             "extra": {
+                "hooks": {
+                    "config": {
+                        "stop-on-failure": [
+                            "pre-push"
+                        ]
+                    },
+                    "pre-push": [
+                        "composer stan",
+                        "composer test"
+                    ]
+                },
                 "laravel": {
                     "providers": [
                         "MarcReichel\\IGDBLaravel\\IGDBLaravelServiceProvider"
@@ -5018,7 +5032,7 @@
             ],
             "support": {
                 "issues": "https://github.com/marcreichel/igdb-laravel/issues",
-                "source": "https://github.com/marcreichel/igdb-laravel/tree/2.4.6"
+                "source": "https://github.com/marcreichel/igdb-laravel/tree/3.5.3"
             },
             "funding": [
                 {
@@ -5026,7 +5040,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-06-27T09:36:13+00:00"
+            "time": "2021-11-07T19:58:47+00:00"
         },
         {
             "name": "maxmind-db/reader",
@@ -13889,9 +13903,6 @@
             "require": {
                 "php": "^7.1 || ^8.0"
             },
-            "replace": {
-                "myclabs/deep-copy": "self.version"
-            },
             "require-dev": {
                 "doctrine/collections": "^1.0",
                 "doctrine/common": "^2.6",
@@ -16620,5 +16631,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }

@@ -42,11 +42,6 @@ return [
             'secret' => env('STRIPE_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
-    ],
-
-    'igdb' => [
-        'key' => env('IGDB_KEY', ''),
-        'url' => 'https://api-v3.igdb.com',
-    ],
+    ]
 
 ];
