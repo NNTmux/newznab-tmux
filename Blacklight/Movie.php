@@ -689,7 +689,7 @@ class Movie
             'imdbid'    => $mov['imdbid'],
             'language'  => html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8'),
             'plot'      => html_entity_decode(preg_replace('/\s+See full summary »/u', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8'),
-            'rating'    => round((int)$mov['rating'], 1),
+            'rating'    => round((int) $mov['rating'], 1),
             'rtrating' => $mov['rtrating'] ?? 'N/A',
             'tagline'   => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
             'title'     => $mov['title'],
