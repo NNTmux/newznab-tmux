@@ -727,9 +727,9 @@ class Console
                         $publishers = [];
                         if (! empty($game->involved_companies)) {
                             foreach ($game->involved_companies as $publisher) {
-                                if ($publisher->publisher === true) {
-                                    $company = Company::find($publisher->company);
-                                    $publishers[] = $company->name;
+                                if ($publisher['publisher'] === true) {
+                                    $company = Company::find($publisher['company']);
+                                    $publishers[] = $company['name'];
                                 }
                             }
                         }
