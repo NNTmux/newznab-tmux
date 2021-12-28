@@ -76,6 +76,7 @@ class Console
 
     /**
      * Store names of failed Amazon lookup items.
+     *
      * @var array
      */
     public $failCache;
@@ -86,7 +87,8 @@ class Console
     protected $colorCli;
 
     /**
-     * @param array $options Class instances / Echo to cli.
+     * @param  array  $options  Class instances / Echo to cli.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -122,9 +124,8 @@ class Console
     }
 
     /**
-     * @param string $title
-     * @param string $platform
-     *
+     * @param  string  $title
+     * @param  string  $platform
      * @return false|\Illuminate\Database\Eloquent\Model
      */
     public function getConsoleInfoByName($title, $platform)
@@ -148,14 +149,14 @@ class Console
     }
 
     /**
-     * @param       $page
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
-     * @param array $excludedCats
-     *
+     * @param  $page
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
+     * @param  array  $excludedCats
      * @return array
+     *
      * @throws \Exception
      */
     public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
@@ -332,7 +333,7 @@ class Console
      * @param $esrb
      * @param $cover
      * @param $genres_id
-     * @param string $review
+     * @param  string  $review
      */
     public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genres_id, $review = 'review'): void
     {
@@ -346,6 +347,7 @@ class Console
     /**
      * @param $gameInfo
      * @return int|mixed
+     *
      * @throws \Exception
      */
     public function updateConsoleInfo($gameInfo)
@@ -371,8 +373,8 @@ class Console
     }
 
     /**
-     * @param array $gameInfo
-     * @param array $con
+     * @param  array  $gameInfo
+     * @param  array  $con
      * @return bool
      */
     protected function _matchConToGameInfo(array $gameInfo = [], array $con = []): bool
@@ -482,8 +484,8 @@ class Console
 
     /**
      * @param $amaz
-     *
      * @return array
+     *
      * @throws \Exception
      */
     protected function _matchGenre($amaz): array
@@ -534,8 +536,8 @@ class Console
 
     /**
      * @param $genreName
-     *
      * @return false|int|string
+     *
      * @throws \Exception
      */
     protected function _getGenreKey($genreName)
@@ -553,6 +555,7 @@ class Console
 
     /**
      * @return array
+     *
      * @throws \Exception
      */
     protected function _loadGenres(): array
@@ -562,12 +565,11 @@ class Console
         return $gen->loadGenres(Genres::CONSOLE_TYPE);
     }
 
-    /** This function sets the platform retrieved
+    /**
+     * This function sets the platform retrieved
      *  from the release to the Amazon equivalent.
      *
-     * @param string $platform
-     *
-     *
+     * @param  string  $platform
      * @return string
      */
     protected function _replacePlatform($platform): string
@@ -634,7 +636,7 @@ class Console
     }
 
     /**
-     * @param array $con
+     * @param  array  $con
      * @return int|mixed
      */
     protected function _updateConsoleTable(array $con = [])
@@ -693,8 +695,8 @@ class Console
     /**
      * @param $gameInfo
      * @param $gamePlatform
-     *
      * @return array|bool|\StdClass
+     *
      * @throws \Exception
      */
     public function fetchIGDBProperties($gameInfo, $gamePlatform)
@@ -702,7 +704,7 @@ class Console
         $bestMatch = false;
 
         $gamePlatform = $this->_replacePlatform($gamePlatform);
-        if (config('services.igdb.key') !== '') {
+        if (config('config.credentials.client_id') !== '' && config('config.credentials.client_secret') !== '') {
             try {
                 $result = Game::where('name', $gameInfo)->get();
                 if (! empty($result)) {
@@ -871,7 +873,6 @@ class Console
 
     /**
      * @param $releaseName
-     *
      * @return array|false
      */
     public function parseTitle($releaseName)
@@ -939,7 +940,6 @@ class Console
 
     /**
      * @param $platform
-     *
      * @return string
      */
     public function getBrowseNode($platform): string
@@ -1011,7 +1011,6 @@ class Console
 
     /**
      * @param $nodeName
-     *
      * @return bool|string
      */
     public function matchBrowseNode($nodeName)

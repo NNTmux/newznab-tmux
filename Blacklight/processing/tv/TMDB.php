@@ -42,7 +42,7 @@ class TMDB extends TV
     /**
      * Construct. Instantiate TMDB Class.
      *
-     * @param array $options Class instances.
+     * @param  array  $options  Class instances.
      *
      * @throws \Exception
      */
@@ -56,7 +56,6 @@ class TMDB extends TV
      *
      * @param $videoId
      * @param $siteID
-     *
      * @return bool
      */
     public function getBanner($videoId, $siteID): bool
@@ -68,10 +67,10 @@ class TMDB extends TV
      * Main processing director function for TMDB
      * Calls work query function and initiates processing.
      *
-     * @param      $groupID
-     * @param      $guidChar
-     * @param      $process
-     * @param bool $local
+     * @param  $groupID
+     * @param  $guidChar
+     * @param  $process
+     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
     {
@@ -211,7 +210,6 @@ class TMDB extends TV
      * Returns a formatted array of show data or false if no match.
      *
      * @param $cleanName
-     *
      * @return array|false
      */
     protected function getShowInfo($cleanName)
@@ -220,7 +218,7 @@ class TMDB extends TV
 
         try {
             $response = TmdbClient::getSearchApi()->searchTv($cleanName);
-        } catch (TmdbApiException | \ErrorException $e) {
+        } catch (TmdbApiException|\ErrorException $e) {
             return false;
         }
 
@@ -234,9 +232,8 @@ class TMDB extends TV
     }
 
     /**
-     * @param array $shows
-     * @param string $cleanName
-     *
+     * @param  array  $shows
+     * @param  string  $cleanName
      * @return array|false
      */
     private function matchShowInfo($shows, $cleanName)
@@ -290,8 +287,7 @@ class TMDB extends TV
     /**
      * Retrieves the poster art for the processed show.
      *
-     * @param int $videoId -- the local Video ID
-     *
+     * @param  int  $videoId  -- the local Video ID
      * @return int
      */
     public function getPoster($videoId): int
@@ -317,12 +313,11 @@ class TMDB extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param int $tmdbid
-     * @param int $season
-     * @param int $episode
-     * @param string  $airdate
-     * @param int $videoId
-     *
+     * @param  int  $tmdbid
+     * @param  int  $season
+     * @param  int  $episode
+     * @param  string  $airdate
+     * @param  int  $videoId
      * @return array|false
      */
     protected function getEpisodeInfo($tmdbid, $season, $episode, $airdate = '', $videoId = 0)
@@ -350,7 +345,6 @@ class TMDB extends TV
      * Returns the formatted array.
      *
      * @param $show
-     *
      * @return array
      */
     protected function formatShowInfo($show): array
@@ -385,7 +379,6 @@ class TMDB extends TV
      * Returns the formatted array.
      *
      * @param $episode
-     *
      * @return array
      */
     protected function formatEpisodeInfo($episode): array

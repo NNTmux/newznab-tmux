@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $releases_id FK to releases.id.
  * @property mixed $uniqueid Unique_ID from mediainfo.
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseUnique whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseUnique whereUniqueid($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseUnique newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseUnique newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseUnique query()

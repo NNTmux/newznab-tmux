@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 class FailedReleasesController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
      * @throws \Exception
      */
     public function failed(Request $request)

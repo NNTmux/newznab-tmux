@@ -12,12 +12,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $publisher The channel/network of production/release (ABC, BBC, Showtime, etc.).
  * @property string $localzone The linux tz style identifier
  * @property bool $image Does the video have a cover image?
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereLocalzone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo wherePublisher($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereSummary($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo whereVideosId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvInfo query()

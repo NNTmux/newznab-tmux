@@ -50,7 +50,7 @@ class UpdateNNTmuxGit extends Command
         }
         $this->info('Getting changes from Github');
         $result = $this->git->gitPull();
-        $this->info($result[2]);
+        $this->info($result[0]);
 
         if ($wasRunning === true) {
             $this->call('tmux-ui:start');

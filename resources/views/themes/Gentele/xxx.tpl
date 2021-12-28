@@ -25,19 +25,19 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-toggle="tooltip" data-placement="top" title
+												data-bs-toggle="tooltip" data-bs-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
 									{/if}
@@ -144,9 +144,9 @@
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{{url("/nfo/{$mguid[$m@index]}")}}"
-															title="View NFO" class="badge badge-info"
+															title="View NFO" class="badge bg-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/browse/group?g={$result->grp_release_grpname}")}}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
@@ -171,10 +171,10 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-info">{$msize[$m@index]|fsize_format:"MB"}</span>
-																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge bg-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge bg-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge bg-info">{$msize[$m@index]|fsize_format:"MB"}</span>
+																<span class="badge bg-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br>
 																<div class="release-subtitle">{if $result->genre != ''}Genre: {$result->genre}, {/if}</div>
@@ -188,26 +188,25 @@
 																</div>
 																<div>
 																	<a role="button" class="btn btn-light btn-xs"
-																	   data-toggle="tooltip" data-placement="top" title
+																	   data-bs-toggle="tooltip" data-bs-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
-																				class="badge"> {$mgrabs[$m@index]}
+																				class="badge bg-info"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
-																				class="badge"> {$mcomments[$m@index]}
+																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-light btn-xs icon_cart text-muted"
-																		  id="guid{$mguid[$m@index]}"
-																		  data-toggle="tooltip" data-placement="top" title
+                                                                    <a href="{{url("/cart/add?id={$mguid[$m@index]}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs text-muted"
+																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
-																				class="fa fa-shopping-basket"></i></span>
+                                                                                class="fa fa-shopping-basket"></i></span></a>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
-																			  data-toggle="tooltip" data-placement="top"
+																			  data-bs-toggle="tooltip" data-bs-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
 																					class="fa fa-share"></i></span>
@@ -312,9 +311,9 @@
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{{url("nfo/{$mguid[$m@index]}")}}"
-															title="View NFO" class="badge badge-info"
+															title="View NFO" class="badge bg-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/browse/group?g={$result->grp_release_grpname}")}}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
@@ -338,10 +337,10 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-info">{$msize[$m@index]|fsize_format:"MB"}</span>
-																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge bg-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge bg-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge bg-info">{$msize[$m@index]|fsize_format:"MB"}</span>
+																<span class="badge bg-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br>
 																<div class="release-subtitle">{if $result->genre != ''}Genre: {$result->genre}, {/if}</div>
@@ -355,26 +354,25 @@
 																</div>
 																<div>
 																	<a role="button" class="btn btn-light btn-xs"
-																	   data-toggle="tooltip" data-placement="top" title
+																	   data-bs-toggle="tooltip" data-bs-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
-																				class="badge"> {$mgrabs[$m@index]}
+																				class="badge bg-info"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
-																				class="badge"> {$mcomments[$m@index]}
+																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-success btn-xs icon_cart text-muted"
-																		  id="guid{$mguid[$m@index]}"
-																		  data-toggle="tooltip" data-placement="top" title
+                                                                    <a href="{{url("/cart/add?id={$mguid[$m@index]}")}}" target="_blank"><span class="btn btn-hover btn-success btn-xs text-muted"
+																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
-																				class="fa fa-shopping-basket"></i></span>
+                                                                                class="fa fa-shopping-basket"></i></span></a>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
-																			  data-toggle="tooltip" data-placement="top"
+																			  data-bs-toggle="tooltip" data-bs-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
 																					class="fa fa-share"></i></span>
@@ -413,19 +411,19 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-toggle="tooltip" data-placement="top" title
+												data-bs-toggle="tooltip" data-bs-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
 									{/if}

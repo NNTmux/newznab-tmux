@@ -30,8 +30,7 @@ abstract class AdultMovies
     }
 
     /**
-     * @param bool $extras
-     *
+     * @param  bool  $extras
      * @return mixed
      */
     abstract protected function productInfo($extras = false);
@@ -57,8 +56,7 @@ abstract class AdultMovies
     abstract protected function genres();
 
     /**
-     * @param string $movie
-     *
+     * @param  string  $movie
      * @return mixed
      */
     abstract public function processSite($movie);

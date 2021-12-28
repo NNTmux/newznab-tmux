@@ -42,19 +42,19 @@
 										<div class="btn-group">
 											<button type="button"
 													class="nzb_multi_operations_download btn btn-sm btn-success"
-													data-toggle="tooltip" data-placement="top" title
+													data-bs-toggle="tooltip" data-bs-placement="top" title
 													data-original-title="Download NZBs">
 												<i class="fa fa-cloud-download"></i></button>
 											<button type="button"
 													class="nzb_multi_operations_cart btn btn-sm btn-info"
-													data-toggle="tooltip" data-placement="top" title
+													data-bs-toggle="tooltip" data-bs-placement="top" title
 													data-original-title="Send to my Download Basket">
 												<i class="fa fa-shopping-basket"></i></button>
 
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
 														class="nzb_multi_operations_sab btn btn-sm btn-success"
-														data-toggle="tooltip" data-placement="top" title
+														data-bs-toggle="tooltip" data-bs-placement="top" title
 														data-original-title="Send to Queue">
 													<i class="fa fa-share"></i></button>
 											{/if}
@@ -118,47 +118,47 @@
 												<i class="fa fa-exclamation-circle" style="color: red"
 												   title="This release has failed to download for some users"></i>{/if}
 												<br/>
-												<span class="badge badge-info">{$result->grabs}
+												<span class="badge bg-info">{$result->grabs}
 													Grab{if $result->grabs != 1}s{/if}</span>
 												{if $result->nfoid > 0}<span><a
 															href="{{url("/nfo/{$result->guid}")}}"
-															class="modal_nfo badge badge-info" rel="nfo">NFO</a>
+															class="modal_nfo badge bg-info" rel="nfo">NFO</a>
 													</span>{/if}
 												{if $result->jpgstatus == 1 && $userdata->can('preview') == true}<span><a
 															href="{{url("/covers/sample/{$result->guid}_thumb.jpg")}}"
 															name="name{$result->guid}"
 															data-fancybox
-															class="badge badge-info"
+															class="badge bg-info"
 															rel="preview">Sample</a></span>{/if}
 												{if $result->haspreview == 1 && $userdata->can('preview') == true}<span><a
 															href="{{url("/covers/preview/{$result->guid}_thumb.jpg")}}"
 															name="name{$result->guid}"
 															data-fancybox
-															class="badge badge-info"
+															class="badge bg-info"
 															rel="preview">Preview</a></span>{/if}
 												{if $result->videos_id > 0}<span><a
 															href="{{url("/series/{$result->videos_id}")}}"
-															class="badge badge-info" rel="series">View TV</a>
+															class="badge bg-info" rel="series">View TV</a>
 													</span>{/if}
 												{if !empty($result->firstaired)}<span
-													class="seriesinfo badge badge-info" title="{$result->guid}">
+													class="seriesinfo badge bg-info" title="{$result->guid}">
 													Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
-												{if $result->anidbid > 0}<span><a class="badge badge-info"
+												{if $result->anidbid > 0}<span><a class="badge bg-info"
 																				 href="{{url("/anime?id={$result->anidbid}")}}">View
 												Anime</a></span>{/if}
-												{if !empty($result->failed)}<span class="badge badge-info">
+												{if !empty($result->failed)}<span class="badge bg-info">
 													<i class="fa fa-thumbs-o-up"></i>
 													{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 													<i class="fa fa-thumbs-o-down"></i>
 													{$result->failed} Failed Download{if $result->failed != 1}s{/if}
 													</span>{/if}
-												<span class="badge badge-info">{$result->group_name}</span>
-												<span class="badge badge-info">{$result->fromname}</span>
+												<span class="badge bg-info">{$result->group_name}</span>
+												<span class="badge bg-info">{$result->fromname}</span>
                                                 {if $lastvisit|strtotime<$result->adddate|strtotime}
-                                                    <span class="badge badge-success">New</span>
+                                                    <span class="badge bg-success">New</span>
                                                 {/if}
 											</td>
-											<td><span class="badge badge-info">{$result->category_name}</span>
+											<td><span class="badge bg-info">{$result->category_name}</span>
 											</td>
 											<td>{Illuminate\Support\Carbon::parse({{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}})->diffForHumans()}</td>
 											<td>{$result->size|filesize}</td>
@@ -176,32 +176,32 @@
 												<a href="{{url("/getnzb?id={$result->guid}")}}"
 												   class="icon_nzb text-muted"><i
 															class="fa fa-cloud-download text-muted"
-															data-toggle="tooltip" data-placement="top" title
+															data-bs-toggle="tooltip" data-bs-placement="top" title
 															data-original-title="Download NZB"></i></a>
 												<a href="{{url("/details/{$result->guid}/#comments")}}"><i
 															class="fa fa-comments-o text-muted"
-															data-toggle="tooltip" data-placement="top" title
+															data-bs-toggle="tooltip" data-bs-placement="top" title
 															data-original-title="Comments"></i></a>
-												<a href="#"><i
+												<a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><i
 															id="guid{$result->guid}"
-															class="icon_cart text-muted fa fa-shopping-basket"
-															data-toggle="tooltip"
-															data-placement="top" title
+															class="text-muted fa fa-shopping-basket"
+															data-bs-toggle="tooltip"
+															data-bs-placement="top" title
 															data-original-title="Send to my download basket"></i></a>
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<a href="#">
 														<i id="guid{$result->guid}"
 														   class="icon_sab text-muted fa fa-share"
-														   data-toggle="tooltip"
-														   data-placement="top" title
+														   data-bs-toggle="tooltip"
+														   data-bs-placement="top" title
 														   data-original-title="Send to my Queue">
 														</i>
 													</a>
 												{/if}
 												{if $weHasVortex}
 													<a href="#" class="icon_vortex text-muted"><i
-																class="fa fa-share" data-toggle="tooltip"
-																data-placement="top"
+																class="fa fa-share" data-bs-toggle="tooltip"
+																data-bs-placement="top"
 																title data-original-title="Send to NZBVortex"></i></a>
 												{/if}
 											</td>
@@ -224,19 +224,19 @@
 										<div class="btn-group">
 											<button type="button"
 													class="nzb_multi_operations_download btn btn-sm btn-success"
-													data-toggle="tooltip" data-placement="top" title
+													data-bs-toggle="tooltip" data-bs-placement="top" title
 													data-original-title="Download NZBs">
 												<i class="fa fa-cloud-download"></i></button>
 											<button type="button"
 													class="nzb_multi_operations_cart btn btn-sm btn-info"
-													data-toggle="tooltip" data-placement="top" title
+													data-bs-toggle="tooltip" data-bs-placement="top" title
 													data-original-title="Send to my Download Basket">
 												<i class="fa fa-shopping-basket"></i></button>
 
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
 														class="nzb_multi_operations_sab btn btn-sm btn-success"
-														data-toggle="tooltip" data-placement="top" title
+														data-bs-toggle="tooltip" data-bs-placement="top" title
 														data-original-title="Send to Queue">
 													<i class="fa fa-share"></i></button>
 											{/if}

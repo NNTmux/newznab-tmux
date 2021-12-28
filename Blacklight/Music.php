@@ -64,6 +64,7 @@ class Music
 
     /**
      * Store names of failed Amazon lookup items.
+     *
      * @var array
      */
     public $failCache;
@@ -74,7 +75,8 @@ class Music
     protected $colorCli;
 
     /**
-     * @param array $options Class instances/ echo to CLI.
+     * @param  array  $options  Class instances/ echo to CLI.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -136,13 +138,13 @@ class Music
 
     /**
      * @param $page
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
-     * @param array $excludedCats
-     *
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
+     * @param  array  $excludedCats
      * @return array
+     *
      * @throws \Exception
      */
     public function getMusicRange($page, $cat, $start, $num, $orderBy, array $excludedCats = [])
@@ -235,7 +237,6 @@ class Music
 
     /**
      * @param $orderBy
-     *
      * @return array
      */
     public function getMusicOrder($orderBy): array
@@ -341,11 +342,11 @@ class Music
     }
 
     /**
-     * @param      $title
-     * @param      $year
-     * @param null $amazdata
-     *
+     * @param  $title
+     * @param  $year
+     * @param  null  $amazdata
      * @return int|mixed
+     *
      * @throws \Exception
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
@@ -439,7 +440,8 @@ class Music
     }
 
     /**
-     * @param bool $local
+     * @param  bool  $local
+     *
      * @throws \Exception
      */
     public function processMusicReleases($local = false)
@@ -518,8 +520,7 @@ class Music
     }
 
     /**
-     * @param string $releaseName
-     *
+     * @param  string  $releaseName
      * @return array|false
      */
     public function parseArtist($releaseName)
@@ -552,7 +553,6 @@ class Music
 
     /**
      * @param $nodeId
-     *
      * @return bool|string
      */
     public function matchBrowseNode($nodeId)
@@ -658,9 +658,9 @@ class Music
     }
 
     /**
-     * @param string $title
-     *
+     * @param  string  $title
      * @return array|bool
+     *
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      * @throws \Exception
      */

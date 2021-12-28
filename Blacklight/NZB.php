@@ -125,9 +125,9 @@ class NZB
      *
      *
      *
-     * @param \App\Models\Release $release
-     *
+     * @param  \App\Models\Release  $release
      * @return bool
+     *
      * @throws \Throwable
      */
     public function writeNzbForReleaseId(Release $release): bool
@@ -252,10 +252,9 @@ class NZB
     /**
      * Build a folder path on the hard drive where the NZB file will be stored.
      *
-     * @param string $releaseGuid      The guid of the release.
-     * @param int    $levelsToSplit    How many sub-paths the folder will be in.
-     * @param bool   $createIfNotExist Create the folder if it doesn't exist.
-     *
+     * @param  string  $releaseGuid  The guid of the release.
+     * @param  int  $levelsToSplit  How many sub-paths the folder will be in.
+     * @param  bool  $createIfNotExist  Create the folder if it doesn't exist.
      * @return string $nzbpath The path to store the NZB file.
      */
     public function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist): string
@@ -278,10 +277,9 @@ class NZB
     /**
      * Retrieve path + filename of the NZB to be stored.
      *
-     * @param string $releaseGuid      The guid of the release.
-     * @param int    $levelsToSplit    How many sub-paths the folder will be in. (optional)
-     * @param bool   $createIfNotExist Create the folder if it doesn't exist. (optional)
-     *
+     * @param  string  $releaseGuid  The guid of the release.
+     * @param  int  $levelsToSplit  How many sub-paths the folder will be in. (optional)
+     * @param  bool  $createIfNotExist  Create the folder if it doesn't exist. (optional)
      * @return string Path+filename.
      */
     public function getNZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false): string
@@ -296,10 +294,9 @@ class NZB
     /**
      * Determine is an NZB exists, returning the path+filename, if not return false.
      *
-     * @param  string $releaseGuid The guid of the release.
-     *
+     * @param  string  $releaseGuid  The guid of the release.
      * @return false|string On success: (string) Path+file name of the nzb.
-     *                     On failure: false .
+     *                      On failure: false .
      */
     public function NZBPath($releaseGuid)
     {
@@ -312,11 +309,10 @@ class NZB
      * Retrieve various information on a NZB file (the subject, # of pars,
      * file extensions, file sizes, file completion, group names, # of parts).
      *
-     * @param string $nzb The NZB contents in a string.
-     * @param array  $options
-     *                    'no-file-key'    => True - use numeric array key; False - Use filename as array key.
-     *                    'strip-count'    => True - Strip file/part count from file name to make the array key; False - Leave file name as is.
-     *
+     * @param  string  $nzb  The NZB contents in a string.
+     * @param  array  $options
+     *                          'no-file-key'    => True - use numeric array key; False - Use filename as array key.
+     *                          'strip-count'    => True - Strip file/part count from file name to make the array key; False - Leave file name as is.
      * @return array $result Empty if not an NZB or the contents of the NZB.
      */
     public function nzbFileList($nzb, array $options = []): array

@@ -43,12 +43,14 @@ class Movie
 
     /**
      * Current title being passed through various sites/api's.
+     *
      * @var string
      */
     protected $currentTitle = '';
 
     /**
      * Current year of parsed search name.
+     *
      * @var string
      */
     protected $currentYear = '';
@@ -77,6 +79,7 @@ class Movie
 
     /**
      * Language to fetch from IMDB.
+     *
      * @var string
      */
     protected $lookuplanguage;
@@ -147,7 +150,8 @@ class Movie
     protected $colorCli;
 
     /**
-     * @param array $options Class instances / Echo to CLI.
+     * @param  array  $options  Class instances / Echo to CLI.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -198,7 +202,6 @@ class Movie
 
     /**
      * @param $imdbId
-     *
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
      */
     public function getMovieInfo($imdbId)
@@ -210,14 +213,13 @@ class Movie
      * Get movie releases with covers for movie browse page.
      *
      *
-     * @param       $page
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
-     * @param int   $maxAge
-     * @param array $excludedCats
-     *
+     * @param  $page
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
      * @return array|mixed
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
@@ -327,7 +329,6 @@ class Movie
      * Get the order type the user requested on the movies page.
      *
      * @param $orderBy
-     *
      * @return array
      */
     protected function getMovieOrder($orderBy): array
@@ -389,31 +390,28 @@ class Movie
     /**
      * Get trailer using IMDB Id.
      *
-     * @param int $imdbID
-     *
+     * @param  int  $imdbId
      * @return bool|string
+     *
      * @throws \Exception
      */
-    public function getTrailer($imdbID)
+    public function getTrailer($imdbId)
     {
-        $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '<>', '')->first(['trailer']);
+        $trailer = MovieInfo::query()->where('imdbid', $imdbId)->where('trailer', '<>', '')->first(['trailer']);
         if ($trailer !== null) {
             return $trailer['trailer'];
         }
 
         if ($this->traktcheck !== null) {
-            $data = $this->traktTv->client->movieSummary('tt'.$imdbID, 'full');
-            if ($data !== false) {
-                $this->parseTraktTv($data);
-                if (! empty($data['trailer'])) {
-                    return $data['trailer'];
-                }
+            $data = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
+            if (($data !== false) && ! empty($data['trailer'])) {
+                return $data['trailer'];
             }
         }
 
-        $trailer = Utility::imdb_trailers($imdbID);
+        $trailer = Utility::imdb_trailers($imdbId);
         if ($trailer) {
-            MovieInfo::query()->where('imdbid', $imdbID)->update(['trailer' => $trailer]);
+            MovieInfo::query()->where('imdbid', $imdbId)->update(['trailer' => $trailer]);
 
             return $trailer;
         }
@@ -424,8 +422,7 @@ class Movie
     /**
      * Parse trakt info, insert into DB.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return mixed
      */
     public function parseTraktTv(&$data)
@@ -441,15 +438,15 @@ class Movie
                 $data['trailer']
             );
         }
-        $imdbid = (strpos($data['ids']['imdb'], 'tt') === 0) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
+        $imdbId = (str_starts_with($data['ids']['imdb'], 'tt')) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
         $cover = 0;
-        if (File::isFile($this->imgSavePath.$imdbid).'-cover.jpg') {
+        if (File::isFile($this->imgSavePath.$imdbId).'-cover.jpg') {
             $cover = 1;
         }
 
         return $this->update([
-            'genre'   => $this->checkTraktValue($data['genres']),
-            'imdbid'   => $this->checkTraktValue($imdbid),
+            'genre'   => implode(', ', $data['genres']),
+            'imdbid'   => $this->checkTraktValue($imdbId),
             'language' => $this->checkTraktValue($data['language']),
             'plot'     => $this->checkTraktValue($data['overview']),
             'rating'   => $this->checkTraktValue($data['rating']),
@@ -464,13 +461,10 @@ class Movie
     }
 
     /**
-     * Checks if the value is set and not empty, returns it, else empty string.
-     *
-     * @param mixed $value
-     *
-     * @return string
+     * @param $value
+     * @return mixed|string
      */
-    private function checkTraktValue($value): string
+    private function checkTraktValue($value)
     {
         if (\is_array($value) && ! empty($value)) {
             $temp = '';
@@ -501,7 +495,7 @@ class Movie
     /**
      * Update movie on movie-edit page.
      *
-     * @param array $values Array of keys/values to update. See $validKeys
+     * @param  array  $values  Array of keys/values to update. See $validKeys
      * @return bool
      */
     public function update(array $values): bool
@@ -538,12 +532,11 @@ class Movie
     /**
      * Returns a tmdb, imdb or trakt variable, the one that is set. Empty string if both not set.
      *
-     * @param string $variable1
-     * @param string $variable2
-     * @param string $variable3
-     * @param string $variable4
-     * @param string $variable5
-     *
+     * @param  string  $variable1
+     * @param  string  $variable2
+     * @param  string  $variable3
+     * @param  string  $variable4
+     * @param  string  $variable5
      * @return array|string
      */
     protected function setVariables($variable1, $variable2, $variable3, $variable4, $variable5)
@@ -571,8 +564,8 @@ class Movie
      * Fetch IMDB/TMDB/TRAKT/OMDB/iTunes info for the movie.
      *
      * @param $imdbId
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function updateMovieInfo($imdbId): bool
@@ -696,7 +689,7 @@ class Movie
             'imdbid'    => $mov['imdbid'],
             'language'  => html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8'),
             'plot'      => html_entity_decode(preg_replace('/\s+See full summary »/u', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8'),
-            'rating'    => round($mov['rating'], 1),
+            'rating'    => round((int) $mov['rating'], 1),
             'rtrating' => $mov['rtrating'] ?? 'N/A',
             'tagline'   => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
             'title'     => $mov['title'],
@@ -724,7 +717,6 @@ class Movie
      * Fetch FanArt.tv backdrop / cover / title.
      *
      * @param $imdbId
-     *
      * @return array|false
      */
     protected function fetchFanartTVProperties($imdbId)
@@ -770,9 +762,8 @@ class Movie
      * Fetch info for IMDB id from TMDB.
      *
      *
-     * @param      $imdbId
-     * @param bool $text
-     *
+     * @param  $imdbId
+     * @param  bool  $text
      * @return array|false
      */
     public function fetchTMDBProperties($imdbId, $text = false)
@@ -781,7 +772,7 @@ class Movie
 
         try {
             $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
-        } catch (TmdbApiException | \ErrorException $error) {
+        } catch (TmdbApiException|\ErrorException $error) {
             if (Utility::isCLI()) {
                 $this->colorCli->error($error->getMessage());
             }
@@ -878,7 +869,6 @@ class Movie
 
     /**
      * @param $imdbId
-     *
      * @return array|false
      */
     public function fetchIMDBProperties($imdbId)
@@ -939,8 +929,8 @@ class Movie
      * Fetch TraktTV backdrop / cover / title.
      *
      * @param $imdbId
-     *
      * @return array|false
+     *
      * @throws \Exception
      */
     public function fetchTraktTVProperties($imdbId)
@@ -991,7 +981,6 @@ class Movie
      * Fetch OMDb backdrop / cover / title.
      *
      * @param $imdbId
-     *
      * @return array|false
      */
     public function fetchOmdbAPIProperties($imdbId)
@@ -999,7 +988,7 @@ class Movie
         if ($this->omdbapikey !== null) {
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
 
-            if (\is_object($resp) && $resp->message === 'OK' && ! Str::contains($resp->data, 'Error:') && $resp->data->Response !== 'False') {
+            if (\is_object($resp) && $resp->message === 'OK' && ! Str::contains($resp->data->Response, 'Error:') && $resp->data->Response !== 'False') {
                 similar_text($this->currentTitle, $resp->data->Title, $percent);
                 if ($percent >= self::MATCH_PERCENT) {
                     similar_text($this->currentYear, $resp->data->Year, $percent);
@@ -1039,9 +1028,9 @@ class Movie
     }
 
     /**
-     * @param string $title
-     *
+     * @param  string  $title
      * @return array|bool
+     *
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      * @throws \Exception
      */
@@ -1079,57 +1068,58 @@ class Movie
     /**
      * Update a release with a IMDB id.
      *
-     * @param string $buffer Data to parse a IMDB id/Trakt Id from.
-     * @param string $service Method that called this method.
-     * @param int $id id of the release.
-     * @param int $processImdb To get IMDB info on this IMDB id or not.
-     *
+     * @param  string  $buffer  Data to parse a IMDB id/Trakt Id from.
+     * @param  string  $service  Method that called this method.
+     * @param  int  $id  id of the release.
+     * @param  int  $processImdb  To get IMDB info on this IMDB id or not.
      * @return string
+     *
      * @throws \Exception
      */
     public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
     {
-        $imdbID = false;
+        $imdbId = false;
         if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $hits)) {
-            $imdbID = $hits['imdbid'];
+            $imdbId = $hits['imdbid'];
         }
 
-        if ($imdbID !== false) {
+        if ($imdbId !== false) {
             $this->service = $service;
             if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
-                PHP_EOL.$this->colorCli->primary($this->service.' found IMDBid: tt'.$imdbID, true);
+                PHP_EOL.$this->colorCli->primary($this->service.' found IMDBid: tt'.$imdbId, true);
             }
 
-            $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
+            $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
-            Release::query()->where('id', $id)->update(['imdbid' =>$imdbID, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
+            Release::query()->where('id', $id)->update(['imdbid' =>$imdbId, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
-                $movCheck = $this->getMovieInfo($imdbID);
+                $movCheck = $this->getMovieInfo($imdbId);
                 if ($movCheck === null || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
-                    $info = $this->updateMovieInfo($imdbID);
+                    $info = $this->updateMovieInfo($imdbId);
                     if ($info === false) {
                         Release::query()->where('id', $id)->update(['imdbid' => 0000000]);
                     } elseif ($info === true) {
-                        $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
+                        $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
-                        Release::query()->where('id', $id)->update(['imdbid' =>$imdbID, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
+                        Release::query()->where('id', $id)->update(['imdbid' =>$imdbId, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
                     }
                 }
             }
         }
 
-        return $imdbID;
+        return $imdbId;
     }
 
     /**
      * Process releases with no IMDB id's.
      *
      *
-     * @param string $groupID
-     * @param string $guidChar
-     * @param int $lookupIMDB
+     * @param  string  $groupID
+     * @param  string  $guidChar
+     * @param  int  $lookupIMDB
+     *
      * @throws \Exception
      */
     public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1): void
@@ -1190,8 +1180,8 @@ class Movie
                 $getIMDBid = $this->localIMDBSearch();
 
                 if ($getIMDBid !== false) {
-                    $imdbID = $this->doMovieUpdate('tt'.$getIMDBid, 'Local DB', $arr['id']);
-                    if ($imdbID !== false) {
+                    $imdbId = $this->doMovieUpdate('tt'.$getIMDBid, 'Local DB', $arr['id']);
+                    if ($imdbId !== false) {
                         $movieUpdated = true;
                     }
                 }
@@ -1206,8 +1196,8 @@ class Movie
                                 similar_text($this->currentYear, $imdbTitle->year(), $percent);
                                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                                     $getIMDBid = $imdbTitle->imdbid();
-                                    $imdbID = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $arr['id']);
-                                    if ($imdbID !== false) {
+                                    $imdbId = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $arr['id']);
+                                    if ($imdbId !== false) {
                                         $movieUpdated = true;
                                     }
                                 }
@@ -1226,12 +1216,12 @@ class Movie
                             $buffer = $this->omdbApi->search($omdbTitle, 'movie');
                         }
 
-                        if (\is_object($buffer) && $buffer->message === 'OK' && ! Str::contains($buffer->data, 'Error:') && $buffer->data->Response === 'True') {
+                        if (\is_object($buffer) && $buffer->message === 'OK' && ! Str::contains($buffer->data->Response, 'Error:') && $buffer->data->Response === 'True') {
                             $getIMDBid = $buffer->data->Search[0]->imdbID;
 
                             if (! empty($getIMDBid)) {
-                                $imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
-                                if ($imdbID !== false) {
+                                $imdbId = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
+                                if ($imdbId !== false) {
                                     $movieUpdated = true;
                                 }
                             }
@@ -1245,8 +1235,8 @@ class Movie
                     if ($data !== false) {
                         $this->parseTraktTv($data);
                         if (! empty($data['ids']['imdb'])) {
-                            $imdbID = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
-                            if ($imdbID !== false) {
+                            $imdbId = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
+                            if ($imdbId !== false) {
                                 $movieUpdated = true;
                             }
                         }
@@ -1264,8 +1254,8 @@ class Movie
                                     if ($percent >= self::YEAR_MATCH_PERCENT) {
                                         $ret = $this->fetchTMDBProperties($result['id'], true);
                                         if ($ret !== false && ! empty($ret['imdbid'])) {
-                                            $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
-                                            if ($imdbID !== false) {
+                                            $imdbId = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
+                                            if ($imdbId !== false) {
                                                 $movieUpdated = true;
                                             }
                                         }
@@ -1277,7 +1267,7 @@ class Movie
                         } else {
                             $movieUpdated = false;
                         }
-                    } catch (TmdbApiException | \ErrorException $error) {
+                    } catch (TmdbApiException|\ErrorException $error) {
                         $movieUpdated = false;
                     }
                 }
@@ -1312,8 +1302,7 @@ class Movie
     /**
      * Parse a movie name from a release search name.
      *
-     * @param string $releaseName
-     *
+     * @param  string  $releaseName
      * @return bool
      */
     protected function parseMovieSearchName($releaseName): bool

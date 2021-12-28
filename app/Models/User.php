@@ -75,6 +75,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $release
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserRequest[] $request
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserSerie[] $series
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiaccess($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereBookview($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereConsoleview($value)
@@ -118,6 +119,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerified($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiToken($value)
  * @mixin \Eloquent
+ *
  * @property int $roles_id FK to roles.id
  * @property string $api_token
  * @property int $rate_limit
@@ -130,6 +132,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions
  * @property-read \Spatie\Permission\Models\Role $role
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User permission($permissions)
@@ -251,6 +254,7 @@ class User extends Authenticatable
 
     /**
      * @param $id
+     *
      * @throws \Exception
      */
     public static function deleteUser($id): void
@@ -259,10 +263,10 @@ class User extends Authenticatable
     }
 
     /**
-     * @param string $role
-     * @param string $username
-     * @param string $host
-     * @param string $email
+     * @param  string  $role
+     * @param  string  $username
+     * @param  string  $host
+     * @param  string  $email
      * @return int
      */
     public static function getCount($role = '', $username = '', $host = '', $email = ''): int
@@ -289,34 +293,34 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  int      $id
-     * @param  string      $userName
-     * @param  string      $email
-     * @param  int     $grabs
-     * @param  int     $role
-     * @param  string    $notes
-     * @param  int     $invites
-     * @param  int     $movieview
-     * @param  int    $musicview
-     * @param  int   $gameview
-     * @param  int    $xxxview
-     * @param  int    $consoleview
-     * @param  int    $bookview
-     * @param string $queueType
-     * @param string $nzbgetURL
-     * @param string $nzbgetUsername
-     * @param string $nzbgetPassword
-     * @param string $saburl
-     * @param string $sabapikey
-     * @param string $sabpriority
-     * @param string $sabapikeytype
-     * @param bool   $nzbvortexServerUrl
-     * @param bool   $nzbvortexApiKey
-     * @param bool   $cp_url
-     * @param bool   $cp_api
-     * @param string $style
-     *
+     * @param  int  $id
+     * @param  string  $userName
+     * @param  string  $email
+     * @param  int  $grabs
+     * @param  int  $role
+     * @param  string  $notes
+     * @param  int  $invites
+     * @param  int  $movieview
+     * @param  int  $musicview
+     * @param  int  $gameview
+     * @param  int  $xxxview
+     * @param  int  $consoleview
+     * @param  int  $bookview
+     * @param  string  $queueType
+     * @param  string  $nzbgetURL
+     * @param  string  $nzbgetUsername
+     * @param  string  $nzbgetPassword
+     * @param  string  $saburl
+     * @param  string  $sabapikey
+     * @param  string  $sabpriority
+     * @param  string  $sabapikeytype
+     * @param  bool  $nzbvortexServerUrl
+     * @param  bool  $nzbvortexApiKey
+     * @param  bool  $cp_url
+     * @param  bool  $cp_api
+     * @param  string  $style
      * @return int
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function updateUser($id, $userName, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None'): int
@@ -366,7 +370,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @param string $userName
+     * @param  string  $userName
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByUsername(string $userName)
@@ -375,9 +379,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @param string $email
-     *
+     * @param  string  $email
      * @return \Illuminate\Database\Eloquent\Model|static
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function getByEmail(string $email)
@@ -386,9 +390,8 @@ class User extends Authenticatable
     }
 
     /**
-     * @param int $uid
-     * @param int $role
-     *
+     * @param  int  $uid
+     * @param  int  $role
      * @return bool
      */
     public static function updateUserRole(int $uid, int $role)
@@ -403,9 +406,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @param int $uid
+     * @param  int  $uid
      * @param $date
-     * @param int $addYear
+     * @param  int  $addYear
      */
     public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0): void
     {
@@ -443,16 +446,16 @@ class User extends Authenticatable
     }
 
     /**
-     * @param        $start
-     * @param        $offset
-     * @param        $orderBy
-     * @param string $userName
-     * @param string $email
-     * @param string $host
-     * @param string $role
-     * @param bool   $apiRequests
-     *
+     * @param  $start
+     * @param  $offset
+     * @param  $orderBy
+     * @param  string  $userName
+     * @param  string  $email
+     * @param  string  $host
+     * @param  string  $role
+     * @param  bool  $apiRequests
      * @return \Illuminate\Database\Eloquent\Collection
+     *
      * @throws \Throwable
      */
     public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false)
@@ -496,7 +499,6 @@ class User extends Authenticatable
      * Get sort types for sorting users on the web page user list.
      *
      * @param $orderBy
-     *
      * @return string[]
      */
     public static function getBrowseOrder($orderBy): array
@@ -545,10 +547,9 @@ class User extends Authenticatable
      *
      * Automatically update the hash if it needs to be.
      *
-     * @param string $password Password to check against hash.
-     * @param string|bool $hash     Hash to check against password.
-     * @param int    $userID   ID of the user.
-     *
+     * @param  string  $password  Password to check against hash.
+     * @param  string|bool  $hash  Hash to check against password.
+     * @param  int  $userID  ID of the user.
      * @return bool
      */
     public static function checkPassword($password, $hash, $userID = -1): bool
@@ -571,7 +572,6 @@ class User extends Authenticatable
 
     /**
      * @param $uid
-     *
      * @return int
      */
     public static function updateRssKey($uid): int
@@ -584,7 +584,6 @@ class User extends Authenticatable
     /**
      * @param $id
      * @param $guid
-     *
      * @return int
      */
     public static function updatePassResetGuid($id, $guid): int
@@ -595,9 +594,8 @@ class User extends Authenticatable
     }
 
     /**
-     * @param int    $id
-     * @param string $password
-     *
+     * @param  int  $id
+     * @param  string  $password
      * @return int
      */
     public static function updatePassword(int $id, string $password): int
@@ -618,8 +616,8 @@ class User extends Authenticatable
 
     /**
      * @param $guid
-     *
      * @return \Illuminate\Database\Eloquent\Model|static
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function getByPassResetGuid(string $guid)
@@ -628,8 +626,8 @@ class User extends Authenticatable
     }
 
     /**
-     * @param     $id
-     * @param int $num
+     * @param  $id
+     * @param  int  $num
      */
     public static function incrementGrabs(int $id, $num = 1): void
     {
@@ -642,7 +640,6 @@ class User extends Authenticatable
      *
      * @param $userID
      * @param $rssToken
-     *
      * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByIdAndRssToken($userID, $rssToken)
@@ -656,7 +653,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @param string $rssToken
+     * @param  string  $rssToken
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByRssToken(string $rssToken)
@@ -666,7 +663,6 @@ class User extends Authenticatable
 
     /**
      * @param $url
-     *
      * @return bool
      */
     public static function isValidUrl($url): bool
@@ -686,9 +682,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @param int $length
-     *
+     * @param  int  $length
      * @return string
+     *
      * @throws \Exception
      */
     public static function generatePassword($length = 15): string
@@ -699,18 +695,18 @@ class User extends Authenticatable
     /**
      * Register a new user.
      *
-     * @param        $userName
-     * @param        $password
-     * @param        $email
-     * @param        $host
-     * @param        $notes
-     * @param int $invites
-     * @param string $inviteCode
-     * @param bool $forceInviteMode
-     *
-     * @param int $role
-     * @param bool $validate
+     * @param  $userName
+     * @param  $password
+     * @param  $email
+     * @param  $host
+     * @param  $notes
+     * @param  int  $invites
+     * @param  string  $inviteCode
+     * @param  bool  $forceInviteMode
+     * @param  int  $role
+     * @param  bool  $validate
      * @return bool|int|string
+     *
      * @throws \Exception
      */
     public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER, $validate = true)
@@ -754,8 +750,7 @@ class User extends Authenticatable
     /**
      * If a invite is used, decrement the person who invited's invite count.
      *
-     * @param string $inviteCode
-     *
+     * @param  string  $inviteCode
      * @return int
      */
     public static function checkAndUseInvite(string $inviteCode): int
@@ -774,16 +769,16 @@ class User extends Authenticatable
     /**
      * Add a new user.
      *
-     * @param string    $userName
-     * @param  string   $password
-     * @param  string   $email
-     * @param int    $role
-     * @param string    $notes
-     * @param string    $host
-     * @param int $invites
-     * @param int $invitedBy
-     *
+     * @param  string  $userName
+     * @param  string  $password
+     * @param  string  $email
+     * @param  int  $role
+     * @param  string  $notes
+     * @param  string  $host
+     * @param  int  $invites
+     * @param  int  $invitedBy
      * @return bool|int
+     *
      * @throws \Exception
      */
     public static function add($userName, $password, $email, $role, $notes = '', $host = '', $invites = Invitation::DEFAULT_INVITES, $invitedBy = 0)
@@ -814,9 +809,9 @@ class User extends Authenticatable
     /**
      * Get the list of categories the user has excluded.
      *
-     * @param int $userID ID of the user.
-     *
+     * @param  int  $userID  ID of the user.
      * @return array
+     *
      * @throws \Exception
      */
     public static function getCategoryExclusionById($userID): array
@@ -871,8 +866,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @throws \Exception
      */
     public static function getCategoryExclusionForApi(Request $request): array
@@ -903,8 +899,8 @@ class User extends Authenticatable
      * @param $serverUrl
      * @param $uid
      * @param $emailTo
-     *
      * @return string
+     *
      * @throws \Exception
      */
     public static function sendInvite($serverUrl, $uid, $emailTo): string
@@ -925,7 +921,8 @@ class User extends Authenticatable
      * the download/request rows must remain for at least one day to allow the role based
      * limits to apply.
      *
-     * @param int $days
+     * @param  int  $days
+     *
      * @throws \Exception
      */
     public static function pruneRequestHistory($days = 0): void

@@ -97,8 +97,7 @@ class Hotmovies extends AdultMovies
     /**
      * Process ProductInfo.
      *
-     * @param bool $extras
-     *
+     * @param  bool  $extras
      * @return array
      */
     protected function productInfo($extras = false): array
@@ -202,8 +201,7 @@ class Hotmovies extends AdultMovies
     /**
      * Searches for match against xxx movie name.
      *
-     * @param string $movie
-     *
+     * @param  string  $movie
      * @return bool , true if search >= 90%
      */
     public function processSite($movie): bool

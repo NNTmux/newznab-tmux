@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\Auth;
 class ForumController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     *
      * @throws \Exception
      */
     public function forum(Request $request)
@@ -65,8 +66,9 @@ class ForumController extends BasePageController
 
     /**
      * @param $id
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     *
      * @throws \Exception
      */
     public function getPosts($id, Request $request)
@@ -105,7 +107,7 @@ class ForumController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function deleteTopic(Request $request)
@@ -122,7 +124,8 @@ class ForumController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -156,8 +159,8 @@ class ForumController extends BasePageController
 
     /**
      * @param $id
-     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     *
      * @throws \Exception
      */
     public function destroy($id)

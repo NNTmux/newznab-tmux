@@ -6,6 +6,7 @@ use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Conner\Tagging\Taggable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -60,9 +61,9 @@ use Illuminate\Support\Facades\DB;
  * @property bool $proc_files
  * @property bool $proc_uid
  * @property bool $proc_srr Has the release been srr
- * processed
+ *                          processed
  * @property bool $proc_hash16k Has the release been hash16k
- * processed
+ *                              processed
  * @property mixed|null $nzb_guid
  * @property-read \App\Models\Category                                                    $category
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[]   $comment
@@ -77,6 +78,7 @@ use Illuminate\Support\Facades\DB;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleasesGroups[]   $releaseGroup
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[]     $userRelease
  * @property-read \App\Models\Video                                                       $video
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAdddate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAnidbid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAudiostatus($value)
@@ -127,11 +129,13 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideostatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereXxxinfoId($value)
  * @mixin \Eloquent
+ *
  * @property int|null $movieinfo_id FK to movieinfo.id
  * @property int $proc_crc32 Has the release been crc32 processed
  * @property mixed $tag_names
  * @property-read \Illuminate\Database\Eloquent\Collection|\Tagged[] $tags
  * @property-read \Illuminate\Database\Eloquent\Collection|\Conner\Tagging\Model\Tagged[] $tagged
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release query()
@@ -144,6 +148,7 @@ use Illuminate\Support\Facades\DB;
 class Release extends Model
 {
     use Taggable;
+    use HasFactory;
 
     /**
      * @var bool
@@ -264,9 +269,9 @@ class Release extends Model
     /**
      * Insert a single release returning the ID on success or false on failure.
      *
-     * @param array $parameters Insert parameters, must be escaped if string.
-     *
+     * @param  array  $parameters  Insert parameters, must be escaped if string.
      * @return bool|int
+     *
      * @throws \Exception
      */
     public static function insertRelease(array $parameters = [])
@@ -308,21 +313,22 @@ class Release extends Model
     /**
      * Used for release edit page on site.
      *
-     * @param int $id
-     * @param string $name
-     * @param string $searchName
-     * @param string $fromName
-     * @param int $categoryId
-     * @param int $parts
-     * @param int $grabs
-     * @param int $size
-     * @param string $postedDate
-     * @param string $addedDate
-     * @param        $videoId
-     * @param        $episodeId
-     * @param int $imDbId
-     * @param int $aniDbId
-     * @param string $tags
+     * @param  int  $id
+     * @param  string  $name
+     * @param  string  $searchName
+     * @param  string  $fromName
+     * @param  int  $categoryId
+     * @param  int  $parts
+     * @param  int  $grabs
+     * @param  int  $size
+     * @param  string  $postedDate
+     * @param  string  $addedDate
+     * @param  $videoId
+     * @param  $episodeId
+     * @param  int  $imDbId
+     * @param  int  $aniDbId
+     * @param  string  $tags
+     *
      * @throws \Exception
      */
     public static function updateRelease($id, $name, $searchName, $fromName, $categoryId, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbId, $aniDbId, string $tags = ''): void
@@ -362,7 +368,8 @@ class Release extends Model
     }
 
     /**
-     * @param string $guid
+     * @param  string  $guid
+     *
      * @throws \Exception
      */
     public static function updateGrab($guid): void
@@ -588,8 +595,8 @@ class Release extends Model
      * Retrieve alternate release with same or similar searchname.
      *
      *
-     * @param string $guid
-     * @param int $userid
+     * @param  string  $guid
+     * @param  int  $userid
      * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getAlternate($guid, $userid)

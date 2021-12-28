@@ -53,15 +53,15 @@ class NZBContents
     /**
      * Construct.
      *
-     * @param array $options
-     *         array(
-     *         'Echo'        => bool        ; To echo to CLI or not.
-     *         'NNTP'        => NNTP        ; Class NNTP.
-     *         'Nfo'         => Nfo         ; Class Nfo.
-     *         'NZB'         => NZB         ; Class NZB.
-     *         'Settings'    => DB          ; Class Blacklight\db\DB.
-     *         'PostProcess' => PostProcess ; Class PostProcess.
-     *         )
+     * @param  array  $options
+     *                          array(
+     *                          'Echo'        => bool        ; To echo to CLI or not.
+     *                          'NNTP'        => NNTP        ; Class NNTP.
+     *                          'Nfo'         => Nfo         ; Class Nfo.
+     *                          'NZB'         => NZB         ; Class NZB.
+     *                          'Settings'    => DB          ; Class Blacklight\db\DB.
+     *                          'PostProcess' => PostProcess ; Class PostProcess.
+     *                          )
      *
      * @throws \Exception
      */
@@ -99,6 +99,7 @@ class NZBContents
      * @param $groupID
      * @param $groupName
      * @return bool|mixed
+     *
      * @throws \Exception
      */
     public function getNfoFromNZB($guid, $relID, $groupID, $groupName)
@@ -145,8 +146,9 @@ class NZBContents
      * @param $guid
      * @param $relID
      * @param $groupID
-     * @param bool $nfoCheck
+     * @param  bool  $nfoCheck
      * @return array|false
+     *
      * @throws \Exception
      */
     public function parseNZB($guid, $relID, $groupID, $nfoCheck = false)
@@ -249,13 +251,13 @@ class NZBContents
     /**
      * Attempts to get the releasename from a par2 file.
      *
-     * @param string $guid
-     * @param int $relID
-     * @param int $groupID
-     * @param int $nameStatus
-     * @param int $show
-     *
+     * @param  string  $guid
+     * @param  int  $relID
+     * @param  int  $groupID
+     * @param  int  $nameStatus
+     * @param  int  $show
      * @return bool
+     *
      * @throws \Exception
      */
     public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show): bool

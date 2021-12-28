@@ -29,7 +29,7 @@ class TVMaze extends TV
     /**
      * TVMaze constructor.
      *
-     * @param array $options
+     * @param  array  $options
      *
      * @throws \Exception
      */
@@ -44,7 +44,6 @@ class TVMaze extends TV
      *
      * @param $videoId
      * @param $siteID
-     *
      * @return bool
      */
     public function getBanner($videoId, $siteID): bool
@@ -56,10 +55,10 @@ class TVMaze extends TV
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param      $groupID
-     * @param      $guidChar
-     * @param      $process
-     * @param bool $local
+     * @param  $groupID
+     * @param  $guidChar
+     * @param  $process
+     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
     {
@@ -201,7 +200,6 @@ class TVMaze extends TV
      *
      * @param $site
      * @param $siteId
-     *
      * @return array|false
      */
     protected function getShowInfoBySiteID($site, $siteId)
@@ -225,8 +223,7 @@ class TVMaze extends TV
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param string $cleanName
-     *
+     * @param  string  $cleanName
      * @return array|false
      */
     protected function getShowInfo($cleanName)
@@ -263,7 +260,6 @@ class TVMaze extends TV
     /**
      * @param $shows
      * @param $cleanName
-     *
      * @return array|false
      */
     private function matchShowInfo(array $shows, $cleanName)
@@ -310,8 +306,7 @@ class TVMaze extends TV
     /**
      * Retrieves the poster art for the processed show.
      *
-     * @param int $videoId -- the local Video ID
-     *
+     * @param  int  $videoId  -- the local Video ID
      * @return int
      */
     public function getPoster($videoId): int
@@ -337,12 +332,11 @@ class TVMaze extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param int $tvMazeId
-     * @param int $season
-     * @param int $episode
-     * @param string  $airDate
-     * @param int $videoId
-     *
+     * @param  int  $tvMazeId
+     * @param  int  $season
+     * @param  int  $episode
+     * @param  string  $airDate
+     * @param  int  $videoId
      * @return array|false
      */
     protected function getEpisodeInfo($tvMazeId, $season, $episode, $airDate = '', $videoId = 0)
@@ -387,7 +381,6 @@ class TVMaze extends TV
      * Returns the formatted array.
      *
      * @param $show
-     *
      * @return array
      */
     protected function formatShowInfo($show): array
@@ -418,7 +411,6 @@ class TVMaze extends TV
      * Returns the formatted array.
      *
      * @param $episode
-     *
      * @return array
      */
     protected function formatEpisodeInfo($episode): array

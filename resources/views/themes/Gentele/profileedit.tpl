@@ -19,11 +19,11 @@
                         {{Form::open(['url' => 'profileedit?action=submit'])}}
                         <ul class="nav nav-tabs" id="profileTab" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" href="#settings" id="settings-tab" data-toggle="tab" role="tab" aria-controls="settings" aria-selected="true"><i class="fa fa-cogs fa-spin"></i>
+                                <a class="nav-link active" href="#settings" id="settings-tab" data-bs-toggle="tab" role="tab" aria-controls="settings" aria-selected="true"><i class="fa fa-cogs fa-spin"></i>
                                     Settings</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#downloaders" id="downloaders-tab" data-toggle="tab" role="tab" aria-controls="downloaders" aria-selected="false"><i class="fa fa-cogs fa-spin"></i>Downloaders</a>
+                                <a class="nav-link" href="#downloaders" id="downloaders-tab" data-bs-toggle="tab" role="tab" aria-controls="downloaders" aria-selected="false"><i class="fa fa-cogs fa-spin"></i>Downloaders</a>
                             </li>
                         </ul>
                         <div class="tab-content" id="profileTabContent">
@@ -41,7 +41,7 @@
                                     <tr>
                                         <th width="200">E-Mail</th>
                                         <td>
-                                            <input id="email" class="form-control" name="email"
+                                            <input id="email" class="form-inline" name="email"
                                                    type="text"
                                                    value="">
                                             <div class="hint">Only enter your email if you want to change it. If you change your email you will need to verify it. You will not be able to access the site until verification is complete.
@@ -52,7 +52,7 @@
                                         <th width="200">Password</th>
                                         <td>
                                             <input autocomplete="off" id="password" name="password"
-                                                   type="password" class="form-control" value="">
+                                                   type="password" class="form-inline" value="">
                                             <div class="hint">Only enter your password if you want
                                                 to change it.
                                             </div>
@@ -63,7 +63,7 @@
                                         <td>
                                             <input autocomplete="off" id="password_confirmation"
                                                    name="password_confirmation" type="password"
-                                                   class="form-control" value="">
+                                                   class="form-inline" value="">
                                         </td>
                                     </tr>
                                     <tr>
@@ -267,14 +267,14 @@
                                         </tr>
                                         <tr>
                                             <th width="200">URL</th>
-                                            <td><input id="saburl" class="form-control"
+                                            <td><input id="saburl" class="form-inline"
                                                        name="saburl" type="text"
                                                        placeholder="SABNZBd URL"
                                                        value="{$saburl_selected}"></td>
                                         </tr>
                                         <tr>
                                             <th width="200">API Key</th>
-                                            <td><input id="sabapikey" class="form-control"
+                                            <td><input id="sabapikey" class="form-inline"
                                                        name="sabapikey" type="text"
                                                        placeholder="SABNZbd API Key"
                                                        value="{$sabapikey_selected}"></td>
@@ -294,7 +294,7 @@
                                         <tr>
                                             <th width="200">Priority Level</th>
                                             <td>
-                                                {html_options id="sabpriority" class="form-control" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$sabpriority_selected}
+                                                {html_options id="sabpriority" class="form-inline" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$sabpriority_selected}
                                                 <div class="hint">Set the priority level for NZBs that
                                                     are added to your queue
                                                 </div>
@@ -333,7 +333,7 @@
                                         <tr>
                                             <th width="200">URL</th>
                                             <td><input id="nzbgeturl" placeholder="NZBGet URL"
-                                                       class="form-control" name="nzbgeturl"
+                                                       class="form-inline" name="nzbgeturl"
                                                        type="text" value="{$user.nzbgeturl}"/></td>
                                         </tr>
                                         <tr>
@@ -342,13 +342,13 @@
                                                 <div class="form-inline">
                                                     <input id="nzbgetusername"
                                                            placeholder="NZBGet Username"
-                                                           class="form-control"
+                                                           class="form-inline"
                                                            name="nzbgetusername" type="text"
                                                            value="{$user.nzbgetusername}"/>
                                                     /
                                                     <input id="nzbgetpassword"
                                                            placeholder="NZBGet Password"
-                                                           class="form-control"
+                                                           class="form-inline"
                                                            name="nzbgetpassword" type="text"
                                                            value="{$user.nzbgetpassword}"/>
                                                 </div>

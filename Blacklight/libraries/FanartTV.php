@@ -40,8 +40,7 @@ class FanartTV
     /**
      * Getting movie pictures.
      *
-     * @param string $id
-     *
+     * @param  string  $id
      * @return array|false
      */
     public function getMovieFanArt($id)
@@ -61,7 +60,7 @@ class FanartTV
     /**
      * Getting tv show pictures.
      *
-     * @param string $id
+     * @param  string  $id
      * @return array|false
      */
     public function getTVFanart($id)
@@ -81,7 +80,7 @@ class FanartTV
     /**
      * The function making all the work using curl to call.
      *
-     * @param string $path
+     * @param  string  $path
      * @return false|array
      */
     private function _getUrl($path)

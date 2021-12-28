@@ -10,49 +10,8 @@ use Illuminate\Support\Arr;
 class MovieController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
-    public function showMovie(Request $request)
-    {
-        $this->setPrefs();
-        if ($request->has('modal') && $request->has('id') && ctype_digit($request->input('id'))) {
-            $mov = (new Movie(['Settings' => $this->settings]))->getMovieInfo($request->input('id'));
-
-            if (! $mov) {
-                return response()->json(['message' => 'No movie with imdbid: '.$request->input('id').' found'], 404);
-            }
-
-            $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
-            $mov['genre'] = makeFieldLinks($mov, 'genre', 'movies');
-            $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
-
-            $this->smarty->assign(['movie' => $mov, 'modal' => true]);
-
-            $title = 'Info for '.$mov['title'];
-            $meta_title = '';
-            $meta_keywords = '';
-            $meta_description = '';
-            $this->smarty->registerPlugin('modifier', 'ss', 'stripslashes');
-
-            if ($request->has('modal')) {
-                $content = $this->smarty->fetch('viewmovie.tpl');
-                $this->smarty->assign('modal', true);
-                echo $this->content;
-            } else {
-                $content = $this->smarty->fetch('viewmoviefull.tpl');
-            }
-        }
-
-        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
-    }
-
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param string                   $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id
      *
      * @throws \Exception
      */
@@ -169,9 +128,9 @@ class MovieController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function showTrailer(Request $request)

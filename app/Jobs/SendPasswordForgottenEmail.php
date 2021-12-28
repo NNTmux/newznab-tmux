@@ -24,7 +24,7 @@ class SendPasswordForgottenEmail implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param \App\Models\User $user
+     * @param  \App\Models\User  $user
      * @param $resetLink
      */
     public function __construct($user, $resetLink)

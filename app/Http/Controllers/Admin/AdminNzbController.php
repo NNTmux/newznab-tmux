@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class AdminNzbController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */
@@ -70,7 +70,7 @@ class AdminNzbController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception
      */

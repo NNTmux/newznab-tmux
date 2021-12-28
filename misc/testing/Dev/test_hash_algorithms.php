@@ -22,26 +22,29 @@ class HashAlgorithms
 {
     /**
      * The input string.
+     *
      * @var string
      */
     protected $_inputString;
 
     /**
      * The string we are expecting to get.
+     *
      * @var array
      */
     protected $_expectedString;
 
     /**
      * Write results to file?
+     *
      * @var bool
      */
     protected $_writeToFile;
 
     /**
-     * @param string $inputString
-     * @param string $expectedString
-     * @param bool $writeToFile
+     * @param  string  $inputString
+     * @param  string  $expectedString
+     * @param  bool  $writeToFile
      */
     public function __construct($inputString, $expectedString, $writeToFile)
     {
@@ -156,8 +159,7 @@ class HashAlgorithms
     /**
      * Return various versions of a input string to hash.
      *
-     * @param string $string
-     *
+     * @param  string  $string
      * @return array
      */
     protected function _hashesToArray($string)

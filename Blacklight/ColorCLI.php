@@ -23,8 +23,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function debug(string $str, bool $newline = false): void
     {
@@ -35,8 +35,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function info(string $str, bool $newline = false): void
     {
@@ -47,8 +47,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function notice(string $str, bool $newline = false): void
     {
@@ -59,8 +59,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function warning(string $str, bool $newline = false): void
     {
@@ -71,8 +71,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function error(string $str, bool $newline = false): void
     {
@@ -83,8 +83,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function primary(string $str, bool $newline = false): void
     {
@@ -95,8 +95,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function header(string $str, bool $newline = false): void
     {
@@ -107,8 +107,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function alternate(string $str, bool $newline = false): void
     {
@@ -119,8 +119,8 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
-     * @param bool   $newline
+     * @param  string  $str
+     * @param  bool  $newline
      */
     public function tmuxOrange(string $str, bool $newline = false): void
     {
@@ -131,7 +131,7 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
+     * @param  string  $str
      */
     public function primaryOver(string $str): void
     {
@@ -139,7 +139,7 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
+     * @param  string  $str
      */
     public function headerOver(string $str): void
     {
@@ -147,7 +147,7 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
+     * @param  string  $str
      */
     public function alternateOver(string $str): void
     {
@@ -155,7 +155,7 @@ class ColorCLI
     }
 
     /**
-     * @param string $str
+     * @param  string  $str
      */
     public function warningOver(string $str): void
     {

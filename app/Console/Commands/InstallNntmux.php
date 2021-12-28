@@ -101,6 +101,7 @@ class InstallNntmux extends Command
 
     /**
      * @return array|bool
+     *
      * @throws \Exception
      * @throws \RuntimeException
      */

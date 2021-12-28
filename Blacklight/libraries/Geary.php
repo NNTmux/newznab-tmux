@@ -43,8 +43,8 @@ class Geary
     private $gateway_secret;
 
     /**
-     * @param string $gateway_id       Your API key obtained from https://admin.gear.mycelium.com/gateways
-     * @param string $gateway_secret   Your API secret obtained from https://admin.gear.mycelium.com/gateways
+     * @param  string  $gateway_id  Your API key obtained from https://admin.gear.mycelium.com/gateways
+     * @param  string  $gateway_secret  Your API secret obtained from https://admin.gear.mycelium.com/gateways
      */
     public function __construct($gateway_id, $gateway_secret)
     {
@@ -57,11 +57,11 @@ class Geary
      *
      * Create a new gateway order
      *
-     * @param float $amount Amount determines the amount to be paid for this
-     *                           order. The amount should be in the currency you
-     *                           have previously set for the gateway. If the
-     *                           gateway currency is BTC, then the amount is
-     *                           normally in satoshis
+     * @param  float  $amount  Amount determines the amount to be paid for this
+     *                         order. The amount should be in the currency you
+     *                         have previously set for the gateway. If the
+     *                         gateway currency is BTC, then the amount is
+     *                         normally in satoshis
      * @param $keychain_id
      * @param $callback_data
      * @return mixed
@@ -89,7 +89,7 @@ class Geary
      *
      * Cancel existing gateway order
      *
-     * @param int $id     Id is an existing order ID or payment ID
+     * @param  int  $id  Id is an existing order ID or payment ID
      * @return mixed
      */
     public function cancel_order($id)
@@ -110,7 +110,7 @@ class Geary
      *
      * Check existing gateway order status
      *
-     * @param int $payment_id     Id is an existing payment ID
+     * @param  int  $payment_id  Id is an existing payment ID
      * @return mixed
      */
     public function check_order($payment_id)
@@ -171,7 +171,7 @@ class Geary
      *
      * Get an order link for status monitoring via websocket
      *
-     * @param int $id     Id is an existing order ID
+     * @param  int  $id  Id is an existing order ID
      * @return string
      */
     public function order_websocket_link($id): string
@@ -224,7 +224,7 @@ class Geary
      *
      * Construct an endpoint URL
      *
-     * @param string $method
+     * @param  string  $method
      * @return string
      */
     private function endpoint($method): string
@@ -237,7 +237,7 @@ class Geary
      *
      * Construct URL parameters
      *
-     * @param mixed $params
+     * @param  mixed  $params
      * @return string
      */
     private function get_params($params): string
@@ -262,7 +262,7 @@ class Geary
      *
      * Get single data from header
      *
-     * @param string $name
+     * @param  string  $name
      * @return string
      */
     private function get_header($name): string
@@ -285,7 +285,7 @@ class Geary
      *
      * Add data to header for authentication purpose
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
     private function prepare_header($data): array
@@ -312,7 +312,7 @@ class Geary
      *
      * Send a signed HTTP request
      *
-     * @param array $data
+     * @param  array  $data
      * @return mixed
      */
     private function send_signed_request($data)

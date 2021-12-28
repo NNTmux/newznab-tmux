@@ -14,12 +14,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $releases_id FK to releases.id
  * @property-read \App\Models\Release $release
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereHosthash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload query()
@@ -60,9 +62,9 @@ class UserDownload extends Model
     /**
      * Get the COUNT of how many NZB's the user has downloaded in the past day.
      *
-     * @param int $userID
-     *
+     * @param  int  $userID
      * @return int
+     *
      * @throws \Exception
      */
     public static function getDownloadRequests($userID): int
@@ -89,7 +91,6 @@ class UserDownload extends Model
      *
      * @param $userID
      * @param $releaseID
-     *
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addDownloadRequest($userID, $releaseID)
@@ -105,8 +106,9 @@ class UserDownload extends Model
     }
 
     /**
-     * @param int $releaseID
+     * @param  int  $releaseID
      * @return mixed
+     *
      * @throws \Exception
      */
     public static function delDownloadRequestsForRelease(int $releaseID)
@@ -116,6 +118,7 @@ class UserDownload extends Model
 
     /**
      * @param $userID
+     *
      * @throws \Exception
      */
     public static function delDownloadRequests($userID): void

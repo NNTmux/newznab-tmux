@@ -38,7 +38,6 @@ class Tmux
 
     /**
      * @param $constants
-     *
      * @return mixed
      */
     public function getConnectionsInfo($constants)
@@ -59,7 +58,6 @@ class Tmux
     /**
      * @param $which
      * @param $connections
-     *
      * @return mixed
      */
     public function getUSPConnections($which, $connections)
@@ -97,7 +95,6 @@ class Tmux
 
     /**
      * @param $constants
-     *
      * @return array
      */
     public function getListOfPanes($constants): array
@@ -220,7 +217,6 @@ class Tmux
     /**
      * @param $setting
      * @param $value
-     *
      * @return int
      */
     public function updateItem($setting, $value)
@@ -239,8 +235,7 @@ class Tmux
     }
 
     /**
-     * @param float $bytes
-     *
+     * @param  float  $bytes
      * @return string
      */
     public function decodeSize($bytes): string
@@ -260,7 +255,6 @@ class Tmux
 
     /**
      * @param $pane
-     *
      * @return string
      */
     public function writelog($pane): ?string
@@ -279,8 +273,8 @@ class Tmux
      * @param $colors_start
      * @param $colors_end
      * @param $colors_exc
-     *
      * @return int
+     *
      * @throws \Exception
      */
     public function get_color($colors_start, $colors_end, $colors_exc): int
@@ -304,10 +298,10 @@ class Tmux
      * Returns random bool, weighted by $chance.
      *
      *
-     * @param     $loop
-     * @param int $chance
-     *
+     * @param  $loop
+     * @param  int  $chance
      * @return bool
+     *
      * @throws \Exception
      */
     public function rand_bool($loop, $chance = 60): bool
@@ -322,7 +316,6 @@ class Tmux
 
     /**
      * @param $_time
-     *
      * @return string
      */
     public function relativeTime($_time): string
@@ -334,7 +327,6 @@ class Tmux
 
     /**
      * @param $cmd
-     *
      * @return bool
      */
     public function command_exist($cmd): bool
@@ -345,13 +337,13 @@ class Tmux
     }
 
     /**
-     * @param        $qry
-     * @param        $bookreqids
-     * @param string $db_name
-     * @param string $ppmax
-     * @param string $ppmin
-     *
+     * @param  $qry
+     * @param  $bookreqids
+     * @param  string  $db_name
+     * @param  string  $ppmax
+     * @param  string  $ppmin
      * @return bool|string
+     *
      * @throws \Exception
      */
     public function proc_query($qry, $bookreqids, $db_name, $ppmax = '', $ppmin = '')
@@ -458,6 +450,7 @@ class Tmux
 
     /**
      * @return bool true if tmux is running, false otherwise.
+     *
      * @throws \RuntimeException
      */
     public function isRunning(): bool
@@ -472,6 +465,7 @@ class Tmux
 
     /**
      * @return bool
+     *
      * @throws \Exception
      */
     public function stopIfRunning(): bool

@@ -77,18 +77,18 @@
         <div class="btn-group">
             <button type="button"
                     class="nzb_multi_operations_download btn btn-sm btn-success"
-                    data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+                    data-bs-toggle="tooltip" data-bs-placement="top" title data-original-title="Download NZBs">
                 <i class="fa fa-cloud-download"></i></button>
             <button type="button"
                     class="nzb_multi_operations_cart btn btn-sm btn-info"
-                    data-toggle="tooltip" data-placement="top" title
+                    data-bs-toggle="tooltip" data-bs-placement="top" title
                     data-original-title="Send to my Download Basket">
                 <i class="fa fa-shopping-basket"></i></button>
 
             {if isset($sabintegrated) && $sabintegrated !=""}
                 <button type="button"
                         class="nzb_multi_operations_sab btn btn-sm btn-success"
-                        data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+                        data-bs-toggle="tooltip" data-bs-placement="top" title data-original-title="Send to Queue">
                     <i class="fa fa-share"></i></button>
             {/if}
             {if isset($isadmin)}
@@ -106,20 +106,20 @@
         <a title="Manage your shows" href="{{route('myshows')}}">My Shows</a> :
         <div class="btn-group">
             {if $myshows.id != ''}
-                <a class="myshows btn btn-sm btn-warning" data-toggle="tooltip" data-placement="top" title
+                <a class="myshows btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title
                    data-original-title="Edit Categories for this show"
                    href="{{url("/myshows?action=edit&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="edit" name="series{$show.id}">
                     <i class="fa fa-pencil"></i>
                 </a>
-                <a class="myshows btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title
+                <a class="myshows btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title
                    data-original-title="Remove from My Shows"
                    href="{{url("/myshows?action=delete&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="remove" name="series{$show.id}">
                     <i class="fa fa-minus"></i>
                 </a>
             {else}
-                <a class="myshows btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title
+                <a class="myshows btn btn-sm btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title
                    data-original-title="Add to My Shows"
                    href="{{url("/myshows?action=add&id={$show.id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
                    rel="add" name="series{$show.id}">
@@ -139,7 +139,7 @@
                 <ul class="nav nav-tabs" id="{$seasonnum}" role="tablist">
                     {foreach $seasons as $seasonnum => $season}
                         <li class="nav-item">
-                            <a class="nav-link" title="View Season {$seasonnum}" href="#season{$seasonnum}" id="season{$seasonnum}-tab" data-toggle="tab" role="tab" aria-controls="{$seasonnum}" aria-selected="{if $season@first} true {else} false{/if}">{$seasonnum}</a>
+                            <a class="nav-link" title="View Season {$seasonnum}" href="#season{$seasonnum}" id="season{$seasonnum}-tab" data-bs-toggle="tab" role="tab" aria-controls="{$seasonnum}" aria-selected="{if $season@first} true {else} false{/if}">{$seasonnum}</a>
                         </li>
                     {/foreach}
                 </ul>
@@ -176,7 +176,7 @@
                                                 <div>
                                                     {if $result->nfoid > 0}<span>
                                                         <a href="{{url("/nfo/{$result->guid}")}}"
-                                                           class="modal_nfo badge badge-info text-muted">NFO</a>
+                                                           class="modal_nfo badge bg-info text-muted">NFO</a>
                                                         </span>{/if}
                                                     {if $result->image == 1 && $userdata->can('preview') == true}
                                                     <a
@@ -184,16 +184,16 @@
                                                         name="name{$result->guid}"
                                                         data-fancybox
                                                         title="View Screenshot"
-                                                        class="badge badge-info"
+                                                        class="badge bg-info"
                                                         rel="preview">Preview</a>{/if}
-                                                    <span class="badge badge-info">{$result->grabs}
+                                                    <span class="badge bg-info">{$result->grabs}
 																		Grab{if $result->grabs != 1}s{/if}</span>
                                                     {if $result->firstaired != ""}<span
-                                                        class="badge badge-success"
+                                                        class="badge bg-success"
                                                         title="{$result->title} Aired on {$result->firstaired|date_format}">
                                                         Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
                                                     {if $result->reid > 0}<span
-                                                        class="mediainfo badge badge-info"
+                                                        class="mediainfo badge bg-info"
                                                         title="{$result->guid}">Media</span>{/if}
                                                 </div>
                                             </td>
@@ -203,7 +203,7 @@
                                                     class="flat" name="table_data{$seasonnum}"
                                                     value="{$result->guid}"/></td>
                                             <td>
-                                                <span class="badge badge-info">{$result->category_name}</span>
+                                                <span class="badge bg-info">{$result->category_name}</span>
                                             </td>
                                             <td width="40"
                                                 title="{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}">{{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate), 'Y-m-d h:i:s')}}|timeago}</td>
@@ -214,26 +214,25 @@
                                                 <a href="{{url("/getnzb?id={$result->guid}")}}"
                                                    class="icon_nzb text-muted"><i
                                                         class="fa fa-cloud-download text-muted"
-                                                        data-toggle="tooltip" data-placement="top"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                                         title
                                                         data-original-title="Download NZB"></i></a>
                                                 <a href="{{url("/details/{$result->guid}/#comments")}}"><i
                                                         class="fa fa-comments-o text-muted"
-                                                        data-toggle="tooltip" data-placement="top"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                                         title
                                                         data-original-title="Comments"></i></a>
-                                                <a href="#"><i
-                                                        id="guid{$result->guid}"
-                                                        class="icon_cart text-muted fa fa-shopping-basket"
-                                                        data-toggle="tooltip"
-                                                        data-placement="top" title
+                                                <a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><i
+                                                        class="text-muted fa fa-shopping-basket"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top" title
                                                         data-original-title="Send to my download basket"></i></a>
                                                 {if isset($sabintegrated) && $sabintegrated !=""}
                                                     <a href="#">
                                                         <i id="guid{$result->guid}"
                                                            class="icon_sab text-muted fa fa-share"
-                                                           data-toggle="tooltip"
-                                                           data-placement="top" title
+                                                           data-bs-toggle="tooltip"
+                                                           data-bs-placement="top" title
                                                            data-original-title="Send to my Queue">
                                                         </i>
                                                     </a>
@@ -241,8 +240,8 @@
                                                 {if $weHasVortex}
                                                     <a href="#" class="icon_vortex text-muted"><i
                                                             class="fa fa-share"
-                                                            data-toggle="tooltip"
-                                                            data-placement="top"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
                                                             title
                                                             data-original-title="Send to NZBVortex"></i></a>
                                                 {/if}

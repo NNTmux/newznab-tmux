@@ -41,6 +41,7 @@ class TmuxOutput extends Tmux
 
     /**
      * @param $runVar
+     *
      * @throws \Cz\Git\GitException
      */
     public function updateMonitorPane(&$runVar): void
@@ -108,7 +109,6 @@ class TmuxOutput extends Tmux
 
     /**
      * @param $compressed
-     *
      * @return array
      */
     protected function _getFormatMasks($compressed): array
@@ -126,6 +126,7 @@ class TmuxOutput extends Tmux
 
     /**
      * @return string
+     *
      * @throws \Cz\Git\GitException
      */
     protected function _getHeader(): string

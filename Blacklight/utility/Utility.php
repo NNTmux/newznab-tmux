@@ -24,8 +24,8 @@ class Utility
      * Checks all levels of the supplied path are readable and executable by current user.
      *
      * @todo Make this recursive with a switch to only check end point.
-     * @param $path	*nix path to directory or file
      *
+     * @param $path	*nix path to directory or file
      * @return bool|string True is successful, otherwise the part of the path that failed testing.
      */
     public static function canExecuteRead($path)
@@ -56,13 +56,12 @@ class Utility
      * relative to the last occurrence of the specified character.
      * The character selected may be retained or discarded.
      *
-     * @param string $character      the character to search for.
-     * @param string $string         the string to search through.
-     * @param string $side           determines whether text to the left or the right of the character is returned.
-     *                               Options are: left, or right.
-     * @param bool   $keep_character determines whether or not to keep the character.
-     *                               Options are: true, or false.
-     *
+     * @param  string  $character  the character to search for.
+     * @param  string  $string  the string to search through.
+     * @param  string  $side  determines whether text to the left or the right of the character is returned.
+     *                        Options are: left, or right.
+     * @param  bool  $keep_character  determines whether or not to keep the character.
+     *                                Options are: true, or false.
      * @return string
      */
     public static function cutStringUsingLast($character, $string, $side, $keep_character = true): string
@@ -88,8 +87,7 @@ class Utility
     }
 
     /**
-     * @param array|null $options
-     *
+     * @param  array|null  $options
      * @return array|null
      */
     public static function getDirFiles(array $options = null): ?array
@@ -158,7 +156,6 @@ class Utility
      *
      *
      * @param $cmd
-     *
      * @return bool
      */
     public static function hasCommand($cmd): bool
@@ -180,7 +177,6 @@ class Utility
 
     /**
      * @param $filename
-     *
      * @return bool|null|string
      */
     public static function isGZipped($filename)
@@ -205,9 +201,8 @@ class Utility
      * Operates directly on the text string, but also returns the result for situations requiring a
      * return value (use in ternary, etc.)/
      *
-     * @param string $text String variable to strip.
-     *
-     * @return string    The stripped variable.
+     * @param  string  $text  String variable to strip.
+     * @return string The stripped variable.
      */
     public static function stripNonPrintingChars(&$text): string
     {
@@ -219,8 +214,7 @@ class Utility
     /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
-     * @param string $filePath
-     *
+     * @param  string  $filePath
      * @return bool|string
      */
     public static function unzipGzipFile($filePath)
@@ -268,8 +262,7 @@ class Utility
      * Creates an array to be used with stream_context_create() to verify openssl certificates
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
-     * @param bool $forceIgnore Force ignoring of verification.
-     *
+     * @param  bool  $forceIgnore  Force ignoring of verification.
      * @return array
      * @static
      */
@@ -303,10 +296,9 @@ class Utility
     /**
      * Set curl context options for verifying SSL certificates.
      *
-     * @param bool $verify false = Ignore config.php and do not verify the openssl cert.
-     *                     true  = Check config.php and verify based on those settings.
-     *                     If you know the certificate will be self-signed, pass false.
-     *
+     * @param  bool  $verify  false = Ignore config.php and do not verify the openssl cert.
+     *                        true  = Check config.php and verify based on those settings.
+     *                        If you know the certificate will be self-signed, pass false.
      * @return array
      * @static
      */
@@ -335,8 +327,7 @@ class Utility
     }
 
     /**
-     * @param array $options
-     *
+     * @param  array  $options
      * @return string
      */
     public static function getCoverURL(array $options = []): string
@@ -366,12 +357,12 @@ class Utility
 
     /**
      * Converts XML to an associative array with namespace preservation -- use if intending to JSON encode.
+     *
      * @author Tamlyn from Outlandish.com
      *
-     * @param \SimpleXMLElement $xml The SimpleXML parsed XML string data
-     * @param array             $options
-     *
-     * @return array            The associate array of the XML namespaced file
+     * @param  \SimpleXMLElement  $xml  The SimpleXML parsed XML string data
+     * @param  array  $options
+     * @return array The associate array of the XML namespaced file
      */
     public static function xmlToArray(\SimpleXMLElement $xml, array $options = []): array
     {
@@ -460,9 +451,9 @@ class Utility
      * Return file type/info using magic numbers.
      * Try using `file` program where available, fallback to using PHP's finfo class.
      *
-     * @param string $path Path to the file / folder to check.
-     *
+     * @param  string  $path  Path to the file / folder to check.
      * @return string File info. Empty string on failure.
+     *
      * @throws \Exception
      */
     public static function fileInfo($path): string
@@ -486,7 +477,6 @@ class Utility
 
     /**
      * @param $code
-     *
      * @return bool
      */
     public function checkStatus($code): bool
@@ -497,8 +487,7 @@ class Utility
     /**
      * Convert Code page 437 chars to UTF.
      *
-     * @param string $string
-     *
+     * @param  string  $string
      * @return string
      */
     public static function cp437toUTF($string): string
@@ -510,7 +499,6 @@ class Utility
      * Fetches an embeddable video to a IMDB trailer from http://www.traileraddict.com.
      *
      * @param $imdbID
-     *
      * @return string
      */
     public static function imdb_trailers($imdbID): string
@@ -526,9 +514,8 @@ class Utility
     /**
      * Convert obj to array.
      *
-     * @param       $arrObjData
-     * @param array $arrSkipIndices
-     *
+     * @param  $arrObjData
+     * @param  array  $arrSkipIndices
      * @return array
      */
     public static function objectsIntoArray($arrObjData, array $arrSkipIndices = []): array
@@ -559,8 +546,7 @@ class Utility
     /**
      * Remove unsafe chars from a filename.
      *
-     * @param string $filename
-     *
+     * @param  string  $filename
      * @return string
      */
     public static function safeFilename($filename): string
@@ -570,7 +556,6 @@ class Utility
 
     /**
      * @param $input
-     *
      * @return \SimpleXMLElement
      */
     public static function responseXmlToObject($input): \SimpleXMLElement
@@ -582,8 +567,9 @@ class Utility
 
     /**
      * Display error/error code.
-     * @param int    $errorCode
-     * @param string $errorText
+     *
+     * @param  int  $errorCode
+     * @param  string  $errorText
      */
     public static function showApiError($errorCode = 900, $errorText = ''): void
     {
@@ -676,7 +662,6 @@ class Utility
      * Simple function to reduce duplication in html string formatting.
      *
      * @param $string
-     *
      * @return string
      */
     public static function htmlfmt($string): string
@@ -686,7 +671,6 @@ class Utility
 
     /**
      * @param $tableName
-     *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getRange($tableName): LengthAwarePaginator
@@ -701,7 +685,6 @@ class Utility
 
     /**
      * @param $tableName
-     *
      * @return int
      */
     public static function getCount($tableName): int

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $categories List of categories for user movies
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereCategories($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereId($value)
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUsersId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie query()
@@ -37,10 +39,9 @@ class UserMovie extends Model
     protected $dateFormat = false;
 
     /**
-     * @param       $uid
-     * @param       $imdbid
-     * @param array $catID
-     *
+     * @param  $uid
+     * @param  $imdbid
+     * @param  array  $catID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addMovie($uid, $imdbid, array $catID = [])
@@ -105,7 +106,7 @@ class UserMovie extends Model
     /**
      * @param $uid
      * @param $imdbid
-     * @param array $catID
+     * @param  array  $catID
      */
     public static function updateMovie($uid, $imdbid, array $catID = [])
     {

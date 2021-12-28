@@ -41,17 +41,17 @@
                                                     <div class="col-sm-6">
                                                         <label for="username" class="h6">Name</label>
                                                         <input id="username" type="text" name="username" value=""
-                                                               placeholder="Name" class="form-control form-white">
+                                                               placeholder="Name" class="form-inline form-white">
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <label for="useremail" class="h6">E-mail</label>
                                                         <input type="text" id="useremail" name="useremail"
-                                                               class="form-control form-white">
+                                                               class="form-inline form-white">
                                                     </div>
                                                 </div>
                                                 <label for="comment" class="h6">Message</label>
                                                 <textarea rows="7" name="comment" id="comment"
-                                                          class="form-control form-white"></textarea>
+                                                          class="form-inline form-white"></textarea>
                                                 {if {config('captcha.enabled')} == 1 && !empty({config('captcha.sitekey')}) && !empty({config('captcha.secret')})}
                                                     {NoCaptcha::display()}{NoCaptcha::renderJs()}
                                                 {/if}

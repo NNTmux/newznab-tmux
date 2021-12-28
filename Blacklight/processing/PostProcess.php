@@ -45,18 +45,21 @@ class PostProcess
 
     /**
      * Use alternate NNTP provider when download fails?
+     *
      * @var bool
      */
     private $alternateNNTP;
 
     /**
      * Add par2 info to rar list?
+     *
      * @var bool
      */
     private $addpar2;
 
     /**
      * Should we echo to CLI?
+     *
      * @var bool
      */
     private $echooutput;
@@ -69,7 +72,7 @@ class PostProcess
     /**
      * Constructor.
      *
-     * @param array $options Pass in class instances.
+     * @param  array  $options  Pass in class instances.
      *
      * @throws \Exception
      */
@@ -103,8 +106,8 @@ class PostProcess
      * Go through every type of post proc.
      *
      * @param $nntp
-     *
      * @return void
+     *
      * @throws \Exception
      */
     public function processAll($nntp): void
@@ -139,6 +142,7 @@ class PostProcess
      * Process books using amazon.com.
      *
      * @return void
+     *
      * @throws \Exception
      */
     public function processBooks(): void
@@ -171,12 +175,12 @@ class PostProcess
     /**
      * Lookup imdb if enabled.
      *
-     * @param string          $groupID             (Optional) ID of a group to work on.
-     * @param string          $guidChar            (Optional) First letter of a release GUID to use to get work.
-     * @param int|string|null $processMovies       (Optional) 0 Don't process, 1 process all releases,
-     *                                             2 process renamed releases only, '' check site setting
-     *
+     * @param  string  $groupID  (Optional) ID of a group to work on.
+     * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
+     * @param  int|string|null  $processMovies  (Optional) 0 Don't process, 1 process all releases,
+     *                                          2 process renamed releases only, '' check site setting
      * @return void
+     *
      * @throws \Exception
      */
     public function processMovies($groupID = '', $guidChar = '', $processMovies = ''): void
@@ -200,11 +204,11 @@ class PostProcess
     /**
      * Process nfo files.
      *
-     * @param NNTP   $nntp
-     * @param string $groupID  (Optional) ID of a group to work on.
-     * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
-     *
+     * @param  NNTP  $nntp
+     * @param  string  $groupID  (Optional) ID of a group to work on.
+     * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
      * @return void
+     *
      * @throws \Exception
      */
     public function processNfos(&$nntp, $groupID = '', $guidChar = ''): void
@@ -217,7 +221,8 @@ class PostProcess
     /**
      * Process comments.
      *
-     * @param NNTP $nntp
+     * @param  NNTP  $nntp
+     *
      * @throws \Exception
      */
     public function processSharing(&$nntp): void
@@ -228,12 +233,12 @@ class PostProcess
     /**
      * Process all TV related releases which will assign their series/episode/rage data.
      *
-     * @param string     $groupID              (Optional) ID of a group to work on.
-     * @param string     $guidChar             (Optional) First letter of a release GUID to use to get work.
-     * @param string|int|null $processTV       (Optional) 0 Don't process, 1 process all releases,
-     *                                         2 process renamed releases only, '' check site setting
-     *
+     * @param  string  $groupID  (Optional) ID of a group to work on.
+     * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
+     * @param  string|int|null  $processTV  (Optional) 0 Don't process, 1 process all releases,
+     *                                      2 process renamed releases only, '' check site setting
      * @return void
+     *
      * @throws \Exception
      */
     public function processTv($groupID = '', $guidChar = '', $processTV = ''): void
@@ -264,11 +269,11 @@ class PostProcess
      *
      * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
      *
-     * @param NNTP $nntp Class NNTP
-     * @param int|string $groupID (Optional) ID of a group to work on.
-     * @param string $guidChar (Optional) First char of release GUID, can be used to select work.
-     *
+     * @param  NNTP  $nntp  Class NNTP
+     * @param  int|string  $groupID  (Optional) ID of a group to work on.
+     * @param  string  $guidChar  (Optional) First char of release GUID, can be used to select work.
      * @return void
+     *
      * @throws \Exception
      */
     public function processAdditional(&$nntp, $groupID = '', $guidChar = ''): void
@@ -281,13 +286,13 @@ class PostProcess
      *
      * @note Called from NZBContents.php
      *
-     * @param string $messageID MessageID from NZB file.
-     * @param int    $relID     ID of the release.
-     * @param int    $groupID   Group ID of the release.
-     * @param NNTP   $nntp      Class NNTP
-     * @param int    $show      Only show result or apply iy.
-     *
+     * @param  string  $messageID  MessageID from NZB file.
+     * @param  int  $relID  ID of the release.
+     * @param  int  $groupID  Group ID of the release.
+     * @param  NNTP  $nntp  Class NNTP
+     * @param  int  $show  Only show result or apply iy.
      * @return bool
+     *
      * @throws \Exception
      */
     public function parsePAR2($messageID, $relID, $groupID, &$nntp, $show): bool

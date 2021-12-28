@@ -21,7 +21,7 @@ use Jrean\UserVerification\Facades\UserVerification;
 class ProfileController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Throwable
      */
@@ -120,9 +120,9 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -352,8 +352,9 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     *
      * @throws \Exception
      */
     public function destroy(Request $request)

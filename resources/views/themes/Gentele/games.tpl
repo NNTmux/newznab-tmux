@@ -78,21 +78,21 @@
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
 													{if $result->classused == "GiantBomb"}<a
-														class="badge badge-info"
+														class="badge bg-info"
 														target="_blank"
 														href="{$site->dereferrer_link}{$result->url}"
 														name="giantbomb{$result->gamesinfo_id}"
 														title="View GiantBomb page">
 															GiantBomb</a>{/if}
 													{if $result->classused == "Steam"}<a
-														class="badge badge-info"
+														class="badge bg-info"
 														target="_blank"
 														href="{$site->dereferrer_link}{$result->url|escape:"htmlall"}"
 														name="steam{$result->gamesinfo_id}"
 														title="View Steam page">
 															Steam</a>{/if}
                                                     {if $result->classused == "IGDB"}<a
-                                                        class="badge badge-info"
+                                                        class="badge bg-info"
                                                         target="_blank"
                                                         href="{$site->dereferrer_link}{$result->url}"
                                                         name="igdb{$result->gamesinfo_id}"
@@ -100,10 +100,10 @@
                                                             IGDB</a>{/if}
 													{if $result->nfoid > 0}<a
 														href="{{url("/nfo/{$result->guid}")}}"
-														title="View NFO" class="modal_nfo badge badge-info"
+														title="View NFO" class="modal_nfo badge bg-info"
 														rel="nfo">
 															NFO</a>{/if}
-													<a class="badge badge-info"
+													<a class="badge bg-info"
 													   href="{{url("/browse/group?g={$result->group_name}")}}"
 													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($result->failed)}
@@ -128,11 +128,11 @@
 																		   value="{$result->guid}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-info">{$result->size|filesize}</span>
-																<span class="badge badge-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+																<span class="badge bg-info">{$result->size|filesize}</span>
+																<span class="badge bg-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
 																	ago</span>
 																{if isset($isadmin)}<a
-																	class="badge badge-warning"
+																	class="badge bg-warning"
 																	href="{{url("/admin/release-edit?id={$result->guid}")}}"
 																	title="Edit release">
 																		Edit</a>{/if}
@@ -167,20 +167,18 @@
 																	   class="btn btn-light btn-xs"
 																	   href="{{url("/getnzb?id={$result->guid}")}}"><i
 																				class="fa fa-cloud-download"></i><span
-																				class="badge"> {$result->grabs}
+																				class="badge bg-info"> {$result->grabs}
 																			Grab{if $result->grabs != 1}s{/if}</span></a>
 																	<a role="button"
 																	   class="btn btn-light btn-xs"
 																	   href="{{url("/details/{$result->guid}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
-																				class="badge"> {$result->comments}
+																				class="badge bg-info"> {$result->comments}
 																			Comment{if $result->comments != 1}s{/if}</span></a>
-																	<span
-																			id="guid{$result->guid}"
-																			class="btn btn-hover btn-light btn-xs icon_cart text-muted"
+                                                                    <a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs text-muted"
 																			title="Send to my Download Basket">
 																	<i class="fa fa-shopping-basket"></i>
-															</span>
+                                                                        </span></a>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span
 																				id="guid{$result->guid}"

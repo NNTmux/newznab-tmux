@@ -12,7 +12,6 @@ use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
  */
 class TVDB extends TV
 {
-    private const TVDB_POSTER_URL = 'https://artworks.thetvdb.com/banners/';
     private const MATCH_PROBABILITY = 75;
 
     /**
@@ -43,20 +42,20 @@ class TVDB extends TV
     /**
      * TVDB constructor.
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         parent::__construct($options);
         $this->client = new TheTVDbAPI();
-        $this->client->setAcceptedLanguages(['en']);
         $this->local = false;
 
         // Check if we can get the time for API status
         // If we can't then we set local to true
         try {
-            $this->token = $this->client->authentication()->login(config('tvdb.api_key'));
+            $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
         } catch (UnauthorizedException $error) {
             $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
             $this->local = true;
@@ -71,10 +70,10 @@ class TVDB extends TV
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param      $groupID
-     * @param      $guidChar
-     * @param      $process
-     * @param bool $local
+     * @param  $groupID
+     * @param  $guidChar
+     * @param  $process
+     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
     {
@@ -213,7 +212,6 @@ class TVDB extends TV
      *
      * @param $videoID
      * @param $siteId
-     *
      * @return bool
      */
     protected function getBanner($videoID, $siteId): bool
@@ -221,14 +219,13 @@ class TVDB extends TV
         return false;
     }
 
-    /**
+    /*
      * Calls the API to perform initial show name match to TVDB title
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param string $cleanName
-     * @param string $country
-     *
+     * @param  string  $cleanName
+     * @param  string  $country
      * @return array|bool|false
      */
     protected function getShowInfo($cleanName, $country = '')
@@ -236,7 +233,7 @@ class TVDB extends TV
         $return = $response = false;
         $highestMatch = 0;
         try {
-            $response = $this->client->search()->searchByName($cleanName);
+            $response = $this->client->search()->search($cleanName);
         } catch (ResourceNotFoundException $e) {
             $response = false;
             $this->colorCli->notice('Show not found on TVDB', true);
@@ -244,7 +241,7 @@ class TVDB extends TV
 
         if ($response === false && $country !== '') {
             try {
-                $response = $this->client->search()->searchByName(rtrim(str_replace($country, '', $cleanName)));
+                $response = $this->client->search()->search(rtrim(str_replace($country, '', $cleanName)));
             } catch (ResourceNotFoundException $e) {
                 $response = false;
                 $this->colorCli->notice('Show not found on TVDB', true);
@@ -294,8 +291,7 @@ class TVDB extends TV
     /**
      * Retrieves the poster art for the processed show.
      *
-     * @param int $videoId -- the local Video ID
-     *
+     * @param  int  $videoId  -- the local Video ID
      * @return int
      */
     public function getPoster($videoId): int
@@ -317,37 +313,33 @@ class TVDB extends TV
         return $hasCover;
     }
 
-    /**
+    /*
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param int $tvDbId
-     * @param int $season
-     * @param int $episode
-     * @param string  $airDate
-     * @param int $videoId
-     *
+     * @param  int  $tvDbId
+     * @param  int  $season
+     * @param  int  $episode
+     * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tvDbId, $season, $episode, $airDate = '', $videoId = 0)
+    protected function getEpisodeInfo($tvDbId, $season, $episode, $videoId = 0)
     {
         $return = $response = false;
 
-        if ($airDate !== '') {
+        if ($videoId > 0) {
             try {
-                $response = $this->client->series()->getEpisodesWithQuery($tvDbId, ['firstAired' => $airDate])->getData();
-            } catch (ResourceNotFoundException $error) {
-                return false;
-            }
-        } elseif ($videoId > 0) {
-            try {
-                $response = $this->client->series()->getAllEpisodes($tvDbId);
+                $response = $this->client->series()->allEpisodes($tvDbId);
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
         } else {
             try {
-                $response = $this->client->series()->getEpisodesWithQuery($tvDbId, ['airedSeason' => $season, 'airedEpisodeNumber' => $episode])->getData();
+                foreach ($this->client->series()->episodes($tvDbId) as $episodeBaseRecord) {
+                    if ($episodeBaseRecord->seasonNumber === $season && $episodeBaseRecord->number === $episode) {
+                        $response = $episodeBaseRecord;
+                    }
+                }
             } catch (ResourceNotFoundException $error) {
                 return false;
             }
@@ -370,33 +362,32 @@ class TVDB extends TV
         return $return;
     }
 
-    /**
+    /*
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
      *
      * @param $show
-     *
      * @return array
      */
     protected function formatShowInfo($show): array
     {
         try {
-            $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
-            $this->posterUrl = ! empty($poster[0]->thumbnail) ? self::TVDB_POSTER_URL.$poster[0]->thumbnail : '';
+            $poster = $this->client->episodes()->extended($show->id);
+            $this->posterUrl = ! empty($poster[0]->thumbnail) ? $poster[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
-            $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
-            $this->fanartUrl = $fanart[0]->thumbnail ? self::TVDB_POSTER_URL.$fanart[0]->thumbnail : '';
+            $fanArt = $this->client->series()->extended($show->id);
+            $this->fanartUrl = ! empty($fanArt[0]->thumbnail) ? $fanArt[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
 
         try {
-            $imdbid = $this->client->series()->getById($show->id);
-            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbid->imdbId, $imdb);
+            $imdbId = $this->client->series()->extended($show->id);
+            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Show ID not found on TVDB', true);
         }
@@ -426,16 +417,15 @@ class TVDB extends TV
      * Returns the formatted array.
      *
      * @param $episode
-     *
      * @return array
      */
     protected function formatEpisodeInfo($episode): array
     {
         return [
-            'title'       => (string) $episode->episodeName,
-            'series'      => (int) $episode->airedSeason,
-            'episode'     => (int) $episode->airedEpisodeNumber,
-            'se_complete' => 'S'.sprintf('%02d', $episode->airedSeason).'E'.sprintf('%02d', $episode->airedEpisodeNumber),
+            'title'       => (string) $episode->name,
+            'series'      => (int) $episode->seasonNumber,
+            'episode'     => (int) $episode->number,
+            'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
             'firstaired'  => $episode->firstAired,
             'summary'     => (string) $episode->overview,
         ];

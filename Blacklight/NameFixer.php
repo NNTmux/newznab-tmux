@@ -148,7 +148,8 @@ class NameFixer
     private $elasticsearch;
 
     /**
-     * @param array $options Class instances / Echo to cli.
+     * @param  array  $options  Class instances / Echo to cli.
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -188,6 +189,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixNamesWithNfo($time, $echo, $cats, $nameStatus, $show): void
@@ -273,6 +275,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show): void
@@ -339,6 +342,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixNamesWithCrc($time, $echo, $cats, $nameStatus, $show): void
@@ -405,6 +409,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixXXXNamesWithFiles($time, $echo, $cats, $nameStatus, $show): void
@@ -468,6 +473,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show): void
@@ -527,12 +533,13 @@ class NameFixer
     /**
      * Attempts to fix release names using the Par2 File.
      *
-     * @param int $time 1: 24 hours, 2: no time limit
-     * @param int $echo 1: change the name, anything else: preview of what could have been changed.
-     * @param int $cats 1: other categories, 2: all categories
-     * @param      $nameStatus
-     * @param      $show
-     * @param NNTP $nntp
+     * @param  int  $time  1: 24 hours, 2: no time limit
+     * @param  int  $echo  1: change the name, anything else: preview of what could have been changed.
+     * @param  int  $cats  1: other categories, 2: all categories
+     * @param  $nameStatus
+     * @param  $show
+     * @param  NNTP  $nntp
+     *
      * @throws \Exception
      */
     public function fixNamesWithPar2($time, $echo, $cats, $nameStatus, $show, $nntp): void
@@ -604,6 +611,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show): void
@@ -674,6 +682,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixNamesWithMediaMovieName($time, $echo, $cats, $nameStatus, $show): void
@@ -742,6 +751,7 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
+     *
      * @throws \Exception
      */
     public function fixNamesWithParHash($time, $echo, $cats, $nameStatus, $show): void
@@ -808,11 +818,10 @@ class NameFixer
     }
 
     /**
-     * @param        $time
-     * @param        $cats
-     * @param        $query
-     * @param string $limit
-     *
+     * @param  $time
+     * @param  $cats
+     * @param  $query
+     * @param  string  $limit
      * @return array|false
      */
     protected function _getReleases($time, $cats, $query, $limit = '')
@@ -839,8 +848,8 @@ class NameFixer
     /**
      * Echo the amount of releases that found a new name.
      *
-     * @param int|bool    $echo 1: change the name, anything else: preview of what could have been changed.
-     * @param string $type The function type that found the name.
+     * @param  int|bool  $echo  1: change the name, anything else: preview of what could have been changed.
+     * @param  string  $type  The function type that found the name.
      */
     protected function _echoFoundCount($echo, $type): void
     {
@@ -864,8 +873,8 @@ class NameFixer
     }
 
     /**
-     * @param int    $time 1: 24 hours, 2: no time limit
-     * @param string $type The function type.
+     * @param  int  $time  1: 24 hours, 2: no time limit
+     * @param  string  $type  The function type.
      */
     protected function _echoStartMessage($time, $type): void
     {
@@ -879,7 +888,7 @@ class NameFixer
     }
 
     /**
-     * @param int $show
+     * @param  int  $show
      */
     protected function _echoRenamed($show): void
     {
@@ -901,14 +910,14 @@ class NameFixer
      * Update the release with the new information.
      *
      *
-     * @param     $release
-     * @param     $name
-     * @param     $method
-     * @param     $echo
-     * @param     $type
-     * @param int $nameStatus
-     * @param bool $show
-     * @param int $preId
+     * @param  $release
+     * @param  $name
+     * @param  $method
+     * @param  $echo
+     * @param  $type
+     * @param  int  $nameStatus
+     * @param  bool  $show
+     * @param  int  $preId
      *
      * @throws \Exception
      */
@@ -1080,16 +1089,16 @@ class NameFixer
     /**
      * Echo a updated release name to CLI.
      *
-     * @param array $data
-     *              array(
-     *              'new_name'     => (string) The new release search name.
-     *              'old_name'     => (string) The old release search name.
-     *              'new_category' => (string) The new category name or ID for the release.
-     *              'old_category' => (string) The old category name or ID for the release.
-     *              'group'        => (string) The group name or ID of the release.
-     *              'release_id'   => (int)    The ID of the release.
-     *              'method'       => (string) The method used to rename the release.
-     *              )
+     * @param  array  $data
+     *                       array(
+     *                       'new_name'     => (string) The new release search name.
+     *                       'old_name'     => (string) The old release search name.
+     *                       'new_category' => (string) The new category name or ID for the release.
+     *                       'old_category' => (string) The old category name or ID for the release.
+     *                       'group'        => (string) The group name or ID of the release.
+     *                       'release_id'   => (int)    The ID of the release.
+     *                       'method'       => (string) The method used to rename the release.
+     *                       )
      *
      * @static
      * @void
@@ -1125,8 +1134,8 @@ class NameFixer
      * @param $echo
      * @param $nameStatus
      * @param $show
-     *
      * @return int
+     *
      * @throws \Exception
      */
     public function matchPredbFT($pre, $echo, $nameStatus, $show): int
@@ -1175,7 +1184,6 @@ class NameFixer
 
     /**
      * @param $preTitle
-     *
      * @return string
      */
     protected function _preFTsearchQuery($preTitle): string
@@ -1196,7 +1204,8 @@ class NameFixer
      * Retrieves releases and their file names to attempt PreDB matches
      * Runs in a limited mode based on arguments passed or a full mode broken into chunks of entire DB.
      *
-     * @param array $args The CLI script arguments
+     * @param  array  $args  The CLI script arguments
+     *
      * @throws \Exception
      */
     public function getPreFileNames(array $args = []): void
@@ -1259,12 +1268,12 @@ class NameFixer
     /**
      * Match a release filename to a PreDB filename or title.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param int $nameStatus
-     * @param bool $show
-     *
+     * @param  $release
+     * @param  bool  $echo
+     * @param  int  $nameStatus
+     * @param  bool  $show
      * @return int
+     *
      * @throws \Exception
      */
     public function matchPreDbFiles($release, $echo, $nameStatus, $show): int
@@ -1352,13 +1361,13 @@ class NameFixer
     /**
      * Match a Hash from the predb to a release.
      *
-     * @param string $hash
-     * @param         $release
-     * @param         $echo
-     * @param         $nameStatus
-     * @param         $show
-     *
+     * @param  string  $hash
+     * @param  $release
+     * @param  $echo
+     * @param  $nameStatus
+     * @param  $show
      * @return int
+     *
      * @throws \Exception
      */
     public function matchPredbHash($hash, $release, $echo, $nameStatus, $show): int
@@ -1406,8 +1415,8 @@ class NameFixer
      * @param $cats
      * @param $nameStatus
      * @param $show
-     *
      * @return int
+     *
      * @throws \Exception
      */
     public function parseTitles($time, $echo, $cats, $nameStatus, $show): int
@@ -1473,14 +1482,14 @@ Q2
     /**
      * Check the array using regex for a clean name.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param int $nameStatus
-     * @param bool $show
-     * @param bool $preid
-     *
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  int  $nameStatus
+     * @param  bool  $show
+     * @param  bool  $preid
      * @return bool
+     *
      * @throws \Exception
      */
     public function checkName($release, $echo, $type, $nameStatus, $show, $preid = false): bool
@@ -1566,13 +1575,14 @@ Q2
         return $this->matched;
     }
 
-    /** This function updates a single variable column in releases
+    /**
+     * This function updates a single variable column in releases
      *  The first parameter is the column to update, the second is the value
      *  The final parameter is the ID of the release to update.
      *
-     * @param string  $column
-     * @param int $status
-     * @param int $id
+     * @param  string  $column
+     * @param  int  $status
+     * @param  int  $id
      */
     public function _updateSingleColumn($column = '', $status = 0, $id = 0): void
     {
@@ -1584,11 +1594,12 @@ Q2
     /**
      * Look for a TV name.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function tvCheck($release, $echo, $type, $nameStatus, $show): void
@@ -1617,11 +1628,12 @@ Q2
     /**
      * Look for a movie name.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function movieCheck($release, $echo, $type, $nameStatus, $show): void
@@ -1662,11 +1674,12 @@ Q2
     /**
      * Look for a game name.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function gameCheck($release, $echo, $type, $nameStatus, $show): void
@@ -1691,11 +1704,12 @@ Q2
     /**
      * Look for a app name.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function appCheck($release, $echo, $type, $nameStatus, $show): void
@@ -1714,11 +1728,12 @@ Q2
     /**
      * TV.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function nfoCheckTV($release, $echo, $type, $nameStatus, $show): void
@@ -1737,11 +1752,12 @@ Q2
     /**
      * Movies.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function nfoCheckMov($release, $echo, $type, $nameStatus, $show): void
@@ -1760,11 +1776,12 @@ Q2
     }
 
     /**
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function nfoCheckMus($release, $echo, $type, $nameStatus, $show): void
@@ -1780,11 +1797,12 @@ Q2
     /**
      * Title (year).
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function nfoCheckTY($release, $echo, $type, $nameStatus, $show): void
@@ -1956,11 +1974,12 @@ Q2
     /**
      * Games.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function nfoCheckG($release, $echo, $type, $nameStatus, $show): void
@@ -1985,11 +2004,12 @@ Q2
     /**
      * Misc.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
+     *
      * @throws \Exception
      */
     public function nfoCheckMisc($release, $echo, $type, $nameStatus, $show): void
@@ -2025,13 +2045,13 @@ Q2
     /**
      * Just for filenames.
      *
-     * @param         $release
-     * @param bool $echo
-     * @param string $type
-     * @param         $nameStatus
-     * @param         $show
-     *
+     * @param  $release
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  $nameStatus
+     * @param  $show
      * @return bool
+     *
      * @throws \Exception
      */
     public function fileCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2129,8 +2149,8 @@ Q2
      * @param $type
      * @param $nameStatus
      * @param $show
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2182,8 +2202,8 @@ Q2
      * @param $type
      * @param $nameStatus
      * @param $show
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function mediaMovieNameCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2221,8 +2241,8 @@ Q2
      * @param $type
      * @param $nameStatus
      * @param $show
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function xxxNameCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2274,8 +2294,8 @@ Q2
      * @param $type
      * @param $nameStatus
      * @param $show
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function srrNameCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2327,8 +2347,8 @@ Q2
      * @param $type
      * @param $nameStatus
      * @param $show
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function hashCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2378,8 +2398,8 @@ Q2
      * @param $type
      * @param $nameStatus
      * @param $show
-     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function crcCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2430,8 +2450,7 @@ Q2
     }
 
     /**
-     * @param string $fileName
-     *
+     * @param  string  $fileName
      * @return array
      */
     private function preMatch($fileName): array
@@ -2443,11 +2462,12 @@ Q2
 
     /**
      * @param $release
-     * @param bool $echo
-     * @param string $type
-     * @param int $nameStatus
-     * @param bool $show
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  int  $nameStatus
+     * @param  bool  $show
      * @return bool
+     *
      * @throws \Exception
      */
     public function preDbFileCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
@@ -2481,11 +2501,12 @@ Q2
 
     /**
      * @param $release
-     * @param bool $echo
-     * @param string $type
-     * @param int $nameStatus
-     * @param bool $show
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  int  $nameStatus
+     * @param  bool  $show
      * @return bool
+     *
      * @throws \Exception
      */
     public function preDbTitleCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool

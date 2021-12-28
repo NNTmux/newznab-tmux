@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 class AdminShowsController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
+     *
      * @throws \Exception
      */
     public function index(Request $request)
@@ -34,7 +35,8 @@ class AdminShowsController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
+     *
      * @throws \Exception
      */
     public function edit(Request $request)

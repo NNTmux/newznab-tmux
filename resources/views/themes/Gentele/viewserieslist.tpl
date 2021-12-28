@@ -29,7 +29,7 @@
 			    {{Form::open(['class' => 'form float-right', 'style' => 'margin-top:-35px;'])}}
                     {{Form::open(['name' => 'showsearch', 'class' => 'navbar-form', 'method' => 'get'])}}
 						<div class="input-group">
-							<input class="form-control" style="width: 150px;"
+							<input class="form-inline" style="width: 150px;"
 								   id="title appendedInputButton"
 								   type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}"{else}{/if}"
 								   placeholder="Search here"/>
@@ -69,7 +69,7 @@
 					<tr>
 						<td><a class="title" title="View series"
 							   href="{{url("/series/{$s.id}")}}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}
-						<br/><span class="badge badge-info">Last: {$s.previnfo|escape:"htmlall"}
+						<br/><span class="badge bg-info">Last: {$s.previnfo|escape:"htmlall"}
 							aired {$s.prevdate|date_format}</span>{/if}</td>
 						<td>{$s.publisher|escape:"htmlall"}</td>
 						<td>{$s.countries_id|escape:"htmlall"}</td>

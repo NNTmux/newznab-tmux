@@ -30,12 +30,14 @@ class Backfill
 
     /**
      * Log and or echo debug.
+     *
      * @var bool
      */
     protected $_debug = false;
 
     /**
      * Echo to cli?
+     *
      * @var bool
      */
     protected $_echoCLI;
@@ -54,6 +56,7 @@ class Backfill
 
     /**
      * Should we disable the group if we have backfilled far enough?
+     *
      * @var bool
      */
     protected $_disableBackfillGroup;
@@ -66,7 +69,7 @@ class Backfill
     /**
      * Constructor.
      *
-     * @param array $options Class instances / Echo to cli?
+     * @param  array  $options  Class instances / Echo to cli?
      *
      * @throws \Exception
      */
@@ -100,9 +103,10 @@ class Backfill
     }
 
     /**
-     * @param string $groupName
-     * @param string|int $articles
-     * @param string $type
+     * @param  string  $groupName
+     * @param  string|int  $articles
+     * @param  string  $type
+     *
      * @throws \Throwable
      */
     public function backfillAllGroups($groupName = '', $articles = '', $type = ''): void
@@ -162,11 +166,11 @@ class Backfill
     /**
      * Backfill single group.
      *
-     * @param array      $groupArr
-     * @param int        $left
-     * @param int|string $articles
-     *
+     * @param  array  $groupArr
+     * @param  int  $left
+     * @param  int|string  $articles
      * @return void
+     *
      * @throws \Throwable
      */
     public function backfillGroup($groupArr, $left, $articles = ''): void
@@ -329,7 +333,8 @@ class Backfill
     }
 
     /**
-     * @param string $articles
+     * @param  string  $articles
+     *
      * @throws \Throwable
      */
     public function safeBackfill($articles = ''): void

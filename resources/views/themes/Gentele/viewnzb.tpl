@@ -17,98 +17,98 @@
 						<i class="fa fa-thumbs-o-down"></i>
 						{$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 				{if $isadmin == true || $ismod == true}
-					<a class="badge badge-warning"
+					<a class="badge bg-warning"
 					   href="{{url("/admin/release-edit?id={$release.guid}")}}"
 					   title="Edit release">Edit</a>
                 {/if}
                 {if isset($isadmin)}
-					<a class="badge badge-danger"
+					<a class="badge bg-danger"
 					   href="{{url("/admin/release-delete/{$release.guid}")}}"
 					   title="Delete release">Delete</a>
 				{/if}
 				{if $movie && $release.videos_id <= 0 }
 					{if $movie.imdbid > 0}
-						<a class="badge badge-info" target="_blank"
+						<a class="badge bg-info" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$movie.imdbid}/"
 						   title="View at IMDB">IMDB</a>
 						<a target="_blank"
 						   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$movie.imdbid}/"
 						   name="trakt{$release.imdbid}" title="View Trakt page"
-						   class="badge badge-info" rel="trakt">TRAKT</a>
+						   class="badge bg-info" rel="trakt">TRAKT</a>
 					{/if}
 					{if $movie.tmdbid > 0}
-						<a class="badge badge-info" target="_blank"
+						<a class="badge bg-info" target="_blank"
 						   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 						   title="View at TMDb">TMDb</a>
 					{/if}
 					{if $movie.imdbid > 0}
-						<a class="badge badge-info" href="{{url("/Movies?imdb={$movie.imdbid}")}}"
+						<a class="badge bg-info" href="{{url("/Movies?imdb={$movie.imdbid}")}}"
 						   title="View all versions">Movie View</a>
 					{/if}
 				{/if}
 				{if $anidb && $release.anidbid > 0}
-					<a class="badge badge-info" href="{{url("/anime?id={$release.anidbid}")}}"
+					<a class="badge bg-info" href="{{url("/anime?id={$release.anidbid}")}}"
 					   title="View all releases from this anime">View all episodes</a>
-					<a class="badge badge-info"
+					<a class="badge bg-info"
 					   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
 					   title="View at AniDB" target="_blank">AniDB</a>
-					<a class="badge badge-info"
+					<a class="badge bg-info"
 					   href="{{url("/rss/full-feed?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">Anime
 						RSS Feed</a>
 				{/if}
 				{if $show && $release.videos_id > 0}
 					<a href="{{url("/myshows?action=add&id={$release.videos_id}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}"
-					   class="badge badge-success">Add to My Shows</a>
-					<a class="badge badge-info" href="{{url("/series/{$release.videos_id}")}}"
+					   class="badge bg-success">Add to My Shows</a>
+					<a class="badge bg-info" href="{{url("/series/{$release.videos_id}")}}"
 					   title="View all releases for this series">View all episodes</a>
 					{if $show.tvdb > 0}
-						<a class="badge badge-info" target="_blank"
+						<a class="badge bg-info" target="_blank"
 						   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}")}}"
 						   title="View at TheTVDB">TheTVDB</a>
 					{/if}
 					{if $show.tvmaze > 0}
-						<a class="badge badge-info" target="_blank"
+						<a class="badge bg-info" target="_blank"
 						   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
 						   title="View at TVMaze">TVMaze</a>
 					{/if}
 					{if $show.trakt > 0}
-						<a class="badge badge-info" target="_blank"
+						<a class="badge bg-info" target="_blank"
 						   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
 						   title="View at TraktTv">Trakt</a>
 					{/if}
 					{if $show.tvrage > 0}
-						<a class="badge badge-info" target="_blank"
+						<a class="badge bg-info" target="_blank"
 						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 						   title="View at TV Rage">TV Rage</a>
 					{/if}
 					{if $show.tmdb > 0}
-						<a class="badge badge-info" target="_blank"
+						<a class="badge bg-info" target="_blank"
 						   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
 						   title="View at TheMovieDB">TMDb</a>
 					{/if}
 				{/if}
 				{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
-											  class="badge badge-info" target="_blank">Amazon</a>{/if}
+											  class="badge bg-info" target="_blank">Amazon</a>{/if}
 				{if $book && $book.url != ""}<a href="{$site->dereferrer_link}{$book.url}/"
-												class="badge badge-info" target="_blank">Amazon</a>{/if}
+												class="badge bg-info" target="_blank">Amazon</a>{/if}
 				{if $music && $music.url != ""}<a href="{$site->dereferrer_link}{$music.url}/"
-												  class="badge badge-info" target="_blank">
+												  class="badge bg-info" target="_blank">
 						Amazon</a>{/if}
 				{if $xxx}
-					{if $xxx.classused === "ade"}<a class="badge badge-info" target="_blank"
+					{if $xxx.classused === "ade"}<a class="badge bg-info" target="_blank"
 													href="{$site->dereferrer_link}{$xxx.directurl}"
 													title="View at Adult DVD Empire">ADE</a>
-					{elseif $xxx.classused === "adm"}<a class="badge badge-info" target="_blank"
+					{elseif $xxx.classused === "adm"}<a class="badge bg-info" target="_blank"
 														href="{$site->dereferrer_link}{$xxx.directurl}"
 														title="View at Adult DVD Marketplace">ADM</a>
-					{elseif $xxx.classused === "pop"}<a class="badge badge-info" target="_blank"
+					{elseif $xxx.classused === "pop"}<a class="badge bg-info" target="_blank"
 														href="{$site->dereferrer_link}{$xxx.directurl}"
 														title="View at Popporn">PopPorn</a>
-					{elseif $xxx.classused === "aebn"}<a class="badge badge-info" target="_blank"
+					{elseif $xxx.classused === "aebn"}<a class="badge bg-info" target="_blank"
 														 href="{$site->dereferrer_link}{$xxx.directurl}"
 														 title="View at Adult Entertainment Broadcast Network">
 							AEBN</a>
-					{elseif $xxx.classused === "hm"}<a class="badge badge-info" target="_blank"
+					{elseif $xxx.classused === "hm"}<a class="badge bg-info" target="_blank"
 													   href="{$site->dereferrer_link}{$xxx.directurl}"
 													   title="View at Hot Movies">HotMovies</a>
 					{/if}
@@ -140,34 +140,34 @@
 						<div class role="tabpanel">
 							<ul class="nav nav-tabs bar-tabs" role="tablist">
 								<li role="presentation" class="active"><a href="#pane1"
-																		  data-toggle="tab">Info</a></li>
+																		  data-bs-toggle="tab">Info</a></li>
 								{if $movie && $release.videos_id <= 0}{if $movie.trailer != ""}
-									<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
+									<li><a href="#pane2" data-bs-toggle="tab">Trailer</a></li>
 								{/if}{/if}
 								{if isset($xxx.trailers) && $xxx.trailers != ''}
-									<li role="presentation"><a href="#pane2" data-toggle="tab">Trailer</a></li>
+									<li role="presentation"><a href="#pane2" data-bs-toggle="tab">Trailer</a></li>
 								{/if}
 								{if !empty($nfo.nfo)}
-									<li role="presentation"><a href="#pane3" data-toggle="tab">NFO</a></li>
+									<li role="presentation"><a href="#pane3" data-bs-toggle="tab">NFO</a></li>
 								{/if}
 								{if isset($similars) && $similars|@count > 1}
-									<li role="presentation"><a href="#pane4" data-toggle="tab">Similar</a></li>
+									<li role="presentation"><a href="#pane4" data-bs-toggle="tab">Similar</a></li>
 								{/if}
 								{if $release.jpgstatus == 1 && $userdata->can('preview') == true}
-									<li role="presentation"><a href="#pane6" data-toggle="tab">Sample</a></li>
+									<li role="presentation"><a href="#pane6" data-bs-toggle="tab">Sample</a></li>
 								{/if}
-								<li role="presentation"><a href="#comments" data-toggle="tab">Comments</a></li>
+								<li role="presentation"><a href="#comments" data-bs-toggle="tab">Comments</a></li>
 								{if ($release.haspreview == 1 && $userdata->can('preview') == true) || ($release.haspreview == 2 && $userdata->can('preview') == true)}
-									<li role="presentation"><a href="#pane7" data-toggle="tab">Preview</a></li>
+									<li role="presentation"><a href="#pane7" data-bs-toggle="tab">Preview</a></li>
 								{/if}
 								{if $reVideo != false || $reAudio != false}
-									<li role="presentation"><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
+									<li role="presentation"><a href="#pane8" data-bs-toggle="tab">MediaInfo</a></li>
 								{/if}
 								{if isset($xxx.backdrop) && $xxx.backdrop == 1}
-									<li role="presentation"><a href="#pane9" data-toggle="tab">Back Cover</a></li>
+									<li role="presentation"><a href="#pane9" data-bs-toggle="tab">Back Cover</a></li>
 								{/if}
 								{if isset($game.backdrop) && $game.backdrop == 1}
-									<li role="presentation"><a href="#pane10" data-toggle="tab">Screenshot</a></li>
+									<li role="presentation"><a href="#pane10" data-bs-toggle="tab">Screenshot</a></li>
 								{/if}
 							</ul>
 						</div>
@@ -179,49 +179,49 @@
 											<img src="{{url("/covers/movies/{$movie.imdbid}-cover.jpg")}}"
 												 width="185"
 												 alt="{$movie.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $show && $release.videos_id > 0 && $show.image != "0"}
 											<img src="{{url("/covers/tvshows/{$release.videos_id}.jpg")}}"
 												 width="185"
 												 alt="{$show.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}
 											<img src="{{url("/covers/anime/{$anidb.anidbid}.jpg")}}"
 												 width="185"
 												 alt="{$anidb.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $con && $con.cover == 1}
 											<img src="{{url("/covers/console/{$con.id}.jpg")}}"
 												 width="185"
 												 alt="{$con.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $game && $game.cover == 1}
 											<img src="{{url("/covers/games/{$game.id}.jpg")}}"
 												 width="185"
 												 alt="{$con.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $music && $music.cover == 1}
 											<img src="{{url("/covers/music/{$music.id}.jpg")}}"
 												 width="185"
 												 alt="{$music.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $book && $book.cover == 1}
 											<img src="{{url("/covers/book/{$book.id}.jpg")}}"
 												 width="185"
 												 alt="{$book.title|escape:"htmlall"}"
-												 data-toggle="modal"
+												 data-bs-toggle="modal"
 												 data-target="#modal-image"/>
 										{/if}
 										{if $xxx && $xxx.cover == 1}
@@ -231,7 +231,7 @@
 														src="{{url("/covers/xxx/{$xxx.id}-cover.jpg")}}"
 														width="185"
 														alt="{$xxx.title|escape:"htmlall"}"
-														data-toggle="modal"
+														data-bs-toggle="modal"
 														data-target="#modal-image"/></a>
 										{/if}
 										<br/><br/>
@@ -239,11 +239,9 @@
 											<a class="btn btn-light btn-sm btn-success btn-transparent"
 											   href="{{url("/getnzb?id={$release.guid}")}}"><i
 														class="fa fa-cloud-download"></i> Download</a>
-											<button type="button"
-													class="btn btn-success btn-sm btn-info btn-transparent cartadd">
-												<i class="icon_cart fa fa-shopping-basket guid"
-												   id="guid{$release.guid}"></i> Add to Cart
-											</button>
+                                            <a class="btn btn-success btn-sm btn-info btn-transparent"
+                                                href="{{url("/cart/add?id={$release.guid}")}}" target="_blank">
+                                                        <i class="fa fa-shopping-basket guid"></i> Add to Cart</a>
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
 														class="btn btn-success btn-sm btn-transparent sabsend">
@@ -552,13 +550,13 @@
 																	<br/>
 																	{if $rf.passworded != 1}
 																		<i class="fa fa-unlock"></i>
-																		<span class="badge badge-success">No Password</span>
+																		<span class="badge bg-success">No Password</span>
 																	{else}
 																		<i class="fa fa-lock"></i>
-																		<span class="badge badge-danger">Passworded</span>
+																		<span class="badge bg-danger">Passworded</span>
 																	{/if}
-																	<span class="badge badge-info">{$rf.size|filesize}</span>
-																	<span class="badge badge-info">{$rf.created_at|date_format}</span>
+																	<span class="badge bg-info">{$rf.size|filesize}</span>
+																	<span class="badge bg-info">{$rf.created_at|date_format}</span>
 																	<br/>
 																{/foreach}
 															</td>
@@ -682,7 +680,7 @@
 								<div id="pane6" class="tab-pane">
 									<img src="{{url("/covers/sample/{$release.guid}_thumb.jpg")}}"
 										 alt="{$release.searchname|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
@@ -690,7 +688,7 @@
 								<div id="pane7" class="tab-pane">
 									<img src="{{url("/covers/preview/{$release.guid}_thumb.jpg")}}"
 										 alt="{$release.searchname|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
@@ -844,7 +842,7 @@
 								<div id="pane9" class="tab-pane">
 									<img src="{{url("/covers/xxx/{$xxx.id}-backdrop.jpg")}}"
 										 alt="{$xxx.title|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
@@ -854,7 +852,7 @@
 										 src="{{url("/covers/games/{$game.id}-backdrop.jpg")}}"
 										 width="500" border="0"
 										 alt="{$game.title|escape:"htmlall"}"
-										 data-toggle="modal"
+										 data-bs-toggle="modal"
 										 data-target="#modal-image"/>
 								</div>
 							{/if}

@@ -15,6 +15,7 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    DariusIII
  * @copyright 2016 newznab-tmux
  */
@@ -30,18 +31,21 @@ class CouchPotato
 {
     /**
      * URL to the CP server.
+     *
      * @var string
      */
     public $cpurl = '';
 
     /**
      * The CP key.
+     *
      * @var string
      */
     public $cpapi = '';
 
     /**
      * Imdb ID.
+     *
      * @var string
      */
     public $imdbid = '';
@@ -49,7 +53,7 @@ class CouchPotato
     /**
      * CouchPotato constructor.
      *
-     * @param \App\Http\Controllers\BasePageController $page
+     * @param  \App\Http\Controllers\BasePageController  $page
      */
     public function __construct($page)
     {
@@ -60,9 +64,9 @@ class CouchPotato
     /**
      * Send a movie to CouchPotato.
      *
-     * @param string $id
-     *
+     * @param  string  $id
      * @return bool|mixed
+     *
      * @throws \RuntimeException
      */
     public function sendToCouchPotato($id)

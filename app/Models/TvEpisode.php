@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $summary Description/summary of the episode.
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
  * @property-read \App\Models\Video $video
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereEpisode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereFirstaired($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereId($value)
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereVideosId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode query()

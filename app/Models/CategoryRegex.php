@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $description Optional extra details on this regex
  * @property int $ordinal Order to run the regex in
  * @property int $categories_id Which categories id to put the release in
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereCategoriesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereGroupRegex($value)
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereStatus($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex query()

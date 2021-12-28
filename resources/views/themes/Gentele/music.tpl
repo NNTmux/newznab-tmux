@@ -25,19 +25,19 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-toggle="tooltip" data-placement="top" title
+												data-bs-toggle="tooltip" data-bs-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
 									{/if}
@@ -71,7 +71,7 @@
 											<i class="fa fa-exclamation-circle" style="color: red"
 											   title="This release has failed to download for some users"></i>{/if}
 										</a>
-										{if $result->url != ""}<a class="badge badge-info"
+										{if $result->url != ""}<a class="badge bg-info"
 																 target="_blank"
 																 href="{$site->dereferrer_link}{$result->url}"
 																 name="amazon{$result->musicinfo_id}"
@@ -79,9 +79,9 @@
 												Amazon</a>{/if}
 										{if $result->nfoid > 0}<a
 											href="{{url("/nfo/{$result->guid}")}}"
-											title="View NFO" class="badge badge-info" rel="nfo">
+											title="View NFO" class="badge bg-info" rel="nfo">
 												NFO</a>{/if}
-										<a class="badge badge-info"
+										<a class="badge bg-info"
 										   href="{{url("/browse/group?g={$result->group_name}")}}"
 										   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 										{if !empty($result->failed)}
@@ -108,10 +108,10 @@
 															   class="flat"
 															   value="{$result->guid}" id="chksingle"/>
 													</label>
-													<span class="badge badge-info">{$result->size|filesize}</span>
-													<span class="badge badge-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+													<span class="badge bg-info">{$result->size|filesize}</span>
+													<span class="badge bg-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
 														ago</span>
-													{if isset($isadmin)}<a class="badge badge-warning"
+													{if isset($isadmin)}<a class="badge bg-warning"
 																		   href="{{url("/admin/release-edit?id={$result->guid}")}}"
 																		   title="Edit release">
 															Edit</a>{/if}
@@ -133,28 +133,25 @@
 													{/if}
 													<div>
 														<a role="button" class="btn btn-light btn-xs"
-														   data-toggle="tooltip" data-placement="top" title
+														   data-bs-toggle="tooltip" data-bs-placement="top" title
 														   data-original-title="Download NZB"
 														   href="{{url("/getnzb?id={$result->guid}")}}"><i
 																	class="fa fa-cloud-download"></i><span
-																	class="badge"> {$result->grabs}
+																	class="badge bg-info"> {$result->grabs}
 																Grab{if $result->grabs != 1}s{/if}</span></a>
 														<a role="button" class="btn btn-light btn-xs"
 														   href="{{url("/details/{$result->guid}/#comments")}}"><i
 																	class="fa fa-comment-o"></i><span
-																	class="badge"> {$result->comments}
+																	class="badge bg-info"> {$result->comments}
 																Comment{if $result->comments != 1}s{/if}</span></a>
-														<span class="btn btn-hover btn-light btn-xs icon icon_cart text-muted"
-															  id="guid{$result->guid}"
-															  data-toggle="tooltip" data-placement="top"
-															  title
+                                                        <a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs icon text-muted"
+															  data-bs-toggle="tooltip" data-bs-placement="top"
 															  data-original-title="Send to my download basket"><i
-																	class="fa fa-shopping-basket"></i></span>
+                                                                    class="fa fa-shopping-basket"></i></span></a>
 														{if isset($sabintegrated) && $sabintegrated !=""}
 															<span class="btn btn-hover btn-light btn-xs icon icon_sab text-muted"
 																  id="guid{$result->guid}"
-																  data-toggle="tooltip" data-placement="top"
-																  title
+																  data-bs-toggle="tooltip" data-bs-placement="top"
 																  data-original-title="Send to my Queue"><i
 																		class="fa fa-share"></i></span>
 														{/if}
@@ -185,19 +182,19 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title
+											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-toggle="tooltip" data-placement="top" title
+												data-bs-toggle="tooltip" data-bs-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
 									{/if}

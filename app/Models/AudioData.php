@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $audiolibrary
  * @property string|null $audiolanguage
  * @property string|null $audiotitle
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereAudiobitrate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereAudiobitratemode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereAudiochannels($value)
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereReleasesId($value)
  * @mixin \Eloquent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData query()
