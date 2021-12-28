@@ -97,14 +97,14 @@ function categorizeRelease($update = true, $echoOutput = false, $argv): int
                             $release->retag($catId['tags']);
                         }
                         \Blacklight\NameFixer::echoChangedReleaseName([
-                                'new_name' => $result->searchname,
-                                'old_name' => $result->searchname,
-                                'new_category' => $catId['categories_id'],
-                                'old_category' => $result->categories_id,
-                                'group' => $result->group->name,
-                                'releases_id' => $result->id,
-                                'method' => 'Recategorize',
-                            ]);
+                            'new_name' => $result->searchname,
+                            'old_name' => $result->searchname,
+                            'new_category' => $catId['categories_id'],
+                            'old_category' => $result->categories_id,
+                            'group' => $result->group->name,
+                            'releases_id' => $result->id,
+                            'method' => 'Recategorize',
+                        ]);
                     }
                     $chgCount++;
                 }
