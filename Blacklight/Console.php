@@ -738,7 +738,7 @@ class Console
 
                         if (! empty($game->themes)) {
                             foreach ($game->themes as $theme) {
-                                $genres[] = $theme->name;
+                                $genres[] = $theme['name'];
                             }
                         }
 
@@ -751,10 +751,10 @@ class Console
                                 $percentCurrent = 0;
                                 $gamePlatforms = Platform::where('id', $platforms)->get();
                                 foreach ($gamePlatforms as $gamePlat) {
-                                    similar_text($gamePlat->name, $gamePlatform, $percent);
+                                    similar_text($gamePlat['name'], $gamePlatform, $percent);
                                     if ($percent >= 85 && $percent > $percentCurrent) {
                                         $percentCurrent = $percent;
-                                        $platform = $gamePlat->name;
+                                        $platform = $gamePlat['name'];
                                         break;
                                     }
                                 }
