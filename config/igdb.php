@@ -15,7 +15,7 @@ return [
      *
      * To turn cache off set this value to 0
      */
-    'cache_lifetime' => env('IGDB_CACHE_LIFETIME', 3600),
+    'cache_lifetime' => env((int) 'IGDB_CACHE_LIFETIME', 3600),
 
     /*
      * Path where the webhooks should be handled.
