@@ -66,9 +66,9 @@ class ApiController extends BasePageController
             Utility::showApiError(200, 'Missing parameter (t)');
         }
 
-        $uid = $apiKey = $oldestGrabTime = $apiOldestTime = '';
+        $uid = $apiKey = $oldestGrabTime = $thisOldestTime = '';
         $res = $catExclusions = [];
-        $maxRequests = $apiRequests = $maxDownloads = $grabs = 0;
+        $maxRequests = $thisRequests = $maxDownloads = $grabs = 0;
 
         // Page is accessible only by the apikey
 
@@ -92,7 +92,7 @@ class ApiController extends BasePageController
             $maxRequests = $res->role->apirequests;
             $maxDownloads = $res->role->downloadrequests;
             $time = UserRequest::whereUsersId($uid)->min('timestamp');
-            $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
+            $thisOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
             $grabTime = UserDownload::whereUsersId($uid)->min('timestamp');
             $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
         }
@@ -100,10 +100,10 @@ class ApiController extends BasePageController
         // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
         if ($uid !== '') {
             event(new UserAccessedApi($res));
-            $apiRequests = UserRequest::getApiRequests($uid);
+            $thisRequests = UserRequest::getApiRequests($uid);
             $grabs = UserDownload::getDownloadRequests($uid);
-            if ($apiRequests > $maxRequests) {
-                Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');
+            if ($thisRequests > $maxRequests) {
+                Utility::showApiError(500, 'Request limit reached ('.$thisRequests.'/'.$maxRequests.')');
             }
         }
 
@@ -121,10 +121,10 @@ class ApiController extends BasePageController
         $params['uid'] = $uid;
         $params['token'] = $apiKey;
         $params['apilimit'] = $maxRequests;
-        $params['requests'] = $apiRequests;
+        $params['requests'] = $thisRequests;
         $params['downloadlimit'] = $maxDownloads;
         $params['grabs'] = $grabs;
-        $params['oldestapi'] = $apiOldestTime;
+        $params['oldestapi'] = $thisOldestTime;
         $params['oldestgrab'] = $oldestGrabTime;
 
         switch ($function) {
@@ -205,15 +205,15 @@ class ApiController extends BasePageController
                $series = $request->input('season') ?? '';
                $episode = $request->input('ep') ?? '';
 
-               if (preg_match('#^(19|20)\d{2}$#', $series, $year) && strpos($episode, '/') !== false) {
-                   $airdate = str_replace('/', '-', $year[0].'-'.$episode);
+               if (preg_match('#^(19|20)\d{2}$#', $series, $year) && str_contains($episode, '/')) {
+                   $airDate = str_replace('/', '-', $year[0].'-'.$episode);
                }
 
                $relData = $releases->tvSearch(
                    $siteIdArr,
                    $series,
                    $episode,
-                   $airdate ?? '',
+                   $airDate ?? '',
                    $api->offset(),
                    $api->limit(),
                    $request->input('q') ?? '',
