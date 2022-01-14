@@ -149,7 +149,7 @@
     "spatie/laravel-backup": "^6.9",
     "spatie/laravel-directory-cleanup": "^1.2",
     "spatie/laravel-fractal": "^5.3",
-    "spatie/laravel-permission": "^3.0",
+    "spatie/laravel-permission": "^5.0",
     "sspat/es-query-sanitizer": "^1.0",
     "vlucas/phpdotenv": "^5.0",
     "voku/simple_html_dom": "^4.3",
