@@ -168,7 +168,7 @@ class API extends Capabilities
     /**
      * Check if a parameter is empty.
      *
-     * @param string $parameter
+     * @param  string  $parameter
      */
     public function verifyEmptyParameter(string $parameter): void
     {
