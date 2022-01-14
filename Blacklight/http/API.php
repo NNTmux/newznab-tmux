@@ -83,7 +83,7 @@ class API extends Capabilities
     {
         $maxAge = -1;
         if (request()->has('maxage')) {
-            if (empty(request()->input('maxage'))) {
+            if (! request()->filled('maxage')) {
                 Utility::showApiError(201, 'Incorrect parameter (maxage must not be empty)');
             } elseif (! is_numeric(request()->input('maxage'))) {
                 Utility::showApiError(201, 'Incorrect parameter (maxage must be numeric)');
@@ -106,7 +106,7 @@ class API extends Capabilities
         if (request()->has('cat')) {
             $categoryIDs = urldecode(request()->input('cat'));
             // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
-            if (strpos($categoryIDs, (string) Category::TV_HD) !== false && strpos($categoryIDs, (string) Category::TV_WEBDL) === false && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+            if (str_contains($categoryIDs, (string) Category::TV_HD) && ! str_contains($categoryIDs, (string) Category::TV_WEBDL) && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
                 $categoryIDs .= (','.Category::TV_WEBDL);
             }
             $categoryID = explode(',', $categoryIDs);
@@ -118,11 +118,11 @@ class API extends Capabilities
     /**
      * Verify groupName parameter.
      *
-     * @return mixed
+     * @return string|int|bool
      *
      * @throws \Exception
      */
-    public function group()
+    public function group(): string|int|bool
     {
         $groupName = -1;
         if (request()->has('group')) {
@@ -170,9 +170,9 @@ class API extends Capabilities
      *
      * @param  string  $parameter
      */
-    public function verifyEmptyParameter($parameter): void
+    public function verifyEmptyParameter(string $parameter): void
     {
-        if (request()->has($parameter) && empty(request()->input($parameter))) {
+        if (request()->has($parameter) && ! request()->filled($parameter)) {
             Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
         }
     }
