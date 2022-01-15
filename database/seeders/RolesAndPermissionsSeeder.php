@@ -19,17 +19,28 @@ class RolesAndPermissionsSeeder extends Seeder
         app('cache')->forget('spatie.permission.cache');
 
         // create permissions
-        Permission::create(['name' => 'preview']);
-        Permission::create(['name' => 'hideads']);
-        Permission::create(['name' => 'edit release']);
-        Permission::create(['name' => 'view console']);
-        Permission::create(['name' => 'view movies']);
-        Permission::create(['name' => 'view audio']);
-        Permission::create(['name' => 'view pc']);
-        Permission::create(['name' => 'view tv']);
-        Permission::create(['name' => 'view adult']);
-        Permission::create(['name' => 'view books']);
-        Permission::create(['name' => 'view other']);
+        Permission::create(['name' => 'preview', 'guard_name' => 'web']);
+        Permission::create(['name' => 'hideads', 'guard_name' => 'web']);
+        Permission::create(['name' => 'edit release', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view console', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view movies', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view audio', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view pc', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view tv', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view adult', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view books', 'guard_name' => 'web']);
+        Permission::create(['name' => 'view other', 'guard_name' => 'web']);
+        Permission::create(['name' => 'preview', 'guard_name' => 'api']);
+        Permission::create(['name' => 'hideads', 'guard_name' => 'api']);
+        Permission::create(['name' => 'edit release', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view console', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view movies', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view audio', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view pc', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view tv', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view adult', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view books', 'guard_name' => 'api']);
+        Permission::create(['name' => 'view other', 'guard_name' => 'api']);
 
         // create roles and assign created permissions
 
