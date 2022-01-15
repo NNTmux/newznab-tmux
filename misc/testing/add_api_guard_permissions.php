@@ -1,6 +1,5 @@
 <?php
 
-use MarcReichel\IGDBLaravel\Models\Game;
 use Spatie\Permission\Models\Permission;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
