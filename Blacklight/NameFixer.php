@@ -1335,6 +1335,7 @@ class NameFixer
                 preg_match('/\.vol\d+(\+\d+)?$/', $this->_fileName) => Utility::cutStringUsingLast('.', $this->_fileName, 'left', false),
                 str_contains($this->_fileName, '\\') => Utility::cutStringUsingLast('\\', $this->_fileName, 'right', false),
                 preg_match('/^\d{2}-/', $this->_fileName) => preg_replace('/^\d{2}-/', '', $this->_fileName),
+                default => trim($this->_fileName),
             };
 
             return trim($this->_fileName);
