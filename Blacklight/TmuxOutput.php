@@ -41,8 +41,7 @@ class TmuxOutput extends Tmux
 
     /**
      * @param $runVar
-     *
-     * @throws \Cz\Git\GitException
+     * @return void
      */
     public function updateMonitorPane(&$runVar): void
     {
@@ -126,8 +125,7 @@ class TmuxOutput extends Tmux
 
     /**
      * @return string
-     *
-     * @throws \Cz\Git\GitException
+     * @throws \CzProject\GitPhp\GitException
      */
     protected function _getHeader(): string
     {

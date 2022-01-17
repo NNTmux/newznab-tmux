@@ -52,7 +52,7 @@ try {
 $runVar['panes'] = $tRun->getListOfPanes($runVar['constants']);
 
 //totals per category in db, results by parentID
-$catcntqry = 'SELECT c.root_categories_id AS parentid, COUNT(r.id) AS count FROM categories c, releases r WHERE r.categories_id = c.id GROUP BY c.root_categories_id';
+$catCountQuery = 'SELECT c.root_categories_id AS parentid, COUNT(r.id) AS count FROM categories c, releases r WHERE r.categories_id = c.id GROUP BY c.root_categories_id';
 
 //create timers and set to now
 $runVar['timers']['timer1'] = $runVar['timers']['timer2'] = $runVar['timers']['timer3'] =
@@ -114,7 +114,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
     //run queries only after time exceeded, these queries can take awhile
     if ((int) $runVar['counts']['iterations'] === 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && (int) $runVar['settings']['is_running'] === 1)) {
-        $runVar['counts']['proc1'] = $runVar['counts']['proc2'] = $runVar['counts']['proc3'] = $splitqry = $newOldqry = false;
+        $runVar['counts']['proc1'] = $runVar['counts']['proc2'] = $runVar['counts']['proc3'] = $splitQry = $newOldQry = false;
         $runVar['counts']['now']['total_work'] = 0;
         $runVar['modsettings']['fix_crap'] = explode(', ', $runVar['settings']['fix_crap']);
 
@@ -122,24 +122,22 @@ while ($runVar['counts']['iterations'] > 0) {
         $timer02 = time();
 
         try {
-            $splitqry = $tRun->proc_query(4, null, $db_name);
+            $splitQry = $tRun->proc_query(4, null, $db_name);
         } catch (Exception $e) {
             echo $e;
         }
         try {
-            $newOldqry = $tRun->proc_query(6, null, null);
+            $newOldQry = $tRun->proc_query(6, null, null);
         } catch (Exception $e) {
             echo $e;
         }
 
-        $splitres = (array) Arr::first(DB::select($splitqry));
-        $runVar['timers']['newOld'] = (array) Arr::first(DB::select($newOldqry));
+        $splitRes = (array) Arr::first(DB::select($splitQry));
+        $runVar['timers']['newOld'] = (array) Arr::first(DB::select($newOldQry));
 
         //assign split query results to main var
-        if (is_array($splitres)) {
-            foreach ($splitres as $splitkey => $split) {
-                $runVar['counts']['now'][$splitkey] = $split;
-            }
+        foreach ($splitRes as $splitKey => $split) {
+            $runVar['counts']['now'][$splitKey] = $split;
         }
 
         $runVar['timers']['query']['split_time'] = (time() - $timer02);
@@ -208,7 +206,7 @@ while ($runVar['counts']['iterations'] > 0) {
                 $stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 
                 switch (true) {
-                    case strpos($tbl, 'collections') !== false:
+                    case str_contains($tbl, 'collections'):
                         $runVar['counts']['now']['collections_table'] +=
                             getTableRowCount($psTableRowCount, $tbl);
                         $added = DB::select(sprintf('SELECT %s AS dateadded FROM %s', $stamp, $tbl));
@@ -218,17 +216,17 @@ while ($runVar['counts']['iterations'] > 0) {
                             $age = $added['dateadded'];
                         }
                         break;
-                    case strpos($tbl, 'binaries') !== false:
+                    case str_contains($tbl, 'binaries'):
                         $runVar['counts']['now']['binaries_table'] +=
                             getTableRowCount($psTableRowCount, $tbl);
                         break;
                     // This case must come before the 'parts_' one.
-                    case strpos($tbl, 'missed_parts') !== false:
+                    case str_contains($tbl, 'missed_parts'):
                         $runVar['counts']['now']['missed_parts_table'] +=
                             getTableRowCount($psTableRowCount, $tbl);
 
                         break;
-                    case strpos($tbl, 'parts') !== false:
+                    case str_contains($tbl, 'parts'):
                         $runVar['counts']['now']['parts_table'] +=
                             getTableRowCount($psTableRowCount, $tbl);
                         break;
@@ -263,14 +261,14 @@ while ($runVar['counts']['iterations'] > 0) {
         }
 
         // now that we have merged our query data we can unset these to free up memory
-        unset($proc1res, $proc2res, $splitres);
+        unset($proc1res, $proc2res, $splitRes);
 
         // Zero out any post proc counts when that type of pp has been turned off
-        foreach ($runVar['settings'] as $settingkey => $setting) {
-            if ((int) $setting === 0 && (int) strpos($settingkey, 'process') === 0) {
-                $runVar['counts']['now'][$settingkey] = $runVar['counts']['start'][$settingkey] = 0;
+        foreach ($runVar['settings'] as $settingKey => $setting) {
+            if ((int) $setting === 0 && (int) strpos($settingKey, 'process') === 0) {
+                $runVar['counts']['now'][$settingKey] = $runVar['counts']['start'][$settingKey] = 0;
             }
-            if ($settingkey === 'fix_names' && (int) $setting === 0) {
+            if ($settingKey === 'fix_names' && (int) $setting === 0) {
                 $runVar['counts']['now']['processrenames'] = $runVar['counts']['start']['processrenames'] = 0;
             }
         }
@@ -283,7 +281,7 @@ while ($runVar['counts']['iterations'] > 0) {
         foreach ($runVar['counts']['now'] as $key => $proc) {
 
             //if key is a process type, add it to total_work
-            if (strpos($key, 'process') === 0) {
+            if (str_starts_with($key, 'process')) {
                 $runVar['counts']['now']['total_work'] += $proc;
             }
 
@@ -408,7 +406,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 function errorOnSQL()
 {
-    (new ColorCLI())->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
+    (new ColorCLI())->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL. Please diagnose and try running again.'.PHP_EOL);
 }
 
 /**
@@ -418,8 +416,7 @@ function errorOnSQL()
  */
 function getTableRowCount(\PDOStatement $ps, $table)
 {
-    $success = $ps->execute([':table' => $table]);
-    if ($success) {
+    if ($ps->execute([':table' => $table])) {
         $result = $ps->fetch();
 
         return is_numeric($result['count']) ? $result['count'] : 0;

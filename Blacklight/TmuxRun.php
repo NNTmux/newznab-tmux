@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\DB;
  */
 class TmuxRun extends Tmux
 {
-    protected $_dateFormat;
+    /**
+     * @var mixed|string
+     */
+    protected mixed $_dateFormat;
 
     /**
      * TmuxRun constructor.
@@ -604,66 +607,25 @@ class TmuxRun extends Tmux
                 $runVar['settings']['seq_timer']
             );
 
-            switch ($runVar['settings']['binaries_run']) {
-                case 0:
-                    $binaries = 'echo "\nbinaries has been disabled/terminated by Binaries"';
-                    break;
-                case 1:
-                    $binaries = sprintf(
-                        '%s %s;',
-                        $runVar['scripts']['binaries'],
-                        $log
-                    );
-                    break;
-                default:
-                    $binaries = '';
-            }
+            $binaries = match ($runVar['settings']['binaries_run']) {
+                0 => 'echo "\nbinaries has been disabled/terminated by Binaries"',
+                1 => sprintf('%s %s;', $runVar['scripts']['binaries'], $log),
+                default => '',
+            };
 
-            switch ($runVar['settings']['backfill']) {
-                case 0:
-                    $backfill = 'echo "backfill is disabled in settings";';
-                    break;
-                case 1:
-                    $backfill = sprintf(
-                        '%s %s %s;',
-                        $runVar['scripts']['backfill'],
-                        $runVar['settings']['backfill_qty'],
-                        $log
-                    );
-                    break;
-                case 2:
-                    $backfill = sprintf(
-                        '%s %s %s;',
-                        $runVar['scripts']['backfill'],
-                        'group',
-                        $log
-                    );
-                    break;
-                case 4:
-                    $backfill = sprintf(
-                        '%s %s;',
-                        $runVar['scripts']['backfill'],
-                        $log
-                    );
-                    break;
-                default:
-                    $backfill = '';
-            }
+            $backfill = match ($runVar['settings']['backfill']) {
+                0 => 'echo "backfill is disabled in settings";',
+                1 => sprintf('%s %s %s;', $runVar['scripts']['backfill'], $runVar['settings']['backfill_qty'], $log),
+                2 => sprintf('%s %s %s;', $runVar['scripts']['backfill'], 'group', $log),
+                4 => sprintf('%s %s;', $runVar['scripts']['backfill'], $log),
+                default => '',
+            };
 
-            switch ($runVar['settings']['releases_run']) {
-                case 0:
-                    $releases = 'echo PHP_EOL . "releases have been disabled/terminated by Releases"';
-                    break;
-                case 1:
-                    $releases = sprintf(
-                        '%s %s;',
-                        $runVar['scripts']['releases'],
-                        $log
-                    );
-                    break;
-                default:
-                    $releases = '';
-            }
+            $releases = match ($runVar['settings']['releases_run']) {
+                0 => 'echo PHP_EOL . "releases have been disabled/terminated by Releases"',
+                1 => sprintf('%s %s;', $runVar['scripts']['releases'], $log),
+                default => '',
+            };
 
             shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 '$binaries $backfill $releases $date $sleep' 2>&1 1> /dev/null");
         } elseif (($runVar['killswitch']['pp'] === false) && (time() - $runVar['timers']['timer5'] >= 4800)) {

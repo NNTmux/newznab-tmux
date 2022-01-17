@@ -15,7 +15,7 @@ class Tmux
     /**
      * @var \PDO
      */
-    public $pdo;
+    public \Closure|\PDO $pdo;
 
     /**
      * @var
@@ -25,7 +25,7 @@ class Tmux
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * Tmux constructor.
@@ -235,10 +235,10 @@ class Tmux
     }
 
     /**
-     * @param  float  $bytes
+     * @param float $bytes
      * @return string
      */
-    public function decodeSize($bytes): string
+    public function decodeSize(float $bytes): string
     {
         $types = ['B', 'KB', 'MB', 'GB', 'TB'];
         $suffix = 'B';
@@ -255,15 +255,15 @@ class Tmux
 
     /**
      * @param $pane
-     * @return string
+     * @return string|null
      */
     public function writelog($pane): ?string
     {
         $path = NN_LOGS;
-        $getdate = gmdate('Ymd');
+        $getDate = now()->format('Y_m_d');
         $logs = Settings::settingValue('site.tmux.write_logs') ?? 0;
         if ($logs === 1) {
-            return "2>&1 | tee -a $path/$pane-$getdate.log";
+            return "2>&1 | tee -a $path/$pane-$getDate.log";
         }
 
         return '';
@@ -320,9 +320,7 @@ class Tmux
      */
     public function relativeTime($_time): string
     {
-        $time = Carbon::createFromTimestamp($_time);
-
-        return $time->ago();
+        return Carbon::createFromTimestamp($_time)->ago();
     }
 
     /**
@@ -333,7 +331,7 @@ class Tmux
     {
         $returnVal = shell_exec("which $cmd 2>/dev/null");
 
-        return empty($returnVal) ? false : true;
+        return ! empty($returnVal);
     }
 
     /**
@@ -346,7 +344,7 @@ class Tmux
      *
      * @throws \Exception
      */
-    public function proc_query($qry, $bookreqids, $db_name, $ppmax = '', $ppmin = '')
+    public function proc_query($qry, $bookreqids, $db_name, $ppmax = '', $ppmin = ''): bool|string
     {
         switch ((int) $qry) {
             case 1:
@@ -471,7 +469,7 @@ class Tmux
      */
     public function stopIfRunning(): bool
     {
-        if ($this->isRunning() === true) {
+        if ($this->isRunning()) {
             Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 0]);
             $sleep = Settings::settingValue('site.tmux.monitor_delay');
             $this->colorCli->header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
@@ -489,7 +487,7 @@ class Tmux
      */
     public function startRunning(): void
     {
-        if ($this->isRunning() === false) {
+        if (! $this->isRunning()) {
             Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 1]);
         }
     }
@@ -497,7 +495,7 @@ class Tmux
     /**
      * @return array
      */
-    public function cbpmTableQuery()
+    public function cbpmTableQuery(): array
     {
         return DB::select(
             "

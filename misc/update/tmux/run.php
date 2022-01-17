@@ -7,7 +7,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
 
-$DIR = base_path().'/misc/update/tmux/';
+$tmuxPath = base_path().'/misc/update/tmux/';
 $import = Settings::settingValue('site.tmux.import') ?? 0;
 $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $seq = Settings::settingValue('site.tmux.sequential') ?? 0;
@@ -27,17 +27,17 @@ if ($session !== null) {
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-$colorCli->header('Resetting expired collections dateadded to now. This could take some time if many collections need to be reset');
+$colorCli->header('Resetting collections that have expired to this moment. This could take some time if many collections need to be reset');
 
 Collection::query()->where('dateadded', '<', now()->subHours($delaytimet))->update(['dateadded' => now()]);
 
 function writelog($pane)
 {
     $path = NN_RES.'logs';
-    $getdate = gmdate('Ymd');
+    $getDate = now()->format('Y_m_d');
     $logs = Settings::settingValue('site.tmux.write_logs');
     if ((int) $logs === 1) {
-        return "2>&1 | tee -a $path/$pane-$getdate.log";
+        return "2>&1 | tee -a $path/$pane-$getDate.log";
     }
 
     return '';
@@ -145,18 +145,18 @@ function window_optimize($tmux_session)
     exec("tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;optimize\033\"'");
 }
 
-function attach($DIR, $tmux_session)
+function attach($tmuxPath, $tmux_session)
 {
-    exec("tmux respawnp -t $tmux_session:0.0 'php ".$DIR."monitor.php'");
+    exec("tmux respawnp -t $tmux_session:0.0 'php ".$tmuxPath."monitor.php'");
     exec("tmux select-window -t $tmux_session:0; tmux attach-session -d -t $tmux_session");
 }
 
 //create tmux session
 
-$tmuxconfig = $DIR.'tmux.conf';
+$tmuxconfig = $tmuxPath.'tmux.conf';
 
 if ((int) $seq === 1) {
-    exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+    exec("cd ${tmuxPath}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_releases\033\"'");
     exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
@@ -164,18 +164,18 @@ if ((int) $seq === 1) {
     window_post($tmux_session);
     window_ircscraper($tmux_session);
     start_apps($tmux_session);
-    attach($DIR, $tmux_session);
+    attach($tmuxPath, $tmux_session);
 } elseif ((int) $seq === 2) {
-    exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+    exec("cd ${tmuxPath}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;sequential\033\"'");
     exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
     window_stripped_utilities($tmux_session);
     window_ircscraper($tmux_session);
     start_apps($tmux_session);
-    attach($DIR, $tmux_session);
+    attach($tmuxPath, $tmux_session);
 } else {
-    exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
+    exec("cd ${tmuxPath}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
     exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_binaries\033\"'");
     exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
     exec("tmux selectp -t $tmux_session:0.2; tmux splitw -t $tmux_session:0 -v -p 67 'printf \"\033]2;backfill\033\"'");
@@ -185,5 +185,5 @@ if ((int) $seq === 1) {
     window_post($tmux_session);
     window_ircscraper($tmux_session);
     start_apps($tmux_session);
-    attach($DIR, $tmux_session);
+    attach($tmuxPath, $tmux_session);
 }
