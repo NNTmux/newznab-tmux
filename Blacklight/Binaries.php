@@ -31,180 +31,180 @@ class Binaries
     /**
      * @var array
      */
-    public $blackList = [];
+    public array $blackList = [];
 
     /**
      * @var array
      */
-    public $whiteList = [];
+    public array $whiteList = [];
 
     /**
      * @var int
      */
-    public $messageBuffer;
+    public int $messageBuffer;
 
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected mixed $colorCli;
 
     /**
      * @var \Blacklight\CollectionsCleaning
      */
-    protected $_collectionsCleaning;
+    protected mixed $_collectionsCleaning;
 
     /**
      * @var \Blacklight\NNTP
      */
-    protected $_nntp;
+    protected mixed $_nntp;
 
     /**
      * Should we use header compression?
      *
      * @var bool
      */
-    protected $_compressedHeaders;
+    protected bool $_compressedHeaders;
 
     /**
      * Should we use part repair?
      *
      * @var bool
      */
-    protected $_partRepair;
+    protected bool $_partRepair;
 
     /**
-     * @var \PDO
+     * @var \Closure|\PDO
      */
-    protected $_pdo;
+    protected \Closure|\PDO $_pdo;
 
     /**
      * How many days to go back on a new group?
      *
      * @var bool
      */
-    protected $_newGroupScanByDays;
+    protected bool $_newGroupScanByDays;
 
     /**
      * How many headers to download on new groups?
      *
      * @var int
      */
-    protected $_newGroupMessagesToScan;
+    protected int $_newGroupMessagesToScan;
 
     /**
      * How many days to go back on new groups?
      *
      * @var int
      */
-    protected $_newGroupDaysToScan;
+    protected int $_newGroupDaysToScan;
 
     /**
      * How many headers to download per run of part repair?
      *
      * @var int
      */
-    protected $_partRepairLimit;
+    protected int $_partRepairLimit;
 
     /**
      * Echo to cli?
      *
      * @var bool
      */
-    protected $_echoCLI;
+    protected bool $_echoCLI;
 
     /**
      * Max tries to download headers.
      *
      * @var int
      */
-    protected $_partRepairMaxTries;
+    protected int $_partRepairMaxTries;
 
     /**
      * An array of BinaryBlacklist IDs that should have their activity date updated.
      *
-     * @var array(int)
+     * @var array
      */
-    protected $_binaryBlacklistIdsToUpdate = [];
+    protected array $_binaryBlacklistIdsToUpdate = [];
 
     /**
      * @var \DateTime
      */
-    protected $startCleaning;
+    protected \DateTime $startCleaning;
 
     /**
      * @var \DateTime
      */
-    protected $startLoop;
+    protected \DateTime $startLoop;
 
     /**
      * @var int How long it took in seconds to download headers
      */
-    protected $timeHeaders;
+    protected int $timeHeaders;
 
     /**
      * @var int How long it took in seconds to clean/parse headers
      */
-    protected $timeCleaning;
+    protected int $timeCleaning;
 
     /**
      * @var \DateTime
      */
-    protected $startPR;
+    protected \DateTime $startPR;
 
     /**
      * @var \DateTime
      */
-    protected $startUpdate;
+    protected \DateTime $startUpdate;
 
     /**
      * @var int The time it took to insert the headers
      */
-    protected $timeInsert;
+    protected int $timeInsert;
 
     /**
      * @var array the header currently being scanned
      */
-    protected $header;
+    protected array $header;
 
     /**
      * @var bool Should we add parts to part repair queue?
      */
-    protected $addToPartRepair;
+    protected bool $addToPartRepair;
 
     /**
      * @var array Numbers of Headers received from the USP
      */
-    protected $headersReceived;
+    protected array $headersReceived;
 
     /**
      * @var array The current newsgroup information being updated
      */
-    protected $groupMySQL;
+    protected array $groupMySQL;
 
     /**
      * @var int the last article number in the range
      */
-    protected $last;
+    protected int $last;
 
     /**
      * @var int the first article number in the range
      */
-    protected $first;
+    protected int $first;
 
     /**
      * @var int How many received headers were not yEnc encoded
      */
-    protected $notYEnc;
+    protected int $notYEnc;
 
     /**
      * @var int How many received headers were blacklist matched
      */
-    protected $headersBlackListed;
+    protected int $headersBlackListed;
 
     /**
      * @var array Header numbers that were not inserted
      */
-    protected $headersNotInserted;
+    protected array $headersNotInserted;
 
     /**
      * Constructor.
@@ -249,13 +249,13 @@ class Binaries
     /**
      * Download new headers for all active groups.
      *
-     * @param  int  $maxHeaders  (Optional) How many headers to download max.
+     * @param int $maxHeaders  (Optional) How many headers to download max.
      * @return void
      *
      * @throws \Exception
      * @throws \Throwable
      */
-    public function updateAllGroups($maxHeaders = 100000): void
+    public function updateAllGroups(int $maxHeaders = 100000): void
     {
         $groups = UsenetGroup::getActive();
 
@@ -307,14 +307,14 @@ class Binaries
     /**
      * Download new headers for a single group.
      *
-     * @param  array  $groupMySQL  Array of MySQL results for a single group.
-     * @param  int  $maxHeaders  (Optional) How many headers to download max.
+     * @param array $groupMySQL  Array of MySQL results for a single group.
+     * @param int $maxHeaders  (Optional) How many headers to download max.
      * @return void
      *
      * @throws \Exception
      * @throws \Throwable
      */
-    public function updateGroup($groupMySQL, $maxHeaders = 0): void
+    public function updateGroup(array $groupMySQL, int $maxHeaders = 0): void
     {
         $startGroup = now();
 
@@ -535,17 +535,17 @@ class Binaries
     /**
      * Loop over range of wanted headers, insert headers into DB.
      *
-     * @param  array  $groupMySQL  The group info from mysql.
-     * @param  int  $first  The oldest wanted header.
-     * @param  int  $last  The newest wanted header.
-     * @param  string  $type  Is this partrepair or update or backfill?
-     * @param  null|array  $missingParts  If we are running in partrepair, the list of missing article numbers.
+     * @param array $groupMySQL  The group info from mysql.
+     * @param int $first  The oldest wanted header.
+     * @param int $last  The newest wanted header.
+     * @param string $type  Is this partrepair or update or backfill?
+     * @param array|null $missingParts  If we are running in partrepair, the list of missing article numbers.
      * @return array Empty on failure.
      *
      * @throws \Exception
      * @throws \Throwable
      */
-    public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null): array
+    public function scan(array $groupMySQL, int $first, int $last, string $type = 'update', array $missingParts = null): array
     {
         // Start time of scan method and of fetching headers.
         $this->startLoop = now();
@@ -667,7 +667,7 @@ class Binaries
                 continue;
             }
 
-            if (! isset($header['Bytes']) || ! $header['Bytes']) {
+            if (empty($header['Bytes'])) {
                 $header['Bytes'] = (isset($this->header[':bytes']) ? $header[':bytes'] : 0);
             }
 
@@ -1019,10 +1019,11 @@ class Binaries
     /**
      * If we failed to insert Collections/Binaries/Parts, rollback the transaction and add the parts to part repair.
      *
-     * @param  array  $headers  Array of headers containing sub-arrays with parts.
+     * @param array $headers Array of headers containing sub-arrays with parts.
      * @return array Array of article numbers to add to part repair.
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     protected function _rollbackAddToPartRepair(array $headers): array
     {
@@ -1040,13 +1041,13 @@ class Binaries
     /**
      * Attempt to get missing article headers.
      *
-     * @param  array  $groupArr  The info for this group from mysql.
+     * @param array $groupArr  The info for this group from mysql.
      * @return void
      *
      * @throws \Exception
      * @throws \Throwable
      */
-    public function partRepair($groupArr): void
+    public function partRepair(array $groupArr): void
     {
         // Get all parts in partrepair table.
         $missingParts = [];
@@ -1168,13 +1169,13 @@ class Binaries
     /**
      * Returns unix time for an article number.
      *
-     * @param  int  $post  The article number to get the time from.
+     * @param int $post  The article number to get the time from.
      * @param  array  $groupData  Usenet group info from NNTP selectGroup method.
      * @return int Timestamp.
      *
      * @throws \Exception
      */
-    public function postdate($post, array $groupData): int
+    public function postdate(int $post, array $groupData): int
     {
         $currentPost = $post;
 
@@ -1237,13 +1238,13 @@ class Binaries
     /**
      * Returns article number based on # of days.
      *
-     * @param  int  $days  How many days back we want to go.
-     * @param  array  $data  Group data from usenet.
+     * @param int $days  How many days back we want to go.
+     * @param array $data  Group data from usenet.
      * @return string
      *
      * @throws \Exception
      */
-    public function daytopost($days, $data): string
+    public function daytopost(int $days, array $data): string
     {
         $goalTime = now()->subDays($days)->timestamp;
         // The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
@@ -1334,11 +1335,11 @@ class Binaries
     /**
      * Add article numbers from missing headers to DB.
      *
-     * @param  array  $numbers  The article numbers of the missing headers.
-     * @param  int  $groupID  The ID of this groups.
+     * @param array $numbers  The article numbers of the missing headers.
+     * @param int $groupID  The ID of this groups.
      * @return string
      */
-    private function addMissingParts($numbers, $groupID): string
+    private function addMissingParts(array $numbers, int $groupID): string
     {
         $insertStr = 'INSERT INTO missed_parts (numberid, groups_id) VALUES ';
         foreach ($numbers as $number) {
@@ -1354,18 +1355,18 @@ class Binaries
      * Clean up part repair table.
      *
      * @param  array  $numbers  The article numbers.
-     * @param  int  $groupID  The ID of the group.
+     * @param int $groupID  The ID of the group.
      * @return void
      *
      * @throws \Throwable
      */
-    private function removeRepairedParts(array $numbers, $groupID): void
+    private function removeRepairedParts(array $numbers, int $groupID): void
     {
         $sql = 'DELETE FROM missed_parts WHERE numberid in (';
         foreach ($numbers as $number) {
             $sql .= $number.',';
         }
-        DB::transaction(function () use ($groupID, $sql) {
+        DB::transaction(static function() use ($groupID, $sql) {
             DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
         }, 10);
     }
@@ -1375,15 +1376,15 @@ class Binaries
      *
      * @var array
      */
-    protected $_listsFound = [];
+    protected array $_listsFound = [];
 
     /**
      * Get blacklist and cache it. Return if already cached.
      *
-     * @param  string  $groupName
+     * @param string $groupName
      * @return void
      */
-    protected function _retrieveBlackList($groupName): void
+    protected function _retrieveBlackList(string $groupName): void
     {
         if (! isset($this->blackList[$groupName])) {
             $this->blackList[$groupName] = $this->getBlacklist(true, self::OPTYPE_BLACKLIST, $groupName, true);
@@ -1397,11 +1398,11 @@ class Binaries
     /**
      * Check if an article is blacklisted.
      *
-     * @param  array  $msg  The article header (OVER format).
-     * @param  string  $groupName  The group name.
+     * @param array $msg  The article header (OVER format).
+     * @param string $groupName  The group name.
      * @return bool
      */
-    public function isBlackListed($msg, $groupName): bool
+    public function isBlackListed(array $msg, string $groupName): bool
     {
         if (! isset($this->_listsFound[$groupName])) {
             $this->_retrieveBlackList($groupName);
@@ -1450,25 +1451,19 @@ class Binaries
     /**
      * Return all blacklists.
      *
-     * @param  bool  $activeOnly  Only display active blacklists ?
-     * @param  int|string  $opType  Optional, get white or black lists (use Binaries constants).
-     * @param  string  $groupName  Optional, group.
-     * @param  bool  $groupRegex  Optional Join groups / binaryblacklist using regexp for equals.
+     * @param bool $activeOnly  Only display active blacklists ?
+     * @param int|string $opType  Optional, get white or black lists (use Binaries constants).
+     * @param string $groupName  Optional, group.
+     * @param bool $groupRegex  Optional Join groups / binaryblacklist using regexp for equals.
      * @return array
      */
-    public function getBlacklist($activeOnly = true, $opType = -1, $groupName = '', $groupRegex = false): array
+    public function getBlacklist(bool $activeOnly = true, int|string $opType = -1, string $groupName = '', bool $groupRegex = false): array
     {
-        switch ($opType) {
-            case self::OPTYPE_BLACKLIST:
-                $opType = 'AND bb.optype = '.self::OPTYPE_BLACKLIST;
-                break;
-            case self::OPTYPE_WHITELIST:
-                $opType = 'AND bb.optype = '.self::OPTYPE_WHITELIST;
-                break;
-            default:
-                $opType = '';
-                break;
-        }
+        $opType = match ($opType) {
+            self::OPTYPE_BLACKLIST => 'AND bb.optype = '.self::OPTYPE_BLACKLIST,
+            self::OPTYPE_WHITELIST => 'AND bb.optype = '.self::OPTYPE_WHITELIST,
+            default => '',
+        };
 
         return DB::select(
             sprintf(
@@ -1490,12 +1485,10 @@ class Binaries
     }
 
     /**
-     * Return the specified blacklist.
-     *
-     * @param  int  $id  The blacklist ID.
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @param int $id
+     * @return \App\Models\BinaryBlacklist|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
-    public function getBlacklistByID($id)
+    public function getBlacklistByID(int $id)
     {
         return BinaryBlacklist::query()->where('id', $id)->first();
     }
@@ -1503,17 +1496,18 @@ class Binaries
     /**
      * Delete a blacklist.
      *
-     * @param  int  $id  The ID of the blacklist.
+     * @param int $id  The ID of the blacklist.
      */
-    public function deleteBlacklist($id): void
+    public function deleteBlacklist(int $id): void
     {
         BinaryBlacklist::query()->where('id', $id)->delete();
     }
 
     /**
-     * @param $blacklistArray
+     * @param array $blacklistArray
+     * @return void
      */
-    public function updateBlacklist($blacklistArray): void
+    public function updateBlacklist(array $blacklistArray): void
     {
         BinaryBlacklist::query()->where('id', $blacklistArray['id'])->update(
             [
@@ -1530,9 +1524,9 @@ class Binaries
     /**
      * Adds a new blacklist from binary blacklist edit admin web page.
      *
-     * @param  array  $blacklistArray
+     * @param array $blacklistArray
      */
-    public function addBlacklist($blacklistArray): void
+    public function addBlacklist(array $blacklistArray): void
     {
         BinaryBlacklist::query()->insert(
             [
@@ -1549,7 +1543,7 @@ class Binaries
     /**
      * Delete Collections/Binaries/Parts for a Collection ID.
      *
-     * @param  int  $collectionID  Collections table ID
+     * @param int $collectionID  Collections table ID
      *
      * @note A trigger automatically deletes the parts/binaries.
      *
@@ -1557,9 +1551,9 @@ class Binaries
      *
      * @throws \Throwable
      */
-    public function delete($collectionID): void
+    public function delete(int $collectionID): void
     {
-        DB::transaction(function () use ($collectionID) {
+        DB::transaction(static function () use ($collectionID) {
             DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
         }, 10);
     }
@@ -1567,11 +1561,11 @@ class Binaries
     /**
      * Log / Echo message.
      *
-     * @param  string  $message  Message to log.
-     * @param  string  $method  Method that called this.
-     * @param  string  $color  ColorCLI method name.
+     * @param string $message  Message to log.
+     * @param string $method  Method that called this.
+     * @param string $color  ColorCLI method name.
      */
-    private function log($message, $method, $color): void
+    private function log(string $message, string $method, string $color): void
     {
         if ($this->_echoCLI) {
             $this->colorCli->$color($message.' ['.__CLASS__."::$method]");
@@ -1581,11 +1575,11 @@ class Binaries
     /**
      * Check if we should ignore the file count and return true or false.
      *
-     * @param  string  $groupName
-     * @param  string  $subject
+     * @param string $groupName
+     * @param string $subject
      * @return bool
      */
-    protected function _ignoreFileCount($groupName, $subject): bool
+    protected function _ignoreFileCount(string $groupName, string $subject): bool
     {
         $ignore = false;
         if (($groupName === 'alt.binaries.erotica') && preg_match('/^\[\d+\]-\[FULL\]-\[#a\.b\.erotica@EFNet\]-\[ \d{2,3}_/', $subject)) {
@@ -1599,7 +1593,7 @@ class Binaries
      * @param $query
      * @return bool
      */
-    protected function runQuery($query)
+    protected function runQuery($query): bool
     {
         try {
             return DB::insert($query);
