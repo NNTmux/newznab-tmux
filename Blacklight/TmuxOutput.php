@@ -125,6 +125,7 @@ class TmuxOutput extends Tmux
 
     /**
      * @return string
+     *
      * @throws \CzProject\GitPhp\GitException
      */
     protected function _getHeader(): string

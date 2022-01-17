@@ -235,7 +235,7 @@ class Tmux
     }
 
     /**
-     * @param float $bytes
+     * @param  float  $bytes
      * @return string
      */
     public function decodeSize(float $bytes): string
