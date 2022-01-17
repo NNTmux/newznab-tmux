@@ -1366,7 +1366,7 @@ class Binaries
         foreach ($numbers as $number) {
             $sql .= $number.',';
         }
-        DB::transaction(static function() use ($groupID, $sql) {
+        DB::transaction(static function () use ($groupID, $sql) {
             DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
         }, 10);
     }
