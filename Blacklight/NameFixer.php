@@ -533,12 +533,12 @@ class NameFixer
     /**
      * Attempts to fix release names using the Par2 File.
      *
-     * @param int $time  1: 24 hours, 2: no time limit
-     * @param int $echo  1: change the name, anything else: preview of what could have been changed.
-     * @param int $cats  1: other categories, 2: all categories
+     * @param  int  $time  1: 24 hours, 2: no time limit
+     * @param  int  $echo  1: change the name, anything else: preview of what could have been changed.
+     * @param  int  $cats  1: other categories, 2: all categories
      * @param  $nameStatus
      * @param  $show
-     * @param NNTP $nntp
+     * @param  NNTP  $nntp
      *
      * @throws \Exception
      */
@@ -821,7 +821,7 @@ class NameFixer
      * @param $time
      * @param $cats
      * @param $query
-     * @param int $limit
+     * @param  int  $limit
      * @return false|\Illuminate\Database\Eloquent\Collection
      */
     protected function _getReleases($time, $cats, $query, int $limit = 0): \Illuminate\Database\Eloquent\Collection|bool
@@ -848,8 +848,8 @@ class NameFixer
     /**
      * Echo the amount of releases that found a new name.
      *
-     * @param bool|int $echo  1: change the name, anything else: preview of what could have been changed.
-     * @param string $type  The function type that found the name.
+     * @param  bool|int  $echo  1: change the name, anything else: preview of what could have been changed.
+     * @param  string  $type  The function type that found the name.
      */
     protected function _echoFoundCount(bool|int $echo, string $type): void
     {
@@ -873,8 +873,8 @@ class NameFixer
     }
 
     /**
-     * @param int $time  1: 24 hours, 2: no time limit
-     * @param string $type  The function type.
+     * @param  int  $time  1: 24 hours, 2: no time limit
+     * @param  string  $type  The function type.
      */
     protected function _echoStartMessage(int $time, string $type): void
     {
@@ -888,7 +888,7 @@ class NameFixer
     }
 
     /**
-     * @param int $show
+     * @param  int  $show
      */
     protected function _echoRenamed(int $show): void
     {
@@ -1181,6 +1181,7 @@ class NameFixer
     /**
      * @param $preTitle
      * @return string
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -1271,9 +1272,9 @@ class NameFixer
      * Match a release filename to a PreDB filename or title.
      *
      * @param  $release
-     * @param bool $echo
-     * @param int $nameStatus
-     * @param bool $show
+     * @param  bool  $echo
+     * @param  int  $nameStatus
+     * @param  bool  $show
      * @return int
      *
      * @throws \Exception
@@ -1346,7 +1347,7 @@ class NameFixer
     /**
      * Match a Hash from the predb to a release.
      *
-     * @param string $hash
+     * @param  string  $hash
      * @param  $release
      * @param  $echo
      * @param  $nameStatus
@@ -1464,11 +1465,11 @@ class NameFixer
      * Check the array using regex for a clean name.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
-     * @param int $nameStatus
-     * @param bool $show
-     * @param bool $preId
+     * @param  bool  $echo
+     * @param  string  $type
+     * @param  int  $nameStatus
+     * @param  bool  $show
+     * @param  bool  $preId
      * @return bool
      *
      * @throws \Exception
@@ -1561,9 +1562,9 @@ class NameFixer
      *  The first parameter is the column to update, the second is the value
      *  The final parameter is the ID of the release to update.
      *
-     * @param string $column
-     * @param int $status
-     * @param int $id
+     * @param  string  $column
+     * @param  int  $status
+     * @param  int  $id
      */
     public function _updateSingleColumn(string $column = '', int $status = 0, int $id = 0): void
     {
@@ -1610,8 +1611,8 @@ class NameFixer
      * Look for a movie name.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1656,8 +1657,8 @@ class NameFixer
      * Look for a game name.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1686,8 +1687,8 @@ class NameFixer
      * Look for a app name.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1710,8 +1711,8 @@ class NameFixer
      * TV.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1734,8 +1735,8 @@ class NameFixer
      * Movies.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1758,8 +1759,8 @@ class NameFixer
 
     /**
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1779,8 +1780,8 @@ class NameFixer
      * Title (year).
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1956,8 +1957,8 @@ class NameFixer
      * Games.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -1986,8 +1987,8 @@ class NameFixer
      * Misc.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      *
@@ -2027,8 +2028,8 @@ class NameFixer
      * Just for filenames.
      *
      * @param  $release
-     * @param bool $echo
-     * @param string $type
+     * @param  bool  $echo
+     * @param  string  $type
      * @param  $nameStatus
      * @param  $show
      * @return bool
@@ -2431,7 +2432,7 @@ class NameFixer
     }
 
     /**
-     * @param string $fileName
+     * @param  string  $fileName
      * @return array
      */
     private function preMatch(string $fileName): array
