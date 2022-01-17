@@ -2,6 +2,8 @@
 
 namespace Blacklight;
 
+use JetBrains\PhpStorm\ArrayShape;
+
 /**
  * Cleans names for collections/imports/namefixer.
  *
@@ -53,32 +55,32 @@ class CollectionsCleaning
     /**
      * @var string
      */
-    public $e0;
+    public string $e0;
 
     /**
      * @var string
      */
-    public $e1;
+    public string $e1;
 
     /**
      * @var string
      */
-    public $e2;
+    public string $e2;
 
     /**
      * @var string
      */
-    public $groupName = '';
+    public string $groupName = '';
 
     /**
      * @var string
      */
-    public $subject = '';
+    public string $subject = '';
 
     /**
      * @var \Blacklight\Regexes
      */
-    protected $_regexes;
+    protected Regexes $_regexes;
 
     /**
      * CollectionsCleaning constructor.
@@ -96,13 +98,13 @@ class CollectionsCleaning
     }
 
     /**
-     * @param  string  $subject
-     * @param  string  $groupName
+     * @param string $subject
+     * @param string $groupName
      * @return array
      *
      * @throws \Exception
      */
-    public function collectionsCleaner($subject, $groupName = ''): array
+    public function collectionsCleaner(string $subject, string $groupName = ''): array
     {
         $this->subject = $subject;
         $this->groupName = $groupName;
@@ -130,15 +132,18 @@ class CollectionsCleaning
         // For non music groups.
         if (! preg_match('/\.(flac|lossless|mp3|music|sounds)/', $this->groupName)) {
             // File/part count.
-            $cleanSubject = preg_replace('/((( \(\d\d\) -|(\d\d)? - \d\d\.|\d{4} \d\d -) | - \d\d-| \d\d\. [a-z]).+| \d\d of \d\d| \dof\d)\.mp3"?|([\)\(\[\s])\d{1,5}(\/|([\s_])of([\s_])|-)\d{1,5}([\)\]\s$:])|\(\d{1,3}\|\d{1,3}\)|[^\d]{4}-\d{1,3}-\d{1,3}\.|\s\d{1,3}\sof\s\d{1,3}\.|\s\d{1,3}\/\d{1,3}|\d{1,3}of\d{1,3}\.|^\d{1,3}\/\d{1,3}\s|\d{1,3} - of \d{1,3}/i', ' ', $this->subject);
             // File extensions.
-            $cleanSubject = preg_replace('/'.$this->e0.'/i', ' ', $cleanSubject);
             // File extensions - If it was not in quotes.
-            $cleanSubject = preg_replace('/(-? [a-z0-9]+-?|\(?\d{4}\)?([_-])[a-z0-9]+)\.jpg"?| [a-z0-9]+\.mu3"?|((\d{1,3})?\.part(\d{1,5})?|\d{1,5} ?|sample|- Partie \d+)?\.(7z|\d{3}(?=([\s"]))|avi|diz|docx?|epub|idx|iso|jpg|m3u|m4a|mds|mkv|mobi|mp4|nfo|nzb|par(\s?2|")|pdf|rar|rev|rtf|r\d\d|sfv|srs|srr|sub|txt|vol.+(par2)|xls|zip|z{2,3})"?|(\s|(\d{2,3})?-)\d{2,3}\.mp3|\d{2,3}\.pdf|\.part\d{1,4}\./i', ' ', $cleanSubject);
             // File Sizes - Non unique ones.
-            $cleanSubject = preg_replace('/\d{1,3}([,\.\/])\d{1,3}\s([kmg])b|(\])?\s\d+KB\s(yENC)?|"?\s\d+\sbytes?|[- ]?\d+([\.,])?\d+\s([gkm])?B\s-?(\s?yenc)?|\s\(d{1,3},\d{1,3}\s{K,M,G}B\)\s|yEnc \d+k$|{\d+ yEnc bytes}|yEnc \d+ |\(\d+ ?([kmg])?b(ytes)?\) yEnc$/i', ' ', $cleanSubject);
             // Random stuff.
-            $cleanSubject = preg_replace('/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |part\d+/i', ' ', $cleanSubject);
+            $cleanSubject = preg_replace([
+                '/\d{1,3}([,\.\/])\d{1,3}\s([kmg])b|(\])?\s\d+KB\s(yENC)?|"?\s\d+\sbytes?|[- ]?\d+([\.,])?\d+\s([gkm])?B\s-?(\s?yenc)?|\s\(d{1,3},\d{1,3}\s{K,M,G}B\)\s|yEnc \d+k$|{\d+ yEnc bytes}|yEnc \d+ |\(\d+ ?([kmg])?b(ytes)?\) yEnc$/i',
+                '/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |part\d+/i',
+                '/((( \(\d\d\) -|(\d\d)? - \d\d\.|\d{4} \d\d -) | - \d\d-| \d\d\. [a-z]).+| \d\d of \d\d| \dof\d)\.mp3"?|([\)\(\[\s])\d{1,5}(\/|([\s_])of([\s_])|-)\d{1,5}([\)\]\s$:])|\(\d{1,3}\|\d{1,3}\)|[^\d]{4}-\d{1,3}-\d{1,3}\.|\s\d{1,3}\sof\s\d{1,3}\.|\s\d{1,3}\/\d{1,3}|\d{1,3}of\d{1,3}\.|^\d{1,3}\/\d{1,3}\s|\d{1,3} - of \d{1,3}/i',
+                '/(-? [a-z0-9]+-?|\(?\d{4}\)?([_-])[a-z0-9]+)\.jpg"?| [a-z0-9]+\.mu3"?|((\d{1,3})?\.part(\d{1,5})?|\d{1,5} ?|sample|- Partie \d+)?\.(7z|\d{3}(?=([\s"]))|avi|diz|docx?|epub|idx|iso|jpg|m3u|m4a|mds|mkv|mobi|mp4|nfo|nzb|par(\s?2|")|pdf|rar|rev|rtf|r\d\d|sfv|srs|srr|sub|txt|vol.+(par2)|xls|zip|z{2,3})"?|(\s|(\d{2,3})?-)\d{2,3}\.mp3|\d{2,3}\.pdf|\.part\d{1,4}\./i',
+                '/'.$this->e0.'/i'
+            ], ' ', $this->subject);
+
             // Multi spaces.
             return [
                 'id'   => self::REGEX_GENERIC_MATCH,
@@ -156,15 +161,17 @@ class CollectionsCleaning
             // Parts/files
         }
 
-        $cleanSubject = preg_replace('/((( \(\d\d\) -|(\d\d)? - \d\d\.|\d{4} \d\d -) | - \d\d-| \d\d\. [a-z]).+| \d\d of \d\d| \dof\d)\.mp3"?|([\(\[\s])\d{1,4}(\/|([\s_])of([\s_])|-)\d{1,4}([\)\]\s$:])|\(\d{1,3}\|\d{1,3}\)|-\d{1,3}-\d{1,3}\.|\s\d{1,3}\sof\s\d{1,3}\.|\s\d{1,3}\/\d{1,3}|\d{1,3}of\d{1,3}\.|^\d{1,3}\/\d{1,3}\s|\d{1,3} - of \d{1,3}/i', ' ', $this->subject);
         // Anything between the quotes. Too much variance within the quotes, so remove it completely.
-        $cleanSubject = preg_replace('/".+"/i', ' ', $cleanSubject);
         // File extensions - If it was not in quotes.
-        $cleanSubject = preg_replace('/(-? [a-z0-9]+-?|\(?\d{4}\)?([_-])[a-z0-9]+)\.jpg"?| [a-z0-9]+\.mu3"?|((\d{1,3})?\.part(\d{1,5})?|\d{1,5} ?|sample|- Partie \d+)?\.(7z|\d{3}(?=([\s"]))|avi|diz|docx?|epub|idx|iso|jpg|m3u|m4a|mds|mkv|mobi|mp4|nfo|nzb|par(\s?2|")|pdf|rar|rev|rtf|r\d\d|sfv|srs|srr|sub|txt|vol.+(par2)|xls|zip|z{2,3})"?|(\s|(\d{2,3})?-)\d{2,3}\.mp3|\d{2,3}\.pdf|\.part\d{1,4}\./i', ' ', $cleanSubject);
         // File Sizes - Non unique ones.
-        $cleanSubject = preg_replace('/\d{1,3}([,\.\/])\d{1,3}\s([kmg])b|(\])?\s\d+KB\s(yENC)?|"?\s\d+\sbytes?|[- ]?\d+[.,]?\d+\s([gkm])?B\s-?(\s?yenc)?|\s\(d{1,3},\d{1,3}\s{K,M,G}B\)\s|yEnc \d+k$|{\d+ yEnc bytes}|yEnc \d+ |\(\d+ ?([kmg])?b(ytes)?\) yEnc$/i', ' ', $cleanSubject);
         // Random stuff.
-        $cleanSubject = preg_replace('/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |part\d+/i', ' ', $cleanSubject);
+        $cleanSubject = preg_replace([
+            '/((( \(\d\d\) -|(\d\d)? - \d\d\.|\d{4} \d\d -) | - \d\d-| \d\d\. [a-z]).+| \d\d of \d\d| \dof\d)\.mp3"?|([\(\[\s])\d{1,4}(\/|([\s_])of([\s_])|-)\d{1,4}([\)\]\s$:])|\(\d{1,3}\|\d{1,3}\)|-\d{1,3}-\d{1,3}\.|\s\d{1,3}\sof\s\d{1,3}\.|\s\d{1,3}\/\d{1,3}|\d{1,3}of\d{1,3}\.|^\d{1,3}\/\d{1,3}\s|\d{1,3} - of \d{1,3}/i',
+            '/".+"/i',
+            '/(-? [a-z0-9]+-?|\(?\d{4}\)?([_-])[a-z0-9]+)\.jpg"?| [a-z0-9]+\.mu3"?|((\d{1,3})?\.part(\d{1,5})?|\d{1,5} ?|sample|- Partie \d+)?\.(7z|\d{3}(?=([\s"]))|avi|diz|docx?|epub|idx|iso|jpg|m3u|m4a|mds|mkv|mobi|mp4|nfo|nzb|par(\s?2|")|pdf|rar|rev|rtf|r\d\d|sfv|srs|srr|sub|txt|vol.+(par2)|xls|zip|z{2,3})"?|(\s|(\d{2,3})?-)\d{2,3}\.mp3|\d{2,3}\.pdf|\.part\d{1,4}\./i',
+            '/\d{1,3}([,\.\/])\d{1,3}\s([kmg])b|(\])?\s\d+KB\s(yENC)?|"?\s\d+\sbytes?|[- ]?\d+[.,]?\d+\s([gkm])?B\s-?(\s?yenc)?|\s\(d{1,3},\d{1,3}\s{K,M,G}B\)\s|yEnc \d+k$|{\d+ yEnc bytes}|yEnc \d+ |\(\d+ ?([kmg])?b(ytes)?\) yEnc$/i',
+            '/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |part\d+/i'
+        ], ' ', $this->subject);
         // Multi spaces.
         $cleanSubject = utf8_encode(trim(preg_replace('/\s\s+/i', ' ', $cleanSubject)));
         // If the subject is too similar to another because it is so short, try to extract info from the subject.
@@ -183,8 +190,7 @@ class CollectionsCleaning
                     $start++;
                 }
             }
-            $newName = preg_replace('/".+?"/', '', $this->subject);
-            $newName = preg_replace('/[a-z0-9]|'.$this->e0.'/i', '', $newName);
+            $newName = preg_replace(['/".+?"/', '/[a-z0-9]|'.$this->e0.'/i'], '', $this->subject);
 
             return [
                 'id'   => self::REGEX_MUSIC_MATCH,
@@ -201,7 +207,7 @@ class CollectionsCleaning
     /**
      * @return string|false
      */
-    protected function musicSubject()
+    protected function musicSubject(): bool|string
     {
         //Broderick_Smith-Unknown_Country-2009-404 "00-broderick_smith-unknown_country-2009.sfv" yEnc
         if (preg_match('/^(\w{10,}-[a-zA-Z0-9]+ ")\d\d-.+?" yEnc$/', $this->subject, $hit)) {
