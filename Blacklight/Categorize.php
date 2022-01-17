@@ -80,8 +80,8 @@ class Categorize
      * Returns Category::OTHER_MISC if no category is appropriate.
      *
      * @param  $groupId
-     * @param string $releaseName
-     * @param string $poster
+     * @param  string  $releaseName
+     * @param  string  $poster
      * @return array
      *
      * @throws \Exception
@@ -1442,9 +1442,9 @@ class Categorize
     }
 
     /**
-     * @param string $regex  Regex to use for match
-     * @param string $fromName  Poster that needs to be matched by regex
-     * @param string $category  Category to set if there is a match
+     * @param  string  $regex  Regex to use for match
+     * @param  string  $fromName  Poster that needs to be matched by regex
+     * @param  string  $category  Category to set if there is a match
      * @return bool
      */
     public function checkPoster(string $regex, string $fromName, string $category): bool
