@@ -96,8 +96,8 @@ class CollectionsCleaning
     }
 
     /**
-     * @param string $subject
-     * @param string $groupName
+     * @param  string  $subject
+     * @param  string  $groupName
      * @return array
      *
      * @throws \Exception
