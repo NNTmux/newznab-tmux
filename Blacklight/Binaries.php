@@ -279,7 +279,6 @@ class Binaries
                     __FUNCTION__,
                     'header'
                 );
-                dump($group, $maxHeaders);
                 $this->updateGroup($group, $maxHeaders);
                 $counter++;
             }
@@ -319,8 +318,7 @@ class Binaries
      */
     public function updateGroup(array $groupMySQL, int $maxHeaders = 0): void
     {
-
-        dump($groupMySQL, $maxHeaders);
+        
         $startGroup = now();
         $this->logIndexerStart();
 

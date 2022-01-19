@@ -14,8 +14,9 @@ use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\NNTP;
 
-$namefixer = new NameFixer();
+$nameFixer = new NameFixer();
 $colorCli = new ColorCLI();
+$nntp = new NNTP();
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     $update = $argv[2] === 'true';
@@ -28,10 +29,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     $setStatus = $argv[4] === 'yes' ? 1 : 2;
 
     $show = isset($argv[5]) && $argv[5] === 'show' ? 1 : 2;
-
-    $nntp = null;
     if ($argv[1] === 7 || $argv[1] === 8) {
-        $nntp = new NNTP();
         if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
             $colorCli->error('Unable to connect to usenet.');
 
@@ -41,64 +39,64 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
 
     switch ($argv[1]) {
         case 1:
-            $namefixer->parseTitles(1, $update, $other, $setStatus, $show);
+            $nameFixer->parseTitles(1, $update, $other, $setStatus, $show);
             break;
         case 2:
-            $namefixer->parseTitles(2, $update, $other, $setStatus, $show);
+            $nameFixer->parseTitles(2, $update, $other, $setStatus, $show);
             break;
         case 3:
-            $namefixer->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
             break;
         case 4:
-            $namefixer->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
             break;
         case 5:
-            $namefixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
             break;
         case 6:
-            $namefixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
             break;
         case 7:
-            $namefixer->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
+            $nameFixer->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
             break;
         case 8:
-            $namefixer->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
+            $nameFixer->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
             break;
         case 9:
-            $namefixer->fixNamesWithMedia(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithMedia(1, $update, $other, $setStatus, $show);
             break;
         case 10:
-            $namefixer->fixNamesWithMedia(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithMedia(2, $update, $other, $setStatus, $show);
             break;
         case 11:
-            $namefixer->fixXXXNamesWithFiles(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixXXXNamesWithFiles(1, $update, $other, $setStatus, $show);
             break;
         case 12:
-            $namefixer->fixXXXNamesWithFiles(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixXXXNamesWithFiles(2, $update, $other, $setStatus, $show);
             break;
         case 13:
-            $namefixer->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
             break;
         case 14:
-            $namefixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
             break;
         case 15:
-            $namefixer->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
             break;
         case 16:
-            $namefixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
             break;
         case 17:
-            $namefixer->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
             break;
         case 18:
-            $namefixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
             break;
         case 19:
-            $namefixer->fixNamesWithCrc(1, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithCrc(1, $update, $other, $setStatus, $show);
             break;
         case 20:
-            $namefixer->fixNamesWithCrc(2, $update, $other, $setStatus, $show);
+            $nameFixer->fixNamesWithCrc(2, $update, $other, $setStatus, $show);
             break;
         default:
             $colorCli->error(PHP_EOL.'ERROR: Wrong argument, type php $argv[0] to see a list of valid arguments.');
