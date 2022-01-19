@@ -131,7 +131,7 @@ class Forking
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : Nfo::NFO_UNPROC;
-        $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
+        $this->maxRetries = max($this->maxRetries, -8);
     }
 
     /**
@@ -314,7 +314,7 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            })->catch(function (SerializableException $serializableException) {
+            })->catch(static function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
             });
             $maxWork--;
@@ -322,7 +322,10 @@ class Forking
         $pool->wait();
     }
 
-    private function safeBackfill()
+    /**
+     * @return void
+     */
+    private function safeBackfill(): void
     {
         $backfill_qty = (int) Settings::settingValue('site.tmux.backfill_qty');
         $backfill_order = (int) Settings::settingValue('site.tmux.backfill_order');
@@ -409,7 +412,7 @@ class Forking
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
-                })->catch(function (SerializableException $serializableException) {
+                })->catch(static function (SerializableException $serializableException) {
                     //we do nothing here just catch the error and move on
                 });
             }
@@ -421,7 +424,7 @@ class Forking
     //////////////////////////////////////// All binaries code here ////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private function binaries()
+    private function binaries(): void
     {
         $this->work = DB::select(
             sprintf(
@@ -445,7 +448,7 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            })->catch(function (SerializableException $serializableException) {
+            })->catch(static function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
             });
             $maxWork--;
@@ -516,7 +519,7 @@ class Forking
                     }
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
-                })->catch(function (SerializableException $serializableException) {
+                })->catch(static function (SerializableException $serializableException) {
                     //we do nothing here just catch the error and move on
                 });
             }
@@ -529,7 +532,7 @@ class Forking
     //////////////////////////////////// All fix release names code here ///////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private function fixRelNames()
+    private function fixRelNames(): void
     {
         $this->maxProcesses = (int) Settings::settingValue('..fixnamethreads');
         $maxperrun = (int) Settings::settingValue('..fixnamesperrun');
@@ -586,7 +589,7 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            })->catch(function (SerializableException $serializableException) {
+            })->catch(static function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
             });
             $maxWork--;
@@ -598,7 +601,7 @@ class Forking
     //////////////////////////////////////// All releases code here ////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private function releases()
+    private function releases(): void
     {
         $work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
         $this->maxProcesses = (int) Settings::settingValue('..releasethreads');
@@ -632,7 +635,7 @@ class Forking
                 $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            })->catch(function (SerializableException $serializableException) {
+            })->catch(static function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
             });
             $maxWork--;
@@ -649,10 +652,10 @@ class Forking
      * Only 1 exit method is used for post process, since they are all similar.
      *
      *
-     * @param  array  $releases
-     * @param  int  $maxProcess
+     * @param array $releases
+     * @param int $maxProcess
      */
-    public function postProcess($releases, $maxProcess)
+    public function postProcess(array $releases, int $maxProcess): void
     {
         $type = $desc = '';
         if ($this->processAdditional) {
@@ -680,7 +683,7 @@ class Forking
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
-                })->catch(function (SerializableException $serializableException) {
+                })->catch(static function (SerializableException $serializableException) {
                     //we do nothing here just catch the error and move on
                 })->timeout(function () use ($count) {
                     $this->colorCli->notice('Task #'.$count.': Timeout occurred.');
@@ -694,7 +697,7 @@ class Forking
     /**
      * @throws \Exception
      */
-    private function postProcessAdd()
+    private function postProcessAdd(): void
     {
         $ppAddMinSize = Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
         $ppAddMinSize = ($ppAddMinSize > 0 ? ('AND r.size > '.($ppAddMinSize * 1048576)) : '');
@@ -728,7 +731,10 @@ class Forking
         $this->postProcess($this->work, $this->maxProcesses);
     }
 
-    private $nfoQueryString = '';
+    /**
+     * @var string
+     */
+    private string $nfoQueryString = '';
 
     /**
      * Check if we should process NFO's.
@@ -751,7 +757,7 @@ class Forking
     /**
      * @throws \Exception
      */
-    private function postProcessNfo()
+    private function postProcessNfo(): void
     {
         $this->maxProcesses = 1;
         if ($this->checkProcessNfo()) {
@@ -797,7 +803,7 @@ class Forking
     /**
      * @throws \Exception
      */
-    private function postProcessMov()
+    private function postProcessMov(): void
     {
         $this->maxProcesses = 1;
         if ($this->checkProcessMovies()) {
@@ -832,7 +838,7 @@ class Forking
      *
      * @throws \Exception
      */
-    private function checkProcessTV()
+    private function checkProcessTV(): bool
     {
         if ((int) Settings::settingValue('..lookuptvrage') > 0) {
             return DB::select(sprintf('
@@ -852,7 +858,7 @@ class Forking
     /**
      * @throws \Exception
      */
-    private function postProcessTv()
+    private function postProcessTv(): void
     {
         $this->maxProcesses = 1;
         if ($this->checkProcessTV()) {
@@ -888,7 +894,7 @@ class Forking
      *
      * @throws \Exception
      */
-    private function processSharing()
+    private function processSharing(): bool
     {
         $sharing = DB::select('SELECT enabled FROM sharing');
         if ($sharing > 0 && (int) $sharing[0]->enabled === 1) {
@@ -908,7 +914,7 @@ class Forking
      *
      * @throws \Exception
      */
-    private function processSingle()
+    private function processSingle(): void
     {
         $postProcess = new PostProcess(['ColorCLI' => $this->colorCli]);
         //$postProcess->processAnime();
@@ -926,7 +932,7 @@ class Forking
     /**
      * @throws \Exception
      */
-    private function updatePerGroup()
+    private function updatePerGroup(): void
     {
         $this->work = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
@@ -943,7 +949,7 @@ class Forking
                 $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
-            })->catch(function (SerializableException $serializableException) {
+            })->catch(static function (SerializableException $serializableException) {
                 //we do nothing here just catch the error and move on
             });
         }
@@ -958,10 +964,10 @@ class Forking
     /**
      * Execute a shell command.
      *
-     * @param  string  $command
+     * @param string $command
      * @return string
      */
-    protected function _executeCommand($command)
+    protected function _executeCommand(string $command): string
     {
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(1800);
@@ -977,9 +983,9 @@ class Forking
     /**
      * Echo a message to CLI.
      *
-     * @param  string  $message
+     * @param string $message
      */
-    public function logger($message)
+    public function logger(string $message): void
     {
         if (config('nntmux.echocli')) {
             echo $message.PHP_EOL;
@@ -989,9 +995,9 @@ class Forking
     /**
      * This method is executed whenever a child is finished doing work.
      *
-     * @param  string  $pid  The PID numbers.
+     * @param string $pid  The PID numbers.
      */
-    public function exit($pid)
+    public function exit(string $pid): void
     {
         if (config('nntmux.echocli')) {
             $this->colorCli->header(

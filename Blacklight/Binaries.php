@@ -226,6 +226,8 @@ class Binaries
         ];
         $options += $defaults;
 
+        $this->startUpdate = now();
+
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->_pdo = DB::connection()->getPdo();
@@ -257,7 +259,7 @@ class Binaries
      */
     public function updateAllGroups(int $maxHeaders = 100000): void
     {
-        $groups = UsenetGroup::getActive();
+        $groups = UsenetGroup::getActive()->toArray();
 
         $groupCount = \count($groups);
         if ($groupCount > 0) {
@@ -277,6 +279,7 @@ class Binaries
                     __FUNCTION__,
                     'header'
                 );
+                dump($group, $maxHeaders);
                 $this->updateGroup($group, $maxHeaders);
                 $counter++;
             }
@@ -316,8 +319,9 @@ class Binaries
      */
     public function updateGroup(array $groupMySQL, int $maxHeaders = 0): void
     {
-        $startGroup = now();
 
+        dump($groupMySQL, $maxHeaders);
+        $startGroup = now();
         $this->logIndexerStart();
 
         // Select the group on the NNTP server, gets the latest info on it.
