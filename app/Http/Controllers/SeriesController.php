@@ -16,7 +16,7 @@ class SeriesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function index($id = '', Request $request)
+    public function index(Request $request, $id = '')
     {
         $this->setPrefs();
         $releases = new Releases();
