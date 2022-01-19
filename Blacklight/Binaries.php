@@ -227,6 +227,7 @@ class Binaries
         $options += $defaults;
 
         $this->startUpdate = now();
+        $this->timeCleaning = 0;
 
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
