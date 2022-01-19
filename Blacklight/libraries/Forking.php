@@ -652,8 +652,8 @@ class Forking
      * Only 1 exit method is used for post process, since they are all similar.
      *
      *
-     * @param array $releases
-     * @param int $maxProcess
+     * @param  array  $releases
+     * @param  int  $maxProcess
      */
     public function postProcess(array $releases, int $maxProcess): void
     {
@@ -964,7 +964,7 @@ class Forking
     /**
      * Execute a shell command.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     protected function _executeCommand(string $command): string
@@ -983,7 +983,7 @@ class Forking
     /**
      * Echo a message to CLI.
      *
-     * @param string $message
+     * @param  string  $message
      */
     public function logger(string $message): void
     {
@@ -995,7 +995,7 @@ class Forking
     /**
      * This method is executed whenever a child is finished doing work.
      *
-     * @param string $pid  The PID numbers.
+     * @param  string  $pid  The PID numbers.
      */
     public function exit(string $pid): void
     {
