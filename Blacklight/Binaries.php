@@ -319,7 +319,6 @@ class Binaries
      */
     public function updateGroup(array $groupMySQL, int $maxHeaders = 0): void
     {
-
         dump($groupMySQL, $maxHeaders);
         $startGroup = now();
         $this->logIndexerStart();
