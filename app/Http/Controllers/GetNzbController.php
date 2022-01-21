@@ -73,7 +73,7 @@ class GetNzbController extends BasePageController
                 Utility::showApiError(501);
             }
 
-            $zip = getZipped($guids);
+            $zip = getStreamingZip($guids);
             if ($zip !== '') {
                 User::incrementGrabs($uid, \count($guids));
                 foreach ($guids as $guid) {
@@ -85,7 +85,7 @@ class GetNzbController extends BasePageController
                     }
                 }
 
-                return response()->download($zip, now()->format('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/zip'])->deleteFileAfterSend(true);
+                return $zip;
             }
 
             return response()->json(['message' => 'Unable to create .zip file'], 404);
