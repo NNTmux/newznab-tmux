@@ -548,8 +548,8 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $groupID
-     * @param string $guidChar
+     * @param  string  $groupID
+     * @param  string  $guidChar
      *
      * @throws \Exception
      */
@@ -581,7 +581,7 @@ class ProcessAdditional
 
     /**
      * @param $guidChar
-     * @param string $groupID
+     * @param  string  $groupID
      *
      * @throws \RuntimeException
      * @throws \Exception
@@ -638,8 +638,8 @@ class ProcessAdditional
     /**
      * Get all releases that need to be processed.
      *
-     * @param int|string $groupID
-     * @param string $guidChar
+     * @param  int|string  $groupID
+     * @param  string  $guidChar
      *
      * @void
      */
@@ -771,8 +771,8 @@ class ProcessAdditional
     /**
      * Deletes files and folders recursively.
      *
-     * @param string $path  Path to a folder or file.
-     * @param string[] $ignoredFolders  array with paths to folders to ignore.
+     * @param  string  $path  Path to a folder or file.
+     * @param  string[]  $ignoredFolders  array with paths to folders to ignore.
      *
      * @void
      */
@@ -960,7 +960,7 @@ class ProcessAdditional
     protected array $_triedCompressedMids = [];
 
     /**
-     * @param bool $reverse
+     * @param  bool  $reverse
      *
      * @throws \Exception
      */
@@ -1056,7 +1056,7 @@ class ProcessAdditional
     /**
      * Check if the data is a ZIP / RAR file, extract files, get file info.
      *
-     * @param string $compressedData
+     * @param  string  $compressedData
      * @return bool
      *
      * @throws \Exception
@@ -1665,8 +1665,8 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $pattern
-     * @param string $path
+     * @param  string  $pattern
+     * @param  string  $path
      * @return bool|string|\Symfony\Component\Finder\SplFileInfo[]
      */
     protected function _getTempDirectoryContents(string $pattern = '', string $path = '')
@@ -1878,7 +1878,7 @@ class ProcessAdditional
     /**
      * Try to get JPG picture, resize it and store it on disk.
      *
-     * @param string $fileLocation
+     * @param  string  $fileLocation
      */
     protected function _getJPGSample(string $fileLocation): void
     {
@@ -1900,7 +1900,7 @@ class ProcessAdditional
     }
 
     /**
-     * @param string $videoLocation
+     * @param  string  $videoLocation
      * @return string
      */
     private function getVideoTime(string $videoLocation): string
@@ -2374,8 +2374,8 @@ class ProcessAdditional
     /**
      * Echo a string to CLI.
      *
-     * @param string $string  String to echo.
-     * @param string $type  Method type.
+     * @param  string  $string  String to echo.
+     * @param  string  $type  Method type.
      *
      * @void
      */
@@ -2389,7 +2389,7 @@ class ProcessAdditional
     /**
      * Echo a string to CLI. For debugging.
      *
-     * @param string $string
+     * @param  string  $string
      *
      * @void
      */
