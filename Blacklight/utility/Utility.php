@@ -28,7 +28,7 @@ class Utility
      * @param $path	*nix path to directory or file
      * @return bool|string True is successful, otherwise the part of the path that failed testing.
      */
-    public static function canExecuteRead($path)
+    public static function canExecuteRead($path): bool|string
     {
         $paths = explode('#/#', $path);
         $fullPath = DS;
@@ -56,15 +56,15 @@ class Utility
      * relative to the last occurrence of the specified character.
      * The character selected may be retained or discarded.
      *
-     * @param  string  $character  the character to search for.
-     * @param  string  $string  the string to search through.
-     * @param  string  $side  determines whether text to the left or the right of the character is returned.
+     * @param string $character  the character to search for.
+     * @param string $string  the string to search through.
+     * @param string $side  determines whether text to the left or the right of the character is returned.
      *                        Options are: left, or right.
-     * @param  bool  $keep_character  determines whether or not to keep the character.
+     * @param bool $keep_character  determines whether or not to keep the character.
      *                                Options are: true, or false.
      * @return string
      */
-    public static function cutStringUsingLast($character, $string, $side, $keep_character = true): string
+    public static function cutStringUsingLast(string $character, string $string, string $side, bool $keep_character = true): string
     {
         $offset = ($keep_character ? 1 : 0);
         $whole_length = \strlen($string);
@@ -141,7 +141,7 @@ class Utility
         $themes = scandir(base_path().'/resources/views/themes', SCANDIR_SORT_ASCENDING);
         $themeList[] = 'None';
         foreach ($themes as $theme) {
-            if (strpos($theme, '.') === false && ! \in_array($theme, $ignoredThemes, false) && File::isDirectory(base_path().'/resources/views/themes/'.$theme)) {
+            if (! str_contains($theme, '.') && ! \in_array($theme, $ignoredThemes, false) && File::isDirectory(base_path().'/resources/views/themes/'.$theme)) {
                 $themeList[] = $theme;
             }
         }
@@ -201,10 +201,10 @@ class Utility
      * Operates directly on the text string, but also returns the result for situations requiring a
      * return value (use in ternary, etc.)/
      *
-     * @param  string  $text  String variable to strip.
+     * @param string $text  String variable to strip.
      * @return string The stripped variable.
      */
-    public static function stripNonPrintingChars(&$text): string
+    public static function stripNonPrintingChars(string &$text): string
     {
         $text = str_replace('/[[:^print:]]/', '', $text);
 
@@ -214,10 +214,10 @@ class Utility
     /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
-     * @param  string  $filePath
+     * @param string $filePath
      * @return bool|string
      */
-    public static function unzipGzipFile($filePath)
+    public static function unzipGzipFile(string $filePath)
     {
         $string = '';
         $gzFile = @gzopen($filePath, 'rb', 0);
@@ -262,11 +262,11 @@ class Utility
      * Creates an array to be used with stream_context_create() to verify openssl certificates
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
-     * @param  bool  $forceIgnore  Force ignoring of verification.
+     * @param bool $forceIgnore  Force ignoring of verification.
      * @return array
      * @static
      */
-    public static function streamSslContextOptions($forceIgnore = false): array
+    public static function streamSslContextOptions(bool $forceIgnore = false): array
     {
         if (config('nntmux_ssl.ssl_cafile') === '' && config('nntmux_ssl.ssl_capath') === '') {
             $options = [
@@ -296,13 +296,13 @@ class Utility
     /**
      * Set curl context options for verifying SSL certificates.
      *
-     * @param  bool  $verify  false = Ignore config.php and do not verify the openssl cert.
+     * @param bool $verify  false = Ignore config.php and do not verify the openssl cert.
      *                        true  = Check config.php and verify based on those settings.
      *                        If you know the certificate will be self-signed, pass false.
      * @return array
      * @static
      */
-    public static function curlSslContextOptions($verify = true): array
+    public static function curlSslContextOptions(bool $verify = true): array
     {
         $options = [];
         if ($verify && config('nntmux_ssl.ssl_verify_host') && (! empty(config('nntmux_ssl.ssl_cafile')) || ! empty(config('nntmux_ssl.ssl_capath')))) {
@@ -418,8 +418,7 @@ class Utility
                         \in_array($childTagName, $options['alwaysArray'], false) || ! $options['autoArray']
                             ? [$childProperties] : $childProperties;
                 } elseif (
-                    \is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName])
-                    === range(0, \count($tagsArray[$childTagName]) - 1)
+                    \is_array($tagsArray[$childTagName]) && array_is_list($tagsArray[$childTagName])
                 ) {
                     //key already exists and is integer indexed array
                     $tagsArray[$childTagName][] = $childProperties;
@@ -451,12 +450,12 @@ class Utility
      * Return file type/info using magic numbers.
      * Try using `file` program where available, fallback to using PHP's finfo class.
      *
-     * @param  string  $path  Path to the file / folder to check.
+     * @param string $path  Path to the file / folder to check.
      * @return string File info. Empty string on failure.
      *
      * @throws \Exception
      */
-    public static function fileInfo($path): string
+    public static function fileInfo(string $path): string
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
         if ($magicPath !== null && self::hasCommand('file')) {
@@ -487,10 +486,10 @@ class Utility
     /**
      * Convert Code page 437 chars to UTF.
      *
-     * @param  string  $string
+     * @param string $string
      * @return string
      */
-    public static function cp437toUTF($string): string
+    public static function cp437toUTF(string $string): string
     {
         return iconv('CP437', 'UTF-8//IGNORE//TRANSLIT', $string);
     }
@@ -546,10 +545,10 @@ class Utility
     /**
      * Remove unsafe chars from a filename.
      *
-     * @param  string  $filename
+     * @param string $filename
      * @return string
      */
-    public static function safeFilename($filename): string
+    public static function safeFilename(string $filename): string
     {
         return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
     }
@@ -568,10 +567,10 @@ class Utility
     /**
      * Display error/error code.
      *
-     * @param  int  $errorCode
-     * @param  string  $errorText
+     * @param int $errorCode
+     * @param string $errorText
      */
-    public static function showApiError($errorCode = 900, $errorText = ''): void
+    public static function showApiError(int $errorCode = 900, string $errorText = ''): void
     {
         $errorHeader = 'HTTP 1.1 400 Bad Request';
         if ($errorText === '') {
