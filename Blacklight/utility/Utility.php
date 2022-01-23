@@ -56,11 +56,11 @@ class Utility
      * relative to the last occurrence of the specified character.
      * The character selected may be retained or discarded.
      *
-     * @param string $character  the character to search for.
-     * @param string $string  the string to search through.
-     * @param string $side  determines whether text to the left or the right of the character is returned.
+     * @param  string  $character  the character to search for.
+     * @param  string  $string  the string to search through.
+     * @param  string  $side  determines whether text to the left or the right of the character is returned.
      *                        Options are: left, or right.
-     * @param bool $keep_character  determines whether or not to keep the character.
+     * @param  bool  $keep_character  determines whether or not to keep the character.
      *                                Options are: true, or false.
      * @return string
      */
@@ -201,7 +201,7 @@ class Utility
      * Operates directly on the text string, but also returns the result for situations requiring a
      * return value (use in ternary, etc.)/
      *
-     * @param string $text  String variable to strip.
+     * @param  string  $text  String variable to strip.
      * @return string The stripped variable.
      */
     public static function stripNonPrintingChars(string &$text): string
@@ -214,7 +214,7 @@ class Utility
     /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
-     * @param string $filePath
+     * @param  string  $filePath
      * @return bool|string
      */
     public static function unzipGzipFile(string $filePath)
@@ -262,7 +262,7 @@ class Utility
      * Creates an array to be used with stream_context_create() to verify openssl certificates
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
-     * @param bool $forceIgnore  Force ignoring of verification.
+     * @param  bool  $forceIgnore  Force ignoring of verification.
      * @return array
      * @static
      */
@@ -296,7 +296,7 @@ class Utility
     /**
      * Set curl context options for verifying SSL certificates.
      *
-     * @param bool $verify  false = Ignore config.php and do not verify the openssl cert.
+     * @param  bool  $verify  false = Ignore config.php and do not verify the openssl cert.
      *                        true  = Check config.php and verify based on those settings.
      *                        If you know the certificate will be self-signed, pass false.
      * @return array
@@ -450,7 +450,7 @@ class Utility
      * Return file type/info using magic numbers.
      * Try using `file` program where available, fallback to using PHP's finfo class.
      *
-     * @param string $path  Path to the file / folder to check.
+     * @param  string  $path  Path to the file / folder to check.
      * @return string File info. Empty string on failure.
      *
      * @throws \Exception
@@ -486,7 +486,7 @@ class Utility
     /**
      * Convert Code page 437 chars to UTF.
      *
-     * @param string $string
+     * @param  string  $string
      * @return string
      */
     public static function cp437toUTF(string $string): string
@@ -545,7 +545,7 @@ class Utility
     /**
      * Remove unsafe chars from a filename.
      *
-     * @param string $filename
+     * @param  string  $filename
      * @return string
      */
     public static function safeFilename(string $filename): string
@@ -567,8 +567,8 @@ class Utility
     /**
      * Display error/error code.
      *
-     * @param int $errorCode
-     * @param string $errorText
+     * @param  int  $errorCode
+     * @param  string  $errorText
      */
     public static function showApiError(int $errorCode = 900, string $errorText = ''): void
     {
