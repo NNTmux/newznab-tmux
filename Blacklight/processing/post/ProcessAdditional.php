@@ -64,7 +64,7 @@ class ProcessAdditional
     /**
      * @var \Blacklight\NZB
      */
-    protected $_nzb;
+    protected NZB $_nzb;
 
     /**
      * List of files with sizes/etc contained in the NZB.
@@ -86,7 +86,7 @@ class ProcessAdditional
     /**
      * @var bool|null|string
      */
-    protected $_innerFileBlacklist;
+    protected mixed $_innerFileBlacklist;
 
     /**
      * @var int
@@ -94,14 +94,14 @@ class ProcessAdditional
     protected int $_maxNestedLevels;
 
     /**
-     * @var null|string
+     * @var string|null
      */
-    protected $_7zipPath;
+    protected mixed $_7zipPath;
 
     /**
      * @var null|string
      */
-    protected $_unrarPath;
+    protected mixed $_unrarPath;
 
     /**
      * @var string
@@ -111,7 +111,7 @@ class ProcessAdditional
     /**
      * @var bool|string
      */
-    protected $_showCLIReleaseID;
+    protected string|bool $_showCLIReleaseID;
 
     /**
      * @var int
@@ -166,32 +166,32 @@ class ProcessAdditional
     /**
      * @var \Blacklight\NNTP
      */
-    protected $_nntp;
+    protected NNTP $_nntp;
 
     /**
      * @var \Blacklight\Categorize
      */
-    protected $_categorize;
+    protected Categorize $_categorize;
 
     /**
      * @var \Blacklight\NameFixer
      */
-    protected $_nameFixer;
+    protected NameFixer $_nameFixer;
 
     /**
      * @var \Blacklight\ReleaseExtra
      */
-    protected $_releaseExtra;
+    protected ReleaseExtra $_releaseExtra;
 
     /**
      * @var \Blacklight\ReleaseImage
      */
-    protected $_releaseImage;
+    protected ReleaseImage $_releaseImage;
 
     /**
      * @var \Blacklight\Nfo
      */
-    protected $_nfo;
+    protected Nfo $_nfo;
 
     /**
      * @var bool
@@ -392,7 +392,7 @@ class ProcessAdditional
     /**
      * @var \Blacklight\SphinxSearch
      */
-    protected $sphinx;
+    protected SphinxSearch $sphinx;
 
     /**
      * @var \FFMpeg\FFMpeg
@@ -504,7 +504,7 @@ class ProcessAdditional
         $this->_maximumRarPasswordChecks =
             (Settings::settingValue('..passchkattempts') !== '') ? (int) Settings::settingValue('..passchkattempts') : 1;
 
-        $this->_maximumRarPasswordChecks = ($this->_maximumRarPasswordChecks < 1 ? 1 : $this->_maximumRarPasswordChecks);
+        $this->_maximumRarPasswordChecks = (max($this->_maximumRarPasswordChecks, 1));
 
         // Maximum size of releases in GB.
         $this->_maxSize = (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
@@ -548,12 +548,12 @@ class ProcessAdditional
     }
 
     /**
-     * @param  string  $groupID
-     * @param  string  $guidChar
+     * @param string $groupID
+     * @param string $guidChar
      *
      * @throws \Exception
      */
-    public function start($groupID = '', $guidChar = ''): void
+    public function start(string $groupID = '', string $guidChar = ''): void
     {
         $this->_setMainTempPath($guidChar, $groupID);
 
@@ -572,21 +572,21 @@ class ProcessAdditional
     /**
      * @var string Main temp path to work on.
      */
-    protected $_mainTmpPath;
+    protected string $_mainTmpPath;
 
     /**
      * @var string Temp path for current release.
      */
-    protected $tmpPath;
+    protected string $tmpPath;
 
     /**
      * @param $guidChar
-     * @param  string  $groupID
+     * @param string $groupID
      *
      * @throws \RuntimeException
      * @throws \Exception
      */
-    protected function _setMainTempPath(&$guidChar, &$groupID = ''): void
+    protected function _setMainTempPath(&$guidChar, string &$groupID = ''): void
     {
         // Set up the temporary files folder location.
         $this->_mainTmpPath = (string) Settings::settingValue('..tmpunrarpath');
@@ -638,12 +638,12 @@ class ProcessAdditional
     /**
      * Get all releases that need to be processed.
      *
-     * @param  int|string  $groupID
-     * @param  string  $guidChar
+     * @param int|string $groupID
+     * @param string $guidChar
      *
      * @void
      */
-    protected function _fetchReleases($groupID, &$guidChar): void
+    protected function _fetchReleases(int|string $groupID, string &$guidChar): void
     {
         $releasesQuery = Release::query()
             ->where('releases.nzbstatus', '=', 1)
@@ -771,12 +771,12 @@ class ProcessAdditional
     /**
      * Deletes files and folders recursively.
      *
-     * @param  string  $path  Path to a folder or file.
-     * @param  string[]  $ignoredFolders  array with paths to folders to ignore.
+     * @param string $path  Path to a folder or file.
+     * @param string[] $ignoredFolders  array with paths to folders to ignore.
      *
      * @void
      */
-    protected function _recursivePathDelete($path, $ignoredFolders = []): void
+    protected function _recursivePathDelete(string $path, array $ignoredFolders = []): void
     {
         if (File::isDirectory($path)) {
             if (\in_array($path, $ignoredFolders, false)) {
@@ -807,8 +807,9 @@ class ProcessAdditional
         if (! File::isDirectory($this->tmpPath)) {
             if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
+                $this->_deleteRelease();
 
-                return $this->_deleteRelease();
+                return false;
             }
         }
 
@@ -825,42 +826,39 @@ class ProcessAdditional
     protected function _getNZBContents(): bool
     {
         $nzbPath = $this->_nzb->NZBPath($this->_release->guid);
-        if ($nzbPath === false) {
-            $this->_echo('NZB not found for GUID: '.$this->_release->guid, 'warning');
+        if ($nzbPath !== false) {
+            $nzbContents = Utility::unzipGzipFile($nzbPath);
+            if (! $nzbContents) {
+                $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid, 'warning');
+                $this->_deleteRelease();
 
-            $this->_deleteRelease();
+                return false;
+            }
+            // Get a list of files in the nzb.
+            $this->_nzbContents = $this->_nzb->nzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
+            if (\count($this->_nzbContents) === 0) {
+                $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid, 'warning');
+                $this->_deleteRelease();
+
+                return false;
+            }
+            // Sort keys.
+            ksort($this->_nzbContents, SORT_NATURAL);
+
+            return true;
         }
+        $this->_echo('NZB not found for GUID: '.$this->_release->guid, 'warning');
+        $this->_deleteRelease();
 
-        $nzbContents = Utility::unzipGzipFile($nzbPath);
-        if (! $nzbContents) {
-            $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid, 'warning');
-
-            $this->_deleteRelease();
-        }
-
-        // Get a list of files in the nzb.
-        $this->_nzbContents = $this->_nzb->nzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
-        if (\count($this->_nzbContents) === 0) {
-            $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid, 'warning');
-
-            $this->_deleteRelease();
-        }
-        // Sort keys.
-        ksort($this->_nzbContents, SORT_NATURAL);
-
-        return true;
+        return false;
     }
 
     /**
-     * @return bool
-     *
-     * @throws \Exception
+     * @return void
      */
-    protected function _deleteRelease(): bool
+    protected function _deleteRelease(): void
     {
         Release::whereId($this->_release->id)->delete();
-
-        return false;
     }
 
     /**
@@ -868,14 +866,14 @@ class ProcessAdditional
      *
      * @var array
      */
-    protected $_currentNZBFile;
+    protected array $_currentNZBFile;
 
     /**
      * Does the current NZB contain a compressed (RAR/ZIP) file?
      *
      * @var bool
      */
-    protected $_NZBHasCompressedFile;
+    protected bool $_NZBHasCompressedFile;
 
     /**
      * Process the files inside the NZB, find Message-ID's to download.
@@ -959,14 +957,14 @@ class ProcessAdditional
      *
      * @var array
      */
-    protected $_triedCompressedMids = [];
+    protected array $_triedCompressedMids = [];
 
     /**
-     * @param  bool  $reverse
+     * @param bool $reverse
      *
      * @throws \Exception
      */
-    protected function _processNZBCompressedFiles($reverse = false): void
+    protected function _processNZBCompressedFiles(bool $reverse = false): void
     {
         $this->_reverse = $reverse;
 
@@ -1058,12 +1056,12 @@ class ProcessAdditional
     /**
      * Check if the data is a ZIP / RAR file, extract files, get file info.
      *
-     * @param  string  $compressedData
+     * @param string $compressedData
      * @return bool
      *
      * @throws \Exception
      */
-    protected function _processCompressedData(&$compressedData): bool
+    protected function _processCompressedData(string &$compressedData): bool
     {
         $this->_compressedFilesChecked++;
         // Give the data to archive info so it can check if it's a rar.
@@ -1270,7 +1268,7 @@ class ProcessAdditional
                         $this->_releaseHasPassword = true;
                         $this->_passwordStatus = Releases::PASSWD_RAR;
                     } //Run a PreDB filename check on insert to try and match the release
-                    elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
+                    elseif ($file['name'] !== '' && ! str_starts_with($file['name'], '.')) {
                         $this->_release['filename'] = $file['name'];
                         $this->_release['releases_id'] = $this->_release->id;
                         $this->_nameFixer->matchPreDbFiles($this->_release, 1, 1, true);
@@ -1484,8 +1482,7 @@ class ProcessAdditional
     {
         // Download and process mediainfo. Also try to get a sample if we didn't get one yet.
         if (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo) {
-            if (! $this->_foundMediaInfo && ! empty($this->_MediaInfoMessageIDs)) {
-
+            if (! empty($this->_MediaInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs, $this->_alternateNNTP);
                 if ($this->_nntp::isError($mediaBinary)) {
@@ -1652,8 +1649,9 @@ class ProcessAdditional
 
         // If we failed to get anything from the RAR/ZIPs, decrement the passwordstatus, if the rar/zip has no password.
         if (! $this->_releaseHasPassword && $this->_NZBHasCompressedFile && $releaseFilesCount === 0) {
-            Release::query()->where('id', $this->_release->id)->decrement('passwordstatus');
-            Release::query()->where('id', $this->_release->id)->update(
+            $release = Release::query()->where('id', $this->_release->id);
+            $release->decrement('passwordstatus');
+            $release->update(
                $updateRows
             );
         } // Else update the release with the password status (if the admin enabled the setting).
@@ -1667,11 +1665,11 @@ class ProcessAdditional
     }
 
     /**
-     * @param  string  $pattern
-     * @param  string  $path
+     * @param string $pattern
+     * @param string $path
      * @return bool|string|\Symfony\Component\Finder\SplFileInfo[]
      */
-    protected function _getTempDirectoryContents($pattern = '', $path = '')
+    protected function _getTempDirectoryContents(string $pattern = '', string $path = '')
     {
         if ($path === '') {
             $path = $this->tmpPath;
@@ -1880,9 +1878,9 @@ class ProcessAdditional
     /**
      * Try to get JPG picture, resize it and store it on disk.
      *
-     * @param  string  $fileLocation
+     * @param string $fileLocation
      */
-    protected function _getJPGSample($fileLocation): void
+    protected function _getJPGSample(string $fileLocation): void
     {
         // Try to resize/move the image.
         $this->_foundJPGSample = (
@@ -1902,10 +1900,10 @@ class ProcessAdditional
     }
 
     /**
-     * @param  string  $videoLocation
+     * @param string $videoLocation
      * @return string
      */
-    private function getVideoTime($videoLocation): string
+    private function getVideoTime(string $videoLocation): string
     {
         // Get the real duration of the file.
         if ($this->ffprobe->isValid($videoLocation)) {
@@ -2090,10 +2088,8 @@ class ProcessAdditional
                 $newFile = ($this->_releaseImage->vidSavePath.$this->_release->guid.'.ogv');
 
                 // Try to move the file to the new path.
-                $renamed = @File::move($fileName, $newFile);
-
                 // If we couldn't rename it, try to copy it.
-                if (! $renamed) {
+                if (! @File::move($fileName, $newFile)) {
                     $copied = @File::copy($fileName, $newFile);
 
                     // Delete the old file.
@@ -2205,8 +2201,7 @@ class ProcessAdditional
 
         $filesAdded = 0;
 
-        $files = $this->_par2Info->getFileList();
-        foreach ($files as $file) {
+        foreach ($this->_par2Info->getFileList() as $file) {
             if (! isset($file['name'])) {
                 continue;
             }
@@ -2346,12 +2341,12 @@ class ProcessAdditional
     protected function _resetReleaseStatus(): void
     {
         // Only process for samples, previews and images if not disabled.
-        $this->_foundVideo = $this->_processVideo ? false : true;
-        $this->_foundMediaInfo = $this->_processMediaInfo ? false : true;
-        $this->_foundAudioInfo = $this->_processAudioInfo ? false : true;
-        $this->_foundAudioSample = $this->_processAudioSample ? false : true;
-        $this->_foundJPGSample = $this->_processJPGSample ? false : true;
-        $this->_foundSample = $this->_processThumbnails ? false : true;
+        $this->_foundVideo = ! $this->_processVideo;
+        $this->_foundMediaInfo = ! $this->_processMediaInfo;
+        $this->_foundAudioInfo = ! $this->_processAudioInfo;
+        $this->_foundAudioSample = ! $this->_processAudioSample;
+        $this->_foundJPGSample = ! $this->_processJPGSample;
+        $this->_foundSample = ! $this->_processThumbnails;
         $this->_foundPAR2Info = false;
 
         $this->_passwordStatus = Releases::PASSWD_NONE;
@@ -2379,12 +2374,12 @@ class ProcessAdditional
     /**
      * Echo a string to CLI.
      *
-     * @param  string  $string  String to echo.
-     * @param  string  $type  Method type.
+     * @param string $string  String to echo.
+     * @param string $type  Method type.
      *
      * @void
      */
-    protected function _echo($string, $type): void
+    protected function _echo(string $string, string $type): void
     {
         if ($this->_echoCLI) {
             (new ColorCLI())->$type($string);
@@ -2394,11 +2389,11 @@ class ProcessAdditional
     /**
      * Echo a string to CLI. For debugging.
      *
-     * @param  string  $string
+     * @param string $string
      *
      * @void
      */
-    protected function _debug($string): void
+    protected function _debug(string $string): void
     {
         $this->_echo('DEBUG: '.$string, 'debug');
     }
