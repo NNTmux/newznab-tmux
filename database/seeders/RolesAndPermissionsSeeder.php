@@ -74,7 +74,7 @@ class RolesAndPermissionsSeeder extends Seeder
         );
 
         $roleAdmin->save();
-        $roleAdmin->givePermissionTo(Permission::all());
+        $roleAdmin->givePermissionTo(['preview', 'hideads', 'edit release', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books', 'view other']);
 
         $roleDisabled = Role::create(
             [
@@ -104,7 +104,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
         $roleMod->save();
-        $roleMod->givePermissionTo(Permission::all());
+        $roleMod->givePermissionTo(['preview', 'hideads', 'edit release', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books', 'view other']);
 
         $roleFriend = Role::create(
             [
