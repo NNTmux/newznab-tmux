@@ -5,7 +5,6 @@ use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Blacklight\XXX;
 use Colors\Color;
-use DariusIII\Zipper\Zipper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -13,6 +12,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
+use Zip as ZipStream;
 
 if (! function_exists('getRawHtml')) {
 
@@ -310,42 +310,34 @@ if (! function_exists('is_it_json')) {
     }
 }
 
-if (! function_exists('getZipped')) {
+/**
+ * @param  array  $guids
+ * @return \STS\ZipStream\ZipStream
+ *
+ * @throws \Exception
+ */
+function getStreamingZip(array $guids = []): \STS\ZipStream\ZipStream
+{
+    $nzb = new NZB();
+    $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
+    foreach ($guids as $guid) {
+        $nzbPath = $nzb->NZBPath($guid);
 
-    /**
-     * @param  array  $guids
-     * @return string
-     *
-     * @throws \Exception
-     */
-    function getZipped(array $guids = []): string
-    {
-        $nzb = new NZB();
-        $zipped = new Zipper();
-        $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
-        $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
-        $archive = $zipped->make($zippedFilePath);
-        foreach ($guids as $guid) {
-            $nzbPath = $nzb->NZBPath($guid);
+        if ($nzbPath) {
+            $nzbContents = Utility::unzipGzipFile($nzbPath);
 
-            if ($nzbPath !== false) {
-                $nzbContents = Utility::unzipGzipFile($nzbPath);
-
-                if ($nzbContents !== false) {
-                    $filename = $guid;
-                    $r = Release::getByGuid($guid);
-                    if ($r) {
-                        $filename = $r['searchname'];
-                    }
-                    $archive->addString($filename.'.nzb', $nzbContents);
+            if ($nzbContents) {
+                $filename = $guid;
+                $r = Release::getByGuid($guid);
+                if ($r) {
+                    $filename = $r['searchname'];
                 }
+                $zipped->addRaw($nzbContents, $filename.'.nzb');
             }
         }
-
-        $archive->close();
-
-        return File::isFile($zippedFilePath) ? $zippedFilePath : '';
     }
+
+    return $zipped;
 }
 
 if (! function_exists('release_flag')) {
