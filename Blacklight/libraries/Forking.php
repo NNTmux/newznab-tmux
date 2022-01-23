@@ -330,7 +330,7 @@ class Forking
         $backfill_qty = (int) Settings::settingValue('site.tmux.backfill_qty');
         $backfill_order = (int) Settings::settingValue('site.tmux.backfill_order');
         $backfill_days = (int) Settings::settingValue('site.tmux.backfill_days');
-        $maxmssgs = (int) Settings::settingValue('..maxmssgs');
+        $maxMessages = (int) Settings::settingValue('..maxmssgs');
         $threads = (int) Settings::settingValue('..backfillthreads');
 
         $orderby = 'ORDER BY a.last_record ASC';
@@ -391,14 +391,14 @@ class Forking
 
         if ($count > 0) {
             if ($count > ($backfill_qty * $threads)) {
-                $geteach = ceil(($backfill_qty * $threads) / $maxmssgs);
+                $getEach = ceil(($backfill_qty * $threads) / $maxMessages);
             } else {
-                $geteach = $count / $maxmssgs;
+                $getEach = $count / $maxMessages;
             }
 
             $queues = [];
-            for ($i = 0; $i <= $geteach - 1; $i++) {
-                $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
+            for ($i = 0; $i <= $getEach - 1; $i++) {
+                $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxMessages - $maxMessages, $data[0]->our_first - $i * $maxMessages - 1, $i + 1);
             }
 
             $pool = Pool::create()->concurrency($threads)->timeout(config('nntmux.multiprocessing_max_child_time'));
@@ -462,8 +462,8 @@ class Forking
      */
     private function safeBinaries()
     {
-        $maxheaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
-        $maxmssgs = (int) Settings::settingValue('..maxmssgs');
+        $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
+        $maxMessages = (int) Settings::settingValue('..maxmssgs');
         $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
 
         $this->work = DB::select(
@@ -485,22 +485,20 @@ class Forking
                 } else {
                     //only process if more than 20k headers available and skip the first 20k
                     $count = $group->their_last - $group->our_last - 20000;
-                    //echo "count: " . $count . "maxmsgs x2: " . ($maxmssgs * 2) . PHP_EOL;
-                    if ($count <= $maxmssgs * 2) {
+                    if ($count <= $maxMessages * 2) {
                         $queues[$i] = sprintf('update_group_headers  %s', $group->groupname);
                         $i++;
                     } else {
                         $queues[$i] = sprintf('part_repair  %s', $group->groupname);
                         $i++;
-                        $geteach = floor(min($count, $maxheaders) / $maxmssgs);
-                        $remaining = min($count, $maxheaders) - $geteach * $maxmssgs;
-                        //echo "maxmssgs: " . $maxmssgs . " geteach: " . $geteach . " remaining: " . $remaining . PHP_EOL;
-                        for ($j = 0; $j < $geteach; $j++) {
-                            $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + $j * $maxmssgs + 1, $group->our_last + $j * $maxmssgs + $maxmssgs, $i);
+                        $getEach = floor(min($count, $maxHeaders) / $maxMessages);
+                        $remaining = min($count, $maxHeaders) - $getEach * $maxMessages;
+                        for ($j = 0; $j < $getEach; $j++) {
+                            $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + $j * $maxMessages + 1, $group->our_last + $j * $maxMessages + $maxMessages, $i);
                             $i++;
                         }
                         //add remainder to queue
-                        $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + ($j + 1) * $maxmssgs + 1, $group->our_last + ($j + 1) * $maxmssgs + $remaining + 1, $i);
+                        $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + ($j + 1) * $maxMessages + 1, $group->our_last + ($j + 1) * $maxMessages + $remaining + 1, $i);
                         $i++;
                     }
                 }
@@ -535,7 +533,7 @@ class Forking
     private function fixRelNames(): void
     {
         $this->maxProcesses = (int) Settings::settingValue('..fixnamethreads');
-        $maxperrun = (int) Settings::settingValue('..fixnamesperrun');
+        $maxPerRun = (int) Settings::settingValue('..fixnamesperrun');
 
         if ($this->maxProcesses > 16) {
             $this->maxProcesses = 16;
@@ -559,7 +557,7 @@ class Forking
                 )
             );
             if ($preCount[0]->num > 0) {
-                $leftGuids = \array_slice($leftGuids, 0, (int) ceil($preCount[0]->num / $maxperrun));
+                $leftGuids = \array_slice($leftGuids, 0, (int) ceil($preCount[0]->num / $maxPerRun));
             } else {
                 $leftGuids = [];
             }
@@ -569,8 +567,8 @@ class Forking
         $queues = [];
         foreach ($leftGuids as $leftGuid) {
             $count++;
-            if ($maxperrun > 0) {
-                $queues[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftGuid, $maxperrun, $count);
+            if ($maxPerRun > 0) {
+                $queues[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftGuid, $maxPerRun, $count);
             }
         }
 
@@ -950,7 +948,7 @@ class Forking
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             })->catch(static function (SerializableException $serializableException) {
-                //we do nothing here just catch the error and move on
+                echo $serializableException->asThrowable()->getMessage();
             });
         }
 
