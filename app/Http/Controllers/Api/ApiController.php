@@ -14,6 +14,7 @@ use Blacklight\Releases;
 use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class ApiController extends BasePageController
 {
@@ -196,7 +197,7 @@ class ApiController extends BasePageController
                    'trakt'  => $request->input('traktid') ?? '0',
                    'tvrage' => $request->input('rid') ?? '0',
                    'tvmaze' => $request->input('tvmazeid') ?? '0',
-                   'imdb'   => $request->input('imdbid') ?? '0',
+                   'imdb'   => Str::replace('tt', '', $request->input('imdbid')) ?? '0',
                    'tmdb'   => $request->input('tmdbid') ?? '0',
                ];
 
