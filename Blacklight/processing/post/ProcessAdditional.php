@@ -1327,81 +1327,74 @@ class ProcessAdditional
 
         // Get all the remaining files in the temp dir.
         $files = $this->_getTempDirectoryContents();
-        foreach ($files as $file) {
-            $file = $file->getPathname();
+        if ($files !== false) {
+            foreach ($files as $file) {
+                $file = $file->getPathname();
 
-            // Skip /. and /..
-            if (preg_match('/[\/\\\\]\.{1,2}$/', $file)) {
-                continue;
-            }
-
-            if (File::isFile($file)) {
-
-                // Process PAR2 files.
-                if (! $this->_foundPAR2Info && preg_match('/\.par2$/', $file)) {
-                    $this->_siftPAR2Info($file);
-                } // Process NFO files.
-                elseif ($this->_releaseHasNoNFO && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
-                    $this->_processNfoFile($file);
-                } // Process audio files.
-                elseif (
-                    (! $this->_foundAudioInfo || ! $this->_foundAudioSample) &&
-                    preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)
-                ) {
-                    // Try to get audio sample/audio media info.
-                    File::move($file, $this->tmpPath.'audiofile.'.$fileType[2]);
-                    $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType[2], $fileType[2]);
-                    File::delete($this->tmpPath.'audiofile.'.$fileType[2]);
-                } // Process JPG files.
-                elseif (! $this->_foundJPGSample && preg_match('/\.jpe?g$/i', $file)) {
-                    $this->_getJPGSample($file);
-                    File::delete($file);
-                } // Video sample // video clip // video media info.
-                elseif ((! $this->_foundSample || ! $this->_foundVideo || ! $this->_foundMediaInfo) &&
-                    preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)
-                ) {
-                    $this->_processVideoFile($file);
+                // Skip /. and /..
+                if (preg_match('/[\/\\\\]\.{1,2}$/', $file)) {
+                    continue;
                 }
 
-                // Check file's magic info.
-                else {
-                    $output = Utility::fileInfo($file);
-                    if (! empty($output)) {
-                        switch (true) {
+                if (File::isFile($file)) {
 
-                            case ! $this->_foundJPGSample && preg_match('/^JPE?G/i', $output):
-                                $this->_getJPGSample($file);
-                                File::delete($file);
-                                break;
+                    // Process PAR2 files.
+                    if (! $this->_foundPAR2Info && preg_match('/\.par2$/', $file)) {
+                        $this->_siftPAR2Info($file);
+                    } // Process NFO files.
+                    elseif ($this->_releaseHasNoNFO && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
+                        $this->_processNfoFile($file);
+                    } // Process audio files.
+                    elseif ((! $this->_foundAudioInfo || ! $this->_foundAudioSample) && preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)) {
+                        // Try to get audio sample/audio media info.
+                        File::move($file, $this->tmpPath.'audiofile.'.$fileType[2]);
+                        $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType[2], $fileType[2]);
+                        File::delete($this->tmpPath.'audiofile.'.$fileType[2]);
+                    } // Process JPG files.
+                    elseif (! $this->_foundJPGSample && preg_match('/\.jpe?g$/i', $file)) {
+                        $this->_getJPGSample($file);
+                        File::delete($file);
+                    } // Video sample // video clip // video media info.
+                    elseif ((! $this->_foundSample || ! $this->_foundVideo || ! $this->_foundMediaInfo) && preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)) {
+                        $this->_processVideoFile($file);
+                    } // Check file's magic info.
+                    else {
+                        $output = Utility::fileInfo($file);
+                        if (! empty($output)) {
+                            switch (true) {
 
-                            case
-                                (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo)
-                                && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
-                                $this->_processVideoFile($file);
-                                break;
+                                case ! $this->_foundJPGSample && preg_match('/^JPE?G/i', $output):
+                                    $this->_getJPGSample($file);
+                                    File::delete($file);
+                                    break;
 
-                            case
-                                (! $this->_foundAudioSample || ! $this->_foundAudioInfo) &&
-                                preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
-                                switch ($fileType[0]) {
-                                    case 'FLAC':
-                                        $fileType = 'FLAC';
-                                        break;
-                                    case 'layer III':
-                                        $fileType = 'MP3';
-                                        break;
-                                    case 'Vorbis audio':
-                                        $fileType = 'OGG';
-                                        break;
-                                }
-                                File::move($file, $this->tmpPath.'audiofile.'.$fileType);
-                                $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType, $fileType);
-                                File::delete($this->tmpPath.'audiofile.'.$fileType);
-                                break;
+                                case
+                                    (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo) && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
+                                    $this->_processVideoFile($file);
+                                    break;
 
-                            case ! $this->_foundPAR2Info && stripos($output, 'Parity') === 0:
-                                $this->_siftPAR2Info($file);
-                                break;
+                                case
+                                    (! $this->_foundAudioSample || ! $this->_foundAudioInfo) && preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
+                                    switch ($fileType[0]) {
+                                        case 'FLAC':
+                                            $fileType = 'FLAC';
+                                            break;
+                                        case 'layer III':
+                                            $fileType = 'MP3';
+                                            break;
+                                        case 'Vorbis audio':
+                                            $fileType = 'OGG';
+                                            break;
+                                    }
+                                    File::move($file, $this->tmpPath.'audiofile.'.$fileType);
+                                    $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType, $fileType);
+                                    File::delete($this->tmpPath.'audiofile.'.$fileType);
+                                    break;
+
+                                case ! $this->_foundPAR2Info && stripos($output, 'Parity') === 0:
+                                    $this->_siftPAR2Info($file);
+                                    break;
+                            }
                         }
                     }
                 }
