@@ -91,8 +91,8 @@ class AniDB
     /**
      * Main switch that initiates AniDB table population.
      *
-     * @param string $type
-     * @param int|string $aniDbId
+     * @param  string  $type
+     * @param  int|string  $aniDbId
      *
      * @throws \Exception
      */
@@ -111,6 +111,7 @@ class AniDB
     /**
      * @param $aniDbId
      * @return array|false
+     *
      * @throws \Exception
      */
     private function getAniDbAPI($aniDbId)
@@ -189,8 +190,8 @@ class AniDB
 
     /**
      * @param  \SimpleXMLElement  $element
-     * @param string|null $property
-     * @param bool $children
+     * @param  string|null  $property
+     * @param  bool  $children
      * @return string
      */
     private function processAPIResponseElement(\SimpleXMLElement $element, string $property = null, bool $children = false): string
@@ -242,10 +243,10 @@ class AniDB
     /**
      * Inserts new anime info from AniDB to anidb table.
      *
-     * @param int $id  The AniDB ID to be inserted
-     * @param string $type  The title type
-     * @param string $lang  The title language
-     * @param string $title  The title of the Anime
+     * @param  int  $id  The AniDB ID to be inserted
+     * @param  string  $type  The title type
+     * @param  string  $lang  The title language
+     * @param  string  $title  The title of the Anime
      */
     private function insertAniDb(int $id, string $type, string $lang, string $title): void
     {
@@ -259,7 +260,7 @@ class AniDB
     }
 
     /**
-     * @param array $AniDBInfoArray
+     * @param  array  $AniDBInfoArray
      * @param $aniDbId
      * @return string
      */
@@ -292,7 +293,7 @@ class AniDB
 
     /**
      * @param $aniDbId
-     * @param array $episodeArr
+     * @param  array  $episodeArr
      * @return void
      */
     private function insertAniDBEpisodes($aniDbId, array $episodeArr = []): void
@@ -377,7 +378,7 @@ class AniDB
     /**
      * Directs flow for populating the AniDB Info/Episodes table.
      *
-     * @param string $aniDbId
+     * @param  string  $aniDbId
      *
      * @throws \Exception
      */
@@ -439,7 +440,7 @@ class AniDB
 
     /**
      * @param $aniDbId
-     * @param array $AniDBInfoArray
+     * @param  array  $AniDBInfoArray
      * @return string
      */
     private function updateAniDBInfoEps($aniDbId, array $AniDBInfoArray = []): string
@@ -471,7 +472,7 @@ class AniDB
 
     /**
      * @param $aniDbId
-     * @param array $AniDBInfoArray
+     * @param  array  $AniDBInfoArray
      * @return void
      */
     private function updateAniChildTables($aniDbId, array $AniDBInfoArray = []): void
