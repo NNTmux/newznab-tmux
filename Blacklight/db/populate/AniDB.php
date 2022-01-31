@@ -474,7 +474,7 @@ class AniDB
      * @param array $AniDBInfoArray
      * @return void
      */
-    private function updateAniChildTables($aniDbId, array $AniDBInfoArray = [] ): void
+    private function updateAniChildTables($aniDbId, array $AniDBInfoArray = []): void
     {
         $check = AnidbInfo::query()->where('anidbid', $aniDbId)->first(['anidbid']);
 
