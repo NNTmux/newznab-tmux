@@ -111,10 +111,10 @@ class Genres
     }
 
     /**
-     * @param string $type
-     * @param bool $activeOnly
-     * @param int $start
-     * @param int $num
+     * @param  string  $type
+     * @param  bool  $activeOnly
+     * @param  int  $start
+     * @param  int  $num
      * @return array
      */
     public function getRange(int $start, int $num, string $type = '', bool $activeOnly = false): array
@@ -126,8 +126,8 @@ class Genres
     }
 
     /**
-     * @param string $type
-     * @param bool $activeOnly
+     * @param  string  $type
+     * @param  bool  $activeOnly
      * @return mixed
      */
     public function getCount(string $type = '', bool $activeOnly = false): mixed
