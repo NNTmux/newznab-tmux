@@ -111,13 +111,13 @@ class Genres
     }
 
     /**
-     * @param  string  $type
-     * @param  bool  $activeOnly
-     * @param  int  $start
-     * @param  int  $num
+     * @param string $type
+     * @param bool $activeOnly
+     * @param int $start
+     * @param int $num
      * @return array
      */
-    public function getRange($type = '', $activeOnly = false, $start, $num): array
+    public function getRange(int $start, int $num, string $type = '', bool $activeOnly = false): array
     {
         $sql = $this->getListQuery($type, $activeOnly);
         $sql .= ' LIMIT '.$num.' OFFSET '.$start;
@@ -126,11 +126,11 @@ class Genres
     }
 
     /**
-     * @param  string  $type
-     * @param  bool  $activeOnly
+     * @param string $type
+     * @param bool $activeOnly
      * @return mixed
      */
-    public function getCount($type = '', $activeOnly = false)
+    public function getCount(string $type = '', bool $activeOnly = false): mixed
     {
         if (! empty($type)) {
             $typesql = sprintf(' AND g.type = %d', $type);
@@ -171,7 +171,7 @@ class Genres
 
     /**
      * @param $id
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return \App\Models\Genre|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
     public function getById($id)
     {
@@ -183,7 +183,7 @@ class Genres
      * @param $disabled
      * @return int
      */
-    public function update($id, $disabled)
+    public function update($id, $disabled): int
     {
         return Genre::query()->where('id', $id)->update(['disabled' => $disabled]);
     }
