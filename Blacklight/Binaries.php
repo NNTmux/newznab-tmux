@@ -559,7 +559,7 @@ class Binaries
 
         $returnArray = $stdHeaders = [];
 
-        $partRepair = ($type === 'partrepair');
+        $partRepair = ($type === 'missed_parts');
         $this->addToPartRepair = ($type === 'update' && $this->_partRepair);
 
         // Download the headers.
