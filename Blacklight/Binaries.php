@@ -1111,7 +1111,7 @@ class Binaries
                 }
 
                 // Get article headers from newsgroup.
-                $this->scan($groupArr, $partFrom, $partTo, 'missed_parts', $partList);
+                $this->scan($groupArr, $partFrom, $partTo, 'partrepair', $partList);
             }
 
             // Calculate parts repaired
