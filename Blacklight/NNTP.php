@@ -188,16 +188,17 @@ class NNTP extends \Net_NNTP_Client
     {
         $primaryUSP = [
             'ip' => gethostbyname(config('nntmux_nntp.server')),
-            'port' => config('nntmux_nntp.port')
+            'port' => config('nntmux_nntp.port'),
         ];
         $alternateUSP = [
             'ip_a' => gethostbyname(config('nntmux_nntp.alternate_server')),
-            'port_a' => config('nntmux_nntp.alternate_server_port')
+            'port_a' => config('nntmux_nntp.alternate_server_port'),
         ];
         $primaryConnections = $this->_tmux->getUSPConnections('primary', $primaryUSP);
         $alternateConnections = $this->_tmux->getUSPConnections('alternate', $alternateUSP);
         if ($this->_isConnected() && (($alternate && $this->_currentServer === config('nntmux_nntp.alternate_server') && ($this->_primaryNntpConnections < $alternateConnections['alternate']['active'])) || (! $alternate && $this->_currentServer === config('nntmux_nntp.server') && ($this->_primaryNntpConnections < $primaryConnections['primary']['active'])))) {
             dump('true');
+
             return true;
         }
 
@@ -311,6 +312,7 @@ class NNTP extends \Net_NNTP_Client
                 if (! $compression || (int) Settings::settingValue('..compressedheaders') === 0) {
                     $this->_compressionSupported = false;
                 }
+
                 return true;
             }
             // If we reached this point and have not connected after all retries, break out of the loop.
@@ -1409,6 +1411,7 @@ class NNTP extends \Net_NNTP_Client
             // 201, Posting NOT allowed
             case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED:
                 $this->_logger?->info('Posting not allowed!');
+
                 return false;
             default:
                 return $this->_handleErrorResponse($response);

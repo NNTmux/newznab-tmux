@@ -52,4 +52,3 @@ try {
 } catch (ErrorException $e) {
     echo $e->getMessage();
 }
-
