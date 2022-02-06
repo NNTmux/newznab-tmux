@@ -177,8 +177,8 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Connect to a usenet server.
      *
-     * @param bool $compression  Should we attempt to enable XFeature Gzip compression on this connection?
-     * @param bool $alternate  Use the alternate NNTP connection.
+     * @param  bool  $compression  Should we attempt to enable XFeature Gzip compression on this connection?
+     * @param  bool  $alternate  Use the alternate NNTP connection.
      * @return mixed On success = (bool)   Did we successfully connect to the usenet?
      *
      * @throws \Exception
@@ -332,7 +332,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Disconnect from the current NNTP server.
      *
-     * @param bool $force  Force quit even if not connected?
+     * @param  bool  $force  Force quit even if not connected?
      * @return mixed On success : (bool)   Did we successfully disconnect from usenet?
      *               On Failure : (object) PEAR_Error.
      */
@@ -382,7 +382,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * @param  string  $group  Name of the group to select.
      * @param  bool  $articles  (optional) experimental! When true the article numbers is returned in 'articles'.
-     * @param bool $force  Force a refresh to get updated data from the usenet server.
+     * @param  bool  $force  Force a refresh to get updated data from the usenet server.
      * @return mixed On success : (array)  Group information.
      *
      * @throws \Exception
@@ -447,7 +447,7 @@ class NNTP extends \Net_NNTP_Client
      *        'Xref'       => string(66) "e alt.test:679871775"
      *    }
      *
-     * @param string $range  Range of articles to get the overview for. Examples follow:
+     * @param  string  $range  Range of articles to get the overview for. Examples follow:
      *                         Single article number:         "679871775"
      *                         Range of article numbers:      "679871775-679999999"
      *                         All newer than article number: "679871775-"
@@ -551,11 +551,11 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download multiple article bodies and string them together.
      *
-     * @param string $groupName  The name of the group the articles are in.
+     * @param  string  $groupName  The name of the group the articles are in.
      * @param  mixed  $identifiers  (string) Message-ID.
      *                              (int)    Article number.
      *                              (array)  Article numbers or Message-ID's (can contain both in the same array)
-     * @param bool $alternate  Use the alternate NNTP provider?
+     * @param  bool  $alternate  Use the alternate NNTP provider?
      * @return mixed On success : (string) The article bodies.
      *
      * @throws \Exception
@@ -664,10 +664,10 @@ class NNTP extends \Net_NNTP_Client
      * Download a full article, the body and the header, return an array with named keys and their
      * associated values, optionally decode the body using yEnc.
      *
-     * @param string $groupName  The name of the group the article is in.
+     * @param  string  $groupName  The name of the group the article is in.
      * @param  mixed  $identifier  (string)The message-ID of the article to download.
      *                             (int) The article number.
-     * @param bool $yEnc  Attempt to yEnc decode the body.
+     * @param  bool  $yEnc  Attempt to yEnc decode the body.
      * @return mixed On success : (array)  The article.
      *               On failure : (object) PEAR_Error.
      *
@@ -742,7 +742,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download a full article header.
      *
-     * @param string $groupName  The name of the group the article is in.
+     * @param  string  $groupName  The name of the group the article is in.
      * @param  mixed  $identifier  (string) The message-ID of the article to download.
      *                             (int)    The article number.
      * @return mixed On success : (array)  The header.
@@ -802,11 +802,11 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Post an article to usenet.
      *
-     * @param array|string $groups  mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
+     * @param  array|string  $groups  mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
      *                                (string) Group.  ie.: $groups = 'alt.test';
-     * @param string $subject  string  The subject.     ie.: $subject = 'Test article';
-     * @param \Exception|string $body  string  The message.     ie.: $message = 'This is only a test, please disregard.';
-     * @param string $from  string  The poster.      ie.: $from = '<anon@anon.com>';
+     * @param  string  $subject  string  The subject.     ie.: $subject = 'Test article';
+     * @param  \Exception|string  $body  string  The message.     ie.: $message = 'This is only a test, please disregard.';
+     * @param  string  $from  string  The poster.      ie.: $from = '<anon@anon.com>';
      * @param $extra    string  Extra, separated by \r\n
      *                                           ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
      * @param $yEnc     bool    Encode the message with yEnc?
@@ -870,9 +870,9 @@ class NNTP extends \Net_NNTP_Client
      * Restart the NNTP connection if an error occurs in the selectGroup
      * function, if it does not restart display the error.
      *
-     * @param NNTP $nntp  Instance of class NNTP.
-     * @param string $group  Name of the group.
-     * @param bool $comp  Use compression or not?
+     * @param  NNTP  $nntp  Instance of class NNTP.
+     * @param  string  $group  Name of the group.
+     * @param  bool  $comp  Use compression or not?
      * @return mixed On success : (array)  The group summary.
      *
      * @throws \Exception
@@ -926,8 +926,8 @@ class NNTP extends \Net_NNTP_Client
      * Split a string into lines of 510 chars ending with \r\n.
      * Usenet limits lines to 512 chars, with \r\n that leaves us 510.
      *
-     * @param string $string  The string to split.
-     * @param bool $compress  Compress the string with gzip?
+     * @param  string  $string  The string to split.
+     * @param  bool  $compress  Compress the string with gzip?
      * @return string The split string.
      */
     protected function _splitLines(string $string, bool $compress = false): string
@@ -946,7 +946,7 @@ class NNTP extends \Net_NNTP_Client
      * Try to see if the NNTP server implements XFeature GZip Compression,
      * change the compression bool object if so.
      *
-     * @param bool $secondTry  This is only used if enabling compression fails, the function will call itself to retry.
+     * @param  bool  $secondTry  This is only used if enabling compression fails, the function will call itself to retry.
      * @return mixed On success : (bool)   True:  The server understood and compression is enabled.
      *               (bool)   False: The server did not understand, compression is not enabled.
      *               On failure : (object) PEAR_Error.
@@ -1116,7 +1116,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Check if the Message-ID has the required opening and closing brackets.
      *
-     * @param string $messageID  The Message-ID with or without brackets.
+     * @param  string  $messageID  The Message-ID with or without brackets.
      * @return string Message-ID with brackets.
      */
     protected function _formatMessageID(string $messageID): string
@@ -1141,9 +1141,11 @@ class NNTP extends \Net_NNTP_Client
 
     /**
      * Download an article body (an article without the header).
-     * @param string $groupName
-     * @param mixed $identifier
+     *
+     * @param  string  $groupName
+     * @param  mixed  $identifier
      * @return mixed|object|string
+     *
      * @throws \Exception
      */
     protected function _getMessage(string $groupName, mixed $identifier): mixed
@@ -1210,7 +1212,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Check if we are still connected. Reconnect if not.
      *
-     * @param bool $reSelectGroup  Select back the group after connecting?
+     * @param  bool  $reSelectGroup  Select back the group after connecting?
      * @return mixed On success: (bool)   True;
      *
      * @throws \Exception
@@ -1254,7 +1256,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Verify NNTP error code and return PEAR error.
      *
-     * @param int $response  NET_NNTP Response code
+     * @param  int  $response  NET_NNTP Response code
      * @return object PEAR error
      */
     protected function _handleErrorResponse(int $response): object
@@ -1340,7 +1342,7 @@ class NNTP extends \Net_NNTP_Client
      *                             (null)|(false) Use no encryption.
      * @param  int  $port  (optional) The port number to connect to, defaults to 119.
      * @param  int  $timeout  (optional) How many seconds to wait before giving up when connecting.
-     * @param int $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
+     * @param  int  $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
      * @return mixed (bool)   On success: True when posting allowed, otherwise false.
      *               (object) On failure: pear_error
      */
@@ -1421,7 +1423,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Test whether we are connected or not.
      *
-     * @param bool $feOf  Check for the end of file pointer.
+     * @param  bool  $feOf  Check for the end of file pointer.
      * @return bool true or false
      */
     public function _isConnected(bool $feOf = true): bool
