@@ -13,4 +13,6 @@ return [
     'alternate_server_ssl' => env('NNTP_SSLENABLED_A', false),
     'socket_timeout' => env('NNTP_SOCKET_TIMEOUT', 120),
     'alternate_server_socket_timeout' => env('NNTP_SOCKET_TIMEOUT_A', 120),
+    'main_nntp_connections' => env('NNTP_CONNECTIONS', 1),
+    'alternate_nntp_connections' => env('NNTP_CONNECTIONS_A', 1)
 ];

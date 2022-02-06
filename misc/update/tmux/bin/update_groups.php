@@ -22,29 +22,34 @@ if ($nntp->doConnect() !== true) {
 }
 
 $colorCli->header('Getting first/last for all your active groups.');
-$data = $nntp->getGroups();
-if ($nntp->isError($data)) {
-    $colorCli->error('Failed to getGroups() from nntp server.');
-    exit();
-}
+try {
+    $data = $nntp->getGroups();
+    if ($nntp->isError($data)) {
+        $colorCli->error('Failed to getGroups() from nntp server.');
+        exit();
+    }
 
-$colorCli->header('Inserting new values into short_groups table.');
+    $colorCli->header('Inserting new values into short_groups table.');
 
-DB::statement('TRUNCATE TABLE short_groups');
+    DB::statement('TRUNCATE TABLE short_groups');
 
 // Put into an array all active groups
-$result = Arr::pluck(UsenetGroup::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
+    $result = Arr::pluck(UsenetGroup::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
 
-foreach ($data as $newgroup) {
-    if (\in_array($newgroup['group'], $result, false)) {
-        ShortGroup::query()->insert([
-            'name' => $newgroup['group'],
-            'first_record' => $newgroup['first'],
-            'last_record' => $newgroup['last'],
-            'updated' => now(),
-        ]);
-        $colorCli->primary('Updated '.$newgroup['group']);
+    foreach ($data as $newgroup) {
+        if (\in_array($newgroup['group'], $result, false)) {
+            ShortGroup::query()->insert([
+                'name' => $newgroup['group'],
+                'first_record' => $newgroup['first'],
+                'last_record' => $newgroup['last'],
+                'updated' => now(),
+            ]);
+            $colorCli->primary('Updated '.$newgroup['group']);
+        }
     }
+
+    $colorCli->header('Running time: '.now()->diffInSeconds($start).' seconds');
+} catch (ErrorException $e) {
+    echo $e->getMessage();
 }
 
-$colorCli->header('Running time: '.now()->diffInSeconds($start).' seconds');

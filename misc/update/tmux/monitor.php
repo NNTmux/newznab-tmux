@@ -88,13 +88,10 @@ while ($runVar['counts']['iterations'] > 0) {
     //assign scripts
     $runVar['scripts']['releases'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/releases.php";
 
-    switch ((int) $runVar['settings']['binaries_run']) {
-        case 1:
-            $runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php binaries";
-            break;
-        default:
-            $runVar['scripts']['binaries'] = 0;
-    }
+    $runVar['scripts']['binaries'] = match ((int) $runVar['settings']['binaries_run']) {
+        1 => "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php binaries",
+        default => 0,
+    };
 
     switch ((int) $runVar['settings']['backfill']) {
         case 1:

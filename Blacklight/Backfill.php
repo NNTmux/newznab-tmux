@@ -145,7 +145,7 @@ class Backfill
                         $this->colorCli->header($dMessage);
                     }
                 }
-                $this->backfillGroup($groupArr, $groupCount - $counter, $articles);
+                $this->backfillGroup($groupArr->toArray(), $groupCount - $counter, $articles);
                 $counter++;
             }
 

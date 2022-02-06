@@ -23,7 +23,7 @@ if (isset($argv[1]) && ! is_numeric($argv[1])) {
     $groupName = $argv[1];
     $colorCli->header("Updating group: $groupName");
 
-    $group = UsenetGroup::getByName($groupName);
+    $group = UsenetGroup::getByName($groupName)->toArray();
     if (is_array($group)) {
         try {
             $binaries->updateGroup(

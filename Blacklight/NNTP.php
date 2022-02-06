@@ -41,73 +41,104 @@ class NNTP extends \Net_NNTP_Client
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * @var bool
      */
-    protected $_debugBool;
+    protected bool $_debugBool;
 
     /**
      * @var bool
      */
-    protected $_echo;
+    protected bool $_echo;
 
     /**
      * Does the server support XFeature GZip header compression?
      *
      * @var bool
      */
-    protected $_compressionSupported = true;
+    protected bool $_compressionSupported = true;
 
     /**
      * Is header compression enabled for the session?
      *
      * @var bool
      */
-    protected $_compressionEnabled = false;
+    protected bool $_compressionEnabled = false;
 
     /**
      * Currently selected group.
      *
      * @var string
      */
-    protected $_currentGroup = '';
+    protected string $_currentGroup = '';
 
     /**
-     * Port of the current NNTP server.
-     *
-     * @var int
+     * @var string
      */
-    protected $_currentPort = 'NNTP_PORT';
+    protected string $_currentPort = 'NNTP_PORT';
 
     /**
      * Address of the current NNTP server.
      *
      * @var string
      */
-    protected $_currentServer = 'NNTP_SERVER';
+    protected string $_currentServer = 'NNTP_SERVER';
 
     /**
      * Are we allowed to post to usenet?
      *
      * @var bool
      */
-    protected $_postingAllowed = false;
+    protected bool $_postingAllowed = false;
 
     /**
      * How many times should we try to reconnect to the NNTP server?
      *
      * @var int
      */
-    protected $_nntpRetries;
+    protected int $_nntpRetries;
+
+    /**
+     * How many connections should we use on primary NNTP server.
+     *
+     * @var string
+     */
+    protected string $_primaryNntpConnections;
+
+    /**
+     * How many connections should we use on alternate NNTP server.
+     *
+     * @var string
+     */
+    protected string $_alternateNntpConnections;
+
+    /**
+     * How many connections do we use on primary NNTP server.
+     *
+     * @var int
+     */
+    protected int $_primaryCurrentNntpConnections;
+
+    /**
+     * How many connections do we use on alternate NNTP server.
+     *
+     * @var int
+     */
+    protected int $_alternateCurrentNntpConnections;
 
     /**
      * Seconds to wait for the blocking socket to timeout.
      *
      * @var int
      */
-    protected $_socketTimeout = 120;
+    protected int $_socketTimeout = 120;
+
+    /**
+     * @var \Blacklight\Tmux
+     */
+    protected Tmux $_tmux;
 
     /**
      * Default constructor.
@@ -127,9 +158,11 @@ class NNTP extends \Net_NNTP_Client
         parent::__construct();
 
         $this->_echo = ($options['Echo'] && config('nntmux.echocli'));
-
+        $this->_tmux = new Tmux();
         $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
         $this->colorCli = new ColorCLI();
+        $this->_primaryNntpConnections = config('nntmux_nntp.main_nntp_connections');
+        $this->_alternateNntpConnections = config('nntmux_nntp.alternate_nntp_connections');
     }
 
     /**
@@ -144,16 +177,27 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Connect to a usenet server.
      *
-     * @param  bool  $compression  Should we attempt to enable XFeature Gzip compression on this connection?
-     * @param  bool  $alternate  Use the alternate NNTP connection.
+     * @param bool $compression  Should we attempt to enable XFeature Gzip compression on this connection?
+     * @param bool $alternate  Use the alternate NNTP connection.
      * @return mixed On success = (bool)   Did we successfully connect to the usenet?
      *
      * @throws \Exception
      *                    On failure = (object) PEAR_Error.
      */
-    public function doConnect($compression = true, $alternate = false)
+    public function doConnect(bool $compression = true, bool $alternate = false): mixed
     {
-        if ($this->_isConnected() && (($alternate && $this->_currentServer === config('nntmux_nntp.alternate_server')) || (! $alternate && $this->_currentServer === config('nntmux_nntp.server')))) {
+        $primaryUSP = [
+            'ip' => gethostbyname(config('nntmux_nntp.server')),
+            'port' => config('nntmux_nntp.port')
+        ];
+        $alternateUSP = [
+            'ip_a' => gethostbyname(config('nntmux_nntp.alternate_server')),
+            'port_a' => config('nntmux_nntp.alternate_server_port')
+        ];
+        $primaryConnections = $this->_tmux->getUSPConnections('primary', $primaryUSP);
+        $alternateConnections = $this->_tmux->getUSPConnections('alternate', $alternateUSP);
+        if ($this->_isConnected() && (($alternate && $this->_currentServer === config('nntmux_nntp.alternate_server') && ($this->_primaryNntpConnections < $alternateConnections['alternate']['active'])) || (! $alternate && $this->_currentServer === config('nntmux_nntp.server') && ($this->_primaryNntpConnections < $primaryConnections['primary']['active'])))) {
+            dump('true');
             return true;
         }
 
@@ -163,14 +207,14 @@ class NNTP extends \Net_NNTP_Client
 
         // Set variables to connect based on if we are using the alternate provider or not.
         if (! $alternate) {
-            $sslEnabled = config('nntmux_nntp.ssl') ? true : false;
+            $sslEnabled = (bool) config('nntmux_nntp.ssl');
             $this->_currentServer = config('nntmux_nntp.server');
             $this->_currentPort = config('nntmux_nntp.port');
             $userName = config('nntmux_nntp.username');
             $password = config('nntmux_nntp.password');
             $socketTimeout = ! empty(config('nntmux_nntp.socket_timeout')) ? config('nntmux_nntp.socket_timeout') : $this->_socketTimeout;
         } else {
-            $sslEnabled = config('nntmux_nntp.alternate_server_ssl') ? true : false;
+            $sslEnabled = (bool) config('nntmux_nntp.alternate_server_ssl');
             $this->_currentServer = config('nntmux_nntp.alternate_server');
             $this->_currentPort = config('nntmux_nntp.alternate_server_port');
             $userName = config('nntmux_nntp.alternate_server_username');
@@ -191,7 +235,6 @@ class NNTP extends \Net_NNTP_Client
             if (! $connected) {
                 $ret = $this->connect($this->_currentServer, $sslEnabled, $this->_currentPort, 5, $socketTimeout);
             }
-
             // Check if we got an error while connecting.
             $cErr = self::isError($ret);
 
@@ -201,11 +244,8 @@ class NNTP extends \Net_NNTP_Client
                 $connected = true;
                 // When there is no error it returns bool if we are allowed to post or not.
                 $this->_postingAllowed = $ret;
-            } else {
-                // Only fetch the message once.
-                if (! $cError) {
-                    $cError = $ret->getMessage();
-                }
+            } elseif (! $cError) {
+                $cError = $ret->getMessage();
             }
 
             // If error, try to connect again.
@@ -226,7 +266,7 @@ class NNTP extends \Net_NNTP_Client
             }
 
             // If we are connected, try to authenticate.
-            if ($connected && ! $authenticated) {
+            if ($connected) {
 
                 // If the username is empty it probably means the server does not require a username.
                 if ($userName === '') {
@@ -265,14 +305,12 @@ class NNTP extends \Net_NNTP_Client
                     }
                 }
             }
-
             // If we are connected and authenticated, try enabling compression if we have it enabled.
             if ($connected && $authenticated) {
                 // Check if we should use compression on the connection.
                 if (! $compression || (int) Settings::settingValue('..compressedheaders') === 0) {
                     $this->_compressionSupported = false;
                 }
-
                 return true;
             }
             // If we reached this point and have not connected after all retries, break out of the loop.
@@ -292,11 +330,11 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Disconnect from the current NNTP server.
      *
-     * @param  bool  $force  Force quit even if not connected?
+     * @param bool $force  Force quit even if not connected?
      * @return mixed On success : (bool)   Did we successfully disconnect from usenet?
      *               On Failure : (object) PEAR_Error.
      */
-    public function doQuit($force = false)
+    public function doQuit(bool $force = false): mixed
     {
         $this->_resetProperties();
 
@@ -342,13 +380,13 @@ class NNTP extends \Net_NNTP_Client
     /**
      * @param  string  $group  Name of the group to select.
      * @param  bool  $articles  (optional) experimental! When true the article numbers is returned in 'articles'.
-     * @param  bool  $force  Force a refresh to get updated data from the usenet server.
+     * @param bool $force  Force a refresh to get updated data from the usenet server.
      * @return mixed On success : (array)  Group information.
      *
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function selectGroup($group, $articles = false, $force = false)
+    public function selectGroup($group, $articles = false, bool $force = false): mixed
     {
         $connected = $this->_checkConnection(false);
         if ($connected !== true) {
@@ -376,7 +414,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function getOverview($range = null, $names = true, $forceNames = true)
+    public function getOverview($range = null, $names = true, $forceNames = true): mixed
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -407,7 +445,7 @@ class NNTP extends \Net_NNTP_Client
      *        'Xref'       => string(66) "e alt.test:679871775"
      *    }
      *
-     * @param  string  $range  Range of articles to get the overview for. Examples follow:
+     * @param string $range  Range of articles to get the overview for. Examples follow:
      *                         Single article number:         "679871775"
      *                         Range of article numbers:      "679871775-679999999"
      *                         All newer than article number: "679871775-"
@@ -417,7 +455,7 @@ class NNTP extends \Net_NNTP_Client
      *
      * @throws \Exception
      */
-    public function getXOVER($range)
+    public function getXOVER(string $range)
     {
         // Check if we are still connected.
         $connected = $this->_checkConnection();
@@ -511,17 +549,17 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download multiple article bodies and string them together.
      *
-     * @param  string  $groupName  The name of the group the articles are in.
+     * @param string $groupName  The name of the group the articles are in.
      * @param  mixed  $identifiers  (string) Message-ID.
      *                              (int)    Article number.
      *                              (array)  Article numbers or Message-ID's (can contain both in the same array)
-     * @param  bool  $alternate  Use the alternate NNTP provider?
+     * @param bool $alternate  Use the alternate NNTP provider?
      * @return mixed On success : (string) The article bodies.
      *
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function getMessages($groupName, $identifiers, $alternate = false)
+    public function getMessages(string $groupName, mixed $identifiers, bool $alternate = false): mixed
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -624,16 +662,16 @@ class NNTP extends \Net_NNTP_Client
      * Download a full article, the body and the header, return an array with named keys and their
      * associated values, optionally decode the body using yEnc.
      *
-     * @param  string  $groupName  The name of the group the article is in.
+     * @param string $groupName  The name of the group the article is in.
      * @param  mixed  $identifier  (string)The message-ID of the article to download.
      *                             (int) The article number.
-     * @param  bool  $yEnc  Attempt to yEnc decode the body.
+     * @param bool $yEnc  Attempt to yEnc decode the body.
      * @return mixed On success : (array)  The article.
      *               On failure : (object) PEAR_Error.
      *
      * @throws \Exception
      */
-    public function get_Article($groupName, $identifier, $yEnc = false)
+    public function get_Article(string $groupName, mixed $identifier, bool $yEnc = false): mixed
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -702,7 +740,7 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download a full article header.
      *
-     * @param  string  $groupName  The name of the group the article is in.
+     * @param string $groupName  The name of the group the article is in.
      * @param  mixed  $identifier  (string) The message-ID of the article to download.
      *                             (int)    The article number.
      * @return mixed On success : (array)  The header.
@@ -710,7 +748,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function get_Header($groupName, $identifier)
+    public function get_Header(string $groupName, mixed $identifier): mixed
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -762,11 +800,11 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Post an article to usenet.
      *
-     * @param  string|array  $groups  mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
+     * @param array|string $groups  mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
      *                                (string) Group.  ie.: $groups = 'alt.test';
-     * @param  string  $subject  string  The subject.     ie.: $subject = 'Test article';
-     * @param  string|\Exception  $body  string  The message.     ie.: $message = 'This is only a test, please disregard.';
-     * @param  string  $from  string  The poster.      ie.: $from = '<anon@anon.com>';
+     * @param string $subject  string  The subject.     ie.: $subject = 'Test article';
+     * @param \Exception|string $body  string  The message.     ie.: $message = 'This is only a test, please disregard.';
+     * @param string $from  string  The poster.      ie.: $from = '<anon@anon.com>';
      * @param $extra    string  Extra, separated by \r\n
      *                                           ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
      * @param $yEnc     bool    Encode the message with yEnc?
@@ -776,7 +814,7 @@ class NNTP extends \Net_NNTP_Client
      *
      * @throws \Exception
      */
-    public function postArticle($groups, $subject, $body, $from, $yEnc = true, $compress = true, $extra = '')
+    public function postArticle(array|string $groups, string $subject, \Exception|string $body, string $from, bool $yEnc = true, bool $compress = true, string $extra = ''): mixed
     {
         if (! $this->_postingAllowed) {
             $message = 'You do not have the right to post articles on server '.$this->_currentServer;
@@ -820,7 +858,7 @@ class NNTP extends \Net_NNTP_Client
         $from = 'From: '.$from;
         // If we had extra stuff to post, format it with from.
         if ($extra !== '') {
-            $from = $from."\r\n".$extra;
+            $from .= "\r\n".$extra;
         }
 
         return $this->mail($groups, $subject, $body, $from);
@@ -830,15 +868,15 @@ class NNTP extends \Net_NNTP_Client
      * Restart the NNTP connection if an error occurs in the selectGroup
      * function, if it does not restart display the error.
      *
-     * @param  NNTP  $nntp  Instance of class NNTP.
-     * @param  string  $group  Name of the group.
-     * @param  bool  $comp  Use compression or not?
+     * @param NNTP $nntp  Instance of class NNTP.
+     * @param string $group  Name of the group.
+     * @param bool $comp  Use compression or not?
      * @return mixed On success : (array)  The group summary.
      *
      * @throws \Exception
      *                    On Failure : (object) PEAR_Error.
      */
-    public function dataError($nntp, $group, $comp = true)
+    public function dataError(NNTP $nntp, string $group, bool $comp = true): mixed
     {
         // Disconnect.
         $nntp->doQuit();
@@ -866,31 +904,31 @@ class NNTP extends \Net_NNTP_Client
      *
      * @var string
      */
-    protected $_yEncSilence;
+    protected string $_yEncSilence;
 
     /**
      * Path to temp yEnc input storage file.
      *
      * @var string
      */
-    protected $_yEncTempInput;
+    protected string $_yEncTempInput;
 
     /**
      * Path to temp yEnc output storage file.
      *
      * @var string
      */
-    protected $_yEncTempOutput;
+    protected string $_yEncTempOutput;
 
     /**
      * Split a string into lines of 510 chars ending with \r\n.
      * Usenet limits lines to 512 chars, with \r\n that leaves us 510.
      *
-     * @param  string  $string  The string to split.
-     * @param  bool  $compress  Compress the string with gzip?
+     * @param string $string  The string to split.
+     * @param bool $compress  Compress the string with gzip?
      * @return string The split string.
      */
-    protected function _splitLines($string, $compress = false): string
+    protected function _splitLines(string $string, bool $compress = false): string
     {
         // Check if the length is longer than 510 chars.
         if (\strlen($string) > 510) {
@@ -906,14 +944,14 @@ class NNTP extends \Net_NNTP_Client
      * Try to see if the NNTP server implements XFeature GZip Compression,
      * change the compression bool object if so.
      *
-     * @param  bool  $secondTry  This is only used if enabling compression fails, the function will call itself to retry.
+     * @param bool $secondTry  This is only used if enabling compression fails, the function will call itself to retry.
      * @return mixed On success : (bool)   True:  The server understood and compression is enabled.
      *               (bool)   False: The server did not understand, compression is not enabled.
      *               On failure : (object) PEAR_Error.
      *
      * @throws \Exception
      */
-    protected function _enableCompression($secondTry = false)
+    protected function _enableCompression(bool $secondTry = false): mixed
     {
         if ($this->_compressionEnabled) {
             return true;
@@ -960,7 +998,7 @@ class NNTP extends \Net_NNTP_Client
      * @return self|string Our overridden function when compression is enabled.
      *                     parent  Parent function when no compression.
      */
-    public function _getTextResponse()
+    public function _getTextResponse(): NNTP|array|string
     {
         if ($this->_compressionEnabled &&
             isset($this->_currentStatusResponse[1]) &&
@@ -985,7 +1023,7 @@ class NNTP extends \Net_NNTP_Client
      *                      On failure : (object) PEAR_Error.
      *                      On decompress failure: (string) error message
      */
-    protected function &_getXFeatureTextResponse()
+    protected function &_getXFeatureTextResponse(): array|string
     {
         $possibleTerm = false;
         $data = null;
@@ -1036,9 +1074,7 @@ class NNTP extends \Net_NNTP_Client
                     }
                     $message = 'Decompression of OVER headers failed.';
 
-                    $message = $this->throwError($this->colorCli->error($message), 1000);
-
-                    return $message;
+                    return $this->throwError($this->colorCli->error($message), 1000);
                 }
                 // The buffer was not empty, so we know this was not the real ending, so reset $possibleTerm.
                 $possibleTerm = false;
@@ -1056,9 +1092,7 @@ class NNTP extends \Net_NNTP_Client
                 if (empty($buffer)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
 
-                    $message = $this->throwError($this->colorCli->error($message), 1000);
-
-                    return $message;
+                    return $this->throwError($this->colorCli->error($message), 1000);
                 }
             }
 
@@ -1066,25 +1100,24 @@ class NNTP extends \Net_NNTP_Client
             $data .= $buffer;
 
             // Check if we have the ending (.\r\n)
-            if (substr($buffer, -3) === ".\r\n") {
+            if (str_ends_with($buffer, ".\r\n")) {
                 // We have a possible ending, next loop check if it is.
                 $possibleTerm = true;
             }
         }
 
         $message = 'Unspecified error while downloading OVER headers.';
-        $message = $this->throwError($this->colorCli->error($message), 1000);
 
-        return $message;
+        return $this->throwError($this->colorCli->error($message), 1000);
     }
 
     /**
      * Check if the Message-ID has the required opening and closing brackets.
      *
-     * @param  string  $messageID  The Message-ID with or without brackets.
+     * @param string $messageID  The Message-ID with or without brackets.
      * @return string Message-ID with brackets.
      */
-    protected function _formatMessageID($messageID): string
+    protected function _formatMessageID(string $messageID): string
     {
         $messageID = (string) $messageID;
         if ($messageID === '') {
@@ -1097,7 +1130,7 @@ class NNTP extends \Net_NNTP_Client
         }
 
         // Check if the last char is >, if not add it.
-        if (substr($messageID, -1) !== '>') {
+        if (! str_ends_with($messageID, '>')) {
             $messageID .= '>';
         }
 
@@ -1106,16 +1139,12 @@ class NNTP extends \Net_NNTP_Client
 
     /**
      * Download an article body (an article without the header).
-     *
-     * @param  string  $groupName  The name of the group the article is in.
-     * @param  mixed  $identifier  (string) The message-ID of the article to download.
-     *                             (int)    The article number.
-     * @return string On success : (string) The article's body.
-     *
+     * @param string $groupName
+     * @param mixed $identifier
+     * @return mixed|object|string
      * @throws \Exception
-     *                    On failure : (object) PEAR_Error.
      */
-    protected function _getMessage($groupName, $identifier): ?string
+    protected function _getMessage(string $groupName, mixed $identifier): mixed
     {
         // Make sure the requested group is already selected, if not select it.
         if ($this->group() !== $groupName) {
@@ -1162,7 +1191,7 @@ class NNTP extends \Net_NNTP_Client
                 }
 
                 // Check for line that starts with double period, remove one.
-                if (strpos($line, '.') === 0 && $line[1] === '.') {
+                if (str_starts_with($line, '.') && $line[1] === '.') {
                     $line = substr($line, 1);
                 }
 
@@ -1179,13 +1208,13 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Check if we are still connected. Reconnect if not.
      *
-     * @param  bool  $reSelectGroup  Select back the group after connecting?
+     * @param bool $reSelectGroup  Select back the group after connecting?
      * @return mixed On success: (bool)   True;
      *
      * @throws \Exception
      *                    On failure: (object) PEAR_Error
      */
-    protected function _checkConnection($reSelectGroup = true)
+    protected function _checkConnection(bool $reSelectGroup = true)
     {
         $currentGroup = $this->_currentGroup;
         // Check if we are connected.
@@ -1223,10 +1252,10 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Verify NNTP error code and return PEAR error.
      *
-     * @param  int  $response  NET_NNTP Response code
+     * @param int $response  NET_NNTP Response code
      * @return object PEAR error
      */
-    protected function _handleErrorResponse($response)
+    protected function _handleErrorResponse(int $response): object
     {
         switch ($response) {
             // 381, RFC2980: 'More authentication information required'
@@ -1309,11 +1338,11 @@ class NNTP extends \Net_NNTP_Client
      *                             (null)|(false) Use no encryption.
      * @param  int  $port  (optional) The port number to connect to, defaults to 119.
      * @param  int  $timeout  (optional) How many seconds to wait before giving up when connecting.
-     * @param  int  $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
+     * @param int $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
      * @return mixed (bool)   On success: True when posting allowed, otherwise false.
      *               (object) On failure: pear_error
      */
-    public function connect($host = null, $encryption = null, $port = null, $timeout = 15, $socketTimeout = 120)
+    public function connect($host = null, $encryption = null, $port = null, $timeout = 15, int $socketTimeout = 120): mixed
     {
         if ($this->_isConnected()) {
             return $this->throwError('Already connected, disconnect first!', null);
@@ -1331,7 +1360,6 @@ class NNTP extends \Net_NNTP_Client
         switch ($encryption) {
             case null:
             case 'tcp':
-            case false:
                 $transport = 'tcp';
                 $port = $port ?? 119;
                 break;
@@ -1343,8 +1371,6 @@ class NNTP extends \Net_NNTP_Client
             default:
                 $message = '$encryption parameter must be either tcp, tls, ssl.';
                 trigger_error($message, E_USER_ERROR);
-
-                return $this->throwError($message);
         }
         // Attempt to connect to usenet.
         $socket = stream_socket_client(
@@ -1361,20 +1387,16 @@ class NNTP extends \Net_NNTP_Client
                 $message .= ' Try disabling SSL/TLS, and/or try a different port.';
             }
             $message .= ' [ERROR '.$errorNumber.': '.$errorString.']';
-            if ($this->_logger) {
-                $this->_logger->notice($message);
-            }
+            $this->_logger?->notice($message);
 
             return $this->throwError($message);
         }
         // Store the socket resource as property.
         $this->_socket = $socket;
-        $this->_socketTimeout = (is_numeric($socketTimeout) ? $socketTimeout : $this->_socketTimeout);
+        $this->_socketTimeout = $socketTimeout ?: $this->_socketTimeout;
         // Set the socket timeout.
         stream_set_timeout($this->_socket, $this->_socketTimeout);
-        if ($this->_logger) {
-            $this->_logger->info("Connection to $transport://$host:$port has been established.");
-        }
+        $this->_logger?->info("Connection to $transport://$host:$port has been established.");
         // Retrieve the server's initial response.
         $response = $this->_getStatusResponse();
         if (self::isError($response)) {
@@ -1383,14 +1405,10 @@ class NNTP extends \Net_NNTP_Client
         switch ($response) {
             // 200, Posting allowed
             case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_ALLOWED:
-                // TODO: Set some variable before return
                 return true;
             // 201, Posting NOT allowed
             case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED:
-                if ($this->_logger) {
-                    $this->_logger->info('Posting not allowed!');
-                }
-                // TODO: Set some variable before return
+                $this->_logger?->info('Posting not allowed!');
                 return false;
             default:
                 return $this->_handleErrorResponse($response);
@@ -1400,11 +1418,11 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Test whether we are connected or not.
      *
-     * @param  bool  $feof  Check for the end of file pointer.
+     * @param bool $feOf  Check for the end of file pointer.
      * @return bool true or false
      */
-    public function _isConnected($feof = true): bool
+    public function _isConnected(bool $feOf = true): bool
     {
-        return is_resource($this->_socket) && ($feof ? ! feof($this->_socket) : true);
+        return is_resource($this->_socket) && (! $feOf || ! feof($this->_socket));
     }
 }
