@@ -33,7 +33,7 @@ try {
 
     DB::statement('TRUNCATE TABLE short_groups');
 
-// Put into an array all active groups
+    // Put into an array all active groups
     $result = Arr::pluck(UsenetGroup::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
 
     foreach ($data as $newgroup) {

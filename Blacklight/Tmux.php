@@ -56,13 +56,12 @@ class Tmux
     }
 
     /**
-     * @param string $which
+     * @param  string  $which
      * @param $connections
      * @return mixed
      */
     public function getUSPConnections(string $which, $connections): mixed
     {
-
         switch ($which) {
             case 'alternate':
                 $ip = 'ip_a';
