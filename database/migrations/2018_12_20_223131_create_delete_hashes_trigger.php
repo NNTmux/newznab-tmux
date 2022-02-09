@@ -1,7 +1,7 @@
 <?php
 
-use DariusIII\LaravelDatabaseTrigger\TriggerFacade as Schema;
 use Illuminate\Database\Migrations\Migration;
+use NtimYeboah\LaravelDatabaseTrigger\TriggerFacade as Schema;
 
 class CreateDeleteHashesTrigger extends Migration
 {
