@@ -11694,22 +11694,22 @@
         },
         {
             "name": "torann/geoip",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Torann/laravel-geoip.git",
-                "reference": "ec99531b32ddbc42233cc8f6e651f6b39c3cf8a3"
+                "reference": "3d730ae7470b86ae828b4128b1757a96156fd941"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Torann/laravel-geoip/zipball/ec99531b32ddbc42233cc8f6e651f6b39c3cf8a3",
-                "reference": "ec99531b32ddbc42233cc8f6e651f6b39c3cf8a3",
+                "url": "https://api.github.com/repos/Torann/laravel-geoip/zipball/3d730ae7470b86ae828b4128b1757a96156fd941",
+                "reference": "3d730ae7470b86ae828b4128b1757a96156fd941",
                 "shasum": ""
             },
             "require": {
-                "illuminate/cache": "^8.0",
-                "illuminate/console": "^8.0",
-                "illuminate/support": "^8.0",
+                "illuminate/cache": "^8.0|^9.0",
+                "illuminate/console": "^8.0|^9.0",
+                "illuminate/support": "^8.0|^9.0",
                 "php": "^8.0"
             },
             "require-dev": {
@@ -11768,9 +11768,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Torann/laravel-geoip/issues",
-                "source": "https://github.com/Torann/laravel-geoip/tree/3.0.3"
+                "source": "https://github.com/Torann/laravel-geoip/tree/3.0.4"
             },
-            "time": "2021-12-20T16:27:11+00:00"
+            "time": "2022-02-09T14:48:24+00:00"
         },
         {
             "name": "treeware/plant",
@@ -13393,12 +13393,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Facade\\Ignition\\": "src"
-                },
                 "files": [
                     "src/helpers.php"
-                ]
+                ],
+                "psr-4": {
+                    "Facade\\Ignition\\": "src"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -13811,16 +13811,16 @@
         },
         {
             "name": "matt-allan/laravel-code-style",
-            "version": "0.7.0",
+            "version": "0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matt-allan/laravel-code-style.git",
-                "reference": "3606701ff947145a58e04ad9a2a5e9d6aa1def2c"
+                "reference": "49b1bccd186240b47ef1b40aae72eee354998212"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/3606701ff947145a58e04ad9a2a5e9d6aa1def2c",
-                "reference": "3606701ff947145a58e04ad9a2a5e9d6aa1def2c",
+                "url": "https://api.github.com/repos/matt-allan/laravel-code-style/zipball/49b1bccd186240b47ef1b40aae72eee354998212",
+                "reference": "49b1bccd186240b47ef1b40aae72eee354998212",
                 "shasum": ""
             },
             "require": {
@@ -13871,9 +13871,10 @@
             ],
             "support": {
                 "issues": "https://github.com/matt-allan/laravel-code-style/issues",
-                "source": "https://github.com/matt-allan/laravel-code-style/tree/0.7.0"
+                "source": "https://github.com/matt-allan/laravel-code-style/tree/0.7.1"
             },
-            "time": "2021-11-24T16:23:34+00:00"
+            "abandoned": "jubeki/laravel-code-style",
+            "time": "2022-02-09T15:06:22+00:00"
         },
         {
             "name": "mockery/mockery",
