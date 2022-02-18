@@ -1,41 +1,8 @@
 {
-  "authors": [
-    {
-      "name": "NNTmux Team"
-    }
-  ],
-  "autoload": {
-    "files": [
-      "vendor/laravel/framework/src/Illuminate/Support/helpers.php",
-      "app/Extensions/helper/helpers.php"
-    ],
-    "psr-4": {
-      "Blacklight\\": "Blacklight/",
-      "App\\": "app/",
-      "Database\\Factories\\": "database/factories/",
-      "Database\\Seeders\\": "database/seeders/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Tests\\": "tests/"
-    }
-  },
-  "config": {
-    "discard-changes": true,
-    "process-timeout": 3600,
-    "preferred-install": {
-      "*": "dist"
-    },
-    "sort-packages": true,
-    "optimize-autoloader": true,
-    "allow-plugins": {
-      "composer/package-versions-deprecated": true,
-      "captainhook/plugin-composer": true,
-      "treeware/plant": true
-    }
-  },
+  "name": "nntmux/newznab-tmux",
   "description": "A Usenet Indexer",
+  "license": "GPL-3.0-only",
+  "type": "project",
   "keywords": [
     "NNTmux",
     "newznab-tmux",
@@ -44,25 +11,11 @@
     "Laravel",
     "Eloquent"
   ],
-  "license": "GPL-3.0-only",
-  "name": "nntmux/newznab-tmux",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/Net_NNTP"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/Laravel.Smarty"
-        }
-
-    ],
-  "minimum-stability": "dev",
-  "prefer-stable" : true,
+  "authors": [
+    {
+      "name": "NNTmux Team"
+    }
+  ],
   "require": {
     "php": "^8.0",
     "ext-bcmath": "*",
@@ -159,7 +112,6 @@
     "yab/laravel-scout-mysql-driver": "^3.0",
     "ytake/laravel-smarty": "^5.0"
   },
-
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^2.4",
     "beyondcode/laravel-dump-server": "^1.4",
@@ -173,16 +125,61 @@
     "nunomaduro/collision": "^4.2.0",
     "nunomaduro/larastan": "^0.6",
     "php-coveralls/php-coveralls": "^2.0",
-    "phpunit/phpunit": "^8.0|^9.0"
+    "phpunit/phpunit": "^8.0 || ^9.0"
   },
-
+  "suggest": {
+    "ext-gd": "to use GD library based image processing.",
+    "ext-imagick": "to use Imagick based image processing.",
+    "ext-xdebug": "For developement work"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/Net_NNTP"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/Laravel.Smarty"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "Blacklight\\": "Blacklight/",
+      "App\\": "app/",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/"
+    },
+    "files": [
+      "vendor/laravel/framework/src/Illuminate/Support/helpers.php",
+      "app/Extensions/helper/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true,
+      "captainhook/plugin-composer": true,
+      "treeware/plant": true
+    },
+    "discard-changes": true,
+    "optimize-autoloader": true,
+    "preferred-install": {
+      "*": "dist"
+    },
+    "process-timeout": 3600,
+    "sort-packages": true
+  },
   "scripts": {
-    "post-root-package-install": [
-      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-    ],
-    "post-create-project-cmd": [
-      "@php artisan key:generate --ansi"
-    ],
     "post-install-cmd": [
       "Blacklight\\build\\ComposerScripts::postInstall"
     ],
@@ -195,13 +192,13 @@
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover --ansi"
     ],
+    "post-root-package-install": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ],
+    "post-create-project-cmd": [
+      "@php artisan key:generate --ansi"
+    ],
     "check-style": "php-cs-fixer fix --dry-run --diff",
     "fix-style": "php-cs-fixer fix"
-  },
-  "suggest": {
-    "ext-gd": "to use GD library based image processing.",
-    "ext-imagick": "to use Imagick based image processing.",
-    "ext-xdebug": "For developement work"
-  },
-  "type": "project"
+  }
 }
