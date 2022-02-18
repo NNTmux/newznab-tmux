@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "677b3fd3d22141421b891f8578e81d6c",
+    "content-hash": "950e7b4efbac5c5d241cc618e554efe7",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -12860,12 +12860,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "2e40cdf2dc6cc3182a47c22173522983df5c1c99"
+                "reference": "32852304d0c8823fe535dfc5b19e68952d4a6f41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/2e40cdf2dc6cc3182a47c22173522983df5c1c99",
-                "reference": "2e40cdf2dc6cc3182a47c22173522983df5c1c99",
+                "url": "https://api.github.com/repos/composer/composer/zipball/32852304d0c8823fe535dfc5b19e68952d4a6f41",
+                "reference": "32852304d0c8823fe535dfc5b19e68952d4a6f41",
                 "shasum": ""
             },
             "require": {
@@ -12958,7 +12958,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-02-18T07:26:59+00:00"
+            "time": "2022-02-18T09:20:20+00:00"
         },
         {
             "name": "composer/metadata-minifier",
