@@ -71,7 +71,7 @@ class ReleaseImage
     }
 
     /**
-     * @param  $imgLoc
+     * @param    $imgLoc
      * @return bool|\Intervention\Image\Image
      */
     protected function fetchImage($imgLoc)

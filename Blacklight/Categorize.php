@@ -79,7 +79,7 @@ class Categorize
      * Then work out which category is applicable for either a group or a binary.
      * Returns Category::OTHER_MISC if no category is appropriate.
      *
-     * @param  $groupId
+     * @param    $groupId
      * @param  string  $releaseName
      * @param  string  $poster
      * @return array

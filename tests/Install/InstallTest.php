@@ -7,6 +7,7 @@
  *
  * @author        DariusIII
  * @copyright (c) 2017, NNTmux
+ *
  * @version       0.0.1
  */
 

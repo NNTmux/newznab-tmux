@@ -174,8 +174,8 @@ abstract class TV extends Videos
     /**
      * Updates the release when match for the current scraper is found.
      *
-     * @param  $videoId
-     * @param  $releaseId
+     * @param    $videoId
+     * @param    $releaseId
      * @param  int  $episodeId
      */
     public function setVideoIdFound($videoId, $releaseId, $episodeId): void
@@ -398,9 +398,9 @@ abstract class TV extends Videos
      *
      * Returns the Episode ID or false if not found
      *
-     * @param  $id
-     * @param  $series
-     * @param  $episode
+     * @param    $id
+     * @param    $series
+     * @param    $episode
      * @param  string  $airdate
      * @return int|false
      */
