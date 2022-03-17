@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Triggers\Trigger;
 
 class CreateReleasesTable extends Migration
 {
@@ -81,6 +82,13 @@ processed');
         DB::statement('ALTER TABLE releases DROP PRIMARY KEY , ADD PRIMARY KEY (id, categories_id)');
         DB::statement('ALTER TABLE releases ADD COLUMN nzb_guid BINARY(16) NULL');
         DB::statement('ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid)');
+
+        Trigger::table('releases')->key('check_insert')->beforeInsert(function () {
+            return 'IF NEW.searchname REGEXP "[a-fA-F0-9]{32}" OR NEW.name REGEXP "[a-fA-F0-9]{32}" THEN SET NEW.ishashed = 1; END IF;';
+        });
+        Trigger::table('releases')->key('check_update')->beforeUpdate(function () {
+            return 'IF NEW.searchname REGEXP "[a-fA-F0-9]{32}" OR NEW.name REGEXP "[a-fA-F0-9]{32}" THEN SET NEW.ishashed = 1; END IF;';
+        });
     }
 
     /**
