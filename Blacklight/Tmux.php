@@ -298,7 +298,7 @@ class Tmux
      * Returns random bool, weighted by $chance.
      *
      *
-     * @param    $loop
+     * @param  $loop
      * @param  int  $chance
      * @return bool
      *
@@ -335,8 +335,8 @@ class Tmux
     }
 
     /**
-     * @param    $qry
-     * @param    $bookreqids
+     * @param  $qry
+     * @param  $bookreqids
      * @param  string  $db_name
      * @param  string  $ppmax
      * @param  string  $ppmin
