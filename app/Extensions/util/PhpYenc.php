@@ -26,7 +26,7 @@ namespace App\Extensions\util;
 class PhpYenc
 {
     /**
-     * @param    $text
+     * @param  $text
      * @param  bool  $ignore
      * @return bool|string
      */
@@ -136,8 +136,8 @@ class PhpYenc
     }
 
     /**
-     * @param    $data
-     * @param    $filename
+     * @param  $data
+     * @param  $filename
      * @param  int  $lineLength
      * @param  bool  $crc32
      * @return string
