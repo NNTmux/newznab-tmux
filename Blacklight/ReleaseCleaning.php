@@ -93,9 +93,9 @@ class ReleaseCleaning
     }
 
     /**
-     * @param    $subject
-     * @param    $fromName
-     * @param    $groupName
+     * @param  $subject
+     * @param  $fromName
+     * @param  $groupName
      * @param  bool  $usePre
      * @return array|false|string
      *
