@@ -188,7 +188,7 @@ SQL_EXPORT;
     }
 
     /**
-     * @param  $filespec
+     * @param    $filespec
      * @param  bool  $localDB
      */
     public function import($filespec, $localDB = false)
