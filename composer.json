@@ -96,6 +96,7 @@
     "propaganistas/laravel-disposable-email": "^2.0",
     "ramsey/uuid": "^4.0",
     "rtconner/laravel-tagging": "^4.0",
+    "sentry/sentry-laravel": "^2.11",
     "smarty/smarty": "^4.0",
     "spatie/async": "^1.0",
     "spatie/laravel-backup": "^8.1",

@@ -27,6 +27,20 @@ class Handler extends ExceptionHandler
     ];
 
     /**
+     * Catch errors with Sentry.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->reportable(function (Throwable $e) {
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+        });
+    }
+
+    /**
      * Report or log an exception.
      *
      *
