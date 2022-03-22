@@ -408,7 +408,7 @@ function errorOnSQL()
 
 /**
  * @param  \PDOStatement  $ps
- * @param  $table
+ * @param    $table
  * @return bool|int|string
  */
 function getTableRowCount(\PDOStatement $ps, $table)

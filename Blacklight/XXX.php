@@ -107,10 +107,10 @@ class XXX
      * Get XXX releases with covers for xxx browse page.
      *
      * @param $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderBy
+     * @param    $cat
+     * @param    $start
+     * @param    $num
+     * @param    $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return array
