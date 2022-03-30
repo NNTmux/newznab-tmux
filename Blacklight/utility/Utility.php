@@ -513,7 +513,7 @@ class Utility
     /**
      * Convert obj to array.
      *
-     * @param    $arrObjData
+     * @param  $arrObjData
      * @param  array  $arrSkipIndices
      * @return array
      */
