@@ -139,8 +139,8 @@ class UserSerie extends Model
     /**
      * Update a TV show category ID for a user's "my show" TV show.
      *
-     * @param  $users_id
-     * @param  $videos_id
+     * @param    $users_id
+     * @param    $videos_id
      * @param  array  $catID  List of category ID's.
      */
     public static function updateShow($users_id, $videos_id, array $catID = []): void

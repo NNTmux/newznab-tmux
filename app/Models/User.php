@@ -446,9 +446,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  $start
-     * @param  $offset
-     * @param  $orderBy
+     * @param    $start
+     * @param    $offset
+     * @param    $orderBy
      * @param  string  $userName
      * @param  string  $email
      * @param  string  $host
@@ -626,7 +626,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  $id
+     * @param    $id
      * @param  int  $num
      */
     public static function incrementGrabs(int $id, $num = 1): void
@@ -695,11 +695,11 @@ class User extends Authenticatable
     /**
      * Register a new user.
      *
-     * @param  $userName
-     * @param  $password
-     * @param  $email
-     * @param  $host
-     * @param  $notes
+     * @param    $userName
+     * @param    $password
+     * @param    $email
+     * @param    $host
+     * @param    $notes
      * @param  int  $invites
      * @param  string  $inviteCode
      * @param  bool  $forceInviteMode
