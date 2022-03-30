@@ -94,6 +94,7 @@ function categorizeRelease($update = true, $echoOutput = false, $argv): int
                         ]);
                         $release = Release::find($result->id);
                         if (! empty($release)) {
+                            $release->untag();
                             $release->retag($catId['tags']);
                         }
                         \Blacklight\NameFixer::echoChangedReleaseName([

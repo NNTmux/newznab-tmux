@@ -1046,6 +1046,7 @@ class NameFixer
 
                         if ($taggedRelease !== null) {
                             $taggedRelease->update($updateColumns);
+                            $taggedRelease->untag();
                             $taggedRelease->retag($determinedCategory['tags']);
                         }
                         if (config('nntmux.elasticsearch_enabled') === true) {
@@ -1069,6 +1070,7 @@ class NameFixer
                                     'iscategorized' => 1,
                                 ]
                             );
+                        $taggedRelease->untag();
                         $taggedRelease?->retag($determinedCategory['tags']);
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->_releases_id);

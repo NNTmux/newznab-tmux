@@ -363,7 +363,9 @@ class Release extends Model
         }
         if (! empty($tags)) {
             $newTags = explode(',', $tags);
-            self::find($id)->retag($newTags);
+            $release = self::find($id);
+            $release->untag();
+            $release->retag($newTags);
         }
     }
 
