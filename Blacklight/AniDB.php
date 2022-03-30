@@ -33,9 +33,9 @@ class AniDB
      * @param  string  $rating
      * @param  string  $categories
      * @param  string  $characters
-     * @param    $epnos
-     * @param    $airdates
-     * @param    $episodetitles
+     * @param  $epnos
+     * @param  $airdates
+     * @param  $episodetitles
      */
     public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles): void
     {

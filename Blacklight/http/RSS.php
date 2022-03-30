@@ -42,10 +42,10 @@ class RSS extends Capabilities
      * Get releases for RSS.
      *
      *
-     * @param    $cat
+     * @param  $cat
      * @param  int  $offset
-     * @param    $videosId
-     * @param    $aniDbID
+     * @param  $videosId
+     * @param  $aniDbID
      * @param  int  $userID
      * @param  int  $airDate
      * @param  int  $limit
