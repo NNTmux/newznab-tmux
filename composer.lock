@@ -3637,16 +3637,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.5.1",
+            "version": "v9.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "35be2599c9ac3d58bf1578895c2e85ea4848a0d7"
+                "reference": "47940a1a8774b96696ed57e6736ccea4a880c057"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/35be2599c9ac3d58bf1578895c2e85ea4848a0d7",
-                "reference": "35be2599c9ac3d58bf1578895c2e85ea4848a0d7",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/47940a1a8774b96696ed57e6736ccea4a880c057",
+                "reference": "47940a1a8774b96696ed57e6736ccea4a880c057",
                 "shasum": ""
             },
             "require": {
@@ -3812,20 +3812,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-03-15T14:41:19+00:00"
+            "time": "2022-03-29T14:41:26+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.9.3",
+            "version": "v5.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "2c2c28dff4b0f8632f74ca1945f830fb462c6b56"
+                "reference": "2e24d95c4efa41c4d43d9551345c86c71b7959a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/2c2c28dff4b0f8632f74ca1945f830fb462c6b56",
-                "reference": "2c2c28dff4b0f8632f74ca1945f830fb462c6b56",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/2e24d95c4efa41c4d43d9551345c86c71b7959a3",
+                "reference": "2e24d95c4efa41c4d43d9551345c86c71b7959a3",
                 "shasum": ""
             },
             "require": {
@@ -3887,22 +3887,22 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.9.3"
+                "source": "https://github.com/laravel/horizon/tree/v5.9.4"
             },
-            "time": "2022-02-22T20:56:51+00:00"
+            "time": "2022-03-29T15:30:33+00:00"
         },
         {
             "name": "laravel/scout",
-            "version": "v9.4.5",
+            "version": "v9.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "ac962d2e052e90ca271e9bb1b30229ed870c4963"
+                "reference": "c4b697218ea7abe89894312caf86668b1f169233"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/ac962d2e052e90ca271e9bb1b30229ed870c4963",
-                "reference": "ac962d2e052e90ca271e9bb1b30229ed870c4963",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/c4b697218ea7abe89894312caf86668b1f169233",
+                "reference": "c4b697218ea7abe89894312caf86668b1f169233",
                 "shasum": ""
             },
             "require": {
@@ -3922,8 +3922,8 @@
                 "phpunit/phpunit": "^9.3"
             },
             "suggest": {
-                "algolia/algoliasearch-client-php": "Required to use the Algolia engine (^2.2).",
-                "meilisearch/meilisearch-php": "Required to use the MeiliSearch engine (^0.17)."
+                "algolia/algoliasearch-client-php": "Required to use the Algolia engine (^3.2).",
+                "meilisearch/meilisearch-php": "Required to use the MeiliSearch engine (^0.23)."
             },
             "type": "library",
             "extra": {
@@ -3961,7 +3961,7 @@
                 "issues": "https://github.com/laravel/scout/issues",
                 "source": "https://github.com/laravel/scout"
             },
-            "time": "2022-02-22T16:20:15+00:00"
+            "time": "2022-03-29T15:56:47+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -4024,16 +4024,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v4.8.0",
+            "version": "v4.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "eac91c87ad9326e8a9eff14e24128d35766fc73d"
+                "reference": "2c61ad4a1d1366f2829cbe3d50d004cef7dfc691"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/eac91c87ad9326e8a9eff14e24128d35766fc73d",
-                "reference": "eac91c87ad9326e8a9eff14e24128d35766fc73d",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/2c61ad4a1d1366f2829cbe3d50d004cef7dfc691",
+                "reference": "2c61ad4a1d1366f2829cbe3d50d004cef7dfc691",
                 "shasum": ""
             },
             "require": {
@@ -4086,22 +4086,22 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/telescope/issues",
-                "source": "https://github.com/laravel/telescope/tree/v4.8.0"
+                "source": "https://github.com/laravel/telescope/tree/v4.8.1"
             },
-            "time": "2022-03-14T19:55:48+00:00"
+            "time": "2022-03-26T16:04:21+00:00"
         },
         {
             "name": "laravel/tinker",
-            "version": "v2.7.1",
+            "version": "v2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/tinker.git",
-                "reference": "1e2d500585a4e546346fadd3adc6f9c1a97e15f4"
+                "reference": "dff39b661e827dae6e092412f976658df82dbac5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/tinker/zipball/1e2d500585a4e546346fadd3adc6f9c1a97e15f4",
-                "reference": "1e2d500585a4e546346fadd3adc6f9c1a97e15f4",
+                "url": "https://api.github.com/repos/laravel/tinker/zipball/dff39b661e827dae6e092412f976658df82dbac5",
+                "reference": "dff39b661e827dae6e092412f976658df82dbac5",
                 "shasum": ""
             },
             "require": {
@@ -4154,9 +4154,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/tinker/issues",
-                "source": "https://github.com/laravel/tinker/tree/v2.7.1"
+                "source": "https://github.com/laravel/tinker/tree/v2.7.2"
             },
-            "time": "2022-03-15T15:25:01+00:00"
+            "time": "2022-03-23T12:38:24+00:00"
         },
         {
             "name": "laravel/ui",
@@ -7079,16 +7079,16 @@
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706"
+                "reference": "77a32518733312af16a44300404e945338981de3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/93ebd0014cab80c4ea9f5e297ea48672f1b87706",
-                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/77a32518733312af16a44300404e945338981de3",
+                "reference": "77a32518733312af16a44300404e945338981de3",
                 "shasum": ""
             },
             "require": {
@@ -7123,9 +7123,9 @@
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
             "support": {
                 "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
-                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.6.0"
+                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.6.1"
             },
-            "time": "2022-01-04T19:58:01+00:00"
+            "time": "2022-03-15T21:29:03+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -15285,16 +15285,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "cc67578d9afd0f5f2545067285613d7a529aefac"
+                "reference": "f32e95f571c9587b4e14be05253ae56fedd00b2c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/cc67578d9afd0f5f2545067285613d7a529aefac",
-                "reference": "cc67578d9afd0f5f2545067285613d7a529aefac",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/f32e95f571c9587b4e14be05253ae56fedd00b2c",
+                "reference": "f32e95f571c9587b4e14be05253ae56fedd00b2c",
                 "shasum": ""
             },
             "require": {
@@ -15320,7 +15320,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.5.1"
+                "source": "https://github.com/phpstan/phpstan/tree/1.5.2"
             },
             "funding": [
                 {
@@ -15340,7 +15340,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-28T15:34:48+00:00"
+            "time": "2022-03-29T07:34:36+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -17030,16 +17030,16 @@
         },
         {
             "name": "spatie/ignition",
-            "version": "1.2.6",
+            "version": "1.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ignition.git",
-                "reference": "be24d33a9de271638314924b5da85e168e4148e4"
+                "reference": "2f059cf42b48f7c522efbba1c05ad59fc2c1a3f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ignition/zipball/be24d33a9de271638314924b5da85e168e4148e4",
-                "reference": "be24d33a9de271638314924b5da85e168e4148e4",
+                "url": "https://api.github.com/repos/spatie/ignition/zipball/2f059cf42b48f7c522efbba1c05ad59fc2c1a3f2",
+                "reference": "2f059cf42b48f7c522efbba1c05ad59fc2c1a3f2",
                 "shasum": ""
             },
             "require": {
@@ -17096,7 +17096,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-03-23T11:02:14+00:00"
+            "time": "2022-03-29T08:48:34+00:00"
         },
         {
             "name": "spatie/laravel-ignition",
