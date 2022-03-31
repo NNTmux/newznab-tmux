@@ -111,7 +111,7 @@ class ReleaseExtra
     }
 
     /**
-     * @param    $releaseID
+     * @param  $releaseID
      * @param  \Mhor\MediaInfo\Container\MediaInfoContainer  $arrXml
      */
     public function addFromXml($releaseID, MediaInfoContainer $arrXml): void
@@ -400,7 +400,7 @@ class ReleaseExtra
     }
 
     /**
-     * @param    $id
+     * @param  $id
      * @param  \Mhor\MediaInfo\Container\MediaInfoContainer  $xmlArray
      */
     public function addFull($id, MediaInfoContainer $xmlArray): void

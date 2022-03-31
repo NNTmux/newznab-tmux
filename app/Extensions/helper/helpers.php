@@ -17,7 +17,7 @@ use Zip as ZipStream;
 if (! function_exists('getRawHtml')) {
 
     /**
-     * @param    $url
+     * @param  $url
      * @param  bool  $cookie
      * @return bool|mixed|string
      */
@@ -207,7 +207,7 @@ if (! function_exists('color')) {
 if (! function_exists('human_filesize')) {
 
     /**
-     * @param    $bytes
+     * @param  $bytes
      * @param  int  $decimals
      * @return string
      */
