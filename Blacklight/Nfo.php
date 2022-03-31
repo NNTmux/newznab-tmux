@@ -232,7 +232,7 @@ class Nfo
     /**
      * Attempt to find NFO files inside the NZB's of releases.
      *
-     * @param    $nntp
+     * @param  $nntp
      * @param  string  $groupID  (optional) Group ID.
      * @param  string  $guidChar  (optional) First character of the release GUID (used for multi-processing).
      * @param  int  $processImdb  (optional) Attempt to find IMDB id's in the NZB?
