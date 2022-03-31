@@ -213,11 +213,11 @@ class Movie
      * Get movie releases with covers for movie browse page.
      *
      *
-     * @param    $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
-     * @param    $orderBy
+     * @param  $page
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return array|mixed
@@ -762,7 +762,7 @@ class Movie
      * Fetch info for IMDB id from TMDB.
      *
      *
-     * @param    $imdbId
+     * @param  $imdbId
      * @param  bool  $text
      * @return array|false
      */
