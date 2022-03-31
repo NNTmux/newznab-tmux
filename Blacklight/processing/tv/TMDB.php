@@ -67,9 +67,9 @@ class TMDB extends TV
      * Main processing director function for TMDB
      * Calls work query function and initiates processing.
      *
-     * @param  $groupID
-     * @param  $guidChar
-     * @param  $process
+     * @param    $groupID
+     * @param    $guidChar
+     * @param    $process
      * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void

@@ -536,8 +536,8 @@ class NameFixer
      * @param  int  $time  1: 24 hours, 2: no time limit
      * @param  int  $echo  1: change the name, anything else: preview of what could have been changed.
      * @param  int  $cats  1: other categories, 2: all categories
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      * @param  NNTP  $nntp
      *
      * @throws \Exception
@@ -910,11 +910,11 @@ class NameFixer
      * Update the release with the new information.
      *
      *
-     * @param  $release
-     * @param  $name
-     * @param  $method
-     * @param  $echo
-     * @param  $type
+     * @param    $release
+     * @param    $name
+     * @param    $method
+     * @param    $echo
+     * @param    $type
      * @param  int  $nameStatus
      * @param  bool  $show
      * @param  int  $preId
@@ -1273,7 +1273,7 @@ class NameFixer
     /**
      * Match a release filename to a PreDB filename or title.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  int  $nameStatus
      * @param  bool  $show
@@ -1351,10 +1351,10 @@ class NameFixer
      * Match a Hash from the predb to a release.
      *
      * @param  string  $hash
-     * @param  $release
-     * @param  $echo
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $release
+     * @param    $echo
+     * @param    $nameStatus
+     * @param    $show
      * @return int
      *
      * @throws \Exception
@@ -1467,7 +1467,7 @@ class NameFixer
     /**
      * Check the array using regex for a clean name.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
      * @param  int  $nameStatus
@@ -1579,11 +1579,11 @@ class NameFixer
     /**
      * Look for a TV name.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1613,11 +1613,11 @@ class NameFixer
     /**
      * Look for a movie name.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1659,11 +1659,11 @@ class NameFixer
     /**
      * Look for a game name.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1689,11 +1689,11 @@ class NameFixer
     /**
      * Look for a app name.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1713,11 +1713,11 @@ class NameFixer
     /**
      * TV.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1737,11 +1737,11 @@ class NameFixer
     /**
      * Movies.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1761,11 +1761,11 @@ class NameFixer
     }
 
     /**
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1782,11 +1782,11 @@ class NameFixer
     /**
      * Title (year).
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1959,11 +1959,11 @@ class NameFixer
     /**
      * Games.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -1989,11 +1989,11 @@ class NameFixer
     /**
      * Misc.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      *
      * @throws \Exception
      */
@@ -2030,11 +2030,11 @@ class NameFixer
     /**
      * Just for filenames.
      *
-     * @param  $release
+     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param  $nameStatus
-     * @param  $show
+     * @param    $nameStatus
+     * @param    $show
      * @return bool
      *
      * @throws \Exception

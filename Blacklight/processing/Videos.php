@@ -69,9 +69,9 @@ abstract class Videos
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param  $groupID
-     * @param  $guidChar
-     * @param  $process
+     * @param    $groupID
+     * @param    $guidChar
+     * @param    $process
      * @param  bool  $local
      */
     abstract protected function processSite($groupID, $guidChar, $process, $local = false): void;
@@ -239,8 +239,8 @@ abstract class Videos
     /**
      * Supplementary function for getByTitle that queries for a like match.
      *
-     * @param  $title
-     * @param  $type
+     * @param    $title
+     * @param    $type
      * @param  int  $source
      * @return array|false
      */
@@ -316,7 +316,7 @@ abstract class Videos
     /**
      * Inserts aliases for videos.
      *
-     * @param  $videoId
+     * @param    $videoId
      * @param  array  $aliases
      */
     public function addAliases($videoId, array $aliases = []): void
