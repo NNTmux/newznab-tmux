@@ -8,6 +8,7 @@ use Blacklight\SphinxSearch;
 use Conner\Tagging\Taggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -323,8 +324,8 @@ class Release extends Model
      * @param  int  $size
      * @param  string  $postedDate
      * @param  string  $addedDate
-     * @param  $videoId
-     * @param  $episodeId
+     * @param    $videoId
+     * @param    $episodeId
      * @param  int  $imDbId
      * @param  int  $aniDbId
      * @param  string  $tags
@@ -596,10 +597,13 @@ class Release extends Model
     /**
      * Retrieve alternate release with same or similar searchname.
      *
+     * @param $guid
+     * @param $userid
+     * @return false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
      *
-     * @param  string  $guid
-     * @param  int  $userid
-     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public static function getAlternate($guid, $userid)
     {
@@ -613,9 +617,19 @@ class Release extends Model
         preg_match('/(^\w+[-_. ].+?\.(\d+p)).+/i', $rel['searchname'], $similar);
 
         if (! empty($similar)) {
-            $alternate = self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->where('releases.searchname', 'like', $rel['searchname'])->orWhere('releases.searchname', 'like', $similar[1].'%')->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderBy('releases.postdate', 'desc')->first(['guid']);
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $searchResult = (new ElasticSearchSiteSearch())->indexSearch($similar, 10);
+            } else {
+                $results = (new SphinxSearch())->searchIndexes('releases_rt', $similar);
 
-            return $alternate;
+                $searchResult = Arr::pluck($results, 'id');
+            }
+
+            if (empty($searchResult)) {
+                return false;
+            }
+
+            return self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->whereIn('releases.id', $searchResult)->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderBy('releases.postdate', 'desc')->first(['guid']);
         }
 
         return false;
