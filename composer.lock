@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "89df92647fc57ba0b1eb4ca4eaa8eb51",
+    "content-hash": "e8a89d0a77881c83fb875d0eeef7c5e1",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2972,22 +2972,24 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.5.1",
+            "version": "v7.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "4a88ceeabadf1c7b4924dd321fb89bc642b58bee"
+                "reference": "575ab12ca7e93a677e5cda9e4f46c1f460e8b7ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/4a88ceeabadf1c7b4924dd321fb89bc642b58bee",
-                "reference": "4a88ceeabadf1c7b4924dd321fb89bc642b58bee",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/575ab12ca7e93a677e5cda9e4f46c1f460e8b7ea",
+                "reference": "575ab12ca7e93a677e5cda9e4f46c1f460e8b7ea",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-dom": "*",
                 "ext-json": "*",
+                "ext-libxml": "*",
+                "ext-simplexml": "*",
                 "php": ">=5.6",
                 "psr/log": "~1.0",
                 "psr/simple-cache": "^1.0"
@@ -3011,9 +3013,9 @@
             "description": "Library for retrieving film and tv information from IMDb",
             "support": {
                 "issues": "https://github.com/tboothman/imdbphp/issues",
-                "source": "https://github.com/tboothman/imdbphp/tree/v6.5.1"
+                "source": "https://github.com/tboothman/imdbphp/tree/v7.3.0"
             },
-            "time": "2021-05-30T00:19:11+00:00"
+            "time": "2022-03-03T21:23:44+00:00"
         },
         {
             "name": "intervention/image",

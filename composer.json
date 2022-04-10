@@ -63,7 +63,7 @@
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "^1.2",
     "guzzlehttp/guzzle": "^7.2",
-    "imdbphp/imdbphp": "^6.0",
+    "imdbphp/imdbphp": "^7.3",
     "intervention/image": "^2.4",
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
