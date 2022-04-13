@@ -9,6 +9,7 @@ use App\Models\Release;
 use App\Models\ReleaseNamingRegex;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -291,7 +292,7 @@ class Regexes
      *
      * @throws \Exception
      */
-    public function tryRegex($subject, $groupName): string
+    public function tryRegex(string $subject, string $groupName): string
     {
         $this->matchedRegex = 0;
 
@@ -323,24 +324,23 @@ class Regexes
      *
      * @param  string  $groupName
      */
-    protected function _fetchRegex($groupName): void
+    protected function _fetchRegex(string $groupName): void
     {
-        // Check if we need to do an initial cache or refresh our cache.
-        if (isset($this->_regexCache[$groupName]['ttl']) && (time() - $this->_regexCache[$groupName]['ttl']) < config('nntmux.cache_expiry_long')) {
-            return;
-        }
-
         // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
-        $this->_regexCache[$groupName]['regex'] = DB::select(
-            sprintf(
+        $sql = sprintf(
                 'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
                 ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
                 $this->tableName,
-                escapeString($groupName)
-            )
-        );
-        // Set the TTL.
-        $this->_regexCache[$groupName]['ttl'] = time();
+                $groupName
+            );
+
+        $this->_regexCache[$groupName]['regex'] = Cache::get(md5($sql));
+        if ($this->_regexCache[$groupName]['regex'] !== null) {
+            return;
+        }
+        $this->_regexCache[$groupName]['regex'] = DB::raw($sql);
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        Cache::put(md5($sql), $this->_regexCache[$groupName]['regex'], $expiresAt);
     }
 
     /**
