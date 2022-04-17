@@ -18,23 +18,23 @@ use Illuminate\Support\Facades\File;
  */
 class Releases extends Release
 {
-    // RAR/ZIP Passworded indicator.
+    // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0; // No password.
     public const PASSWD_RAR = 1; // Definitely passworded.
 
     /**
      * @var \Blacklight\SphinxSearch
      */
-    public $sphinxSearch;
+    public SphinxSearch $sphinxSearch;
 
     /**
      * @var int
      */
-    public $passwordStatus;
+    public int $passwordStatus;
     /**
      * @var ElasticSearchSiteSearch
      */
-    private $elasticSearch;
+    private ElasticSearchSiteSearch $elasticSearch;
 
     /**
      * @var array Class instances.
@@ -52,11 +52,11 @@ class Releases extends Release
      * Used for Browse results.
      *
      *
-     * @param  $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderBy
+     * @param    $page
+     * @param    $cat
+     * @param    $start
+     * @param    $num
+     * @param    $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @param  array  $tags
@@ -64,7 +64,7 @@ class Releases extends Release
      * @param  int  $minSize
      * @return Collection|mixed
      */
-    public function getBrowseRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0, array $tags = [])
+    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int $groupName = -1, int $minSize = 0, array $tags = [])
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
@@ -132,11 +132,11 @@ class Releases extends Release
      * @param  array  $cat
      * @param  int  $maxAge
      * @param  array  $excludedCats
-     * @param  string|int  $groupName
+     * @param  int|string  $groupName
      * @param  array  $tags
      * @return int
      */
-    public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = '', array $tags = []): int
+    public function getBrowseCount(array $cat, int $maxAge = -1, array $excludedCats = [], int|string $groupName = '', array $tags = []): int
     {
         return $this->getPagerCount(sprintf(
             'SELECT COUNT(r.id) AS count
@@ -165,47 +165,30 @@ class Releases extends Release
     {
         $show = (int) Settings::settingValue('..showpasswordedrelease');
         $setting = $show ?? 0;
-        switch ($setting) {
-            case 1: // Shows everything.
 
-                    return '<= '.self::PASSWD_RAR;
-            case 0:
-            default:// Hide releases with a password.
-
-                return '= '.self::PASSWD_NONE;
-        }
+        return match ($setting) {
+            1 => '<= '.self::PASSWD_RAR,
+            default => '= '.self::PASSWD_NONE,
+        };
     }
 
     /**
      * Use to order releases on site.
      *
-     * @param  string|array  $orderBy
+     * @param  array|string  $orderBy
      * @return array
      */
-    public function getBrowseOrder($orderBy): array
+    public function getBrowseOrder(array|string $orderBy): array
     {
         $orderArr = explode('_', ($orderBy === '' ? 'posted_desc' : $orderBy));
-        switch ($orderArr[0]) {
-            case 'cat':
-                $orderField = 'categories_id';
-                break;
-            case 'name':
-                $orderField = 'searchname';
-                break;
-            case 'size':
-                $orderField = 'size';
-                break;
-            case 'files':
-                $orderField = 'totalpart';
-                break;
-            case 'stats':
-                $orderField = 'grabs';
-                break;
-            case 'posted':
-            default:
-                $orderField = 'postdate';
-                break;
-        }
+        $orderField = match ($orderArr[0]) {
+            'cat' => 'categories_id',
+            'name' => 'searchname',
+            'size' => 'size',
+            'files' => 'totalpart',
+            'stats' => 'grabs',
+            default => 'postdate',
+        };
 
         return [$orderField, isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
     }
@@ -242,7 +225,7 @@ class Releases extends Release
      * @param  string  $groupID
      * @return Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getForExport($postFrom = '', $postTo = '', $groupID = '')
+    public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '')
     {
         $query = self::query()
             ->where('r.nzbstatus', NZB::NZB_ADDED)
@@ -310,7 +293,7 @@ class Releases extends Release
      *
      * @return array
      */
-    public function getReleasedGroupsForSelect($blnIncludeAll = true): array
+    public function getReleasedGroupsForSelect(bool $blnIncludeAll = true): array
     {
         $groups = self::query()
             ->selectRaw('DISTINCT g.id, g.name')
@@ -341,7 +324,7 @@ class Releases extends Release
      * @param  array  $excludedCats
      * @return Collection|mixed
      */
-    public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = [])
+    public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
@@ -382,12 +365,12 @@ class Releases extends Release
     /**
      * Get count for my shows page pagination.
      *
-     * @param  $userShows
+     * @param    $userShows
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return int
      */
-    public function getShowsCount($userShows, $maxAge = -1, array $excludedCats = []): int
+    public function getShowsCount($userShows, int $maxAge = -1, array $excludedCats = []): int
     {
         return $this->getPagerCount(
             sprintf(
@@ -412,11 +395,11 @@ class Releases extends Release
     /**
      * Delete multiple releases, or a single by ID.
      *
-     * @param  array|int|string  $list  Array of GUID or ID of releases to delete.
+     * @param  int|array|string  $list  Array of GUID or ID of releases to delete.
      *
      * @throws \Exception
      */
-    public function deleteMultiple($list): void
+    public function deleteMultiple(int|array|string $list): void
     {
         $list = (array) $list;
 
@@ -438,7 +421,7 @@ class Releases extends Release
      *
      * @throws \Exception
      */
-    public function deleteSingle($identifiers, NZB $nzb, ReleaseImage $releaseImage): void
+    public function deleteSingle(array $identifiers, NZB $nzb, ReleaseImage $releaseImage): void
     {
         // Delete NZB from disk.
         $nzbPath = $nzb->NZBPath($identifiers['g']);
@@ -512,7 +495,7 @@ class Releases extends Release
      * @param  string  $type
      * @return string
      */
-    public function uSQL($userQuery, $type): string
+    public function uSQL(Collection|array $userQuery, string $type): string
     {
         $sql = '(1=2 ';
         foreach ($userQuery as $query) {
@@ -537,14 +520,14 @@ class Releases extends Release
      *
      *
      * @param  array  $searchArr
-     * @param  $groupName
-     * @param  $sizeFrom
-     * @param  $sizeTo
-     * @param  $daysNew
-     * @param  $daysOld
+     * @param    $groupName
+     * @param    $sizeFrom
+     * @param    $sizeTo
+     * @param    $daysNew
+     * @param    $daysOld
      * @param  int  $offset
      * @param  int  $limit
-     * @param  string|array  $orderBy
+     * @param  array|string  $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @param  string  $type
@@ -557,7 +540,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function search($searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
+    public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0, array $tags = [])
     {
         $sizeRange = [
             1 => 1,
@@ -580,14 +563,11 @@ class Releases extends Release
             $orderBy = $this->getBrowseOrder($orderBy);
         }
 
-        $searchFields = Arr::where($searchArr, function ($value) {
+        $searchFields = Arr::where($searchArr, static function ($value) {
             return $value !== -1;
         });
 
-        $phrases = [];
-        foreach ($searchFields as $key => $value) {
-            $phrases[] = $value;
-        }
+        $phrases = array_values($searchFields);
 
         if (config('nntmux.elasticsearch_enabled') === true) {
             $searchResult = $this->elasticSearch->indexSearch($phrases, $limit);
@@ -620,7 +600,7 @@ class Releases extends Release
             ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
             ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            ('AND r.id IN ('.implode(',', $searchResult).')'),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
@@ -662,7 +642,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ! empty($searchResult) ? self::fromQuery($sql) : collect();
+        $releases = self::fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -676,8 +656,8 @@ class Releases extends Release
      * Search function for API.
      *
      *
-     * @param  $searchName
-     * @param  $groupName
+     * @param    $searchName
+     * @param    $groupName
      * @param  int  $offset
      * @param  int  $limit
      * @param  int  $maxAge
@@ -691,7 +671,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $tags = [])
+    public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0, array $tags = []): mixed
     {
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -787,7 +767,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airDate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         $siteSQL = [];
         $showSql = '';
@@ -904,7 +884,7 @@ class Releases extends Release
             return $releases;
         }
         $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
-        if (! empty($releases) && $releases->isNotEmpty()) {
+        if (count($releases) !== 0 && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -937,7 +917,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airDate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         $siteSQL = [];
         $showSql = '';
@@ -986,7 +966,7 @@ class Releases extends Release
         if (! empty($name) && $showSql === '') {
             if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
-                if (! empty($episode) && strpos($episode, '/') === false) {
+                if (! empty($episode) && ! str_contains($episode, '/')) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                 }
             } elseif (! empty($airDate)) {
@@ -1076,7 +1056,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
+    public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = [])
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -1160,7 +1140,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -1271,7 +1251,7 @@ class Releases extends Release
      * @param  string  $query  The query to get the count from.
      * @return int
      */
-    private function getPagerCount($query): int
+    private function getPagerCount(string $query): int
     {
         $sql = sprintf(
             'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
