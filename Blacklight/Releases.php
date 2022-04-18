@@ -1228,7 +1228,7 @@ class Releases extends Release
             $catRow = Category::find($currRow['categories_id']);
             $parentCat = $catRow['root_categories_id'];
 
-            $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
+            $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, 'basic', [$parentCat]);
             if (! $results) {
                 return $ret;
             }
