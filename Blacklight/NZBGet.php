@@ -400,7 +400,7 @@ class NZBGet
                     $value = (array) $member->value;
                     $value = array_shift($value);
                     if (! \is_object($value)) {
-                        $retVal[(string) $member->name] = $value;
+                        $retVal = [(string) $member->name => $value];
                     }
                 }
             }

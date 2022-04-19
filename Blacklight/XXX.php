@@ -107,10 +107,10 @@ class XXX
      * Get XXX releases with covers for xxx browse page.
      *
      * @param $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderBy
+     * @param    $cat
+     * @param    $start
+     * @param    $num
+     * @param    $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return array
@@ -161,8 +161,8 @@ class XXX
         $xxxIDs = $releaseIDs = false;
         if (\is_array($xxxmovies['result'])) {
             foreach ($xxxmovies['result'] as $xxx => $id) {
-                $xxxIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
+                $xxxIDs = [$id->id];
+                $releaseIDs = [$id->grp_release_id];
             }
         }
         $sql = sprintf(
@@ -265,7 +265,7 @@ class XXX
     {
         $browseBy = ' ';
         foreach (['title', 'director', 'actors', 'genre', 'id'] as $bb) {
-            if (isset($_REQUEST[$bb]) && ! empty($_REQUEST[$bb])) {
+            if (! empty($_REQUEST[$bb])) {
                 $bbv = stripslashes($_REQUEST[$bb]);
                 if ($bb === 'genre') {
                     $bbv = $this->getGenreID($bbv);
@@ -343,7 +343,7 @@ class XXX
      * @param  bool  $activeOnly
      * @return array
      */
-    public function getAllGenres($activeOnly = false): array
+    public function getAllGenres(bool $activeOnly = false): array
     {
         $ret = [];
         if ($activeOnly) {
@@ -352,11 +352,7 @@ class XXX
             $res = Genre::query()->where(['type' => Category::XXX_ROOT])->orderBy('title')->get(['title']);
         }
 
-        foreach ($res as $arr => $value) {
-            $ret[] = $value['title'];
-        }
-
-        return $ret;
+        return array_column($res, 'title');
     }
 
     /**

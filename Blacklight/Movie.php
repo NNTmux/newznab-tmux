@@ -1158,7 +1158,7 @@ class Movie
             // Loop over releases.
             foreach ($res as $arr) {
                 // Try to get a name/year.
-                if ($this->parseMovieSearchName($arr['searchname']) === false) {
+                if (! $this->parseMovieSearchName($arr['searchname'])) {
                     //We didn't find a name, so set to all 0's so we don't parse again.
                     Release::query()->where('id', $arr['id'])->update(['imdbid' => 0000000]);
                     continue;

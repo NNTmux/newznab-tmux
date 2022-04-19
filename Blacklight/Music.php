@@ -194,8 +194,8 @@ class Music
         $musicIDs = $releaseIDs = false;
         if (\is_array($music['result'])) {
             foreach ($music['result'] as $mus => $id) {
-                $musicIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
+                $musicIDs = [$id->id];
+                $releaseIDs = [$id->grp_release_id];
             }
         }
         $sql = sprintf(
@@ -295,7 +295,7 @@ class Music
     {
         $browseby = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
-            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
+            if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if (stripos($bbv, 'id') !== false) {
                     $browseby .= ' AND m.'.$bbv.' = '.$bbs;

@@ -279,8 +279,8 @@ class Games
         $gameIDs = $releaseIDs = false;
         if (\is_array($games['result'])) {
             foreach ($games['result'] as $game => $id) {
-                $gameIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
+                $gameIDs = [$id->id];
+                $releaseIDs = [$id->grp_release_id];
             }
         }
         $returnSql =
@@ -383,7 +383,7 @@ class Games
     {
         $browseBy = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
-            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
+            if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if ($bbk === 'year') {
                     $browseBy .= ' AND YEAR (gi.releasedate) '.'LIKE '.escapeString('%'.$bbs.'%');

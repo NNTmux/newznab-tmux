@@ -72,7 +72,7 @@ final class NZBVortex
         $response = $this->sendRequest(sprintf('app/webUpdate'), $params);
         foreach ($response['nzbs'] as &$nzb) {
             $nzb['original_state'] = $nzb['state'];
-            $nzb['state'] = (1 == $nzb['isPaused']) ? 'Paused' : $this->getState($nzb['state']);
+            $nzb['state'] = ($nzb['isPaused'] === true) ? 'Paused' : $this->getState($nzb['state']);
         }
 
         return $response;

@@ -265,7 +265,7 @@ class NZBContents
         $nzbFile = $this->LoadNZB($guid);
         if ($nzbFile !== false) {
             foreach ($nzbFile->file as $nzbContents) {
-                if ($nameStatus === 1 && $this->pp->parsePAR2((string) $nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)/i', (string) $nzbContents->attributes()->subject)) {
+                if ($nameStatus === 1 && $this->pp->parsePAR2((string) $nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) && preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)/i', (string) $nzbContents->attributes()->subject)) {
                     Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
 
                     return true;

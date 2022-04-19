@@ -205,8 +205,8 @@ class Console
         $consoleIDs = $releaseIDs = false;
         if (\is_array($consoles['result'])) {
             foreach ($consoles['result'] as $console => $id) {
-                $consoleIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
+                $consoleIDs = [$id->id];
+                $releaseIDs = [$id->grp_release_id];
             }
         }
         $sql = sprintf(
@@ -312,7 +312,7 @@ class Console
     {
         $browseBy = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
-            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
+            if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 $browseBy .= ' AND con.'.$bbv.' LIKE '.escapeString('%'.$bbs.'%');
             }

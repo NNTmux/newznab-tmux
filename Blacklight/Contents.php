@@ -33,11 +33,7 @@ class Contents
             return false;
         }
 
-        foreach ($rows as $row) {
-            $arr[] = $row;
-        }
-
-        return $arr;
+        return array_values($rows);
     }
 
     /**
@@ -51,11 +47,7 @@ class Contents
             return false;
         }
 
-        foreach ($rows as $row) {
-            $arr[] = $row;
-        }
-
-        return $arr;
+        return array_values($rows);
     }
 
     /**
@@ -71,11 +63,7 @@ class Contents
             return false;
         }
 
-        foreach ($rows as $row) {
-            $arr[] = $row;
-        }
-
-        return $arr;
+        return array_values($rows);
     }
 
     /**
@@ -89,11 +77,7 @@ class Contents
             return false;
         }
 
-        foreach ($rows as $row) {
-            $arr[] = $row;
-        }
-
-        return $arr;
+        return array_values($rows);
     }
 
     /**
@@ -109,11 +93,7 @@ class Contents
             return false;
         }
 
-        foreach ($rows as $row) {
-            $arr[] = $row;
-        }
-
-        return $arr;
+        return array_values($rows);
     }
 
     /**

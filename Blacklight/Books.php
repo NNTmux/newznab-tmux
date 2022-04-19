@@ -191,8 +191,8 @@ class Books
         $bookIDs = $releaseIDs = false;
         if (\is_array($books['result'])) {
             foreach ($books['result'] as $book => $id) {
-                $bookIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
+                $bookIDs = [$id->id];
+                $releaseIDs = [$id->grp_release_id];
             }
         }
         $sql = sprintf(
@@ -307,7 +307,7 @@ class Books
     {
         $browseby = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
-            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
+            if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 $browseby .= ' AND boo.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
             }
@@ -336,11 +336,10 @@ class Books
                 $this->processBookReleasesHelper(
                     Release::query()->where('nzbstatus', '=', NZB::NZB_ADDED)
                         ->whereNull('bookinfo_id')
-                        ->whereIn('categories_id', [$bookids[$i]])
+                        ->whereIn('categories_id', [$iValue])
                     ->orderBy('postdate', 'desc')
                     ->limit($this->bookqty)
-                    ->get(['searchname', 'id', 'categories_id']),
-                    $bookids[$i]
+                    ->get(['searchname', 'id', 'categories_id']), $iValue
                 );
             }
         }

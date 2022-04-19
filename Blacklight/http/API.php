@@ -67,7 +67,7 @@ class API extends Capabilities
                 if (isset($release->id)) {
                     $language = AudioData::query()->where('releases_id', $release->id)->first(['audiolanguage']);
                     if ($language !== null) {
-                        $releases[$key]->searchname .= ' '.$language['audiolanguage'];
+                        $release->searchname .= ' '.$language['audiolanguage'];
                     }
                 }
             }
@@ -186,7 +186,7 @@ class API extends Capabilities
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
                 if (isset($release->id)) {
-                    $releases[$key]->coverurl = $getCoverURL($release);
+                    $release->coverurl = $getCoverURL($release);
                 }
             }
         }

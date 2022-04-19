@@ -271,7 +271,7 @@ class TMDB extends TV
                 return false;
             }
 
-            if ($showAlternativeTitles !== null && \is_array($showAlternativeTitles)) {
+            if (\is_array($showAlternativeTitles)) {
                 foreach ($showAlternativeTitles['results'] as $aka) {
                     $highest['alternative_titles'][] = $aka['title'];
                 }
