@@ -102,11 +102,8 @@ class Contents
     public function getIndex()
     {
         $row = $this->data_getIndex();
-        if ($row === null) {
-            return false;
-        }
 
-        return $row;
+        return $row ?? false;
     }
 
     /**
@@ -230,7 +227,7 @@ class Contents
         return Content::query()
             ->where('status', '=', 1)
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
-            ->get();
+            ->get()->toArray();
     }
 
     /**
@@ -238,7 +235,7 @@ class Contents
      */
     public function data_getAll()
     {
-        return Content::query()->select()->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')->get();
+        return Content::query()->select()->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')->get()->toArray();
     }
 
     /**
@@ -249,7 +246,7 @@ class Contents
         return Content::query()
             ->where('id', '<>', 1)
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
-            ->get();
+            ->get()->toArray();
     }
 
     /**
@@ -264,7 +261,7 @@ class Contents
             $query->where('role', $role)->orWhere('role', '=', 0);
         }
 
-        return $query->get();
+        return $query->get()->toArray();
     }
 
     /**
@@ -280,7 +277,7 @@ class Contents
                 ]
             )
             ->orderByRaw('ordinal ASC, COALESCE(ordinal, 1000000), id')
-            ->get();
+            ->get()->toArray();
     }
 
     /**
@@ -308,6 +305,6 @@ class Contents
             $query->where('role', $role)->orWhere('role', '=', 0);
         }
 
-        return $query->get();
+        return $query->get()->toArray();
     }
 }
