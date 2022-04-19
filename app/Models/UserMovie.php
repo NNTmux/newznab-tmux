@@ -39,8 +39,8 @@ class UserMovie extends Model
     protected $dateFormat = false;
 
     /**
-     * @param  $uid
-     * @param  $imdbid
+     * @param    $uid
+     * @param    $imdbid
      * @param  array  $catID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */

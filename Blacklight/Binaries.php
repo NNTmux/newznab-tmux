@@ -1558,6 +1558,8 @@ class Binaries
         DB::transaction(static function () use ($collectionID) {
             DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
         }, 10);
+
+        Collection::query()->where('id', $collectionID)->delete();
     }
 
     /**

@@ -141,7 +141,7 @@ class Video extends Model
     /**
      * Retrieves and returns a list of shows with eligible releases.
      *
-     * @param  $uid
+     * @param    $uid
      * @param  string  $letter
      * @param  string  $showname
      * @return array
