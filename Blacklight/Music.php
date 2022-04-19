@@ -138,10 +138,10 @@ class Music
 
     /**
      * @param $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
-     * @param    $orderBy
+     * @param  $cat
+     * @param  $start
+     * @param  $num
+     * @param  $orderBy
      * @param  array  $excludedCats
      * @return array
      *
@@ -342,8 +342,8 @@ class Music
     }
 
     /**
-     * @param    $title
-     * @param    $year
+     * @param  $title
+     * @param  $year
      * @param  null  $amazdata
      * @return int|mixed
      *
