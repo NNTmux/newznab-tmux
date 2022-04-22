@@ -810,16 +810,16 @@
         },
         {
             "name": "czproject/git-php",
-            "version": "v4.0.2",
+            "version": "v4.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/czproject/git-php.git",
-                "reference": "32505124ef2a8651f10a5afebace58f85eff2f93"
+                "reference": "5e82d5479da5f16d37a915de4ec55e1ac78de733"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/czproject/git-php/zipball/32505124ef2a8651f10a5afebace58f85eff2f93",
-                "reference": "32505124ef2a8651f10a5afebace58f85eff2f93",
+                "url": "https://api.github.com/repos/czproject/git-php/zipball/5e82d5479da5f16d37a915de4ec55e1ac78de733",
+                "reference": "5e82d5479da5f16d37a915de4ec55e1ac78de733",
                 "shasum": ""
             },
             "require": {
@@ -850,7 +850,7 @@
             ],
             "support": {
                 "issues": "https://github.com/czproject/git-php/issues",
-                "source": "https://github.com/czproject/git-php/tree/v4.0.2"
+                "source": "https://github.com/czproject/git-php/tree/v4.0.3"
             },
             "funding": [
                 {
@@ -858,7 +858,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2021-06-15T09:39:16+00:00"
+            "time": "2022-04-21T16:50:57+00:00"
         },
         {
             "name": "dariusiii/l5-fixtures",
@@ -8890,16 +8890,16 @@
         },
         {
             "name": "spatie/fractalistic",
-            "version": "2.9.4",
+            "version": "2.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/fractalistic.git",
-                "reference": "15cf14220cf3f84096154242a1bc1416b99e4e1a"
+                "reference": "6f12686a03d035f4558d166989c62aa93bde2151"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/15cf14220cf3f84096154242a1bc1416b99e4e1a",
-                "reference": "15cf14220cf3f84096154242a1bc1416b99e4e1a",
+                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/6f12686a03d035f4558d166989c62aa93bde2151",
+                "reference": "6f12686a03d035f4558d166989c62aa93bde2151",
                 "shasum": ""
             },
             "require": {
@@ -8939,7 +8939,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/fractalistic/issues",
-                "source": "https://github.com/spatie/fractalistic/tree/2.9.4"
+                "source": "https://github.com/spatie/fractalistic/tree/2.9.5"
             },
             "funding": [
                 {
@@ -8947,7 +8947,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-04-12T08:42:59+00:00"
+            "time": "2022-04-21T12:26:22+00:00"
         },
         {
             "name": "spatie/laravel-backup",
