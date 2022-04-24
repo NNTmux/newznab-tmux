@@ -20,57 +20,57 @@ class Books
     /**
      * @var bool
      */
-    public $echooutput;
+    public bool $echooutput;
 
     /**
      * @var null|string
      */
-    public $pubkey;
+    public mixed $pubkey;
 
     /**
      * @var null|string
      */
-    public $privkey;
+    public mixed $privkey;
 
     /**
      * @var null|string
      */
-    public $asstag;
+    public mixed $asstag;
 
     /**
      * @var int|null|string
      */
-    public $bookqty;
+    public string|int|null $bookqty;
 
     /**
      * @var int|null|string
      */
-    public $sleeptime;
+    public string|int|null $sleeptime;
 
     /**
      * @var string
      */
-    public $imgSavePath;
+    public string $imgSavePath;
 
     /**
      * @var null|string
      */
-    public $bookreqids;
+    public mixed $bookreqids;
 
     /**
      * @var string
      */
-    public $renamed;
+    public string $renamed;
 
     /**
      * @var array
      */
-    public $failCache;
+    public array $failCache;
 
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * @param  array  $options  Class instances / Echo to cli.
@@ -120,8 +120,7 @@ class Books
 
         //only used to get a count of words
         $searchWords = '';
-        $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
-        $title = preg_replace('/[^\w ]+/', '', $title);
+        $title = preg_replace(['/( - | -|\(.+\)|\(|\))/', '/[^\w ]+/'], [' ', ''], $title);
         $title = trim(trim(preg_replace('/\s\s+/i', ' ', $title)));
         foreach (explode(' ', $title) as $word) {
             $word = trim(rtrim(trim($word), '-'));
@@ -136,15 +135,13 @@ class Books
     }
 
     /**
-     * @param  $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderby
-     * @param  array  $excludedcats
+     * @param $page
+     * @param $cat
+     * @param $start
+     * @param $num
+     * @param $orderby
+     * @param array $excludedcats
      * @return array
-     *
-     * @throws \Exception
      */
     public function getBookRange($page, $cat, $start, $num, $orderby, array $excludedcats = []): array
     {
@@ -240,30 +237,15 @@ class Books
     {
         $order = $orderby === '' ? 'r.postdate' : $orderby;
         $orderArr = explode('_', $order);
-        switch ($orderArr[0]) {
-            case 'title':
-                $orderfield = 'boo.title';
-                break;
-            case 'author':
-                $orderfield = 'boo.author';
-                break;
-            case 'publishdate':
-                $orderfield = 'boo.publishdate';
-                break;
-            case 'size':
-                $orderfield = 'r.size';
-                break;
-            case 'files':
-                $orderfield = 'r.totalpart';
-                break;
-            case 'stats':
-                $orderfield = 'r.grabs';
-                break;
-            case 'posted':
-            default:
-                $orderfield = 'r.postdate';
-                break;
-        }
+        $orderfield = match ($orderArr[0]) {
+            'title' => 'boo.title',
+            'author' => 'boo.author',
+            'publishdate' => 'boo.publishdate',
+            'size' => 'r.size',
+            'files' => 'r.totalpart',
+            'stats' => 'r.grabs',
+            default => 'r.postdate',
+        };
         $ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderfield, $ordersort];
@@ -391,7 +373,7 @@ class Books
                         if ($bookId === -2) {
                             $this->failCache[] = $bookInfo;
                         }
-                    } elseif ($bookCheck !== null) {
+                    } else {
                         $bookId = $bookCheck['id'];
                     }
 
@@ -470,13 +452,13 @@ class Books
     }
 
     /**
-     * @param  string  $bookInfo
+     * @param string $bookInfo
      * @param  null  $amazdata
      * @return false|int|string
      *
      * @throws \Exception
      */
-    public function updateBookInfo($bookInfo = '', $amazdata = null)
+    public function updateBookInfo(string $bookInfo = '', $amazdata = null)
     {
         $ri = new ReleaseImage();
 

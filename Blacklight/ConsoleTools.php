@@ -10,7 +10,7 @@ class ConsoleTools extends ColorCLI
     /**
      * @var int
      */
-    public $lastMessageLength;
+    public int $lastMessageLength;
 
     /**
      * ConsoleTools constructor.
@@ -25,7 +25,7 @@ class ConsoleTools extends ColorCLI
      * @param  string  $message
      * @param  bool  $reset
      */
-    public function overWriteHeader($message, $reset = false): void
+    public function overWriteHeader(string $message, bool $reset = false): void
     {
         if ($reset) {
             $this->lastMessageLength = 0;
@@ -43,7 +43,7 @@ class ConsoleTools extends ColorCLI
      * @param  string  $message
      * @param  bool  $reset
      */
-    public function overWritePrimary($message, $reset = false): void
+    public function overWritePrimary(string $message, bool $reset = false): void
     {
         if ($reset) {
             $this->lastMessageLength = 0;
@@ -61,7 +61,7 @@ class ConsoleTools extends ColorCLI
      * @param  string  $message
      * @param  bool  $reset
      */
-    public function overWrite($message, $reset = false): void
+    public function overWrite(string $message, bool $reset = false): void
     {
         if ($reset) {
             $this->lastMessageLength = 0;
@@ -78,7 +78,7 @@ class ConsoleTools extends ColorCLI
     /**
      * @param  string  $message
      */
-    public function appendWrite($message): void
+    public function appendWrite(string $message): void
     {
         echo $message;
         $this->lastMessageLength += \strlen($message);
@@ -89,7 +89,7 @@ class ConsoleTools extends ColorCLI
      * @param  int  $total
      * @return string
      */
-    public function percentString($cur, $total): string
+    public function percentString(int $cur, int $total): string
     {
         $percent = 100 * $cur / $total;
         $formatString = '% '.\strlen($total).'d/%d (% 2d%%)';
@@ -103,7 +103,7 @@ class ConsoleTools extends ColorCLI
      * @param  int  $total
      * @return string
      */
-    public function percentString2($first, $last, $total): string
+    public function percentString2(int $first, int $last, int $total): string
     {
         $percent1 = 100 * ($first - 1) / $total;
         $percent2 = 100 * $last / $total;
@@ -118,7 +118,7 @@ class ConsoleTools extends ColorCLI
      * @param  int  $seconds
      * @return string
      */
-    public function convertTime($seconds): string
+    public function convertTime(int $seconds): string
     {
         if ($seconds > 3600) {
             return round($seconds / 3600).' hour(s)';
@@ -136,7 +136,7 @@ class ConsoleTools extends ColorCLI
      * @param  int  $seconds
      * @return string
      */
-    public function convertTimer($seconds): string
+    public function convertTimer(int $seconds): string
     {
         return ' '.sprintf('%02dh:%02dm:%02ds', floor($seconds / 3600), floor(($seconds / 60) % 60), $seconds % 60);
     }
@@ -146,7 +146,7 @@ class ConsoleTools extends ColorCLI
      *
      * @param  int  $seconds
      */
-    public function showSleep($seconds): void
+    public function showSleep(int $seconds): void
     {
         for ($i = $seconds; $i >= 0; $i--) {
             $this->overWriteHeader('Sleeping for '.$i.' seconds.');
