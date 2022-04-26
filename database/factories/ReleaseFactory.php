@@ -28,6 +28,7 @@ class ReleaseFactory extends Factory
             'postdate' => $this->faker->date(),
             'adddate' => $this->faker->date(),
             'guid' => $this->faker->sha1(),
+            'categories_id' => '2080',
             'nzbstatus' => 1,
             'passwordstatus' => 0,
             'isrenamed' => 1,

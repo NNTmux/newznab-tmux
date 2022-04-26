@@ -19,27 +19,27 @@ class SphinxSearch
     /**
      * @var \Foolz\SphinxQL\SphinxQL
      */
-    public $sphinxQL;
+    public SphinxQL $sphinxQL;
 
     /**
      * @var \Foolz\SphinxQL\Drivers\Pdo\Connection
      */
-    protected $connection;
+    protected Connection $connection;
 
     /**
      * @var \Illuminate\Config\Repository|mixed
      */
-    protected $config;
+    protected mixed $config;
 
     /**
      * @var \Foolz\SphinxQL\Helper
      */
-    protected $helper;
+    protected Helper $helper;
 
     /**
      * @var \Blacklight\ColorCLI
      */
-    private $cli;
+    private ColorCLI $cli;
 
     /**
      * Establish connection to SphinxQL.
@@ -59,19 +59,19 @@ class SphinxSearch
     /**
      * Insert release into Sphinx RT table.
      *
-     * @param $parameters
+     * @param  array  $parameters
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function insertRelease($parameters): void
+    public function insertRelease(array $parameters): void
     {
         if ($this->sphinxQL !== null && $parameters['id']) {
             $this->sphinxQL
                 ->replace()
                 ->into($this->config['indexes']['releases'])
-                ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
+                ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'categories_id' => $parameters['categories_id'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
                 ->execute();
         }
     }
@@ -79,13 +79,13 @@ class SphinxSearch
     /**
      * Insert release into Sphinx RT table.
      *
-     * @param $parameters
+     * @param  array  $parameters
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function insertPredb($parameters): void
+    public function insertPredb(array $parameters): void
     {
         if ($this->sphinxQL !== null && $parameters['id']) {
             $this->sphinxQL
@@ -101,7 +101,7 @@ class SphinxSearch
      *
      * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
      */
-    public function deleteRelease($identifiers): void
+    public function deleteRelease(array $identifiers): void
     {
         if ($identifiers['i'] === false) {
             $identifiers['i'] = Release::query()->where('guid', $identifiers['g'])->first(['id']);
@@ -120,7 +120,7 @@ class SphinxSearch
      * @param  string  $string  unescaped string
      * @return string Escaped string.
      */
-    public static function escapeString($string): string
+    public static function escapeString(string $string): string
     {
         $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', "'"];
         $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\=', "\'"];
@@ -135,12 +135,12 @@ class SphinxSearch
      *
      * @throws \Exception
      */
-    public function updateRelease($releaseID): void
+    public function updateRelease(int $releaseID): void
     {
         $new = Release::query()
                 ->where('releases.id', $releaseID)
                 ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-                ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
+                ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
                 ->groupBy('releases.id')
                 ->first();
 
@@ -156,7 +156,7 @@ class SphinxSearch
      *
      * @throws \Exception
      */
-    public function updatePreDb($parameters): void
+    public function updatePreDb(array $parameters): void
     {
         if (! empty($parameters)) {
             $this->insertPredb($parameters);
@@ -169,7 +169,7 @@ class SphinxSearch
      * @param  array  $indexes
      * @return bool
      */
-    public function truncateRTIndex($indexes = []): bool
+    public function truncateRTIndex(array $indexes = []): bool
     {
         if (empty($indexes)) {
             $this->cli->error('You need to provide index name to truncate');
@@ -210,7 +210,7 @@ class SphinxSearch
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function searchIndexes(string $rt_index, $searchString = '', $column = [], array $searchArray = []): array
+    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): array
     {
         $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(0, 10000)->orderBy('id', 'desc');
         if (! empty($searchArray)) {

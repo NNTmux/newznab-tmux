@@ -11,11 +11,11 @@ use sspat\ESQuerySanitizer\Sanitizer;
 class ElasticSearchSiteSearch
 {
     /**
-     * @param  string|array  $phrases
+     * @param  array|string  $phrases
      * @param  int  $limit
      * @return mixed
      */
-    public function indexSearch($phrases, int $limit)
+    public function indexSearch(array|string $phrases, int $limit): mixed
     {
         $keywords = $this->sanitize($phrases);
         try {
@@ -70,11 +70,11 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param  string|array  $searchName
+     * @param  array|string  $searchName
      * @param  int  $limit
      * @return array
      */
-    public function indexSearchApi($searchName, int $limit)
+    public function indexSearchApi(array|string $searchName, int $limit): array
     {
         $keywords = $this->sanitize($searchName);
         try {
@@ -131,11 +131,11 @@ class ElasticSearchSiteSearch
     /**
      * Search function used in TV, TV API, Movies and Anime searches.
      *
-     * @param  string|array  $name
+     * @param  array|string  $name
      * @param  int  $limit
      * @return array
      */
-    public function indexSearchTMA($name, $limit)
+    public function indexSearchTMA(array|string $name, int $limit): array
     {
         $keywords = $this->sanitize($name);
         try {
@@ -190,10 +190,10 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param  string|array  $search
+     * @param  array|string  $search
      * @return array|\Illuminate\Support\Collection
      */
-    public function predbIndexSearch($search)
+    public function predbIndexSearch(array|string $search): array|\Illuminate\Support\Collection
     {
         try {
             $search = [
@@ -253,6 +253,7 @@ class ElasticSearchSiteSearch
                 'searchname' => $parameters['searchname'],
                 'plainsearchname' => $searchNameDotless,
                 'fromname' => $parameters['fromname'],
+                'categories_id' => $parameters['categories_id'],
                 'filename' => $parameters['filename'] ?? '',
                 'add_date' => now()->format('Y-m-d H:i:s'),
                 'post_date' => $parameters['postdate'],
@@ -267,12 +268,12 @@ class ElasticSearchSiteSearch
     /**
      * @param  int  $id
      */
-    public function updateRelease(int $id)
+    public function updateRelease(int $id): void
     {
         $new = Release::query()
             ->where('releases.id', $id)
             ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
+            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
             ->groupBy('releases.id')
             ->first();
         if ($new !== null) {
@@ -285,6 +286,7 @@ class ElasticSearchSiteSearch
                         'searchname' => $new->searchname,
                         'plainsearchname' => $searchNameDotless,
                         'fromname' => $new->fromname,
+                        'categories_id' => $new->categories_id,
                         'filename' => $new->filename,
                     ],
                     'doc_as_upsert' => true,
@@ -302,7 +304,7 @@ class ElasticSearchSiteSearch
      * @param $searchTerm
      * @return array
      */
-    public function searchPreDb($searchTerm)
+    public function searchPreDb($searchTerm): array
     {
         $search = [
             'index' => 'predb',
@@ -333,9 +335,9 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param $parameters
+     * @param  array  $parameters
      */
-    public function insertPreDb($parameters)
+    public function insertPreDb(array $parameters): void
     {
         $data = [
             'body' => [
@@ -352,9 +354,9 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param $parameters
+     * @param  array  $parameters
      */
-    public function updatePreDb($parameters)
+    public function updatePreDb(array $parameters): void
     {
         $data = [
             'body' => [
@@ -378,7 +380,7 @@ class ElasticSearchSiteSearch
      * @param  array|string  $phrases
      * @return string
      */
-    private function sanitize($phrases): string
+    private function sanitize(array|string $phrases): string
     {
         if (! is_array($phrases)) {
             $wordArray = explode(' ', str_replace('.', ' ', $phrases));

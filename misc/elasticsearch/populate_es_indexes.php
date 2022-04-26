@@ -22,7 +22,7 @@ function populate_indexes($table, $max)
     if (\in_array($table, $allowedIndexes, true)) {
         if ($table === 'releases') {
             DB::statement('SET SESSION group_concat_max_len=16384;');
-            $query = 'SELECT r.id, r.name, r.searchname, r.fromname, r.adddate, r.postdate, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
+            $query = 'SELECT r.id, r.name, r.searchname, r.fromname, r.categories_id, r.adddate, r.postdate, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 				FROM releases r
 				LEFT JOIN release_files rf ON r.id = rf.releases_id
 				WHERE r.id > %d
@@ -84,6 +84,7 @@ function populate_indexes($table, $max)
                             'searchname' => $row->searchname,
                             'plainsearchname' => $searchName,
                             'fromname' => $row->fromname,
+                            'categories_id' => $row->categories_id,
                             'filename' => $row->filename,
                             'add_date' => $row->adddate,
                             'post_date' => $row->postdate,

@@ -30,7 +30,7 @@ function populate_rt($table, $max)
         $sphinx->truncateRTIndex(Arr::wrap($table));
         if ($table === 'releases_rt') {
             DB::statement('SET SESSION group_concat_max_len=16384;');
-            $query = 'SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
+            $query = 'SELECT r.id, r.name, r.searchname, r.fromname, r.categories_id, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 				FROM releases r
 				LEFT JOIN release_files rf ON r.id = rf.releases_id
 				WHERE r.id > %d
@@ -82,6 +82,7 @@ function populate_rt($table, $max)
                             'name' => $row->name,
                             'searchname' => $row->searchname,
                             'fromname' => $row->fromname,
+                            'categories_id' => (string) $row->categories_id,
                             'filename' => $row->filename,
                         ]);
                         break;

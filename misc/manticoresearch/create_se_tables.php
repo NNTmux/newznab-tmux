@@ -10,7 +10,7 @@ if ($argc === 3 && is_numeric($argv[2])) {
 } elseif ($argc === 2) {
     // Checks that argv[1] exists AND that there are no other arguments, which would be an error.
     $socket = preg_replace('#^(?:unix://)?(.*)$#', '$1', $argv[1]);
-    if (strpos($socket, '/') === 0) {
+    if (str_starts_with($socket, '/')) {
         // Make sure the socket path is fully qualified (and using correct separator).
         $sphinxConnection = sprintf('unix://%s:', $socket);
     }
@@ -27,6 +27,7 @@ CREATE TABLE releases_se
 	name        VARCHAR(255) NOT NULL DEFAULT '',
 	searchname  VARCHAR(255) NOT NULL DEFAULT '',
 	fromname    VARCHAR(255) NULL,
+	categories_id   INT UNSIGNED NOT NULL DEFAULT 10,
 	filename    VARCHAR(1000) NULL,
 	INDEX(query)
 ) ENGINE=SPHINX CONNECTION="%sreleases_rt"
