@@ -140,7 +140,7 @@ class Books
      * @param $start
      * @param $num
      * @param $orderby
-     * @param array $excludedcats
+     * @param  array  $excludedcats
      * @return array
      */
     public function getBookRange($page, $cat, $start, $num, $orderby, array $excludedcats = []): array
@@ -452,7 +452,7 @@ class Books
     }
 
     /**
-     * @param string $bookInfo
+     * @param  string  $bookInfo
      * @param  null  $amazdata
      * @return false|int|string
      *
