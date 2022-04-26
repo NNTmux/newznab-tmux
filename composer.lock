@@ -810,16 +810,16 @@
         },
         {
             "name": "czproject/git-php",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/czproject/git-php.git",
-                "reference": "5e82d5479da5f16d37a915de4ec55e1ac78de733"
+                "reference": "8a84f699216eb3aae5ee6e05bcd9fb79c9351355"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/czproject/git-php/zipball/5e82d5479da5f16d37a915de4ec55e1ac78de733",
-                "reference": "5e82d5479da5f16d37a915de4ec55e1ac78de733",
+                "url": "https://api.github.com/repos/czproject/git-php/zipball/8a84f699216eb3aae5ee6e05bcd9fb79c9351355",
+                "reference": "8a84f699216eb3aae5ee6e05bcd9fb79c9351355",
                 "shasum": ""
             },
             "require": {
@@ -850,7 +850,7 @@
             ],
             "support": {
                 "issues": "https://github.com/czproject/git-php/issues",
-                "source": "https://github.com/czproject/git-php/tree/v4.0.3"
+                "source": "https://github.com/czproject/git-php/tree/v4.0.4"
             },
             "funding": [
                 {
@@ -858,7 +858,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2022-04-21T16:50:57+00:00"
+            "time": "2022-04-24T12:22:45+00:00"
         },
         {
             "name": "dariusiii/l5-fixtures",
@@ -4632,16 +4632,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.0.17",
+            "version": "3.0.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "29eb78cac0be0c22237c5e0f6f98234d97037d79"
+                "reference": "c8e137e594948240b03372e012344b07c61b9193"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/29eb78cac0be0c22237c5e0f6f98234d97037d79",
-                "reference": "29eb78cac0be0c22237c5e0f6f98234d97037d79",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/c8e137e594948240b03372e012344b07c61b9193",
+                "reference": "c8e137e594948240b03372e012344b07c61b9193",
                 "shasum": ""
             },
             "require": {
@@ -4702,7 +4702,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.0.17"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.0.18"
             },
             "funding": [
                 {
@@ -4718,7 +4718,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-04-14T14:57:13+00:00"
+            "time": "2022-04-25T18:55:04+00:00"
         },
         {
             "name": "league/fractal",
@@ -8320,16 +8320,16 @@
         },
         {
             "name": "rtconner/laravel-tagging",
-            "version": "4.1.3",
+            "version": "4.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtconner/laravel-tagging.git",
-                "reference": "4645bf629ff2cd1b0a00297e1e2d4bb9553dd65f"
+                "reference": "bcce5300c01e5706b01f3dd3d7c920b46eb63c06"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/4645bf629ff2cd1b0a00297e1e2d4bb9553dd65f",
-                "reference": "4645bf629ff2cd1b0a00297e1e2d4bb9553dd65f",
+                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/bcce5300c01e5706b01f3dd3d7c920b46eb63c06",
+                "reference": "bcce5300c01e5706b01f3dd3d7c920b46eb63c06",
                 "shasum": ""
             },
             "require": {
@@ -8380,9 +8380,9 @@
             ],
             "support": {
                 "issues": "https://github.com/rtconner/laravel-tagging/issues",
-                "source": "https://github.com/rtconner/laravel-tagging/tree/4.1.3"
+                "source": "https://github.com/rtconner/laravel-tagging/tree/4.1.4"
             },
-            "time": "2022-03-28T04:45:55+00:00"
+            "time": "2022-04-25T22:18:50+00:00"
         },
         {
             "name": "seld/cli-prompt",
@@ -15291,16 +15291,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.5.7",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "7fb7e2e1e9f3d59a26a413b2d3d5e47f0edb75ac"
+                "reference": "e8852764cf5ec8dcd2a3fa8ea03cbcf523639419"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/7fb7e2e1e9f3d59a26a413b2d3d5e47f0edb75ac",
-                "reference": "7fb7e2e1e9f3d59a26a413b2d3d5e47f0edb75ac",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e8852764cf5ec8dcd2a3fa8ea03cbcf523639419",
+                "reference": "e8852764cf5ec8dcd2a3fa8ea03cbcf523639419",
                 "shasum": ""
             },
             "require": {
@@ -15326,7 +15326,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.5.7"
+                "source": "https://github.com/phpstan/phpstan/tree/1.6.1"
             },
             "funding": [
                 {
@@ -15346,7 +15346,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-04-20T12:20:27+00:00"
+            "time": "2022-04-26T18:09:31+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -17036,16 +17036,16 @@
         },
         {
             "name": "spatie/ignition",
-            "version": "1.2.7",
+            "version": "1.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ignition.git",
-                "reference": "2f059cf42b48f7c522efbba1c05ad59fc2c1a3f2"
+                "reference": "db25202fab2d5c14613b8914a1bb374998bbf870"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ignition/zipball/2f059cf42b48f7c522efbba1c05ad59fc2c1a3f2",
-                "reference": "2f059cf42b48f7c522efbba1c05ad59fc2c1a3f2",
+                "url": "https://api.github.com/repos/spatie/ignition/zipball/db25202fab2d5c14613b8914a1bb374998bbf870",
+                "reference": "db25202fab2d5c14613b8914a1bb374998bbf870",
                 "shasum": ""
             },
             "require": {
@@ -17102,7 +17102,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-03-29T08:48:34+00:00"
+            "time": "2022-04-23T20:37:21+00:00"
         },
         {
             "name": "spatie/laravel-ignition",
