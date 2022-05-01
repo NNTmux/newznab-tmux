@@ -142,7 +142,7 @@ class SphinxSearch
                 ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
                 ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
                 ->groupBy('releases.id')
-                ->first();
+                ->first()->toArray();
 
         if ($new !== null) {
             $this->insertRelease($new);
@@ -164,10 +164,12 @@ class SphinxSearch
     }
 
     /**
-     * Truncate the RT index.
-     *
      * @param  array  $indexes
      * @return bool
+     *
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function truncateRTIndex(array $indexes = []): bool
     {
@@ -178,7 +180,7 @@ class SphinxSearch
         }
         foreach ($indexes as $index) {
             if (\in_array($index, $this->config['indexes'], true)) {
-                $this->helper->truncateRtIndex($index);
+                $this->helper->truncateRtIndex($index)->execute();
                 $this->cli->info('Truncating index '.$index.' finished.');
             } else {
                 $this->cli->error('Unsupported index: '.$index);
@@ -194,8 +196,8 @@ class SphinxSearch
     public function optimizeRTIndex(): void
     {
         foreach ($this->config['indexes'] as $index) {
-            $this->helper->flushRtIndex($index);
-            $this->helper->optimizeIndex($index);
+            $this->helper->flushRtIndex($index)->execute();
+            $this->helper->optimizeIndex($index)->execute();
         }
     }
 

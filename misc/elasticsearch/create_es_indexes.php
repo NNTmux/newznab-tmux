@@ -36,7 +36,7 @@ $releases_index = [
                     ],
                 ],
                 'categories_id' => [
-                    'type' => 'long',
+                    'type' => 'text',
                 ],
                 'fromname' => [
                     'type' => 'text',

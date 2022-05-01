@@ -18,6 +18,7 @@ class ElasticSearchSiteSearch
     public function indexSearch(array|string $phrases, int $limit): mixed
     {
         $keywords = $this->sanitize($phrases);
+
         try {
             $search = [
                 'scroll' => '30s',
@@ -26,7 +27,7 @@ class ElasticSearchSiteSearch
                     'query' => [
                         'query_string' => [
                             'query' => $keywords,
-                            'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name'],
+                            'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name', 'categories_id'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
                         ],
@@ -43,27 +44,7 @@ class ElasticSearchSiteSearch
                 ],
             ];
 
-            $results = \Elasticsearch::search($search);
-
-            $searchResult = [];
-            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                foreach ($results['hits']['hits'] as $result) {
-                    $searchResult[] = $result['_source']['id'];
-                }
-
-                // When done, get the new scroll_id
-                // You must always refresh your _scroll_id!  It can change sometimes
-                $scroll_id = $results['_scroll_id'];
-
-                // Execute a Scroll request and repeat
-                $results = \Elasticsearch::scroll([
-                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                    'scroll' => '30s',        // and the same timeout window
-                ]
-            );
-            }
-
-            return $searchResult;
+            return $this->search($search);
         } catch (BadRequest400Exception $request400Exception) {
             return [];
         }
@@ -102,27 +83,7 @@ class ElasticSearchSiteSearch
                 ],
             ];
 
-            $results = \Elasticsearch::search($search);
-
-            $searchResult = [];
-            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                foreach ($results['hits']['hits'] as $result) {
-                    $searchResult[] = $result['_source']['id'];
-                }
-
-                // When done, get the new scroll_id
-                // You must always refresh your _scroll_id!  It can change sometimes
-                $scroll_id = $results['_scroll_id'];
-
-                // Execute a Scroll request and repeat
-                $results = \Elasticsearch::scroll([
-                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                    'scroll' => '30s',        // and the same timeout window
-                ]
-                );
-            }
-
-            return $searchResult;
+            return $this->search($search);
         } catch (BadRequest400Exception $request400Exception) {
             return [];
         }
@@ -163,27 +124,7 @@ class ElasticSearchSiteSearch
                 ],
             ];
 
-            $results = \Elasticsearch::search($search);
-
-            $searchResult = [];
-            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                foreach ($results['hits']['hits'] as $result) {
-                    $searchResult[] = $result['_source']['id'];
-                }
-
-                // When done, get the new scroll_id
-                // You must always refresh your _scroll_id!  It can change sometimes
-                $scroll_id = $results['_scroll_id'];
-
-                // Execute a Scroll request and repeat
-                $results = \Elasticsearch::scroll([
-                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                    'scroll'    => '30s',        // and the same timeout window
-                ]
-                );
-            }
-
-            return $searchResult;
+            return $this->search($search);
         } catch (BadRequest400Exception $request400Exception) {
             return [];
         }
@@ -212,29 +153,7 @@ class ElasticSearchSiteSearch
                 ],
             ];
 
-            $results = \Elasticsearch::search($search);
-
-            $ids = [];
-            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                foreach ($results['hits']['hits'] as $result) {
-                    $ids[] = $result['_source']['id'];
-                }
-                if (empty($ids)) {
-                    return collect();
-                }
-                // When done, get the new scroll_id
-                // You must always refresh your _scroll_id!  It can change sometimes
-                $scroll_id = $results['_scroll_id'];
-
-                // Execute a Scroll request and repeat
-                $results = \Elasticsearch::scroll([
-                    'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
-                    'scroll' => '30s',        // and the same timeout window
-                ]
-                );
-            }
-
-            return $ids;
+            return $this->search($search);
         } catch (BadRequest400Exception $request400Exception) {
             return [];
         }
@@ -407,5 +326,40 @@ class ElasticSearchSiteSearch
         }
 
         return implode(' ', $keywords);
+    }
+
+    /**
+     * @param  array  $search
+     * @param  bool  $fullResults
+     * @return array|\Illuminate\Support\Collection
+     */
+    protected function search(array $search, bool $fullResults = false): array|\Illuminate\Support\Collection
+    {
+        $results = \Elasticsearch::search($search);
+
+        $searchResult = [];
+        while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
+            foreach ($results['hits']['hits'] as $result) {
+                if ($fullResults === true) {
+                    $searchResult[] = $result['_source'];
+                } else {
+                    $searchResult[] = $result['_source']['id']; }
+            }
+            // When done, get the new scroll_id
+            // You must always refresh your _scroll_id!  It can change sometimes
+            $scroll_id = $results['_scroll_id'];
+
+            // Execute a Scroll request and repeat
+            $results = \Elasticsearch::scroll([
+                'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                'scroll' => '30s',        // and the same timeout window
+            ]
+            );
+        }
+        if (empty($searchResult)) {
+            return collect();
+        }
+
+        return $searchResult;
     }
 }
