@@ -343,7 +343,8 @@ class ElasticSearchSiteSearch
                 if ($fullResults === true) {
                     $searchResult[] = $result['_source'];
                 } else {
-                    $searchResult[] = $result['_source']['id']; }
+                    $searchResult[] = $result['_source']['id'];
+                }
             }
             // When done, get the new scroll_id
             // You must always refresh your _scroll_id!  It can change sometimes
