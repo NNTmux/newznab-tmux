@@ -25,49 +25,49 @@ class XXX
      *
      * @var string
      */
-    protected $whichClass = '';
+    protected string $whichClass = '';
 
     /**
      * Current title being passed through various sites/api's.
      *
      * @var string
      */
-    protected $currentTitle = '';
+    protected string $currentTitle = '';
 
     /**
      * @var bool
      */
-    protected $echoOutput;
+    protected bool $echoOutput;
 
     /**
      * @var string
      */
-    protected $imgSavePath;
+    protected string $imgSavePath;
 
     /**
      * @var \Blacklight\ReleaseImage
      */
-    protected $releaseImage;
+    protected ReleaseImage $releaseImage;
 
     /**
      * @var int|null|string
      */
-    protected $movieQty;
+    protected string|int|null $movieQty;
 
     /**
      * @var string
      */
-    protected $showPasswords;
+    protected string $showPasswords;
 
     /**
      * @var string
      */
-    protected $cookie;
+    protected string $cookie;
 
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * @param  array  $options  Echo to cli / Class instances.
@@ -107,10 +107,10 @@ class XXX
      * Get XXX releases with covers for xxx browse page.
      *
      * @param $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderBy
+     * @param    $cat
+     * @param    $start
+     * @param    $num
+     * @param    $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return array
@@ -235,15 +235,10 @@ class XXX
     protected function getXXXOrder($orderBy): array
     {
         $orderArr = explode('_', (($orderBy === '') ? 'r.postdate' : $orderBy));
-        switch ($orderArr[0]) {
-            case 'title':
-                $orderField = 'xxx.title';
-                break;
-            case 'posted':
-            default:
-                $orderField = 'r.postdate';
-                break;
-        }
+        $orderField = match ($orderArr[0]) {
+            'title' => 'xxx.title',
+            default => 'r.postdate',
+        };
 
         return [$orderField, isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
     }
@@ -300,20 +295,20 @@ class XXX
      * @param  string  $backdrop
      */
     public function update(
-        $id = '',
-        $title = '',
-        $tagLine = '',
-        $plot = '',
-        $genre = '',
-        $director = '',
-        $actors = '',
-        $extras = '',
-        $productInfo = '',
-        $trailers = '',
-        $directUrl = '',
-        $classUsed = '',
-        $cover = '',
-        $backdrop = ''
+        string $id = '',
+        string $title = '',
+        string $tagLine = '',
+        string $plot = '',
+        string $genre = '',
+        string $director = '',
+        string $actors = '',
+        string $extras = '',
+        string $productInfo = '',
+        string $trailers = '',
+        string $directUrl = '',
+        string $classUsed = '',
+        string $cover = '',
+        string $backdrop = ''
     ): void {
         if (! empty($id)) {
             XxxInfo::query()->where('id', $id)->update(
@@ -347,9 +342,9 @@ class XXX
     {
         $ret = [];
         if ($activeOnly) {
-            $res = Genre::query()->where(['disabled' => 0, 'type' => Category::XXX_ROOT])->orderBy('title')->get(['title']);
+            $res = Genre::query()->where(['disabled' => 0, 'type' => Category::XXX_ROOT])->orderBy('title')->get(['title'])->toArray();
         } else {
-            $res = Genre::query()->where(['type' => Category::XXX_ROOT])->orderBy('title')->get(['title']);
+            $res = Genre::query()->where(['type' => Category::XXX_ROOT])->orderBy('title')->get(['title'])->toArray();
         }
 
         return array_column($res, 'title');
@@ -360,7 +355,7 @@ class XXX
      * @param  null  $gid
      * @return mixed
      */
-    public function getGenres($activeOnly = false, $gid = null)
+    public function getGenres(bool $activeOnly = false, $gid = null): mixed
     {
         if ($activeOnly) {
             return Genre::query()->where(['disabled' => 0, 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
@@ -411,7 +406,7 @@ class XXX
      * @param $genre
      * @return int|string
      */
-    private function insertGenre($genre)
+    private function insertGenre($genre): int|string
     {
         $res = '';
         if ($genre !== null) {
@@ -457,7 +452,7 @@ class XXX
      *
      * @throws \Exception
      */
-    public function updateXXXInfo($movie)
+    public function updateXXXInfo($movie): bool|int|string
     {
         $cover = $backdrop = 0;
         $xxxID = -2;
@@ -501,25 +496,14 @@ class XXX
         // If a result is true getAll information.
         if ($res) {
             if ($this->echoOutput) {
-                switch ($this->whichClass) {
-                    case 'aebn':
-                        $fromstr = 'Adult Entertainment Broadcast Network';
-                        break;
-                    case 'ade':
-                        $fromstr = 'Adult DVD Empire';
-                        break;
-                    case 'pop':
-                        $fromstr = 'PopPorn';
-                        break;
-                    case 'adm':
-                        $fromstr = 'Adult DVD Marketplace';
-                        break;
-                    case 'hotm':
-                        $fromstr = 'HotMovies';
-                        break;
-                    default:
-                        $fromstr = '';
-                }
+                $fromstr = match ($this->whichClass) {
+                    'aebn' => 'Adult Entertainment Broadcast Network',
+                    'ade' => 'Adult DVD Empire',
+                    'pop' => 'PopPorn',
+                    'adm' => 'Adult DVD Marketplace',
+                    'hotm' => 'HotMovies',
+                    default => '',
+                };
                 $this->colorCli->primary('Fetching XXX info from: '.$fromstr);
             }
             $res = $mov->getAll();
@@ -642,7 +626,7 @@ class XXX
                 $idcheck = -2;
 
                 // Try to get a name.
-                if ($this->parseXXXSearchName($arr['searchname']) !== false) {
+                if ($this->parseXXXSearchName($arr['searchname'])) {
                     $check = $this->checkXXXInfoExists($this->currentTitle);
                     if ($check === null) {
                         if ($this->echoOutput) {
@@ -685,7 +669,7 @@ class XXX
      * @param  string  $releaseName
      * @return bool
      */
-    protected function parseXXXSearchName($releaseName): bool
+    protected function parseXXXSearchName(string $releaseName): bool
     {
         $name = '';
         $followingList = '[^\w]((2160|1080|480|720)(p|i)|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[ ._-]?264|xvid|[Dd][Ii][Ss][Cc](\d+|\s*\d+|\.\d+)|XXX|BTS|DirFix|Trailer|WEBRiP|NFO|(19|20)\d\d)[^\w]';
