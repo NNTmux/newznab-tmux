@@ -219,9 +219,9 @@ class Games
 
     /**
      * @param $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
+     * @param    $cat
+     * @param    $start
+     * @param    $num
      * @param  string|array  $orderBy
      * @param  string  $maxAge
      * @param  array  $excludedCats

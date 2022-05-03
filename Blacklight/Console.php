@@ -149,11 +149,11 @@ class Console
     }
 
     /**
-     * @param  $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderBy
+     * @param    $page
+     * @param    $cat
+     * @param    $start
+     * @param    $num
+     * @param    $orderBy
      * @param  array  $excludedCats
      * @return array
      *

@@ -287,7 +287,7 @@ final class NZBVortex
     /**
      * sendRequest().
      *
-     * @param  $path
+     * @param    $path
      * @param  array  $params
      * @return array
      *

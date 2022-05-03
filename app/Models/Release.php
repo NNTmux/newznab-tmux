@@ -324,8 +324,8 @@ class Release extends Model
      * @param  int  $size
      * @param  string  $postedDate
      * @param  string  $addedDate
-     * @param  $videoId
-     * @param  $episodeId
+     * @param    $videoId
+     * @param    $episodeId
      * @param  int  $imDbId
      * @param  int  $aniDbId
      * @param  string  $tags

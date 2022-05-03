@@ -52,11 +52,11 @@ class Releases extends Release
      * Used for Browse results.
      *
      *
-     * @param  $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderBy
+     * @param    $page
+     * @param    $cat
+     * @param    $start
+     * @param    $num
+     * @param    $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @param  array  $tags
@@ -365,7 +365,7 @@ class Releases extends Release
     /**
      * Get count for my shows page pagination.
      *
-     * @param  $userShows
+     * @param    $userShows
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return int
@@ -520,11 +520,11 @@ class Releases extends Release
      *
      *
      * @param  array  $searchArr
-     * @param  $groupName
-     * @param  $sizeFrom
-     * @param  $sizeTo
-     * @param  $daysNew
-     * @param  $daysOld
+     * @param    $groupName
+     * @param    $sizeFrom
+     * @param    $sizeTo
+     * @param    $daysNew
+     * @param    $daysOld
      * @param  int  $offset
      * @param  int  $limit
      * @param  array|string  $orderBy
@@ -656,8 +656,8 @@ class Releases extends Release
      * Search function for API.
      *
      *
-     * @param  $searchName
-     * @param  $groupName
+     * @param    $searchName
+     * @param    $groupName
      * @param  int  $offset
      * @param  int  $limit
      * @param  int  $maxAge
