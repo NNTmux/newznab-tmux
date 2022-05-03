@@ -107,10 +107,10 @@ class XXX
      * Get XXX releases with covers for xxx browse page.
      *
      * @param $page
-     * @param  $cat
-     * @param  $start
-     * @param  $num
-     * @param  $orderBy
+     * @param    $cat
+     * @param    $start
+     * @param    $num
+     * @param    $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return array
@@ -158,11 +158,10 @@ class XXX
             $xxxmovies = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($xxxmoviesSql.$page), $xxxmovies, $expiresAt);
         }
-        $xxxIDs = $releaseIDs = false;
+        $xxxIDs = [];
         if (\is_array($xxxmovies['result'])) {
             foreach ($xxxmovies['result'] as $xxx => $id) {
-                $xxxIDs = [$id->id];
-                $releaseIDs = [$id->grp_release_id];
+                $xxxIDs[] = $id->id;
             }
         }
         $sql = sprintf(
@@ -200,7 +199,7 @@ class XXX
 			%s %s %s %s
 			GROUP BY xxx.id
 			ORDER BY %s %s",
-            (\is_array($xxxIDs) ? implode(',', $xxxIDs) : -1),
+            (! empty($xxxIDs) ? implode(',', $xxxIDs) : -1),
             $this->showPasswords,
             $this->getBrowseBy(),
             $catSrch,
