@@ -358,7 +358,7 @@ class ElasticSearchSiteSearch
             );
         }
         if (empty($searchResult)) {
-            return collect();
+            return [];
         }
 
         return $searchResult;
