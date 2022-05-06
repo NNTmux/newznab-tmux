@@ -66,7 +66,7 @@ class ElasticSearchSiteSearch
                     'query' => [
                         'query_string' => [
                             'query' => $keywords,
-                            'fields' => ['searchname', 'plainsearchname'],
+                            'fields' => ['searchname', 'plainsearchname', 'fromname', 'filename', 'name', 'categories_id'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
                         ],
