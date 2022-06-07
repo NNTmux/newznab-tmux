@@ -71,7 +71,7 @@ class SphinxSearch
             $this->sphinxQL
                 ->replace()
                 ->into($this->config['indexes']['releases'])
-                ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'categories_id' => $parameters['categories_id'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
+                ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'categories_id' => (string) $parameters['categories_id'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
                 ->execute();
         }
     }
