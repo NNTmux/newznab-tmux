@@ -191,11 +191,11 @@ class Music
             $music = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($musicSql.$page), $music, $expiresAt);
         }
-        $musicIDs = $releaseIDs = false;
+        $musicIDs = $releaseIDs = [];
         if (\is_array($music['result'])) {
             foreach ($music['result'] as $mus => $id) {
-                $musicIDs = [$id->id];
-                $releaseIDs = [$id->grp_release_id];
+                $musicIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
         $sql = sprintf(

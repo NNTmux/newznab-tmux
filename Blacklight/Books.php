@@ -185,11 +185,11 @@ class Books
             $books = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($booksql.$page), $books, $expiresAt);
         }
-        $bookIDs = $releaseIDs = false;
+        $bookIDs = $releaseIDs = [];
         if (\is_array($books['result'])) {
             foreach ($books['result'] as $book => $id) {
-                $bookIDs = [$id->id];
-                $releaseIDs = [$id->grp_release_id];
+                $bookIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
         $sql = sprintf(
