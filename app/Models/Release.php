@@ -618,9 +618,9 @@ class Release extends Model
 
         if (! empty($similar)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch())->indexSearch($similar, 10);
+                $searchResult = (new ElasticSearchSiteSearch())->indexSearch($similar[1], 10);
             } else {
-                $results = (new SphinxSearch())->searchIndexes('releases_rt', $similar);
+                $results = (new SphinxSearch())->searchIndexes('releases_rt', $similar[1]);
 
                 $searchResult = Arr::pluck($results, 'id');
             }
