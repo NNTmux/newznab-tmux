@@ -235,9 +235,9 @@ class ApiController extends BasePageController
                $maxAge = $api->maxAge();
                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
-               $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
-               $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
-               $traktId = $request->has('traktid') && ! empty($request->input('traktid')) ? $request->input('traktid') : -1;
+               $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? (int) $request->input('imdbid') : -1;
+               $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? (int) $request->input('tmdbid') : -1;
+               $traktId = $request->has('traktid') && ! empty($request->input('traktid')) ? (int) $request->input('traktid') : -1;
 
                $relData = $releases->moviesSearch(
                    $imdbId,
