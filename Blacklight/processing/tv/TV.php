@@ -729,10 +729,10 @@ abstract class TV extends Videos
 
         switch ($type) {
             case 'tvdbS':
-                $required = ['id', 'seriesName', 'overview', 'firstAired'];
+                $required = ['tvdb_id', 'name', 'overview', 'first_air_time'];
                 break;
             case 'tvdbE':
-                $required = ['episodeName', 'airedSeason', 'airedEpisodeNumber', 'firstAired', 'overview'];
+                $required = ['name', 'seasonNumber', 'number', 'aired', 'overview'];
                 break;
             case 'tvmazeS':
                 $required = ['id', 'name', 'summary', 'premiered', 'country'];
@@ -756,7 +756,7 @@ abstract class TV extends Videos
 
         if (\is_array($required)) {
             foreach ($required as $req) {
-                if (! \in_array($type, ['tmdbS', 'tmdbE', 'traktS', 'traktE'], false)) {
+                if (! \in_array($type, ['tvdbS', 'tvdbE', 'tmdbS', 'tmdbE', 'traktS', 'traktE'], false)) {
                     if (! isset($array->$req)) {
                         return false;
                     }

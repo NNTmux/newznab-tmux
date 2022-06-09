@@ -260,7 +260,7 @@ class TVDB extends TV
                     }
 
                     // Check each show title for similarity and then find the highest similar value
-                    $matchPercent = $this->checkMatch(strtolower($show->seriesName), strtolower($cleanName), self::MATCH_PROBABILITY);
+                    $matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
 
                     // If new match has a higher percentage, set as new matched title
                     if ($matchPercent > $highestMatch) {
@@ -372,21 +372,21 @@ class TVDB extends TV
     protected function formatShowInfo($show): array
     {
         try {
-            $poster = $this->client->episodes()->extended($show->id);
+            $poster = $this->client->episodes()->extended($show->tvdb_id);
             $this->posterUrl = ! empty($poster[0]->thumbnail) ? $poster[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
-            $fanArt = $this->client->series()->extended($show->id);
+            $fanArt = $this->client->series()->extended($show->tvdb_id);
             $this->fanartUrl = ! empty($fanArt[0]->thumbnail) ? $fanArt[0]->thumbnail : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Fanart image not found on TVDB', true);
         }
 
         try {
-            $imdbId = $this->client->series()->extended($show->id);
+            $imdbId = $this->client->series()->extended($show->tvdb_id);
             preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Show ID not found on TVDB', true);
@@ -394,15 +394,15 @@ class TVDB extends TV
 
         return [
             'type'      => parent::TYPE_TV,
-            'title'     => (string) $show->seriesName,
+            'title'     => (string) $show->name,
             'summary'   => (string) $show->overview,
-            'started'   => $show->firstAired,
+            'started'   => $show->first_air_time,
             'publisher' => (string) $show->network,
             'poster'    => $this->posterUrl,
             'fanart'    => $this->fanartUrl,
             'source'    => parent::SOURCE_TVDB,
             'imdb'      => (int) ($imdb['imdbid'] ?? 0),
-            'tvdb'      => (int) $show->id,
+            'tvdb'      => (int) $show->tvdb_id,
             'trakt'     => 0,
             'tvrage'    => 0,
             'tvmaze'    => 0,
@@ -426,7 +426,7 @@ class TVDB extends TV
             'series'      => (int) $episode->seasonNumber,
             'episode'     => (int) $episode->number,
             'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
-            'firstaired'  => $episode->firstAired,
+            'firstaired'  => $episode->aired,
             'summary'     => (string) $episode->overview,
         ];
     }
