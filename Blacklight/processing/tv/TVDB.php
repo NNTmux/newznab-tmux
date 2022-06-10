@@ -372,24 +372,17 @@ class TVDB extends TV
     protected function formatShowInfo($show): array
     {
         try {
-            $poster = $this->client->episodes()->extended($show->tvdb_id);
-            $this->posterUrl = ! empty($poster[0]->thumbnail) ? $poster[0]->thumbnail : '';
+            $poster = $this->client->series()->artworks($show->tvdb_id);
+            $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Poster image not found on TVDB', true);
         }
 
         try {
-            $fanArt = $this->client->series()->extended($show->tvdb_id);
-            $this->fanartUrl = ! empty($fanArt[0]->thumbnail) ? $fanArt[0]->thumbnail : '';
+            $imdbId = $this->client->series()->extended($show->tvdb_id)->getIMDBId();
+            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId, $imdb);
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->notice('Fanart image not found on TVDB', true);
-        }
-
-        try {
-            $imdbId = $this->client->series()->extended($show->tvdb_id);
-            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbId->getIMDBId(), $imdb);
-        } catch (ResourceNotFoundException $e) {
-            $this->colorCli->notice('Show ID not found on TVDB', true);
+            $this->colorCli->notice('Show ImdbId not found on TVDB', true);
         }
 
         return [

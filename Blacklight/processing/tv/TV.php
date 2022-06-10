@@ -720,10 +720,10 @@ abstract class TV extends Videos
      * Returns true or false.
      *
      * @param $array
-     * @param  int  $type
+     * @param  string  $type
      * @return bool
      */
-    public function checkRequiredAttr($array, $type): bool
+    public function checkRequiredAttr($array, string $type): bool
     {
         $required = ['failedToMatchType'];
 
@@ -754,15 +754,13 @@ abstract class TV extends Videos
                 break;
         }
 
-        if (\is_array($required)) {
-            foreach ($required as $req) {
-                if (! \in_array($type, ['tvdbS', 'tvdbE', 'tmdbS', 'tmdbE', 'traktS', 'traktE'], false)) {
-                    if (! isset($array->$req)) {
-                        return false;
-                    }
-                } elseif (! isset($array[$req])) {
+        foreach ($required as $req) {
+            if (! \in_array($type, ['tmdbS', 'tmdbE', 'traktS', 'traktE'], false)) {
+                if (! isset($array->$req)) {
                     return false;
                 }
+            } elseif (! isset($array[$req])) {
+                return false;
             }
         }
 
