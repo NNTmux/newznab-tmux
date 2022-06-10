@@ -254,7 +254,7 @@ class TVDB extends TV
             foreach ($response as $show) {
                 if ($this->checkRequiredAttr($show, 'tvdbS')) {
                     // Check for exact title match first and then terminate if found
-                    if (strtolower($show->seriesName) === strtolower($cleanName)) {
+                    if (strtolower($show->name) === strtolower($cleanName)) {
                         $highest = $show;
                         break;
                     }
