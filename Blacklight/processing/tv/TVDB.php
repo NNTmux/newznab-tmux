@@ -233,7 +233,7 @@ class TVDB extends TV
         $return = $response = false;
         $highestMatch = 0;
         try {
-            $response = $this->client->search()->search($cleanName);
+            $response = $this->client->search()->search($cleanName, ['type' => 'series']);
         } catch (ResourceNotFoundException $e) {
             $response = false;
             $this->colorCli->notice('Show not found on TVDB', true);
@@ -379,8 +379,8 @@ class TVDB extends TV
         }
 
         try {
-            $imdbId = $this->client->series()->extended($show->tvdb_id)->getIMDBId();
-            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId, $imdb);
+            $imdbId = $this->client->series()->extended($show->tvdb_id);
+            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->notice('Show ImdbId not found on TVDB', true);
         }
@@ -390,7 +390,7 @@ class TVDB extends TV
             'title'     => (string) $show->name,
             'summary'   => (string) $show->overview,
             'started'   => $show->first_air_time,
-            'publisher' => (string) $show->network,
+            'publisher' => (string) $imdbId->originalNetwork->name,
             'poster'    => $this->posterUrl,
             'fanart'    => $this->fanartUrl,
             'source'    => parent::SOURCE_TVDB,
