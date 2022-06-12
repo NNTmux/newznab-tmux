@@ -390,7 +390,7 @@ class TVDB extends TV
             'title'     => (string) $show->name,
             'summary'   => (string) $show->overview,
             'started'   => $show->first_air_time,
-            'publisher' => (string) $imdbId->originalNetwork->name,
+            'publisher' => $imdbId->originalNetwork->name ?? '',
             'poster'    => $this->posterUrl,
             'fanart'    => $this->fanartUrl,
             'source'    => parent::SOURCE_TVDB,
