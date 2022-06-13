@@ -17,27 +17,22 @@ class TVDB extends TV
     /**
      * @var \CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI
      */
-    public $client;
+    public TheTVDbAPI $client;
 
     /**
      * @var string Authorization token for TVDB v2 API
      */
-    public $token;
+    public string $token;
 
     /**
      * @string URL for show poster art
      */
-    public $posterUrl = '';
-
-    /**
-     * @var string URL for show fanart
-     */
-    public $fanartUrl = '';
+    public string $posterUrl = '';
 
     /**
      * @bool Do a local lookup only if server is down
      */
-    private $local;
+    private bool $local;
 
     /**
      * TVDB constructor.
@@ -88,7 +83,7 @@ class TVDB extends TV
 
         foreach ($res as $row) {
             $tvDbId = false;
-            $this->posterUrl = $this->fanartUrl = '';
+            $this->posterUrl = '';
 
             // Clean the show name for better match probability
             $release = $this->parseInfo($row['searchname']);
@@ -112,7 +107,7 @@ class TVDB extends TV
 
                 // Force local lookup only
                 $lookupSetting = true;
-                if ($local === true || $this->local === true) {
+                if ($local === true || $this->local) {
                     $lookupSetting = false;
                 }
 
@@ -147,7 +142,7 @@ class TVDB extends TV
                 }
 
                 if ((int) $videoId > 0 && (int) $tvDbId > 0) {
-                    if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
+                    if (! empty($tvdbShow['poster'])) {
                         $this->getPoster($videoId);
                     }
 
@@ -162,7 +157,7 @@ class TVDB extends TV
                     }
 
                     // Download all episodes if new show to reduce API/bandwidth usage
-                    if ($this->countEpsByVideoID($videoId) === false) {
+                    if (! $this->countEpsByVideoID($videoId)) {
                         $this->getEpisodeInfo($tvDbId, -1, -1, '', $videoId);
                     }
 
@@ -226,16 +221,15 @@ class TVDB extends TV
      *
      * @param  string  $cleanName
      * @param  string  $country
-     * @return array|bool|false
+     * @return array|bool
      */
-    protected function getShowInfo($cleanName, $country = '')
+    protected function getShowInfo($cleanName, $country = ''): bool|array
     {
         $return = $response = false;
         $highestMatch = 0;
         try {
             $response = $this->client->search()->search($cleanName, ['type' => 'series']);
         } catch (ResourceNotFoundException $e) {
-            $response = false;
             $this->colorCli->notice('Show not found on TVDB', true);
         }
 
@@ -300,11 +294,6 @@ class TVDB extends TV
 
         // Try to get the Poster
         $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '', false);
-
-        // Couldn't get poster, try fan art instead
-        if ($hasCover !== 1) {
-            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath, '', '', false);
-        }
         // Mark it retrieved if we saved an image
         if ($hasCover === 1) {
             $this->setCoverFound($videoId);
@@ -323,7 +312,7 @@ class TVDB extends TV
      * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tvDbId, $season, $episode, $videoId = 0)
+    protected function getEpisodeInfo($tvDbId, $season, $episode, $videoId = 0): bool|array
     {
         $return = $response = false;
 
@@ -392,7 +381,6 @@ class TVDB extends TV
             'started'   => $show->first_air_time,
             'publisher' => $imdbId->originalNetwork->name ?? '',
             'poster'    => $this->posterUrl,
-            'fanart'    => $this->fanartUrl,
             'source'    => parent::SOURCE_TVDB,
             'imdb'      => (int) ($imdb['imdbid'] ?? 0),
             'tvdb'      => (int) $show->tvdb_id,
@@ -405,14 +393,14 @@ class TVDB extends TV
         ];
     }
 
-    /**
-     * Assigns API episode response values to a formatted array for insertion
-     * Returns the formatted array.
-     *
-     * @param $episode
-     * @return array
-     */
-    protected function formatEpisodeInfo($episode): array
+ /**
+  * Assigns API episode response values to a formatted array for insertion
+  * Returns the formatted array.
+  *
+  * @param $episode
+  * @return array
+  */
+ protected function formatEpisodeInfo($episode): array
     {
         return [
             'title'       => (string) $episode->name,
