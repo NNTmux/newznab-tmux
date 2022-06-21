@@ -10,7 +10,7 @@
 			<p class="login-box-msg">Please sign in to access the site</p>
 			{{Form::open(['url' => 'login', 'id' => 'login'])}}
 				<div class="form-group has-feedback">
-					{{Form::text('username', 'Username or email', ['class' => 'form-inline'])}}
+					{{Form::text('username', null, ['placeholder' => 'Username or email', 'class' => 'form-inline'])}}
 					<span class="fas fa-envelope form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
