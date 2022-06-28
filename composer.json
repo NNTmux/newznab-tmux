@@ -118,15 +118,16 @@
     "beyondcode/laravel-dump-server": "^1.4",
     "captainhook/captainhook": "^5.1",
     "captainhook/plugin-composer": "^5.1",
-    "spatie/laravel-ignition": "^1.0",
     "friendsofphp/php-cs-fixer": "^3.5",
-    "laracasts/generators": "^2.0",
     "jubeki/laravel-code-style": "^1.0",
+    "laracasts/generators": "^2.0",
     "mockery/mockery": "^1.0",
     "nunomaduro/collision": "^6.0",
     "nunomaduro/larastan": "^2.0",
     "php-coveralls/php-coveralls": "^2.0",
-    "phpunit/phpunit": "^8.0 || ^9.0"
+    "phpunit/phpunit": "^8.0 || ^9.0",
+    "rector/rector": "^0.13.6",
+    "spatie/laravel-ignition": "^1.0"
   },
   "suggest": {
     "ext-gd": "to use GD library based image processing.",
