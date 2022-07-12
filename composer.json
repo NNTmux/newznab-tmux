@@ -68,7 +68,7 @@
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "jamesmills/laravel-timezone": "^1.11",
-    "joshpinkney/tv-maze-php-api": "^1.0",
+    "joshpinkney/tv-maze-php-api": "dev-master",
     "jrean/laravel-user-verification": "^10.0",
     "junaidnasir/larainvite": "^5.0",
     "kevinlebrun/colors.php": "^1.0",
