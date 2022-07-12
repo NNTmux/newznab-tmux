@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use JetBrains\PhpStorm\ArrayShape;
 
 class ProcessReleases
 {
@@ -41,57 +42,57 @@ class ProcessReleases
     /**
      * @var int
      */
-    public $collectionDelayTime;
+    public int $collectionDelayTime;
 
     /**
      * @var int
      */
-    public $crossPostTime;
+    public int $crossPostTime;
 
     /**
      * @var int
      */
-    public $releaseCreationLimit;
+    public int $releaseCreationLimit;
 
     /**
      * @var int
      */
-    public $completion;
+    public int $completion;
 
     /**
      * @var bool
      */
-    public $echoCLI;
+    public bool $echoCLI;
 
     /**
      * @var \PDO
      */
-    public $pdo;
+    public \PDO $pdo;
 
     /**
      * @var \Blacklight\ConsoleTools
      */
-    public $consoleTools;
+    public ConsoleTools $consoleTools;
 
     /**
      * @var \Blacklight\NZB
      */
-    public $nzb;
+    public NZB $nzb;
 
     /**
      * @var \Blacklight\ReleaseCleaning
      */
-    public $releaseCleaning;
+    public ReleaseCleaning $releaseCleaning;
 
     /**
      * @var \Blacklight\Releases
      */
-    public $releases;
+    public Releases $releases;
 
     /**
      * @var \Blacklight\ReleaseImage
      */
-    public $releaseImage;
+    public ReleaseImage $releaseImage;
 
     /**
      * Time (hours) to wait before delete a stuck/broken collection.
@@ -99,7 +100,7 @@ class ProcessReleases
      *
      * @var int
      */
-    private $collectionTimeout;
+    private int $collectionTimeout;
 
     /**
      * @param  array  $options  Class instances / Echo to cli ?
@@ -155,7 +156,7 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput): int
+    public function processReleases(int $categorize, int $postProcess, string $groupName, NNTP $nntp, bool $echooutput): int
     {
         $this->echoCLI = ($echooutput && config('nntmux.echocli'));
         $groupID = '';
@@ -212,7 +213,7 @@ class ProcessReleases
      *
      * @void
      */
-    public function resetCategorize($where = ''): void
+    public function resetCategorize(string $where = ''): void
     {
         DB::update(
             sprintf('UPDATE releases SET categories_id = %d, iscategorized = 0 %s', Category::OTHER_MISC, $where)
@@ -228,7 +229,7 @@ class ProcessReleases
      *
      * @throws \Exception
      */
-    public function categorizeRelease($type, $groupId): int
+    public function categorizeRelease(string $type, $groupId): int
     {
         $cat = new Categorize();
         $categorized = $total = 0;
@@ -446,7 +447,8 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    public function createReleases($groupID): array
+    #[ArrayShape(['added' => 'int', 'dupes' => 'int'])]
+ public function createReleases(int|string $groupID): array
     {
         $startTime = now()->toImmutable();
 
@@ -599,7 +601,7 @@ class ProcessReleases
                 }
             } else {
                 // The release was already in the DB, so delete the collection.
-                DB::transaction(function () use ($collection) {
+                DB::transaction(static function () use ($collection) {
                     Collection::query()->where('collectionhash', $collection->collectionhash)->delete();
                 }, 10);
 
@@ -632,7 +634,7 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    public function createNZBs($groupID): int
+    public function createNZBs(int|string $groupID): int
     {
         $startTime = now()->toImmutable();
 
@@ -684,21 +686,16 @@ class ProcessReleases
      *
      * @throws \Exception
      */
-    public function categorizeReleases($categorize, $groupID = ''): void
+    public function categorizeReleases(int $categorize, int|string $groupID = ''): void
     {
         $startTime = now()->toImmutable();
         if ($this->echoCLI) {
             $this->consoleTools->header('Process Releases -> Categorize releases.');
         }
-        switch ((int) $categorize) {
-            case 2:
-                $type = 'searchname';
-                break;
-            case 1:
-            default:
-                $type = 'name';
-                break;
-        }
+        $type = match ((int) $categorize) {
+            2 => 'searchname',
+            default => 'name',
+        };
         $this->categorizeRelease(
             $type,
             $groupID
@@ -721,7 +718,7 @@ class ProcessReleases
      *
      * @throws \Exception
      */
-    public function postProcessReleases($postProcess, &$nntp): void
+    public function postProcessReleases(int $postProcess, NNTP $nntp): void
     {
         if ((int) $postProcess === 1) {
             (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
@@ -832,7 +829,7 @@ class ProcessReleases
      *
      * @throws \Exception
      */
-    public function deletedReleasesByGroup($groupID = ''): void
+    public function deletedReleasesByGroup(int|string $groupID = ''): void
     {
         $startTime = now()->toImmutable();
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
@@ -1055,7 +1052,7 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage1($groupID): void
+    private function collectionFileCheckStage1(int $groupID): void
     {
         DB::transaction(function () use ($groupID) {
             $collectionsCheck = Collection::query()->select(['collections.id'])
@@ -1088,7 +1085,7 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage2($groupID): void
+    private function collectionFileCheckStage2(int $groupID): void
     {
         DB::transaction(function () use ($groupID) {
             $collectionsCheck = Collection::query()->select(['collections.id'])
@@ -1125,9 +1122,9 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage3($where): void
+    private function collectionFileCheckStage3(string $where): void
     {
-        DB::transaction(function () use ($where) {
+        DB::transaction(static function () use ($where) {
             DB::update(
                 sprintf(
                     '
@@ -1151,7 +1148,7 @@ class ProcessReleases
             );
         }, 10);
 
-        DB::transaction(function () use ($where) {
+        DB::transaction(static function () use ($where) {
             DB::update(
                 sprintf(
                     '
@@ -1187,9 +1184,9 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage4(&$where): void
+    private function collectionFileCheckStage4(string &$where): void
     {
-        DB::transaction(function () use ($where) {
+        DB::transaction(static function () use ($where) {
             DB::update(
                 sprintf(
                     '
@@ -1218,9 +1215,9 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage5($groupId): void
+    private function collectionFileCheckStage5(int $groupId): void
     {
-        DB::transaction(function () use ($groupId) {
+        DB::transaction(static function () use ($groupId) {
             $collectionQuery = Collection::query()->whereIn('filecheck', [self::COLLFC_TEMPCOMP, self::COLLFC_ZEROPART]);
             if (! empty($groupId)) {
                 $collectionQuery->where('groups_id', $groupId);
@@ -1239,7 +1236,7 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage6(&$where): void
+    private function collectionFileCheckStage6(string &$where): void
     {
         DB::transaction(function () use ($where) {
             DB::update(
@@ -1268,7 +1265,7 @@ class ProcessReleases
      * @throws \Exception
      * @throws \Throwable
      */
-    private function processStuckCollections($groupID): void
+    private function processStuckCollections(int $groupID): void
     {
         $lastRun = Settings::settingValue('indexer.processing.last_run_time');
 

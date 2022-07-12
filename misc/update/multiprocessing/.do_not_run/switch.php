@@ -1,20 +1,20 @@
 <?php
 
 if (! isset($argv[1])) {
-    exit('This script is not intended to be run manually.' . PHP_EOL);
+    exit('This script is not intended to be run manually.'.PHP_EOL);
 }
 
-require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
+require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\UsenetGroup;
 use App\Models\Settings;
-use Blacklight\processing\PostProcess;
-use Blacklight\processing\ProcessReleases;
-use Blacklight\processing\post\ProcessAdditional;
+use App\Models\UsenetGroup;
 use Blacklight\Backfill;
 use Blacklight\Binaries;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
+use Blacklight\processing\post\ProcessAdditional;
+use Blacklight\processing\PostProcess;
+use Blacklight\processing\ProcessReleases;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +28,7 @@ switch ($options[1]) {
     // $options[2] => (string)group name, Name of group to work on.
     // $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
     case 'backfill':
-        if (in_array((int)$options[3], [1, 2], false)) {
+        if (in_array((int) $options[3], [1, 2], false)) {
             $value = (int) Settings::settingValue('site.tmux.backfill_qty');
             if ($value !== null) {
                 try {
@@ -262,7 +262,6 @@ switch ($options[1]) {
         }
         break;
 
-
     // Do a single group (update_binaries/backFill/update_releases/postprocess).
     // $options[2] => (int)groupid, group to work on
     case 'update_per_group':
@@ -271,7 +270,7 @@ switch ($options[1]) {
             $groupMySQL = UsenetGroup::find($options[2])->toArray();
 
             if ($groupMySQL === null) {
-                exit('ERROR: Group not found with id ' . $options[2] . PHP_EOL);
+                exit('ERROR: Group not found with id '.$options[2].PHP_EOL);
             }
 
             // Connect to NNTP.
@@ -384,14 +383,14 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
- * @param                 $groupID
- * @param ProcessReleases $releases
+ * @param    $groupID
+ * @param  ProcessReleases  $releases
  *
  * @throws \Throwable
  */
 function processReleases($releases, $groupID)
 {
-    $releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
+    $releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int) Settings::settingValue('..maxnzbsprocessed') : 1000);
     $releases->processIncompleteCollections($groupID);
     $releases->processCollectionSizes($groupID);
     $releases->deleteUnwantedCollections($groupID);
@@ -408,31 +407,31 @@ function processReleases($releases, $groupID)
 /**
  * Check if the character contains a-f or 0-9.
  *
- * @param string $char
- *
+ * @param  string  $char
  * @return bool
  */
 function charCheck($char)
 {
-    if (\in_array($char, ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'], true)) {
+    if (\in_array($char, ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], true)) {
         return true;
     }
+
     return false;
 }
 
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param bool $alternate Use alternate NNTP provider.
- *
+ * @param  bool  $alternate Use alternate NNTP provider.
  * @return NNTP
+ *
  * @throws \Exception
  */
 function &nntp($alternate = false)
 {
     $nntp = new NNTP();
-    if (($alternate && (int)Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-        exit('ERROR: Unable to connect to usenet.' . PHP_EOL);
+    if (($alternate && (int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+        exit('ERROR: Unable to connect to usenet.'.PHP_EOL);
     }
 
     return $nntp;
