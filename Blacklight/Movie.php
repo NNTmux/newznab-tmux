@@ -253,10 +253,10 @@ class Movie
                     ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                     : ''
                 ),
-                (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                \count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '',
                 $order[0],
                 $order[1],
-                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+                $start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start
             );
         $movieCache = Cache::get(md5($moviesSql.$page));
         if ($movieCache !== null) {
