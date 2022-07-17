@@ -979,7 +979,6 @@ class ProcessAdditional
         $failed = $downloaded = 0;
         // Loop through the files, attempt to find if password-ed and files. Starting with what not to process.
         foreach ($this->_nzbContents as $nzbFile) {
-            // TODO change this to max calculated size, as segments vary in size greatly.
             if ($downloaded >= $this->_maximumRarSegments) {
                 break;
             }
@@ -1662,7 +1661,7 @@ class ProcessAdditional
      * @param  string  $path
      * @return bool|string|\Symfony\Component\Finder\SplFileInfo[]
      */
-    protected function _getTempDirectoryContents(string $pattern = '', string $path = '')
+    protected function _getTempDirectoryContents(string $pattern = '', string $path = ''): array|bool|string
     {
         if ($path === '') {
             $path = $this->tmpPath;
@@ -2027,16 +2026,11 @@ class ProcessAdditional
                         $lowestLength = ($numbers[1] - $this->_ffMPEGDuration);
                         // Form the time string.
                         $end = '.'.$numbers[2];
-                        switch (\strlen($lowestLength)) {
-                            case 1:
-                                $lowestLength = ('00:00:0'.$lowestLength.$end);
-                                break;
-                            case 2:
-                                $lowestLength = ('00:00:'.$lowestLength.$end);
-                                break;
-                            default:
-                                $lowestLength = '00:00:60.00';
-                        }
+                        $lowestLength = match (\strlen($lowestLength)) {
+                            1 => ('00:00:0'.$lowestLength.$end),
+                            2 => ('00:00:'.$lowestLength.$end),
+                            default => '00:00:60.00',
+                        };
                     }
 
                     // Try to get the sample (from the end instead of the start).

@@ -3,6 +3,7 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
+use JetBrains\PhpStorm\ArrayShape;
 use Tmdb\Client;
 use Tmdb\Exception\TmdbApiException;
 use Tmdb\Helper\ImageHelper;
@@ -17,39 +18,27 @@ class TMDB extends TV
     /**
      * @string URL for show poster art
      */
-    public $posterUrl = '';
+    public string $posterUrl = '';
     /**
      * @var ApiToken
      */
-    public $token;
+    public ApiToken $token;
     /**
      * @var Client
      */
-    public $client;
+    public Client $client;
     /**
      * @var ConfigurationRepository
      */
-    public $configRepository;
+    public ConfigurationRepository $configRepository;
     /**
      * @var \Tmdb\Model\Configuration
      */
-    public $config;
+    public \Tmdb\Model\Configuration $config;
     /**
      * @var ImageHelper
      */
-    public $helper;
-
-    /**
-     * Construct. Instantiate TMDB Class.
-     *
-     * @param  array  $options  Class instances.
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
-    {
-        parent::__construct($options);
-    }
+    public ImageHelper $helper;
 
     /**
      * Fetch banner from site.
@@ -209,10 +198,10 @@ class TMDB extends TV
      * Calls the API to perform initial show name match to TMDB title
      * Returns a formatted array of show data or false if no match.
      *
-     * @param $cleanName
+     * @param  string  $cleanName
      * @return array|false
      */
-    protected function getShowInfo($cleanName)
+    protected function getShowInfo($cleanName): bool|array
     {
         $return = $response = false;
 
@@ -236,7 +225,7 @@ class TMDB extends TV
      * @param  string  $cleanName
      * @return array|false
      */
-    private function matchShowInfo($shows, $cleanName)
+    private function matchShowInfo(array $shows, string $cleanName): bool|array
     {
         $return = false;
         $highestMatch = 0;
@@ -320,7 +309,7 @@ class TMDB extends TV
      * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tmdbid, $season, $episode, $airdate = '', $videoId = 0)
+    protected function getEpisodeInfo($tmdbid, $season, $episode, $airdate = '', $videoId = 0): bool|array
     {
         $return = false;
 
@@ -381,7 +370,15 @@ class TMDB extends TV
      * @param $episode
      * @return array
      */
-    protected function formatEpisodeInfo($episode): array
+    #[ArrayShape([
+        'title' => 'string',
+        'series' => 'int',
+        'episode' => 'int',
+        'se_complete' => 'string',
+        'firstaired' => 'string',
+        'summary' => 'string',
+    ])]
+ protected function formatEpisodeInfo($episode): array
     {
         return [
             'title'       => (string) $episode['name'],

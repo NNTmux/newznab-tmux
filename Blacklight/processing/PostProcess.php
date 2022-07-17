@@ -31,12 +31,12 @@ class PostProcess
     /**
      * @var \Blacklight\NameFixer
      */
-    protected $nameFixer;
+    protected NameFixer $nameFixer;
 
     /**
      * @var \dariusiii\rarinfo\Par2Info
      */
-    protected $_par2Info;
+    protected Par2Info $_par2Info;
 
     /**
      * @var
@@ -48,26 +48,26 @@ class PostProcess
      *
      * @var bool
      */
-    private $alternateNNTP;
+    private bool $alternateNNTP;
 
     /**
      * Add par2 info to rar list?
      *
      * @var bool
      */
-    private $addpar2;
+    private bool $addpar2;
 
     /**
      * Should we echo to CLI?
      *
      * @var bool
      */
-    private $echooutput;
+    private bool $echooutput;
 
     /**
      * @var \Blacklight\Nfo
      */
-    private $Nfo;
+    private Nfo $Nfo;
 
     /**
      * Constructor.
@@ -183,7 +183,7 @@ class PostProcess
      *
      * @throws \Exception
      */
-    public function processMovies($groupID = '', $guidChar = '', $processMovies = ''): void
+    public function processMovies(string $groupID = '', string $guidChar = '', int|string|null $processMovies = ''): void
     {
         $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::settingValue('..lookupimdb'));
         if ($processMovies > 0) {
@@ -211,7 +211,7 @@ class PostProcess
      *
      * @throws \Exception
      */
-    public function processNfos(&$nntp, $groupID = '', $guidChar = ''): void
+    public function processNfos(NNTP $nntp, string $groupID = '', string $guidChar = ''): void
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
             $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
@@ -225,7 +225,7 @@ class PostProcess
      *
      * @throws \Exception
      */
-    public function processSharing(&$nntp): void
+    public function processSharing(NNTP $nntp): void
     {
         (new Sharing(['NNTP' => $nntp]))->start();
     }
@@ -235,13 +235,13 @@ class PostProcess
      *
      * @param  string  $groupID  (Optional) ID of a group to work on.
      * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
-     * @param  string|int|null  $processTV  (Optional) 0 Don't process, 1 process all releases,
+     * @param  int|string|null  $processTV  (Optional) 0 Don't process, 1 process all releases,
      *                                      2 process renamed releases only, '' check site setting
      * @return void
      *
      * @throws \Exception
      */
-    public function processTv($groupID = '', $guidChar = '', $processTV = ''): void
+    public function processTv(string $groupID = '', string $guidChar = '', int|string|null $processTV = ''): void
     {
         $processTV = (is_numeric($processTV) ? $processTV : Settings::settingValue('..lookuptvrage'));
         if ($processTV > 0) {
@@ -276,7 +276,7 @@ class PostProcess
      *
      * @throws \Exception
      */
-    public function processAdditional(&$nntp, $groupID = '', $guidChar = ''): void
+    public function processAdditional(NNTP $nntp, int|string $groupID = '', string $guidChar = ''): void
     {
         (new ProcessAdditional(['Echo' => $this->echooutput, 'NNTP' => $nntp, 'NameFixer' => $this->nameFixer, 'Nfo' => $this->Nfo]))->start($groupID, $guidChar);
     }
@@ -295,7 +295,7 @@ class PostProcess
      *
      * @throws \Exception
      */
-    public function parsePAR2($messageID, $relID, $groupID, &$nntp, $show): bool
+    public function parsePAR2(string $messageID, int $relID, int $groupID, NNTP $nntp, int $show): bool
     {
         if ($messageID === '') {
             return false;

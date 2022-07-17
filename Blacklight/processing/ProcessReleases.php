@@ -540,7 +540,7 @@ class ProcessReleases
 
                 if ($releaseID !== null) {
                     // Update collections table to say we inserted the release.
-                    DB::transaction(function () use ($collection, $releaseID) {
+                    DB::transaction(static function () use ($collection, $releaseID) {
                         Collection::query()->where('id', $collection->id)->update(['filecheck' => self::COLLFC_INSERTED, 'releases_id' => $releaseID]);
                     }, 10);
 
@@ -1054,7 +1054,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage1(int $groupID): void
     {
-        DB::transaction(function () use ($groupID) {
+        DB::transaction(static function () use ($groupID) {
             $collectionsCheck = Collection::query()->select(['collections.id'])
                 ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
                 ->where('collections.totalfiles', '>', 0)
@@ -1087,7 +1087,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage2(int $groupID): void
     {
-        DB::transaction(function () use ($groupID) {
+        DB::transaction(static function () use ($groupID) {
             $collectionsCheck = Collection::query()->select(['collections.id'])
                 ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
                 ->where('binaries.filenumber', '=', 0)
@@ -1103,7 +1103,7 @@ class ProcessReleases
             })->update(['collections.filecheck' => self::COLLFC_ZEROPART]);
         }, 10);
 
-        DB::transaction(function () use ($groupID) {
+        DB::transaction(static function () use ($groupID) {
             $collectionQuery = Collection::query()->where('filecheck', '=', self::COLLFC_COMPCOLL);
             if (! empty($groupID)) {
                 $collectionQuery->where('groups_id', $groupID);

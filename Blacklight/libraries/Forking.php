@@ -460,7 +460,7 @@ class Forking
     /**
      * @throws \Exception
      */
-    private function safeBinaries()
+    private function safeBinaries(): void
     {
         $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
         $maxMessages = (int) Settings::settingValue('..maxmssgs');

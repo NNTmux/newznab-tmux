@@ -388,7 +388,7 @@ switch ($options[1]) {
  *
  * @throws \Throwable
  */
-function processReleases($releases, $groupID)
+function processReleases(ProcessReleases $releases, $groupID): void
 {
     $releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int) Settings::settingValue('..maxnzbsprocessed') : 1000);
     $releases->processIncompleteCollections($groupID);
@@ -410,24 +410,20 @@ function processReleases($releases, $groupID)
  * @param  string  $char
  * @return bool
  */
-function charCheck($char)
+function charCheck($char): bool
 {
-    if (\in_array($char, ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], true)) {
-        return true;
-    }
-
-    return false;
+    return \in_array($char, ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], true);
 }
 
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param  bool  $alternate Use alternate NNTP provider.
+ * @param bool $alternate Use alternate NNTP provider.
  * @return NNTP
  *
  * @throws \Exception
  */
-function &nntp($alternate = false)
+function &nntp(bool $alternate = false)
 {
     $nntp = new NNTP();
     if (($alternate && (int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
