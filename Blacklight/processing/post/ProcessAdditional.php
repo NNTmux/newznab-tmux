@@ -2217,7 +2217,7 @@ class ProcessAdditional
             if (! $foundName) {
                 $this->_release->textstring = $file['name'];
                 $this->_release->releases_id = $this->_release->id;
-                if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? true : false), 'PAR2, ', 1, 1)) {
+                if ($this->_nameFixer->checkName($this->_release, $this->_echoCLI, 'PAR2, ', 1, 1)) {
                     $foundName = true;
                 }
             }
@@ -2235,7 +2235,7 @@ class ProcessAdditional
     protected function _processNfoFile($fileLocation): void
     {
         $data = @File::get($fileLocation);
-        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, $this->_release, $this->_nntp)) {
+        if ($data != false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, $this->_release, $this->_nntp)) {
             $this->_releaseHasNoNFO = false;
         }
     }
@@ -2269,11 +2269,11 @@ class ProcessAdditional
     /**
      * Comparison function for uSort, for sorting NZB files.
      *
-     * @param  array|null|string  $a
-     * @param  array|null|string  $b
+     * @param  array|string|null  $a
+     * @param  array|string|null  $b
      * @return int
      */
-    protected function _sortNZB($a, $b): int
+    protected function _sortNZB(array|string|null $a, array|string|null $b): int
     {
         $pos = 0;
         $af = $bf = false;
