@@ -109,16 +109,12 @@ switch ($options[1]) {
         }
         try {
             $binaries = new Binaries(['NNTP' => $nntp, 'Groups' => null]);
-        } catch (Throwable $e) {
-            Log::error($e->getTraceAsString());
-            echo $e->getMessage();
-        }
-        try {
             $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill'));
         } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
+
         if (empty($return)) {
             exit();
         }
@@ -410,7 +406,7 @@ function processReleases(ProcessReleases $releases, $groupID): void
  * @param  string  $char
  * @return bool
  */
-function charCheck($char): bool
+function charCheck(string $char): bool
 {
     return \in_array($char, ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], true);
 }
@@ -418,12 +414,12 @@ function charCheck($char): bool
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param bool $alternate Use alternate NNTP provider.
+ * @param  bool  $alternate Use alternate NNTP provider.
  * @return NNTP
  *
  * @throws \Exception
  */
-function &nntp(bool $alternate = false)
+function &nntp(bool $alternate = false): NNTP
 {
     $nntp = new NNTP();
     if (($alternate && (int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
