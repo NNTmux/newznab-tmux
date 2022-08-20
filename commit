@@ -5,12 +5,7 @@ EXIT_STATUS=0
 # Add changes.
 git add -i
 
-# Edit changelog.
-nano Changelog
-
-# Add changes to changelog.
-git add Changelog
-
+# Migrate database changes if needed
 php artisan migrate
 
 # Commit changes.
