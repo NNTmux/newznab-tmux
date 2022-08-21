@@ -30,7 +30,7 @@ class PhpYenc
      * @param  bool  $ignore
      * @return bool|string
      */
-    public static function decode(&$text, $ignore = false)
+    public static function decode(&$text, $ignore = false): bool|string
     {
         $crc = '';
         // Extract the yEnc string itself.
@@ -91,7 +91,7 @@ class PhpYenc
      * @param  string  $text  The encoded text to decode.
      * @return string The decoded yEnc string, or the input string, if it's not yEnc.
      */
-    public static function decodeIgnore(&$text): string
+    public static function decodeIgnore(string &$text): string
     {
         if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input)) {
             $text = '';
@@ -142,7 +142,7 @@ class PhpYenc
      * @param  bool  $crc32
      * @return string
      */
-    public static function encode($data, $filename, $lineLength = 128, $crc32 = true): string
+    public static function encode($data, $filename, int $lineLength = 128, bool $crc32 = true): string
     {
         // yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
         if ($lineLength > 254) {
@@ -159,20 +159,13 @@ class PhpYenc
         $stringLength = \strlen($data);
         // Encode each character of the string one at a time.
         foreach ($data as $i => $iValue) {
-            $value = ((\ord($data[$i]) + 42) % 256);
+            $value = ((\ord($iValue) + 42) % 256);
 
             // Escape NULL, TAB, LF, CR, space, . and = characters.
-            switch ($value) {
-                case 0:
-                case 10:
-                case 13:
-                case 61:
-                    $encoded .= ('='.\chr(($value + 64) % 256));
-                    break;
-                default:
-                    $encoded .= \chr($value);
-                    break;
-            }
+            $encoded .= match ($value) {
+                0, 10, 13, 61 => ('='.\chr(($value + 64) % 256)),
+                default => \chr($value),
+            };
         }
 
         $encoded =
