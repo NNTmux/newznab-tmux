@@ -29,7 +29,7 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected string $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -46,7 +46,7 @@ class ResetPasswordController extends Controller
      *
      * @throws \Exception
      */
-    public function reset(Request $request)
+    public function reset(Request $request): void
     {
         $error = '';
         $confirmed = '';

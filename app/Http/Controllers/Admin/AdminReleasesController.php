@@ -30,9 +30,8 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -90,11 +89,10 @@ class AdminReleasesController extends BasePageController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Http\RedirectResponse
     {
         if ($id) {
             $releases = new Releases();

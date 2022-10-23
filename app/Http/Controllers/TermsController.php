@@ -7,7 +7,7 @@ class TermsController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function terms()
+    public function terms(): void
     {
         $this->setPrefs();
         $title = 'Terms and Conditions';

@@ -14,7 +14,7 @@ class GamesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): void
     {
         $this->setPrefs();
         $games = new Games(['Settings' => $this->settings]);

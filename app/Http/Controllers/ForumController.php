@@ -15,7 +15,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function forum(Request $request)
+    public function forum(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
         if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
@@ -71,7 +71,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function getPosts($id, Request $request)
+    public function getPosts($id, Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
 
@@ -110,7 +110,7 @@ class ForumController extends BasePageController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function deleteTopic(Request $request)
+    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $id = $request->input('id') + 0;
 
@@ -128,7 +128,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): void
     {
         $this->setPrefs();
 
@@ -163,7 +163,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
 

@@ -13,7 +13,7 @@ class PasswordSecurityController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function show2faForm(Request $request)
+    public function show2faForm(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
         $user = Auth::user();
 
@@ -41,7 +41,7 @@ class PasswordSecurityController extends Controller
      * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
      * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
      */
-    public function generate2faSecret(Request $request)
+    public function generate2faSecret(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $user = Auth::user();
 
@@ -65,7 +65,7 @@ class PasswordSecurityController extends Controller
      * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
      * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
      */
-    public function enable2fa(Request $request)
+    public function enable2fa(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $user = Auth::user();
         $secret = $request->input('verify-code');
@@ -84,7 +84,7 @@ class PasswordSecurityController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function disable2fa(Request $request)
+    public function disable2fa(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if (! (Hash::check($request->get('current-password'), Auth::user()->password))) {
             // The passwords matches

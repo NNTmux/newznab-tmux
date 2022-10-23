@@ -10,11 +10,11 @@ class FailedReleasesController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\Response
      *
      * @throws \Exception
      */
-    public function failed(Request $request)
+    public function failed(Request $request): \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\Response
     {
         if ($request->missing('api_token')) {
             return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);

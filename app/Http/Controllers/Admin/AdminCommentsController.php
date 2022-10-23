@@ -10,7 +10,7 @@ class AdminCommentsController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
 
@@ -25,10 +25,10 @@ class AdminCommentsController extends BasePageController
     }
 
     /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): \Illuminate\Http\RedirectResponse
     {
         if ($id) {
             ReleaseComment::deleteComment($id);

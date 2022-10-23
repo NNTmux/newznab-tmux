@@ -18,7 +18,7 @@ class AdminAjaxController extends BasePageController
      *
      * @throws \Throwable
      */
-    public function ajaxAction(Request $request)
+    public function ajaxAction(Request $request): void
     {
         if ($request->missing('action')) {
             exit();

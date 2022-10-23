@@ -40,7 +40,7 @@ class ForgotPasswordController extends Controller
      *
      * @throws \Exception
      */
-    public function showLinkRequestForm(Request $request)
+    public function showLinkRequestForm(Request $request): void
     {
         $sent = '';
         $email = request()->input('email') ?? '';

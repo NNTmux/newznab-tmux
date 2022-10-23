@@ -15,7 +15,7 @@ class BtcPaymentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
         $gateway_id = env('MYCELIUM_GATEWAY_ID');
@@ -64,7 +64,7 @@ class BtcPaymentController extends BasePageController
     /**
      * Callback data from Mycelium Gear.
      */
-    public function callback()
+    public function callback(): void
     {
         $gateway_id = env('MYCELIUM_GATEWAY_ID');
         $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');

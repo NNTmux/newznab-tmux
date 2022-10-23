@@ -11,11 +11,11 @@ class BooksController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
+     * @param string $id
      *
      * @throws \Exception
      */
-    public function index(Request $request, $id = '')
+    public function index(Request $request, string $id = ''): void
     {
         $this->setPrefs();
         $book = new Books(['Settings' => $this->settings]);

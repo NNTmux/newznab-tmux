@@ -13,7 +13,7 @@ class AdminTmuxController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): void
     {
         $this->setAdminPrefs();
 

@@ -8,11 +8,11 @@ use Blacklight\NZB;
 class FileListController extends BasePageController
 {
     /**
-     * @param $guid
+     * @param string $guid
      *
      * @throws \Exception
      */
-    public function show($guid)
+    public function show(string $guid): void
     {
         $this->setPrefs();
         $nzb = new NZB();
@@ -31,8 +31,7 @@ class FileListController extends BasePageController
 
             ob_start();
             @readgzfile($nzbpath);
-            $nzbfile = ob_get_contents();
-            ob_end_clean();
+            $nzbfile = ob_get_clean();
 
             $ret = $nzb->nzbFileList($nzbfile);
 

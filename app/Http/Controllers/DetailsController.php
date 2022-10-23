@@ -27,12 +27,12 @@ use Illuminate\Support\Facades\Auth;
 class DetailsController extends BasePageController
 {
     /**
-     * @param $guid
+     * @param string $guid
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      *
      * @throws \Exception
      */
-    public function show($guid)
+    public function show(string $guid): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
 

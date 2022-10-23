@@ -17,7 +17,7 @@ class MyShowsController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
         $action = $request->input('action') ?? '';
@@ -168,7 +168,7 @@ class MyShowsController extends BasePageController
      *
      * @throws \Exception
      */
-    public function browse(Request $request)
+    public function browse(Request $request): void
     {
         $this->setPrefs();
         $title = 'Browse My Shows';

@@ -357,7 +357,7 @@ class ProfileController extends BasePageController
      *
      * @throws \Exception
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
         $userId = $request->input('id');

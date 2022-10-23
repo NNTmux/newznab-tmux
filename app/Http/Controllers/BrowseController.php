@@ -62,7 +62,7 @@ class BrowseController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(string $parentCategory, string $id = 'All')
+    public function show(string $parentCategory, string $id = 'All'): void
     {
         $this->setPrefs();
         $releases = new Releases();
@@ -158,7 +158,7 @@ class BrowseController extends BasePageController
      *
      * @throws \Exception
      */
-    public function group(Request $request)
+    public function group(Request $request): void
     {
         $this->setPrefs();
         $releases = new Releases();
@@ -199,7 +199,7 @@ class BrowseController extends BasePageController
      *
      * @throws \Exception
      */
-    public function tags(Request $request)
+    public function tags(Request $request): void
     {
         $this->setPrefs();
         $releases = new Releases();

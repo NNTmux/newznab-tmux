@@ -14,7 +14,7 @@ class ApiHelpController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setPrefs();
         $title = 'Api Help';
@@ -30,7 +30,7 @@ class ApiHelpController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function apiv2()
+    public function apiv2(): void
     {
         $this->setPrefs();
         $title = 'Api V2 Help';

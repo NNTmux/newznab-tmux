@@ -13,7 +13,7 @@ class AdminMusicController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
 
@@ -34,7 +34,7 @@ class AdminMusicController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
         $music = new Music();

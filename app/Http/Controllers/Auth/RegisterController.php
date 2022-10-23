@@ -42,12 +42,12 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected string $redirectTo = '/';
 
     /**
      * @var string
      */
-    private $inviteCodeQuery;
+    private string $inviteCodeQuery;
 
     /**
      * Create a new controller instance.
@@ -212,10 +212,10 @@ class RegisterController extends Controller
 
     /**
      * @param  Request  $request
-     * @param  string  $error
-     * @param  int  $showRegister
+     * @param string $error
+     * @param int $showRegister
      */
-    public function showRegistrationForm(Request $request, $error = '', $showRegister = 0)
+    public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0): void
     {
         $inviteCode = '';
         if ($request->has('invitecode')) {

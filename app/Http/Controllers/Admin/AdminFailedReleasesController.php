@@ -10,7 +10,7 @@ class AdminFailedReleasesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
 

@@ -9,7 +9,7 @@ class BrowseGroupController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show()
+    public function show(): void
     {
         $this->setPrefs();
         $groupList = UsenetGroup::getGroupsRange('', true);

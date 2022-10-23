@@ -12,7 +12,7 @@ class AjaxController extends BasePageController
      *
      * @throws \Exception
      */
-    public function profile(Request $request)
+    public function profile(Request $request): void
     {
         $this->setPrefs();
         if ($request->has('action') && (int) $request->input('action') === 1 && $request->has('emailto')) {

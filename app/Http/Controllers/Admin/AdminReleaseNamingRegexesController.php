@@ -14,7 +14,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): void
     {
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
@@ -39,7 +39,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
@@ -106,7 +106,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function testRegex(Request $request)
+    public function testRegex(Request $request): void
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Release Naming Regex Test';

@@ -16,7 +16,7 @@ class SendReleaseController extends BasePageController
      *
      * @throws \Exception
      */
-    public function couchPotato(Request $request)
+    public function couchPotato(Request $request): void
     {
         $this->setPrefs();
         if (empty($request->input('id'))) {
@@ -68,7 +68,7 @@ class SendReleaseController extends BasePageController
      *
      * @throws \Exception
      */
-    public function nzbGet(Request $request)
+    public function nzbGet(Request $request): void
     {
         $this->setPrefs();
         if (empty($request->input('id'))) {
@@ -99,7 +99,7 @@ class SendReleaseController extends BasePageController
      *
      * @throws \Exception
      */
-    public function queue(Request $request)
+    public function queue(Request $request): void
     {
         $this->setPrefs();
         if (empty($request->input('id'))) {

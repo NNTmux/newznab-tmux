@@ -17,7 +17,7 @@ class MyMoviesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
         $mv = new Movie(['Settings' => $this->settings]);

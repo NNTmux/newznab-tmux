@@ -14,7 +14,7 @@ class SearchController extends BasePageController
      *
      * @throws \Exception
      */
-    public function search(Request $request)
+    public function search(Request $request): void
     {
         $this->setPrefs();
         $releases = new Releases();

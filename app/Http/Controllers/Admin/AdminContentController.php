@@ -12,7 +12,7 @@ class AdminContentController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
         $contentList = (new Contents())->getAll();
@@ -33,7 +33,7 @@ class AdminContentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
         $contents = new Contents();
@@ -113,7 +113,7 @@ class AdminContentController extends BasePageController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         if ($request->has('id')) {
             $contents = new Contents();

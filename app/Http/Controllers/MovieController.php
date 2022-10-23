@@ -11,11 +11,11 @@ class MovieController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
+     * @param string $id
      *
      * @throws \Exception
      */
-    public function showMovies(Request $request, $id = '')
+    public function showMovies(Request $request, string $id = ''): void
     {
         $this->setPrefs();
         $movie = new Movie(['Settings' => $this->settings]);
@@ -133,7 +133,7 @@ class MovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function showTrailer(Request $request)
+    public function showTrailer(Request $request): \Illuminate\Http\JsonResponse
     {
         $movie = new Movie;
 

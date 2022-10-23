@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 class ContactUsController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
      *
-     * @throws \Exception
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function contact(Request $request)
+    public function contact(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
     {
         $this->setPrefs();
         $this->validate($request, [
@@ -50,11 +50,11 @@ class ContactUsController extends BasePageController
     }
 
     /**
-     * @param  string  $msg
+     * @param string $msg
      *
      * @throws \Exception
      */
-    public function showContactForm($msg = '')
+    public function showContactForm(string $msg = ''): void
     {
         $this->setPrefs();
         $title = 'Contact '.config('app.name');

@@ -14,7 +14,7 @@ class AdminCategoryRegexesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): void
     {
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' =>null, 'Table_Name' => 'category_regexes']);
@@ -39,8 +39,8 @@ class AdminCategoryRegexesController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -112,10 +112,10 @@ class AdminCategoryRegexesController extends BasePageController
             ->orderBy('c.id')
             ->get();
         $categories = ['category_names', 'category_ids'];
-        if ($categories_db) {
+        if (count($categories_db) !== 0) {
             foreach ($categories_db as $category_db) {
-                $categories['category_names'][] = $category_db->parent_title.' '.$category_db->title.': '.$category_db->id;
-                $categories['category_ids'][] = $category_db->id;
+                $categories['category_names'] = $category_db->parent_title.' '.$category_db->title.': '.$category_db->id;
+                $categories['category_ids'] = $category_db->id;
             }
         }
         $this->smarty->assign('category_names', $categories['category_names']);

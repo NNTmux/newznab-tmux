@@ -14,7 +14,7 @@ class AdminMovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
 
@@ -36,7 +36,7 @@ class AdminMovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         if (! \defined('STDOUT')) {
             \define('STDOUT', fopen('php://stdout', 'wb'));
@@ -84,7 +84,7 @@ class AdminMovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
 

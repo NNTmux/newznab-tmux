@@ -18,56 +18,56 @@ class BasePageController extends Controller
     /**
      * @var \App\Models\Settings
      */
-    public $settings;
+    public Settings $settings;
 
     /**
      * @var string
      */
-    public $title = '';
+    public string $title = '';
 
     /**
      * @var string
      */
-    public $content = '';
+    public string $content = '';
 
     /**
      * @var string
      */
-    public $meta_keywords = '';
+    public string $meta_keywords = '';
 
     /**
      * @var string
      */
-    public $meta_title = '';
+    public string $meta_title = '';
 
     /**
      * @var string
      */
-    public $meta_description = '';
+    public string $meta_description = '';
 
     /**
      * Current page the user is browsing. ie browse.
      *
      * @var string
      */
-    public $page = '';
+    public string $page = '';
 
     /**
      * @var string
      */
-    public $page_template = '';
+    public string $page_template = '';
 
     /**
      * @var User
      */
-    public $userdata;
+    public User $userdata;
 
     /**
      * User's theme.
      *
      * @var string
      */
-    protected $theme = 'Gentele';
+    protected string $theme = 'Gentele';
 
     /**
      * @var \Illuminate\Foundation\Application|mixed
@@ -216,7 +216,7 @@ class BasePageController extends Controller
         abort(429, $retry);
     }
 
-    public function render()
+    public function render(): void
     {
         $this->smarty->display($this->page_template);
     }
@@ -307,7 +307,7 @@ class BasePageController extends Controller
     /**
      *  Set admin preferences.
      */
-    public function setAdminPrefs()
+    public function setAdminPrefs(): void
     {
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(

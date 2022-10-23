@@ -13,7 +13,7 @@ class ContentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->setPrefs();
         $contents = new Contents();

@@ -13,7 +13,7 @@ class AdminGroupController extends BasePageController
      *
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): void
     {
         $this->setAdminPrefs();
 
@@ -39,7 +39,7 @@ class AdminGroupController extends BasePageController
      *
      * @throws \Exception
      */
-    public function createBulk(Request $request)
+    public function createBulk(Request $request): void
     {
         $this->setAdminPrefs();
 
@@ -72,7 +72,7 @@ class AdminGroupController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
 
@@ -138,7 +138,7 @@ class AdminGroupController extends BasePageController
      *
      * @throws \Exception
      */
-    public function active(Request $request)
+    public function active(Request $request): void
     {
         $this->setAdminPrefs();
         $gname = '';
@@ -168,7 +168,7 @@ class AdminGroupController extends BasePageController
      *
      * @throws \Exception
      */
-    public function inactive(Request $request)
+    public function inactive(Request $request): void
     {
         $this->setAdminPrefs();
         $gname = '';

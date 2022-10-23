@@ -12,12 +12,12 @@ class ConsoleController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
+     * @param string $id
      * @return \Illuminate\Http\JsonResponse
      *
      * @throws \Exception
      */
-    public function show(Request $request, $id = '')
+    public function show(Request $request, string $id = ''): \Illuminate\Http\JsonResponse
     {
         $this->setPrefs();
         if ($id === 'WiiVare') {

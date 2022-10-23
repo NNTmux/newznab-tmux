@@ -15,8 +15,8 @@ use Spatie\Permission\Models\Role;
 class AdminSiteController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -168,7 +168,7 @@ class AdminSiteController extends BasePageController
 
         $this->smarty->assign('themelist', Utility::getThemesList());
 
-        if (strpos(env('NNTP_SERVER'), 'astra') === false) {
+        if (! str_contains(env('NNTP_SERVER'), 'astra')) {
             $this->smarty->assign('compress_headers_warning', 'compress_headers_warning');
         }
 
@@ -182,7 +182,7 @@ class AdminSiteController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function stats()
+    public function stats(): void
     {
         $this->setAdminPrefs();
 

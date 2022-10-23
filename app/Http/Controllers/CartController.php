@@ -12,7 +12,7 @@ class CartController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setPrefs();
         $meta_title = 'My Download Basket';
@@ -33,7 +33,7 @@ class CartController extends BasePageController
      *
      * @throws \Exception
      */
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
         $guids = explode(',', $request->input('id'));
@@ -55,12 +55,12 @@ class CartController extends BasePageController
     }
 
     /**
-     * @param  string|array  $id
+     * @param array|string $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      *
      * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy(array|string $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
         $ids = null;

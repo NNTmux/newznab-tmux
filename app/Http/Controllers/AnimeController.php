@@ -36,7 +36,7 @@ class AnimeController extends BasePageController
      *
      * @throws \Exception
      */
-    public function showAnime(Request $request)
+    public function showAnime(Request $request): void
     {
         $this->setPrefs();
 
@@ -87,7 +87,7 @@ class AnimeController extends BasePageController
      *
      * @throws \Exception
      */
-    public function showList(Request $request)
+    public function showList(Request $request): void
     {
         $this->setPrefs();
         $letter = ($request->has('id') && preg_match('/^(0\-9|[A-Z])$/i', $request->input('id'))) ? $request->input('id') : '0-9';

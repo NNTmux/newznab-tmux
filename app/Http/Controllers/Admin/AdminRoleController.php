@@ -11,7 +11,7 @@ class AdminRoleController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
 
@@ -241,7 +241,7 @@ class AdminRoleController extends BasePageController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         if ($request->has('id')) {
             Role::query()->where('id', $request->input('id'))->delete();

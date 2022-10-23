@@ -14,7 +14,7 @@ class AdminSharingController extends BasePageController
      *
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): void
     {
         $this->setAdminPrefs();
 

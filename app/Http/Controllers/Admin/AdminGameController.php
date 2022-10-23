@@ -13,7 +13,7 @@ class AdminGameController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
         $game = new Games(['Settings' => null]);
@@ -37,7 +37,7 @@ class AdminGameController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
         $games = new Games(['Settings' => null]);

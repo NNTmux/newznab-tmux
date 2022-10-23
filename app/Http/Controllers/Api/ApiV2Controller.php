@@ -56,10 +56,12 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
-     *
-     * @throws \Exception
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
+     * @throws \Throwable
      */
     public function movie(Request $request): \Illuminate\Http\JsonResponse
     {

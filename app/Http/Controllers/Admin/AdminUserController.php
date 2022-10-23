@@ -82,7 +82,7 @@ class AdminUserController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
 
@@ -220,7 +220,7 @@ class AdminUserController extends BasePageController
      *
      * @throws \Exception
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
@@ -243,7 +243,7 @@ class AdminUserController extends BasePageController
      *
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
-    public function resendVerification(Request $request)
+    public function resendVerification(Request $request): \Illuminate\Http\RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
@@ -257,15 +257,19 @@ class AdminUserController extends BasePageController
         }
     }
 
-    public function verify(Request $request)
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function verify(Request $request): \Illuminate\Http\RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
             User::query()->where('id', $request->input('id'))->update(['verified' => 1, 'email_verified_at' => now()]);
 
             return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
-        } else {
-            return redirect()->back()->with('error', 'User is invalid');
         }
+
+        return redirect()->back()->with('error', 'User is invalid');
     }
 }

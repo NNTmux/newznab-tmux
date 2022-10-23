@@ -19,7 +19,7 @@ class RssController extends BasePageController
      *
      * @throws \Throwable
      */
-    public function myMoviesRss(Request $request)
+    public function myMoviesRss(Request $request): \Illuminate\Http\JsonResponse|array
     {
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
@@ -45,7 +45,7 @@ class RssController extends BasePageController
      *
      * @throws \Throwable
      */
-    public function myShowsRss(Request $request)
+    public function myShowsRss(Request $request): \Illuminate\Http\JsonResponse|array
     {
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
@@ -67,7 +67,7 @@ class RssController extends BasePageController
      *
      * @throws \Throwable
      */
-    public function fullFeedRss(Request $request)
+    public function fullFeedRss(Request $request): \Illuminate\Http\JsonResponse|array
     {
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
@@ -92,7 +92,7 @@ class RssController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function showRssDesc()
+    public function showRssDesc(): void
     {
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
@@ -139,7 +139,7 @@ class RssController extends BasePageController
      *
      * @throws \Throwable
      */
-    public function cartRss(Request $request)
+    public function cartRss(Request $request): \Illuminate\Http\JsonResponse|array
     {
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
@@ -169,7 +169,7 @@ class RssController extends BasePageController
      *
      * @throws \Throwable
      */
-    public function categoryFeedRss(Request $request)
+    public function categoryFeedRss(Request $request): \Illuminate\Http\JsonResponse|array
     {
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
@@ -203,7 +203,7 @@ class RssController extends BasePageController
      *
      * @throws \Throwable
      */
-    private function userCheck(Request $request)
+    private function userCheck(Request $request): \Illuminate\Http\JsonResponse|array
     {
         if ($request->missing('api_token')) {
             return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);

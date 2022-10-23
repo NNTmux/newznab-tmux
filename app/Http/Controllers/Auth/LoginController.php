@@ -28,15 +28,22 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
-    protected $maxAttempts = 3; // Default is 5
-    protected $decayMinutes = 2; // Default is 1
+    /**
+     * @var int
+     */
+    protected int $maxAttempts = 3; // Default is 5
+
+    /**
+     * @var int
+     */
+    protected int $decayMinutes = 2; // Default is 1
 
     /**
      * Where to redirect users after login.
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected string $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -49,9 +56,9 @@ class LoginController extends Controller
     }
 
     /**
-     * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse|void
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|null
+     * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
@@ -121,7 +128,10 @@ class LoginController extends Controller
         return $this->showLoginForm();
     }
 
-    public function showLoginForm()
+    /**
+     * @return void
+     */
+    public function showLoginForm(): void
     {
         $theme = Settings::settingValue('site.main.style');
 
@@ -137,7 +147,7 @@ class LoginController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function logout(Request $request)
+    public function logout(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->guard()->logout();
 

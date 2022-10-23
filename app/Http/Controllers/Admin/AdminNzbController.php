@@ -16,7 +16,7 @@ class AdminNzbController extends BasePageController
      *
      * @throws \Exception
      */
-    public function import(Request $request)
+    public function import(Request $request): void
     {
         $this->setAdminPrefs();
 
@@ -48,7 +48,7 @@ class AdminNzbController extends BasePageController
                 }
 
                 // Get the files from the user specified path.
-                $filesToProcess = glob($path.'*.nzb');
+                $filesToProcess = glob($path.'*.nzb', GLOB_NOSORT);
             }
 
             if (\count($filesToProcess) > 0) {
@@ -74,7 +74,7 @@ class AdminNzbController extends BasePageController
      *
      * @throws \Exception
      */
-    public function export(Request $request)
+    public function export(Request $request): void
     {
         if (Utility::isCLI()) {
             exit('This script is only for exporting from the web, use the script in misc/testing'.

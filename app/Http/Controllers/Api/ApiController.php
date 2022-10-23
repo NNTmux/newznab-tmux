@@ -24,7 +24,7 @@ class ApiController extends BasePageController
      *
      * @throws \Throwable
      */
-    public function api(Request $request)
+    public function api(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         // API functions.
         $function = 's';

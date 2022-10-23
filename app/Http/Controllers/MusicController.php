@@ -12,11 +12,11 @@ class MusicController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
+     * @param string $id
      *
      * @throws \Exception
      */
-    public function show(Request $request, $id = '')
+    public function show(Request $request, string $id = ''): void
     {
         $this->setPrefs();
         $music = new Music(['Settings' => $this->settings]);

@@ -19,7 +19,7 @@ class ApiInformController extends Controller
      *
      * @throws \Exception
      */
-    public function release(Request $request)
+    public function release(Request $request): \Illuminate\Http\JsonResponse
     {
         $releaseObName = $request->has('relo') && ! empty($request->input('relo')) ? $request->input('relo') : '';
         $releasePrName = $request->has('relp') && ! empty($request->input('relp')) ? $request->input('relp') : '';

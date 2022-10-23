@@ -11,7 +11,7 @@ class AdminAnidbController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
 
@@ -36,12 +36,12 @@ class AdminAnidbController extends BasePageController
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      *
      * @throws \Exception
      */
-    public function edit($id)
+    public function edit(int $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
 
@@ -94,11 +94,11 @@ class AdminAnidbController extends BasePageController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      *
      * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy(int $id): void
     {
         $this->setAdminPrefs();
 
