@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ContactUsController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -50,7 +50,7 @@ class ContactUsController extends BasePageController
     }
 
     /**
-     * @param string $msg
+     * @param  string  $msg
      *
      * @throws \Exception
      */

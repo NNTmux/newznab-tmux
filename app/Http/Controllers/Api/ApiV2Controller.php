@@ -56,8 +56,9 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException

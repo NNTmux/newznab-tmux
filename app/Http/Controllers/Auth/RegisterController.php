@@ -212,8 +212,8 @@ class RegisterController extends Controller
 
     /**
      * @param  Request  $request
-     * @param string $error
-     * @param int $showRegister
+     * @param  string  $error
+     * @param  int  $showRegister
      */
     public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0): void
     {

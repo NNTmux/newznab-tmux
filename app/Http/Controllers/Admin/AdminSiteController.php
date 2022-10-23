@@ -15,8 +15,9 @@ use Spatie\Permission\Models\Role;
 class AdminSiteController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     *
      * @throws \Exception
      */
     public function edit(Request $request)

@@ -25,7 +25,7 @@ class AdminCommentsController extends BasePageController
     }
 
     /**
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(int $id): \Illuminate\Http\RedirectResponse

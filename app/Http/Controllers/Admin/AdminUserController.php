@@ -252,13 +252,13 @@ class AdminUserController extends BasePageController
             UserVerification::send($user, 'User email verification required');
 
             return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
-        } else {
-            return redirect()->back()->with('error', 'User is invalid');
         }
+
+        return redirect()->back()->with('error', 'User is invalid');
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function verify(Request $request): \Illuminate\Http\RedirectResponse

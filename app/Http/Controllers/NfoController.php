@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class NfoController extends BasePageController
 {
     /**
-     * @param string $id
+     * @param  string  $id
      * @param  \Illuminate\Http\Request  $request
      *
      * @throws \Exception

@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Auth;
 class DetailsController extends BasePageController
 {
     /**
-     * @param string $guid
+     * @param  string  $guid
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      *
      * @throws \Exception

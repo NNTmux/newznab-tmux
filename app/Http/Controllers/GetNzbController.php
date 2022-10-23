@@ -12,14 +12,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetNzbController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse|\STS\ZipStream\ZipStream|\Symfony\Component\HttpFoundation\StreamedResponse
+     *
      * @throws \Exception
      */
     public function getNzb(Request $request): \STS\ZipStream\ZipStream|StreamedResponse|JsonResponse

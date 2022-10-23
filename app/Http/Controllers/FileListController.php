@@ -8,7 +8,7 @@ use Blacklight\NZB;
 class FileListController extends BasePageController
 {
     /**
-     * @param string $guid
+     * @param  string  $guid
      *
      * @throws \Exception
      */

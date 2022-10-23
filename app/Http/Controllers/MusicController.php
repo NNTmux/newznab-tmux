@@ -12,7 +12,7 @@ class MusicController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param string $id
+     * @param  string  $id
      *
      * @throws \Exception
      */

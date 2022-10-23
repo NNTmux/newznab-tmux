@@ -56,8 +56,9 @@ class LoginController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|null
+     *
      * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException
      */

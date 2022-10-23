@@ -12,7 +12,7 @@ class ConsoleController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param string $id
+     * @param  string  $id
      * @return \Illuminate\Http\JsonResponse
      *
      * @throws \Exception
