@@ -25,7 +25,7 @@ class Contents
     /**
      * @return array|false
      */
-    public function get()
+    public function get(): bool|array
     {
         $arr = [];
         $rows = $this->data_get();
@@ -43,7 +43,7 @@ class Contents
     /**
      * @return array|false
      */
-    public function getAll()
+    public function getAll(): bool|array
     {
         $arr = [];
         $rows = $this->data_getAll();
@@ -63,7 +63,7 @@ class Contents
      *
      * @return array|false
      */
-    public function getAllButFront()
+    public function getAllButFront(): bool|array
     {
         $arr = [];
         $rows = $this->data_getAllButFront();
@@ -81,7 +81,7 @@ class Contents
     /**
      * @return array|false
      */
-    public function getFrontPage()
+    public function getFrontPage(): bool|array
     {
         $arr = [];
         $rows = $this->data_getFrontPage();
@@ -101,7 +101,7 @@ class Contents
      * @param $role
      * @return array|false
      */
-    public function getForMenuByTypeAndRole($id, $role)
+    public function getForMenuByTypeAndRole($id, $role): bool|array
     {
         $arr = [];
         $rows = $this->data_getForMenuByTypeAndRole($id, $role);
@@ -116,25 +116,19 @@ class Contents
         return $arr;
     }
 
-    /**
-     * @return \Blacklight\Contents|bool|\Illuminate\Database\Eloquent\Model|null|object
-     */
     public function getIndex()
     {
         $row = $this->data_getIndex();
-        if ($row === null) {
-            return false;
-        }
 
-        return $row;
+        return $row ?? false;
     }
 
     /**
      * @param $id
      * @param $role
-     * @return bool|\Illuminate\Database\Eloquent\Collection|static[]
+     * @return false|mixed
      */
-    public function getByID($id, $role)
+    public function getByID($id, $role): mixed
     {
         $row = $this->data_getByID($id, $role);
 
@@ -149,13 +143,13 @@ class Contents
      * @param $content
      * @return mixed
      */
-    public function validate($content)
+    public function validate($content): mixed
     {
         if ($content['url'] !== '/') {
             $content['url'] = '/'.$content['url'];
         }
 
-        if (substr($content['url'], \strlen($content['url']) - 1) !== '/') {
+        if (! str_ends_with($content['url'], '/')) {
             $content['url'] .= '/';
         }
 
@@ -166,7 +160,7 @@ class Contents
      * @param $form
      * @return int
      */
-    public function add($form)
+    public function add($form): int
     {
         if ($form['ordinal'] === 1) {
             Content::query()->where('ordinal', '>', 0)->increment('ordinal');
@@ -179,7 +173,7 @@ class Contents
      * @param $id
      * @return mixed
      */
-    public function delete($id)
+    public function delete($id): mixed
     {
         return Content::query()->where('id', $id)->delete();
     }
@@ -188,7 +182,7 @@ class Contents
      * @param $form
      * @return mixed|Content
      */
-    public function update($form)
+    public function update($form): mixed
     {
         $this->data_update($form);
 
@@ -223,7 +217,7 @@ class Contents
      * @param $content
      * @return int
      */
-    public function data_add($content)
+    public function data_add($content): int
     {
         return Content::query()
             ->insertGetId(
@@ -243,9 +237,9 @@ class Contents
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \App\Models\Content[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
      */
-    public function data_get()
+    public function data_get(): array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
     {
         return Content::query()
             ->where('status', '=', 1)
@@ -256,7 +250,7 @@ class Contents
     /**
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getAll()
+    public function data_getAll(): \Illuminate\Database\Eloquent\Collection|static
     {
         return Content::query()->select()->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')->get();
     }
@@ -264,7 +258,7 @@ class Contents
     /**
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getAllButFront()
+    public function data_getAllButFront(): \Illuminate\Database\Eloquent\Collection|static
     {
         return Content::query()
             ->where('id', '<>', 1)
@@ -277,7 +271,7 @@ class Contents
      * @param $role
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getByID($id, $role)
+    public function data_getByID($id, $role): \Illuminate\Database\Eloquent\Collection|static
     {
         $query = Content::query()->where('id', $id);
         if ($role !== User::ROLE_ADMIN) {
@@ -290,7 +284,7 @@ class Contents
     /**
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getFrontPage()
+    public function data_getFrontPage(): \Illuminate\Database\Eloquent\Collection|static
     {
         return Content::query()
             ->where(
@@ -304,9 +298,9 @@ class Contents
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|object|static
+     * @return \App\Models\Content|null
      */
-    public function data_getIndex()
+    public function data_getIndex(): Content|null
     {
         return Content::query()->where(
             [
@@ -321,7 +315,7 @@ class Contents
      * @param $role
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getForMenuByTypeAndRole($id, $role)
+    public function data_getForMenuByTypeAndRole($id, $role): \Illuminate\Database\Eloquent\Collection|static
     {
         $query = Content::query()->where('showinmenu', '=', 1)->where('contenttype', $id)->where('status', '=', 1);
         if ($role !== User::ROLE_ADMIN) {

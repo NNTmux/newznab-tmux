@@ -9,19 +9,16 @@ class ContentController extends BasePageController
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|void
      *
      * @throws \Exception
      */
-    public function show(Request $request): \Illuminate\Http\JsonResponse
+    public function show(Request $request)
     {
         $this->setPrefs();
         $contents = new Contents();
 
-        $role = 0;
-        if (! empty($this->userdata)) {
-            $role = $this->userdata->role;
-        }
+        $role = $this->userdata->role ?? 0;
 
         /* The role column in the content table values are :
          * 1 = logged in users
