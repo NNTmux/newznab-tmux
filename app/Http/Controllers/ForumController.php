@@ -10,12 +10,11 @@ use Illuminate\Support\Facades\Auth;
 class ForumController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
-    public function forum(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function forum(Request $request)
     {
         $this->setPrefs();
         if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
