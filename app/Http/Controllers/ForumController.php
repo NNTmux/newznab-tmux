@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\Auth;
 class ForumController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     *
      * @throws \Exception
      */
     public function forum(Request $request)
