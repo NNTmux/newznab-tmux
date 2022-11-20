@@ -67,7 +67,7 @@ class SphinxSearch
      */
     public function insertRelease(array $parameters): void
     {
-        if ($this->sphinxQL !== null && $parameters['id']) {
+        if ($parameters['id']) {
             $this->sphinxQL
                 ->replace()
                 ->into($this->config['indexes']['releases'])
@@ -87,7 +87,7 @@ class SphinxSearch
      */
     public function insertPredb(array $parameters): void
     {
-        if ($this->sphinxQL !== null && $parameters['id']) {
+        if ($parameters['id']) {
             $this->sphinxQL
                 ->replace()
                 ->into($this->config['indexes']['predb'])
