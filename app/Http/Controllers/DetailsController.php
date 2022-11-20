@@ -27,12 +27,13 @@ use Illuminate\Support\Facades\Auth;
 class DetailsController extends BasePageController
 {
     /**
-     * @param  string  $guid
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
-     * @throws \Exception
+     * @param string $guid
+     * @return \Illuminate\Http\RedirectResponse|void
+     * @throws \Foolz\SphinxQL\Exception\ConnectionException
+     * @throws \Foolz\SphinxQL\Exception\DatabaseException
+     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function show(string $guid): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function show(string $guid)
     {
         $this->setPrefs();
 
