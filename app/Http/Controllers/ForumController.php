@@ -66,12 +66,11 @@ class ForumController extends BasePageController
 
     /**
      * @param $id
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
-    public function getPosts($id, Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function getPosts($id, Request $request)
     {
         $this->setPrefs();
 
@@ -107,10 +106,10 @@ class ForumController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $id = $request->input('id') + 0;
 
@@ -159,11 +158,10 @@ class ForumController extends BasePageController
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function destroy($id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function destroy($id): \Illuminate\Http\RedirectResponse
     {
         $this->setPrefs();
 
