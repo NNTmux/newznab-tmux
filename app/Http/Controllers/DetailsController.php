@@ -27,8 +27,9 @@ use Illuminate\Support\Facades\Auth;
 class DetailsController extends BasePageController
 {
     /**
-     * @param string $guid
+     * @param  string  $guid
      * @return \Illuminate\Http\RedirectResponse|void
+     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
