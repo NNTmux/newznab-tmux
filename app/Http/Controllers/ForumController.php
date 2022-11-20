@@ -66,8 +66,9 @@ class ForumController extends BasePageController
 
     /**
      * @param $id
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     *
      * @throws \Exception
      */
     public function getPosts($id, Request $request)
@@ -106,7 +107,7 @@ class ForumController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
@@ -159,6 +160,7 @@ class ForumController extends BasePageController
     /**
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
+     *
      * @throws \Exception
      */
     public function destroy($id): \Illuminate\Http\RedirectResponse
