@@ -28,12 +28,11 @@ class AdminContentController extends BasePageController
     }
 
     /**
-     * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
-    public function create(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function create(Request $request)
     {
         $this->setAdminPrefs();
         $contents = new Contents();
@@ -110,10 +109,10 @@ class AdminContentController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if ($request->has('id')) {
             $contents = new Contents();
