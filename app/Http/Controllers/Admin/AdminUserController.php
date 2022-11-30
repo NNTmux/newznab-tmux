@@ -13,8 +13,9 @@ use Spatie\Permission\Models\Role;
 class AdminUserController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return void
+     *
      * @throws \Throwable
      */
     public function index(Request $request): void
@@ -77,8 +78,9 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -214,7 +216,7 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
@@ -235,8 +237,9 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
+     *
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
     public function resendVerification(Request $request): \Illuminate\Http\RedirectResponse
@@ -254,7 +257,7 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function verify(Request $request): \Illuminate\Http\RedirectResponse
