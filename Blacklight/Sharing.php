@@ -170,7 +170,7 @@ class Sharing
 				INNER JOIN users u ON rc.users_id = u.id
 				INNER JOIN releases r on rc.releases_id = r.id
 				WHERE (rc.shared = 0 or issynced = 1) LIMIT %d',
-                $this->siteSettings['max_push']
+                $this->siteSettings->max_push
             )
         );
 
@@ -487,7 +487,7 @@ class Sharing
 
         if ($currentArticle > 0) {
             // Update sharing's last article number.
-            $this->siteSettings['lastarticle'] = $currentArticle;
+            $this->siteSettings->lastarticle = $currentArticle;
             DB::update(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
         }
 
