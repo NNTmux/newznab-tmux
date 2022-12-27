@@ -224,7 +224,6 @@ class ApiController extends BasePageController
                    $catExclusions
                );
 
-               $api->addLanguage($relData);
                $api->output($relData, $params, $outputXML, $offset, 'api');
                break;
 

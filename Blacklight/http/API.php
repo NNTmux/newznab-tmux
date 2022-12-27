@@ -36,7 +36,7 @@ class API extends Capabilities
     /**
      * @var array The get request from the web server
      */
-    public $getRequest;
+    public mixed $getRequest;
 
     /**
      * @param  array  $options
@@ -58,9 +58,9 @@ class API extends Capabilities
     /**
      * Add language from media info XML to release search names (Used by API).
      *
-     * @param  array  $releases
+     * @param array $releases
      */
-    public function addLanguage(&$releases): void
+    public function addLanguage(array &$releases): void
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {

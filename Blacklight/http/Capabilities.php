@@ -25,6 +25,7 @@ namespace Blacklight\http;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * Class Output -- abstract class for printing web requests outside of Smarty.
@@ -34,12 +35,12 @@ abstract class Capabilities
     /**
      * @var \PDO
      */
-    public $pdo;
+    public \PDO $pdo;
 
     /**
      * @var string The type of Capabilities request
      */
-    protected $type;
+    protected string $type;
 
     /**
      * Construct.
@@ -59,15 +60,15 @@ abstract class Capabilities
     /**
      * Print XML or JSON output.
      *
-     * @param  array|\Illuminate\Database\Eloquent\Collection  $data  Data to print.
-     * @param  array  $params  Additional request parameters
-     * @param  bool  $xml  True: Print as XML False: Print as JSON.
-     * @param  int  $offset  How much releases to skip
-     * @param  string  $type  What type of API query to format if XML
+     * @param \Illuminate\Database\Eloquent\Collection|array $data  Data to print.
+     * @param array $params  Additional request parameters
+     * @param bool $xml  True: Print as XML False: Print as JSON.
+     * @param int $offset  How much releases to skip
+     * @param string $type  What type of API query to format if XML
      *
      * @throws \Exception
      */
-    public function output($data, $params, $xml = true, $offset, $type = ''): void
+    public function output(\Illuminate\Database\Eloquent\Collection|array $data, array $params, bool $xml = true, int $offset, string $type = ''): void
     {
         $this->type = $type;
 
@@ -87,10 +88,7 @@ abstract class Capabilities
         } else {
             // JSON encode the XMLWriter response
             $response = json_encode(
-            // Convert SimpleXMLElement response from XMLWriter
-            //into array with namespace preservation
                 Utility::xmlToArray(
-                // Load the XMLWriter response
                     @simplexml_load_string($response),
                     [
                         'attributePrefix' => '_',
@@ -119,7 +117,7 @@ abstract class Capabilities
      *
      * @throws \Exception
      */
-    public function getForMenu(): array
+     public function getForMenu(): array
     {
         $serverroot = url('/');
 

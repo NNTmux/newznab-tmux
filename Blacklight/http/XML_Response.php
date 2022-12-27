@@ -34,61 +34,61 @@ class XML_Response
     /**
      * @var string The buffered cData before final write
      */
-    protected $cdata;
+    protected string $cdata;
 
     /**
      * The RSS namespace used for the output.
      *
      * @var string
      */
-    protected $namespace;
+    protected string $namespace;
 
     /**
      * The trailing URL parameters on the request.
      *
      * @var mixed
      */
-    protected $parameters;
+    protected mixed $parameters;
 
     /**
      * The release we are adding to the stream.
      *
      * @var mixed
      */
-    protected $release;
+    protected mixed $release;
 
     /**
      * The retrieved releases we are returning from the API call.
      *
      * @var mixed
      */
-    protected $releases;
+    protected mixed $releases;
 
     /**
      * The various server variables and active categories.
      *
      * @var mixed
      */
-    protected $server;
+    protected mixed $server;
 
     /**
      * The XML formatting operation we are returning.
      *
      * @var mixed
      */
-    protected $type;
+    protected mixed $type;
 
     /**
      * The XMLWriter Class.
      *
      * @var \XMLWriter
      */
-    protected $xml;
+    protected \XMLWriter $xml;
 
     /**
      * @var mixed
      */
-    protected $offset;
+    protected mixed $offset;
 
     /**
      * XMLReturn constructor.
@@ -120,7 +120,7 @@ class XML_Response
     /**
      * @return bool|string
      */
-    public function returnXML()
+    public function returnXML(): bool|string
     {
         if ($this->xml) {
             switch ($this->type) {
@@ -208,9 +208,9 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param  array  $element  An array with the name of the element and the attribute data
+     * @param array $element  An array with the name of the element and the attribute data
      */
-    protected function addNode($element): void
+    protected function addNode(array $element): void
     {
         $this->xml->startElement($element['name']);
         foreach ($element['data'] as $attr => $val) {
@@ -222,9 +222,9 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param  array  $element  An array with the name of the element and the attribute data
+     * @param array $element  An array with the name of the element and the attribute data
      */
-    protected function addNodes($element): void
+    protected function addNodes(array $element): void
     {
         $this->xml->startElement($element['name']);
         foreach ($element['data'] as $elem => $value) {
@@ -266,14 +266,10 @@ class XML_Response
      */
     protected function includeRssAtom(): void
     {
-        switch ($this->namespace) {
-            case 'newznab':
-                $url = 'http://www.newznab.com/DTD/2010/feeds/attributes/';
-                break;
-            case 'nntmux':
-            default:
-                $url = $this->server['server']['url'].'/rss-info/';
-        }
+        $url = match ($this->namespace) {
+            'newznab' => 'http://www.newznab.com/DTD/2010/feeds/attributes/',
+            default => $this->server['server']['url'].'/rss-info/',
+        };
 
         $this->xml->startElement('rss');
         $this->xml->writeAttribute('version', '2.0');
@@ -379,7 +375,7 @@ class XML_Response
                     $this->setZedAttributes();
                     $this->xml->endElement();
                 }
-            } elseif ($this->releases instanceof Release) {
+            } else {
                 $this->release = $this->releases;
                 $this->xml->startElement('item');
                 $this->includeReleaseMain();
@@ -434,7 +430,7 @@ class XML_Response
     {
         $this->writeZedAttr('category', $this->release->categories_id);
         $this->writeZedAttr('size', $this->release->size);
-        if (isset($this->release->coverurl) && ! empty($this->release->coverurl)) {
+        if (! empty($this->release->coverurl)) {
             $this->writeZedAttr(
                 'coverurl',
                 $this->server['server']['url']."/covers/{$this->release->coverurl}"
@@ -516,10 +512,10 @@ class XML_Response
     /**
      * Writes individual zed (newznab) type attributes.
      *
-     * @param  string  $name  The namespaced attribute name tag
-     * @param  string  $value  The namespaced attribute value
+     * @param string $name  The namespaced attribute name tag
+     * @param string $value  The namespaced attribute value
      */
-    protected function writeZedAttr($name, $value): void
+    protected function writeZedAttr(string $name, string $value): void
     {
         $this->xml->startElement($this->namespace.':attr');
         $this->xml->writeAttribute('name', $name);
@@ -569,22 +565,13 @@ class XML_Response
             "\t<li>Poster: {$this->release->fromname}</li>\n".
             "\t<li>Posted: {$this->release->postdate}</li>\n";
 
-        switch ($this->release->passwordstatus) {
-            case 0:
-                $pstatus = 'None';
-                break;
-            case 1:
-                $pstatus = 'Possibly Passworded';
-                break;
-            case 2:
-                $pstatus = 'Probably not viable';
-                break;
-            case 10:
-                $pstatus = 'Passworded';
-                break;
-            default:
-                $pstatus = 'Unknown';
-        }
+        $pstatus = match ($this->release->passwordstatus) {
+            0 => 'None',
+            1 => 'Possibly Passworded',
+            2 => 'Probably not viable',
+            10 => 'Passworded',
+            default => 'Unknown',
+        };
         $this->cdata .= "\t<li>Password: {$pstatus}</li>\n";
         if ($this->release->nfostatus === 1) {
             $this->cdata .=
