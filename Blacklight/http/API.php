@@ -58,7 +58,7 @@ class API extends Capabilities
     /**
      * Add language from media info XML to release search names (Used by API).
      *
-     * @param array $releases
+     * @param  array  $releases
      */
     public function addLanguage(array &$releases): void
     {

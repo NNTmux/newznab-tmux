@@ -208,7 +208,7 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param array $element  An array with the name of the element and the attribute data
+     * @param  array  $element  An array with the name of the element and the attribute data
      */
     protected function addNode(array $element): void
     {
@@ -222,7 +222,7 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param array $element  An array with the name of the element and the attribute data
+     * @param  array  $element  An array with the name of the element and the attribute data
      */
     protected function addNodes(array $element): void
     {
@@ -512,8 +512,8 @@ class XML_Response
     /**
      * Writes individual zed (newznab) type attributes.
      *
-     * @param string $name  The namespaced attribute name tag
-     * @param string $value  The namespaced attribute value
+     * @param  string  $name  The namespaced attribute name tag
+     * @param  string  $value  The namespaced attribute value
      */
     protected function writeZedAttr(string $name, string $value): void
     {

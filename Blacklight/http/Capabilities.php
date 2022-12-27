@@ -25,7 +25,6 @@ namespace Blacklight\http;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * Class Output -- abstract class for printing web requests outside of Smarty.
@@ -60,11 +59,11 @@ abstract class Capabilities
     /**
      * Print XML or JSON output.
      *
-     * @param \Illuminate\Database\Eloquent\Collection|array $data  Data to print.
-     * @param array $params  Additional request parameters
-     * @param bool $xml  True: Print as XML False: Print as JSON.
-     * @param int $offset  How much releases to skip
-     * @param string $type  What type of API query to format if XML
+     * @param  \Illuminate\Database\Eloquent\Collection|array  $data  Data to print.
+     * @param  array  $params  Additional request parameters
+     * @param  bool  $xml  True: Print as XML False: Print as JSON.
+     * @param  int  $offset  How much releases to skip
+     * @param  string  $type  What type of API query to format if XML
      *
      * @throws \Exception
      */
@@ -110,13 +109,13 @@ abstract class Capabilities
         }
     }
 
-    /**
-     * Collect and return various capability information for usage in API.
-     *
-     * @return array
-     *
-     * @throws \Exception
-     */
+     /**
+      * Collect and return various capability information for usage in API.
+      *
+      * @return array
+      *
+      * @throws \Exception
+      */
      public function getForMenu(): array
     {
         $serverroot = url('/');
