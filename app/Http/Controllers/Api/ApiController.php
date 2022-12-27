@@ -257,7 +257,7 @@ class ApiController extends BasePageController
                        return Utility::getCoverURL(['type' => 'movies', 'id' => $release->imdbid]);
                    }
                );
-               
+
                $api->output($relData, $params, $outputXML, $offset, 'api');
                break;
 
