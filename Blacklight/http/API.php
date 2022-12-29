@@ -36,7 +36,7 @@ class API extends Capabilities
     /**
      * @var array The get request from the web server
      */
-    public $getRequest;
+    public mixed $getRequest;
 
     /**
      * @param  array  $options
@@ -60,7 +60,7 @@ class API extends Capabilities
      *
      * @param  array  $releases
      */
-    public function addLanguage(&$releases): void
+    public function addLanguage(array &$releases): void
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
