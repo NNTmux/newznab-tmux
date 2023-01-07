@@ -1909,9 +1909,9 @@ class ProcessAdditional
 
         // Reduce the last number by 1, this is to make sure we don't ask avconv/ffmpeg for non existing data.
         if ($numbers[3] > 0) {
-            --$numbers[3];
+            $numbers[3]--;
         } elseif ($numbers[1] > 0) {
-            --$numbers[2];
+            $numbers[2]--;
             $numbers[3] = '99';
         }
 
