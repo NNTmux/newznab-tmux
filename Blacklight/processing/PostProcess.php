@@ -39,11 +39,6 @@ class PostProcess
     protected Par2Info $_par2Info;
 
     /**
-     * @var
-     */
-    protected $_srrInfo;
-
-    /**
      * Use alternate NNTP provider when download fails?
      *
      * @var bool
@@ -360,7 +355,7 @@ class PostProcess
                 // Try to get a new name.
                 if ($foundName === false) {
                     $query['textstring'] = $file['name'];
-                    if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
+                    if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show)) {
                         $foundName = true;
                     }
                 }

@@ -902,7 +902,7 @@ class ProcessAdditional
             }
 
             // Look for a video sample, make sure it's not an image.
-            if ($this->_processThumbnails && empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g$/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
+            if ($this->_processThumbnails && empty($this->_sampleMessageIDs) && isset($this->_currentNZBFile['segments']) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g$/i', $this->_currentNZBFile['title'])
             ) {
                 // Get the amount of segments for this file.
                 $segCount = (\count($this->_currentNZBFile['segments']) - 1);
@@ -916,7 +916,7 @@ class ProcessAdditional
             }
 
             // Look for a JPG picture, make sure it's not a CD cover.
-            if ($this->_processJPGSample && empty($this->_JPGMessageIDs) && ! preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $this->_releaseGroupName) && preg_match('/\.jpe?g[. ")\]]/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
+            if ($this->_processJPGSample && empty($this->_JPGMessageIDs) && isset($this->_currentNZBFile['segments']) && ! preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $this->_releaseGroupName) && preg_match('/\.jpe?g[. ")\]]/i', $this->_currentNZBFile['title'])
             ) {
                 // Get the amount of segments for this file.
                 $segCount = (\count($this->_currentNZBFile['segments']) - 1);
@@ -930,13 +930,13 @@ class ProcessAdditional
             }
 
             // Look for a video file, make sure it's not a sample, for MediaInfo.
-            if ($this->_processMediaInfo && empty($this->_MediaInfoMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && preg_match('/'.$this->_videoFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'][0])
+            if ($this->_processMediaInfo && empty($this->_MediaInfoMessageIDs) && isset($this->_currentNZBFile['segments'][0]) && stripos($this->_currentNZBFile['title'], 'sample') !== false && preg_match('/'.$this->_videoFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title'])
             ) {
                 $this->_MediaInfoMessageIDs = (string) $this->_currentNZBFile['segments'][0];
             }
 
-            // Look for a audio file.
-            if ($this->_processAudioInfo && empty($this->_AudioInfoMessageIDs) && preg_match('/'.$this->_audioFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title'], $type) && isset($this->_currentNZBFile['segments'])
+            // Look for an audio file.
+            if ($this->_processAudioInfo && empty($this->_AudioInfoMessageIDs) && isset($this->_currentNZBFile['segments']) && preg_match('/'.$this->_audioFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title'], $type)
             ) {
                 // Get the extension.
                 $this->_AudioInfoExtension = $type[1];
@@ -1909,9 +1909,9 @@ class ProcessAdditional
 
         // Reduce the last number by 1, this is to make sure we don't ask avconv/ffmpeg for non existing data.
         if ($numbers[3] > 0) {
-            $numbers[3] -= 1;
+            --$numbers[3];
         } elseif ($numbers[1] > 0) {
-            $numbers[2] -= 1;
+            --$numbers[2];
             $numbers[3] = '99';
         }
 
