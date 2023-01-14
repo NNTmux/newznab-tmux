@@ -74,6 +74,8 @@ class Categorize
         $this->catWebDL = (bool) Settings::settingValue('indexer.categorise.catwebdl');
     }
 
+
+
     /**
      * Look up the site to see which language of categorizing to use.
      * Then work out which category is applicable for either a group or a binary.
@@ -94,13 +96,33 @@ class Categorize
         $this->groupName = UsenetGroup::whereId($this->groupId)->value('name');
 
         return match (true) {
-            $this->isMisc(), $this->isPC(), $this->isXxx(), $this->isTV(), $this->isMovie(), $this->isConsole(), $this->isBook(), $this->isMusic() => [
+            $this->isMisc(), $this->byGroupName($this->groupName), $this->isPC(), $this->isXxx(), $this->isTV(), $this->isMovie(), $this->isConsole(), $this->isBook(), $this->isMusic() => [
                 'categories_id' => $this->tmpCat,
                 'tags' => $this->tmpTag,
             ],
             default => ['categories_id' => $this->tmpCat, 'tags' => $this->tmpTag],
         };
     }
+
+    /**
+     * @param $groupName
+     * @return bool
+     */
+    public function byGroupName($groupName): bool
+   {
+        switch(true) {
+            case preg_match('/alt\.binaries\.erotica([.]\w+)?/i', $groupName):
+                if ($this->isXxx()) {
+                    break;
+                }
+                $this->tmpCat = Category::XXX_OTHER;
+                $this->tmpTag[] = Category::TAG_XXX_OTHER;
+                break;
+            default:
+                return false;
+        }
+        return true;
+   }
 
     //
     // Beginning of functions to determine category by release name.
