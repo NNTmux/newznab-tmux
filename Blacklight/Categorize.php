@@ -74,8 +74,6 @@ class Categorize
         $this->catWebDL = (bool) Settings::settingValue('indexer.categorise.catwebdl');
     }
 
-
-
     /**
      * Look up the site to see which language of categorizing to use.
      * Then work out which category is applicable for either a group or a binary.
@@ -121,6 +119,7 @@ class Categorize
             default:
                 return false;
         }
+
         return true;
    }
 
