@@ -47,7 +47,7 @@ class RegisterController extends Controller
     /**
      * @var string
      */
-    private string $inviteCodeQuery;
+    private string $inviteCodeQuery = '';
 
     /**
      * Create a new controller instance.
