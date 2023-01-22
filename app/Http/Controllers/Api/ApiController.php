@@ -9,7 +9,6 @@ use App\Models\ReleaseNfo;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
-use App\Http\Controllers\Api\API;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
 use Illuminate\Http\Request;

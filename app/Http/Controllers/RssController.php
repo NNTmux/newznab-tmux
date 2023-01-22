@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\RSS;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
-use App\Http\Controllers\Api\RSS;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
