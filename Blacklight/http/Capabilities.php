@@ -57,17 +57,15 @@ abstract class Capabilities
     }
 
     /**
-     * Print XML or JSON output.
-     *
-     * @param  \Illuminate\Database\Eloquent\Collection|array  $data  Data to print.
-     * @param  array  $params  Additional request parameters
-     * @param  bool  $xml  True: Print as XML False: Print as JSON.
-     * @param  int  $offset  How much releases to skip
-     * @param  string  $type  What type of API query to format if XML
-     *
+     * @param $data
+     * @param array $params
+     * @param bool $xml
+     * @param int $offset
+     * @param string $type
+     * @return void
      * @throws \Exception
      */
-    public function output(\Illuminate\Database\Eloquent\Collection|array $data, array $params, bool $xml = true, int $offset, string $type = ''): void
+    public function output($data, array $params, bool $xml = true, int $offset, string $type = ''): void
     {
         $this->type = $type;
 
