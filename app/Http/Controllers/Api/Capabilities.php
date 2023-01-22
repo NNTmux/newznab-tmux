@@ -20,7 +20,7 @@
  * @copyright 2016 nZEDb
  */
 
-namespace Blacklight\http;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Category;
 use App\Models\Settings;
