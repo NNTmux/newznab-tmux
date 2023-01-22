@@ -58,11 +58,12 @@ abstract class Capabilities
 
     /**
      * @param $data
-     * @param array $params
-     * @param bool $xml
-     * @param int $offset
-     * @param string $type
+     * @param  array  $params
+     * @param  bool  $xml
+     * @param  int  $offset
+     * @param  string  $type
      * @return void
+     *
      * @throws \Exception
      */
     public function output($data, array $params, bool $xml = true, int $offset, string $type = ''): void
