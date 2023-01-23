@@ -14,7 +14,7 @@ if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_mat
     $colorCli->error(
         "\nThis script will attempt to re-categorize releases and is useful if changes have been made to Category.php.\n"
         ."No updates will be done unless the category changes\n"
-        ."An optional last argument, test, will display the number of category changes that would be made\n"
+        ."An optional last argument, false, will display the number of category changes that would be made\n"
         ."but will not update the database.\n\n"
         ."php $argv[0] all                     ...: To process all releases.\n"
         ."php $argv[0] misc                    ...: To process all releases in misc categories.\n"
@@ -26,10 +26,9 @@ if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_mat
 
 reCategorize($argv);
 
-function reCategorize($argv)
+function reCategorize($argv): void
 {
     $colorCli = new ColorCLI();
-    $update = true;
 
     if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]))) {
         $colorCli->header('Categorizing all releases in '.$argv[1].' using searchname. This can take a while, be patient.');
@@ -39,13 +38,9 @@ function reCategorize($argv)
         $colorCli->header('Categorizing all releases using searchname. This can take a while, be patient.');
     }
     $timeStart = now();
-    if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]) || $argv[1] === 'misc')) {
-        $chgCount = categorizeRelease($update, true, $argv);
-    } else {
-        $chgCount = categorizeRelease($update, true, $argv);
-    }
+    $chgCount = categorizeRelease($argv, true);
     $time = now()->diffInSeconds($timeStart);
-    if ($update === true) {
+    if (! isset($argv[2])) {
         $colorCli->header('Finished re-categorizing '.number_format($chgCount).' releases in '.$time.' seconds, using the searchname.').PHP_EOL;
     } else {
         $colorCli->header('Finished re-categorizing in '.$time.' seconds , using the searchname.'.PHP_EOL
@@ -53,7 +48,7 @@ function reCategorize($argv)
     }
 }
 
-function categorizeRelease($update = true, $echoOutput = false, $argv): int
+function categorizeRelease($argv, $echoOutput = false): int
 {
     $otherCats = implode(',', Category::OTHERS_GROUP);
     $query = Release::query()->select(['id', 'searchname', 'fromname', 'groups_id', 'categories_id']);
