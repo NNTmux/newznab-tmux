@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Imdb\Config;
 use Imdb\Title;
@@ -1190,19 +1191,25 @@ class Movie
                 if ($movieUpdated === false) {
                     $imdbSearch = new TitleSearch($this->config);
                     foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
-                        if (! empty($imdbTitle->orig_title())) {
-                            similar_text($imdbTitle->orig_title(), $this->currentTitle, $percent);
-                            if ($percent >= self::MATCH_PERCENT) {
-                                similar_text($this->currentYear, $imdbTitle->year(), $percent);
-                                if ($percent >= self::YEAR_MATCH_PERCENT) {
-                                    $getIMDBid = $imdbTitle->imdbid();
-                                    $imdbId = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $arr['id']);
-                                    if ($imdbId !== false) {
-                                        $movieUpdated = true;
+                        try {
+                            if (! empty($imdbTitle->orig_title())) {
+                                similar_text($imdbTitle->orig_title(), $this->currentTitle, $percent);
+                                if ($percent >= self::MATCH_PERCENT) {
+                                    similar_text($this->currentYear, $imdbTitle->year(), $percent);
+                                    if ($percent >= self::YEAR_MATCH_PERCENT) {
+                                        $getIMDBid = $imdbTitle->imdbid();
+                                        $imdbId = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $arr['id']);
+                                        if ($imdbId !== false) {
+                                            $movieUpdated = true;
+                                        }
                                     }
                                 }
                             }
+                        } catch (\ErrorException $e) {
+                            $this->colorCli->error('Error fetching data from imdb occured', true);
+                            Log::debug($e->getMessage());
                         }
+
                     }
                 }
 
