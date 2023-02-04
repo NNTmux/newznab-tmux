@@ -50,6 +50,7 @@ function reCategorize($argv): void
 
 function categorizeRelease($argv, $echoOutput = false): int
 {
+    $update = true;
     $otherCats = implode(',', Category::OTHERS_GROUP);
     $query = Release::query()->select(['id', 'searchname', 'fromname', 'groups_id', 'categories_id']);
     if (isset($argv[1]) && is_numeric($argv[1])) {
