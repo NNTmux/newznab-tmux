@@ -15,6 +15,7 @@ use App\Transformers\CategoryTransformer;
 use App\Transformers\DetailsTransformer;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -23,7 +24,7 @@ class ApiV2Controller extends BasePageController
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function capabilities(): \Illuminate\Http\JsonResponse
+    public function capabilities(): JsonResponse
     {
         $category = Category::getForApi();
 
@@ -63,7 +64,7 @@ class ApiV2Controller extends BasePageController
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      * @throws \Throwable
      */
-    public function movie(Request $request): \Illuminate\Http\JsonResponse
+    public function movie(Request $request): JsonResponse
     {
         $api = new API();
         $releases = new Releases();
@@ -119,7 +120,7 @@ class ApiV2Controller extends BasePageController
      * @throws \Exception
      * @throws \Throwable
      */
-    public function apiSearch(Request $request): \Illuminate\Http\JsonResponse
+    public function apiSearch(Request $request): JsonResponse
     {
         $api = new API();
         $releases = new Releases();
@@ -188,7 +189,7 @@ class ApiV2Controller extends BasePageController
      * @throws \Exception
      * @throws \Throwable
      */
-    public function tv(Request $request): \Illuminate\Http\JsonResponse
+    public function tv(Request $request): JsonResponse
     {
         $api = new API();
         $releases = new Releases();
@@ -225,15 +226,15 @@ class ApiV2Controller extends BasePageController
         $series = $request->input('season') ?? '';
         $episode = $request->input('ep') ?? '';
 
-        if (preg_match('#^(19|20)\d{2}$#', $series, $year) && strpos($episode, '/') !== false) {
-            $airdate = str_replace('/', '-', $year[0].'-'.$episode);
+        if (preg_match('#^(19|20)\d{2}$#', $series, $year) && str_contains($episode, '/')) {
+            $airDate = str_replace('/', '-', $year[0].'-'.$episode);
         }
 
         $relData = $releases->apiTvSearch(
             $siteIdArr,
             $series,
             $episode,
-            $airdate ?? '',
+            $airDate ?? '',
             $api->offset(),
             $api->limit(),
             $request->input('id') ?? '',
@@ -265,7 +266,7 @@ class ApiV2Controller extends BasePageController
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      */
     public function getNzb(Request $request)
     {
@@ -284,7 +285,7 @@ class ApiV2Controller extends BasePageController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function details(Request $request): \Illuminate\Http\JsonResponse
+    public function details(Request $request): JsonResponse
     {
         if ($request->missing('id')) {
             Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');

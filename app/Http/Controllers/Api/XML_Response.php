@@ -674,7 +674,7 @@ class XML_Response
      * @param  array  $columns  The columns in the release we need to insert
      * @return string The HTML format cData
      */
-    protected function buildCdata($columns): string
+    protected function buildCdata(array $columns): string
     {
         $cData = '';
 

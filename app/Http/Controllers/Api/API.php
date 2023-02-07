@@ -172,7 +172,7 @@ class API extends Capabilities
      */
     public function verifyEmptyParameter(string $parameter): void
     {
-        if (request()->has($parameter) && ! request()->filled($parameter)) {
+        if (request()->has($parameter) && request()->isNotFilled($parameter)) {
             Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
         }
     }

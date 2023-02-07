@@ -64,7 +64,7 @@ class Releases extends Release
      * @param  int  $minSize
      * @return Collection|mixed
      */
-    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, array $tags = [])
+    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, array $tags = []): mixed
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
@@ -161,7 +161,7 @@ class Releases extends Release
     /**
      * @return string
      */
-    public function showPasswords()
+    public function showPasswords(): string
     {
         $show = (int) Settings::settingValue('..showpasswordedrelease');
         $setting = $show ?? 0;
@@ -217,13 +217,10 @@ class Releases extends Release
     }
 
     /**
-     * Get list of releases available for export.
-     *
-     *
      * @param  string  $postFrom
      * @param  string  $postTo
      * @param  string  $groupID
-     * @return Collection|\Illuminate\Support\Collection|static[]
+     * @return \App\Models\Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
      */
     public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '')
     {
@@ -257,13 +254,9 @@ class Releases extends Release
     }
 
     /**
-     * Get date in this format : 01/01/2014 of the oldest release.
-     *
-     * @note Used for exporting NZBs.
-     *
-     * @return mixed
+     * @return mixed|string
      */
-    public function getEarliestUsenetPostDate()
+    public function getEarliestUsenetPostDate(): mixed
     {
         $row = self::query()->selectRaw("DATE_FORMAT(min(postdate), '%d/%m/%Y') AS postdate")->first();
 
@@ -271,13 +264,9 @@ class Releases extends Release
     }
 
     /**
-     * Get date in this format : 01/01/2014 of the newest release.
-     *
-     * @note Used for exporting NZBs.
-     *
-     * @return mixed
+     * @return mixed|string
      */
-    public function getLatestUsenetPostDate()
+    public function getLatestUsenetPostDate(): mixed
     {
         $row = self::query()->selectRaw("DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate")->first();
 
@@ -285,12 +274,7 @@ class Releases extends Release
     }
 
     /**
-     * Gets all groups for drop down selection on NZB-Export web page.
-     *
      * @param  bool  $blnIncludeAll
-     *
-     * @note Used for exporting NZBs.
-     *
      * @return array
      */
     public function getReleasedGroupsForSelect(bool $blnIncludeAll = true): array
@@ -313,16 +297,13 @@ class Releases extends Release
     }
 
     /**
-     * Get TV for My Shows page.
-     *
-     *
      * @param $userShows
      * @param $offset
      * @param $limit
      * @param $orderBy
      * @param  int  $maxAge
      * @param  array  $excludedCats
-     * @return Collection|mixed
+     * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
@@ -363,9 +344,7 @@ class Releases extends Release
     }
 
     /**
-     * Get count for my shows page pagination.
-     *
-     * @param    $userShows
+     * @param $userShows
      * @param  int  $maxAge
      * @param  array  $excludedCats
      * @return int
@@ -393,9 +372,8 @@ class Releases extends Release
     }
 
     /**
-     * Delete multiple releases, or a single by ID.
-     *
-     * @param  int|array|string  $list  Array of GUID or ID of releases to delete.
+     * @param  int|array|string  $list
+     * @return void
      *
      * @throws \Exception
      */
@@ -540,7 +518,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0, array $tags = [])
+    public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0, array $tags = []): mixed
     {
         $sizeRange = [
             1 => 1,
@@ -816,7 +794,7 @@ class Releases extends Release
         if (! empty($name) && $showSql === '') {
             if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
-                if (! empty($episode) && strpos($episode, '/') === false) {
+                if (! empty($episode) && ! str_contains($episode, '/')) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                 }
             } elseif (! empty($airDate)) {
@@ -917,7 +895,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
         $siteSQL = [];
         $showSql = '';
@@ -945,7 +923,7 @@ class Releases extends Release
             );
             $show = self::fromQuery($showQry);
             if ($show->isNotEmpty()) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airDate)) && $show[0]->episodes != '') {
+                if ((! empty($series) || ! empty($episode) || ! empty($airDate)) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
@@ -1056,7 +1034,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = [])
+    public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -1140,7 +1118,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -1219,7 +1197,7 @@ class Releases extends Release
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function searchSimilar($currentID, $name, array $excludedCats = [])
+    public function searchSimilar($currentID, $name, array $excludedCats = []): bool|array
     {
         // Get the category for the parent of this release.
         $ret = false;
