@@ -885,6 +885,7 @@ class ProcessAdditional
     {
         $totalBookFiles = 0;
         foreach ($this->_nzbContents as $this->_currentNZBFile) {
+            try{
 
             // Check if it's not a nfo, nzb, par2 etc...
             if (preg_match($this->_supportFileRegex.'|nfo\b|inf\b|ofn\b)($|[ ")\]-])(?!.{20,})/i', $this->_currentNZBFile['title'])) {
@@ -946,6 +947,9 @@ class ProcessAdditional
             // Some releases contain many books, increment this to ignore them later.
             if (preg_match($this->_ignoreBookRegex, $this->_currentNZBFile['title'])) {
                 $totalBookFiles++;
+            }
+        } catch (\ErrorException $e) {
+                Log::debug($e->getTraceAsString());
             }
         }
 
