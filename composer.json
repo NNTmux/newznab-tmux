@@ -86,6 +86,7 @@
     "mhor/php-mediainfo": "^5.0",
     "monicahq/laravel-cloudflare": "^3.2",
     "monolog/monolog": "^2.0",
+    "mtownsend/xml-to-array": "^2.0",
     "nesbot/carbon": "^2.14",
     "opis/closure": "^3.6",
     "pear/net_nntp": "^1.6.0",
