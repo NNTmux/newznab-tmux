@@ -37,7 +37,7 @@ return [
              * @see https://www.elastic.co/guide/en/elasticsearch/client/php-api/2.0/_configuration.html#_inline_host_configuration
              */
             'hosts' => [
-                    env('ELASTICSEARCH_SCHEME', 'http').'://'.env('ELASTICSEARCH_HOST', 'localhost').':'.env('ELASTICSEARCH_PORT', 9200),
+                env('ELASTICSEARCH_SCHEME', 'http').'://'.env('ELASTICSEARCH_HOST', 'localhost').':'.env('ELASTICSEARCH_PORT', 9200),
             ],
             'basicAuthentication' => [
                 'user' => env('ELASTICSEARCH_USER', null),
