@@ -17,7 +17,7 @@
     }
   ],
   "require": {
-    "php": "^8.0",
+    "php": "^8.1",
     "ext-bcmath": "*",
     "ext-ctype": "*",
     "ext-curl": "*",
@@ -43,7 +43,7 @@
     "ext-xmlwriter": "*",
     "ext-zlib": "*",
     "aharen/omdbapi": "^2.0",
-    "anhskohbo/no-captcha": "^3.0",
+    "anhskohbo/no-captcha": "dev-master",
     "b3rs3rk/steamfront": "dev-master",
     "bacon/bacon-qr-code": "^2.0",
     "bhuvidya/laravel-countries": "^9.0",
@@ -55,8 +55,8 @@
     "dariusiii/l5-fixtures": "^3.0",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
-    "dariusiii/tmdb-laravel": "^5.0",
-    "dariusiii/token": "^4.0",
+    "dariusiii/tmdb-laravel": "^6.0",
+    "dariusiii/token": "^5.0",
     "dborsatto/php-giantbomb": "^2.0",
     "doctrine/dbal": "^3.0",
     "fakerphp/faker": "^1.12",
@@ -65,27 +65,27 @@
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "^1.2",
     "guzzlehttp/guzzle": "^7.2",
-    "imdbphp/imdbphp": "^7.3",
+    "imdbphp/imdbphp": "^8.0",
     "intervention/image": "^2.4",
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "jamesmills/laravel-timezone": "^1.11",
     "joshpinkney/tv-maze-php-api": "dev-master",
-    "jrean/laravel-user-verification": "^10.0",
+    "jrean/laravel-user-verification": "dev-master",
     "junaidnasir/larainvite": "^5.0",
     "kevinlebrun/colors.php": "^1.0",
-    "laravel/framework": "^9.0",
+    "laravel/framework": "^10.0",
     "laravel/horizon": "^5.0",
     "laravel/scout": "^9.0",
     "laravel/telescope": "^4.0",
     "laravel/tinker": "^2.0",
-    "laravel/ui": "^3.0",
+    "laravel/ui": "^4.0",
     "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
     "marcreichel/igdb-laravel": "^3.0",
     "mhor/php-mediainfo": "^5.0",
     "monicahq/laravel-cloudflare": "^3.2",
-    "monolog/monolog": "^2.0",
+    "monolog/monolog": "^3.0",
     "mtownsend/xml-to-array": "^2.0",
     "nesbot/carbon": "^2.14",
     "opis/closure": "^3.6",
@@ -98,7 +98,7 @@
     "propaganistas/laravel-disposable-email": "^2.0",
     "ramsey/uuid": "^4.0",
     "rtconner/laravel-tagging": "^4.0",
-    "sentry/sentry-laravel": "^2.11",
+    "sentry/sentry-laravel": "^3.0",
     "smarty/smarty": "^4.0",
     "spatie/async": "^1.0",
     "spatie/laravel-backup": "^8.1",
@@ -124,11 +124,11 @@
     "jubeki/laravel-code-style": "^1.0",
     "laracasts/generators": "^2.0",
     "mockery/mockery": "^1.0",
-    "nunomaduro/collision": "^6.0",
+    "nunomaduro/collision": "^7.0",
     "nunomaduro/larastan": "^2.0",
     "php-coveralls/php-coveralls": "^2.0",
-    "phpunit/phpunit": "^8.0 || ^9.0",
-    "spatie/laravel-ignition": "^1.0"
+    "phpunit/phpunit": "^8.0 || ^9.0 || ^10.0",
+    "spatie/laravel-ignition": "^2.0"
   },
   "suggest": {
     "ext-gd": "to use GD library based image processing.",
@@ -143,6 +143,46 @@
     {
       "type": "vcs",
       "url": "https://github.com/DariusIII/larainvite"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/Laravel.Smarty"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/imagecache"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/laravel-geoip"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/model"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/DariusIII/laravel-elasticsearch"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/NNTmux/laravel-caffeine"
+    },
+    {
+       "type": "vcs",
+       "url": "https://github.com/NNTmux/laravel-countries"
+    },
+    {
+       "type": "vcs",
+       "url": "https://github.com/DariusIII/Laravel-5-Generators-Extended"
+    },
+    {
+        "type": "vcs",
+        "url": "https://github.com/DariusIII/theTVDbAPI"
+    },
+    {
+        "type": "vcs",
+        "url": "https://github.com/DariusIII/imdbphp"
     },
     {
       "type": "vcs",
