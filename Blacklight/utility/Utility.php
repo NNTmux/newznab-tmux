@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
  */
 class Utility
 {
-
     public static function clearScreen(): void
     {
         if (self::isCLI()) {

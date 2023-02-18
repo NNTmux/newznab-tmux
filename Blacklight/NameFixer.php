@@ -9,6 +9,7 @@ use App\Models\UsenetGroup;
 use Blacklight\processing\PostProcess;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * Class NameFixer.
@@ -1333,10 +1334,10 @@ class NameFixer
 
         if ($this->_fileName !== '' && ! str_starts_with($this->_fileName, '.')) {
             $this->_fileName = match (true) {
-                str_contains($this->_fileName, '.') => Utility::cutStringUsingLast('.', $this->_fileName, 'left', false),
-                preg_match('/\.part\d+$/', $this->_fileName) => Utility::cutStringUsingLast('.', $this->_fileName, 'left', false),
-                preg_match('/\.vol\d+(\+\d+)?$/', $this->_fileName) => Utility::cutStringUsingLast('.', $this->_fileName, 'left', false),
-                str_contains($this->_fileName, '\\') => Utility::cutStringUsingLast('\\', $this->_fileName, 'right', false),
+                str_contains($this->_fileName, '.') => Str::beforeLast('.', $this->_fileName),
+                preg_match('/\.part\d+$/', $this->_fileName) => Str::beforeLast('.', $this->_fileName),
+                preg_match('/\.vol\d+(\+\d+)?$/', $this->_fileName) => Str::beforeLast('.', $this->_fileName),
+                str_contains($this->_fileName, '\\') => Str::afterLast('\\', $this->_fileName),
                 preg_match('/^\d{2}-/', $this->_fileName) => preg_replace('/^\d{2}-/', '', $this->_fileName),
                 default => trim($this->_fileName),
             };
