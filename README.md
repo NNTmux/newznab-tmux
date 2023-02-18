@@ -22,8 +22,7 @@ NNTmux improves upon the original design, implementing several new features incl
 - Optional multi-threaded processing (header retrieval, release creation, post-processing etc)
 - Advanced search features (name, subject, category, post-date etc)
 - Intelligent local caching of metadata
-- Optional sharing of comments with other NNTmux and newznab sites
-- Optional tmux (terminal session multiplexing) engine that provides thread, database and performance monitoring
+- Tmux (terminal session multiplexing) engine that provides thread, database and performance monitoring
 - Image and video samples
 - SABnzbd/NZBGet integration (web, API and pause/resume)
 - CouchPotato integration (web and API)
@@ -35,16 +34,16 @@ System Administration know-how. NNTmux is not plug-n-play software. Installation
 
 ### Hardware
 
-	4GB RAM, 2 cores(threads) and 20GB disk space minimum.
+	16GB RAM, 4 cores(8 threads) and 80GB disk space minimum.
 
-If you wish to use more than 5 threads a quad core CPU is beneficial.
+If you wish to use more than 5 threads an eight core CPU is beneficial.
 
 The overall speed of NNTmux is largely governed by performance of the database. As many of the database tables should be held within system RAM as possible. See Database Section below.
 
 ### Software
 
-	PHP 7.2+ (and various modules)
-	MySQL 5.6+ (Postgres is not supported)
+	PHP 8.1+ (and various modules)
+	MariaDB 10+ or MySQL 8+ (Postgres is not supported)
 The installation guides have more detailed software requirements.
 
 ### Database
@@ -130,14 +129,6 @@ There are other commands available in cli/docker (i.e. to stop the tmux session 
 ### Licenses
 
  NNTmux is GPL v3. See LICENSE.txt for the full license.
-
- Other licenses by various software used by NNTmux:
-
- Net_NNTP => W3C
-
- Zip file creation class => No license specified.
-
- simple_html_dom.php => MIT
 
  All external libraries will have their full licenses in their respectful folders.
 
