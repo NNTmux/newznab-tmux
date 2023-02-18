@@ -130,12 +130,12 @@ class XML_Response
                 case 'api':
                     $this->namespace = 'newznab';
 
-                    return $this->returnApiRss();
+                    return $this->returnApiXml();
                     break;
                 case 'rss':
                     $this->namespace = 'nntmux';
 
-                    return $this->returnApiRss();
+                    return $this->returnApiRssXml();
                     break;
                 case 'reg':
                     return $this->returnReg();
@@ -171,12 +171,34 @@ class XML_Response
      *
      * @return string The XML Formatted string data
      */
-    protected function returnApiRss(): string
+    protected function returnApiRssXml(): string
     {
         $this->xml->startDocument('1.0', 'UTF-8');
         $this->includeRssAtom(); // Open RSS
         $this->xml->startElement('channel'); // Open channel
         $this->includeRssAtomLink();
+        $this->includeMetaInfo();
+        $this->includeImage();
+        $this->includeTotalRows();
+        $this->includeLimits();
+        $this->includeReleases();
+        $this->xml->endElement(); // End channel
+        $this->xml->endElement(); // End RSS
+        $this->xml->endDocument();
+
+        return $this->xml->outputMemory();
+    }
+
+    /**
+     * XML writes and returns the API data.
+     *
+     * @return string The XML Formatted string data
+     */
+    protected function returnApiXml(): string
+    {
+        $this->xml->startDocument('1.0', 'UTF-8');
+        $this->includeRssAtom(); // Open RSS
+        $this->xml->startElement('channel'); // Open channel
         $this->includeMetaInfo();
         $this->includeImage();
         $this->includeTotalRows();

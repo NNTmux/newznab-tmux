@@ -13,123 +13,12 @@ use Illuminate\Support\Str;
  */
 class Utility
 {
-    /**
-     *  Regex for detecting multi-platform path. Use it where needed so it can be updated in one location as required characters get added.
-     */
-    public const PATH_REGEX = '(?P<drive>[A-Za-z]:|)(?P<path>[/\w.-]+|)';
-
-    public const VERSION_REGEX = '#(?P<all>v(?P<digits>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<revision>\d+)(?:\.(?P<fix>\d+))?)(?:-(?P<suffix>(?:RC\d+|dev)))?)#';
-
-    /**
-     * Checks all levels of the supplied path are readable and executable by current user.
-     *
-     * @todo Make this recursive with a switch to only check end point.
-     *
-     * @param $path	*nix path to directory or file
-     * @return bool|string True is successful, otherwise the part of the path that failed testing.
-     */
-    public static function canExecuteRead($path): bool|string
-    {
-        $paths = explode('#/#', $path);
-        $fullPath = DS;
-        foreach ($paths as $singlePath) {
-            if ($singlePath !== '') {
-                $fullPath .= $singlePath.DS;
-                if (! is_readable($fullPath) || ! is_executable($fullPath)) {
-                    return "The '$fullPath' directory must be readable and executable by all .".PHP_EOL;
-                }
-            }
-        }
-
-        return true;
-    }
 
     public static function clearScreen(): void
     {
         if (self::isCLI()) {
             passthru('clear');
         }
-    }
-
-    /**
-     * Removes the preceeding or proceeding portion of a string
-     * relative to the last occurrence of the specified character.
-     * The character selected may be retained or discarded.
-     *
-     * @param  string  $character  the character to search for.
-     * @param  string  $string  the string to search through.
-     * @param  string  $side  determines whether text to the left or the right of the character is returned.
-     *                        Options are: left, or right.
-     * @param  bool  $keep_character  determines whether or not to keep the character.
-     *                                Options are: true, or false.
-     * @return string
-     */
-    public static function cutStringUsingLast(string $character, string $string, string $side, bool $keep_character = true): string
-    {
-        $offset = ($keep_character ? 1 : 0);
-        $whole_length = \strlen($string);
-        $right_length = (\strlen(strrchr($string, $character)) - 1);
-        $left_length = ($whole_length - $right_length - 1);
-        switch ($side) {
-            case 'left':
-                $piece = substr($string, 0, $left_length + $offset);
-                break;
-            case 'right':
-                $start = (0 - ($right_length + $offset));
-                $piece = substr($string, $start);
-                break;
-            default:
-                $piece = false;
-                break;
-        }
-
-        return $piece;
-    }
-
-    /**
-     * @param  array|null  $options
-     * @return array|null
-     */
-    public static function getDirFiles(array $options = null): ?array
-    {
-        $defaults = [
-            'dir'   => false,
-            'ext'   => '', // no full stop (period) separator should be used.
-            'file'    => true,
-            'path'  => '',
-            'regex' => '',
-        ];
-        $options += $defaults;
-        if (! $options['dir'] && ! $options['file']) {
-            return null;
-        }
-
-        // Replace windows style path separators with unix style.
-        $iterator = new \FilesystemIterator(
-            str_replace('\\', '/', $options['path']),
-            \FilesystemIterator::KEY_AS_PATHNAME |
-            \FilesystemIterator::SKIP_DOTS |
-            \FilesystemIterator::UNIX_PATHS
-        );
-
-        $files = [];
-        foreach ($iterator as $fileInfo) {
-            $file = $iterator->key();
-            switch (true) {
-                case ! $options['dir'] && $fileInfo->isDir():
-                    break;
-                case ! empty($options['ext']) && $fileInfo->getExtension() !== $options['ext']:
-                    break;
-                case empty($options['regex']) || ! preg_match($options['regex'], $file):
-                    break;
-                case ! $options['file'] && $fileInfo->isFile():
-                    break;
-                default:
-                    $files[] = $file;
-            }
-        }
-
-        return $files;
     }
 
     /**
@@ -173,26 +62,6 @@ class Utility
     public static function isCLI(): bool
     {
         return strtolower(PHP_SAPI) === 'cli';
-    }
-
-    /**
-     * @param $filename
-     * @return bool|null|string
-     */
-    public static function isGZipped($filename)
-    {
-        $gzipped = null;
-        if (($fp = fopen($filename, 'rb')) !== false) {
-            if (@fread($fp, 2) === "\x1F\x8B") { // this is a gzip'd file
-                fseek($fp, -4, SEEK_END);
-                if (\strlen($datum = @fread($fp, 4)) === 4) {
-                    $gzipped = $datum;
-                }
-            }
-            fclose($fp);
-        }
-
-        return $gzipped;
     }
 
     /**
@@ -291,39 +160,6 @@ class Utility
         // the context options would be for tls and would not apply to ssl,
         // so set both tls and ssl context in case the server does not support tls.
         return ['tls' => $options, 'ssl' => $options];
-    }
-
-    /**
-     * Set curl context options for verifying SSL certificates.
-     *
-     * @param  bool  $verify  false = Ignore config.php and do not verify the openssl cert.
-     *                        true  = Check config.php and verify based on those settings.
-     *                        If you know the certificate will be self-signed, pass false.
-     * @return array
-     * @static
-     */
-    public static function curlSslContextOptions(bool $verify = true): array
-    {
-        $options = [];
-        if ($verify && config('nntmux_ssl.ssl_verify_host') && (! empty(config('nntmux_ssl.ssl_cafile')) || ! empty(config('nntmux_ssl.ssl_capath')))) {
-            $options += [
-                CURLOPT_SSL_VERIFYPEER => (bool) config('nntmux_ssl.ssl_verify_peer'),
-                CURLOPT_SSL_VERIFYHOST => config('nntmux_ssl.ssl_verify_host') ? 2 : 0,
-            ];
-            if (! empty(config('nntmux_ssl.ssl_cafile'))) {
-                $options += [CURLOPT_CAINFO => config('nntmux_ssl.ssl_cafile')];
-            }
-            if (! empty(config('nntmux_ssl.ssl_capath'))) {
-                $options += [CURLOPT_CAPATH => config('nntmux_ssl.ssl_capath')];
-            }
-        } else {
-            $options += [
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => 0,
-            ];
-        }
-
-        return $options;
     }
 
     /**
@@ -475,15 +311,6 @@ class Utility
     }
 
     /**
-     * @param $code
-     * @return bool
-     */
-    public function checkStatus($code): bool
-    {
-        return $code === 0;
-    }
-
-    /**
      * Convert Code page 437 chars to UTF.
      *
      * @param  string  $string
@@ -508,60 +335,6 @@ class Utility
         }
 
         return '';
-    }
-
-    /**
-     * Convert obj to array.
-     *
-     * @param    $arrObjData
-     * @param  array  $arrSkipIndices
-     * @return array
-     */
-    public static function objectsIntoArray($arrObjData, array $arrSkipIndices = []): array
-    {
-        $arrData = [];
-
-        // If input is object, convert into array.
-        if (\is_object($arrObjData)) {
-            $arrObjData = get_object_vars($arrObjData);
-        }
-
-        if (\is_array($arrObjData)) {
-            foreach ($arrObjData as $index => $value) {
-                // Recursive call.
-                if (\is_object($value) || \is_array($value)) {
-                    $value = self::objectsIntoArray($value, $arrSkipIndices);
-                }
-                if (\in_array($index, $arrSkipIndices, false)) {
-                    continue;
-                }
-                $arrData[$index] = $value;
-            }
-        }
-
-        return $arrData;
-    }
-
-    /**
-     * Remove unsafe chars from a filename.
-     *
-     * @param  string  $filename
-     * @return string
-     */
-    public static function safeFilename(string $filename): string
-    {
-        return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
-    }
-
-    /**
-     * @param $input
-     * @return \SimpleXMLElement
-     */
-    public static function responseXmlToObject($input): \SimpleXMLElement
-    {
-        $input = str_replace('<newznab:', '<', $input);
-
-        return @simplexml_load_string($input);
     }
 
     /**

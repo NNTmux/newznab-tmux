@@ -313,7 +313,7 @@ class ApiController extends BasePageController
 
            // Capabilities request.
            case 'c':
-               $api->output([], $params, true, $offset, 'caps');
+               $api->output([], $params, $outputXML, $offset, 'caps');
                break;
        }
     }

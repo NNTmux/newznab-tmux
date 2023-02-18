@@ -85,18 +85,7 @@ abstract class Capabilities
             header('Content-type: text/xml');
         } else {
             // JSON encode the XMLWriter response
-            $response = json_encode(
-                Utility::xmlToArray(
-                    @simplexml_load_string($response),
-                    [
-                        'attributePrefix' => '_',
-                        'textContent'     => 'text',
-                    ]
-                )
-                // Strip the RSS+XML info from the JSON response by selecting enclosed data only
-                ['rss']['channel'],
-                JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES
-            );
+            $response = json_encode(xml_to_array($response), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES);
             header('Content-type: application/json');
         }
         if ($response === false) {
