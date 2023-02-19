@@ -108,7 +108,7 @@ class Games
      * @var
      */
     protected $igdbSleep;
-    
+
     /**
      * @var \Blacklight\ColorCLI
      */
