@@ -108,6 +108,11 @@ class Games
      * @var
      */
     protected $igdbSleep;
+    
+    /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
 
     /**
      * Games constructor.
