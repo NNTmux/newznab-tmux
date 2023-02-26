@@ -5,7 +5,6 @@ namespace Blacklight;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use Elastic\Elasticsearch\Endpoints\Cat;
 
 /**
  * Categorizing of releases by name/group.
@@ -1331,8 +1330,10 @@ class Categorize
         if (preg_match('/podcast/i', $this->releaseName)) {
             $this->tmpCat = Category::MUSIC_PODCAST;
             $this->tmpTag[] = Category::TAG_MUSIC_PODCAST;
+
             return true;
         }
+
         return false;
     }
 

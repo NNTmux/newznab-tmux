@@ -553,7 +553,7 @@ class Category extends Model
     /**
      * Return a list of categories for use in a dropdown.
      *
-     * @param bool $blnIncludeNoneSelected
+     * @param  bool  $blnIncludeNoneSelected
      * @return array
      */
     public static function getForSelect(bool $blnIncludeNoneSelected = true): array
@@ -572,8 +572,8 @@ class Category extends Model
     }
 
     /**
-     * @param bool $activeOnly
-     * @param array $excludedCats
+     * @param  bool  $activeOnly
+     * @param  array  $excludedCats
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
     public static function getCategories(bool $activeOnly = false, array $excludedCats = []): \Illuminate\Database\Eloquent\Collection|array
