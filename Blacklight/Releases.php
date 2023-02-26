@@ -724,8 +724,7 @@ class Releases extends Release
     }
 
     /**
-     * Search TV Shows via API.
-     *
+     * Search for TV shows via API.
      *
      * @param  array  $siteIdArr
      * @param  string  $series
@@ -739,13 +738,13 @@ class Releases extends Release
      * @param  int  $minSize
      * @param  array  $excludedCategories
      * @param  array  $tags
-     * @return Collection|mixed
+     * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = [])
+    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
         $siteSQL = [];
         $showSql = '';

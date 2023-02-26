@@ -3,7 +3,7 @@
 namespace Blacklight;
 
 use App\Models\Release;
-use Elasticsearch\Common\Exceptions\BadRequest400Exception;
+use Elastic\Elasticsearch\Exception\ElasticsearchException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use sspat\ESQuerySanitizer\Sanitizer;
@@ -45,7 +45,7 @@ class ElasticSearchSiteSearch
             ];
 
             return $this->search($search);
-        } catch (BadRequest400Exception $request400Exception) {
+        } catch (ElasticsearchException $request400Exception) {
             return [];
         }
     }
@@ -84,7 +84,7 @@ class ElasticSearchSiteSearch
             ];
 
             return $this->search($search);
-        } catch (BadRequest400Exception $request400Exception) {
+        } catch (ElasticsearchException $request400Exception) {
             return [];
         }
     }
@@ -125,7 +125,7 @@ class ElasticSearchSiteSearch
             ];
 
             return $this->search($search);
-        } catch (BadRequest400Exception $request400Exception) {
+        } catch (ElasticsearchException $request400Exception) {
             return [];
         }
     }
@@ -154,7 +154,7 @@ class ElasticSearchSiteSearch
             ];
 
             return $this->search($search);
-        } catch (BadRequest400Exception $request400Exception) {
+        } catch (ElasticsearchException $request400Exception) {
             return [];
         }
     }
@@ -246,7 +246,7 @@ class ElasticSearchSiteSearch
             foreach ($primaryResults['hits']['hits'] as $primaryResult) {
                 $results[] = $primaryResult['_source'];
             }
-        } catch (BadRequest400Exception $badRequest400Exception) {
+        } catch (ElasticsearchException $badRequest400Exception) {
             return [];
         }
 
