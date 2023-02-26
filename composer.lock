@@ -2613,24 +2613,24 @@
         },
         {
             "name": "graham-campbell/result-type",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GrahamCampbell/Result-Type.git",
-                "reference": "a878d45c1914464426dc94da61c9e1d36ae262a8"
+                "reference": "672eff8cf1d6fe1ef09ca0f89c4b287d6a3eb831"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/a878d45c1914464426dc94da61c9e1d36ae262a8",
-                "reference": "a878d45c1914464426dc94da61c9e1d36ae262a8",
+                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/672eff8cf1d6fe1ef09ca0f89c4b287d6a3eb831",
+                "reference": "672eff8cf1d6fe1ef09ca0f89c4b287d6a3eb831",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2.5 || ^8.0",
-                "phpoption/phpoption": "^1.9"
+                "phpoption/phpoption": "^1.9.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.5.28 || ^9.5.21"
+                "phpunit/phpunit": "^8.5.32 || ^9.6.3 || ^10.0.12"
             },
             "type": "library",
             "autoload": {
@@ -2659,7 +2659,7 @@
             ],
             "support": {
                 "issues": "https://github.com/GrahamCampbell/Result-Type/issues",
-                "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.0"
+                "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.1"
             },
             "funding": [
                 {
@@ -2671,7 +2671,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-30T15:56:11+00:00"
+            "time": "2023-02-25T20:23:15+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -7201,16 +7201,16 @@
         },
         {
             "name": "php-tmdb/api",
-            "version": "4.1.2",
+            "version": "4.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/api.git",
-                "reference": "8d6671a354fa9069b70be7b7e0d4b3bb8f5f45e0"
+                "reference": "7f7b3c6317b1346e6bc646ad63edb212a2b55584"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/api/zipball/8d6671a354fa9069b70be7b7e0d4b3bb8f5f45e0",
-                "reference": "8d6671a354fa9069b70be7b7e0d4b3bb8f5f45e0",
+                "url": "https://api.github.com/repos/php-tmdb/api/zipball/7f7b3c6317b1346e6bc646ad63edb212a2b55584",
+                "reference": "7f7b3c6317b1346e6bc646ad63edb212a2b55584",
                 "shasum": ""
             },
             "require": {
@@ -7288,9 +7288,23 @@
             ],
             "support": {
                 "issues": "https://github.com/php-tmdb/api/issues",
-                "source": "https://github.com/php-tmdb/api/tree/4.1.2"
+                "source": "https://github.com/php-tmdb/api/tree/4.1.3"
             },
-            "time": "2022-11-03T19:20:32+00:00"
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SMLZ362KQ8K8W",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/php-tmdb",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/wtfzdotnet",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-11-04T19:25:12+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -7459,24 +7473,24 @@
         },
         {
             "name": "phpoption/phpoption",
-            "version": "1.9.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-option.git",
-                "reference": "dc5ff11e274a90cc1c743f66c9ad700ce50db9ab"
+                "reference": "dd3a383e599f49777d8b628dadbb90cae435b87e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/dc5ff11e274a90cc1c743f66c9ad700ce50db9ab",
-                "reference": "dc5ff11e274a90cc1c743f66c9ad700ce50db9ab",
+                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/dd3a383e599f49777d8b628dadbb90cae435b87e",
+                "reference": "dd3a383e599f49777d8b628dadbb90cae435b87e",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2.5 || ^8.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.8",
-                "phpunit/phpunit": "^8.5.28 || ^9.5.21"
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "phpunit/phpunit": "^8.5.32 || ^9.6.3 || ^10.0.12"
             },
             "type": "library",
             "extra": {
@@ -7518,7 +7532,7 @@
             ],
             "support": {
                 "issues": "https://github.com/schmittjoh/php-option/issues",
-                "source": "https://github.com/schmittjoh/php-option/tree/1.9.0"
+                "source": "https://github.com/schmittjoh/php-option/tree/1.9.1"
             },
             "funding": [
                 {
@@ -7530,7 +7544,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-30T15:51:26+00:00"
+            "time": "2023-02-25T19:38:58+00:00"
         },
         {
             "name": "pragmarx/google2fa",
@@ -7586,16 +7600,16 @@
         },
         {
             "name": "pragmarx/google2fa-laravel",
-            "version": "v2.1.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/antonioribeiro/google2fa-laravel.git",
-                "reference": "0022c643e0191aed37adf01b4765560bb6e7ae6e"
+                "reference": "035b799d6ea080d07722012c926c15c9dde66fd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/antonioribeiro/google2fa-laravel/zipball/0022c643e0191aed37adf01b4765560bb6e7ae6e",
-                "reference": "0022c643e0191aed37adf01b4765560bb6e7ae6e",
+                "url": "https://api.github.com/repos/antonioribeiro/google2fa-laravel/zipball/035b799d6ea080d07722012c926c15c9dde66fd7",
+                "reference": "035b799d6ea080d07722012c926c15c9dde66fd7",
                 "shasum": ""
             },
             "require": {
@@ -7656,9 +7670,9 @@
             ],
             "support": {
                 "issues": "https://github.com/antonioribeiro/google2fa-laravel/issues",
-                "source": "https://github.com/antonioribeiro/google2fa-laravel/tree/v2.1.0"
+                "source": "https://github.com/antonioribeiro/google2fa-laravel/tree/v2.1.1"
             },
-            "time": "2023-02-17T11:53:13+00:00"
+            "time": "2023-02-26T09:41:06+00:00"
         },
         {
             "name": "pragmarx/google2fa-qrcode",
@@ -15349,16 +15363,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.2",
+            "version": "1.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "a2ffec7db373d8da4973d1d62add872db5cd22dd"
+                "reference": "5419375b5891add97dc74be71e6c1c34baaddf64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a2ffec7db373d8da4973d1d62add872db5cd22dd",
-                "reference": "a2ffec7db373d8da4973d1d62add872db5cd22dd",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/5419375b5891add97dc74be71e6c1c34baaddf64",
+                "reference": "5419375b5891add97dc74be71e6c1c34baaddf64",
                 "shasum": ""
             },
             "require": {
@@ -15388,7 +15402,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.10.2"
+                "source": "https://github.com/phpstan/phpstan/tree/1.10.3"
             },
             "funding": [
                 {
@@ -15404,27 +15418,27 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-23T14:36:46+00:00"
+            "time": "2023-02-25T14:47:13+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "10.0.0",
+            "version": "10.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "bf4fbc9c13af7da12b3ea807574fb460f255daba"
+                "reference": "b9c21a93dd8c8eed79879374884ee733259475cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/bf4fbc9c13af7da12b3ea807574fb460f255daba",
-                "reference": "bf4fbc9c13af7da12b3ea807574fb460f255daba",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/b9c21a93dd8c8eed79879374884ee733259475cc",
+                "reference": "b9c21a93dd8c8eed79879374884ee733259475cc",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
-                "nikic/php-parser": "^4.14",
+                "nikic/php-parser": "^4.15",
                 "php": ">=8.1",
                 "phpunit/php-file-iterator": "^4.0",
                 "phpunit/php-text-template": "^3.0",
@@ -15473,7 +15487,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/10.0.0"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/10.0.1"
             },
             "funding": [
                 {
@@ -15481,7 +15495,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-03T07:14:34+00:00"
+            "time": "2023-02-25T05:35:03+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -15726,16 +15740,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.0.11",
+            "version": "10.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "d18a18b07e7a9ad52d994b1785f9e301fc84b616"
+                "reference": "87d5cfdb4ecf440fb9f08b636b1152be433fc6f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d18a18b07e7a9ad52d994b1785f9e301fc84b616",
-                "reference": "d18a18b07e7a9ad52d994b1785f9e301fc84b616",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/87d5cfdb4ecf440fb9f08b636b1152be433fc6f1",
+                "reference": "87d5cfdb4ecf440fb9f08b636b1152be433fc6f1",
                 "shasum": ""
             },
             "require": {
@@ -15806,7 +15820,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.0.11"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.0.12"
             },
             "funding": [
                 {
@@ -15822,7 +15836,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-20T16:39:36+00:00"
+            "time": "2023-02-25T06:05:15+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -16848,16 +16862,16 @@
         },
         {
             "name": "sebastianfeldmann/git",
-            "version": "3.8.5",
+            "version": "3.8.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/git.git",
-                "reference": "14de823cba82e30a3759e9eab1ebbd0d6f5d542c"
+                "reference": "d4ce674cf5104a162f8401033d88ea7f47134c5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/14de823cba82e30a3759e9eab1ebbd0d6f5d542c",
-                "reference": "14de823cba82e30a3759e9eab1ebbd0d6f5d542c",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/d4ce674cf5104a162f8401033d88ea7f47134c5d",
+                "reference": "d4ce674cf5104a162f8401033d88ea7f47134c5d",
                 "shasum": ""
             },
             "require": {
@@ -16897,7 +16911,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianfeldmann/git/issues",
-                "source": "https://github.com/sebastianfeldmann/git/tree/3.8.5"
+                "source": "https://github.com/sebastianfeldmann/git/tree/3.8.6"
             },
             "funding": [
                 {
@@ -16905,7 +16919,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-10-23T11:29:41+00:00"
+            "time": "2023-02-24T21:21:52+00:00"
         },
         {
             "name": "spatie/backtrace",
