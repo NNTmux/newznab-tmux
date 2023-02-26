@@ -689,6 +689,16 @@ class CategoriesTableSeeder extends Seeder
                 'minsizetoformrelease' => 0,
                 'maxsizetoformrelease' => 0,
             ],
+            75 => [
+                'id' => 3050,
+                'title' => 'Podcast',
+                'root_categories_id' => 3000,
+                'status' => 1,
+                'description' => null,
+                'disablepreview' => 0,
+                'minsizetoformrelease' => 0,
+                'maxsizetoformrelease' => 0,
+            ],
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');

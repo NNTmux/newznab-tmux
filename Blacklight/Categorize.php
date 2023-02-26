@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use Elastic\Elasticsearch\Endpoints\Cat;
 
 /**
  * Categorizing of releases by name/group.
@@ -115,6 +116,10 @@ class Categorize
                 }
                 $this->tmpCat = Category::XXX_OTHER;
                 $this->tmpTag[] = Category::TAG_XXX_OTHER;
+                break;
+            case preg_match('/alt\.binaries\.podcast$/i', $groupName):
+                $this->tmpCat = Category::MUSIC_PODCAST;
+                $this->tmpTag = Category::TAG_MUSIC_PODCAST;
                 break;
             default:
                 return false;
@@ -1178,7 +1183,7 @@ class Categorize
     public function isMusic(): bool
     {
         return match (true) {
-            $this->isMusicVideo(), $this->isAudiobook(), $this->isMusicLossless(), $this->isMusicMP3(), $this->isMusicOther() => true,
+            $this->isMusicVideo(), $this->isAudiobook(), $this->isMusicLossless(), $this->isMusicMP3(), $this->isMusicPodcast(),$this->isMusicOther() => true,
             default => false,
         };
     }
@@ -1315,6 +1320,19 @@ class Categorize
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMusicPodcast(): bool
+    {
+        if (preg_match('/podcast/i', $this->releaseName)) {
+            $this->tmpCat = Category::MUSIC_PODCAST;
+            $this->tmpTag[] = Category::TAG_MUSIC_PODCAST;
+            return true;
+        }
         return false;
     }
 

@@ -74,6 +74,7 @@ class Category extends Model
     public const MUSIC_VIDEO = 3020;
     public const MUSIC_AUDIOBOOK = 3030;
     public const MUSIC_LOSSLESS = 3040;
+    public const MUSIC_PODCAST = 3050;
     public const MUSIC_OTHER = 3999;
     public const MUSIC_FOREIGN = 3060;
     public const PC_0DAY = 4010;
@@ -200,6 +201,7 @@ class Category extends Model
     public const TAG_MUSIC_VIDEO = 'Music_Video';
     public const TAG_MUSIC_AUDIOBOOK = 'Music_Audio_Book';
     public const TAG_MUSIC_LOSSLESS = 'Music_LossLess';
+    public const TAG_MUSIC_PODCAST = 'Music_Podcast';
     public const TAG_MUSIC_OTHER = 'Music_Other';
     public const TAG_MUSIC_FOREIGN = 'Music_Foreign';
     public const TAG_PC_0DAY = 'Pc_0Day';
@@ -488,7 +490,7 @@ class Category extends Model
      *
      * @param $id
      * @param $status
-     * @param $desc->update
+     * @param $desc
      * @param $disablepreview
      * @param $minsize
      * @param $maxsize
@@ -551,10 +553,10 @@ class Category extends Model
     /**
      * Return a list of categories for use in a dropdown.
      *
-     * @param  bool  $blnIncludeNoneSelected
+     * @param bool $blnIncludeNoneSelected
      * @return array
      */
-    public static function getForSelect($blnIncludeNoneSelected = true): array
+    public static function getForSelect(bool $blnIncludeNoneSelected = true): array
     {
         $categories = self::getCategories();
         $temp_array = [];
@@ -570,11 +572,11 @@ class Category extends Model
     }
 
     /**
-     * @param  bool  $activeOnly
-     * @param  array  $excludedCats
-     * @return array
+     * @param bool $activeOnly
+     * @param array $excludedCats
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
-    public static function getCategories($activeOnly = false, array $excludedCats = [])
+    public static function getCategories(bool $activeOnly = false, array $excludedCats = []): \Illuminate\Database\Eloquent\Collection|array
     {
         $sql = self::query()
             ->with('parent')
