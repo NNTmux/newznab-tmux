@@ -142,7 +142,7 @@ class Music
      * @param $start
      * @param $num
      * @param $orderBy
-     * @param array $excludedCats
+     * @param  array  $excludedCats
      * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getMusicRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): mixed
@@ -216,7 +216,7 @@ class Music
 			GROUP BY m.id
 			ORDER BY %s %s',
             ! empty($musicIDs) ? 'WHERE m.id IN ('.implode(',', $musicIDs).')' : 'AND 1=1',
-            (! empty($releaseIDs)) ? 'AND r.id in ('. implode(',', $releaseIDs).')' : '',
+            (! empty($releaseIDs)) ? 'AND r.id in ('.implode(',', $releaseIDs).')' : '',
             $catsrch,
             $order[0],
             $order[1]
