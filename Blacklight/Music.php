@@ -138,16 +138,14 @@ class Music
 
     /**
      * @param $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
-     * @param    $orderBy
-     * @param  array  $excludedCats
-     * @return array
-     *
-     * @throws \Exception
+     * @param $cat
+     * @param $start
+     * @param $num
+     * @param $orderBy
+     * @param array $excludedCats
+     * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function getMusicRange($page, $cat, $start, $num, $orderBy, array $excludedCats = [])
+    public function getMusicRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): mixed
     {
         $browseby = $this->getBrowseBy();
         $catsrch = '';
@@ -198,6 +196,9 @@ class Music
                 $releaseIDs[] = $id->grp_release_id;
             }
         }
+        if (empty($musicIDs) && empty($releaseIDs)) {
+            return collect();
+        }
         $sql = sprintf(
             '
 			SELECT
@@ -211,13 +212,11 @@ class Music
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			INNER JOIN musicinfo m ON m.id = r.musicinfo_id
-			WHERE m.id IN (%s)
-			AND r.id IN (%s)
-			%s
+			%s %s %s
 			GROUP BY m.id
 			ORDER BY %s %s',
-            (\is_array($musicIDs) ? implode(',', $musicIDs) : -1),
-            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            ! empty($musicIDs) ? 'WHERE m.id IN ('.implode(',', $musicIDs).')' : 'AND 1=1',
+            (! empty($releaseIDs)) ? 'AND r.id in ('. implode(',', $releaseIDs).')' : '',
             $catsrch,
             $order[0],
             $order[1]
@@ -226,8 +225,8 @@ class Music
         if ($return !== null) {
             return $return;
         }
-        $return = DB::select($sql);
-        if (! empty($return)) {
+        $return = MusicInfo::fromQuery($sql);
+        if ($return->isNotEmpty()) {
             $return[0]->_totalcount = $music['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
