@@ -12,21 +12,21 @@
         "package-update": "ncu -u -x pnotify,laravel-mix"
     },
     "devDependencies": {
-        "axios": "^1.2.2",
+        "axios": "^1.3.4",
         "cross-env": "^7.0.3",
         "jquery": "3.6.3",
         "laravel-mix": "^6.0.49",
         "lodash": "^4.17.21",
         "popper.js": "^1.16.1",
-        "prettier": "^2.8.3",
+        "prettier": "^2.8.4",
         "resolve-url-loader": "^5.0.0",
-        "vue": "^3.2.45"
+        "vue": "^3.2.47"
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
-        "@fortawesome/fontawesome-free": "^6.2.1",
+        "@fortawesome/fontawesome-free": "^6.3.0",
         "animate.css": "^4.1.1",
-        "autosize": "^5.0.2",
+        "autosize": "^6.0.1",
         "bootstrap": "^5.2.3",
         "bootstrap-datepicker": "^1.9.0",
         "bootstrap-hover-dropdown": "^2.2.1",
@@ -36,7 +36,7 @@
         "icheck": "^1.0.2",
         "jquery-colorbox": "^1.6.4",
         "jquery-goup": "^1.1.3",
-        "jquery-migrate": "3.4.0",
+        "jquery-migrate": "3.4.1",
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
         "pace-js": "^1.2.4",
