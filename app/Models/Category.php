@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -168,79 +170,6 @@ class Category extends Model
         ];
 
     /**
-     * Tag constants.
-     * Do NOT use the values, as they may change, always use the constant - that's what it's for.
-     */
-    public const TAG_OTHER_MISC = 'Other_Misc';
-    public const TAG_OTHER_HASHED = 'Other_Hashed';
-    public const TAG_GAME_NDS = 'Game_NDS';
-    public const TAG_GAME_PSP = 'Game_PSP';
-    public const TAG_GAME_WII = 'Game_Wii';
-    public const TAG_GAME_XBOX = 'Game_Xbox';
-    public const TAG_GAME_XBOX360 = 'Game_Xbox360';
-    public const TAG_GAME_WIIWARE = 'Game_WiiWare';
-    public const TAG_GAME_XBOX360DLC = 'Game_Xbox360_DLC';
-    public const TAG_GAME_PS3 = 'Game_PS3';
-    public const TAG_GAME_OTHER = 'Game_Other';
-    public const TAG_GAME_3DS = 'Game_3DS';
-    public const TAG_GAME_PSVITA = 'Game_PS_Vita';
-    public const TAG_GAME_WIIU = 'Game_WiiU';
-    public const TAG_GAME_XBOXONE = 'Game_Xbox_One';
-    public const TAG_GAME_PS4 = 'Game_PS4';
-    public const TAG_MOVIE_FOREIGN = 'Movie_Foreign';
-    public const TAG_MOVIE_OTHER = 'Movie_Other';
-    public const TAG_MOVIE_SD = 'Movie_SD';
-    public const TAG_MOVIE_HD = 'Movie_HD';
-    public const TAG_MOVIE_UHD = 'Movie_UHD';
-    public const TAG_MOVIE_3D = 'Movie_3D';
-    public const TAG_MOVIE_BLURAY = 'Movie_BluRay';
-    public const TAG_MOVIE_DVD = 'Movie_DVD';
-    public const TAG_MOVIE_WEBDL = 'Movie_Web_DL';
-    public const TAG_MOVIE_X265 = 'Movie_x265';
-    public const TAG_MUSIC_MP3 = 'Music_MP3';
-    public const TAG_MUSIC_VIDEO = 'Music_Video';
-    public const TAG_MUSIC_AUDIOBOOK = 'Music_Audio_Book';
-    public const TAG_MUSIC_LOSSLESS = 'Music_LossLess';
-    public const TAG_MUSIC_PODCAST = 'Music_Podcast';
-    public const TAG_MUSIC_OTHER = 'Music_Other';
-    public const TAG_MUSIC_FOREIGN = 'Music_Foreign';
-    public const TAG_PC_0DAY = 'Pc_0Day';
-    public const TAG_PC_ISO = 'Pc_Iso';
-    public const TAG_PC_MAC = 'Pc_Mac';
-    public const TAG_PC_PHONE_OTHER = 'Pc_Phone_Other';
-    public const TAG_PC_GAMES = 'Pc_Games';
-    public const TAG_PC_PHONE_IOS = 'Pc_Phone_Ios';
-    public const TAG_PC_PHONE_ANDROID = 'Pc_Phone_Android';
-    public const TAG_TV_WEBDL = 'Tv_Web_DL';
-    public const TAG_TV_FOREIGN = 'Tv_Foreign';
-    public const TAG_TV_SD = 'Tv_SD';
-    public const TAG_TV_HD = 'Tv_HD';
-    public const TAG_TV_UHD = 'Tv_UHD';
-    public const TAG_TV_OTHER = 'Tv_Other';
-    public const TAG_TV_SPORT = 'Tv_Sport';
-    public const TAG_TV_ANIME = 'Tv_Anime';
-    public const TAG_TV_DOCU = 'Tv_Documentary';
-    public const TAG_TV_X265 = 'Tv_x265';
-    public const TAG_XXX_DVD = 'Xxx_DVD';
-    public const TAG_XXX_WMV = 'Xxx_Wmv';
-    public const TAG_XXX_XVID = 'Xxx_XvID';
-    public const TAG_XXX_X264 = 'Xxx_X264';
-    public const TAG_XXX_CLIPHD = 'Xxx_Clip_HD';
-    public const TAG_XXX_CLIPSD = 'Xxx_Clip_SD';
-    public const TAG_XXX_UHD = 'Xxx_UHD';
-    public const TAG_XXX_PACK = 'Xxx_Pack';
-    public const TAG_XXX_IMAGESET = 'Xxx_ImageSet';
-    public const TAG_XXX_OTHER = 'Xxx_Other';
-    public const TAG_XXX_SD = 'Xxx_SD';
-    public const TAG_XXX_WEBDL = 'Xxx_Web_DL';
-    public const TAG_BOOKS_MAGAZINES = 'Magazines';
-    public const TAG_BOOKS_EBOOK = 'Ebook';
-    public const TAG_BOOKS_COMICS = 'Comics';
-    public const TAG_BOOKS_TECHNICAL = 'Technical';
-    public const TAG_BOOKS_FOREIGN = 'Books_Foreign';
-    public const TAG_BOOKS_UNKNOWN = 'Books_Unknown';
-
-    /**
      * @var string
      */
     protected $table = 'categories';
@@ -261,7 +190,7 @@ class Category extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function releases()
     {
@@ -269,7 +198,7 @@ class Category extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function parent()
     {

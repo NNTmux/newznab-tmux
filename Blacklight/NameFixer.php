@@ -985,7 +985,6 @@ class NameFixer
                 }
 
                 $newTitle = substr($newName, 0, 299);
-                $taggedRelease = Release::find($release->releases_id);
 
                 if ($echo === true) {
                     if ($nameStatus === 1) {
@@ -1045,11 +1044,6 @@ class NameFixer
                             }
                         }
 
-                        if ($taggedRelease !== null) {
-                            $taggedRelease->update($updateColumns);
-                            $taggedRelease->untag();
-                            $taggedRelease->retag($determinedCategory['tags']);
-                        }
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->releases_id);
                         } else {
@@ -1071,8 +1065,7 @@ class NameFixer
                                     'iscategorized' => 1,
                                 ]
                             );
-                        $taggedRelease->untag();
-                        $taggedRelease?->retag($determinedCategory['tags']);
+
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->_releases_id);
                         } else {

@@ -1770,8 +1770,6 @@ class ProcessAdditional
                                     // Update the search name.
                                     $release = Release::whereId($this->_release->id);
                                     $release->update(['searchname' => $newTitle, 'categories_id' => $newCat['categories_id'], 'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1]);
-                                    $release->untag();
-                                    $release->retag($newCat['tags']);
 
                                     if (config('nntmux.elasticsearch_enabled') === true) {
                                         $this->elasticsearch->updateRelease($this->_release->id);

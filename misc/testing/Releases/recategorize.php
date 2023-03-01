@@ -88,11 +88,6 @@ function categorizeRelease($argv, $echoOutput = false): int
                             'xxxinfo_id' => 0,
                             'categories_id' => $catId['categories_id'],
                         ]);
-                        $release = Release::find($result->id);
-                        if (! empty($release)) {
-                            $release->untag();
-                            $release->retag($catId['tags']);
-                        }
                         \Blacklight\NameFixer::echoChangedReleaseName([
                             'new_name' => $result->searchname,
                             'old_name' => $result->searchname,

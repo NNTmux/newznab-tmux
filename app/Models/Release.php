@@ -5,7 +5,6 @@ namespace App\Models;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
-use Conner\Tagging\Taggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -134,8 +133,8 @@ use Illuminate\Support\Facades\DB;
  * @property int|null $movieinfo_id FK to movieinfo.id
  * @property int $proc_crc32 Has the release been crc32 processed
  * @property mixed $tag_names
- * @property-read \Illuminate\Database\Eloquent\Collection|\Tagged[] $tags
- * @property-read \Illuminate\Database\Eloquent\Collection|\Conner\Tagging\Model\Tagged[] $tagged
+ * @property-read \Illuminate\Database\Eloquent\Collection
+ * @property-read \Illuminate\Database\Eloquent\Collection
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release newQuery()
@@ -148,7 +147,6 @@ use Illuminate\Support\Facades\DB;
  */
 class Release extends Model
 {
-    use Taggable;
     use HasFactory;
 
     /**
@@ -314,25 +312,25 @@ class Release extends Model
     /**
      * Used for release edit page on site.
      *
-     * @param  int  $id
-     * @param  string  $name
-     * @param  string  $searchName
-     * @param  string  $fromName
-     * @param  int  $categoryId
-     * @param  int  $parts
-     * @param  int  $grabs
-     * @param  int  $size
-     * @param  string  $postedDate
-     * @param  string  $addedDate
+     * @param int $id
+     * @param string $name
+     * @param string $searchName
+     * @param string $fromName
+     * @param int $categoryId
+     * @param int $parts
+     * @param int $grabs
+     * @param int $size
+     * @param string $postedDate
+     * @param string $addedDate
      * @param    $videoId
      * @param    $episodeId
-     * @param  int  $imDbId
-     * @param  int  $aniDbId
+     * @param int $imDbId
+     * @param int $aniDbId
      * @param  string  $tags
      *
      * @throws \Exception
      */
-    public static function updateRelease($id, $name, $searchName, $fromName, $categoryId, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbId, $aniDbId, string $tags = ''): void
+    public static function updateRelease(int $id, string $name, string $searchName, string $fromName, int $categoryId, int $parts, int $grabs, int $size, string $postedDate, string $addedDate, $videoId, $episodeId, int $imDbId, int $aniDbId): void
     {
         $movieInfoId = null;
         if (! empty($imDbId)) {
@@ -361,12 +359,6 @@ class Release extends Model
             (new ElasticSearchSiteSearch())->updateRelease($id);
         } else {
             (new SphinxSearch())->updateRelease($id);
-        }
-        if (! empty($tags)) {
-            $newTags = explode(',', $tags);
-            $release = self::find($id);
-            $release->untag();
-            $release->retag($newTags);
         }
     }
 

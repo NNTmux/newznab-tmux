@@ -520,18 +520,6 @@
 																   href="{{url("/browse/{$release.parent_category}/{$release.sub_category}")}}"> {$release.category_name}</a>
 															</td>
 														</tr>
-                                                        {if !empty($release->tagSlugs())}
-                                                            <tr>
-                                                                <th width="140">Category Tags</th>
-                                                                <td>
-                                                                    {foreach $release->tagNames() as $tag}
-                                                                        <a title="Browse {$tag}"
-                                                                           href="{{url("/browse/tags?tags={$tag}")}}"> {$tag}</a>
-                                                                    {/foreach}
-                                                                </td>
-
-                                                            </tr>
-                                                        {/if}
 														<tr>
 															<th width="140">Files</th>
 															<td>
