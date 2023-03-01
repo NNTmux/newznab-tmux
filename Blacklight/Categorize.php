@@ -104,18 +104,16 @@ class Categorize
         switch(true) {
             case preg_match('/alt\.binaries\.erotica([.]\w+)?/i', $groupName):
                 if ($this->isXxx()) {
-                    break;
+                    return true;
                 }
                 $this->tmpCat = Category::XXX_OTHER;
-                break;
+                return true;
             case preg_match('/alt\.binaries\.podcast$/i', $groupName):
                 $this->tmpCat = Category::MUSIC_PODCAST;
-                break;
+                return true;
             default:
                 return false;
         }
-
-        return true;
    }
 
     //
