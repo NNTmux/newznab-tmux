@@ -4,6 +4,7 @@ namespace Blacklight\processing\post;
 
 use App\Models\AnidbEpisode;
 use App\Models\Category;
+use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\db\populate\AniDB as PaDb;
@@ -284,16 +285,7 @@ class AniDB
      */
     private function updateRelease($anidbId, $relId): void
     {
-        DB::update(
-            sprintf(
-                '
-				UPDATE releases
-				SET anidbid = %d
-				WHERE id = %d',
-                $anidbId,
-                $relId
-            )
-        );
+        Release::update(['anidbid' => $anidbId])->where('id', $relId);
     }
 
     /**

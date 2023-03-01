@@ -89,7 +89,7 @@ class Categorize
 
         return match (true) {
             $this->isMisc(), $this->byGroupName($this->groupName), $this->isPC(), $this->isXxx(), $this->isTV(), $this->isMovie(), $this->isConsole(), $this->isBook(), $this->isMusic() => [
-                'categories_id' => $this->tmpCat
+                'categories_id' => $this->tmpCat,
             ],
             default => ['categories_id' => $this->tmpCat],
         };
@@ -488,6 +488,7 @@ class Categorize
     {
         if (preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName)) {
             $this->tmpCat = Category::MOVIE_WEBDL;
+
             return true;
         }
 
@@ -784,6 +785,7 @@ class Categorize
             case preg_match('/(iPT\sTeam|KLEENEX)/i', $this->releaseName):
             case stripos($this->releaseName, 'SDPORN') !== false:
                 $this->tmpCat = Category::XXX_CLIPSD;
+
                 return true;
             default:
                 return false;
@@ -895,6 +897,7 @@ class Categorize
         if (preg_match('/[^e]PS3/i', $this->releaseName)) {
             if (preg_match('/ANTiDOTE|DLC|DUPLEX|EUR?|Googlecus|GOTY|\-HR|iNSOMNi|JAP|JPN|KONDIOS|\[PS3\]|PSN/i', $this->releaseName)) {
                 $this->tmpCat = Category::GAME_PS3;
+
                 return true;
             }
             if (preg_match('/AGENCY|APATHY|Caravan|MULTi|NRP|NTSC|PAL|SPLiT|STRiKE|USA?|ZRY/i', $this->releaseName)) {
@@ -915,6 +918,7 @@ class Categorize
         if (preg_match('/[ \(_.-]PS4[ \)_.-]/i', $this->releaseName)) {
             if (preg_match('/ANTiDOTE|DLC|DUPLEX|EUR?|Googlecus|GOTY|\-HR|iNSOMNi|JAP|JPN|KONDIOS|\[PS4\]/i', $this->releaseName)) {
                 $this->tmpCat = Category::GAME_PS4;
+
                 return true;
             }
             if (preg_match('/AGENCY|APATHY|Caravan|MULTi|NRP|NTSC|PAL|SPLiT|STRiKE|USA?|WaYsTeD|ZRY/i', $this->releaseName)) {

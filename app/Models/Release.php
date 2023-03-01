@@ -312,20 +312,20 @@ class Release extends Model
     /**
      * Used for release edit page on site.
      *
-     * @param int $id
-     * @param string $name
-     * @param string $searchName
-     * @param string $fromName
-     * @param int $categoryId
-     * @param int $parts
-     * @param int $grabs
-     * @param int $size
-     * @param string $postedDate
-     * @param string $addedDate
+     * @param  int  $id
+     * @param  string  $name
+     * @param  string  $searchName
+     * @param  string  $fromName
+     * @param  int  $categoryId
+     * @param  int  $parts
+     * @param  int  $grabs
+     * @param  int  $size
+     * @param  string  $postedDate
+     * @param  string  $addedDate
      * @param    $videoId
      * @param    $episodeId
-     * @param int $imDbId
-     * @param int $aniDbId
+     * @param  int  $imDbId
+     * @param  int  $aniDbId
      * @param  string  $tags
      *
      * @throws \Exception
