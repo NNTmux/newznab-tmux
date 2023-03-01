@@ -107,9 +107,11 @@ class Categorize
                     return true;
                 }
                 $this->tmpCat = Category::XXX_OTHER;
+
                 return true;
             case preg_match('/alt\.binaries\.podcast$/i', $groupName):
                 $this->tmpCat = Category::MUSIC_PODCAST;
+
                 return true;
             default:
                 return false;
