@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Extensions\util\Git;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Process;
 
 class UpdateNNTmuxGit extends Command
 {
@@ -23,11 +23,6 @@ class UpdateNNTmuxGit extends Command
     protected $description = 'Update NNTmux from git repository';
 
     /**
-     * @var \app\extensions\util\Git object.
-     */
-    protected $git;
-
-    /**
      * Create a new command instance.
      */
     public function __construct()
@@ -36,11 +31,10 @@ class UpdateNNTmuxGit extends Command
     }
 
     /**
-     * @throws \Cz\Git\GitException
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        $this->initialiseGit();
 
         $wasRunning = false;
 
@@ -48,22 +42,13 @@ class UpdateNNTmuxGit extends Command
             $wasRunning = true;
             $this->call('tmux-ui:stop', ['--kill' => true]);
         }
-        $this->info('Getting changes from Github');
-        $result = $this->git->gitPull();
-        $this->info($result[0]);
+        $this->output->writeln('<comment>Getting changes from Github</comment>');
+        $process = Process::run('git pull');
+        echo $process->output();
+        echo $process->errorOutput();
 
         if ($wasRunning === true) {
             $this->call('tmux-ui:start');
-        }
-    }
-
-    /**
-     * @throws \Cz\Git\GitException
-     */
-    protected function initialiseGit()
-    {
-        if (! ($this->git instanceof Git)) {
-            $this->git = new Git();
         }
     }
 }

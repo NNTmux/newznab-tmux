@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Settings;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
-use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Process;
 
 class TmuxUIStop extends Command
 {
@@ -32,10 +32,9 @@ class TmuxUIStop extends Command
         $tmux->stopIfRunning();
         if ($this->option('kill') === true) {
             $sessionName = Settings::settingValue('site.tmux.tmux_session');
-            $tmuxSession = Process::fromShellCommandline('exec tmux kill-session -t '.$sessionName);
+            $tmuxSession = Process::run('tmux kill-session -t '.$sessionName);
             $this->info('Killing active tmux session: '.$sessionName);
-            $tmuxSession->run();
-            if ($tmuxSession->isSuccessful()) {
+            if ($tmuxSession->successful()) {
                 $this->info('Tmux session killed successfully');
             }
         }

@@ -23,10 +23,6 @@ class UpdateNNTmux extends Command
      */
     protected $description = 'Update NNTmux installation';
 
-    /**
-     * @var \app\extensions\util\Git object.
-     */
-    protected $git;
 
     /**
      * @var array Decoded JSON updates file.

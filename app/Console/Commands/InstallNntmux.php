@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Process;
 
 class InstallNntmux extends Command
 {
@@ -35,14 +35,7 @@ class InstallNntmux extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Exception
-     */
+
     public function handle()
     {
         $error = false;
@@ -51,15 +44,9 @@ class InstallNntmux extends Command
             if (File::exists(base_path().'/_install/install.lock')) {
                 if ($this->confirm('Do you want to remove install.lock file so you can continue with install?')) {
                     $this->info('Removing install.lock file so we can continue with install process');
-                    $remove = Process::fromShellCommandline('exec rm _install/install.lock');
-                    $remove->setTimeout(600);
-                    $remove->run(function ($type, $buffer) {
-                        if (Process::ERR === $type) {
-                            echo 'ERR > '.$buffer;
-                        } else {
-                            echo $buffer;
-                        }
-                    });
+                    $remove = Process::timeout(600)->run('rm _install/install.lock');
+                    echo $remove->output();
+                    echo $remove->errorOutput();
                 } else {
                     $this->info('Not removing install.lock, stopping install process');
                     exit;

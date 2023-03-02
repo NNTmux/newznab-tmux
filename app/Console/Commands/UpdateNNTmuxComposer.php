@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Extensions\util\Git;
 use Illuminate\Console\Command;
-use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Process;
 
 class UpdateNNTmuxComposer extends Command
 {
@@ -23,13 +22,6 @@ class UpdateNNTmuxComposer extends Command
     protected $description = 'Update composer libraries for NNTmux';
 
     /**
-     * @var \app\extensions\util\Git object.
-     */
-    protected $git;
-
-    private $gitBranch;
-
-    /**
      * Create a new command instance.
      */
     public function __construct()
@@ -38,51 +30,21 @@ class UpdateNNTmuxComposer extends Command
     }
 
     /**
-     * @throws \Cz\Git\GitException
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->composer();
     }
 
     /**
-     * Issues the command to 'install' the composer package.
-     *
-     * It first checks the current branch for stable versions. If found then the '--no-dev'
-     * option is added to the command to prevent development packages being also downloaded.
-     *
-     * @return string
-     *
-     * @throws \Cz\Git\GitException
+     * @return void
      */
-    protected function composer()
+    protected function composer(): void
     {
-        $this->initialiseGit();
-        $command = 'composer install';
-        if (\in_array($this->gitBranch, $this->git->getBranchesStable(), false)) {
-            $command .= ' --prefer-dist --no-dev';
-        } else {
-            $command .= ' --prefer-dist';
-        }
         $this->output->writeln('<comment>Running composer install process...</comment>');
-        $process = Process::fromShellCommandline('exec '.$command);
-        $process->setTimeout(360);
-        $process->run(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                echo $buffer;
-            }
-        });
-
-        return $process->getOutput();
-    }
-
-    /**
-     * @throws \Cz\Git\GitException
-     */
-    protected function initialiseGit()
-    {
-        if (! ($this->git instanceof Git)) {
-            $this->git = new Git();
-        }
+        $process = Process::timeout(360)->run('composer install');
+        echo $process->output();
+        echo $process->errorOutput();
     }
 }
