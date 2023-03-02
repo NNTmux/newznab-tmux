@@ -110,8 +110,8 @@ class TmuxOutput extends Tmux
     {
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
-        $version = Process::run('git describe --tags')->output();
-        $branch = Process::run('git branch')->output();
+        $version = str_replace(["\n", "\r"], '', Process::run('git describe --tags')->output());
+        $branch = str_replace(["\n", "\r"], '', Process::run('git branch --show-current')->output());
 
         $buffer .= sprintf(
             $this->tmpMasks[2],

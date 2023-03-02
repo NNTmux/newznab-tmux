@@ -12,7 +12,7 @@ use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Process;
+use Symfony\Component\Process\Process;
 use Opis\Closure\SerializableClosure;
 use Spatie\Async\Output\SerializableException;
 use Spatie\Async\Pool;
@@ -910,11 +910,20 @@ class Forking
     //////////////////////////////////////////// Various methods ///////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected function _executeCommand(string $command): void
+    /**
+     * @param string $command
+     * @return string
+     */
+    protected function _executeCommand(string $command): string
     {
-        Process::timeout(config('nntmux.multiprocessing_max_child_time'))->run($command, function (string $type, string $output) {
-            echo $output;
+        $process = Process::fromShellCommandline($command);
+        $process->setTimeout(1800);
+        $process->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                echo $buffer;
+            }
         });
+        return $process->getOutput();
     }
 
     /**
