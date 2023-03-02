@@ -17,9 +17,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class GetNzbController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse|\STS\ZipStream\ZipStream|\Symfony\Component\HttpFoundation\StreamedResponse
-     *
      * @throws \Exception
      */
     public function getNzb(Request $request): \STS\ZipStream\ZipStream|StreamedResponse|JsonResponse

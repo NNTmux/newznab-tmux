@@ -9,8 +9,6 @@ class TagsTransformer extends TransformerAbstract
 {
     /**
      * A Fractal transformer.
-     *
-     * @return array
      */
     public function transform(Tagged $tagged): array
     {

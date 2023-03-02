@@ -12,8 +12,6 @@ use Illuminate\Http\Request;
 class AdminNzbController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function import(Request $request): void
@@ -34,7 +32,6 @@ class AdminNzbController extends BasePageController
                     }
                 }
             } else {
-
                 // Check if the user wants to use the file name as the release name.
                 $useNzbName = ($request->has('usefilename') && $request->input('usefilename') === 'on');
 
@@ -52,7 +49,6 @@ class AdminNzbController extends BasePageController
             }
 
             if (\count($filesToProcess) > 0) {
-
                 // Create a new instance of NZBImport and send it the file locations.
                 $NZBImport = new NZBImport(['Browser' => true, 'Settings' => null]);
 
@@ -70,8 +66,6 @@ class AdminNzbController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function export(Request $request): void
@@ -93,7 +87,7 @@ class AdminNzbController extends BasePageController
 
             if ($path !== '') {
                 $NE = new NZBExport([
-                    'Browser'  => true, 'Settings' => null,
+                    'Browser' => true, 'Settings' => null,
                     'Releases' => $rel,
                 ]);
                 $retVal = $NE->beginExport(
@@ -111,19 +105,19 @@ class AdminNzbController extends BasePageController
 
             $this->smarty->assign(
                 [
-                    'folder'   => $path,
-                    'output'   => $retVal,
+                    'folder' => $path,
+                    'output' => $retVal,
                     'fromdate' => $postFrom,
-                    'todate'   => $postTo,
-                    'group'    => $request->input('group'),
-                    'gzip'     => $request->input('gzip'),
+                    'todate' => $postTo,
+                    'group' => $request->input('group'),
+                    'gzip' => $request->input('gzip'),
                 ]
             );
         } else {
             $this->smarty->assign(
                 [
                     'fromdate' => $rel->getEarliestUsenetPostDate(),
-                    'todate'   => $rel->getLatestUsenetPostDate(),
+                    'todate' => $rel->getLatestUsenetPostDate(),
                 ]
             );
         }
@@ -131,7 +125,7 @@ class AdminNzbController extends BasePageController
         $meta_title = $title = 'Export Nzbs';
         $this->smarty->assign(
             [
-                'gziplist'  => [1 => 'True', 0 => 'False'],
+                'gziplist' => [1 => 'True', 0 => 'False'],
                 'grouplist' => $rel->getReleasedGroupsForSelect(true),
             ]
         );

@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 class AdminGroupController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function index(Request $request): void
@@ -35,8 +33,6 @@ class AdminGroupController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function createBulk(Request $request): void
@@ -67,7 +63,6 @@ class AdminGroupController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      *
      * @throws \Exception
@@ -80,16 +75,16 @@ class AdminGroupController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         $group = [
-            'id'                    => '',
-            'name'                  => '',
-            'description'           => '',
+            'id' => '',
+            'name' => '',
+            'description' => '',
             'minfilestoformrelease' => 0,
-            'active'                => 0,
-            'backfill'              => 0,
-            'minsizetoformrelease'  => 0,
-            'first_record'          => 0,
-            'last_record'           => 0,
-            'backfill_target'       => 0,
+            'active' => 0,
+            'backfill' => 0,
+            'minsizetoformrelease' => 0,
+            'first_record' => 0,
+            'last_record' => 0,
+            'backfill_target' => 0,
         ];
 
         switch ($action) {
@@ -134,8 +129,6 @@ class AdminGroupController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function active(Request $request): void
@@ -164,8 +157,6 @@ class AdminGroupController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function inactive(Request $request): void

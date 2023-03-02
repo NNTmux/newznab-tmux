@@ -46,6 +46,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment newModelQuery()
@@ -84,7 +85,6 @@ class ReleaseComment extends Model
      * Get a comment by id.
      *
      *
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getCommentById($id)
@@ -93,7 +93,6 @@ class ReleaseComment extends Model
     }
 
     /**
-     * @param $id
      * @return array
      */
     public static function getComments($id)
@@ -101,9 +100,6 @@ class ReleaseComment extends Model
         return self::query()->where('releases_id', $id)->orderBy('created_at', 'desc')->get()->toArray();
     }
 
-    /**
-     * @return int
-     */
     public static function getCommentCount(): int
     {
         return self::query()->count(['id']);
@@ -111,8 +107,6 @@ class ReleaseComment extends Model
 
     /**
      * Delete single comment on the site.
-     *
-     * @param $id
      */
     public static function deleteComment($id): void
     {
@@ -127,12 +121,6 @@ class ReleaseComment extends Model
      * Add a release_comments row.
      *
      *
-     * @param $id
-     * @param $gid
-     * @param $text
-     * @param $userid
-     * @param $host
-     * @return int
      *
      * @throws \Exception
      */
@@ -181,8 +169,6 @@ class ReleaseComment extends Model
 
     /**
      * Update the denormalised count of comments for a release.
-     *
-     * @param $gid
      */
     public static function updateReleaseCommentCount($gid): void
     {
@@ -192,9 +178,6 @@ class ReleaseComment extends Model
 
     /**
      * Get a count of all comments for a user.
-     *
-     * @param $uid
-     * @return int
      */
     public static function getCommentCountForUser($uid): int
     {
@@ -204,7 +187,6 @@ class ReleaseComment extends Model
     }
 
     /**
-     * @param $uid
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getCommentsForUserRange($uid)

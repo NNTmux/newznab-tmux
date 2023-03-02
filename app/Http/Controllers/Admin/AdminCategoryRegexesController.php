@@ -10,14 +10,12 @@ use Illuminate\Http\Request;
 class AdminCategoryRegexesController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function index(Request $request): void
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' =>null, 'Table_Name' => 'category_regexes']);
+        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'category_regexes']);
 
         $meta_title = $title = 'Category Regex List';
 
@@ -39,7 +37,6 @@ class AdminCategoryRegexesController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      *
      * @throws \Exception

@@ -20,7 +20,6 @@ class UpdateUserLoggedIn
     /**
      * Handle the event.
      *
-     * @param  UserLoggedIn  $event
      * @return void
      */
     public function handle(UserLoggedIn $event)

@@ -33,9 +33,6 @@ class AniDB
      * @param  string  $rating
      * @param  string  $categories
      * @param  string  $characters
-     * @param    $epnos
-     * @param    $airdates
-     * @param    $episodetitles
      */
     public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles): void
     {
@@ -69,24 +66,22 @@ class AniDB
     }
 
     /**
-     * @param $anidbID
-     *
      * @throws \Throwable
      */
     public function deleteTitle($anidbID): void
     {
         DB::transaction(function () use ($anidbID) {
             DB::delete(
-            sprintf(
-                '
+                sprintf(
+                    '
 				DELETE at, ai, ae
 				FROM anidb_titles AS at
 				LEFT OUTER JOIN anidb_info ai USING (anidbid)
 				LEFT OUTER JOIN anidb_episodes ae USING (anidbid)
 				WHERE anidbid = %d',
-                $anidbID
-            )
-        );
+                    $anidbID
+                )
+            );
         }, 3);
     }
 
@@ -96,7 +91,6 @@ class AniDB
      *
      * @param  string  $letter
      * @param  string  $animetitle
-     * @return array
      */
     public function getAnimeList($letter = '', $animetitle = ''): array
     {
@@ -137,7 +131,6 @@ class AniDB
      *
      *
      * @param  string  $animetitle
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function getAnimeRange($animetitle = ''): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
@@ -159,7 +152,6 @@ class AniDB
      * Retrieves all info for a specific AniDB ID.
      *
      *
-     * @param $anidbID
      * @return mixed
      */
     public function getAnimeInfo($anidbID)

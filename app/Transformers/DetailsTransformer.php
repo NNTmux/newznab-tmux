@@ -13,8 +13,6 @@ class DetailsTransformer extends TransformerAbstract
 
     /**
      * ApiTransformer constructor.
-     *
-     * @param $user
      */
     public function __construct($user)
     {
@@ -23,9 +21,6 @@ class DetailsTransformer extends TransformerAbstract
 
     /**
      * A Fractal transformer.
-     *
-     * @param  \App\Models\Release  $releases
-     * @return array
      */
     public function transform(Release $releases): array
     {

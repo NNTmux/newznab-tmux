@@ -13,6 +13,7 @@ use Laravel\Scout\Searchable;
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp whereAppid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp whereName($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp newModelQuery()
@@ -22,6 +23,7 @@ use Laravel\Scout\Searchable;
 class SteamApp extends Model
 {
     use Searchable;
+
     /**
      * @var bool
      */

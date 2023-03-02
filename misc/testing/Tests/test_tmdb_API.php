@@ -8,7 +8,6 @@ use Tmdb\Laravel\Facades\Tmdb;
 $colorCli = new ColorCLI();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
-
     // Test if your TMDB API configuration is working
     // If it works you should get a var dumped array of the show/season/episode entered
 

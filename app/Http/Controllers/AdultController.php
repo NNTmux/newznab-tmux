@@ -10,9 +10,6 @@ use Illuminate\Support\Arr;
 class AdultController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     *
      * @throws \Exception
      */
     public function show(Request $request, string $id = ''): void
@@ -93,7 +90,7 @@ class AdultController extends BasePageController
 
         $this->smarty->assign(
             [
-                'resultsadd'=>  $movies,
+                'resultsadd' => $movies,
                 'results' => $results,
                 'covgroup' => 'xxx',
             ]

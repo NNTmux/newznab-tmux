@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle whereSubsid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle whereSubslanguage($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseSubtitle newModelQuery()

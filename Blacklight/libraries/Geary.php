@@ -37,9 +37,11 @@ if (! \function_exists('getAllHeaders')) {
 class Geary
 {
     public const CONNECT_TIMEOUT = 60;
+
     public const API_URL = 'https://gateway.gear.mycelium.com';
 
     private $gateway_id;
+
     private $gateway_secret;
 
     /**
@@ -62,8 +64,6 @@ class Geary
      *                         have previously set for the gateway. If the
      *                         gateway currency is BTC, then the amount is
      *                         normally in satoshis
-     * @param $keychain_id
-     * @param $callback_data
      * @return mixed
      */
     public function create_order($amount, $keychain_id, $callback_data)
@@ -152,14 +152,14 @@ class Geary
 
         if ($signature === $header_signature) {
             return [
-                'order_id'              => $_GET['order_id'],
-                'amount'                => $_GET['amount'],
-                'amount_in_btc'         => $_GET['amount_in_btc'],
-                'amount_paid_in_btc'    => $_GET['amount_paid_in_btc'],
-                'status'                => $_GET['status'],
-                'address'               => $_GET['address'],
-                'transaction_ids'       => $_GET['transaction_ids'],
-                'callback_data'         => $_GET['callback_data'],
+                'order_id' => $_GET['order_id'],
+                'amount' => $_GET['amount'],
+                'amount_in_btc' => $_GET['amount_in_btc'],
+                'amount_paid_in_btc' => $_GET['amount_paid_in_btc'],
+                'status' => $_GET['status'],
+                'address' => $_GET['address'],
+                'transaction_ids' => $_GET['transaction_ids'],
+                'callback_data' => $_GET['callback_data'],
             ];
         }
 
@@ -172,7 +172,6 @@ class Geary
      * Get an order link for status monitoring via websocket
      *
      * @param  int  $id  Id is an existing order ID
-     * @return string
      */
     public function order_websocket_link($id): string
     {
@@ -203,9 +202,6 @@ class Geary
      *Curl Error.
      *
      * Output curl error if possible
-     *
-     * @param $ch
-     * @return bool
      */
     private function curl_error($ch): bool
     {
@@ -225,7 +221,6 @@ class Geary
      * Construct an endpoint URL
      *
      * @param  string  $method
-     * @return string
      */
     private function endpoint($method): string
     {
@@ -238,7 +233,6 @@ class Geary
      * Construct URL parameters
      *
      * @param  mixed  $params
-     * @return string
      */
     private function get_params($params): string
     {
@@ -263,7 +257,6 @@ class Geary
      * Get single data from header
      *
      * @param  string  $name
-     * @return string
      */
     private function get_header($name): string
     {
@@ -286,7 +279,6 @@ class Geary
      * Add data to header for authentication purpose
      *
      * @param  array  $data
-     * @return array
      */
     private function prepare_header($data): array
     {
@@ -324,12 +316,12 @@ class Geary
         $params = $this->get_params($data['params']);
 
         $curl_data = [
-            CURLOPT_URL             => $url.$params,
-            CURLOPT_RETURNTRANSFER  => true,
-            CURLOPT_HTTPHEADER      => $headers,
-            CURLOPT_SSL_VERIFYPEER  => true,
-            CURLOPT_CONNECTTIMEOUT  => self::CONNECT_TIMEOUT,
-            CURLOPT_POST            => $data['request_method'] === 'POST',
+            CURLOPT_URL => $url.$params,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT,
+            CURLOPT_POST => $data['request_method'] === 'POST',
         ];
 
         curl_setopt_array($ch, $curl_data);

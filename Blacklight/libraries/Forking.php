@@ -12,10 +12,10 @@ use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 use Opis\Closure\SerializableClosure;
 use Spatie\Async\Output\SerializableException;
 use Spatie\Async\Pool;
-use Illuminate\Support\Facades\Process;
 
 /**
  * Class Forking.
@@ -27,9 +27,6 @@ use Illuminate\Support\Facades\Process;
  */
 class Forking
 {
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     public ColorCLI $colorCli;
 
     /**
@@ -39,75 +36,47 @@ class Forking
 
     /**
      * Path to do not run folder.
-     *
-     * @var string
      */
     private string $dnr_path;
 
     /**
      * Work to work on.
-     *
-     * @var array
      */
     private array $work = [];
 
     /**
      * How much work do we have to do?
-     *
-     * @var int
      */
     public int $_workCount = 0;
 
     /**
      * The type of work we want to work on.
-     *
-     * @var string
      */
     private string $workType = '';
 
     /**
      * List of passed in options for the current work type.
-     *
-     * @var array
      */
     private array $workTypeOptions = [];
 
     /**
      * Max amount of child processes to do work at a time.
-     *
-     * @var int
      */
     private int $maxProcesses = 1;
 
     /**
      * Group used for safe backfill.
-     *
-     * @var string
      */
     private string $safeBackfillGroup = '';
-    /**
-     * @var int
-     */
+
     protected int $maxSize;
 
-    /**
-     * @var int
-     */
     protected int $minSize;
 
-    /**
-     * @var int
-     */
     protected int $maxRetries;
 
-    /**
-     * @var int
-     */
     protected int $dummy;
 
-    /**
-     * @var bool
-     */
     private bool $processAdditional = false; // Should we process additional?
 
     private bool $processNFO = false; // Should we process NFOs?
@@ -171,8 +140,6 @@ class Forking
 
     /**
      * Only post process renamed movie / tv releases?
-     *
-     * @var bool
      */
     private bool $ppRenamedOnly;
 
@@ -186,7 +153,6 @@ class Forking
         $this->maxProcesses = 0;
 
         switch ($this->workType) {
-
             case 'backfill':
                 $this->backfill();
                 break;
@@ -322,9 +288,6 @@ class Forking
         $pool->wait();
     }
 
-    /**
-     * @return void
-     */
     private function safeBackfill(): void
     {
         $backfill_qty = (int) Settings::settingValue('site.tmux.backfill_qty');
@@ -648,10 +611,6 @@ class Forking
 
     /**
      * Only 1 exit method is used for post process, since they are all similar.
-     *
-     *
-     * @param  array  $releases
-     * @param  int  $maxProcess
      */
     public function postProcess(array $releases, int $maxProcess): void
     {
@@ -729,15 +688,11 @@ class Forking
         $this->postProcess($this->work, $this->maxProcesses);
     }
 
-    /**
-     * @var string
-     */
     private string $nfoQueryString = '';
 
     /**
      * Check if we should process NFO's.
      *
-     * @return bool
      *
      * @throws \Exception
      */
@@ -778,8 +733,6 @@ class Forking
     }
 
     /**
-     * @return bool
-     *
      * @throws \Exception
      */
     private function checkProcessMovies(): bool
@@ -832,7 +785,6 @@ class Forking
     /**
      * Check if we should process TV's.
      *
-     * @return bool
      *
      * @throws \Exception
      */
@@ -888,7 +840,6 @@ class Forking
     /**
      * Process sharing.
      *
-     * @return bool
      *
      * @throws \Exception
      */
@@ -959,10 +910,6 @@ class Forking
     //////////////////////////////////////////// Various methods ///////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @param string $command
-     * @return void
-     */
     protected function _executeCommand(string $command): void
     {
         Process::timeout(config('nntmux.multiprocessing_max_child_time'))->run($command, function (string $type, string $output) {
@@ -972,8 +919,6 @@ class Forking
 
     /**
      * Echo a message to CLI.
-     *
-     * @param  string  $message
      */
     public function logger(string $message): void
     {

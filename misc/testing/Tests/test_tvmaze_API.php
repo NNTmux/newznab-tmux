@@ -8,7 +8,6 @@ $c = new Blacklight\ColorCLI();
 $tvmaze = new TVMaze();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
-
     // Test if your TVMaze API configuration is working
     // If it works you should get a var dumped array of the show/season/episode entered
 

@@ -28,20 +28,12 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
-    /**
-     * @var int
-     */
     protected int $maxAttempts = 3; // Default is 5
 
-    /**
-     * @var int
-     */
     protected int $decayMinutes = 2; // Default is 1
 
     /**
      * Where to redirect users after login.
-     *
-     * @var string
      */
     protected string $redirectTo = '/';
 
@@ -56,7 +48,6 @@ class LoginController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
@@ -129,9 +120,6 @@ class LoginController extends Controller
         return $this->showLoginForm();
     }
 
-    /**
-     * @return void
-     */
     public function showLoginForm(): void
     {
         $theme = Settings::settingValue('site.main.style');
@@ -144,10 +132,6 @@ class LoginController extends Controller
         app('smarty.view')->display($theme.'/basepage.tpl');
     }
 
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
     public function logout(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->guard()->logout();

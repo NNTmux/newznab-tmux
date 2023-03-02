@@ -22,8 +22,6 @@ class RSS extends Capabilities
     public $releases;
 
     /**
-     * @param  array  $options
-     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -42,13 +40,8 @@ class RSS extends Capabilities
      * Get releases for RSS.
      *
      *
-     * @param    $cat
-     * @param  int  $offset
-     * @param    $videosId
-     * @param    $aniDbID
      * @param  int  $userID
      * @param  int  $airDate
-     * @param  int  $limit
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
      */
     public function getRss($cat, $videosId, $aniDbID, $userID = 0, $airDate = -1, int $limit = 100, int $offset = 0)
@@ -119,7 +112,6 @@ class RSS extends Capabilities
     /**
      * @param  int  $limit
      * @param  int  $userID
-     * @param  array  $excludedCats
      * @param  int  $airDate
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      *
@@ -182,7 +174,6 @@ class RSS extends Capabilities
      *
      * @param  int  $limit
      * @param  int  $userID
-     * @param  array  $excludedCats
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      *
      * @throws \Exception
@@ -238,9 +229,6 @@ class RSS extends Capabilities
     }
 
     /**
-     * @param $column
-     * @param $table
-     * @param $order
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null
      */
     public function getFirstInstance($column, $table, $order)

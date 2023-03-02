@@ -40,6 +40,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereYear($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo newModelQuery()
@@ -49,10 +50,12 @@ use Laravel\Scout\Searchable;
 class MusicInfo extends Model
 {
     use Searchable;
+
     /**
      * @var string
      */
     protected $table = 'musicinfo';
+
     /**
      * @var bool
      */
@@ -87,7 +90,7 @@ class MusicInfo extends Model
     public function toSearchableArray()
     {
         return [
-            'artist'=> $this->artist,
+            'artist' => $this->artist,
             'title' => $this->title,
         ];
     }

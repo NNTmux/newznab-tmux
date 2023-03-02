@@ -31,14 +31,14 @@ class PreDb
      * @var array Prepared Statement objects
      */
     protected $ps = [
-        'AddGroups'        => null,
-        'DeleteShort'    => null,
-        'Export'        => null,
-        'Import'        => null,
-        'Insert'        => null,
-        'LoadData'        => null,
-        'Truncate'        => null,
-        'UpdateGroupID'    => null,
+        'AddGroups' => null,
+        'DeleteShort' => null,
+        'Export' => null,
+        'Import' => null,
+        'Insert' => null,
+        'LoadData' => null,
+        'Truncate' => null,
+        'UpdateGroupID' => null,
     ];
 
     /**
@@ -96,12 +96,12 @@ class PreDb
     public function executeExport(array $options = null)
     {
         $defaults = [
-            'enclosedby'    => '',
-            'fields'        => '\t',
-            'limit'            => 0,
-            'lines'            => '\r\n',    // use Windows style endings so that text can contain \n
-            'local'            => false,
-            'path'            => null,
+            'enclosedby' => '',
+            'fields' => '\t',
+            'limit' => 0,
+            'lines' => '\r\n',    // use Windows style endings so that text can contain \n
+            'local' => false,
+            'path' => null,
         ];
         $options += $defaults;
 
@@ -141,13 +141,12 @@ SQL_EXPORT;
     }
 
     /**
-     * @param  array|null  $options
      * @return null
      */
     public function executeLoadData(array $options = null)
     {
         $defaults = [
-            'path'        => null,
+            'path' => null,
         ];
         $options += $defaults;
 
@@ -188,7 +187,6 @@ SQL_EXPORT;
     }
 
     /**
-     * @param    $filespec
      * @param  bool  $localDB
      */
     public function import($filespec, $localDB = false)
@@ -212,7 +210,6 @@ SQL_EXPORT;
 
     /**
      * @param  null  $settings
-     * @param  array  $options
      * @return mixed|null
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -220,8 +217,8 @@ SQL_EXPORT;
     public function progress($settings = null, array $options = [])
     {
         $defaults = [
-            'path'    => base_path().'/cli/data/predb_progress.txt',
-            'read'    => true,
+            'path' => base_path().'/cli/data/predb_progress.txt',
+            'read' => true,
         ];
         $options += $defaults;
 
@@ -254,7 +251,6 @@ SQL_EXPORT;
     }
 
     /**
-     * @param $sql
      * @param  string  $index
      */
     protected function prepareSQLStatement($sql, $index): void
@@ -303,18 +299,15 @@ SQL_INSERT;
         $this->prepareSQLStatement($sql, 'Insert');
     }
 
-    /**
-     * @param  array  $options
-     */
     protected function prepareSQLLoadData(array $options = []): void
     {
         $enclosedby = '';
         $defaults = [
-            'enclosedby'    => "'",
-            'fields'        => '\t',
-            'lines'            => '\r\n',    // Windows' style EOL to allow \n to be used in text.
-            'local'            => true,
-            'optional'        => true,
+            'enclosedby' => "'",
+            'fields' => '\t',
+            'lines' => '\r\n',    // Windows' style EOL to allow \n to be used in text.
+            'local' => true,
+            'optional' => true,
         ];
         $options += $defaults;
 

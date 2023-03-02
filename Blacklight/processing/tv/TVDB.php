@@ -14,9 +14,6 @@ class TVDB extends TV
 {
     private const MATCH_PROBABILITY = 75;
 
-    /**
-     * @var \CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI
-     */
     public TheTVDbAPI $client;
 
     /**
@@ -37,7 +34,6 @@ class TVDB extends TV
     /**
      * TVDB constructor.
      *
-     * @param  array  $options
      *
      * @throws \Exception
      */
@@ -65,9 +61,6 @@ class TVDB extends TV
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param    $groupID
-     * @param    $guidChar
-     * @param    $process
      * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
@@ -95,6 +88,7 @@ class TVDB extends TV
                                     $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
                     }
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+
                     continue;
                 }
 
@@ -112,8 +106,7 @@ class TVDB extends TV
                 }
 
                 if ($tvDbId === false && $lookupSetting) {
-
-                        // If it doesnt exist locally and lookups are allowed lets try to get it.
+                    // If it doesnt exist locally and lookups are allowed lets try to get it.
                     if ($this->echooutput) {
                         $this->colorCli->primaryOver('Video ID for ').
                                 $this->colorCli->headerOver($release['cleanname']).
@@ -125,7 +118,7 @@ class TVDB extends TV
                         isset($release['country']) && \strlen($release['country']) === 2
                             ? (string) $release['country']
                             : ''
-                        );
+                    );
 
                     // Get the show from TVDB
                     $tvdbShow = $this->getShowInfo((string) $release['cleanname'], $country);
@@ -153,6 +146,7 @@ class TVDB extends TV
                         // Set the video ID and leave episode 0
                         $this->setVideoIdFound($videoId, $row['id'], 0);
                         $this->colorCli->primary('Found TVDB Match for Full Season!', true);
+
                         continue;
                     }
 
@@ -171,7 +165,7 @@ class TVDB extends TV
                             $seasonNo,
                             $episodeNo,
                             $release['airdate']
-                            );
+                        );
 
                         if ($tvdbEpisode) {
                             $episode = $this->addEpisode($videoId, $tvdbEpisode);
@@ -204,10 +198,6 @@ class TVDB extends TV
 
     /**
      * Placeholder for Videos getBanner.
-     *
-     * @param $videoID
-     * @param $siteId
-     * @return bool
      */
     protected function getBanner($videoID, $siteId): bool
     {
@@ -286,7 +276,6 @@ class TVDB extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param  int  $videoId  -- the local Video ID
-     * @return int
      */
     public function getPoster($videoId): int
     {
@@ -375,20 +364,20 @@ class TVDB extends TV
         }
 
         return [
-            'type'      => parent::TYPE_TV,
-            'title'     => (string) $show->name,
-            'summary'   => (string) $show->overview,
-            'started'   => $show->first_air_time,
+            'type' => parent::TYPE_TV,
+            'title' => (string) $show->name,
+            'summary' => (string) $show->overview,
+            'started' => $show->first_air_time,
             'publisher' => $imdbId->originalNetwork->name ?? '',
-            'poster'    => $this->posterUrl,
-            'source'    => parent::SOURCE_TVDB,
-            'imdb'      => (int) ($imdb['imdbid'] ?? 0),
-            'tvdb'      => (int) $show->tvdb_id,
-            'trakt'     => 0,
-            'tvrage'    => 0,
-            'tvmaze'    => 0,
-            'tmdb'      => 0,
-            'aliases'   => ! empty($show->aliases) ? $show->aliases : '',
+            'poster' => $this->posterUrl,
+            'source' => parent::SOURCE_TVDB,
+            'imdb' => (int) ($imdb['imdbid'] ?? 0),
+            'tvdb' => (int) $show->tvdb_id,
+            'trakt' => 0,
+            'tvrage' => 0,
+            'tvmaze' => 0,
+            'tmdb' => 0,
+            'aliases' => ! empty($show->aliases) ? $show->aliases : '',
             'localzone' => "''",
         ];
     }
@@ -396,19 +385,16 @@ class TVDB extends TV
  /**
   * Assigns API episode response values to a formatted array for insertion
   * Returns the formatted array.
-  *
-  * @param $episode
-  * @return array
   */
  protected function formatEpisodeInfo($episode): array
-    {
-        return [
-            'title'       => (string) $episode->name,
-            'series'      => (int) $episode->seasonNumber,
-            'episode'     => (int) $episode->number,
-            'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
-            'firstaired'  => $episode->aired,
-            'summary'     => (string) $episode->overview,
-        ];
-    }
+ {
+     return [
+         'title' => (string) $episode->name,
+         'series' => (int) $episode->seasonNumber,
+         'episode' => (int) $episode->number,
+         'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
+         'firstaired' => $episode->aired,
+         'summary' => (string) $episode->overview,
+     ];
+ }
 }

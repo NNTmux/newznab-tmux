@@ -12,7 +12,9 @@ use Illuminate\Support\Arr;
 class Contents
 {
     public const TYPEUSEFUL = 1;
+
     public const TYPEARTICLE = 2;
+
     public const TYPEINDEX = 3;
 
     /**
@@ -97,8 +99,6 @@ class Contents
     }
 
     /**
-     * @param $id
-     * @param $role
      * @return array|false
      */
     public function getForMenuByTypeAndRole($id, $role): bool|array
@@ -124,8 +124,6 @@ class Contents
     }
 
     /**
-     * @param $id
-     * @param $role
      * @return false|mixed
      */
     public function getByID($id, $role): mixed
@@ -139,10 +137,6 @@ class Contents
         return Arr::first($row);
     }
 
-    /**
-     * @param $content
-     * @return mixed
-     */
     public function validate($content): mixed
     {
         if ($content['url'] !== '/') {
@@ -156,10 +150,6 @@ class Contents
         return $content;
     }
 
-    /**
-     * @param $form
-     * @return int
-     */
     public function add($form): int
     {
         if ($form['ordinal'] === 1) {
@@ -169,17 +159,12 @@ class Contents
         return $this->data_add($form);
     }
 
-    /**
-     * @param $id
-     * @return mixed
-     */
     public function delete($id): mixed
     {
         return Content::query()->where('id', $id)->delete();
     }
 
     /**
-     * @param $form
      * @return mixed|Content
      */
     public function update($form): mixed
@@ -189,10 +174,6 @@ class Contents
         return $form;
     }
 
-    /**
-     * @param $content
-     * @return int
-     */
     public function data_update($content): int
     {
         return Content::query()
@@ -213,10 +194,6 @@ class Contents
             );
     }
 
-    /**
-     * @param $content
-     * @return int
-     */
     public function data_add($content): int
     {
         return Content::query()
@@ -267,8 +244,6 @@ class Contents
     }
 
     /**
-     * @param $id
-     * @param $role
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function data_getByID($id, $role): \Illuminate\Database\Eloquent\Collection|static
@@ -297,9 +272,6 @@ class Contents
             ->get();
     }
 
-    /**
-     * @return \App\Models\Content|null
-     */
     public function data_getIndex(): Content|null
     {
         return Content::query()->where(
@@ -311,8 +283,6 @@ class Contents
     }
 
     /**
-     * @param $id
-     * @param $role
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function data_getForMenuByTypeAndRole($id, $role): \Illuminate\Database\Eloquent\Collection|static

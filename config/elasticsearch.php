@@ -45,8 +45,8 @@ return [
             ],
             'cloud_api' => [
                 // Alternatively, you can log in via API keys
-                'api_id'            => env('ELASTICSEARCH_API_ID', null),
-                'api_key'           => env('ELASTICSEARCH_API_KEY', null),
+                'api_id' => env('ELASTICSEARCH_API_ID', null),
+                'api_key' => env('ELASTICSEARCH_API_KEY', null),
             ],
 
             /*

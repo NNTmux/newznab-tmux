@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Auth;
 class SendReleaseController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function couchPotato(Request $request): void
@@ -37,8 +35,6 @@ class SendReleaseController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function sabNzbd(Request $request)
@@ -64,8 +60,6 @@ class SendReleaseController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function nzbGet(Request $request): void
@@ -95,8 +89,6 @@ class SendReleaseController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function queue(Request $request): void

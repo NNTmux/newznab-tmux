@@ -24,7 +24,9 @@ class Popporn extends AdultMovies
      * Needed Search Queries Constant.
      */
     private const IF18 = 'https://www.popporn.com/popporn/4';
+
     private const POPURL = 'https://www.popporn.com';
+
     private const TRAILINGSEARCH = '/search&q=';
 
     /**
@@ -187,9 +189,6 @@ class Popporn extends AdultMovies
         return $this->_res;
     }
 
-    /**
-     * @return array
-     */
     protected function cast(): array
     {
         $cast = false;

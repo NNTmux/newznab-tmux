@@ -22,26 +22,16 @@ class XXX
 {
     /**
      * What scraper class did we use -- used for template and trailer information.
-     *
-     * @var string
      */
     protected string $whichClass = '';
 
     /**
      * Current title being passed through various sites/api's.
-     *
-     * @var string
      */
     protected string $currentTitle = '';
 
-    /**
-     * @var bool
-     */
     protected bool $echoOutput;
 
-    /**
-     * @var string
-     */
     protected string $imgSavePath;
 
     /**
@@ -49,19 +39,10 @@ class XXX
      */
     protected ReleaseImage $releaseImage;
 
-    /**
-     * @var int|null|string
-     */
     protected string|int|null $movieQty;
 
-    /**
-     * @var string
-     */
     protected string $showPasswords;
 
-    /**
-     * @var string
-     */
     protected string $cookie;
 
     /**
@@ -77,9 +58,9 @@ class XXX
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'         => false,
+            'Echo' => false,
             'ReleaseImage' => null,
-            'Settings'     => null,
+            'Settings' => null,
         ];
         $options += $defaults;
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
@@ -95,7 +76,6 @@ class XXX
     /**
      * Get info for a xxx id.
      *
-     * @param $xxxid
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function getXXXInfo($xxxid)
@@ -106,14 +86,7 @@ class XXX
     /**
      * Get XXX releases with covers for xxx browse page.
      *
-     * @param $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
-     * @param    $orderBy
      * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @return array
      */
     public function getXXXRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
     {
@@ -141,9 +114,9 @@ class XXX
                 $this->getBrowseBy(),
                 $catSrch,
                 (
-                $maxAge > 0
-                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                    : ''
+                    $maxAge > 0
+                        ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
+                        : ''
                 ),
                 (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 $order[0],
@@ -204,9 +177,9 @@ class XXX
             $this->getBrowseBy(),
             $catSrch,
             (
-            $maxAge > 0
-                ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                : ''
+                $maxAge > 0
+                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
+                    : ''
             ),
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             $order[0],
@@ -227,9 +200,6 @@ class XXX
 
     /**
      * Get the order type the user requested on the xxx page.
-     *
-     * @param $orderBy
-     * @return array
      */
     protected function getXXXOrder($orderBy): array
     {
@@ -244,17 +214,12 @@ class XXX
 
     /**
      * Order types for xxx page.
-     *
-     * @return array
      */
     public function getXXXOrdering(): array
     {
         return ['title_asc', 'title_desc', 'name_asc', 'name_desc', 'size_asc', 'size_desc', 'posted_asc', 'posted_desc', 'cat_asc', 'cat_desc'];
     }
 
-    /**
-     * @return string
-     */
     protected function getBrowseBy(): string
     {
         $browseBy = ' ';
@@ -277,21 +242,6 @@ class XXX
 
     /**
      * Update XXX Information from getXXXCovers.php in misc/testing/PostProc.
-     *
-     * @param  string  $id
-     * @param  string  $title
-     * @param  string  $tagLine
-     * @param  string  $plot
-     * @param  string  $genre
-     * @param  string  $director
-     * @param  string  $actors
-     * @param  string  $extras
-     * @param  string  $productInfo
-     * @param  string  $trailers
-     * @param  string  $directUrl
-     * @param  string  $classUsed
-     * @param  string  $cover
-     * @param  string  $backdrop
      */
     public function update(
         string $id = '',
@@ -320,7 +270,7 @@ class XXX
                     'actors' => $actors,
                     'extras' => $extras,
                     'productinfo' => $productInfo,
-                    'trailers'=> $trailers,
+                    'trailers' => $trailers,
                     'directurl' => $directUrl,
                     'classused' => $classUsed,
                     'cover' => empty($cover) ? 0 : $cover,
@@ -332,10 +282,6 @@ class XXX
 
     /**
      * Get all genres for search-filter.tpl.
-     *
-     *
-     * @param  bool  $activeOnly
-     * @return array
      */
     public function getAllGenres(bool $activeOnly = false): array
     {
@@ -350,9 +296,7 @@ class XXX
     }
 
     /**
-     * @param  bool  $activeOnly
      * @param  null  $gid
-     * @return mixed
      */
     public function getGenres(bool $activeOnly = false, $gid = null): mixed
     {
@@ -400,10 +344,6 @@ class XXX
 
     /**
      * Inserts Genre and returns last affected row (Genre ID).
-     *
-     *
-     * @param $genre
-     * @return int|string
      */
     private function insertGenre($genre): int|string
     {
@@ -417,10 +357,6 @@ class XXX
 
     /**
      * Inserts Trailer Code by Class.
-     *
-     * @param $whichClass
-     * @param $res
-     * @return string
      */
     public function insertSwf($whichClass, $res): string
     {
@@ -446,7 +382,6 @@ class XXX
     }
 
     /**
-     * @param $movie
      * @return false|int|string
      *
      * @throws \Exception
@@ -515,19 +450,19 @@ class XXX
         $res['genres'] = ! empty($res['genres']) ? $this->getGenreID($res['genres']) : '';
 
         $mov = [
-            'trailers'    => ! empty($res['trailers']) ? serialize($res['trailers']) : '',
-            'extras'      => ! empty($res['extras']) ? serialize($res['extras']) : '',
+            'trailers' => ! empty($res['trailers']) ? serialize($res['trailers']) : '',
+            'extras' => ! empty($res['extras']) ? serialize($res['extras']) : '',
             'productinfo' => ! empty($res['productinfo']) ? serialize($res['productinfo']) : '',
-            'backdrop'    => ! empty($res['backcover']) ? $res['backcover'] : 0,
-            'cover'       => ! empty($res['boxcover']) ? $res['boxcover'] : 0,
-            'title'       => ! empty($res['title']) ? html_entity_decode($res['title'], ENT_QUOTES, 'UTF-8') : '',
-            'plot'        => ! empty($res['synopsis']) ? html_entity_decode($res['synopsis'], ENT_QUOTES, 'UTF-8') : '',
-            'tagline'     => ! empty($res['tagline']) ? html_entity_decode($res['tagline'], ENT_QUOTES, 'UTF-8') : '',
-            'genre'       => ! empty($res['genres']) ? html_entity_decode($res['genres'], ENT_QUOTES, 'UTF-8') : '',
-            'director'    => ! empty($res['director']) ? html_entity_decode($res['director'], ENT_QUOTES, 'UTF-8') : '',
-            'actors'      => ! empty($res['cast']) ? html_entity_decode($res['cast'], ENT_QUOTES, 'UTF-8') : '',
-            'directurl'   => ! empty($res['directurl']) ? html_entity_decode($res['directurl'], ENT_QUOTES, 'UTF-8') : '',
-            'classused'   => $this->whichClass,
+            'backdrop' => ! empty($res['backcover']) ? $res['backcover'] : 0,
+            'cover' => ! empty($res['boxcover']) ? $res['boxcover'] : 0,
+            'title' => ! empty($res['title']) ? html_entity_decode($res['title'], ENT_QUOTES, 'UTF-8') : '',
+            'plot' => ! empty($res['synopsis']) ? html_entity_decode($res['synopsis'], ENT_QUOTES, 'UTF-8') : '',
+            'tagline' => ! empty($res['tagline']) ? html_entity_decode($res['tagline'], ENT_QUOTES, 'UTF-8') : '',
+            'genre' => ! empty($res['genres']) ? html_entity_decode($res['genres'], ENT_QUOTES, 'UTF-8') : '',
+            'director' => ! empty($res['director']) ? html_entity_decode($res['director'], ENT_QUOTES, 'UTF-8') : '',
+            'actors' => ! empty($res['cast']) ? html_entity_decode($res['cast'], ENT_QUOTES, 'UTF-8') : '',
+            'directurl' => ! empty($res['directurl']) ? html_entity_decode($res['directurl'], ENT_QUOTES, 'UTF-8') : '',
+            'classused' => $this->whichClass,
         ];
 
         $check = XxxInfo::query()->where('title', $mov['title'])->first(['id']);
@@ -599,16 +534,16 @@ class XXX
             ->where(['nzbstatus' => 1, 'xxxinfo_id' => 0])
             ->whereIn(
                 'categories_id',
-            [
-                Category::XXX_DVD,
-                Category::XXX_WMV,
-                Category::XXX_XVID,
-                Category::XXX_X264,
-                Category::XXX_SD,
-                Category::XXX_CLIPHD,
-                Category::XXX_CLIPSD,
-                Category::XXX_WEBDL,
-            ]
+                [
+                    Category::XXX_DVD,
+                    Category::XXX_WMV,
+                    Category::XXX_XVID,
+                    Category::XXX_X264,
+                    Category::XXX_SD,
+                    Category::XXX_CLIPHD,
+                    Category::XXX_CLIPSD,
+                    Category::XXX_WEBDL,
+                ]
             )
             ->limit($this->movieQty)
             ->get(['searchname', 'id']);
@@ -654,7 +589,6 @@ class XXX
     /**
      * Checks xxxinfo to make sure releases exist.
      *
-     * @param $releaseName
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     protected function checkXXXInfoExists($releaseName)
@@ -664,9 +598,6 @@ class XXX
 
     /**
      * Cleans up a searchname to make it easier to scrape.
-     *
-     * @param  string  $releaseName
-     * @return bool
      */
     protected function parseXXXSearchName(string $releaseName): bool
     {
@@ -679,7 +610,6 @@ class XXX
 
         // Check if we got something.
         if ($name !== '') {
-
             // If we still have any of the words in $followingList, remove them.
             $name = preg_replace('/'.$followingList.'/i', ' ', $name);
             // Remove periods, underscored, anything between parenthesis.

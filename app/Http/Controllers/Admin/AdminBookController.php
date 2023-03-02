@@ -31,9 +31,6 @@ class AdminBookController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse

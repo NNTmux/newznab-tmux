@@ -20,6 +20,7 @@ class Releases extends Release
 {
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0; // No password.
+
     public const PASSWD_RAR = 1; // Definitely passworded.
 
     /**
@@ -27,13 +28,8 @@ class Releases extends Release
      */
     public SphinxSearch $sphinxSearch;
 
-    /**
-     * @var int
-     */
     public int $passwordStatus;
-    /**
-     * @var ElasticSearchSiteSearch
-     */
+
     private ElasticSearchSiteSearch $elasticSearch;
 
     /**
@@ -52,16 +48,6 @@ class Releases extends Release
      * Used for Browse results.
      *
      *
-     * @param    $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
-     * @param    $orderBy
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @param  array  $tags
-     * @param  int|string  $groupName
-     * @param  int  $minSize
      * @return Collection|mixed
      */
     public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, array $tags = []): mixed
@@ -128,13 +114,6 @@ class Releases extends Release
 
     /**
      * Used for pager on browse page.
-     *
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @param  int|string  $groupName
-     * @param  array  $tags
-     * @return int
      */
     public function getBrowseCount(array $cat, int $maxAge = -1, array $excludedCats = [], int|string $groupName = '', array $tags = []): int
     {
@@ -158,9 +137,6 @@ class Releases extends Release
         ));
     }
 
-    /**
-     * @return string
-     */
     public function showPasswords(): string
     {
         $show = (int) Settings::settingValue('..showpasswordedrelease');
@@ -174,9 +150,6 @@ class Releases extends Release
 
     /**
      * Use to order releases on site.
-     *
-     * @param  array|string  $orderBy
-     * @return array
      */
     public function getBrowseOrder(array|string $orderBy): array
     {
@@ -217,9 +190,6 @@ class Releases extends Release
     }
 
     /**
-     * @param  string  $postFrom
-     * @param  string  $postTo
-     * @param  string  $groupID
      * @return \App\Models\Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
      */
     public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '')
@@ -273,10 +243,6 @@ class Releases extends Release
         return $row === null ? '01/01/2014' : $row['postdate'];
     }
 
-    /**
-     * @param  bool  $blnIncludeAll
-     * @return array
-     */
     public function getReleasedGroupsForSelect(bool $blnIncludeAll = true): array
     {
         $groups = self::query()
@@ -297,12 +263,6 @@ class Releases extends Release
     }
 
     /**
-     * @param $userShows
-     * @param $offset
-     * @param $limit
-     * @param $orderBy
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
      * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = [])
@@ -343,12 +303,6 @@ class Releases extends Release
         return $result;
     }
 
-    /**
-     * @param $userShows
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @return int
-     */
     public function getShowsCount($userShows, int $maxAge = -1, array $excludedCats = []): int
     {
         return $this->getPagerCount(
@@ -372,9 +326,6 @@ class Releases extends Release
     }
 
     /**
-     * @param  int|array|string  $list
-     * @return void
-     *
      * @throws \Exception
      */
     public function deleteMultiple(int|array|string $list): void
@@ -439,13 +390,6 @@ class Releases extends Release
     }
 
     /**
-     * @param $guids
-     * @param $category
-     * @param $grabs
-     * @param $videoId
-     * @param $episodeId
-     * @param $anidbId
-     * @param $imdbId
      * @return bool|int
      */
     public function updateMulti($guids, $category, $grabs, $videoId, $episodeId, $anidbId, $imdbId)
@@ -455,12 +399,12 @@ class Releases extends Release
         }
 
         $update = [
-            'categories_id'     => $category === -1 ? 'categories_id' : $category,
-            'grabs'          => $grabs,
-            'videos_id'      => $videoId,
+            'categories_id' => $category === -1 ? 'categories_id' : $category,
+            'grabs' => $grabs,
+            'videos_id' => $videoId,
             'tv_episodes_id' => $episodeId,
-            'anidbid'        => $anidbId,
-            'imdbid'         => $imdbId,
+            'anidbid' => $anidbId,
+            'imdbid' => $imdbId,
         ];
 
         return self::query()->whereIn('guid', $guids)->update($update);
@@ -468,10 +412,6 @@ class Releases extends Release
 
     /**
      * Creates part of a query for some functions.
-     *
-     * @param  array|Collection  $userQuery
-     * @param  string  $type
-     * @return string
      */
     public function uSQL(Collection|array $userQuery, string $type): string
     {
@@ -497,21 +437,6 @@ class Releases extends Release
      * Function for searching on the site (by subject, searchname or advanced).
      *
      *
-     * @param  array  $searchArr
-     * @param    $groupName
-     * @param    $sizeFrom
-     * @param    $sizeTo
-     * @param    $daysNew
-     * @param    $daysOld
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  array|string  $orderBy
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @param  string  $type
-     * @param  array  $cat
-     * @param  int  $minSize
-     * @param  array  $tags
      * @return array|Collection|mixed
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
@@ -634,15 +559,6 @@ class Releases extends Release
      * Search function for API.
      *
      *
-     * @param    $searchName
-     * @param    $groupName
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @param  array  $cat
-     * @param  int  $minSize
-     * @param  array  $tags
      * @return Collection|mixed
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
@@ -726,18 +642,6 @@ class Releases extends Release
     /**
      * Search for TV shows via API.
      *
-     * @param  array  $siteIdArr
-     * @param  string  $series
-     * @param  string  $episode
-     * @param  string  $airDate
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  int  $minSize
-     * @param  array  $excludedCategories
-     * @param  array  $tags
      * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
@@ -876,18 +780,6 @@ class Releases extends Release
      * Search TV Shows via APIv2.
      *
      *
-     * @param  array  $siteIdArr
-     * @param  string  $series
-     * @param  string  $episode
-     * @param  string  $airDate
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  int  $minSize
-     * @param  array  $excludedCategories
-     * @param  array  $tags
      * @return Collection|mixed
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
@@ -1020,13 +912,6 @@ class Releases extends Release
      * Search anime releases.
      *
      *
-     * @param $aniDbID
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  array  $excludedCategories
      * @return Collection|mixed
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
@@ -1100,17 +985,6 @@ class Releases extends Release
      * Movies search through API and site.
      *
      *
-     * @param  int  $imDbId
-     * @param  int  $tmDbId
-     * @param  int  $traktId
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  int  $minSize
-     * @param  array  $excludedCategories
-     * @param  array  $tags
      * @return Collection|mixed
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
@@ -1187,11 +1061,6 @@ class Releases extends Release
     }
 
     /**
-     * @param $currentID
-     * @param $name
-     * @param  array  $excludedCats
-     * @return array|bool
-     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -1226,7 +1095,6 @@ class Releases extends Release
      *
      *
      * @param  string  $query  The query to get the count from.
-     * @return int
      */
     private function getPagerCount(string $query): int
     {

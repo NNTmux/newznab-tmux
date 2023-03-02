@@ -18,10 +18,10 @@ return [
     'untag_on_delete' => true,
 
     // Auto-delete unused tags from the 'tags' database table (when they are used zero times)
-    'delete_unused_tags'=>true,
+    'delete_unused_tags' => true,
 
     // Model to use to store the tags in the database
-    'tag_model'=>'\Conner\Tagging\Model\Tag',
+    'tag_model' => '\Conner\Tagging\Model\Tag',
 
     // Delimiter used within tags
     'delimiter' => '-',

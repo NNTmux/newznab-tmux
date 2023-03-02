@@ -57,9 +57,6 @@ class BrowseController extends BasePageController
     }
 
     /**
-     * @param  string  $parentCategory
-     * @param  string  $id
-     *
      * @throws \Exception
      */
     public function show(string $parentCategory, string $id = 'All'): void
@@ -154,8 +151,6 @@ class BrowseController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function group(Request $request): void
@@ -195,8 +190,6 @@ class BrowseController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function tags(Request $request): void

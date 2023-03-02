@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 class SearchController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function search(Request $request): void
@@ -139,7 +137,7 @@ class SearchController extends BasePageController
                 $this->smarty->assign(
                     'orderby'.$orderType,
                     url('/search?'.$orderByString.'&search_type=adv&ob='.$orderType
-                ));
+                    ));
             }
 
             $searchArr = [
@@ -177,8 +175,8 @@ class SearchController extends BasePageController
         $this->smarty->assign(
             [
                 'sizelist' => [
-                    -1 => '--Select--', 1  => '100MB', 2  => '250MB', 3  => '500MB', 4  => '1GB', 5  => '2GB',
-                    6  => '3GB', 7  => '4GB', 8  => '8GB', 9  => '16GB', 10 => '32GB', 11 => '64GB',
+                    -1 => '--Select--', 1 => '100MB', 2 => '250MB', 3 => '500MB', 4 => '1GB', 5 => '2GB',
+                    6 => '3GB', 7 => '4GB', 8 => '8GB', 9 => '16GB', 10 => '32GB', 11 => '64GB',
                 ],
                 'results' => $results,
                 'sadvanced' => $searchType !== 'basic',

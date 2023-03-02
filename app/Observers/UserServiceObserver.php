@@ -16,7 +16,6 @@ class UserServiceObserver
     /**
      * Handle the user "created" event.
      *
-     * @param  \App\Models\User  $user
      * @return void
      *
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException

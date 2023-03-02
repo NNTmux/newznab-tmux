@@ -49,8 +49,11 @@ class Nfo
     protected $echo;
 
     public const NFO_FAILED = -9; // We failed to get a NFO after admin set max retries.
+
     public const NFO_UNPROC = -1; // Release has not been processed yet.
+
     public const NFO_NONFO = 0; // Release has no NFO.
+
     public const NFO_FOUND = 1; // Release has an NFO.
 
     /**
@@ -93,7 +96,7 @@ class Nfo
             $return =
             [
                 'showid' => trim($hits[1]),
-                'site'   => 'tvmaze',
+                'site' => 'tvmaze',
             ];
         }
 
@@ -101,7 +104,7 @@ class Nfo
             $return =
                 [
                     'showid' => trim($hits[1]),
-                    'site'   => 'imdb',
+                    'site' => 'imdb',
                 ];
         }
 
@@ -109,7 +112,7 @@ class Nfo
             $return =
                 [
                     'showid' => trim($hits[1]),
-                    'site'   => 'thetvdb',
+                    'site' => 'thetvdb',
                 ];
         }
 
@@ -146,7 +149,6 @@ class Nfo
             // Linux boxes have 'file' (so should Macs), Windows *can* have it too: see GNUWIN.txt in docs.
             $result = Utility::fileInfo($tmpPath);
             if (! empty($result)) {
-
                 // Check if it's text.
                 if (preg_match('/(ASCII|ISO-8859|UTF-(8|16|32).*?)\s*text/', $result)) {
                     @File::delete($tmpPath);
@@ -167,7 +169,6 @@ class Nfo
             $check = (new \getID3())->analyze($tmpPath);
             @File::delete($tmpPath);
             if (isset($check['error'])) {
-
                 // Check if it's a par2.
                 $par2info = new Par2Info();
                 $par2info->setData($possibleNFO);
@@ -189,7 +190,6 @@ class Nfo
      * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
      *
      * @param  string  $nfo  The nfo.
-     * @param $release
      * @param  NNTP  $nntp  Instance of class NNTP.
      * @return bool True on success, False on failure.
      *
@@ -215,9 +215,9 @@ class Nfo
                     [
                         'Echo' => $this->echo,
                         'NNTP' => $nntp,
-                        'Nfo'  => $this,
-                        'Settings'   => null,
-                        'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
+                        'Nfo' => $this,
+                        'Settings' => null,
+                        'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
                     ]
                 );
                 $nzbContents->parseNZB($release->guid, $release->id, $release->guid);
@@ -232,7 +232,6 @@ class Nfo
     /**
      * Attempt to find NFO files inside the NZB's of releases.
      *
-     * @param    $nntp
      * @param  string  $groupID  (optional) Group ID.
      * @param  string  $guidChar  (optional) First character of the release GUID (used for multi-processing).
      * @param  int  $processImdb  (optional) Attempt to find IMDB id's in the NZB?
@@ -280,7 +279,7 @@ class Nfo
                     'Processing '.$nfoCount.
                     ' NFO(s), starting at '.$this->nzbs.
                     ' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
-                );
+            );
 
             if ($this->echo) {
                 // Get count of releases per nfo status
@@ -387,9 +386,9 @@ class Nfo
      * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
      * To use in a query.
      *
-     * @return string
      *
      * @throws \Exception
+     *
      * @static
      */
     public static function NfoQueryString(): string

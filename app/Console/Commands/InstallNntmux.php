@@ -133,9 +133,6 @@ class InstallNntmux extends Command
         ];
     }
 
-    /**
-     * @return bool
-     */
     private function addAdminUser(): bool
     {
         if (config('nntmux.admin_username') === '' || config('nntmux.admin_password') === '' || config('nntmux.admin_email') === '') {

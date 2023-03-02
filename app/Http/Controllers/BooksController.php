@@ -10,9 +10,6 @@ use Illuminate\Support\Arr;
 class BooksController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     *
      * @throws \Exception
      */
     public function index(Request $request, string $id = ''): void
@@ -91,7 +88,7 @@ class BooksController extends BasePageController
 
         $this->smarty->assign(
             [
-                'resultsadd'=>  $books,
+                'resultsadd' => $books,
                 'results' => $results,
                 'covgroup' => 'books',
             ]

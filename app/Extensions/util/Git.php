@@ -25,30 +25,17 @@ use Symfony\Component\Process\Process;
 
 class Git
 {
-    /**
-     * @var \CzProject\GitPhp\GitRepository
-     */
     protected GitRepository $repo;
 
-    /**
-     * @var array
-     */
     public array $_config;
 
-    /**
-     * @var
-     */
     protected $gitTagLatest;
 
-    /**
-     * @var string
-     */
     private string $branch;
 
     /**
      * Git constructor.
      *
-     * @param  array  $config
      *
      * @throws \CzProject\GitPhp\GitException
      */
@@ -77,7 +64,6 @@ class Git
     }
 
     /**
-     * @param $options
      * @return string[]
      *
      * @throws \CzProject\GitPhp\GitException
@@ -136,7 +122,6 @@ class Git
     /**
      * Determine if the supplied object is commited to the repository or not.
      *
-     * @param $gitObject
      * @return bool
      *
      * @throws \Exception
@@ -163,7 +148,6 @@ class Git
     }
 
     /**
-     * @param $branch
      * @return bool
      */
     public function isStable($branch)
@@ -197,7 +181,6 @@ class Git
     }
 
     /**
-     * @param  array  $options
      * @return string[]
      *
      * @throws \CzProject\GitPhp\GitException
@@ -205,8 +188,8 @@ class Git
     public function gitPull(array $options = [])
     {
         $default = [
-            'branch'	=> $this->getBranch(),
-            'remote'	=> 'origin',
+            'branch' => $this->getBranch(),
+            'remote' => 'origin',
         ];
         $options += $default;
 

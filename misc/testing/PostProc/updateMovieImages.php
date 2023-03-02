@@ -57,21 +57,21 @@ foreach ($itr as $filePath) {
 }
 
 $qry = MovieInfo::query()->where('cover', '=', 1)->select(['imdbid'])->get();
-    foreach ($qry as $rows) {
-        if (! is_file($path2covers.$rows['imdbid'].'-cover.jpg')) {
-            MovieInfo::query()->where('cover', '=', 1)->where('imdbid', $rows['imdbid'])->update(['cover' => 0]);
-            $colorCli->info($path2covers.$rows['imdbid'].'-cover.jpg does not exist.');
-            $deleted++;
-        }
+foreach ($qry as $rows) {
+    if (! is_file($path2covers.$rows['imdbid'].'-cover.jpg')) {
+        MovieInfo::query()->where('cover', '=', 1)->where('imdbid', $rows['imdbid'])->update(['cover' => 0]);
+        $colorCli->info($path2covers.$rows['imdbid'].'-cover.jpg does not exist.');
+        $deleted++;
     }
-    $qry1 = MovieInfo::query()->where('backdrop', '=', 1)->select(['imdbid'])->get();
-    foreach ($qry1 as $rows) {
-        if (! is_file($path2covers.$rows['imdbid'].'-backdrop.jpg')) {
-            MovieInfo::query()->where('backdrop', '=', 1)->where('imdbid', $rows['imdbid'])->update(['backdrop' => 0]);
-            $colorCli->info($path2covers.$rows['imdbid'].'-backdrop.jpg does not exist.');
-            $deleted++;
-        }
+}
+$qry1 = MovieInfo::query()->where('backdrop', '=', 1)->select(['imdbid'])->get();
+foreach ($qry1 as $rows) {
+    if (! is_file($path2covers.$rows['imdbid'].'-backdrop.jpg')) {
+        MovieInfo::query()->where('backdrop', '=', 1)->where('imdbid', $rows['imdbid'])->update(['backdrop' => 0]);
+        $colorCli->info($path2covers.$rows['imdbid'].'-backdrop.jpg does not exist.');
+        $deleted++;
     }
+}
 $colorCli->header($covers.' covers set.');
 $colorCli->header($updated.' backdrops set.');
 $colorCli->header($deleted.' movies unset.');

@@ -26,8 +26,6 @@ class ResetPasswordController extends Controller
 
     /**
      * Where to redirect users after resetting their password.
-     *
-     * @var string
      */
     protected string $redirectTo = '/';
 
@@ -42,8 +40,6 @@ class ResetPasswordController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function reset(Request $request): void
@@ -60,7 +56,6 @@ class ResetPasswordController extends Controller
             if ($ret === null) {
                 $error = 'Bad reset code provided.';
             } else {
-
                 //
                 // reset the password, inform the user, send out the email
                 //

@@ -21,8 +21,6 @@ use Jrean\UserVerification\Facades\UserVerification;
 class ProfileController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Throwable
      */
     public function show(Request $request)
@@ -70,13 +68,13 @@ class ProfileController extends BasePageController
         }
         $this->smarty->assign(
             [
-                'apirequests'       => UserRequest::getApiRequests($userID),
-                'grabstoday'        => UserDownload::getDownloadRequests($userID),
-                'userinvitedby'     => $this->userdata->invitedby !== '' ? User::find($this->userdata->invitedby) : '',
-                'user'              => $this->userdata,
-                'privateprofiles'   => $privateProfiles,
-                'publicview'        => $publicView,
-                'privileged'        => $privileged,
+                'apirequests' => UserRequest::getApiRequests($userID),
+                'grabstoday' => UserDownload::getDownloadRequests($userID),
+                'userinvitedby' => $this->userdata->invitedby !== '' ? User::find($this->userdata->invitedby) : '',
+                'user' => $this->userdata,
+                'privateprofiles' => $privateProfiles,
+                'publicview' => $publicView,
+                'privileged' => $privileged,
             ]
         );
 
@@ -85,7 +83,7 @@ class ProfileController extends BasePageController
             SABnzbd::API_TYPE_FULL => 'Full Api Key',
         ];
         $sabPriorities = [
-            SABnzbd::PRIORITY_FORCE  => 'Force', SABnzbd::PRIORITY_HIGH => 'High',
+            SABnzbd::PRIORITY_FORCE => 'Force', SABnzbd::PRIORITY_HIGH => 'High',
             SABnzbd::PRIORITY_NORMAL => 'Normal', SABnzbd::PRIORITY_LOW => 'Low',
         ];
         $sabSettings = [1 => 'Site', 2 => 'Cookie'];
@@ -93,12 +91,12 @@ class ProfileController extends BasePageController
         // Pager must be fetched after the variables are assigned to smarty.
         $this->smarty->assign(
             [
-                'commentslist'  => ReleaseComment::getCommentsForUserRange($userID),
-                'saburl'        => $sab->url,
-                'sabapikey'     => $sab->apikey,
+                'commentslist' => ReleaseComment::getCommentsForUserRange($userID),
+                'saburl' => $sab->url,
+                'sabapikey' => $sab->apikey,
                 'sabapikeytype' => $sab->apikeytype !== '' ? $sabApiKeyTypes[$sab->apikeytype] : '',
-                'sabpriority'   => $sab->priority !== '' ? $sabPriorities[$sab->priority] : '',
-                'sabsetting'    => $sabSettings[$sab->checkCookie() ? 2 : 1],
+                'sabpriority' => $sab->priority !== '' ? $sabPriorities[$sab->priority] : '',
+                'sabsetting' => $sabSettings[$sab->checkCookie() ? 2 : 1],
             ]
         );
 
@@ -120,7 +118,6 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      *
      * @throws \Exception
@@ -331,7 +328,7 @@ class ProfileController extends BasePageController
 
         $this->smarty->assign(
             [
-                'queuetypes'   => $queueTypes,
+                'queuetypes' => $queueTypes,
                 'queuetypeids' => $queueTypeIDs,
             ]
         );
@@ -352,9 +349,6 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @param  Request  $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
-     *
      * @throws \Exception
      */
     public function destroy(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Illuminate\Http\RedirectResponse

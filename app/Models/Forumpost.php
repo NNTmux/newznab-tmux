@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereSubject($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost newModelQuery()
@@ -54,14 +55,9 @@ class Forumpost extends Model
     protected $guarded = [];
 
     /**
-     * @param $parentId
-     * @param $userid
-     * @param $subject
-     * @param $message
      * @param  int  $locked
      * @param  int  $sticky
      * @param  int  $replies
-     * @return int
      */
     public static function add($parentId, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0): int
     {
@@ -96,7 +92,6 @@ class Forumpost extends Model
      * Get parent of the forum post.
      *
      *
-     * @param $parent
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getParent($parent)
@@ -112,7 +107,6 @@ class Forumpost extends Model
      * Get forum posts for a parent category.
      *
      *
-     * @param $parent
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
     public static function getPosts($parent)
@@ -132,7 +126,6 @@ class Forumpost extends Model
      * Get post from forum.
      *
      *
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getPost($id)
@@ -160,8 +153,6 @@ class Forumpost extends Model
 
     /**
      * Delete parent category from forum.
-     *
-     * @param $parent
      */
     public static function deleteParent($parent): void
     {
@@ -170,8 +161,6 @@ class Forumpost extends Model
 
     /**
      * Delete post from forum.
-     *
-     * @param $id
      */
     public static function deletePost($id): void
     {
@@ -187,18 +176,12 @@ class Forumpost extends Model
 
     /**
      * Delete user from forum.
-     *
-     * @param $id
      */
     public static function deleteUser($id): void
     {
         self::query()->where('users_id', $id)->delete();
     }
 
-    /**
-     * @param $uid
-     * @return int
-     */
     public static function getCountForUser($uid): int
     {
         $res = self::query()->where('users_id', $uid)->count('id');
@@ -210,9 +193,6 @@ class Forumpost extends Model
      * Get range of posts for user.
      *
      *
-     * @param $uid
-     * @param $start
-     * @param $num
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
     public static function getForUserRange($uid, $start, $num)
@@ -231,10 +211,6 @@ class Forumpost extends Model
 
     /**
      * Edit forum post for user.
-     *
-     * @param $id
-     * @param $message
-     * @param $uid
      */
     public static function editPost($id, $message, $uid): void
     {
@@ -246,9 +222,6 @@ class Forumpost extends Model
 
     /**
      * Lock forum topic.
-     *
-     * @param $id
-     * @param $lock
      */
     public static function lockUnlockTopic($id, $lock): void
     {

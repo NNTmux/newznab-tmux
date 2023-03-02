@@ -39,8 +39,6 @@ class API extends Capabilities
     public mixed $getRequest;
 
     /**
-     * @param  array  $options
-     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -48,7 +46,7 @@ class API extends Capabilities
         parent::__construct($options);
         $defaults = [
             'Settings' => null,
-            'Request'  => null,
+            'Request' => null,
         ];
         $options += $defaults;
 
@@ -57,8 +55,6 @@ class API extends Capabilities
 
     /**
      * Add language from media info XML to release search names (Used by API).
-     *
-     * @param  array  $releases
      */
     public function addLanguage(array &$releases): void
     {
@@ -97,8 +93,6 @@ class API extends Capabilities
 
     /**
      * Verify cat parameter.
-     *
-     * @return array
      */
     public function categoryID(): array
     {
@@ -118,7 +112,6 @@ class API extends Capabilities
     /**
      * Verify groupName parameter.
      *
-     * @return string|int|bool
      *
      * @throws \Exception
      */
@@ -137,8 +130,6 @@ class API extends Capabilities
 
     /**
      * Verify limit parameter.
-     *
-     * @return int
      */
     public function limit(): int
     {
@@ -152,8 +143,6 @@ class API extends Capabilities
 
     /**
      * Verify offset parameter.
-     *
-     * @return int
      */
     public function offset(): int
     {
@@ -167,8 +156,6 @@ class API extends Capabilities
 
     /**
      * Check if a parameter is empty.
-     *
-     * @param  string  $parameter
      */
     public function verifyEmptyParameter(string $parameter): void
     {
@@ -177,10 +164,6 @@ class API extends Capabilities
         }
     }
 
-    /**
-     * @param $releases
-     * @param  callable  $getCoverURL
-     */
     public function addCoverURL(&$releases, callable $getCoverURL): void
     {
         if ($releases && \count($releases)) {

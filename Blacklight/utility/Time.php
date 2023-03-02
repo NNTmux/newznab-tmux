@@ -35,7 +35,6 @@ class Time
      *
      * @param  string  $time
      * @param  string  $zone
-     * @return string
      */
     public static function localizeAirdate($time = '', $zone = ''): string
     {

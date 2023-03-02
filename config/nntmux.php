@@ -12,7 +12,7 @@ return [
     'rename_par2' => env('RENAME_PAR2', true),
     'rename_music_mediainfo' => env('RENAME_MUSIC_MEDIAINFO', true),
     'cache_expiry_short' => env('CACHE_EXPIRY_SHORT', 5),
-    'cache_expiry_medium' =>env('CACHE_EXPIRY_MEDIUM', 10),
+    'cache_expiry_medium' => env('CACHE_EXPIRY_MEDIUM', 10),
     'cache_expiry_long' => env('CACHE_EXPIRY_LONG', 15),
     'admin_username' => env('ADMIN_USER', 'admin'),
     'admin_password' => env('ADMIN_PASS', 'admin'),

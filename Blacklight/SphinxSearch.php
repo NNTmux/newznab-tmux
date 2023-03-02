@@ -16,14 +16,8 @@ use Illuminate\Support\Facades\DB;
  */
 class SphinxSearch
 {
-    /**
-     * @var \Foolz\SphinxQL\SphinxQL
-     */
     public SphinxQL $sphinxQL;
 
-    /**
-     * @var \Foolz\SphinxQL\Drivers\Pdo\Connection
-     */
     protected Connection $connection;
 
     /**
@@ -31,9 +25,6 @@ class SphinxSearch
      */
     protected mixed $config;
 
-    /**
-     * @var \Foolz\SphinxQL\Helper
-     */
     protected Helper $helper;
 
     /**
@@ -59,7 +50,6 @@ class SphinxSearch
     /**
      * Insert release into Sphinx RT table.
      *
-     * @param  array  $parameters
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
@@ -79,7 +69,6 @@ class SphinxSearch
     /**
      * Insert release into Sphinx RT table.
      *
-     * @param  array  $parameters
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
@@ -131,7 +120,6 @@ class SphinxSearch
     /**
      * Update Sphinx Relases index for given releases_id.
      *
-     * @param  int  $releaseID
      *
      * @throws \Exception
      */
@@ -152,7 +140,6 @@ class SphinxSearch
     /**
      * Update Sphinx Predb index for given predb_id.
      *
-     * @param  array  $parameters
      *
      * @throws \Exception
      */
@@ -164,9 +151,6 @@ class SphinxSearch
     }
 
     /**
-     * @param  array  $indexes
-     * @return bool
-     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -205,8 +189,6 @@ class SphinxSearch
      * @param  string  $rt_index  (releases_rt or predb_rt)
      * @param  string  $searchString  (what are we looking for?)
      * @param  array  $column  (one or multiple columns from the columns that exist in indexes)
-     * @param  array  $searchArray
-     * @return array
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException

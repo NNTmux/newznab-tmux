@@ -13,18 +13,12 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * ApiTransformer constructor.
-     *
-     * @param $user
      */
     public function __construct($user)
     {
         $this->user = $user;
     }
 
-    /**
-     * @param  \App\Models\Release  $releases
-     * @return array
-     */
     public function transform(Release $releases): array
     {
         if (\in_array($releases->categories_id, Category::MOVIES_GROUP, false)) {
@@ -65,7 +59,7 @@ class ApiTransformer extends TransformerAbstract
                 'episode_title' => $releases->title ?? $this->null(),
                 'season' => $releases->series ?? $this->null(),
                 'episode' => $releases->episode ?? $this->null(),
-                'tvairdate' =>$releases->firstaired ?? $this->null(),
+                'tvairdate' => $releases->firstaired ?? $this->null(),
                 'tvdbid' => $releases->tvdb !== null && $releases->tvdb !== 0 ? $releases->tvdb : $this->null(),
                 'traktid' => $releases->trakt !== null && $releases->trakt !== 0 ? $releases->trakt : $this->null(),
                 'tvrageid' => $releases->tvrage !== null && $releases->tvrage !== 0 ? $releases->tvrage : $this->null(),

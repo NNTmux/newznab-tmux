@@ -27,77 +27,49 @@ use JetBrains\PhpStorm\ArrayShape;
 class ProcessReleases
 {
     public const COLLFC_DEFAULT = 0; // Collection has default filecheck status
+
     public const COLLFC_COMPCOLL = 1; // Collection is a complete collection
+
     public const COLLFC_COMPPART = 2; // Collection is a complete collection and has all parts available
+
     public const COLLFC_SIZED = 3; // Collection has been calculated for total size
+
     public const COLLFC_INSERTED = 4; // Collection has been inserted into releases
+
     public const COLLFC_DELETE = 5; // Collection is ready for deletion
+
     public const COLLFC_TEMPCOMP = 15; // Collection is complete and being checked for complete parts
+
     public const COLLFC_ZEROPART = 16; // Collection has a 00/0XX designator (temporary)
 
     public const FILE_INCOMPLETE = 0; // We don't have all the parts yet for the file (binaries table partcheck column).
+
     public const FILE_COMPLETE = 1; // We have all the parts for the file (binaries table partcheck column).
 
-    /**
-     * @var int
-     */
     public int $collectionDelayTime;
 
-    /**
-     * @var int
-     */
     public int $crossPostTime;
 
-    /**
-     * @var int
-     */
     public int $releaseCreationLimit;
 
-    /**
-     * @var int
-     */
     public int $completion;
 
-    /**
-     * @var bool
-     */
     public bool $echoCLI;
 
-    /**
-     * @var \PDO
-     */
     public \PDO $pdo;
 
-    /**
-     * @var \Blacklight\ConsoleTools
-     */
     public ConsoleTools $consoleTools;
 
-    /**
-     * @var \Blacklight\NZB
-     */
     public NZB $nzb;
 
-    /**
-     * @var \Blacklight\ReleaseCleaning
-     */
     public ReleaseCleaning $releaseCleaning;
 
-    /**
-     * @var \Blacklight\Releases
-     */
     public Releases $releases;
 
-    /**
-     * @var \Blacklight\ReleaseImage
-     */
     public ReleaseImage $releaseImage;
 
     /**
      * Time (hours) to wait before delete a stuck/broken collection.
-     *
-     *
-     * @var int
      */
     private int $collectionTimeout;
 
@@ -109,14 +81,14 @@ class ProcessReleases
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'            => true,
-            'ConsoleTools'    => null,
-            'Groups'          => null,
-            'NZB'             => null,
+            'Echo' => true,
+            'ConsoleTools' => null,
+            'Groups' => null,
+            'NZB' => null,
             'ReleaseCleaning' => null,
-            'ReleaseImage'    => null,
-            'Releases'        => null,
-            'Settings'        => null,
+            'ReleaseImage' => null,
+            'Releases' => null,
+            'Settings' => null,
         ];
         $options += $defaults;
 
@@ -146,12 +118,7 @@ class ProcessReleases
     /**
      * Main method for creating releases/NZB files from collections.
      *
-     * @param  int  $categorize
-     * @param  int  $postProcess
      * @param  string  $groupName  (optional)
-     * @param  \Blacklight\NNTP  $nntp
-     * @param  bool  $echooutput
-     * @return int
      *
      * @throws \Throwable
      */
@@ -223,7 +190,6 @@ class ProcessReleases
      * Categorizes releases.
      *
      * @param  string  $type  name or searchname | Categorize using the search name or subject.
-     * @param $groupId
      * @return int Quantity of categorized releases.
      *
      * @throws \Exception
@@ -258,8 +224,6 @@ class ProcessReleases
     }
 
     /**
-     * @param $groupID
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -300,8 +264,6 @@ class ProcessReleases
     }
 
     /**
-     * @param $groupID
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -344,8 +306,6 @@ class ProcessReleases
     }
 
     /**
-     * @param $groupID
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -435,186 +395,184 @@ class ProcessReleases
 
     /**
      * @param  int|string  $groupID  (optional)
-     * @return array
      *
      * @throws \Throwable
      */
     #[ArrayShape(['added' => 'int', 'dupes' => 'int'])]
  public function createReleases(int|string $groupID): array
-    {
-        $startTime = now()->toImmutable();
+ {
+     $startTime = now()->toImmutable();
 
-        $categorize = new Categorize();
-        $returnCount = $duplicate = 0;
+     $categorize = new Categorize();
+     $returnCount = $duplicate = 0;
 
-        if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Create releases from complete collections.');
-        }
-        $collectionsQuery = Collection::query()
-            ->where('collections.filecheck', self::COLLFC_SIZED)
-            ->where('collections.filesize', '>', 0);
-        if (! empty($groupID)) {
-            $collectionsQuery->where('collections.groups_id', $groupID);
-        }
-        $collectionsQuery->select(['collections.*', 'usenet_groups.name as gname'])
-            ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')
-            ->limit($this->releaseCreationLimit);
-        $collections = $collectionsQuery->get();
-        if ($this->echoCLI && $collections->count() > 0) {
-            $this->consoleTools->primary(\count($collections).' Collections ready to be converted to releases.', true);
-        }
+     if ($this->echoCLI) {
+         $this->consoleTools->header('Process Releases -> Create releases from complete collections.');
+     }
+     $collectionsQuery = Collection::query()
+         ->where('collections.filecheck', self::COLLFC_SIZED)
+         ->where('collections.filesize', '>', 0);
+     if (! empty($groupID)) {
+         $collectionsQuery->where('collections.groups_id', $groupID);
+     }
+     $collectionsQuery->select(['collections.*', 'usenet_groups.name as gname'])
+         ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')
+         ->limit($this->releaseCreationLimit);
+     $collections = $collectionsQuery->get();
+     if ($this->echoCLI && $collections->count() > 0) {
+         $this->consoleTools->primary(\count($collections).' Collections ready to be converted to releases.', true);
+     }
 
-        foreach ($collections as $collection) {
-            $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
-            $fromName = utf8_encode(
-                trim($collection->fromname, "'")
-            );
+     foreach ($collections as $collection) {
+         $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
+         $fromName = utf8_encode(
+             trim($collection->fromname, "'")
+         );
 
-            // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
-            // A 1% variance in size is considered the same size when the subject and poster are the same
-            $dupeCheck = Release::query()
-                ->where(['name' => $cleanRelName, 'fromname' => $fromName])
-                ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
-                ->first(['id']);
+         // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
+         // A 1% variance in size is considered the same size when the subject and poster are the same
+         $dupeCheck = Release::query()
+             ->where(['name' => $cleanRelName, 'fromname' => $fromName])
+             ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
+             ->first(['id']);
 
-            if ($dupeCheck === null) {
-                $cleanedName = $this->releaseCleaning->releaseCleaner(
-                    $collection->subject,
-                    $collection->fromname,
-                    $collection->gname
-                );
+         if ($dupeCheck === null) {
+             $cleanedName = $this->releaseCleaning->releaseCleaner(
+                 $collection->subject,
+                 $collection->fromname,
+                 $collection->gname
+             );
 
-                if (\is_array($cleanedName)) {
-                    $properName = $cleanedName['properlynamed'] ?? false;
-                    $preID = $cleanedName['predb'] ?? false;
-                    $cleanedName = $cleanedName['cleansubject'] ?? $cleanRelName;
-                } else {
-                    $properName = true;
-                    $preID = false;
-                }
+             if (\is_array($cleanedName)) {
+                 $properName = $cleanedName['properlynamed'] ?? false;
+                 $preID = $cleanedName['predb'] ?? false;
+                 $cleanedName = $cleanedName['cleansubject'] ?? $cleanRelName;
+             } else {
+                 $properName = true;
+                 $preID = false;
+             }
 
-                if ($preID === false && $cleanedName !== '') {
-                    // try to match the cleaned searchname to predb title or filename here
-                    $preMatch = Predb::matchPre($cleanedName);
-                    if ($preMatch !== false) {
-                        $cleanedName = $preMatch['title'];
-                        $preID = $preMatch['predb_id'];
-                        $properName = true;
-                    }
-                }
+             if ($preID === false && $cleanedName !== '') {
+                 // try to match the cleaned searchname to predb title or filename here
+                 $preMatch = Predb::matchPre($cleanedName);
+                 if ($preMatch !== false) {
+                     $cleanedName = $preMatch['title'];
+                     $preID = $preMatch['predb_id'];
+                     $properName = true;
+                 }
+             }
 
-                $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
+             $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
 
-                $releaseID = Release::insertRelease(
-                    [
-                        'name' => $cleanRelName,
-                        'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
-                        'totalpart' => $collection->totalfiles,
-                        'groups_id' => $collection->groups_id,
-                        'guid' => createGUID(),
-                        'postdate' => $collection->date,
-                        'fromname' => $fromName,
-                        'size' => $collection->filesize,
-                        'categories_id' => $determinedCategory['categories_id'] ?? Category::OTHER_MISC,
-                        'isrenamed' => $properName === true ? 1 : 0,
-                        'predb_id' => $preID === false ? 0 : $preID,
-                        'nzbstatus' => NZB::NZB_NONE,
-                    ]
-                );
+             $releaseID = Release::insertRelease(
+                 [
+                     'name' => $cleanRelName,
+                     'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
+                     'totalpart' => $collection->totalfiles,
+                     'groups_id' => $collection->groups_id,
+                     'guid' => createGUID(),
+                     'postdate' => $collection->date,
+                     'fromname' => $fromName,
+                     'size' => $collection->filesize,
+                     'categories_id' => $determinedCategory['categories_id'] ?? Category::OTHER_MISC,
+                     'isrenamed' => $properName === true ? 1 : 0,
+                     'predb_id' => $preID === false ? 0 : $preID,
+                     'nzbstatus' => NZB::NZB_NONE,
+                 ]
+             );
 
-                if ($releaseID !== null) {
-                    // Update collections table to say we inserted the release.
-                    DB::transaction(static function () use ($collection, $releaseID) {
-                        Collection::query()->where('id', $collection->id)->update(['filecheck' => self::COLLFC_INSERTED, 'releases_id' => $releaseID]);
-                    }, 10);
+             if ($releaseID !== null) {
+                 // Update collections table to say we inserted the release.
+                 DB::transaction(static function () use ($collection, $releaseID) {
+                     Collection::query()->where('id', $collection->id)->update(['filecheck' => self::COLLFC_INSERTED, 'releases_id' => $releaseID]);
+                 }, 10);
 
-                    // Add the id of regex that matched the collection and release name to release_regexes table
-                    ReleaseRegex::insertOrIgnore([
-                        'releases_id'            => $releaseID,
-                        'collection_regex_id'    => $collection->collection_regexes_id,
-                        'naming_regex_id'        => $cleanedName['id'] ?? 0,
-                    ]);
+                 // Add the id of regex that matched the collection and release name to release_regexes table
+                 ReleaseRegex::insertOrIgnore([
+                     'releases_id' => $releaseID,
+                     'collection_regex_id' => $collection->collection_regexes_id,
+                     'naming_regex_id' => $cleanedName['id'] ?? 0,
+                 ]);
 
-                    if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
-                        foreach ($hits[1] as $grp) {
-                            //check if the group name is in a valid format
-                            $grpTmp = UsenetGroup::isValidGroup($grp);
-                            if ($grpTmp !== false) {
-                                //check if the group already exists in database
-                                $xrefGrpID = UsenetGroup::getIDByName($grpTmp);
-                                if ($xrefGrpID === '') {
-                                    $xrefGrpID = UsenetGroup::addGroup(
-                                        [
-                                            'name'                  => $grpTmp,
-                                            'description'           => 'Added by Release processing',
-                                            'backfill_target'       => 1,
-                                            'first_record'          => 0,
-                                            'last_record'           => 0,
-                                            'active'                => 0,
-                                            'backfill'              => 0,
-                                            'minfilestoformrelease' => '',
-                                            'minsizetoformrelease'  => '',
-                                        ]
-                                    );
-                                }
+                 if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
+                     foreach ($hits[1] as $grp) {
+                         //check if the group name is in a valid format
+                         $grpTmp = UsenetGroup::isValidGroup($grp);
+                         if ($grpTmp !== false) {
+                             //check if the group already exists in database
+                             $xrefGrpID = UsenetGroup::getIDByName($grpTmp);
+                             if ($xrefGrpID === '') {
+                                 $xrefGrpID = UsenetGroup::addGroup(
+                                     [
+                                         'name' => $grpTmp,
+                                         'description' => 'Added by Release processing',
+                                         'backfill_target' => 1,
+                                         'first_record' => 0,
+                                         'last_record' => 0,
+                                         'active' => 0,
+                                         'backfill' => 0,
+                                         'minfilestoformrelease' => '',
+                                         'minsizetoformrelease' => '',
+                                     ]
+                                 );
+                             }
 
-                                $relGroupsChk = ReleasesGroups::query()->where(
-                                    [
-                                        ['releases_id', '=', $releaseID],
-                                        ['groups_id', '=', $xrefGrpID],
-                                    ]
-                                )->first();
+                             $relGroupsChk = ReleasesGroups::query()->where(
+                                 [
+                                     ['releases_id', '=', $releaseID],
+                                     ['groups_id', '=', $xrefGrpID],
+                                 ]
+                             )->first();
 
-                                if ($relGroupsChk === null) {
-                                    ReleasesGroups::query()->insert(
-                                        [
-                                            'releases_id' => $releaseID,
-                                            'groups_id'   => $xrefGrpID,
-                                        ]
-                                    );
-                                }
-                            }
-                        }
-                    }
+                             if ($relGroupsChk === null) {
+                                 ReleasesGroups::query()->insert(
+                                     [
+                                         'releases_id' => $releaseID,
+                                         'groups_id' => $xrefGrpID,
+                                     ]
+                                 );
+                             }
+                         }
+                     }
+                 }
 
-                    $returnCount++;
+                 $returnCount++;
 
-                    if ($this->echoCLI) {
-                        echo "Added $returnCount releases.\r";
-                    }
-                }
-            } else {
-                // The release was already in the DB, so delete the collection.
-                DB::transaction(static function () use ($collection) {
-                    Collection::query()->where('collectionhash', $collection->collectionhash)->delete();
-                }, 10);
+                 if ($this->echoCLI) {
+                     echo "Added $returnCount releases.\r";
+                 }
+             }
+         } else {
+             // The release was already in the DB, so delete the collection.
+             DB::transaction(static function () use ($collection) {
+                 Collection::query()->where('collectionhash', $collection->collectionhash)->delete();
+             }, 10);
 
-                $duplicate++;
-            }
-        }
+             $duplicate++;
+         }
+     }
 
-        $totalTime = now()->diffInSeconds($startTime);
+     $totalTime = now()->diffInSeconds($startTime);
 
-        if ($this->echoCLI) {
-            $this->consoleTools->primary(
-                PHP_EOL.
-                number_format($returnCount).
-                ' Releases added and '.
-                number_format($duplicate).
-                ' duplicate collections deleted in '.
-                $totalTime.Str::plural(' second', $totalTime),
-                true
-            );
-        }
+     if ($this->echoCLI) {
+         $this->consoleTools->primary(
+             PHP_EOL.
+             number_format($returnCount).
+             ' Releases added and '.
+             number_format($duplicate).
+             ' duplicate collections deleted in '.
+             $totalTime.Str::plural(' second', $totalTime),
+             true
+         );
+     }
 
-        return ['added' => $returnCount, 'dupes' => $duplicate];
-    }
+     return ['added' => $returnCount, 'dupes' => $duplicate];
+ }
 
     /**
      * Create NZB files from complete releases.
      *
      * @param  int|string  $groupID  (optional)
-     * @return int
      *
      * @throws \Throwable
      */
@@ -663,7 +621,6 @@ class ProcessReleases
     /**
      * Categorize releases.
      *
-     * @param  int  $categorize
      * @param  int|string  $groupID  (optional)
      *
      * @void
@@ -695,8 +652,6 @@ class ProcessReleases
     /**
      * Post-process releases.
      *
-     * @param  int  $postProcess
-     * @param  NNTP  $nntp
      *
      * @void
      *
@@ -715,8 +670,6 @@ class ProcessReleases
     }
 
     /**
-     * @param $groupID
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -1030,7 +983,6 @@ class ProcessReleases
      * This means the the binary table has the same count as the file count in the subject, but
      * the collection might not be complete yet since we might not have all the articles in the parts table.
      *
-     * @param  int  $groupID
      *
      * @void
      *
@@ -1063,7 +1015,6 @@ class ProcessReleases
      * at 0 then you would never get a complete collection if it starts with 1 and if it starts, you can end up creating
      * a incomplete collection, since you assumed it was complete.
      *
-     * @param  int  $groupID
      *
      * @void
      *
@@ -1100,7 +1051,6 @@ class ProcessReleases
      * Check if the files (binaries table) in a complete collection has all the parts.
      * If we have all the parts, set binaries table partcheck to FILE_COMPLETE.
      *
-     * @param  string  $where
      *
      * @void
      *
@@ -1162,7 +1112,6 @@ class ProcessReleases
      * Set collections filecheck column to COLLFC_COMPPART.
      * This means the collection is complete.
      *
-     * @param  string  $where
      *
      * @void
      *
@@ -1193,7 +1142,6 @@ class ProcessReleases
      * If not all files (binaries table) had their parts on the previous stage,
      * reset the collection filecheck column to COLLFC_COMPCOLL so we reprocess them next time.
      *
-     * @param  int  $groupId
      *
      * @void
      *
@@ -1214,7 +1162,6 @@ class ProcessReleases
      * If a collection did not have the file count (ie: [00/12]) or the collection is incomplete after
      * $this->collectionDelayTime hours, set the collection to complete to create it into a release/nzb.
      *
-     * @param  string  $where
      *
      * @void
      *
@@ -1242,7 +1189,6 @@ class ProcessReleases
     /**
      * If a collection has been stuck for $this->collectionTimeout hours, delete it, it's bad.
      *
-     * @param  int  $groupID
      *
      * @void
      *

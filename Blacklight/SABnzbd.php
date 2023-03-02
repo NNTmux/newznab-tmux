@@ -14,21 +14,27 @@ class SABnzbd
      * Type of site integration.
      */
     public const INTEGRATION_TYPE_NONE = 0;
+
     public const INTEGRATION_TYPE_USER = 2;
 
     /**
      * Type of SAB API key.
      */
     public const API_TYPE_NZB = 1;
+
     public const API_TYPE_FULL = 2;
 
     /**
      * Priority to send the NZB to SAB.
      */
     public const PRIORITY_PAUSED = -2;
+
     public const PRIORITY_LOW = -1;
+
     public const PRIORITY_NORMAL = 0;
+
     public const PRIORITY_HIGH = 1; // Sab is completely disabled - no user can use it.
+
     public const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
 
     /**
@@ -152,48 +158,41 @@ class SABnzbd
     }
 
     /**
-     * @param $guid
-     * @return string
-     *
      * @throws \RuntimeException
      */
     public function sendToSab($guid): string
     {
         return $this->client->post(
-                $this->url.
-                    'api?mode=addurl&priority='.
-                    $this->priority.
-                    '&apikey='.
-                    $this->apikey.
-                    '&name='.
-                    urlencode(
-                        $this->serverurl.
-                        'getnzb?id='.
-                        $guid.
-                        '&r='.
-                        $this->api_token
-                    )
+            $this->url.
+                'api?mode=addurl&priority='.
+                $this->priority.
+                '&apikey='.
+                $this->apikey.
+                '&name='.
+                urlencode(
+                    $this->serverurl.
+                    'getnzb?id='.
+                    $guid.
+                    '&r='.
+                    $this->api_token
+                )
         )->getBody()->getContents();
     }
 
     /**
-     * @return string
-     *
      * @throws \RuntimeException
      */
     public function getAdvQueue(): string
     {
         return $this->client->get(
-                    $this->url.
-                    'api?mode=queue&start=START&limit=LIMIT&output=json&apikey='.
-                    $this->apikey
+            $this->url.
+            'api?mode=queue&start=START&limit=LIMIT&output=json&apikey='.
+            $this->apikey
 
         )->getBody()->getContents();
     }
 
     /**
-     * @return string
-     *
      * @throws \RuntimeException
      */
     public function getHistory(): string
@@ -207,41 +206,34 @@ class SABnzbd
     }
 
     /**
-     * @param $id
-     * @return string
-     *
      * @throws \RuntimeException
      */
     public function delFromQueue($id): string
     {
         return $this->client->get(
-        $this->url.
-            'api?mode=queue&name=delete&value='.
-            $id.
-            '&apikey='.
-            $this->apikey
+            $this->url.
+                'api?mode=queue&name=delete&value='.
+                $id.
+                '&apikey='.
+                $this->apikey
         )->getBody()->getContents();
     }
 
     /**
-     * @param $id
-     * @return string
-     *
      * @throws \RuntimeException
      */
     public function pauseFromQueue($id): string
     {
         return $this->client->get(
-        $this->url.
-            'api?mode=queue&name=pause&value='.
-            $id.
-            '&apikey='.
-            $this->apikey
+            $this->url.
+                'api?mode=queue&name=pause&value='.
+                $id.
+                '&apikey='.
+                $this->apikey
         )->getBody()->getContents();
     }
 
     /**
-     * @param $id
      * @return string
      *
      * @throws \RuntimeException
@@ -249,43 +241,40 @@ class SABnzbd
     public function resumeFromQueue($id)
     {
         return $this->client->get(
-        $this->url.
-        'api?mode=queue&name=resume&value='.
-            $id.
-        '&apikey='.
-            $this->apikey
+            $this->url.
+            'api?mode=queue&name=resume&value='.
+                $id.
+            '&apikey='.
+                $this->apikey
         )->getBody()->getContents();
     }
 
     /**
-     * @return string
-     *
      * @throws \RuntimeException
      */
     public function pauseAll(): string
     {
         return $this->client->get(
-        $this->url.
-        'api?mode=pause'.
-        '&apikey='.
-            $this->apikey
+            $this->url.
+            'api?mode=pause'.
+            '&apikey='.
+                $this->apikey
         )->getBody()->getContents();
     }
 
     /**
      * Resume all NZB's in the SAB queue.
      *
-     * @return string
      *
      * @throws \RuntimeException
      */
     public function resumeAll(): string
     {
         return $this->client->get(
-        $this->url.
-        'api?mode=resume'.
-        '&apikey='.
-            $this->apikey
+            $this->url.
+            'api?mode=resume'.
+            '&apikey='.
+                $this->apikey
         )->getBody()->getContents();
     }
 
@@ -315,11 +304,6 @@ class SABnzbd
 
     /**
      * Creates the SAB cookies for the user's browser.
-     *
-     * @param $host
-     * @param $apikey
-     * @param $priority
-     * @param $apitype
      */
     public function setCookie($host, $apikey, $priority, $apitype)
     {

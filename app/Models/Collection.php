@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereSubject($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereTotalfiles($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereXref($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection newModelQuery()

@@ -10,9 +10,6 @@ use Spatie\Permission\Models\Role;
 class BtcPaymentController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse

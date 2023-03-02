@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property-read \App\Models\AnidbEpisode $episode
  * @property-read \App\Models\AnidbTitle $title
+ *
  * @mixin \Eloquent
  *
  * @property int $anidbid ID of title from AniDB

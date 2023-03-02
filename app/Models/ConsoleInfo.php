@@ -37,6 +37,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo whereUrl($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo newModelQuery()
@@ -46,6 +47,7 @@ use Laravel\Scout\Searchable;
 class ConsoleInfo extends Model
 {
     use Searchable;
+
     /**
      * @var string
      */
@@ -61,21 +63,15 @@ class ConsoleInfo extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return string
-     */
     public function searchableAs(): string
     {
         return 'ix_consoleinfo_title_platform_ft';
     }
 
-    /**
-     * @return array
-     */
     public function toSearchableArray(): array
     {
         return [
-            'title'=> $this->title,
+            'title' => $this->title,
             'platform' => $this->platform,
         ];
     }

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereSummary($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereVideosId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode newModelQuery()

@@ -106,7 +106,6 @@ class NZBGet
     }
 
     /**
-     * @param $guid
      * @return \GuzzleHttp\Psr7\Request
      */
     public function sendNZBToNZBGet($guid)

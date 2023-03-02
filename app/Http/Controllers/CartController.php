@@ -28,9 +28,6 @@ class CartController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function store(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -55,9 +52,6 @@ class CartController extends BasePageController
     }
 
     /**
-     * @param  array|string  $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function destroy(array|string $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse

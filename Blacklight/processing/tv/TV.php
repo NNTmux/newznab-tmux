@@ -21,10 +21,15 @@ abstract class TV extends Videos
 {
     // Television Sources
     protected const SOURCE_NONE = 0;   // No Scrape source
+
     protected const SOURCE_TVDB = 1;   // Scrape source was TVDB
+
     protected const SOURCE_TVMAZE = 2;   // Scrape source was TVMAZE
+
     protected const SOURCE_TMDB = 3;   // Scrape source was TMDB
+
     protected const SOURCE_TRAKT = 4;   // Scrape source was Trakt
+
     protected const SOURCE_IMDB = 5;   // Scrape source was IMDB
 
     // Anime Sources
@@ -32,11 +37,17 @@ abstract class TV extends Videos
 
     // Processing signifiers
     protected const PROCESS_TVDB = 0;   // Process TVDB First
+
     protected const PROCESS_TVMAZE = -1;   // Process TVMaze Second
+
     protected const PROCESS_TMDB = -2;   // Process TMDB Third
+
     protected const PROCESS_TRAKT = -3;   // Process Trakt Fourth
+
     protected const PROCESS_IMDB = -4;   // Process IMDB Fifth
+
     protected const NO_MATCH_FOUND = -6;   // Failed All Methods
+
     protected const FAILED_PARSE = -100; // Failed Parsing
 
     /**
@@ -67,7 +78,6 @@ abstract class TV extends Videos
     /**
      * TV constructor.
      *
-     * @param  array  $options
      *
      * @throws \Exception
      */
@@ -84,8 +94,6 @@ abstract class TV extends Videos
     /**
      * Retrieve banner image from site using its API.
      *
-     * @param $videoID
-     * @param $siteId
      * @return mixed
      */
     abstract protected function getBanner($videoID, $siteId);
@@ -104,7 +112,6 @@ abstract class TV extends Videos
      * Retrieve poster image for TV episode from site using its API.
      *
      * @param  int  $videoId  ID from videos table.
-     * @return int
      */
     abstract protected function getPoster($videoId): int;
 
@@ -119,18 +126,12 @@ abstract class TV extends Videos
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $show
-     * @return array
      */
     abstract protected function formatShowInfo($show): array;
 
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $episode
-     * @return array
      */
     abstract protected function formatEpisodeInfo($episode): array;
 
@@ -174,8 +175,6 @@ abstract class TV extends Videos
     /**
      * Updates the release when match for the current scraper is found.
      *
-     * @param    $videoId
-     * @param    $releaseId
      * @param  int  $episodeId
      */
     public function setVideoIdFound($videoId, $releaseId, $episodeId): void
@@ -187,9 +186,6 @@ abstract class TV extends Videos
 
     /**
      * Updates the release tv_episodes_id status when scraper match is not found.
-     *
-     * @param $status
-     * @param $Id
      */
     public function setVideoNotFound($status, $Id): void
     {
@@ -201,9 +197,6 @@ abstract class TV extends Videos
     /**
      * Inserts a new video ID into the database for TV shows
      * If a duplicate is found it is handle by calling update instead.
-     *
-     * @param  array  $show
-     * @return int
      */
     public function add(array $show = []): int
     {
@@ -265,8 +258,6 @@ abstract class TV extends Videos
     /**
      * Inserts a new TV episode into the tv_episodes table following a match to a Video ID.
      *
-     * @param $videoId
-     * @param  array  $episode
      * @return false|int
      */
     public function addEpisode($videoId, array $episode = [])
@@ -295,7 +286,6 @@ abstract class TV extends Videos
      * Only called when a duplicate show is found during insert.
      *
      * @param  int  $videoId
-     * @param  array  $show
      */
     public function update($videoId, array $show = []): void
     {
@@ -308,25 +298,25 @@ abstract class TV extends Videos
 
         DB::update(
             sprintf(
-                    '
+                '
 				UPDATE videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				SET v.countries_id = %s, v.tvdb = %s, v.trakt = %s, v.tvrage = %s,
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
 					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
 				WHERE v.id = %d',
-                    sprintf($ifStringInfo, 'v.countries_id', escapeString($show['country']), 'v.countries_id'),
-                    sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
-                    sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
-                    sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
-                    sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
-                    sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
-                    sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
-                    sprintf($ifStringInfo, 'tvi.summary', escapeString($show['summary']), 'tvi.summary'),
-                    sprintf($ifStringInfo, 'tvi.publisher', escapeString($show['publisher']), 'tvi.publisher'),
-                    sprintf($ifStringInfo, 'tvi.localzone', escapeString($show['localzone']), 'tvi.localzone'),
-                    $videoId
-                )
+                sprintf($ifStringInfo, 'v.countries_id', escapeString($show['country']), 'v.countries_id'),
+                sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
+                sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
+                sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
+                sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
+                sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
+                sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
+                sprintf($ifStringInfo, 'tvi.summary', escapeString($show['summary']), 'tvi.summary'),
+                sprintf($ifStringInfo, 'tvi.publisher', escapeString($show['publisher']), 'tvi.publisher'),
+                sprintf($ifStringInfo, 'tvi.localzone', escapeString($show['localzone']), 'tvi.localzone'),
+                $videoId
+            )
         );
         if (! empty($show['aliases'])) {
             $this->addAliases($videoId, $show['aliases']);
@@ -337,7 +327,6 @@ abstract class TV extends Videos
      * Deletes a TV show entirely from all child tables via the Video ID.
      *
      *
-     * @param $id
      * @return mixed
      *
      * @throws \Throwable
@@ -362,8 +351,6 @@ abstract class TV extends Videos
 
     /**
      * Sets the TV show's image column to found (1).
-     *
-     * @param $videoId
      */
     public function setCoverFound($videoId): void
     {
@@ -375,8 +362,6 @@ abstract class TV extends Videos
      * Returns the ID value or false if none found.
      *
      *
-     * @param $column
-     * @param $id
      * @return bool|\Illuminate\Database\Eloquent\Model|mixed|null|static
      */
     public function getSiteByID($column, $id)
@@ -398,9 +383,6 @@ abstract class TV extends Videos
      *
      * Returns the Episode ID or false if not found
      *
-     * @param    $id
-     * @param    $series
-     * @param    $episode
      * @param  string  $airdate
      * @return int|false
      */
@@ -431,10 +413,6 @@ abstract class TV extends Videos
 
     /**
      * Returns (true) if episodes for a given Video ID exist or don't (false).
-     *
-     *
-     * @param $videoId
-     * @return bool
      */
     public function countEpsByVideoID($videoId): bool
     {
@@ -448,7 +426,6 @@ abstract class TV extends Videos
      * Parses a release searchname for specific TV show data
      * Returns an array of show data.
      *
-     * @param $relname
      * @return array|false
      */
     public function parseInfo($relname)
@@ -456,7 +433,6 @@ abstract class TV extends Videos
         $showInfo['name'] = $this->parseName($relname);
 
         if (! empty($showInfo['name'])) {
-
             // Retrieve the country from the cleaned name
             $showInfo['country'] = $this->parseCountry($showInfo['name']);
 
@@ -522,7 +498,6 @@ abstract class TV extends Videos
     /**
      * Parses the release searchname for the season/episode/airdate information.
      *
-     * @param $relname
      * @return array
      */
     private function parseSeasonEp($relname)
@@ -613,7 +588,6 @@ abstract class TV extends Videos
      * Parses the cleaned release name to determine if it has a country appended.
      *
      * @param  string  $showName
-     * @return string
      */
     private function parseCountry($showName): string
     {
@@ -642,9 +616,6 @@ abstract class TV extends Videos
      * Supplementary to parseInfo
      * Cleans a derived local 'showname' for better matching probability
      * Returns the cleaned string.
-     *
-     * @param $str
-     * @return string
      */
     public function cleanName($str): string
     {
@@ -673,9 +644,6 @@ abstract class TV extends Videos
      * Simple function that compares two strings of text
      * Returns percentage of similarity.
      *
-     * @param $ourName
-     * @param $scrapeName
-     * @param $probability
      * @return int|float
      */
     public function checkMatch($ourName, $scrapeName, $probability)
@@ -698,7 +666,6 @@ abstract class TV extends Videos
      * Could this be a mistake? i.e. trying to solve the mm-dd-yyyy/dd-mm-yyyy confusion into a yyyy-mm-dd?
      *
      * @param  string|bool|null  $date
-     * @return string
      */
     public function checkDate($date): string
     {
@@ -718,10 +685,6 @@ abstract class TV extends Videos
     /**
      * Checks API response returns have all REQUIRED attributes set
      * Returns true or false.
-     *
-     * @param $array
-     * @param  string  $type
-     * @return bool
      */
     public function checkRequiredAttr($array, string $type): bool
     {

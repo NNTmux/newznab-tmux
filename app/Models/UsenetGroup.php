@@ -41,6 +41,7 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinfilestoformrelease($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinsizetoformrelease($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereName($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup newModelQuery()
@@ -100,9 +101,6 @@ class UsenetGroup extends Model
 
     /**
      * Returns an associative array of groups for list selection.
-     *
-     *
-     * @return array
      */
     public static function getGroupsForSelect(): array
     {
@@ -122,7 +120,6 @@ class UsenetGroup extends Model
      * Get all properties of a single group by its ID.
      *
      *
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getGroupByID($id)
@@ -142,7 +139,6 @@ class UsenetGroup extends Model
      * Get active backfill groups ordered by name ascending.
      *
      *
-     * @param $order
      * @return array|\Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getActiveBackfill($order)
@@ -175,7 +171,6 @@ class UsenetGroup extends Model
      * Get all group columns by Name.
      *
      *
-     * @param $grp
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByName($grp)
@@ -257,7 +252,6 @@ class UsenetGroup extends Model
      * Update an existing group.
      *
      *
-     * @param $group
      * @return int
      */
     public static function updateGroup($group)
@@ -297,7 +291,6 @@ class UsenetGroup extends Model
      * Add a new group.
      *
      *
-     * @param $group
      * @return int|mixed
      */
     public static function addGroup($group)
@@ -324,7 +317,6 @@ class UsenetGroup extends Model
      * Delete a group.
      *
      * @param  int|string  $id  ID of the group.
-     * @return bool
      *
      * @throws \Exception
      */
@@ -339,7 +331,6 @@ class UsenetGroup extends Model
      * Reset a group.
      *
      * @param  string|int  $id  The group ID.
-     * @return bool
      *
      * @throws \Exception
      */
@@ -364,8 +355,6 @@ class UsenetGroup extends Model
 
     /**
      * Reset all groups.
-     *
-     * @return bool
      */
     public static function resetall(): bool
     {
@@ -422,7 +411,7 @@ class UsenetGroup extends Model
                 ],
                 $nzb,
                 $releaseImage
-                );
+            );
         }
     }
 
@@ -462,9 +451,9 @@ class UsenetGroup extends Model
                     if ($res === false) {
                         self::addGroup(
                             [
-                                'name'        => $group['group'],
-                                'active'      => $active,
-                                'backfill'    => $backfill,
+                                'name' => $group['group'],
+                                'active' => $active,
+                                'backfill' => $backfill,
                                 'description' => 'Added by bulkAdd',
                             ]
                         );
@@ -487,7 +476,6 @@ class UsenetGroup extends Model
      * @param  int  $id  Which group ID
      * @param  string  $column  Which column active/backfill
      * @param  int  $status  Which status we are setting
-     * @return string
      */
     public static function updateGroupStatus($id, $column, $status = 0): string
     {

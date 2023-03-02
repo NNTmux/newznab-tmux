@@ -165,12 +165,12 @@ class HashAlgorithms
     protected function _hashesToArray($string)
     {
         $strings = [
-            'input'         => $string,
-            'lower'         => strtolower($string),
+            'input' => $string,
+            'lower' => strtolower($string),
             'lower_reverse' => strtolower(strrev($string)),
             'upper_reverse' => strtoupper(strrev($string)),
-            'upper'         => strtoupper($string),
-            'reverse'        => strrev($string),
+            'upper' => strtoupper($string),
+            'reverse' => strrev($string),
             'reverse_upper' => strrev(strtoupper($string)),
             'reverse_lower' => strrev(strtolower($string)),
         ];

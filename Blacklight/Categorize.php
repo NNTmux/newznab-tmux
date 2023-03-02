@@ -16,45 +16,28 @@ class Categorize
 {
     /**
      * Temporary category while we sort through the name.
-     *
-     * @var int
      */
     protected int $tmpCat = Category::OTHER_MISC;
 
-    /**
-     * @var bool
-     */
     protected bool $categorizeForeign;
 
-    /**
-     * @var bool
-     */
     protected bool $catWebDL;
 
     /**
      * Release name to sort through.
-     *
-     * @var string
      */
     public string $releaseName;
 
     /**
      * Release poster to sort through.
-     *
-     * @var string
      */
     public string $poster;
 
     /**
      * Group id of the releasename we are sorting through.
-     *
-     * @var int|string
      */
     public string|int $groupId;
 
-    /**
-     * @var string
-     */
     public string $groupName;
 
     /**
@@ -73,10 +56,6 @@ class Categorize
      * Then work out which category is applicable for either a group or a binary.
      * Returns Category::OTHER_MISC if no category is appropriate.
      *
-     * @param    $groupId
-     * @param  string  $releaseName
-     * @param  string  $poster
-     * @return array
      *
      * @throws \Exception
      */
@@ -95,12 +74,8 @@ class Categorize
         };
     }
 
-    /**
-     * @param $groupName
-     * @return bool
-     */
     public function byGroupName($groupName): bool
-   {
+    {
         switch(true) {
             case preg_match('/alt\.binaries\.erotica([.]\w+)?/i', $groupName):
                 if ($this->isXxx()) {
@@ -116,15 +91,12 @@ class Categorize
             default:
                 return false;
         }
-   }
+    }
 
     //
     // Beginning of functions to determine category by release name.
     //
 
-    /**
-     * @return bool
-     */
     public function isTV(): bool
     {
         if (preg_match('/Daily[\-_\.]Show|Nightly News|^\[[a-zA-Z\.\-]+\].*[\-_].*\d{1,3}[\-_. ](([\[\(])(h264-)?\d{3,4}([pi])([\]\)])\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?|(\d\d-){2}[12]\d{3}|[12]\d{3}(\.\d\d){2}|\d+x\d+|\.e\d{1,3}\.|s\d{1,3}[._ -]?[ed]\d{1,3}([ex]\d{1,3}|[\-.\w ])|[._ -](\dx\d\d|C4TV|Complete[._ -]Season|DSR|([DHPS])DTV|EP[._ -]?\d{1,3}|S\d{1,3}.+Extras|SUBPACK|Season[._ -]\d{1,2})([._ -]|$)|TVRIP|TV[._ -](19|20)\d\d|Troll(HD|UHD)/i', $this->releaseName)
@@ -161,9 +133,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isOtherTV(): bool
     {
         if (preg_match('/[._ -]S\d{1,3}.+(EP\d{1,3}|Extras|SUBPACK)[._ -]|News/i', $this->releaseName)
@@ -178,9 +147,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isForeignTV(): bool
     {
         switch (true) {
@@ -197,9 +163,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isSportTV(): bool
     {
         switch (true) {
@@ -216,9 +179,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isDocumentaryTV(): bool
     {
         if (preg_match('/[._ -](Docu|Documentary)[._ -]/i', $this->releaseName)) {
@@ -230,9 +190,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isWEBDL(): bool
     {
         if (preg_match('/(S\d+).*.web[._-]?(dl|rip).*/i', $this->releaseName)) {
@@ -244,9 +201,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isAnimeTV(): bool
     {
         if (preg_match('/[._ -]Anime[._ -]|^\[[a-zA-Z\.\-]+\].*[\-_].*\d{1,3}[\-_. ](([\[\(])((\d{1,4}x\d{1,4})|(h264-)?\d{3,4}([pi]))([\]\)])\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?/i', $this->releaseName)) {
@@ -263,9 +217,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isHDTV(): bool
     {
         if (preg_match('/1080([ip])|720p|bluray/i', $this->releaseName)) {
@@ -282,9 +233,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isUHDTV(): bool
     {
         if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon|NF|AMZN).*(TrollUHD|NTb|VLAD|DEFLATE|POFUDUK)/i', $this->releaseName)) {
@@ -296,9 +244,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isSDTV(): bool
     {
         switch (true) {
@@ -313,9 +258,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isOtherTV2(): bool
     {
         if (preg_match('/[._ -]s\d{1,3}[._ -]?(e|d(isc)?)\d{1,3}([._ -]|$)/i', $this->releaseName)) {
@@ -327,9 +269,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isTVx265(): bool
     {
         if (preg_match('/(S\d+).*(x265).*(rmteam|MeGusta|HETeam|PSA|ONLY|H4S5S|TrollHD|ImE)/i', $this->releaseName)) {
@@ -343,9 +282,6 @@ class Categorize
 
     //  Movies.
 
-    /**
-     * @return bool
-     */
     public function isMovie(): bool
     {
         if (preg_match('/[._ -]AVC|[._ -]|[BH][DR]RIP|Bluray|BD[._ -]?(25|50)?|\bBR\b|Camrip|[._ -]\d{4}[._ -].+(720p|1080p|Cam|HDTS)|DIVX|[._ -]DVD[._ -]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|[._ -](DTS|TVrip)[._ -]/i', $this->releaseName) && ! preg_match('/auto(cad|desk)|divx[._ -]plus|[._ -]exe$|[._ -](jav|XXX)[._ -]|SWE6RUS|\wXXX(1080p|720p|DVD)|Xilisoft/i', $this->releaseName)) {
@@ -358,9 +294,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieForeign(): bool
     {
         switch (true) {
@@ -377,9 +310,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieDVD(): bool
     {
         if (preg_match('/(dvd\-?r|[._ -]dvd|dvd9|dvd5|[._ -]r5)[._ -]/i', $this->releaseName)) {
@@ -391,9 +321,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieSD(): bool
     {
         if (preg_match('/(divx|dvdscr|extrascene|dvdrip|\.CAM|HDTS(-LINE)?|vhsrip|xvid(vd)?)[._ -]/i', $this->releaseName)) {
@@ -405,9 +332,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovie3D(): bool
     {
         if (preg_match('/[._ -]3D\s?[\.\-_\[ ](1080p|(19|20)\d\d|AVC|BD(25|50)|Blu[._ -]?ray|CEE|Complete|GER|MVC|MULTi|SBS|H(-)?SBS)[._ -]/i', $this->releaseName)) {
@@ -419,9 +343,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieBluRay(): bool
     {
         if (preg_match('/bluray-|[._ -]bd?[._ -]?(25|50)|blu-ray|Bluray\s-\sUntouched|[._ -]untouched[._ -]/i', $this->releaseName)
@@ -434,9 +355,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieHD(): bool
     {
         if (preg_match('/720p|1080p|AVC|VC1|VC-1|web-dl|wmvhd|x264|XvidHD|bdrip/i', $this->releaseName)) {
@@ -453,9 +371,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieUHD(): bool
     {
         if (! preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName) && false !== stripos($this->releaseName, '2160p')) {
@@ -467,9 +382,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieOther(): bool
     {
         if (preg_match('/[._ -]cam[._ -]/i', $this->releaseName)) {
@@ -481,9 +393,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieWEBDL(): bool
     {
         if (preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName)) {
@@ -495,9 +404,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMovieX265(): bool
     {
         if (preg_match('/(\w+[\.-_\s]+).*(x265).*(Tigole|SESKAPiLE|CHD|IAMABLE|THREESOME|OohLaLa|DEFLATE|NCmt)/i', $this->releaseName)) {
@@ -511,9 +417,6 @@ class Categorize
 
     //  PC.
 
-    /**
-     * @return bool
-     */
     public function isPC(): bool
     {
         return match (true) {
@@ -522,9 +425,6 @@ class Categorize
         };
     }
 
-    /**
-     * @return bool
-     */
     public function isPhone(): bool
     {
         switch (true) {
@@ -544,9 +444,6 @@ class Categorize
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isISO(): bool
     {
         switch (true) {
@@ -560,9 +457,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function is0day(): bool
     {
         switch (true) {
@@ -577,9 +471,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isMac(): bool
     {
         if (preg_match('/(\b|[._ -])mac([\.\s])?osx(\b|[\-_. ])/i', $this->releaseName)) {
@@ -591,9 +482,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isPCGame(): bool
     {
         if (preg_match('/[^a-z0-9](0x0007|ALiAS|BACKLASH|BAT|CLONECD|CPY|FAS(DOX|iSO)|FLT([._ -]|COGENT)|FLT(DOX)?|PC GAMES?|\(?(Game([sz])|GAME([SZ]))\)? ?(\(([Cc])\))|GENESIS|-GOG|-HATRED|HI2U|INLAWS|JAGUAR|MAZE|MONEY|OUTLAWS|PPTCLASSiCS|PC Game|PROPHET|RAiN|Razor1911|RELOADED|DEViANCE|PLAZA|RiTUELYPOGEiOS|[rR][iI][pP]-[uU][nN][lL][eE][aA][sS][hH][eE][dD]|Steam(\b)?Rip|SKIDROW|TiNYiSO|CODEX|SiMPLEX)[^a-z0-9]?/', $this->releaseName)) {
@@ -611,9 +499,6 @@ class Categorize
 
     //	XXX.
 
-    /**
-     * @return bool
-     */
     public function isXxx(): bool
     {
         switch (true) {
@@ -640,9 +525,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isXxx264(): bool
     {
         if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && ! preg_match('/\bwmv\b/i', $this->releaseName) && stripos($this->releaseName, 'SDX264XXX') === false) {
@@ -659,9 +541,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxUHD(): bool
     {
         if (preg_match('/XXX.+(2160p)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
@@ -673,9 +552,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxClipHD(): bool
     {
         if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
@@ -687,9 +563,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxWMV(): bool
     {
         if (preg_match('/(\d{2}\.\d{2}\.\d{2})|([ex]\d{2,})|[^a-z0-9](f4v|flv|isom|(issue\.\d{2,})|mov|mp(4|eg)|multiformat|pack-|realmedia|uhq|wmv)[^a-z0-9]/i', $this->releaseName) && stripos($this->releaseName, 'SDX264XXX') === false) {
@@ -701,9 +574,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxXvid(): bool
     {
         if (preg_match('/(b[dr]|dvd)rip|detoxication|divx|nympho|pornolation|swe6|tesoro|xvid/i', $this->releaseName)) {
@@ -715,9 +585,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxDVD(): bool
     {
         if (preg_match('/dvdr[^i]|dvd[59]/i', $this->releaseName)) {
@@ -729,9 +596,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxImageset(): bool
     {
         if (preg_match('/IMAGESET|PICTURESET|ABPEA/i', $this->releaseName)) {
@@ -743,9 +607,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxPack(): bool
     {
         if (preg_match('/[ .]PACK[ .]/i', $this->releaseName)) {
@@ -757,9 +618,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxOther(): bool
     {
         // If nothing else matches, then try these words.
@@ -772,9 +630,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxClipSD(): bool
     {
         switch (true) {
@@ -792,9 +647,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxSD(): bool
     {
         if (preg_match('/SDX264XXX|XXX\.HR\./i', $this->releaseName)) {
@@ -806,9 +658,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isXxxWEBDL(): bool
     {
         if (preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName)) {
@@ -822,9 +671,6 @@ class Categorize
 
     //	Console.
 
-    /**
-     * @return bool
-     */
     public function isConsole(): bool
     {
         return match (true) {
@@ -833,9 +679,6 @@ class Categorize
         };
     }
 
-    /**
-     * @return bool
-     */
     public function isGameNDS(): bool
     {
         if (preg_match('/^NDS|[^a-zA-Z0-9]NDS|[\._-](nds|NDS)|nintendo.+[^3]n?dsi?/', $this->releaseName)) {
@@ -854,9 +697,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGame3DS(): bool
     {
         if (preg_match('/\b3DS\b[^max]|[\._-]3ds|nintendo.+3ds|[_\.]3DS-/i', $this->releaseName) && ! preg_match('/3ds max/i', $this->releaseName) && preg_match('/(EUR|FR|GAME|HOL|JP|JPN|NL|NTSC|PAL|KS|USA|ASIA)/i', $this->releaseName)) {
@@ -868,9 +708,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGameNGC(): bool
     {
         if (preg_match('/[\._-]N?G(AME)?C(UBE)?-/i', $this->releaseName)) {
@@ -889,9 +726,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGamePS3(): bool
     {
         if (preg_match('/[^e]PS3/i', $this->releaseName)) {
@@ -910,9 +744,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGamePS4(): bool
     {
         if (preg_match('/[ \(_.-]PS4[ \)_.-]/i', $this->releaseName)) {
@@ -931,9 +762,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGamePSP(): bool
     {
         if (stripos($this->releaseName, 'PSP') !== false) {
@@ -952,9 +780,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGamePSVita(): bool
     {
         if (preg_match('/PS ?Vita/i', $this->releaseName)) {
@@ -966,9 +791,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGameWiiWare(): bool
     {
         if (preg_match('/(Console|DLC|VC).+[._ -]WII|(Console|DLC|VC)[._ -]WII|WII[._ -].+(Console|DLC|VC)|WII[._ -](Console|DLC|VC)|WIIWARE/i', $this->releaseName)) {
@@ -980,9 +802,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGameWiiU(): bool
     {
         switch (true) {
@@ -997,9 +816,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isGameWii(): bool
     {
         switch (true) {
@@ -1014,9 +830,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isGameXBOX360DLC(): bool
     {
         if (preg_match('/DLC.+xbox360|xbox360.+DLC|XBLA.+xbox360|xbox360.+XBLA/i', $this->releaseName)) {
@@ -1028,9 +841,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGameXBOX360(): bool
     {
         if (stripos($this->releaseName, '/XBOX360/i') !== false) {
@@ -1054,9 +864,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGameXBOXONE(): bool
     {
         if (preg_match('/XBOXONE|XBOX\.ONE/i', $this->releaseName)) {
@@ -1068,9 +875,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGameXBOX(): bool
     {
         if (stripos($this->releaseName, 'XBOX') !== false) {
@@ -1082,9 +886,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGameOther(): bool
     {
         if (preg_match('/\b(PS(1)X|PS2|SNES|NES|SEGA\s(GENESIS|CD)|GB([AC])|Dreamcast|SEGA\sSaturn|Atari\s(Jaguar)?|3DO)\b/i', $this->releaseName) && preg_match('/EUR|FR|GAME|HOL|\bISO\b|JP|JPN|NL|NTSC|PAL|KS|USA|ROMS?(et)?/i', $this->releaseName)) {
@@ -1098,9 +899,6 @@ class Categorize
 
     //	Music.
 
-    /**
-     * @return bool
-     */
     public function isMusic(): bool
     {
         return match (true) {
@@ -1109,9 +907,6 @@ class Categorize
         };
     }
 
-    /**
-     * @return bool
-     */
     public function isMusicForeign(): bool
     {
         if ($this->categorizeForeign && preg_match('/[ \-\._](brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|ita|latin|mandarin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish|bl|cz|de|es|fr|ger|heb|hu|hun|it(a| 19|20\d\d)|jap|ko|kor|nl|pl|se)[ \-\._]/i', $this->releaseName)) {
@@ -1123,9 +918,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isAudiobook(): bool
     {
         if ($this->categorizeForeign && stripos($this->releaseName, 'Audiobook') !== false) {
@@ -1146,9 +938,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMusicVideo(): bool
     {
         if (preg_match('/(720P|x264)\-(19|20)\d\d\-[a-z0-9]{1,12}/i', $this->releaseName)) {
@@ -1171,9 +960,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMusicLossless(): bool
     {
         if (preg_match('/\[(19|20)\d\d\][._ -]\[FLAC\]|([\(\[])flac([\)\]])|FLAC\-(19|20)\d\d\-[a-z0-9]{1,12}|\.flac"|(19|20)\d\d\sFLAC|[._ -]FLAC.+(19|20)\d\d[._ -]| FLAC$/i', $this->releaseName)) {
@@ -1188,9 +974,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMusicMP3(): bool
     {
         if (preg_match('/[a-z0-9]{1,12}\-(19|20)\d\d\-[a-z0-9]{1,12}|[\.\-\(\[_ ]\d{2,3}k[\.\-\)\]_ ]|\((192|256|320)\)|(320|cd|eac|vbr).+mp3|(cd|eac|mp3|vbr).+320|FIH\_INT|\s\dCDs|[._ -]MP3[._ -]|MP3\-\d{3}kbps|\.(m3u|mp3)"|NMR\s\d{2,3}\skbps|\(320\)\.|\-\((Bootleg|Promo)\)|\.mp3$|\-\sMP3\s(19|20)\d\d|\(vbr\)|rip(192|256|320)|[._ -](CDR|SBD|WEB).+(19|20)\d\d/i', $this->releaseName)) {
@@ -1213,9 +996,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMusicOther(): bool
     {
         if (preg_match('/(19|20)\d\d\-(C4)$|[._ -]\d?CD[._ -](19|20)\d\d|\(\d\-?CD\)|\-\dcd\-|\d[._ -]Albums|Albums.+(EP)|Bonus.+Tracks|Box.+?CD.+SET|Discography|D\.O\.M|Greatest\sSongs|Live.+(Bootleg|Remastered)|Music.+Vol|([\(\[\s])NMR([\)\]\s])|Promo.+CD|Reggaeton|Tiesto.+Club|Vinyl\s2496|\WV\.A\.|^\(VA\s|^VA[._ -]/i', $this->releaseName)) {
@@ -1234,9 +1014,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isMusicPodcast(): bool
     {
         if (preg_match('/podcast/i', $this->releaseName)) {
@@ -1250,9 +1027,6 @@ class Categorize
 
     //	Books.
 
-    /**
-     * @return bool
-     */
     public function isBook(): bool
     {
         return match (true) {
@@ -1261,9 +1035,6 @@ class Categorize
         };
     }
 
-    /**
-     * @return bool
-     */
     public function isBookForeign(): bool
     {
         switch (true) {
@@ -1276,9 +1047,6 @@ class Categorize
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isComic(): bool
     {
         switch (true) {
@@ -1294,9 +1062,6 @@ class Categorize
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isTechnicalBook(): bool
     {
         switch (true) {
@@ -1312,9 +1077,6 @@ class Categorize
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isMagazine(): bool
     {
         switch (true) {
@@ -1330,9 +1092,6 @@ class Categorize
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isBookOther(): bool
     {
         if (preg_match('/"\d\d-\d\d-20\d\d\./', $this->releaseName)) {
@@ -1344,9 +1103,6 @@ class Categorize
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isEBook(): bool
     {
         switch (true) {
@@ -1364,9 +1120,6 @@ class Categorize
 
     //	Misc, all hash/misc go in other misc.
 
-    /**
-     * @return bool
-     */
     public function isMisc(): bool
     {
         switch (true) {
@@ -1388,7 +1141,6 @@ class Categorize
      * @param  string  $regex  Regex to use for match
      * @param  string  $fromName  Poster that needs to be matched by regex
      * @param  string  $category  Category to set if there is a match
-     * @return bool
      */
     public function checkPoster(string $regex, string $fromName, string $category): bool
     {

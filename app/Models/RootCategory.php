@@ -24,15 +24,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RootCategory whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RootCategory whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RootCategory whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class RootCategory extends Model
 {
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function categories(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Category::class, 'root_categories_id');

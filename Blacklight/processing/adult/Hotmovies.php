@@ -9,26 +9,32 @@ class Hotmovies extends AdultMovies
      * Needed Search Queries Variables.
      */
     private const EXTRASEARCH = '&complete=on&search_in=video_title';
+
     private const HMURL = 'http://www.hotmovies.com';
+
     private const TRAILINGSEARCH = '/search.php?words=';
+
     /**
      * Keyword Search.
      *
      * @var string
      */
     protected $searchTerm = '';
+
     /**
      * Define a cookie location.
      *
      * @var string
      */
     public $cookie = '';
+
     /**
      * If a direct link is set parse it instead of search for it.
      *
      * @var string
      */
     protected $directLink = '';
+
     /**
      * Sets the direct url in the getAll method.
      *
@@ -78,8 +84,6 @@ class Hotmovies extends AdultMovies
 
     /**
      * Gets the synopsis.
-     *
-     * @return array
      */
     protected function synopsis(): array
     {
@@ -98,7 +102,6 @@ class Hotmovies extends AdultMovies
      * Process ProductInfo.
      *
      * @param  bool  $extras
-     * @return array
      */
     protected function productInfo($extras = false): array
     {
@@ -141,8 +144,6 @@ class Hotmovies extends AdultMovies
 
     /**
      * Gets the cast members and director.
-     *
-     * @return array
      */
     protected function cast(): array
     {
@@ -161,8 +162,6 @@ class Hotmovies extends AdultMovies
 
     /**
      * Gets categories.
-     *
-     * @return array
      */
     protected function genres(): array
     {

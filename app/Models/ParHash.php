@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash whereHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash whereReleasesId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ParHash newModelQuery()

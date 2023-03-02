@@ -8,7 +8,9 @@
  * @author    DariusIII <dkrisan@gmail.com>
  * @copyright 2013 confact
  * @copyright 2017 NNTmux
+ *
  * @date 2017-04-12
+ *
  * @release <0.0.2>
  */
 
@@ -28,8 +30,6 @@ class FanartTV
 
     /**
      * The constructor setting the config variables.
-     *
-     * @param $apiKey
      */
     public function __construct($apiKey)
     {

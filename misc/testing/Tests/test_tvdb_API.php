@@ -8,7 +8,6 @@ $c = new Blacklight\ColorCLI();
 $tvDB = new TVDB();
 
 if (! empty($argv[1]) && isset($argv[2], $argv[3]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
-
     // Test if your TvDB API key and configuration are working
     // If it works you should get a var dumped array of the show/season/episode entered
 

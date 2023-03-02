@@ -24,10 +24,6 @@ class AdminCommentsController extends BasePageController
         $this->adminrender();
     }
 
-    /**
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function destroy(int $id): \Illuminate\Http\RedirectResponse
     {
         if ($id) {

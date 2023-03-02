@@ -36,8 +36,6 @@ class ForgotPasswordController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function showLinkRequestForm(Request $request): void
@@ -91,9 +89,9 @@ class ForgotPasswordController extends Controller
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,
                 'meta_description' => $meta_description,
-                'email'     => $email,
-                'apikey'    => $rssToken,
-                'sent'      => $sent,
+                'email' => $email,
+                'apikey' => $rssToken,
+                'sent' => $sent,
             ]
         );
         app('smarty.view')->display($theme.'/basepage.tpl');

@@ -15,9 +15,7 @@ use Symfony\Component\Process\Process;
 use Zip as ZipStream;
 
 if (! function_exists('getRawHtml')) {
-
     /**
-     * @param    $url
      * @param  bool  $cookie
      * @return bool|mixed|string
      */
@@ -52,11 +50,7 @@ if (! function_exists('getRawHtml')) {
 }
 
 if (! function_exists('makeFieldLinks')) {
-
     /**
-     * @param $data
-     * @param $field
-     * @param $type
      * @return string
      *
      * @throws \Exception
@@ -88,7 +82,6 @@ if (! function_exists('makeFieldLinks')) {
 if (! function_exists('getUserBrowseOrder')) {
     /**
      * @param  string  $orderBy
-     * @return array
      */
     function getUserBrowseOrder($orderBy): array
     {
@@ -134,9 +127,6 @@ if (! function_exists('getUserBrowseOrder')) {
 
 if (! function_exists('getUserBrowseOrdering')) {
 
-    /**
-     * @return array
-     */
     function getUserBrowseOrdering(): array
     {
         return [
@@ -168,8 +158,6 @@ if (! function_exists('getUserBrowseOrdering')) {
 
 if (! function_exists('createGUID')) {
     /**
-     * @return string
-     *
      * @throws \Exception
      */
     function createGUID(): string
@@ -185,7 +173,6 @@ if (! function_exists('createGUID')) {
 if (! function_exists('getSimilarName')) {
     /**
      * @param  string  $name
-     * @return string
      */
     function getSimilarName($name): string
     {
@@ -196,7 +183,6 @@ if (! function_exists('getSimilarName')) {
 if (! function_exists('color')) {
     /**
      * @param  string  $string
-     * @return \Colors\Color
      */
     function color($string = ''): Color
     {
@@ -205,11 +191,8 @@ if (! function_exists('color')) {
 }
 
 if (! function_exists('human_filesize')) {
-
     /**
-     * @param    $bytes
      * @param  int  $decimals
-     * @return string
      */
     function human_filesize($bytes, $decimals = 0): string
     {
@@ -221,9 +204,7 @@ if (! function_exists('human_filesize')) {
 }
 
 if (! function_exists('bcdechex')) {
-
     /**
-     * @param $dec
      * @return string
      */
     function bcdechex($dec)
@@ -268,9 +249,7 @@ if (! function_exists('runCmd')) {
 }
 
 if (! function_exists('escapeString')) {
-
     /**
-     * @param $string
      * @return string
      */
     function escapeString($string)
@@ -280,9 +259,7 @@ if (! function_exists('escapeString')) {
 }
 
 if (! function_exists('realDuration')) {
-
     /**
-     * @param $milliseconds
      * @return string
      */
     function realDuration($milliseconds)
@@ -294,7 +271,6 @@ if (! function_exists('realDuration')) {
 }
 
 if (! function_exists('is_it_json')) {
-
     /**
      * @param  array|string  $isIt
      * @return bool
@@ -311,12 +287,11 @@ if (! function_exists('is_it_json')) {
 }
 
 /**
- * @param  array  $guids
  * @return \STS\ZipStream\ZipStream
  *
  * @throws \Exception
  */
-function getStreamingZip(array $guids = []): \STS\ZipStream\ZipStream
+function getStreamingZip(array $guids = []): STS\ZipStream\ZipStream
 {
     $nzb = new NZB();
     $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');

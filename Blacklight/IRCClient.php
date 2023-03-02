@@ -369,7 +369,7 @@ class IRCClient
                         return false;
                     }
                 }
-                //ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
+            //ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
             } elseif (preg_match('/^ERROR\s*:/', $this->_buffer)) {
                 echo $this->_buffer.PHP_EOL;
 
@@ -410,7 +410,7 @@ class IRCClient
                     $this->_pong($hits[1]);
                 }
 
-                // Check for a channel message.
+            // Check for a channel message.
             } elseif (preg_match(
                 '/^:(?P<nickname>.+?)\!.+?\s+PRIVMSG\s+(?P<channel>#.+?)\s+:\s*(?P<message>.+?)\s*$/',
                 $this->_stripControlCharacters($this->_buffer),
@@ -420,8 +420,8 @@ class IRCClient
                 $this->_channelData =
                     [
                         'nickname' => $hits['nickname'],
-                        'channel'  => $hits['channel'],
-                        'message'  => $hits['message'],
+                        'channel' => $hits['channel'],
+                        'message' => $hits['message'],
                     ];
 
                 $this->processChannelMessages();
@@ -566,7 +566,6 @@ class IRCClient
 
             // http://www.php.net/manual/en/function.fwrite.php#96951 | fwrite can return 0 causing an infinite loop.
             if ($fWrite === false || $fWrite <= 0) {
-
                 // If it failed, try a second time.
                 $fWrite = $this->_writeSocketChar(substr($command, $written));
                 if ($fWrite === false || $fWrite <= 0) {

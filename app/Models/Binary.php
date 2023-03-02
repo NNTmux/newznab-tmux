@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary wherePartcheck($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary wherePartsize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary whereTotalparts($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Binary newModelQuery()

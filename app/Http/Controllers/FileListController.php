@@ -8,8 +8,6 @@ use Blacklight\NZB;
 class FileListController extends BasePageController
 {
     /**
-     * @param  string  $guid
-     *
      * @throws \Exception
      */
     public function show(string $guid): void
@@ -47,7 +45,7 @@ class FileListController extends BasePageController
 
             $this->smarty->assign(
                 compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description')
-                );
+            );
             $this->pagerender();
         }
     }

@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\DB;
 class Genres
 {
     public const CONSOLE_TYPE = Category::GAME_ROOT;
+
     public const MUSIC_TYPE = Category::MUSIC_ROOT;
+
     public const GAME_TYPE = Category::PC_ROOT;
 
     public const STATUS_ENABLED = 0;
+
     public const STATUS_DISABLED = 1;
 
     /**
@@ -52,10 +55,6 @@ class Genres
         return $genres;
     }
 
-    /**
-     * @param $type
-     * @return array
-     */
     public function loadGenres($type): array
     {
         $genres = $this->getGenres($type);
@@ -70,7 +69,6 @@ class Genres
     /**
      * @param  string  $type
      * @param  bool  $activeOnly
-     * @return string
      */
     private function getListQuery($type = '', $activeOnly = false): string
     {
@@ -110,13 +108,6 @@ class Genres
         return $sql;
     }
 
-    /**
-     * @param  string  $type
-     * @param  bool  $activeOnly
-     * @param  int  $start
-     * @param  int  $num
-     * @return array
-     */
     public function getRange(int $start, int $num, string $type = '', bool $activeOnly = false): array
     {
         $sql = $this->getListQuery($type, $activeOnly);
@@ -125,11 +116,6 @@ class Genres
         return (array) Arr::first(DB::select($sql));
     }
 
-    /**
-     * @param  string  $type
-     * @param  bool  $activeOnly
-     * @return mixed
-     */
     public function getCount(string $type = '', bool $activeOnly = false): mixed
     {
         if (! empty($type)) {
@@ -170,7 +156,6 @@ class Genres
     }
 
     /**
-     * @param $id
      * @return \App\Models\Genre|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
     public function getById($id)
@@ -178,11 +163,6 @@ class Genres
         return Genre::query()->where('id', $id)->first();
     }
 
-    /**
-     * @param $id
-     * @param $disabled
-     * @return int
-     */
     public function update($id, $disabled): int
     {
         return Genre::query()->where('id', $id)->update(['disabled' => $disabled]);

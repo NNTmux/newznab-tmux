@@ -13,6 +13,7 @@
  * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
+ *
  * @author    niel
  * @copyright 2016 nZEDb
  */
@@ -20,10 +21,10 @@ use App\Models\Category;
 
 /**
  * Returns the value of the specified Category constant.
+ *
  * @usage {getcatval category=BOOKS_COMICS}
  *
- *@param string $params Name of constant whose value to return.
- *
+ *@param  string  $params Name of constant whose value to return.
  *@return Value of the specified Category constant.
  */
 function smarty_function_getcatval($params)

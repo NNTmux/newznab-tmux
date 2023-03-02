@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereOptype($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereStatus($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist newModelQuery()

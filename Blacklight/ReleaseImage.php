@@ -71,7 +71,6 @@ class ReleaseImage
     }
 
     /**
-     * @param    $imgLoc
      * @return bool|\Intervention\Image\Image
      */
     protected function fetchImage($imgLoc)
@@ -155,7 +154,6 @@ class ReleaseImage
      * Delete images for the release.
      *
      * @param  string  $guid  The GUID of the release.
-     * @return void
      */
     public function delete($guid): void
     {

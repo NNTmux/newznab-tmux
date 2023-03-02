@@ -26,13 +26,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExpirationEmail whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExpirationEmail whereUsersId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExpirationEmail whereWeek($value)
+ *
  * @mixin \Eloquent
  */
 class RoleExpirationEmail extends Model
 {
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');

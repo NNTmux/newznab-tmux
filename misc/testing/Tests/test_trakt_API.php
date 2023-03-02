@@ -8,7 +8,6 @@ $c = new Blacklight\ColorCLI();
 $trakt = new TraktTv();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
-
     // Test if your Trakt API key and configuration are working
     // If it works you should get a printed array of the show/season/episode entered
 

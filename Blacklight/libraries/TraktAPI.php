@@ -37,7 +37,6 @@ class TraktAPI
      * Construct. Assign passed request headers.  Headers should be complete with API key.
      *
      *
-     * @param $headers
      *
      * @throws \Exception
      */
@@ -95,7 +94,7 @@ class TraktAPI
     public function getBoxOffice()
     {
         $array = $this->getJsonArray(
-                self::API_URL.'movies/boxoffice'
+            self::API_URL.'movies/boxoffice'
         );
         if (! $array) {
             return false;
@@ -116,7 +115,7 @@ class TraktAPI
     public function getCalendar($start = '', $days = 7)
     {
         $array = $this->getJsonArray(
-                self::API_URL.'calendars/all/shows/'.$start.'/'.$days
+            self::API_URL.'calendars/all/shows/'.$start.'/'.$days
         );
         if (! $array) {
             return false;

@@ -35,7 +35,9 @@ abstract class Videos
 {
     // Video Type Identifiers
     protected const TYPE_TV = 0; // Type of video is a TV Programme/Show
+
     protected const TYPE_FILM = 1; // Type of video is a Film/Movie
+
     protected const TYPE_ANIME = 2; // Type of video is a Anime
 
     /**
@@ -56,7 +58,7 @@ abstract class Videos
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'     => false,
+            'Echo' => false,
             'Settings' => null,
         ];
         $options += $defaults;
@@ -69,9 +71,6 @@ abstract class Videos
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param    $groupID
-     * @param    $guidChar
-     * @param    $process
      * @param  bool  $local
      */
     abstract protected function processSite($groupID, $guidChar, $process, $local = false): void;
@@ -111,8 +110,6 @@ abstract class Videos
      * Get video info from a Site ID and column.
      *
      *
-     * @param $siteColumn
-     * @param $siteID
      * @return bool|int
      */
     protected function getVideoIDFromSiteID($siteColumn, $siteID)
@@ -126,8 +123,6 @@ abstract class Videos
     }
 
     /**
-     * @param $title
-     * @param $type
      * @param  int  $source
      * @return $this|array|bool|false|\Illuminate\Database\Eloquent\Model|mixed|null
      */
@@ -180,7 +175,6 @@ abstract class Videos
                 return $res;
             }
         } else {
-
             // If there was not an exact title match, look for title with missing chars
             // example release name :Zorro 1990, tvrage name Zorro (1990)
             // Only search if the title contains more than one word to prevent incorrect matches
@@ -201,8 +195,6 @@ abstract class Videos
     }
 
     /**
-     * @param $title
-     * @param $type
      * @param  int  $source
      * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
@@ -239,8 +231,6 @@ abstract class Videos
     /**
      * Supplementary function for getByTitle that queries for a like match.
      *
-     * @param    $title
-     * @param    $type
      * @param  int  $source
      * @return array|false
      */
@@ -282,8 +272,6 @@ abstract class Videos
      * Supplementary function for getByTitle that replaces special chars to find an exact match.
      * Add more ->whereRaw() methods if needed. Might slow TV PP down though.
      *
-     * @param $title
-     * @param $type
      * @param  int  $source
      * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
@@ -315,9 +303,6 @@ abstract class Videos
 
     /**
      * Inserts aliases for videos.
-     *
-     * @param    $videoId
-     * @param  array  $aliases
      */
     public function addAliases($videoId, array $aliases = []): void
     {
@@ -341,8 +326,6 @@ abstract class Videos
      * Retrieves all aliases for given VideoID or VideoID for a given alias.
      *
      *
-     * @param  int  $videoId
-     * @param  string  $alias
      * @return VideoAlias[]|bool|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getAliases(int $videoId, string $alias = '')

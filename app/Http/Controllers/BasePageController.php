@@ -15,57 +15,29 @@ use Illuminate\Support\Facades\Auth;
 
 class BasePageController extends Controller
 {
-    /**
-     * @var \App\Models\Settings
-     */
     public Settings $settings;
 
-    /**
-     * @var string
-     */
     public string $title = '';
 
-    /**
-     * @var string
-     */
     public string $content = '';
 
-    /**
-     * @var string
-     */
     public string $meta_keywords = '';
 
-    /**
-     * @var string
-     */
     public string $meta_title = '';
 
-    /**
-     * @var string
-     */
     public string $meta_description = '';
 
     /**
      * Current page the user is browsing. ie browse.
-     *
-     * @var string
      */
     public string $page = '';
 
-    /**
-     * @var string
-     */
     public string $page_template = '';
 
-    /**
-     * @var User
-     */
     public User $userdata;
 
     /**
      * User's theme.
-     *
-     * @var string
      */
     protected string $theme = 'Gentele';
 
@@ -94,15 +66,6 @@ class BasePageController extends Controller
         $this->smarty->assign('serverroot', url('/'));
     }
 
-    /**
-     * @param $query
-     * @param $totalCount
-     * @param $items
-     * @param $page
-     * @param $path
-     * @param $reqQuery
-     * @return \Illuminate\Pagination\LengthAwarePaginator
-     */
     public function paginate($query, $totalCount, $items, $page, $path, $reqQuery): LengthAwarePaginator
     {
         return new LengthAwarePaginator($query, $totalCount, $items, $page, ['path' => $path, 'query' => $reqQuery]);
@@ -139,15 +102,12 @@ class BasePageController extends Controller
 
         $this->smarty->assign(
             [
-                'theme'=> $this->theme,
+                'theme' => $this->theme,
                 'site' => $this->settings,
             ]
         );
     }
 
-    /**
-     * @return bool
-     */
     public function isPostBack(): bool
     {
         return \request()->isMethod('POST');
@@ -156,7 +116,6 @@ class BasePageController extends Controller
     /**
      * Show 404 page.
      *
-     * @param $message
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show404($message = null)
@@ -312,9 +271,9 @@ class BasePageController extends Controller
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(
             [
-                'admin'    => config('ytake-laravel-smarty.template_path').'/admin',
-                'shared'    => config('ytake-laravel-smarty.template_path').'/shared',
-                'default'    => config('ytake-laravel-smarty.template_path').'/admin',
+                'admin' => config('ytake-laravel-smarty.template_path').'/admin',
+                'shared' => config('ytake-laravel-smarty.template_path').'/shared',
+                'default' => config('ytake-laravel-smarty.template_path').'/admin',
             ]
         );
 

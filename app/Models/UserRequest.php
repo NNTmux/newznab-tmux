@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereRequest($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest newModelQuery()
@@ -57,8 +58,6 @@ class UserRequest extends Model
     }
 
     /**
-     * @param $userID
-     *
      * @throws \Throwable
      */
     public static function delApiRequests($userID): void
@@ -72,7 +71,6 @@ class UserRequest extends Model
      * Get the quantity of API requests in the last day for the users_id.
      *
      * @param  int  $userID
-     * @return int
      *
      * @throws \Exception
      * @throws \Throwable
@@ -95,7 +93,7 @@ class UserRequest extends Model
     public static function addApiRequest($token, $request): void
     {
         $userID = User::query()->select(['id'])->where('api_token', $token)->value('id');
-        self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> now()]);
+        self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp' => now()]);
     }
 
     /**
@@ -104,7 +102,6 @@ class UserRequest extends Model
      * @param  int|bool  $userID
      *                            int The users ID.
      *                            bool false do all user ID's..
-     * @return void
      *
      * @throws \Exception
      * @throws \Throwable

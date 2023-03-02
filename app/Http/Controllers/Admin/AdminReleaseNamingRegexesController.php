@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 class AdminReleaseNamingRegexesController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function index(Request $request): void
@@ -34,9 +32,6 @@ class AdminReleaseNamingRegexesController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -102,8 +97,6 @@ class AdminReleaseNamingRegexesController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function testRegex(Request $request): void

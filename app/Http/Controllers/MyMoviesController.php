@@ -12,9 +12,6 @@ use Illuminate\Http\Request;
 class MyMoviesController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -67,25 +64,25 @@ class MyMoviesController extends BasePageController
                     return redirect('/mymovies');
                 }
 
-            $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
-            $categories = [];
-            foreach ($tmpcats as $c) {
-                // If MOVIE WEB-DL categorization is disabled, don't include it as an option
-                if ((int) $c['id'] === Category::MOVIE_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
-                    continue;
+                $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
+                $categories = [];
+                foreach ($tmpcats as $c) {
+                    // If MOVIE WEB-DL categorization is disabled, don't include it as an option
+                    if ((int) $c['id'] === Category::MOVIE_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+                        continue;
+                    }
+                    $categories[$c['id']] = $c['title'];
                 }
-                $categories[$c['id']] = $c['title'];
-            }
-            $this->smarty->assign('type', 'add');
-            $this->smarty->assign('cat_ids', array_keys($categories));
-            $this->smarty->assign('cat_names', $categories);
-            $this->smarty->assign('cat_selected', []);
-            $this->smarty->assign('imdbid', $imdbid);
-            $this->smarty->assign('movie', $movie);
-            $content = $this->smarty->fetch('mymovies-add.tpl');
-            $this->smarty->assign('content', $content);
-            $this->pagerender();
-            break;
+                $this->smarty->assign('type', 'add');
+                $this->smarty->assign('cat_ids', array_keys($categories));
+                $this->smarty->assign('cat_names', $categories);
+                $this->smarty->assign('cat_selected', []);
+                $this->smarty->assign('imdbid', $imdbid);
+                $this->smarty->assign('movie', $movie);
+                $content = $this->smarty->fetch('mymovies-add.tpl');
+                $this->smarty->assign('content', $content);
+                $this->pagerender();
+                break;
             case 'edit':
             case 'doedit':
                 $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
@@ -104,22 +101,22 @@ class MyMoviesController extends BasePageController
                     return redirect('mymovies');
                 }
 
-            $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
-            $categories = [];
-            foreach ($tmpcats as $c) {
-                $categories[$c['id']] = $c['title'];
-            }
+                $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
+                $categories = [];
+                foreach ($tmpcats as $c) {
+                    $categories[$c['id']] = $c['title'];
+                }
 
-            $this->smarty->assign('type', 'edit');
-            $this->smarty->assign('cat_ids', array_keys($categories));
-            $this->smarty->assign('cat_names', $categories);
-            $this->smarty->assign('cat_selected', explode('|', $movie['categories']));
-            $this->smarty->assign('imdbid', $imdbid);
-            $this->smarty->assign('movie', $movie);
-            $content = $this->smarty->fetch('mymovies-add.tpl');
-            $this->smarty->assign('content', $content);
-            $this->pagerender();
-            break;
+                $this->smarty->assign('type', 'edit');
+                $this->smarty->assign('cat_ids', array_keys($categories));
+                $this->smarty->assign('cat_names', $categories);
+                $this->smarty->assign('cat_selected', explode('|', $movie['categories']));
+                $this->smarty->assign('imdbid', $imdbid);
+                $this->smarty->assign('movie', $movie);
+                $content = $this->smarty->fetch('mymovies-add.tpl');
+                $this->smarty->assign('content', $content);
+                $this->pagerender();
+                break;
             case 'browse':
 
                 $title = 'Browse My Movies';

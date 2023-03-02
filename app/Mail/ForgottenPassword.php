@@ -26,8 +26,6 @@ class ForgottenPassword extends Mailable
 
     /**
      * Create a new message instance.
-     *
-     * @param $resetLink
      */
     public function __construct($resetLink)
     {

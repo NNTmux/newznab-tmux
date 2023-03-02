@@ -62,16 +62,16 @@ $colorCli->header("Checked / releases deleted\n");
 $checked = $deleted = 0;
 
 $res = Release::query()->select(['id', 'guid', 'nzbstatus'])->get();
-    foreach ($res as $row) {
-        $nzbpath = $nzb->getNZBPath($row->guid);
-        if (! File::isFile($nzbpath)) {
-            $deleted++;
-            $releases->deleteSingle(['g' => $row->guid, 'i' => $row->id], $nzb, $releaseImage);
-        } elseif ($row->nzbstatus !== 1) {
-            Release::where('id', $row->id)->update(['nzbstatus' => 1]);
-        }
-        $checked++;
-        echo "$checked / $deleted\r";
+foreach ($res as $row) {
+    $nzbpath = $nzb->getNZBPath($row->guid);
+    if (! File::isFile($nzbpath)) {
+        $deleted++;
+        $releases->deleteSingle(['g' => $row->guid, 'i' => $row->id], $nzb, $releaseImage);
+    } elseif ($row->nzbstatus !== 1) {
+        Release::where('id', $row->id)->update(['nzbstatus' => 1]);
     }
+    $checked++;
+    echo "$checked / $deleted\r";
+}
 $colorCli->header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
 $colorCli->header("Script started at [$timestart], finished at [".now()->toRfc2822String().']');

@@ -23,7 +23,6 @@ class ReleaseExtra
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function get($id)
@@ -33,7 +32,6 @@ class ReleaseExtra
     }
 
     /**
-     * @param $id
      * @return array|false
      */
     public function getVideo($id)
@@ -48,7 +46,6 @@ class ReleaseExtra
     }
 
     /**
-     * @param $id
      * @return array|false
      */
     public function getAudio($id)
@@ -63,7 +60,6 @@ class ReleaseExtra
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getSubs($id)
@@ -73,7 +69,6 @@ class ReleaseExtra
 
     /**
      * @param  string  $guid
-     * @return array
      */
     public function getBriefByGuid($guid): array
     {
@@ -92,7 +87,6 @@ class ReleaseExtra
     }
 
     /**
-     * @param $guid
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null|object
      */
     public function getByGuid($guid)
@@ -100,9 +94,6 @@ class ReleaseExtra
         return VideoData::query()->where('r.guid', $guid)->leftJoin('releases as r', 'r.id', '=', 'video_data.releases_id')->first();
     }
 
-    /**
-     * @param $id
-     */
     public function delete($id): void
     {
         AudioData::query()->where('releases_id', $id)->delete();
@@ -110,10 +101,6 @@ class ReleaseExtra
         VideoData::query()->where('releases_id', $id)->delete();
     }
 
-    /**
-     * @param    $releaseID
-     * @param  \Mhor\MediaInfo\Container\MediaInfoContainer  $arrXml
-     */
     public function addFromXml($releaseID, MediaInfoContainer $arrXml): void
     {
         $containerFormat = '';
@@ -260,19 +247,6 @@ class ReleaseExtra
         }
     }
 
-    /**
-     * @param $releaseID
-     * @param $containerFormat
-     * @param $overallBitRate
-     * @param $videoDuration
-     * @param $videoFormat
-     * @param $videoCodec
-     * @param $videoWidth
-     * @param $videoHeight
-     * @param $videoAspect
-     * @param $videoFrameRate
-     * @param $videoLibrary
-     */
     public function addVideo(
         $releaseID,
         $containerFormat,
@@ -304,19 +278,6 @@ class ReleaseExtra
         }
     }
 
-    /**
-     * @param $releaseID
-     * @param $audioID
-     * @param $audioFormat
-     * @param $audioMode
-     * @param $audioBitRateMode
-     * @param $audioBitRate
-     * @param $audioChannels
-     * @param $audioSampleRate
-     * @param $audioLibrary
-     * @param $audioLanguage
-     * @param $audioTitle
-     */
     private function addAudio($releaseID, $audioID, $audioFormat, $audioMode, $audioBitRateMode, $audioBitRate, $audioChannels, $audioSampleRate, $audioLibrary, $audioLanguage, $audioTitle): void
     {
         $ckid = AudioData::query()->where('releases_id', $releaseID)->first(['releases_id']);
@@ -337,11 +298,6 @@ class ReleaseExtra
         }
     }
 
-    /**
-     * @param $releaseID
-     * @param $subsID
-     * @param $subsLanguage
-     */
     private function addSubs($releaseID, $subsID, $subsLanguage): void
     {
         $ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->first(['releases_id']);
@@ -381,7 +337,6 @@ class ReleaseExtra
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getFull($id)
@@ -399,10 +354,6 @@ class ReleaseExtra
         return ReleaseExtraFull::query()->where('releases_id', $id)->delete();
     }
 
-    /**
-     * @param    $id
-     * @param  \Mhor\MediaInfo\Container\MediaInfoContainer  $xmlArray
-     */
     public function addFull($id, MediaInfoContainer $xmlArray): void
     {
         $ckid = ReleaseExtraFull::query()->where('releases_id', $id)->first();

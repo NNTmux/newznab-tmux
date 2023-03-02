@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereNfo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereReleasesId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo newModelQuery()
@@ -44,7 +45,6 @@ class ReleaseNfo extends Model
     }
 
     /**
-     * @param $id
      * @param  bool  $getNfoString
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */

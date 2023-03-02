@@ -41,6 +41,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereUrl($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo newModelQuery()
@@ -50,6 +51,7 @@ use Laravel\Scout\Searchable;
 class BookInfo extends Model
 {
     use Searchable;
+
     /**
      * @var string
      */
@@ -79,7 +81,7 @@ class BookInfo extends Model
     public function toSearchableArray()
     {
         return [
-            'author'=> $this->author,
+            'author' => $this->author,
             'title' => $this->title,
         ];
     }

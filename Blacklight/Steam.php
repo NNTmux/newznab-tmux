@@ -23,9 +23,6 @@ class Steam
      */
     protected $steamGameID;
 
-    /**
-     * @var
-     */
     protected $lastUpdate;
 
     /**
@@ -41,7 +38,6 @@ class Steam
     /**
      * Steam constructor.
      *
-     * @param  array  $options
      *
      * @throws \Exception
      */
@@ -53,7 +49,7 @@ class Steam
         $this->steamFront = new Main(
             [
                 'country_code' => 'us',
-                'local_lang'   => 'english',
+                'local_lang' => 'english',
             ]
         );
 
@@ -72,16 +68,16 @@ class Steam
 
         if ($res !== false) {
             $result = [
-                'title'       => $res->name,
+                'title' => $res->name,
                 'description' => $res->description['short'] ?? null,
-                'cover'       => $res->images['header'] ?? null,
-                'backdrop'    => $res->images['background'] ?? null,
-                'steamid'     => $res->appid,
-                'directurl'   => Main::STEAM_STORE_ROOT.'app/'.$res->appid,
-                'publisher'   => $res->publishers,
-                'rating'      => $res->metacritic['score'] ?? null,
+                'cover' => $res->images['header'] ?? null,
+                'backdrop' => $res->images['background'] ?? null,
+                'steamid' => $res->appid,
+                'directurl' => Main::STEAM_STORE_ROOT.'app/'.$res->appid,
+                'publisher' => $res->publishers,
+                'rating' => $res->metacritic['score'] ?? null,
                 'releasedate' => $res->releasedate['date'] ?? null,
-                'genres'      => $res->genres !== null ? implode(',', array_column($res->genres, 'description')) : '',
+                'genres' => $res->genres !== null ? implode(',', array_column($res->genres, 'description')) : '',
             ];
 
             return $result;

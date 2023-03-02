@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Process;

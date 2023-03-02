@@ -46,6 +46,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereYear($value)
+ *
  * @mixin \Eloquent
  *
  * @property int $traktid

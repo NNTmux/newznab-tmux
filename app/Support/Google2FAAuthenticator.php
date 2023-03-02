@@ -7,9 +7,6 @@ use PragmaRX\Google2FALaravel\Support\Authenticator;
 
 class Google2FAAuthenticator extends Authenticator
 {
-    /**
-     * @return bool
-     */
     protected function canPassWithoutCheckingOTP(): bool
     {
         if (! $this->getUser()->passwordSecurity) {

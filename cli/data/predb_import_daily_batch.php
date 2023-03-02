@@ -95,6 +95,7 @@ foreach ($data as $dir => $files) {
                         ', as your minimum unix time argument is '.
                         $timeMatch.PHP_EOL;
                     $total--;
+
                     continue;
                 }
 
@@ -105,12 +106,14 @@ foreach ($data as $dir => $files) {
                 if (! $dump) {
                     echo "Error downloading dump {$hit[2]} you can try manually importing it.".
                         PHP_EOL;
+
                     continue;
                 }
 
                 // Make sure we didn't get an HTML page.
                 if (strpos($dump, '<!DOCTYPE html>') !== false) {
                     echo "The dump file {$hit[2]} might be missing from GitHub.".PHP_EOL;
+
                     continue;
                 }
 
@@ -119,6 +122,7 @@ foreach ($data as $dir => $files) {
 
                 if (! $dump) {
                     echo "Error decompressing dump {$hit[2]}.".PHP_EOL;
+
                     continue;
                 }
 
@@ -128,6 +132,7 @@ foreach ($data as $dir => $files) {
                 if (! $fetched) {
                     echo "Error storing dump file {$hit[2]} in (".NN_RES.').'.
                         PHP_EOL;
+
                     continue;
                 }
 

@@ -12,9 +12,6 @@ use Illuminate\Http\Request;
 class MyShowsController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -66,27 +63,27 @@ class MyShowsController extends BasePageController
                     return redirect('myshows');
                 }
 
-            $tmpcats = Category::getChildren(Category::TV_ROOT);
-            $categories = [];
-            foreach ($tmpcats as $c) {
-                // If TV WEB-DL categorization is disabled, don't include it as an option
-                if ((int) $c['id'] === Category::TV_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
-                    continue;
+                $tmpcats = Category::getChildren(Category::TV_ROOT);
+                $categories = [];
+                foreach ($tmpcats as $c) {
+                    // If TV WEB-DL categorization is disabled, don't include it as an option
+                    if ((int) $c['id'] === Category::TV_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+                        continue;
+                    }
+                    $categories[$c['id']] = $c['title'];
                 }
-                $categories[$c['id']] = $c['title'];
-            }
-            $this->smarty->assign('type', 'add');
-            $this->smarty->assign('cat_ids', array_keys($categories));
-            $this->smarty->assign('cat_names', $categories);
-            $this->smarty->assign('cat_selected', []);
-            $this->smarty->assign('video', $videoId);
-            $this->smarty->assign('show', $show);
-            $content = $this->smarty->fetch('myshows-add.tpl');
-            $this->smarty->assign([
-                'content' => $content,
-            ]);
-            $this->pagerender();
-            break;
+                $this->smarty->assign('type', 'add');
+                $this->smarty->assign('cat_ids', array_keys($categories));
+                $this->smarty->assign('cat_names', $categories);
+                $this->smarty->assign('cat_selected', []);
+                $this->smarty->assign('video', $videoId);
+                $this->smarty->assign('show', $show);
+                $content = $this->smarty->fetch('myshows-add.tpl');
+                $this->smarty->assign([
+                    'content' => $content,
+                ]);
+                $this->pagerender();
+                break;
             case 'edit':
             case 'doedit':
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
@@ -105,24 +102,24 @@ class MyShowsController extends BasePageController
                     return redirect('myshows');
                 }
 
-            $tmpcats = Category::getChildren(Category::TV_ROOT);
-            $categories = [];
-            foreach ($tmpcats as $c) {
-                $categories[$c['id']] = $c['title'];
-            }
+                $tmpcats = Category::getChildren(Category::TV_ROOT);
+                $categories = [];
+                foreach ($tmpcats as $c) {
+                    $categories[$c['id']] = $c['title'];
+                }
 
-            $this->smarty->assign('type', 'edit');
-            $this->smarty->assign('cat_ids', array_keys($categories));
-            $this->smarty->assign('cat_names', $categories);
-            $this->smarty->assign('cat_selected', explode('|', $show['categories']));
-            $this->smarty->assign('video', $videoId);
-            $this->smarty->assign('show', $show);
-            $content = $this->smarty->fetch('myshows-add.tpl');
-            $this->smarty->assign([
-                'content' => $content,
-            ]);
-            $this->pagerender();
-            break;
+                $this->smarty->assign('type', 'edit');
+                $this->smarty->assign('cat_ids', array_keys($categories));
+                $this->smarty->assign('cat_names', $categories);
+                $this->smarty->assign('cat_selected', explode('|', $show['categories']));
+                $this->smarty->assign('video', $videoId);
+                $this->smarty->assign('show', $show);
+                $content = $this->smarty->fetch('myshows-add.tpl');
+                $this->smarty->assign([
+                    'content' => $content,
+                ]);
+                $this->pagerender();
+                break;
             default:
 
                 $title = 'My Shows';
@@ -164,8 +161,6 @@ class MyShowsController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function browse(Request $request): void

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereOrdinal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex whereStatus($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CollectionRegex newModelQuery()

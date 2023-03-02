@@ -9,7 +9,6 @@ $fanart = new FanartTV(config('nntmux_api.fanarttv_api_key'));
 $colorCli = new ColorCLI();
 
 if (! empty($argv[1])) {
-
     // Test if you can fetch Fanart.TV images
 
     // Search for a movie/tv

@@ -41,6 +41,7 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSetting($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSubsection($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereValue($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings newModelQuery()
@@ -83,6 +84,7 @@ class Settings extends Model
      * @var Command
      */
     protected $console;
+
     /**
      * @var array
      */
@@ -140,7 +142,6 @@ class Settings extends Model
      *
      * @param  bool  $excludeUnsectioned  If rows with empty 'section' field should be excluded.
      *                                    Note this doesn't prevent empty 'subsection' fields.
-     * @return array
      *
      * @throws \RuntimeException
      */
@@ -166,7 +167,6 @@ class Settings extends Model
     }
 
     /**
-     * @param $setting
      * @return mixed
      */
     public static function settingValue($setting)
@@ -185,8 +185,6 @@ class Settings extends Model
 
     /**
      * Returns the stored Db version string.
-     *
-     * @return string
      */
     public function getDbVersion(): string
     {
@@ -221,9 +219,6 @@ class Settings extends Model
         }
     }
 
-    /**
-     * @param  array  $data
-     */
     public static function settingsUpdate(array $data = [])
     {
         foreach ($data as $key => $value) {

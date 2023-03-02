@@ -36,9 +36,6 @@ class AdminAnidbController extends BasePageController
     }
 
     /**
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function edit(int $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -94,7 +91,6 @@ class AdminAnidbController extends BasePageController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
      *
      * @throws \Exception
      */

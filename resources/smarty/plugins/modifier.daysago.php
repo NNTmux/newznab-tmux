@@ -7,7 +7,9 @@
  * Purpose:  converts unix timestamps or datetime strings to words
  * Type:     modifier<br>
  * Name:     daysAgo<br>.
+ *
  * @author   Stephan Otto
+ *
  * @param string
  * @return string
  */

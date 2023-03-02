@@ -30,12 +30,12 @@ return [
     /***********************************************************************************************************************
      * This is the nick name visible in IRC channels.
      **********************************************************************************************************************/
-    'scrape_irc_nickname'=> env('SCRAPE_IRC_USERNAME', ''),
+    'scrape_irc_nickname' => env('SCRAPE_IRC_USERNAME', ''),
 
     /***********************************************************************************************************************
      * This is a name that is visible to others when they type /whois nickname.
      **********************************************************************************************************************/
-    'scrape_irc_realname'=> env('SCRAPE_IRC_USERNAME', ''),
+    'scrape_irc_realname' => env('SCRAPE_IRC_USERNAME', ''),
 
     /***********************************************************************************************************************
      * This is used as part of your "ident" when connecting to IRC.
@@ -75,8 +75,8 @@ return [
     'scrape_irc_channels' => serialize(
         [
             //'#Channel'                => 'Password',
-            '#PreNNTmux'                => null,
-            '#nZEDbPRE'                 => null,
+            '#PreNNTmux' => null,
+            '#nZEDbPRE' => null,
         ]
     ),
 
@@ -87,26 +87,26 @@ return [
 
     'scrape_irc_source_ignore' => serialize(
         [
-            '#a.b.cd.image'               => false,
-            '#a.b.console.ps3'            => false,
-            '#a.b.dvd'                    => false,
-            '#a.b.erotica'                => false,
-            '#a.b.flac'                   => false,
-            '#a.b.foreign'                => false,
-            '#a.b.games.nintendods'       => false,
-            '#a.b.inner-sanctum'          => false,
-            '#a.b.moovee'                 => false,
-            '#a.b.movies.divx'            => false,
-            '#a.b.sony.psp'               => false,
+            '#a.b.cd.image' => false,
+            '#a.b.console.ps3' => false,
+            '#a.b.dvd' => false,
+            '#a.b.erotica' => false,
+            '#a.b.flac' => false,
+            '#a.b.foreign' => false,
+            '#a.b.games.nintendods' => false,
+            '#a.b.inner-sanctum' => false,
+            '#a.b.moovee' => false,
+            '#a.b.movies.divx' => false,
+            '#a.b.sony.psp' => false,
             '#a.b.sounds.mp3.complete_cd' => false,
-            '#a.b.teevee'                 => false,
-            '#a.b.games.wii'              => false,
-            '#a.b.warez'                  => false,
-            '#a.b.games.xbox360'          => false,
-            '#pre@corrupt'                => false,
-            '#scnzb'                      => false,
-            '#tvnzb'                      => false,
-            'srrdb'                       => false,
+            '#a.b.teevee' => false,
+            '#a.b.games.wii' => false,
+            '#a.b.warez' => false,
+            '#a.b.games.xbox360' => false,
+            '#pre@corrupt' => false,
+            '#scnzb' => false,
+            '#tvnzb' => false,
+            'srrdb' => false,
         ]
     ),
 ];

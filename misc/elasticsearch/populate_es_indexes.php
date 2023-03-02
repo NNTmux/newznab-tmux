@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1])) {
     exit(
-            "Argument 1 is the index name, releases and predb are the only supported ones currently.\n".
-            "Argument 2 is optional, max number of rows to send to ES at a time, 10,000 is the default if not set.\n"
+        "Argument 1 is the index name, releases and predb are the only supported ones currently.\n".
+        "Argument 2 is optional, max number of rows to send to ES at a time, 10,000 is the default if not set.\n"
     );
 }
 

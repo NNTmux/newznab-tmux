@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull whereMediainfo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull whereReleasesId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull newModelQuery()
@@ -51,9 +52,6 @@ class ReleaseExtraFull extends Model
      */
     protected $primaryKey = 'releases_id';
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');

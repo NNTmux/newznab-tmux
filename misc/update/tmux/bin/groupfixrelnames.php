@@ -24,7 +24,6 @@ $nameFixer = new NameFixer();
 [$type, $guidChar, $maxPerRun, $thread] = explode(' ', $argv[1]);
 
 switch (true) {
-
     case $type === 'standard' && $guidChar !== null && $maxPerRun !== null && is_numeric($maxPerRun):
 
         // Allow for larger filename return sets

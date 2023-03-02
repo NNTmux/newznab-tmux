@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 class AdminSharingController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function index(Request $request): void

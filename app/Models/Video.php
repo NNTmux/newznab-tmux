@@ -37,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvmaze($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvrage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereType($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video newModelQuery()
@@ -88,7 +89,6 @@ class Video extends Model
      * Get info from tables for the provided ID.
      *
      *
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByVideoID($id)
@@ -125,7 +125,6 @@ class Video extends Model
      *
      *
      * @param  string  $showname
-     * @return int
      */
     public static function getCount($showname = ''): int
     {
@@ -141,10 +140,8 @@ class Video extends Model
     /**
      * Retrieves and returns a list of shows with eligible releases.
      *
-     * @param    $uid
      * @param  string  $letter
      * @param  string  $showname
-     * @return array
      */
     public static function getSeriesList($uid, $letter = '', $showname = ''): array
     {

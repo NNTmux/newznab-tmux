@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUsersId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereVideosId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie newModelQuery()
@@ -51,9 +52,6 @@ class UserSerie extends Model
      * When a user wants to add a show to "my shows" insert it into the user series table.
      *
      *
-     * @param $userId
-     * @param $videoId
-     * @param  array  $catID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addShow($userId, $videoId, array $catID = [])
@@ -74,7 +72,6 @@ class UserSerie extends Model
      * Get all the user's "my shows".
      *
      *
-     * @param $userId
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getShows($userId)
@@ -89,9 +86,6 @@ class UserSerie extends Model
 
     /**
      * Delete a tv show from the user's "my shows".
-     *
-     * @param $users_id
-     * @param $videos_id
      */
     public static function delShow($users_id, $videos_id): void
     {
@@ -102,8 +96,6 @@ class UserSerie extends Model
      * Get tv show information for a user.
      *
      *
-     * @param $userId
-     * @param $videoId
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getShow($userId, $videoId)
@@ -116,9 +108,6 @@ class UserSerie extends Model
 
     /**
      * Delete all shows from the user's "my shows".
-     *
-     *
-     * @param $userId
      */
     public static function delShowForUser($userId): void
     {
@@ -127,9 +116,6 @@ class UserSerie extends Model
 
     /**
      * Delete TV shows from all user's "my shows" that match a TV id.
-     *
-     *
-     * @param $videoId
      */
     public static function delShowForSeries($videoId): void
     {
@@ -139,12 +125,10 @@ class UserSerie extends Model
     /**
      * Update a TV show category ID for a user's "my show" TV show.
      *
-     * @param    $users_id
-     * @param    $videos_id
      * @param  array  $catID  List of category ID's.
      */
     public static function updateShow($users_id, $videos_id, array $catID = []): void
     {
-        self::query()->where(compact('users_id', 'videos_id'))->update(['categories' =>  ! empty($catID) ? implode('|', $catID) : 'NULL']);
+        self::query()->where(compact('users_id', 'videos_id'))->update(['categories' => ! empty($catID) ? implode('|', $catID) : 'NULL']);
     }
 }

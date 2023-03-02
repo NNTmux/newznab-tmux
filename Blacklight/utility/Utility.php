@@ -20,9 +20,6 @@ class Utility
         }
     }
 
-    /**
-     * @return array
-     */
     public static function getThemesList(): array
     {
         $ignoredThemes = ['admin', 'shared'];
@@ -41,10 +38,6 @@ class Utility
 
     /**
      * Detect if the command is accessible on the system.
-     *
-     *
-     * @param $cmd
-     * @return bool
      */
     public static function hasCommand($cmd): bool
     {
@@ -55,8 +48,6 @@ class Utility
 
     /**
      * Check if user is running from CLI.
-     *
-     * @return bool
      */
     public static function isCLI(): bool
     {
@@ -82,7 +73,6 @@ class Utility
     /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
-     * @param  string  $filePath
      * @return bool|string
      */
     public static function unzipGzipFile(string $filePath)
@@ -106,9 +96,6 @@ class Utility
         return $string === '' ? false : $string;
     }
 
-    /**
-     * @param $path
-     */
     public static function setCoversConstant($path): void
     {
         if (! \defined('NN_COVERS')) {
@@ -131,21 +118,21 @@ class Utility
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
      * @param  bool  $forceIgnore  Force ignoring of verification.
-     * @return array
+     *
      * @static
      */
     public static function streamSslContextOptions(bool $forceIgnore = false): array
     {
         if (config('nntmux_ssl.ssl_cafile') === '' && config('nntmux_ssl.ssl_capath') === '') {
             $options = [
-                'verify_peer'       => false,
-                'verify_peer_name'  => false,
+                'verify_peer' => false,
+                'verify_peer_name' => false,
                 'allow_self_signed' => true,
             ];
         } else {
             $options = [
-                'verify_peer'       => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_peer'),
-                'verify_peer_name'  => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_host'),
+                'verify_peer' => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_peer'),
+                'verify_peer_name' => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_host'),
                 'allow_self_signed' => $forceIgnore ? true : config('nntmux_ssl.ssl_allow_self_signed'),
             ];
             if (config('nntmux_ssl.ssl_cafile') !== '') {
@@ -161,16 +148,12 @@ class Utility
         return ['tls' => $options, 'ssl' => $options];
     }
 
-    /**
-     * @param  array  $options
-     * @return string
-     */
     public static function getCoverURL(array $options = []): string
     {
         $defaults = [
-            'id'     => null,
+            'id' => null,
             'suffix' => '-cover.jpg',
-            'type'   => '',
+            'type' => '',
         ];
         $options += $defaults;
         $fileSpecTemplate = '%s/%s%s';
@@ -180,7 +163,7 @@ class Utility
             $options['type'],
             ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'],
             false
-            )
+        )
         ) {
             $fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
             $fileSpec = file_exists(NN_COVERS.$fileSpec) ? $fileSpec :
@@ -196,7 +179,6 @@ class Utility
      * @author Tamlyn from Outlandish.com
      *
      * @param  \SimpleXMLElement  $xml  The SimpleXML parsed XML string data
-     * @param  array  $options
      * @return array The associate array of the XML namespaced file
      */
     public static function xmlToArray(\SimpleXMLElement $xml, array $options = []): array
@@ -311,9 +293,6 @@ class Utility
 
     /**
      * Convert Code page 437 chars to UTF.
-     *
-     * @param  string  $string
-     * @return string
      */
     public static function cp437toUTF(string $string): string
     {
@@ -322,9 +301,6 @@ class Utility
 
     /**
      * Fetches an embeddable video to a IMDB trailer from http://www.traileraddict.com.
-     *
-     * @param $imdbID
-     * @return string
      */
     public static function imdb_trailers($imdbID): string
     {
@@ -338,9 +314,6 @@ class Utility
 
     /**
      * Display error/error code.
-     *
-     * @param  int  $errorCode
-     * @param  string  $errorText
      */
     public static function showApiError(int $errorCode = 900, string $errorText = ''): void
     {
@@ -431,19 +404,12 @@ class Utility
 
     /**
      * Simple function to reduce duplication in html string formatting.
-     *
-     * @param $string
-     * @return string
      */
     public static function htmlfmt($string): string
     {
         return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
     }
 
-    /**
-     * @param $tableName
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
     public static function getRange($tableName): LengthAwarePaginator
     {
         $range = DB::table($tableName);
@@ -454,10 +420,6 @@ class Utility
         return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
     }
 
-    /**
-     * @param $tableName
-     * @return int
-     */
     public static function getCount($tableName): int
     {
         $res = DB::table($tableName)->count('id');

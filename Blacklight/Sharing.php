@@ -73,7 +73,7 @@ class Sharing
     {
         $defaults = [
             'Settings' => null,
-            'NNTP'     => null,
+            'NNTP' => null,
         ];
         $options += $defaults;
 
@@ -220,8 +220,6 @@ class Sharing
     }
 
     /**
-     * @param $row
-     *
      * @throws \Exception
      */
     protected function postComment(&$row)
@@ -232,7 +230,6 @@ class Sharing
         // Check if the comment is already shared.
         $check = DB::selectOne(sprintf('SELECT id FROM release_comments WHERE shareid = %s', escapeString($sid)));
         if ($check === null) {
-
             // Example of a subject.
             //(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
 
@@ -244,8 +241,8 @@ class Sharing
                     [
                         'USER' => $this->siteSettings->hide_users ? 'ANON' : $row->username,
                         'TIME' => $row->unix_time,
-                        'SID'  => $sid,
-                        'RID'  => $row->nzb_guid,
+                        'SID' => $sid,
+                        'RID' => $row->nzb_guid,
                         'BODY' => $row->text,
                     ]
                 ),
@@ -254,7 +251,6 @@ class Sharing
 
             // Check if we succesfully uploaded it.
             if ($success === true && $this->nntp->isError($success) === false) {
-
                 // Update DB to say we posted the article.
                 DB::update(
                     sprintf(
@@ -310,8 +306,8 @@ class Sharing
 
         // Update first time seen.
         DB::update(
-        sprintf(
-            "
+            sprintf(
+                "
 					UPDATE sharing_sites ss
 					INNER JOIN
 						(SELECT siteid, created_at
@@ -322,8 +318,8 @@ class Sharing
 					ON ss.site_guid = rc.siteid
 					SET ss.first_time = rc.created_at
 					WHERE ss.first_time IS NULL OR ss.first_time > rc.created_at"
-        )
-    );
+            )
+        );
     }
 
     /**
@@ -383,7 +379,6 @@ class Sharing
         $found = $total = $currentArticle = 0;
         // Loop over NNTP headers until we find comments.
         foreach ($headers as $header) {
-
             // Check if the article is missing.
             if (! isset($header['Number'])) {
                 continue;
@@ -401,7 +396,6 @@ class Sharing
             //(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
             if ($header['From'] === '<anon@anon.com>' &&
                 preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $hits)) {
-
                 // Check if this is from our own site.
                 if ($hits['guid'] === $this->siteSettings->site_guid) {
                     continue;
@@ -417,7 +411,6 @@ class Sharing
 
                 // We don't have it, so insert it.
                 if ($check === null) {
-
                     // Check if we have the site and if it is enabled.
                     $check = DB::selectOne(
                         sprintf(
@@ -440,6 +433,7 @@ class Sharing
                                     escapeString($hits['guid'])
                                 )
                             );
+
                             continue;
                         }
 
@@ -505,7 +499,6 @@ class Sharing
      *
      * @param  string  $messageID  Message-ID for the article.
      * @param  string  $siteID  id of the site.
-     * @return bool
      *
      * @throws \Exception
      */

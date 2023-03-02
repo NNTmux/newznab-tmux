@@ -217,7 +217,7 @@ while ($runVar['counts']['iterations'] > 0) {
                         $runVar['counts']['now']['binaries_table'] +=
                             getTableRowCount($psTableRowCount, $tbl);
                         break;
-                    // This case must come before the 'parts_' one.
+                        // This case must come before the 'parts_' one.
                     case str_contains($tbl, 'missed_parts'):
                         $runVar['counts']['now']['missed_parts_table'] +=
                             getTableRowCount($psTableRowCount, $tbl);
@@ -276,7 +276,6 @@ while ($runVar['counts']['iterations'] > 0) {
         }
 
         foreach ($runVar['counts']['now'] as $key => $proc) {
-
             //if key is a process type, add it to total_work
             if (str_starts_with($key, 'process')) {
                 $runVar['counts']['now']['total_work'] += $proc;
@@ -309,7 +308,6 @@ while ($runVar['counts']['iterations'] > 0) {
 
     //begin pane run execution
     if ($runVar['settings']['is_running'] === '1') {
-
         //run main updating function(s)
         try {
             $tRun->runPane('main', $runVar);
@@ -347,7 +345,6 @@ while ($runVar['counts']['iterations'] > 0) {
 
         //run these if complete sequential not set
         if ((int) $runVar['constants']['sequential'] !== 2) {
-
             //fix names
             try {
                 $tRun->runPane('fixnames', $runVar);
@@ -408,10 +405,9 @@ function errorOnSQL()
 
 /**
  * @param  \PDOStatement  $ps
- * @param    $table
  * @return bool|int|string
  */
-function getTableRowCount(\PDOStatement $ps, $table)
+function getTableRowCount(PDOStatement $ps, $table)
 {
     if ($ps->execute([':table' => $table])) {
         $result = $ps->fetch();

@@ -158,11 +158,11 @@ class Movie
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'         => false,
-            'Logger'    => null,
+            'Echo' => false,
+            'Logger' => null,
             'ReleaseImage' => null,
-            'Settings'     => null,
-            'TMDb'         => null,
+            'Settings' => null,
+            'TMDb' => null,
         ];
         $options += $defaults;
 
@@ -202,7 +202,6 @@ class Movie
     }
 
     /**
-     * @param $imdbId
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
      */
     public function getMovieInfo($imdbId)
@@ -214,13 +213,7 @@ class Movie
      * Get movie releases with covers for movie browse page.
      *
      *
-     * @param    $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
-     * @param    $orderBy
      * @param  int  $maxAge
-     * @param  array  $excludedCats
      * @return array|mixed
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
@@ -328,9 +321,6 @@ class Movie
 
     /**
      * Get the order type the user requested on the movies page.
-     *
-     * @param $orderBy
-     * @return array
      */
     protected function getMovieOrder($orderBy): array
     {
@@ -356,17 +346,12 @@ class Movie
 
     /**
      * Order types for movies page.
-     *
-     * @return array
      */
     public function getMovieOrdering(): array
     {
         return ['title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc'];
     }
 
-    /**
-     * @return string
-     */
     protected function getBrowseBy(): string
     {
         $browseBy = ' ';
@@ -446,23 +431,22 @@ class Movie
         }
 
         return $this->update([
-            'genre'   => implode(', ', $data['genres']),
-            'imdbid'   => $this->checkTraktValue($imdbId),
+            'genre' => implode(', ', $data['genres']),
+            'imdbid' => $this->checkTraktValue($imdbId),
             'language' => $this->checkTraktValue($data['language']),
-            'plot'     => $this->checkTraktValue($data['overview']),
-            'rating'   => $this->checkTraktValue($data['rating']),
-            'tagline'  => $this->checkTraktValue($data['tagline']),
-            'title'    => $this->checkTraktValue($data['title']),
-            'tmdbid'   => $this->checkTraktValue($data['ids']['tmdb']),
-            'traktid'  => $this->checkTraktValue($data['ids']['trakt']),
-            'trailer'  => $this->checkTraktValue($data['trailer']),
-            'cover'    => $cover,
-            'year'     => $this->checkTraktValue($data['year']),
+            'plot' => $this->checkTraktValue($data['overview']),
+            'rating' => $this->checkTraktValue($data['rating']),
+            'tagline' => $this->checkTraktValue($data['tagline']),
+            'title' => $this->checkTraktValue($data['title']),
+            'tmdbid' => $this->checkTraktValue($data['ids']['tmdb']),
+            'traktid' => $this->checkTraktValue($data['ids']['trakt']),
+            'trailer' => $this->checkTraktValue($data['trailer']),
+            'cover' => $cover,
+            'year' => $this->checkTraktValue($data['year']),
         ]);
     }
 
     /**
-     * @param $value
      * @return mixed|string
      */
     private function checkTraktValue($value)
@@ -482,8 +466,6 @@ class Movie
 
     /**
      * Get array of column keys, for inserting / updating.
-     *
-     * @return array
      */
     public function getColumnKeys(): array
     {
@@ -497,7 +479,6 @@ class Movie
      * Update movie on movie-edit page.
      *
      * @param  array  $values  Array of keys/values to update. See $validKeys
-     * @return bool
      */
     public function update(array $values): bool
     {
@@ -564,8 +545,6 @@ class Movie
     /**
      * Fetch IMDB/TMDB/TRAKT/OMDB/iTunes info for the movie.
      *
-     * @param $imdbId
-     * @return bool
      *
      * @throws \Exception
      */
@@ -682,22 +661,22 @@ class Movie
 
         $mov['title'] = str_replace(['/', '\\'], '', $mov['title']);
         $movieID = $this->update([
-            'actors'    => html_entity_decode($mov['actors'], ENT_QUOTES, 'UTF-8'),
-            'backdrop'  => $mov['backdrop'],
-            'cover'     => $mov['cover'],
-            'director'  => html_entity_decode($mov['director'], ENT_QUOTES, 'UTF-8'),
-            'genre'     => html_entity_decode($mov['genre'], ENT_QUOTES, 'UTF-8'),
-            'imdbid'    => $mov['imdbid'],
-            'language'  => html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8'),
-            'plot'      => html_entity_decode(preg_replace('/\s+See full summary »/u', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8'),
-            'rating'    => round((int) $mov['rating'], 1),
+            'actors' => html_entity_decode($mov['actors'], ENT_QUOTES, 'UTF-8'),
+            'backdrop' => $mov['backdrop'],
+            'cover' => $mov['cover'],
+            'director' => html_entity_decode($mov['director'], ENT_QUOTES, 'UTF-8'),
+            'genre' => html_entity_decode($mov['genre'], ENT_QUOTES, 'UTF-8'),
+            'imdbid' => $mov['imdbid'],
+            'language' => html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8'),
+            'plot' => html_entity_decode(preg_replace('/\s+See full summary »/u', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8'),
+            'rating' => round((int) $mov['rating'], 1),
             'rtrating' => $mov['rtrating'] ?? 'N/A',
-            'tagline'   => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
-            'title'     => $mov['title'],
-            'tmdbid'    => $mov['tmdbid'],
-            'traktid'   => $mov['traktid'],
-            'type'      => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
-            'year'      => $mov['year'],
+            'tagline' => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
+            'title' => $mov['title'],
+            'tmdbid' => $mov['tmdbid'],
+            'traktid' => $mov['traktid'],
+            'type' => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
+            'year' => $mov['year'],
         ]);
 
         if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
@@ -717,7 +696,6 @@ class Movie
     /**
      * Fetch FanArt.tv backdrop / cover / title.
      *
-     * @param $imdbId
      * @return array|false
      */
     protected function fetchFanartTVProperties($imdbId)
@@ -763,7 +741,6 @@ class Movie
      * Fetch info for IMDB id from TMDB.
      *
      *
-     * @param    $imdbId
      * @param  bool  $text
      * @return array|false
      */
@@ -869,7 +846,6 @@ class Movie
     }
 
     /**
-     * @param $imdbId
      * @return array|false
      */
     public function fetchIMDBProperties($imdbId)
@@ -929,7 +905,6 @@ class Movie
     /**
      * Fetch TraktTV backdrop / cover / title.
      *
-     * @param $imdbId
      * @return array|false
      *
      * @throws \Exception
@@ -981,7 +956,6 @@ class Movie
     /**
      * Fetch OMDb backdrop / cover / title.
      *
-     * @param $imdbId
      * @return array|false
      */
     public function fetchOmdbAPIProperties($imdbId)
@@ -1073,7 +1047,6 @@ class Movie
      * @param  string  $service  Method that called this method.
      * @param  int  $id  id of the release.
      * @param  int  $processImdb  To get IMDB info on this IMDB id or not.
-     * @return string
      *
      * @throws \Exception
      */
@@ -1092,7 +1065,7 @@ class Movie
 
             $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
-            Release::query()->where('id', $id)->update(['imdbid' =>$imdbId, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
+            Release::query()->where('id', $id)->update(['imdbid' => $imdbId, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
@@ -1104,7 +1077,7 @@ class Movie
                     } elseif ($info === true) {
                         $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
-                        Release::query()->where('id', $id)->update(['imdbid' =>$imdbId, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
+                        Release::query()->where('id', $id)->update(['imdbid' => $imdbId, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
                     }
                 }
             }
@@ -1162,6 +1135,7 @@ class Movie
                 if (! $this->parseMovieSearchName($arr['searchname'])) {
                     //We didn't find a name, so set to all 0's so we don't parse again.
                     Release::query()->where('id', $arr['id'])->update(['imdbid' => 0000000]);
+
                     continue;
                 }
                 $this->currentRelID = $arr['id'];
@@ -1209,7 +1183,6 @@ class Movie
                             $this->colorCli->error('Error fetching data from imdb occured', true);
                             Log::debug($e->getMessage());
                         }
-
                     }
                 }
 
@@ -1310,7 +1283,6 @@ class Movie
      * Parse a movie name from a release search name.
      *
      * @param  string  $releaseName
-     * @return bool
      */
     protected function parseMovieSearchName($releaseName): bool
     {
@@ -1326,16 +1298,15 @@ class Movie
             $name = $hits['name'];
             $year = $hits['year'];
 
-        /* If we didn't find a year, try to get a name anyways.
-         * Try to look for a title before the $followingList and after anything but a-z0-9 two times or more (-[ for example)
-         */
+            /* If we didn't find a year, try to get a name anyways.
+             * Try to look for a title before the $followingList and after anything but a-z0-9 two times or more (-[ for example)
+             */
         } elseif (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $hits)) {
             $name = $hits['name'];
         }
 
         // Check if we got something.
         if ($name !== '') {
-
             // If we still have any of the words in $followingList, remove them.
             $name = preg_replace('/'.$followingList.'/i', ' ', $name);
             // Remove periods, underscored, anything between parenthesis.
@@ -1356,8 +1327,6 @@ class Movie
 
     /**
      * Get IMDB genres.
-     *
-     * @return array
      */
     public function getGenres(): array
     {

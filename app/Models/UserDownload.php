@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload newModelQuery()
@@ -63,7 +64,6 @@ class UserDownload extends Model
      * Get the COUNT of how many NZB's the user has downloaded in the past day.
      *
      * @param  int  $userID
-     * @return int
      *
      * @throws \Exception
      */
@@ -77,7 +77,6 @@ class UserDownload extends Model
     }
 
     /**
-     * @param $userID
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getDownloadRequestsForUser($userID)
@@ -89,8 +88,6 @@ class UserDownload extends Model
      * If a user downloads a NZB, log it.
      *
      *
-     * @param $userID
-     * @param $releaseID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addDownloadRequest($userID, $releaseID)
@@ -106,7 +103,6 @@ class UserDownload extends Model
     }
 
     /**
-     * @param  int  $releaseID
      * @return mixed
      *
      * @throws \Exception
@@ -117,8 +113,6 @@ class UserDownload extends Model
     }
 
     /**
-     * @param $userID
-     *
      * @throws \Exception
      */
     public static function delDownloadRequests($userID): void

@@ -30,12 +30,8 @@ class UpdateNNTmuxGit extends Command
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
     public function handle(): void
     {
-
         $wasRunning = false;
 
         if ((new Tmux())->isRunning() === true) {

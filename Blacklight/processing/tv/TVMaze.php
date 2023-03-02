@@ -29,7 +29,6 @@ class TVMaze extends TV
     /**
      * TVMaze constructor.
      *
-     * @param  array  $options
      *
      * @throws \Exception
      */
@@ -41,10 +40,6 @@ class TVMaze extends TV
 
     /**
      * Fetch banner from site.
-     *
-     * @param $videoId
-     * @param $siteID
-     * @return bool
      */
     public function getBanner($videoId, $siteID): bool
     {
@@ -55,9 +50,6 @@ class TVMaze extends TV
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param    $groupID
-     * @param    $guidChar
-     * @param    $process
      * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
@@ -87,6 +79,7 @@ class TVMaze extends TV
                                     $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
                         }
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
+
                         continue;
                     }
 
@@ -144,6 +137,7 @@ class TVMaze extends TV
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->colorCli->primary('Found TVMaze Match for Full Season!', true);
+
                             continue;
                         }
 
@@ -198,8 +192,6 @@ class TVMaze extends TV
      * Calls the API to lookup the TvMaze info for a given TVDB or TVRage ID
      * Returns a formatted array of show data or false if no match.
      *
-     * @param $site
-     * @param $siteId
      * @return array|false
      */
     protected function getShowInfoBySiteID($site, $siteId)
@@ -258,8 +250,6 @@ class TVMaze extends TV
     }
 
     /**
-     * @param $shows
-     * @param $cleanName
      * @return array|false
      */
     private function matchShowInfo(array $shows, $cleanName)
@@ -307,7 +297,6 @@ class TVMaze extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param  int  $videoId  -- the local Video ID
-     * @return int
      */
     public function getPoster($videoId): int
     {
@@ -379,29 +368,26 @@ class TVMaze extends TV
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $show
-     * @return array
      */
     protected function formatShowInfo($show): array
     {
         $this->posterUrl = (string) ($show->mediumImage ?? '');
 
         return [
-            'type'      => parent::TYPE_TV,
-            'title'     => (string) $show->name,
-            'summary'   => (string) $show->summary,
-            'started'   => (string) $show->premiered,
+            'type' => parent::TYPE_TV,
+            'title' => (string) $show->name,
+            'summary' => (string) $show->summary,
+            'started' => (string) $show->premiered,
             'publisher' => (string) $show->network,
-            'country'   => (string) $show->country,
-            'source'    => parent::SOURCE_TVMAZE,
-            'imdb'      => 0,
-            'tvdb'      => (int) ($show->externalIDs['thetvdb'] ?? 0),
-            'tvmaze'    => (int) $show->id,
-            'trakt'     => 0,
-            'tvrage'    => (int) ($show->externalIDs['tvrage'] ?? 0),
-            'tmdb'      => 0,
-            'aliases'   => ! empty($show->akas) ? (array) $show->akas : '',
+            'country' => (string) $show->country,
+            'source' => parent::SOURCE_TVMAZE,
+            'imdb' => 0,
+            'tvdb' => (int) ($show->externalIDs['thetvdb'] ?? 0),
+            'tvmaze' => (int) $show->id,
+            'trakt' => 0,
+            'tvrage' => (int) ($show->externalIDs['tvrage'] ?? 0),
+            'tmdb' => 0,
+            'aliases' => ! empty($show->akas) ? (array) $show->akas : '',
             'localzone' => "''",
         ];
     }
@@ -409,19 +395,16 @@ class TVMaze extends TV
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $episode
-     * @return array
      */
     protected function formatEpisodeInfo($episode): array
     {
         return [
-            'title'       => (string) $episode->name,
-            'series'      => (int) $episode->season,
-            'episode'     => (int) $episode->number,
+            'title' => (string) $episode->name,
+            'series' => (int) $episode->season,
+            'episode' => (int) $episode->number,
             'se_complete' => 'S'.sprintf('%02d', $episode->season).'E'.sprintf('%02d', $episode->number),
-            'firstaired'  => (string) $episode->airdate,
-            'summary'     => (string) $episode->summary,
+            'firstaired' => (string) $episode->airdate,
+            'summary' => (string) $episode->summary,
         ];
     }
 }

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease newModelQuery()
@@ -48,17 +49,12 @@ class UsersRelease extends Model
         return $this->belongsTo(Release::class, 'releases_id');
     }
 
-    /**
-     * @param $uid
-     */
     public static function delCartForUser($uid): void
     {
         self::query()->where('users_id', $uid)->delete();
     }
 
     /**
-     * @param $uid
-     * @param $releaseid
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addCart($uid, $releaseid)
@@ -74,7 +70,6 @@ class UsersRelease extends Model
     }
 
     /**
-     * @param $uid
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getCart($uid)
@@ -83,8 +78,6 @@ class UsersRelease extends Model
     }
 
     /**
-     * @param $guids
-     * @param $userID
      * @return bool|mixed
      */
     public static function delCartByGuid($guids, $userID)
@@ -104,10 +97,6 @@ class UsersRelease extends Model
         return self::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete() === 1;
     }
 
-    /**
-     * @param $guid
-     * @param $uid
-     */
     public static function delCartByUserAndRelease($guid, $uid): void
     {
         $rel = Release::query()->where('guid', $guid)->first(['id']);
@@ -116,9 +105,6 @@ class UsersRelease extends Model
         }
     }
 
-    /**
-     * @param $rid
-     */
     public static function delCartForRelease($rid): void
     {
         self::query()->where('releases_id', $rid)->delete();

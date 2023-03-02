@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 class AniDB
 {
     private const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
+
     private const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
 
     /**
@@ -54,7 +55,7 @@ class AniDB
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'     => false,
+            'Echo' => false,
             'Settings' => null,
         ];
         $options += $defaults;
@@ -118,7 +119,6 @@ class AniDB
     /**
      * Selects episode info for a local match.
      *
-     * @param $anidbId
      * @param  int  $episode
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
@@ -215,8 +215,6 @@ class AniDB
      * If no info is available locally the AniDB API is invoked.
      *
      *
-     * @param $release
-     * @return bool
      *
      * @throws \Exception
      */
@@ -279,10 +277,6 @@ class AniDB
         return $matched;
     }
 
-    /**
-     * @param $anidbId
-     * @param $relId
-     */
     private function updateRelease($anidbId, $relId): void
     {
         Release::update(['anidbid' => $anidbId])->where('id', $relId);
@@ -292,7 +286,6 @@ class AniDB
      * Checks a specific Anime title's last update time.
      *
      *
-     * @param $anidbId
      * @return mixed
      */
     private function updateTimeCheck($anidbId)

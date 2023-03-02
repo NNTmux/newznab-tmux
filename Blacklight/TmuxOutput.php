@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Extensions\util\Git;
+use Illuminate\Support\Facades\Process;
 
 /**
  * Tmux output functions for printing monitor data.
@@ -12,19 +12,11 @@ use App\Extensions\util\Git;
  */
 class TmuxOutput extends Tmux
 {
-    /**
-     * @var
-     */
+
     protected $_colourMasks;
 
-    /**
-     * @var
-     */
     private $runVar;
 
-    /**
-     * @var
-     */
     private $tmpMasks;
 
     /**
@@ -39,10 +31,6 @@ class TmuxOutput extends Tmux
         $this->_setColourMasks();
     }
 
-    /**
-     * @param $runVar
-     * @return void
-     */
     public function updateMonitorPane(&$runVar): void
     {
         $this->runVar = $runVar;
@@ -63,9 +51,6 @@ class TmuxOutput extends Tmux
         echo $buffer;
     }
 
-    /**
-     * @return string
-     */
     protected function _getBackfill(): string
     {
         $buffer = sprintf($this->tmpMasks[3], 'Groups', 'Active', 'Backfill');
@@ -106,10 +91,6 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    /**
-     * @param $compressed
-     * @return array
-     */
     protected function _getFormatMasks($compressed): array
     {
         $index = ((int) $compressed === 1 ? '2.1' : '2.0');
@@ -125,15 +106,13 @@ class TmuxOutput extends Tmux
 
     /**
      * @return string
-     *
-     * @throws \CzProject\GitPhp\GitException
      */
     protected function _getHeader(): string
     {
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
-        $version = (new Git())->tagLatest();
-        $branch = (new Git())->getBranch();
+        $version = Process::run('git describe --tags')->output();
+        $branch = Process::run('git branch')->output();
 
         $buffer .= sprintf(
             $this->tmpMasks[2],
@@ -222,9 +201,6 @@ class TmuxOutput extends Tmux
         return $buffer.PHP_EOL;
     }
 
-    /**
-     * @return string
-     */
     protected function _getMonitor(): string
     {
         $buffer = $this->_getTableCounts();
@@ -417,9 +393,6 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    /**
-     * @return string
-     */
     protected function _getPaths(): string
     {
         $buffer = '';
@@ -473,9 +446,6 @@ class TmuxOutput extends Tmux
         return $buffer.PHP_EOL;
     }
 
-    /**
-     * @return string
-     */
     protected function _getQueries(): string
     {
         $buffer = PHP_EOL;
@@ -523,9 +493,6 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    /**
-     * @return string
-     */
     protected function _getSeparator(): string
     {
         return sprintf(
@@ -536,9 +503,6 @@ class TmuxOutput extends Tmux
         );
     }
 
-    /**
-     * @return string
-     */
     protected function _getTableCounts(): string
     {
         $buffer = sprintf($this->tmpMasks[3], 'Collections', 'Binaries', 'Parts');

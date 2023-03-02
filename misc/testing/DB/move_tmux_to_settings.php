@@ -7,12 +7,12 @@ $tmux = \Illuminate\Support\Facades\DB::table('tmux')->get();
 foreach ($tmux as $item) {
     echo 'Inserting '.$item->setting.' into settings table'.PHP_EOL;
     \App\Models\Settings::insertOrIgnore(
-            [
-                'section' => 'site',
-                'subsection' => 'tmux',
-                'name' => $item->setting,
-                'value' => $item->value,
-                'setting'=> $item->setting,
-            ]
-        );
+        [
+            'section' => 'site',
+            'subsection' => 'tmux',
+            'name' => $item->setting,
+            'value' => $item->value,
+            'setting' => $item->setting,
+        ]
+    );
 }

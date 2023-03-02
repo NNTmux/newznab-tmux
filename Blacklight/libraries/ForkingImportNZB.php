@@ -16,24 +16,12 @@ class ForkingImportNZB extends Forking
      */
     private $importPath;
 
-    /**
-     * @var
-     */
     private $deleteComplete;
 
-    /**
-     * @var
-     */
     private $deleteFailed;
 
-    /**
-     * @var
-     */
     private $useFileName;
 
-    /**
-     * @var
-     */
     private $maxPerProcess;
 
     /**
@@ -47,14 +35,6 @@ class ForkingImportNZB extends Forking
         $this->importPath = PHP_BINARY.' misc/testing/nzb-import.php ';
     }
 
-    /**
-     * @param $folder
-     * @param $maxProcesses
-     * @param $deleteComplete
-     * @param $deleteFailed
-     * @param $useFileName
-     * @param $maxPerProcess
-     */
     public function start($folder, $maxProcesses, $deleteComplete, $deleteFailed, $useFileName, $maxPerProcess): void
     {
         $startTime = now()->timestamp;
@@ -102,7 +82,7 @@ class ForkingImportNZB extends Forking
             $this->colorCli->header(
                 'Multi-processing for import finished in '.(now()->timestamp - $startTime).
                     ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
-                );
+            );
         }
     }
 }

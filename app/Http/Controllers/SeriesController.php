@@ -11,9 +11,6 @@ use Illuminate\Support\Arr;
 class SeriesController extends BasePageController
 {
     /**
-     * @param  string  $id
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function index(Request $request, string $id = ''): void

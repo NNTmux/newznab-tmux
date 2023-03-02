@@ -56,7 +56,6 @@ class Handler extends ExceptionHandler
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $exception
      * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      *
      * @throws \Throwable

@@ -28,40 +28,25 @@ use Illuminate\Support\Carbon;
 
 class PostProcess
 {
-    /**
-     * @var \Blacklight\NameFixer
-     */
     protected NameFixer $nameFixer;
 
-    /**
-     * @var \dariusiii\rarinfo\Par2Info
-     */
     protected Par2Info $_par2Info;
 
     /**
      * Use alternate NNTP provider when download fails?
-     *
-     * @var bool
      */
     private bool $alternateNNTP;
 
     /**
      * Add par2 info to rar list?
-     *
-     * @var bool
      */
     private bool $addpar2;
 
     /**
      * Should we echo to CLI?
-     *
-     * @var bool
      */
     private bool $echooutput;
 
-    /**
-     * @var \Blacklight\Nfo
-     */
     private Nfo $Nfo;
 
     /**
@@ -74,13 +59,13 @@ class PostProcess
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'         => true,
-            'Logger'       => null,
-            'Groups'       => null,
-            'NameFixer'    => null,
-            'Nfo'          => null,
+            'Echo' => true,
+            'Logger' => null,
+            'Groups' => null,
+            'NameFixer' => null,
+            'Nfo' => null,
             'ReleaseFiles' => null,
-            'Settings'     => null,
+            'Settings' => null,
         ];
         $options += $defaults;
 
@@ -100,8 +85,6 @@ class PostProcess
     /**
      * Go through every type of post proc.
      *
-     * @param $nntp
-     * @return void
      *
      * @throws \Exception
      */
@@ -136,7 +119,6 @@ class PostProcess
     /**
      * Process books using amazon.com.
      *
-     * @return void
      *
      * @throws \Exception
      */
@@ -174,7 +156,6 @@ class PostProcess
      * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
      * @param  int|string|null  $processMovies  (Optional) 0 Don't process, 1 process all releases,
      *                                          2 process renamed releases only, '' check site setting
-     * @return void
      *
      * @throws \Exception
      */
@@ -199,10 +180,8 @@ class PostProcess
     /**
      * Process nfo files.
      *
-     * @param  NNTP  $nntp
      * @param  string  $groupID  (Optional) ID of a group to work on.
      * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
-     * @return void
      *
      * @throws \Exception
      */
@@ -216,7 +195,6 @@ class PostProcess
     /**
      * Process comments.
      *
-     * @param  NNTP  $nntp
      *
      * @throws \Exception
      */
@@ -232,7 +210,6 @@ class PostProcess
      * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
      * @param  int|string|null  $processTV  (Optional) 0 Don't process, 1 process all releases,
      *                                      2 process renamed releases only, '' check site setting
-     * @return void
      *
      * @throws \Exception
      */
@@ -267,7 +244,6 @@ class PostProcess
      * @param  NNTP  $nntp  Class NNTP
      * @param  int|string  $groupID  (Optional) ID of a group to work on.
      * @param  string  $guidChar  (Optional) First char of release GUID, can be used to select work.
-     * @return void
      *
      * @throws \Exception
      */
@@ -286,7 +262,6 @@ class PostProcess
      * @param  int  $groupID  Group ID of the release.
      * @param  NNTP  $nntp  Class NNTP
      * @param  int  $show  Only show result or apply iy.
-     * @return bool
      *
      * @throws \Exception
      */
@@ -342,7 +317,6 @@ class PostProcess
                 if ($this->addpar2) {
                     // Add to release files.
                     if ($filesAdded < 21 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first() === null) {
-
                         // Try to add the files to the DB.
                         if (ReleaseFile::addReleaseFiles($relID, $file['name'], $file['size'], $query['postdate'] !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $query['postdate']) : now(), 0, $file['hash_16K'])) {
                             $filesAdded++;
@@ -363,7 +337,6 @@ class PostProcess
 
             // If we found some files.
             if ($filesAdded > 0) {
-
                 // Update the file count with the new file count + old file count.
                 Release::whereId($relID)->increment('rarinnerfilecount', $filesAdded);
             }

@@ -11,9 +11,6 @@ use Illuminate\Support\Arr;
 class MusicController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     *
      * @throws \Exception
      */
     public function show(Request $request, string $id = ''): void
@@ -98,7 +95,7 @@ class MusicController extends BasePageController
 
         $this->smarty->assign(
             [
-                'resultsadd'=>  $musics,
+                'resultsadd' => $musics,
                 'results' => $results,
                 'covgroup' => 'music',
             ]

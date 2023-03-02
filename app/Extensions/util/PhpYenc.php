@@ -26,9 +26,7 @@ namespace App\Extensions\util;
 class PhpYenc
 {
     /**
-     * @param    $text
      * @param  bool  $ignore
-     * @return bool|string
      */
     public static function decode(&$text, $ignore = false): bool|string
     {
@@ -127,21 +125,11 @@ class PhpYenc
         return $text;
     }
 
-    /**
-     * @return bool
-     */
     public static function enabled(): bool
     {
         return true;
     }
 
-    /**
-     * @param    $data
-     * @param    $filename
-     * @param  int  $lineLength
-     * @param  bool  $crc32
-     * @return string
-     */
     public static function encode($data, $filename, int $lineLength = 128, bool $crc32 = true): string
     {
         // yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.

@@ -21,31 +21,28 @@ use Illuminate\Support\Carbon;
 
 class ApiV2Controller extends BasePageController
 {
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function capabilities(): JsonResponse
     {
         $category = Category::getForApi();
 
         $capabilities = [
             'server' => [
-                'title'      => config('app.name'),
-                'strapline'  => Settings::settingValue('site.main.strapline'),
-                'email'      => config('mail.from.address'),
-                'url'        => url('/'),
+                'title' => config('app.name'),
+                'strapline' => Settings::settingValue('site.main.strapline'),
+                'email' => config('mail.from.address'),
+                'url' => url('/'),
             ],
             'limits' => [
-                'max'     => 100,
+                'max' => 100,
                 'default' => 100,
             ],
             'registration' => [
                 'available' => 'no',
-                'open'      => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
+                'open' => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
             ],
             'searching' => [
-                'search'       => ['available' => 'yes', 'supportedParams' => 'id'],
-                'tv-search'    => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
+                'search' => ['available' => 'yes', 'supportedParams' => 'id'],
+                'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
                 'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid, tmdbid, traktid'],
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
@@ -56,9 +53,6 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -114,9 +108,6 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -183,9 +174,6 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -212,13 +200,13 @@ class ApiV2Controller extends BasePageController
         event(new UserAccessedApi($user));
 
         $siteIdArr = [
-            'id'     => $request->input('vid') ?? '0',
-            'tvdb'   => $request->input('tvdbid') ?? '0',
-            'trakt'  => $request->input('traktid') ?? '0',
+            'id' => $request->input('vid') ?? '0',
+            'tvdb' => $request->input('tvdbid') ?? '0',
+            'trakt' => $request->input('traktid') ?? '0',
             'tvrage' => $request->input('rid') ?? '0',
             'tvmaze' => $request->input('tvmazeid') ?? '0',
-            'imdb'   => $request->input('imdbid') ?? '0',
-            'tmdb'   => $request->input('tmdbid') ?? '0',
+            'imdb' => $request->input('imdbid') ?? '0',
+            'tmdb' => $request->input('tmdbid') ?? '0',
         ];
 
         // Process season only queries or Season and Episode/Airdate queries
@@ -265,7 +253,6 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      */
     public function getNzb(Request $request)
@@ -281,10 +268,6 @@ class ApiV2Controller extends BasePageController
         Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
     }
 
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function details(Request $request): JsonResponse
     {
         if ($request->missing('id')) {

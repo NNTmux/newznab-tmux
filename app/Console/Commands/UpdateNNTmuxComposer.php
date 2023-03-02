@@ -29,17 +29,11 @@ class UpdateNNTmuxComposer extends Command
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
     public function handle(): void
     {
         $this->composer();
     }
 
-    /**
-     * @return void
-     */
     protected function composer(): void
     {
         $this->output->writeln('<comment>Running composer install process...</comment>');

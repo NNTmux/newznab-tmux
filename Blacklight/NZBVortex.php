@@ -11,6 +11,7 @@ use Page;
 final class NZBVortex
 {
     private $nonce = null;
+
     private $session = null;
 
     public function __construct()
@@ -30,16 +31,16 @@ final class NZBVortex
     public function getState($code = 0)
     {
         $states = [
-            0  => 'Waiting',
-            1  => 'Downloading',
-            2  => 'Waiting for save',
-            3  => 'Saving',
-            4  => 'Saved',
-            5  => 'Password request',
-            6  => 'Queued for processing',
-            7  => 'User wait for processing',
-            8  => 'Checking',
-            9  => 'Repairing',
+            0 => 'Waiting',
+            1 => 'Downloading',
+            2 => 'Waiting for save',
+            3 => 'Saving',
+            4 => 'Saved',
+            5 => 'Password request',
+            6 => 'Queued for processing',
+            7 => 'User wait for processing',
+            8 => 'Checking',
+            9 => 'Repairing',
             10 => 'Joining',
             11 => 'Wait for further processing',
             12 => 'Joining',
@@ -97,7 +98,7 @@ final class NZBVortex
 
             $params = [
                 'sessionid' => $this->session,
-                'url'       => $url,
+                'url' => $url,
             ];
 
             $response = $this->sendRequest('nzb/add', $params);
@@ -108,7 +109,6 @@ final class NZBVortex
      * resume NZB.
      *
      * @param  int  $id
-     * @return void
      *
      * @throws \Exception
      */
@@ -269,9 +269,9 @@ final class NZBVortex
         $hash = base64_encode($hash);
 
         $params = [
-            'nonce'  => $this->nonce,
+            'nonce' => $this->nonce,
             'cnonce' => $cnonce,
-            'hash'   => $hash,
+            'hash' => $hash,
         ];
 
         $response = $this->sendRequest('auth/login', $params);
@@ -287,7 +287,6 @@ final class NZBVortex
     /**
      * sendRequest().
      *
-     * @param    $path
      * @param  array  $params
      * @return array
      *

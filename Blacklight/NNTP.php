@@ -43,95 +43,64 @@ class NNTP extends \Net_NNTP_Client
      */
     protected ColorCLI $colorCli;
 
-    /**
-     * @var bool
-     */
     protected bool $_debugBool;
 
-    /**
-     * @var bool
-     */
     protected bool $_echo;
 
     /**
      * Does the server support XFeature GZip header compression?
-     *
-     * @var bool
      */
     protected bool $_compressionSupported = true;
 
     /**
      * Is header compression enabled for the session?
-     *
-     * @var bool
      */
     protected bool $_compressionEnabled = false;
 
     /**
      * Currently selected group.
-     *
-     * @var string
      */
     protected string $_currentGroup = '';
 
-    /**
-     * @var string
-     */
     protected string $_currentPort = 'NNTP_PORT';
 
     /**
      * Address of the current NNTP server.
-     *
-     * @var string
      */
     protected string $_currentServer = 'NNTP_SERVER';
 
     /**
      * Are we allowed to post to usenet?
-     *
-     * @var bool
      */
     protected bool $_postingAllowed = false;
 
     /**
      * How many times should we try to reconnect to the NNTP server?
-     *
-     * @var int
      */
     protected int $_nntpRetries;
 
     /**
      * How many connections should we use on primary NNTP server.
-     *
-     * @var string
      */
     protected string $_primaryNntpConnections;
 
     /**
      * How many connections should we use on alternate NNTP server.
-     *
-     * @var string
      */
     protected string $_alternateNntpConnections;
 
     /**
      * How many connections do we use on primary NNTP server.
-     *
-     * @var int
      */
     protected int $_primaryCurrentNntpConnections;
 
     /**
      * How many connections do we use on alternate NNTP server.
-     *
-     * @var int
      */
     protected int $_alternateCurrentNntpConnections;
 
     /**
      * Seconds to wait for the blocking socket to timeout.
-     *
-     * @var int
      */
     protected int $_socketTimeout = 120;
 
@@ -150,7 +119,7 @@ class NNTP extends \Net_NNTP_Client
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'      => true,
+            'Echo' => true,
             'Logger' => null,
         ];
         $options += $defaults;
@@ -268,7 +237,6 @@ class NNTP extends \Net_NNTP_Client
 
             // If we are connected, try to authenticate.
             if ($connected) {
-
                 // If the username is empty it probably means the server does not require a username.
                 if ($userName === '') {
                     $authenticated = true;
@@ -502,7 +470,6 @@ class NNTP extends \Net_NNTP_Client
 
         // Loop over strings of headers.
         foreach ($data as $key => $header) {
-
             // Split the individual headers by tab.
             $header = explode("\t", $header);
 
@@ -580,7 +547,6 @@ class NNTP extends \Net_NNTP_Client
 
             // Loop over the message-ID's or article numbers.
             foreach ($identifiers as $wanted) {
-
                 /* This is to attempt to prevent string size overflow.
                  * We get the size of 1 body in bytes, we increment the loop on every loop,
                  * then we multiply the # of loops by the first size we got and check if it
@@ -603,7 +569,7 @@ class NNTP extends \Net_NNTP_Client
                         $messageSize = \strlen($message);
                     }
 
-                    // If there is an error try the alternate provider or return the PEAR error.
+                // If there is an error try the alternate provider or return the PEAR error.
                 } elseif ($alternate) {
                     if (! $aConnected) {
                         // Check if the current connected server is the alternate or not.
@@ -637,7 +603,7 @@ class NNTP extends \Net_NNTP_Client
                 }
             }
 
-            // If it's a string check if it's a valid message-ID.
+        // If it's a string check if it's a valid message-ID.
         } elseif (\is_string($identifiers) || is_numeric($identifiers)) {
             $body = $this->_getMessage($groupName, $identifiers);
             if ($alternate && self::isError($body)) {
@@ -646,7 +612,7 @@ class NNTP extends \Net_NNTP_Client
                 $aConnected = true;
             }
 
-            // Else return an error.
+        // Else return an error.
         } else {
             $message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: '.gettype($identifiers);
 
@@ -714,6 +680,7 @@ class NNTP extends \Net_NNTP_Client
                 if (! $emptyLine) {
                     if ($line === '') {
                         $emptyLine = true;
+
                         continue;
                     }
 
@@ -727,7 +694,7 @@ class NNTP extends \Net_NNTP_Client
                         }
                     }
 
-                    // Now we have the header, so get the body from the rest of the lines.
+                // Now we have the header, so get the body from the rest of the lines.
                 } else {
                     $body .= $line;
                 }
@@ -903,22 +870,16 @@ class NNTP extends \Net_NNTP_Client
 
     /**
      * If on unix, hide yydecode CLI output.
-     *
-     * @var string
      */
     protected string $_yEncSilence;
 
     /**
      * Path to temp yEnc input storage file.
-     *
-     * @var string
      */
     protected string $_yEncTempInput;
 
     /**
      * Path to temp yEnc output storage file.
-     *
-     * @var string
      */
     protected string $_yEncTempOutput;
 
@@ -1031,10 +992,8 @@ class NNTP extends \Net_NNTP_Client
         $data = null;
 
         while (! feof($this->_socket)) {
-
             // Did we find a possible ending ? (.\r\n)
             if ($possibleTerm) {
-
                 // Loop, sleeping shortly, to allow the server time to upload data, if it has any.
                 for ($i = 0; $i < 3; $i++) {
                     // If the socket is really empty, fGets will get stuck here, so set the socket to non blocking in case.
@@ -1064,9 +1023,9 @@ class NNTP extends \Net_NNTP_Client
                         $bytesReceived = \strlen($data);
                         if ($this->_echo && $bytesReceived > 10240) {
                             $this->colorCli->primaryOver(
-                                    'Received '.round($bytesReceived / 1024).
-                                    'KB from group ('.$this->group().').'
-                                );
+                                'Received '.round($bytesReceived / 1024).
+                                'KB from group ('.$this->group().').'
+                            );
                         }
 
                         // Split the string of headers into an array of individual headers, then return it.
@@ -1142,8 +1101,6 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Download an article body (an article without the header).
      *
-     * @param  string  $groupName
-     * @param  mixed  $identifier
      * @return mixed|object|string
      *
      * @throws \Exception
@@ -1174,10 +1131,8 @@ class NNTP extends \Net_NNTP_Client
 
         $body = '';
         if ($response === NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS) {
-
             // Continue until connection is lost
             while (! feof($this->_socket)) {
-
                 // Retrieve and append up to 1024 characters from the server.
                 $line = fgets($this->_socket, 1024);
 
@@ -1189,7 +1144,6 @@ class NNTP extends \Net_NNTP_Client
 
                 // Check if the line terminates the text response.
                 if ($line === ".\r\n") {
-
                     // Attempt to yEnc decode and return the body.
                     return PhpYenc::decodeIgnore($body);
                 }
@@ -1265,64 +1219,64 @@ class NNTP extends \Net_NNTP_Client
             // 381, RFC2980: 'More authentication information required'
             case NET_NNTP_PROTOCOL_RESPONSECODE_AUTHENTICATION_CONTINUE:
                 return $this->throwError('More authentication information required', $response, $this->_currentStatusResponse());
-            // 400, RFC977: 'Service discontinued'
+                // 400, RFC977: 'Service discontinued'
             case NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_FORCED:
                 return $this->throwError('Server refused connection', $response, $this->_currentStatusResponse());
-            // 411, RFC977: 'no such news group'
+                // 411, RFC977: 'no such news group'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NO_SUCH_GROUP:
                 return $this->throwError('No such news group on server', $response, $this->_currentStatusResponse());
-            // 412, RFC2980: 'No news group current selected'
+                // 412, RFC2980: 'No news group current selected'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NO_GROUP_SELECTED:
                 return $this->throwError('No news group current selected', $response, $this->_currentStatusResponse());
-            // 420, RFC2980: 'Current article number is invalid'
+                // 420, RFC2980: 'Current article number is invalid'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NO_ARTICLE_SELECTED:
                 return $this->throwError('Current article number is invalid', $response, $this->_currentStatusResponse());
-            // 421, RFC977: 'no next article in this group'
+                // 421, RFC977: 'no next article in this group'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NO_NEXT_ARTICLE:
                 return $this->throwError('No next article in this group', $response, $this->_currentStatusResponse());
-            // 422, RFC977: 'no previous article in this group'
+                // 422, RFC977: 'no previous article in this group'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NO_PREVIOUS_ARTICLE:
                 return $this->throwError('No previous article in this group', $response, $this->_currentStatusResponse());
-            // 423, RFC977: 'No such article number in this group'
+                // 423, RFC977: 'No such article number in this group'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NO_SUCH_ARTICLE_NUMBER:
                 return $this->throwError('No such article number in this group', $response, $this->_currentStatusResponse());
-            // 430, RFC977: 'No such article found'
+                // 430, RFC977: 'No such article found'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NO_SUCH_ARTICLE_ID:
                 return $this->throwError('No such article found', $response, $this->_currentStatusResponse());
-            // 435, RFC977: 'Article not wanted'
+                // 435, RFC977: 'Article not wanted'
             case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_UNWANTED:
                 return $this->throwError('Article not wanted', $response, $this->_currentStatusResponse());
-            // 436, RFC977: 'Transfer failed - try again later'
+                // 436, RFC977: 'Transfer failed - try again later'
             case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_FAILURE:
                 return $this->throwError('Transfer failed - try again later', $response, $this->_currentStatusResponse());
-            // 437, RFC977: 'Article rejected - do not try again'
+                // 437, RFC977: 'Article rejected - do not try again'
             case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_REJECTED:
                 return $this->throwError('Article rejected - do not try again', $response, $this->_currentStatusResponse());
-            // 440, RFC977: 'posting not allowed'
+                // 440, RFC977: 'posting not allowed'
             case NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_PROHIBITED:
                 return $this->throwError('Posting not allowed', $response, $this->_currentStatusResponse());
-            // 441, RFC977: 'posting failed'
+                // 441, RFC977: 'posting failed'
             case NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_FAILURE:
                 return $this->throwError('Posting failed', $response, $this->_currentStatusResponse());
-            // 481, RFC2980: 'Groups and descriptions unavailable'
+                // 481, RFC2980: 'Groups and descriptions unavailable'
             case NET_NNTP_PROTOCOL_RESPONSECODE_XGTITLE_GROUPS_UNAVAILABLE:
                 return $this->throwError('Groups and descriptions unavailable', $response, $this->_currentStatusResponse());
-            // 482, RFC2980: 'Authentication rejected'
+                // 482, RFC2980: 'Authentication rejected'
             case NET_NNTP_PROTOCOL_RESPONSECODE_AUTHENTICATION_REJECTED:
                 return $this->throwError('Authentication rejected', $response, $this->_currentStatusResponse());
-            // 500, RFC977: 'Command not recognized'
+                // 500, RFC977: 'Command not recognized'
             case NET_NNTP_PROTOCOL_RESPONSECODE_UNKNOWN_COMMAND:
                 return $this->throwError('Command not recognized', $response, $this->_currentStatusResponse());
-            // 501, RFC977: 'Command syntax error'
+                // 501, RFC977: 'Command syntax error'
             case NET_NNTP_PROTOCOL_RESPONSECODE_SYNTAX_ERROR:
                 return $this->throwError('Command syntax error', $response, $this->_currentStatusResponse());
-            // 502, RFC2980: 'No permission'
+                // 502, RFC2980: 'No permission'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NOT_PERMITTED:
                 return $this->throwError('No permission', $response, $this->_currentStatusResponse());
-            // 503, RFC2980: 'Program fault - command not performed'
+                // 503, RFC2980: 'Program fault - command not performed'
             case NET_NNTP_PROTOCOL_RESPONSECODE_NOT_SUPPORTED:
                 return $this->throwError('Internal server error, function not performed', $response, $this->_currentStatusResponse());
-            // RFC4642: 'Can not initiate TLS negotiation'
+                // RFC4642: 'Can not initiate TLS negotiation'
             case NET_NNTP_PROTOCOL_RESPONSECODE_TLS_FAILED_NEGOTIATION:
                 return $this->throwError('Can not initiate TLS negotiation', $response, $this->_currentStatusResponse());
             default:
@@ -1410,7 +1364,7 @@ class NNTP extends \Net_NNTP_Client
             // 200, Posting allowed
             case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_ALLOWED:
                 return true;
-            // 201, Posting NOT allowed
+                // 201, Posting NOT allowed
             case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED:
                 $this->_logger?->info('Posting not allowed!');
 

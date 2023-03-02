@@ -21,6 +21,7 @@ class Backfill
      * @var \Blacklight\NNTP
      */
     protected $_nntp;
+
     /**
      * Should we use compression for headers?
      *
@@ -76,11 +77,11 @@ class Backfill
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'      => true,
-            'Logger'    => null,
-            'Groups'    => null,
-            'NNTP'      => null,
-            'Settings'  => null,
+            'Echo' => true,
+            'Logger' => null,
+            'Groups' => null,
+            'NNTP' => null,
+            'Settings' => null,
         ];
         $options += $defaults;
 
@@ -169,7 +170,6 @@ class Backfill
      * @param  array  $groupArr
      * @param  int  $left
      * @param  int|string  $articles
-     * @return void
      *
      * @throws \Throwable
      */
@@ -258,7 +258,7 @@ class Backfill
                     '. Our oldest article is article '.
                     number_format($groupArr['first_record']).
                     '.'
-                );
+            );
         }
 
         // Set first and last, moving the window by max messages.
@@ -328,7 +328,7 @@ class Backfill
                     ' processed in '.
                     number_format(now()->timestamp - $startGroup, 2).
                     ' seconds.'
-                );
+            );
         }
     }
 

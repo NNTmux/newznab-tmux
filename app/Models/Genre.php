@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre whereType($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre newModelQuery()
@@ -29,6 +30,7 @@ class Genre extends Model
      * @var bool
      */
     protected $dateFormat = false;
+
     /**
      * @var bool
      */

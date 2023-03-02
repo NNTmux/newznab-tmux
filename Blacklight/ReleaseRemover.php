@@ -113,13 +113,13 @@ class ReleaseRemover
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Browser'      => false, // Are we coming from the web script.
+            'Browser' => false, // Are we coming from the web script.
             'ConsoleTools' => null,
-            'Echo'         => true, // Echo to CLI?
-            'NZB'          => null,
+            'Echo' => true, // Echo to CLI?
+            'NZB' => null,
             'ReleaseImage' => null,
-            'Releases'     => null,
-            'Settings'     => null,
+            'Releases' => null,
+            'Settings' => null,
         ];
         $options += $defaults;
 
@@ -720,7 +720,6 @@ class ReleaseRemover
     /**
      * Remove releases using the site blacklist regexes.
      *
-     * @return bool
      *
      * @throws \Exception
      */
@@ -813,12 +812,12 @@ class ReleaseRemover
                 // Provide useful output of operations
                 $this->consoleTools->header(
                     sprintf(
-                    'Finding crap releases for %s: Using %s method against release %s.'.
-                        '%s',
-                    $this->method,
-                    $blType,
-                    $opTypeName,
-                    $ftUsing
+                        'Finding crap releases for %s: Using %s method against release %s.'.
+                            '%s',
+                        $this->method,
+                        $blType,
+                        $opTypeName,
+                        $ftUsing
                     ),
                     true
                 );
@@ -854,7 +853,6 @@ class ReleaseRemover
     /**
      * Remove releases using the site blacklist regexes against file names.
      *
-     * @return bool
      *
      * @throws \Exception
      */
@@ -918,11 +916,11 @@ class ReleaseRemover
                 // Provide useful output of operations
                 $this->consoleTools->header(
                     sprintf(
-                    'Finding crap releases for %s: Using %s method against release filenames.'.PHP_EOL.
-                        '%s',
-                    $this->method,
-                    $blType,
-                    $ftUsing
+                        'Finding crap releases for %s: Using %s method against release filenames.'.PHP_EOL.
+                            '%s',
+                        $this->method,
+                        $blType,
+                        $ftUsing
                     ),
                     true
                 );
@@ -1291,7 +1289,6 @@ class ReleaseRemover
      * Remove multiple spaces and trim leading spaces.
      *
      * @param  string  $string
-     * @return string
      */
     protected function cleanSpaces($string): string
     {
@@ -1303,7 +1300,6 @@ class ReleaseRemover
      *
      * @param  string  $string  The string to format.
      * @param  string  $type  The column name.
-     * @return string
      */
     protected function formatLike($string, $type): string
     {

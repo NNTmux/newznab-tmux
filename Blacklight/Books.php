@@ -17,9 +17,6 @@ use Illuminate\Support\Facades\DB;
  */
 class Books
 {
-    /**
-     * @var bool
-     */
     public bool $echooutput;
 
     /**
@@ -37,19 +34,10 @@ class Books
      */
     public mixed $asstag;
 
-    /**
-     * @var int|null|string
-     */
     public string|int|null $bookqty;
 
-    /**
-     * @var int|null|string
-     */
     public string|int|null $sleeptime;
 
-    /**
-     * @var string
-     */
     public string $imgSavePath;
 
     /**
@@ -57,14 +45,8 @@ class Books
      */
     public mixed $bookreqids;
 
-    /**
-     * @var string
-     */
     public string $renamed;
 
-    /**
-     * @var array
-     */
     public array $failCache;
 
     /**
@@ -80,7 +62,7 @@ class Books
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'     => false,
+            'Echo' => false,
             'Settings' => null,
         ];
         $options += $defaults;
@@ -103,7 +85,6 @@ class Books
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getBookInfo($id)
@@ -112,12 +93,10 @@ class Books
     }
 
     /**
-     * @param $title
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function getBookInfoByName($title)
     {
-
         //only used to get a count of words
         $searchWords = '';
         $title = preg_replace(['/( - | -|\(.+\)|\(|\))/', '/[^\w ]+/'], [' ', ''], $title);
@@ -134,15 +113,6 @@ class Books
         return BookInfo::search($searchWords)->first();
     }
 
-    /**
-     * @param $page
-     * @param $cat
-     * @param $start
-     * @param $num
-     * @param $orderby
-     * @param  array  $excludedcats
-     * @return array
-     */
     public function getBookRange($page, $cat, $start, $num, $orderby, array $excludedcats = []): array
     {
         $browseby = $this->getBrowseBy();
@@ -229,10 +199,6 @@ class Books
         return $return;
     }
 
-    /**
-     * @param $orderby
-     * @return array
-     */
     public function getBookOrder($orderby): array
     {
         $order = $orderby === '' ? 'r.postdate' : $orderby;
@@ -251,9 +217,6 @@ class Books
         return [$orderfield, $ordersort];
     }
 
-    /**
-     * @return array
-     */
     public function getBookOrdering(): array
     {
         return [
@@ -274,17 +237,11 @@ class Books
         ];
     }
 
-    /**
-     * @return array
-     */
     public function getBrowseByOptions(): array
     {
         return ['author' => 'author', 'title' => 'title'];
     }
 
-    /**
-     * @return string
-     */
     public function getBrowseBy(): string
     {
         $browseby = ' ';
@@ -328,9 +285,6 @@ class Books
     }
 
     /**
-     * @param $res
-     * @param $categoryID
-     *
      * @throws \Exception
      */
     protected function processBookReleasesHelper($res, $categoryID): void
@@ -397,9 +351,6 @@ class Books
     }
 
     /**
-     * @param $release_name
-     * @param $releaseID
-     * @param $releasetype
      * @return bool|string
      */
     public function parseTitle($release_name, $releaseID, $releasetype)
@@ -452,7 +403,6 @@ class Books
     }
 
     /**
-     * @param  string  $bookInfo
      * @param  null  $amazdata
      * @return false|int|string
      *
@@ -546,7 +496,6 @@ class Books
     }
 
     /**
-     * @param  string  $bookInfo
      * @return array|bool
      *
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException

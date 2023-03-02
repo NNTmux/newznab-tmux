@@ -22,10 +22,6 @@ class SendContactUsEmail implements ShouldQueue
 
     /**
      * SendContactUsEmail constructor.
-     *
-     * @param $email
-     * @param $mailTo
-     * @param $mailBody
      */
     public function __construct($email, $mailTo, $mailBody)
     {

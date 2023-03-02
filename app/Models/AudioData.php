@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereAudiotitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData whereReleasesId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AudioData newModelQuery()

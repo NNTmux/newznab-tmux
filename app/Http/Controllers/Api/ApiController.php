@@ -18,9 +18,6 @@ use Illuminate\Support\Str;
 class ApiController extends BasePageController
 {
     /**
-     * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Symfony\Component\HttpFoundation\StreamedResponse
-     *
      * @throws \Throwable
      */
     public function api(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -29,39 +26,39 @@ class ApiController extends BasePageController
         $function = 's';
         if ($request->has('t')) {
             switch ($request->input('t')) {
-               case 'd':
-               case 'details':
-                   $function = 'd';
-                   break;
-               case 'g':
-               case 'get':
-                   $function = 'g';
-                   break;
-               case 's':
-               case 'search':
-                   $function = 's';
-                   break;
-               case 'c':
-               case 'caps':
-                   $function = 'c';
-                   break;
-               case 'tv':
-               case 'tvsearch':
-                   $function = 'tv';
-                   break;
-               case 'm':
-               case 'movie':
-                   $function = 'm';
-                   break;
-               case 'gn':
-               case 'n':
-               case 'nfo':
-               case 'info':
-                   $function = 'n';
-                   break;
-               default:
-                   Utility::showApiError(202, 'No such function ('.$request->input('t').')');
-           }
+                case 'd':
+                case 'details':
+                    $function = 'd';
+                    break;
+                case 'g':
+                case 'get':
+                    $function = 'g';
+                    break;
+                case 's':
+                case 'search':
+                    $function = 's';
+                    break;
+                case 'c':
+                case 'caps':
+                    $function = 'c';
+                    break;
+                case 'tv':
+                case 'tvsearch':
+                    $function = 'tv';
+                    break;
+                case 'm':
+                case 'movie':
+                    $function = 'm';
+                    break;
+                case 'gn':
+                case 'n':
+                case 'nfo':
+                case 'info':
+                    $function = 'n';
+                    break;
+                default:
+                    Utility::showApiError(202, 'No such function ('.$request->input('t').')');
+            }
         } else {
             Utility::showApiError(200, 'Missing parameter (t)');
         }
@@ -128,193 +125,193 @@ class ApiController extends BasePageController
         $params['oldestgrab'] = $oldestGrabTime;
 
         switch ($function) {
-           // Search releases.
-           case 's':
-               $api->verifyEmptyParameter('q');
-               $maxAge = $api->maxAge();
-               $groupName = $api->group();
-               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
-               $categoryID = $api->categoryID();
-               $limit = $api->limit();
-               $searchArr = [
-                   'searchname' => $request->input('q') ?? -1,
-                   'name' => -1,
-                   'fromname' => -1,
-                   'filename' => -1,
-               ];
+            // Search releases.
+            case 's':
+                $api->verifyEmptyParameter('q');
+                $maxAge = $api->maxAge();
+                $groupName = $api->group();
+                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                $categoryID = $api->categoryID();
+                $limit = $api->limit();
+                $searchArr = [
+                    'searchname' => $request->input('q') ?? -1,
+                    'name' => -1,
+                    'fromname' => -1,
+                    'filename' => -1,
+                ];
 
-               if ($request->has('q')) {
-                   $relData = $releases->search(
-                       $searchArr,
-                       $groupName,
-                       -1,
-                       -1,
-                       -1,
-                       -1,
-                       $offset,
-                       $limit,
-                       '',
-                       $maxAge,
-                       $catExclusions,
-                       'basic',
-                       $categoryID,
-                       $minSize
-                   );
-               } else {
-                   $relData = $releases->getBrowseRange(
-                       1,
-                       $categoryID,
-                       $offset,
-                       $limit,
-                       '',
-                       $maxAge,
-                       $catExclusions,
-                       $groupName,
-                       $minSize
-                   );
-               }
-               $api->output($relData, $params, $outputXML, $offset, 'api');
-               break;
-           // Search tv releases.
-           case 'tv':
-               $api->verifyEmptyParameter('q');
-               $api->verifyEmptyParameter('vid');
-               $api->verifyEmptyParameter('tvdbid');
-               $api->verifyEmptyParameter('traktid');
-               $api->verifyEmptyParameter('rid');
-               $api->verifyEmptyParameter('tvmazeid');
-               $api->verifyEmptyParameter('imdbid');
-               $api->verifyEmptyParameter('tmdbid');
-               $api->verifyEmptyParameter('season');
-               $api->verifyEmptyParameter('ep');
-               $maxAge = $api->maxAge();
-               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                if ($request->has('q')) {
+                    $relData = $releases->search(
+                        $searchArr,
+                        $groupName,
+                        -1,
+                        -1,
+                        -1,
+                        -1,
+                        $offset,
+                        $limit,
+                        '',
+                        $maxAge,
+                        $catExclusions,
+                        'basic',
+                        $categoryID,
+                        $minSize
+                    );
+                } else {
+                    $relData = $releases->getBrowseRange(
+                        1,
+                        $categoryID,
+                        $offset,
+                        $limit,
+                        '',
+                        $maxAge,
+                        $catExclusions,
+                        $groupName,
+                        $minSize
+                    );
+                }
+                $api->output($relData, $params, $outputXML, $offset, 'api');
+                break;
+                // Search tv releases.
+            case 'tv':
+                $api->verifyEmptyParameter('q');
+                $api->verifyEmptyParameter('vid');
+                $api->verifyEmptyParameter('tvdbid');
+                $api->verifyEmptyParameter('traktid');
+                $api->verifyEmptyParameter('rid');
+                $api->verifyEmptyParameter('tvmazeid');
+                $api->verifyEmptyParameter('imdbid');
+                $api->verifyEmptyParameter('tmdbid');
+                $api->verifyEmptyParameter('season');
+                $api->verifyEmptyParameter('ep');
+                $maxAge = $api->maxAge();
+                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
-               $siteIdArr = [
-                   'id'     => $request->input('vid') ?? '0',
-                   'tvdb'   => $request->input('tvdbid') ?? '0',
-                   'trakt'  => $request->input('traktid') ?? '0',
-                   'tvrage' => $request->input('rid') ?? '0',
-                   'tvmaze' => $request->input('tvmazeid') ?? '0',
-                   'imdb'   => Str::replace('tt', '', $request->input('imdbid')) ?? '0',
-                   'tmdb'   => $request->input('tmdbid') ?? '0',
-               ];
+                $siteIdArr = [
+                    'id' => $request->input('vid') ?? '0',
+                    'tvdb' => $request->input('tvdbid') ?? '0',
+                    'trakt' => $request->input('traktid') ?? '0',
+                    'tvrage' => $request->input('rid') ?? '0',
+                    'tvmaze' => $request->input('tvmazeid') ?? '0',
+                    'imdb' => Str::replace('tt', '', $request->input('imdbid')) ?? '0',
+                    'tmdb' => $request->input('tmdbid') ?? '0',
+                ];
 
-               // Process season only queries or Season and Episode/Airdate queries
+                // Process season only queries or Season and Episode/Airdate queries
 
-               $series = $request->input('season') ?? '';
-               $episode = $request->input('ep') ?? '';
+                $series = $request->input('season') ?? '';
+                $episode = $request->input('ep') ?? '';
 
-               if (preg_match('#^(19|20)\d{2}$#', $series, $year) && str_contains($episode, '/')) {
-                   $airDate = str_replace('/', '-', $year[0].'-'.$episode);
-               }
+                if (preg_match('#^(19|20)\d{2}$#', $series, $year) && str_contains($episode, '/')) {
+                    $airDate = str_replace('/', '-', $year[0].'-'.$episode);
+                }
 
-               $relData = $releases->tvSearch(
-                   $siteIdArr,
-                   $series,
-                   $episode,
-                   $airDate ?? '',
-                   $api->offset(),
-                   $api->limit(),
-                   $request->input('q') ?? '',
-                   $api->categoryID(),
-                   $maxAge,
-                   $minSize,
-                   $catExclusions
-               );
+                $relData = $releases->tvSearch(
+                    $siteIdArr,
+                    $series,
+                    $episode,
+                    $airDate ?? '',
+                    $api->offset(),
+                    $api->limit(),
+                    $request->input('q') ?? '',
+                    $api->categoryID(),
+                    $maxAge,
+                    $minSize,
+                    $catExclusions
+                );
 
-               $api->output($relData, $params, $outputXML, $offset, 'api');
-               break;
+                $api->output($relData, $params, $outputXML, $offset, 'api');
+                break;
 
-           // Search movie releases.
-           case 'm':
-               $api->verifyEmptyParameter('q');
-               $api->verifyEmptyParameter('imdbid');
-               $maxAge = $api->maxAge();
-               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                // Search movie releases.
+            case 'm':
+                $api->verifyEmptyParameter('q');
+                $api->verifyEmptyParameter('imdbid');
+                $maxAge = $api->maxAge();
+                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
-               $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? (int) $request->input('imdbid') : -1;
-               $tmdbId = $request->has('tmdbid') && $request->filled('tmdbid') ? (int) $request->input('tmdbid') : -1;
-               $traktId = $request->has('traktid') && $request->filled('traktid') ? (int) $request->input('traktid') : -1;
+                $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? (int) $request->input('imdbid') : -1;
+                $tmdbId = $request->has('tmdbid') && $request->filled('tmdbid') ? (int) $request->input('tmdbid') : -1;
+                $traktId = $request->has('traktid') && $request->filled('traktid') ? (int) $request->input('traktid') : -1;
 
-               $relData = $releases->moviesSearch(
-                   $imdbId,
-                   $tmdbId,
-                   $traktId,
-                   $api->offset(),
-                   $api->limit(),
-                   $request->input('q') ?? '',
-                   $api->categoryID(),
-                   $maxAge,
-                   $minSize,
-                   $catExclusions
-               );
+                $relData = $releases->moviesSearch(
+                    $imdbId,
+                    $tmdbId,
+                    $traktId,
+                    $api->offset(),
+                    $api->limit(),
+                    $request->input('q') ?? '',
+                    $api->categoryID(),
+                    $maxAge,
+                    $minSize,
+                    $catExclusions
+                );
 
-               $api->addCoverURL(
-                   $relData,
-                   function ($release) {
-                       return Utility::getCoverURL(['type' => 'movies', 'id' => $release->imdbid]);
-                   }
-               );
+                $api->addCoverURL(
+                    $relData,
+                    function ($release) {
+                        return Utility::getCoverURL(['type' => 'movies', 'id' => $release->imdbid]);
+                    }
+                );
 
-               $api->output($relData, $params, $outputXML, $offset, 'api');
-               break;
+                $api->output($relData, $params, $outputXML, $offset, 'api');
+                break;
 
-           // Get NZB.
-           case 'g':
-               $api->verifyEmptyParameter('g');
-               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
-               $relData = Release::checkGuidForApi($request->input('id'));
-               if ($relData) {
-                   return redirect(url('/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
-               }
+                // Get NZB.
+            case 'g':
+                $api->verifyEmptyParameter('g');
+                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                $relData = Release::checkGuidForApi($request->input('id'));
+                if ($relData) {
+                    return redirect(url('/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
+                }
 
-               Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
-               break;
+                Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
+                break;
 
-           // Get individual NZB details.
-           case 'd':
-               if ($request->missing('id')) {
-                   Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
-               }
+                // Get individual NZB details.
+            case 'd':
+                if ($request->missing('id')) {
+                    Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
+                }
 
-               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
-               $data = Release::getByGuid($request->input('id'));
+                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                $data = Release::getByGuid($request->input('id'));
 
-               $api->output($data, $params, $outputXML, $offset, 'api');
-               break;
+                $api->output($data, $params, $outputXML, $offset, 'api');
+                break;
 
-           // Get an NFO file for an individual release.
-           case 'n':
-               if ($request->missing('id')) {
-                   Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
-               }
+                // Get an NFO file for an individual release.
+            case 'n':
+                if ($request->missing('id')) {
+                    Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
+                }
 
-               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
-               $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
-               $data = ReleaseNfo::getReleaseNfo($rel['id']);
+                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
+                $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
-               if ($rel !== null) {
-                   if ($data !== null) {
-                       if ($request->has('o') && $request->input('o') === 'file') {
-                           return response()->streamDownload(function () use ($data) {
-                               echo $data['nfo'];
-                           }, $rel['searchname'].'.nfo', ['Content-type:' => 'application/octet-stream']);
-                       }
+                if ($rel !== null) {
+                    if ($data !== null) {
+                        if ($request->has('o') && $request->input('o') === 'file') {
+                            return response()->streamDownload(function () use ($data) {
+                                echo $data['nfo'];
+                            }, $rel['searchname'].'.nfo', ['Content-type:' => 'application/octet-stream']);
+                        }
 
-                       echo nl2br(Utility::cp437toUTF($data['nfo']));
-                   } else {
-                       Utility::showApiError(300, 'Release does not have an NFO file associated.');
-                   }
-               } else {
-                   Utility::showApiError(300, 'Release does not exist.');
-               }
-               break;
+                        echo nl2br(Utility::cp437toUTF($data['nfo']));
+                    } else {
+                        Utility::showApiError(300, 'Release does not have an NFO file associated.');
+                    }
+                } else {
+                    Utility::showApiError(300, 'Release does not exist.');
+                }
+                break;
 
-           // Capabilities request.
-           case 'c':
-               $api->output([], $params, $outputXML, $offset, 'caps');
-               break;
-       }
+                // Capabilities request.
+            case 'c':
+                $api->output([], $params, $outputXML, $offset, 'caps');
+                break;
+        }
     }
 }

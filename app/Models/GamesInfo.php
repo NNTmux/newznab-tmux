@@ -39,6 +39,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereTrailer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereUrl($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo newModelQuery()

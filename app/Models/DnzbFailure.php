@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereFailed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereReleaseId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure newModelQuery()
@@ -63,7 +64,6 @@ class DnzbFailure extends Model
      * Read failed downloads count for requested release_id.
      *
      *
-     * @param $relId
      * @return bool|mixed
      */
     public static function getFailedCount($relId)
@@ -76,9 +76,6 @@ class DnzbFailure extends Model
         return false;
     }
 
-    /**
-     * @return int
-     */
     public static function getCount(): int
     {
         return self::query()->count('release_id');

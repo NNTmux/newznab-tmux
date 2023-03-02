@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 class ContactUsController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function contact(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
@@ -50,8 +47,6 @@ class ContactUsController extends BasePageController
     }
 
     /**
-     * @param  string  $msg
-     *
      * @throws \Exception
      */
     public function showContactForm(string $msg = ''): void

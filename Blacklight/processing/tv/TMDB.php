@@ -19,33 +19,19 @@ class TMDB extends TV
      * @string URL for show poster art
      */
     public string $posterUrl = '';
-    /**
-     * @var ApiToken
-     */
+
     public ApiToken $token;
-    /**
-     * @var Client
-     */
+
     public Client $client;
-    /**
-     * @var ConfigurationRepository
-     */
+
     public ConfigurationRepository $configRepository;
-    /**
-     * @var \Tmdb\Model\Configuration
-     */
+
     public \Tmdb\Model\Configuration $config;
-    /**
-     * @var ImageHelper
-     */
+
     public ImageHelper $helper;
 
     /**
      * Fetch banner from site.
-     *
-     * @param $videoId
-     * @param $siteID
-     * @return bool
      */
     public function getBanner($videoId, $siteID): bool
     {
@@ -56,9 +42,6 @@ class TMDB extends TV
      * Main processing director function for TMDB
      * Calls work query function and initiates processing.
      *
-     * @param    $groupID
-     * @param    $guidChar
-     * @param    $process
      * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
@@ -90,6 +73,7 @@ class TMDB extends TV
                                     $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
                         }
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+
                         continue;
                     }
 
@@ -144,6 +128,7 @@ class TMDB extends TV
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->colorCli->primary('Found TMDB Match for Full Season!', true);
+
                             continue;
                         }
 
@@ -221,8 +206,6 @@ class TMDB extends TV
     }
 
     /**
-     * @param  array  $shows
-     * @param  string  $cleanName
      * @return array|false
      */
     private function matchShowInfo(array $shows, string $cleanName): bool|array
@@ -277,7 +260,6 @@ class TMDB extends TV
      * Retrieves the poster art for the processed show.
      *
      * @param  int  $videoId  -- the local Video ID
-     * @return int
      */
     public function getPoster($videoId): int
     {
@@ -332,9 +314,6 @@ class TMDB extends TV
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $show
-     * @return array
      */
     protected function formatShowInfo($show): array
     {
@@ -345,20 +324,20 @@ class TMDB extends TV
         }
 
         return [
-            'type'      => parent::TYPE_TV,
-            'title'     => (string) $show['name'],
-            'summary'   => (string) $show['overview'],
-            'started'   => (string) $show['first_air_date'],
+            'type' => parent::TYPE_TV,
+            'title' => (string) $show['name'],
+            'summary' => (string) $show['overview'],
+            'started' => (string) $show['first_air_date'],
             'publisher' => isset($show['network']) ? (string) $show['network'] : '',
-            'country'   => $show['origin_country'][0] ?? '',
-            'source'    => parent::SOURCE_TMDB,
-            'imdb'      => isset($imdb['imdbid']) ? (int) $imdb['imdbid'] : 0,
-            'tvdb'      => isset($show['external_ids']['tvdb_id']) ? (int) $show['external_ids']['tvdb_id'] : 0,
-            'trakt'     => 0,
-            'tvrage'    => isset($show['external_ids']['tvrage_id']) ? (int) $show['external_ids']['tvrage_id'] : 0,
-            'tvmaze'    => 0,
-            'tmdb'      => (int) $show['id'],
-            'aliases'   => ! empty($show['alternative_titles']) ? (array) $show['alternative_titles'] : '',
+            'country' => $show['origin_country'][0] ?? '',
+            'source' => parent::SOURCE_TMDB,
+            'imdb' => isset($imdb['imdbid']) ? (int) $imdb['imdbid'] : 0,
+            'tvdb' => isset($show['external_ids']['tvdb_id']) ? (int) $show['external_ids']['tvdb_id'] : 0,
+            'trakt' => 0,
+            'tvrage' => isset($show['external_ids']['tvrage_id']) ? (int) $show['external_ids']['tvrage_id'] : 0,
+            'tvmaze' => 0,
+            'tmdb' => (int) $show['id'],
+            'aliases' => ! empty($show['alternative_titles']) ? (array) $show['alternative_titles'] : '',
             'localzone' => "''",
         ];
     }
@@ -366,9 +345,6 @@ class TMDB extends TV
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $episode
-     * @return array
      */
     #[ArrayShape([
         'title' => 'string',
@@ -379,14 +355,14 @@ class TMDB extends TV
         'summary' => 'string',
     ])]
  protected function formatEpisodeInfo($episode): array
-    {
-        return [
-            'title'       => (string) $episode['name'],
-            'series'      => (int) $episode['season_number'],
-            'episode'     => (int) $episode['episode_number'],
-            'se_complete' => 'S'.sprintf('%02d', $episode['season_number']).'E'.sprintf('%02d', $episode['episode_number']),
-            'firstaired'  => (string) $episode['air_date'],
-            'summary'     => (string) $episode['overview'],
-        ];
-    }
+ {
+     return [
+         'title' => (string) $episode['name'],
+         'series' => (int) $episode['season_number'],
+         'episode' => (int) $episode['episode_number'],
+         'se_complete' => 'S'.sprintf('%02d', $episode['season_number']).'E'.sprintf('%02d', $episode['episode_number']),
+         'firstaired' => (string) $episode['air_date'],
+         'summary' => (string) $episode['overview'],
+     ];
+ }
 }

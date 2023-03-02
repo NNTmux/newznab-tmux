@@ -45,6 +45,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereTitle($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb newModelQuery()
@@ -57,10 +58,15 @@ class Predb extends Model
 
     // Nuke status.
     public const PRE_NONUKE = 0; // Pre is not nuked.
+
     public const PRE_UNNUKED = 1; // Pre was un nuked.
+
     public const PRE_NUKED = 2; // Pre is nuked.
+
     public const PRE_MODNUKE = 3; // Nuke reason was modified.
+
     public const PRE_RENUKED = 4; // Pre was re nuked.
+
     public const PRE_OLDNUKE = 5; // Pre is nuked for being old.
 
     /**
@@ -129,7 +135,7 @@ class Predb extends Model
                 if (config('nntmux.echocli')) {
                     $consoleTools->overWritePrimary(
                         'Matching up preDB titles with release searchnames: '.$consoleTools->percentString(++$updated, $total)
-                        );
+                    );
                 }
             }
             if (config('nntmux.echocli')) {
@@ -212,7 +218,6 @@ class Predb extends Model
      * Get all PRE's for a release.
      *
      *
-     * @param $preID
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getForRelease($preID)
@@ -224,7 +229,6 @@ class Predb extends Model
      * Return a single PRE for a release.
      *
      *
-     * @param $preID
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getOne($preID)

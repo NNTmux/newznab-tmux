@@ -12,6 +12,7 @@ class ADM extends AdultMovies
      * Needed Search Queries Constant.
      */
     private const ADMURL = 'http://www.adultdvdmarketplace.com';
+
     private const TRAILINGSEARCH = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
 
     /**
@@ -92,8 +93,6 @@ class ADM extends AdultMovies
 
     /**
      * Gets the synopsis.
-     *
-     * @return array
      */
     protected function synopsis(): array
     {
@@ -112,7 +111,6 @@ class ADM extends AdultMovies
      *
      *
      * @param  bool  $extras
-     * @return array
      */
     protected function productInfo($extras = false): array
     {
@@ -135,8 +133,6 @@ class ADM extends AdultMovies
 
     /**
      * Gets the cast members.
-     *
-     * @return array
      */
     protected function cast(): array
     {
@@ -160,8 +156,6 @@ class ADM extends AdultMovies
 
     /**
      * Gets categories.
-     *
-     * @return array
      */
     protected function genres(): array
     {
@@ -182,7 +176,6 @@ class ADM extends AdultMovies
     /**
      * Searches for match against searchterm.
      *
-     * @param $movie
      * @return bool - true if search = 100%
      */
     public function processSite($movie): bool

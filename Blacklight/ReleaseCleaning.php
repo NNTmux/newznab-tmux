@@ -17,6 +17,7 @@ class ReleaseCleaning
      * Used for matching endings in article subjects.
      *
      * @const
+     *
      * @string
      */
     private const REGEX_END = '[ -]{0,3}yEnc$/u';
@@ -25,6 +26,7 @@ class ReleaseCleaning
      * Used for matching file extension endings in article subjects.
      *
      * @const
+     *
      * @string
      */
     private const REGEX_FILE_EXTENSIONS = '([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}"|")';
@@ -33,7 +35,9 @@ class ReleaseCleaning
      * Used for matching size strings in article subjects.
      *
      * @example ' - 365.15 KB - '
+     *
      * @const
+     *
      * @string
      */
     private const REGEX_SUBJECT_SIZE = '[ -]{0,3}\d+([.,]\d+)? [kKmMgG][bB][ -]{0,3}';
@@ -93,9 +97,6 @@ class ReleaseCleaning
     }
 
     /**
-     * @param    $subject
-     * @param    $fromName
-     * @param    $groupName
      * @param  bool  $usePre
      * @return array|false|string
      *
@@ -119,11 +120,11 @@ class ReleaseCleaning
                     }
                     if ($title !== null) {
                         return [
-                            'cleansubject'  => $title['title'],
+                            'cleansubject' => $title['title'],
                             'properlynamed' => true,
-                            'increment'     => false,
-                            'predb'         => $title['id'],
-                            'requestid'     => false,
+                            'increment' => false,
+                            'predb' => $title['id'],
+                            'requestid' => false,
                         ];
                     }
                 }
@@ -135,7 +136,7 @@ class ReleaseCleaning
             preg_match('/^(\d{4,6})-\d{1}\[/', $subject, $hit) ||
             preg_match('/(\d{4,6}) -/', $subject, $hit)
         ) {
-            $title = Predb::query()->where(['predb.requestid'=> $hit[1], 'g.name' => $groupName])->join('usenet_groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
+            $title = Predb::query()->where(['predb.requestid' => $hit[1], 'g.name' => $groupName])->join('usenet_groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             //check for predb title matches against other groups where it matches relative size / fromname
             //known crossposted requests only atm
             $reqGname = '';
@@ -159,7 +160,7 @@ class ReleaseCleaning
                     break;
             }
             if ($title === null && ! empty($reqGname)) {
-                $title = Predb::query()->where(['predb.requestid'=> $hit[1], 'g.name' => $reqGname])->join('usenet_groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
+                $title = Predb::query()->where(['predb.requestid' => $hit[1], 'g.name' => $reqGname])->join('usenet_groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             }
             // don't match against ab.teevee if title is for just the season
             if ($groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $hit)) {
@@ -167,11 +168,11 @@ class ReleaseCleaning
             }
             if ($title !== null) {
                 return [
-                    'cleansubject'  => $title['title'],
+                    'cleansubject' => $title['title'],
                     'properlynamed' => true,
-                    'increment'     => false,
-                    'predb'         => $title['id'],
-                    'requestid'     => true,
+                    'increment' => false,
+                    'predb' => $title['id'],
+                    'requestid' => true,
                 ];
             }
         }
@@ -183,7 +184,7 @@ class ReleaseCleaning
         $potentialName = $this->_regexes->tryRegex($subject, $groupName);
         if ($potentialName) {
             return [
-                'id'   => $this->_regexes->matchedRegex,
+                'id' => $this->_regexes->matchedRegex,
                 'cleansubject' => $potentialName,
                 'properlynamed' => false,
             ];
@@ -200,9 +201,6 @@ class ReleaseCleaning
         return $this->generic();
     }
 
-    /**
-     * @return array
-     */
     public function teevee(): array
     {
         //[140022]-[04] - [01/40] - "140022-04.nfo" yEnc
@@ -425,10 +423,6 @@ class ReleaseCleaning
         ];
     }
 
-    /**
-     * @param $subject
-     * @return string
-     */
     public function releaseCleanerHelper($subject): string
     {
         $cleanerName = preg_replace('/(\- )?yEnc$/', '', $subject);
@@ -439,7 +433,6 @@ class ReleaseCleaning
     /**
      * Cleans release name for the namefixer class.
      *
-     * @param $name
      * @return mixed|string
      */
     public function fixerCleaner($name)

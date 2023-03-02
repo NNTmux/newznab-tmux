@@ -17,7 +17,9 @@ class AEBN extends AdultMovies
      * Url Constants used within this class.
      */
     private const AEBNSURL = 'http://straight.theater.aebn.net';
+
     private const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
+
     private const TRAILERURL = '/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=';
 
     /**
@@ -43,14 +45,14 @@ class AEBN extends AdultMovies
      * @var array
      */
     protected $_res = [
-        'backcover'   => [],
-        'boxcover'    => [],
-        'cast'        => [],
-        'director'    => [],
-        'genres'      => [],
+        'backcover' => [],
+        'boxcover' => [],
+        'cast' => [],
+        'director' => [],
+        'genres' => [],
         'productinfo' => [],
-        'synopsis'    => [],
-        'trailers'    => ['url' => []],
+        'synopsis' => [],
+        'trailers' => ['url' => []],
     ];
 
     /**
@@ -79,8 +81,6 @@ class AEBN extends AdultMovies
 
     /**
      * Gets the front and back cover of the box.
-     *
-     * @return array
      */
     protected function covers(): array
     {
@@ -99,8 +99,6 @@ class AEBN extends AdultMovies
 
     /**
      * Gets the Genres "Categories".
-     *
-     * @return array
      */
     protected function genres(): array
     {
@@ -118,8 +116,6 @@ class AEBN extends AdultMovies
 
     /**
      * Gets the Cast Members "Stars" and Director if any.
-     *
-     * @return array
      */
     protected function cast(): array
     {
@@ -147,7 +143,6 @@ class AEBN extends AdultMovies
      * Gets the product information.
      *
      * @param  bool  $extras
-     * @return array
      */
     protected function productInfo($extras = false): array
     {
@@ -174,8 +169,6 @@ class AEBN extends AdultMovies
 
     /**
      * Gets the synopsis "plot".
-     *
-     * @return array
      */
     protected function synopsis(): array
     {
@@ -196,7 +189,6 @@ class AEBN extends AdultMovies
      * Searches for a XXX name.
      *
      * @param  string  $movie
-     * @return bool
      */
     public function processSite($movie): bool
     {
@@ -223,6 +215,7 @@ class AEBN extends AdultMovies
 
                         return true;
                     }
+
                     continue;
                 }
                 $i++;

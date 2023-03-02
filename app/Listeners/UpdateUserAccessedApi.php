@@ -20,7 +20,6 @@ class UpdateUserAccessedApi
     /**
      * Handle the event.
      *
-     * @param  UserAccessedApi  $event
      * @return void
      */
     public function handle(UserAccessedApi $event)

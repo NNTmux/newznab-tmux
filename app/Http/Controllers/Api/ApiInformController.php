@@ -14,8 +14,6 @@ class ApiInformController extends Controller
     /**
      * http://sitename/api/inform/release?api_token=xxxxx&relo=xxx&relp=xxx.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      *
      * @throws \Exception
      */

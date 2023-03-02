@@ -74,11 +74,11 @@ class CouchPotato
         $this->imdbid = $id;
 
         return (new Client(['verify' => false]))->get(
-                $this->cpurl.
-                    '/api/'.
-                    $this->cpapi.
-                    '/movie.add/?identifier=tt'.
-                    $this->imdbid
+            $this->cpurl.
+                '/api/'.
+                $this->cpapi.
+                '/movie.add/?identifier=tt'.
+                $this->imdbid
 
         )->getBody()->getContents();
     }

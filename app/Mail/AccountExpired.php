@@ -11,13 +11,13 @@ class AccountExpired extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+
     private $siteEmail;
+
     private $siteTitle;
 
     /**
      * Create a new message instance.
-     *
-     * @param $user
      */
     public function __construct($user)
     {

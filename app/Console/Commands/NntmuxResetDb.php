@@ -93,7 +93,7 @@ class NntmuxResetDb extends Command
                 }
                 $releases_index = [
                     'index' => 'releases',
-                    'body'  => [
+                    'body' => [
                         'settings' => [
                             'number_of_shards' => 2,
                             'number_of_replicas' => 0,
@@ -137,7 +137,7 @@ class NntmuxResetDb extends Command
                 }
                 $predb_index = [
                     'index' => 'predb',
-                    'body'  => [
+                    'body' => [
                         'settings' => [
                             'number_of_shards' => 2,
                             'number_of_replicas' => 0,

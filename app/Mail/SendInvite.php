@@ -34,7 +34,6 @@ class SendInvite extends Mailable
      * SendInvite constructor.
      *
      * @param  \App\Models\User  $user
-     * @param    $invite
      */
     public function __construct($user, $invite)
     {

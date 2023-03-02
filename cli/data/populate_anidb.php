@@ -19,10 +19,10 @@ if ($argc > 1 && $argv[1] === 'true' && isset($argv[2])) {
     }
 } else {
     (new ColorCLI())->error(
-            'To execute this script you must provide a boolean argument.'.PHP_EOL.
-            'Argument1: true|false to run this script or not'.PHP_EOL.
-            'Argument2: full|info for what type of data to populate.'.PHP_EOL.
-            'Argument3 (optional) anidbid to fetch info for'.PHP_EOL.
-            'WARNING: Argument "info" without third argument will get you banned from AniDB almost instantly'
+        'To execute this script you must provide a boolean argument.'.PHP_EOL.
+        'Argument1: true|false to run this script or not'.PHP_EOL.
+        'Argument2: full|info for what type of data to populate.'.PHP_EOL.
+        'Argument3 (optional) anidbid to fetch info for'.PHP_EOL.
+        'WARNING: Argument "info" without third argument will get you banned from AniDB almost instantly'
     );
 }

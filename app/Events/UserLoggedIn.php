@@ -15,16 +15,10 @@ class UserLoggedIn
      */
     public $user;
 
-    /**
-     * @var
-     */
     public $ip;
 
     /**
      * Create a new event instance.
-     *
-     * @param $user
-     * @param $ip
      */
     public function __construct($user, $ip = '')
     {

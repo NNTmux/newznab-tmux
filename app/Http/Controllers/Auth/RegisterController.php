@@ -39,14 +39,9 @@ class RegisterController extends Controller
 
     /**
      * Where to redirect users after registration.
-     *
-     * @var string
      */
     protected string $redirectTo = '/';
 
-    /**
-     * @var string
-     */
     private string $inviteCodeQuery = '';
 
     /**
@@ -59,10 +54,6 @@ class RegisterController extends Controller
         $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
     }
 
-    /**
-     * @param  array  $data
-     * @return \App\Models\User
-     */
     protected function create(array $data): User
     {
         $user = User::create([
@@ -118,7 +109,6 @@ class RegisterController extends Controller
     }
 
     /**
-     * @param  Request  $request
      * @return RedirectResponse|Redirector|void
      *
      * @throws ValidationException
@@ -193,28 +183,22 @@ class RegisterController extends Controller
                     $showRegister = 1;
                 }
                 break;
-
         }
         app('smarty.view')->assign(
             [
-                'username'          => Utility::htmlfmt($userName),
-                'password'          => Utility::htmlfmt($password),
-                'password_confirmation'   => Utility::htmlfmt($confirmPassword),
-                'email'             => Utility::htmlfmt($email),
-                'invitecode'        => Utility::htmlfmt($inviteCode),
+                'username' => Utility::htmlfmt($userName),
+                'password' => Utility::htmlfmt($password),
+                'password_confirmation' => Utility::htmlfmt($confirmPassword),
+                'email' => Utility::htmlfmt($email),
+                'invitecode' => Utility::htmlfmt($inviteCode),
                 'invite_code_query' => Utility::htmlfmt($this->inviteCodeQuery),
-                'showregister'      => $showRegister,
+                'showregister' => $showRegister,
             ]
         );
 
         return $this->showRegistrationForm($request, $error, $showRegister);
     }
 
-    /**
-     * @param  Request  $request
-     * @param  string  $error
-     * @param  int  $showRegister
-     */
     public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0): void
     {
         $inviteCode = '';

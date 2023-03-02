@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ShortGroup whereLastRecord($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ShortGroup whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ShortGroup whereUpdated($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ShortGroup newModelQuery()

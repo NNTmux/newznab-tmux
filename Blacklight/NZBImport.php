@@ -97,14 +97,14 @@ class NZBImport
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Browser'         => false,    // Was this started from the browser?
-            'Echo'            => true,    // Echo to CLI?
-            'Binaries'        => null,
-            'Categorize'      => null,
-            'NZB'             => null,
+            'Browser' => false,    // Was this started from the browser?
+            'Echo' => true,    // Echo to CLI?
+            'Binaries' => null,
+            'Categorize' => null,
+            'NZB' => null,
             'ReleaseCleaning' => null,
-            'Releases'        => null,
-            'Settings'        => null,
+            'Releases' => null,
+            'Settings' => null,
         ];
         $options += $defaults;
 
@@ -149,7 +149,6 @@ class NZBImport
 
             // Check if the file is really there.
             if (File::isFile($nzbFile)) {
-
                 // Get the contents of the NZB file as a string.
                 if (strtolower(substr($nzbFile, -7)) === '.nzb.gz') {
                     $nzbString = Utility::unzipGzipFile($nzbFile);
@@ -164,6 +163,7 @@ class NZBImport
                         @unlink($nzbFile);
                     }
                     $nzbsSkipped++;
+
                     continue;
                 }
 
@@ -176,6 +176,7 @@ class NZBImport
                         @unlink($nzbFile);
                     }
                     $nzbsSkipped++;
+
                     continue;
                 }
 
@@ -183,7 +184,6 @@ class NZBImport
                 $inserted = $this->scanNZBFile($nzbXML, ($useNzbName ? str_ireplace('.nzb', '', basename($nzbFile)) : false));
 
                 if ($inserted) {
-
                     // Try to copy the NZB to the NZB folder.
                     $path = $this->nzb->getNZBPath($this->relGuid, 0, true);
 
@@ -241,9 +241,7 @@ class NZBImport
     }
 
     /**
-     * @param $nzbXML
      * @param  bool  $useNzbName
-     * @return bool
      *
      * @throws \Exception
      */
@@ -317,7 +315,6 @@ class NZBImport
 
             // If we found a group and it's not blacklisted.
             if ($groupID !== -1 && ! $isBlackListed) {
-
                 // Get the size of the release.
                 if (\count($file->segments->segment) > 0) {
                     foreach ($file->segments->segment as $segment) {
@@ -350,14 +347,14 @@ class NZBImport
         // Try to insert the NZB details into the DB.
         return $this->insertNZB(
             [
-                'subject'    => $firstName,
-                'useFName'   => $useNzbName,
-                'postDate'   => empty($postDate) ? now()->format('Y-m-d H:i:s') : $postDate,
-                'from'       => empty($posterName) ? '' : $posterName,
-                'groups_id'   => $groupID,
-                'groupName'  => $groupName,
+                'subject' => $firstName,
+                'useFName' => $useNzbName,
+                'postDate' => empty($postDate) ? now()->format('Y-m-d H:i:s') : $postDate,
+                'from' => empty($posterName) ? '' : $posterName,
+                'groups_id' => $groupID,
+                'groupName' => $groupName,
                 'totalFiles' => $totalFiles,
-                'totalSize'  => $totalSize,
+                'totalSize' => $totalSize,
             ]
         );
     }
@@ -365,8 +362,6 @@ class NZBImport
     /**
      * Insert the NZB details into the database.
      *
-     * @param $nzbDetails
-     * @return bool
      *
      * @throws \Exception
      */
@@ -406,19 +401,19 @@ class NZBImport
             // Insert the release into the DB.
             $relID = Release::insertRelease(
                 [
-                    'name'            => $escapedSubject,
-                    'searchname'    => $escapedSearchName ?? $escapedSubject,
-                    'totalpart'        => $nzbDetails['totalFiles'],
-                    'groups_id'        => $nzbDetails['groups_id'],
-                    'guid'            => $this->relGuid,
-                    'postdate'        => $nzbDetails['postDate'],
-                    'fromname'        => $escapedFromName,
-                    'size'            => $nzbDetails['totalSize'],
-                    'categories_id'    => $determinedCategory['categories_id'],
-                    'isrenamed'        => $renamed,
-                    'reqidstatus'    => 0,
-                    'predb_id'        => 0,
-                    'nzbstatus'        => NZB::NZB_ADDED,
+                    'name' => $escapedSubject,
+                    'searchname' => $escapedSearchName ?? $escapedSubject,
+                    'totalpart' => $nzbDetails['totalFiles'],
+                    'groups_id' => $nzbDetails['groups_id'],
+                    'guid' => $this->relGuid,
+                    'postdate' => $nzbDetails['postDate'],
+                    'fromname' => $escapedFromName,
+                    'size' => $nzbDetails['totalSize'],
+                    'categories_id' => $determinedCategory['categories_id'],
+                    'isrenamed' => $renamed,
+                    'reqidstatus' => 0,
+                    'predb_id' => 0,
+                    'nzbstatus' => NZB::NZB_ADDED,
                 ]
             );
         } else {
@@ -438,8 +433,6 @@ class NZBImport
 
     /**
      * Get all groups in the DB.
-     *
-     * @return bool
      */
     protected function getAllGroups(): bool
     {

@@ -17,9 +17,6 @@ class Tmux
      */
     public \Closure|\PDO $pdo;
 
-    /**
-     * @var
-     */
     public $tmux_session;
 
     /**
@@ -37,7 +34,6 @@ class Tmux
     }
 
     /**
-     * @param $constants
      * @return mixed
      */
     public function getConnectionsInfo($constants)
@@ -55,11 +51,6 @@ class Tmux
         return $runVar['connections'];
     }
 
-    /**
-     * @param  string  $which
-     * @param $connections
-     * @return mixed
-     */
     public function getUSPConnections(string $which, $connections): mixed
     {
         switch ($which) {
@@ -93,10 +84,6 @@ class Tmux
         return $runVar['conncounts'];
     }
 
-    /**
-     * @param $constants
-     * @return array
-     */
     public function getListOfPanes($constants): array
     {
         $panes = ['zero' => '', 'one' => '', 'two' => ''];
@@ -121,9 +108,6 @@ class Tmux
         return $panes;
     }
 
-    /**
-     * @return string
-     */
     public function getConstantSettings(): string
     {
         $settstr = 'SELECT value FROM settings WHERE setting =';
@@ -141,9 +125,6 @@ class Tmux
         return $sql;
     }
 
-    /**
-     * @return string
-     */
     public function getMonitorSettings(): string
     {
         $settstr = 'SELECT value FROM settings WHERE setting =';
@@ -215,8 +196,6 @@ class Tmux
     }
 
     /**
-     * @param $setting
-     * @param $value
      * @return int
      */
     public function updateItem($setting, $value)
@@ -224,9 +203,6 @@ class Tmux
         return Settings::query()->where('setting', '=', $setting)->update(['value' => $value]);
     }
 
-    /**
-     * @return float
-     */
     public function microtime_float(): float
     {
         [$usec, $sec] = explode(' ', microtime());
@@ -234,10 +210,6 @@ class Tmux
         return (float) $usec + (float) $sec;
     }
 
-    /**
-     * @param  float  $bytes
-     * @return string
-     */
     public function decodeSize(float $bytes): string
     {
         $types = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -253,10 +225,6 @@ class Tmux
         return round($bytes, 2).' '.$suffix;
     }
 
-    /**
-     * @param $pane
-     * @return string|null
-     */
     public function writelog($pane): ?string
     {
         $path = NN_LOGS;
@@ -270,11 +238,6 @@ class Tmux
     }
 
     /**
-     * @param $colors_start
-     * @param $colors_end
-     * @param $colors_exc
-     * @return int
-     *
      * @throws \Exception
      */
     public function get_color($colors_start, $colors_end, $colors_exc): int
@@ -298,9 +261,7 @@ class Tmux
      * Returns random bool, weighted by $chance.
      *
      *
-     * @param    $loop
      * @param  int  $chance
-     * @return bool
      *
      * @throws \Exception
      */
@@ -314,19 +275,11 @@ class Tmux
         return random_int(1, 100) <= $chance;
     }
 
-    /**
-     * @param $_time
-     * @return string
-     */
     public function relativeTime($_time): string
     {
         return Carbon::createFromTimestamp($_time)->ago();
     }
 
-    /**
-     * @param $cmd
-     * @return bool
-     */
     public function command_exist($cmd): bool
     {
         $returnVal = shell_exec("which $cmd 2>/dev/null");
@@ -335,12 +288,9 @@ class Tmux
     }
 
     /**
-     * @param    $qry
-     * @param    $bookreqids
      * @param  string  $db_name
      * @param  string  $ppmax
      * @param  string  $ppmin
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -463,8 +413,6 @@ class Tmux
     }
 
     /**
-     * @return bool
-     *
      * @throws \Exception
      */
     public function stopIfRunning(): bool
@@ -492,9 +440,6 @@ class Tmux
         }
     }
 
-    /**
-     * @return array
-     */
     public function cbpmTableQuery(): array
     {
         return DB::select(

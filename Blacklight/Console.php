@@ -20,13 +20,11 @@ use MarcReichel\IGDBLaravel\Models\Platform;
 class Console
 {
     public const CONS_UPROC = 0; // Release has not been processed.
+
     public const CONS_NTFND = -2;
 
     protected const MATCH_PERCENT = 60;
 
-    /**
-     * @var
-     */
     protected $igdbSleep;
 
     /**
@@ -94,7 +92,7 @@ class Console
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'     => false,
+            'Echo' => false,
             'Settings' => null,
         ];
         $options += $defaults;
@@ -115,7 +113,6 @@ class Console
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getConsoleInfo($id)
@@ -149,14 +146,6 @@ class Console
     }
 
     /**
-     * @param    $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
-     * @param    $orderBy
-     * @param  array  $excludedCats
-     * @return array
-     *
      * @throws \Exception
      */
     public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
@@ -249,10 +238,6 @@ class Console
         return $return;
     }
 
-    /**
-     * @param $orderBy
-     * @return array
-     */
     public function getConsoleOrder($orderBy): array
     {
         $order = ($orderBy === '') ? 'r.postdate' : $orderBy;
@@ -289,25 +274,16 @@ class Console
         return [$orderfield, $ordersort];
     }
 
-    /**
-     * @return array
-     */
     public function getConsoleOrdering(): array
     {
         return ['title_asc', 'title_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc', 'files_asc', 'files_desc', 'stats_asc', 'stats_desc', 'platform_asc', 'platform_desc', 'releasedate_asc', 'releasedate_desc', 'genre_asc', 'genre_desc'];
     }
 
-    /**
-     * @return array
-     */
     public function getBrowseByOptions(): array
     {
         return ['platform' => 'platform', 'title' => 'title', 'genre' => 'genres_id'];
     }
 
-    /**
-     * @return string
-     */
     public function getBrowseBy(): string
     {
         $browseBy = ' ';
@@ -322,17 +298,6 @@ class Console
     }
 
     /**
-     * @param $id
-     * @param $title
-     * @param $asin
-     * @param $url
-     * @param $salesrank
-     * @param $platform
-     * @param $publisher
-     * @param $releasedate
-     * @param $esrb
-     * @param $cover
-     * @param $genres_id
      * @param  string  $review
      */
     public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genres_id, $review = 'review'): void
@@ -345,7 +310,6 @@ class Console
     }
 
     /**
-     * @param $gameInfo
      * @return int|mixed
      *
      * @throws \Exception
@@ -372,11 +336,6 @@ class Console
         return $consoleId;
     }
 
-    /**
-     * @param  array  $gameInfo
-     * @param  array  $con
-     * @return bool
-     */
     protected function _matchConToGameInfo(array $gameInfo = [], array $con = []): bool
     {
         $matched = false;
@@ -416,11 +375,6 @@ class Console
         return $matched;
     }
 
-    /**
-     * @param $amaz
-     * @param $gameInfo
-     * @return array
-     */
     protected function _setConBeforeMatch($amaz, $gameInfo): array
     {
         $con = [];
@@ -445,10 +399,6 @@ class Console
         return $con;
     }
 
-    /**
-     * @param $amaz
-     * @return array
-     */
     protected function _setConAfterMatch($amaz): array
     {
         $con = [];
@@ -483,9 +433,6 @@ class Console
     }
 
     /**
-     * @param $amaz
-     * @return array
-     *
      * @throws \Exception
      */
     protected function _matchGenre($amaz): array
@@ -535,7 +482,6 @@ class Console
     }
 
     /**
-     * @param $genreName
      * @return false|int|string
      *
      * @throws \Exception
@@ -554,8 +500,6 @@ class Console
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
     protected function _loadGenres(): array
@@ -570,12 +514,10 @@ class Console
      *  from the release to the Amazon equivalent.
      *
      * @param  string  $platform
-     * @return string
      */
     protected function _replacePlatform($platform): string
     {
         switch (strtoupper($platform)) {
-
             case 'X360':
             case 'XBOX360':
                 $platform = 'Xbox 360';
@@ -636,7 +578,6 @@ class Console
     }
 
     /**
-     * @param  array  $con
      * @return int|mixed
      */
     protected function _updateConsoleTable(array $con = [])
@@ -693,8 +634,6 @@ class Console
     }
 
     /**
-     * @param $gameInfo
-     * @param $gamePlatform
      * @return array|bool|\StdClass
      *
      * @throws \Exception
@@ -858,7 +797,7 @@ class Console
                 }
 
                 // Update release.
-                Release::query()->where('id', $arr['id'])->update(['consoleinfo_id'=> $gameId]);
+                Release::query()->where('id', $arr['id'])->update(['consoleinfo_id' => $gameId]);
 
                 // Sleep to not flood amazon.
                 $diff = floor((now()->timestamp - $startTime) * 1000000);
@@ -872,7 +811,6 @@ class Console
     }
 
     /**
-     * @param $releaseName
      * @return array|false
      */
     public function parseTitle($releaseName)
@@ -938,10 +876,6 @@ class Console
         return (isset($result['title'], $result['platform']) && ! empty($result['title'])) ? $result : false;
     }
 
-    /**
-     * @param $platform
-     * @return string
-     */
     public function getBrowseNode($platform): string
     {
         switch ($platform) {
@@ -1010,7 +944,6 @@ class Console
     }
 
     /**
-     * @param $nodeName
      * @return bool|string
      */
     public function matchBrowseNode($nodeName)

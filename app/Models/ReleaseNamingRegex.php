@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereOrdinal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex whereStatus($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNamingRegex newModelQuery()

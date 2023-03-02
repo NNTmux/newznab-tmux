@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroup whereGroupsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroup whereReleasesId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleasesGroup newModelQuery()

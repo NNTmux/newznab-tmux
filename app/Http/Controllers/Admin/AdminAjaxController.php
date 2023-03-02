@@ -14,8 +14,6 @@ use Illuminate\Http\Request;
 class AdminAjaxController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Throwable
      */
     public function ajaxAction(Request $request): void

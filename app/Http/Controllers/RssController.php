@@ -14,9 +14,6 @@ use Illuminate\Support\Carbon;
 class RssController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Http\JsonResponse
-     *
      * @throws \Throwable
      */
     public function myMoviesRss(Request $request): \Illuminate\Http\JsonResponse|array
@@ -40,9 +37,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Http\JsonResponse
-     *
      * @throws \Throwable
      */
     public function myShowsRss(Request $request): \Illuminate\Http\JsonResponse|array
@@ -62,9 +56,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Http\JsonResponse
-     *
      * @throws \Throwable
      */
     public function fullFeedRss(Request $request): \Illuminate\Http\JsonResponse|array
@@ -121,7 +112,7 @@ class RssController extends BasePageController
 
         $this->smarty->assign(
             [
-                'categorylist'       => Category::getCategories(true, $catExclusions),
+                'categorylist' => Category::getCategories(true, $catExclusions),
                 'parentcategorylist' => Category::getForMenu($catExclusions),
             ]
         );
@@ -134,9 +125,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Http\JsonResponse
-     *
      * @throws \Throwable
      */
     public function cartRss(Request $request): \Illuminate\Http\JsonResponse|array
@@ -164,9 +152,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Http\JsonResponse
-     *
      * @throws \Throwable
      */
     public function categoryFeedRss(Request $request): \Illuminate\Http\JsonResponse|array
@@ -198,9 +183,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Http\JsonResponse
-     *
      * @throws \Throwable
      */
     private function userCheck(Request $request): \Illuminate\Http\JsonResponse|array
@@ -236,12 +218,12 @@ class RssController extends BasePageController
         }
         $params =
             [
-                'dl'       => $request->has('dl') && $request->input('dl') === '1' ? '1' : '0',
-                'del'      => $request->has('del') && $request->input('del') === '1' ? '1' : '0',
+                'dl' => $request->has('dl') && $request->input('dl') === '1' ? '1' : '0',
+                'del' => $request->has('del') && $request->input('del') === '1' ? '1' : '0',
                 'extended' => 1,
-                'uid'      => $uid,
-                'token'    => $rssToken,
-                'apilimit'    => $maxRequests,
+                'uid' => $uid,
+                'token' => $rssToken,
+                'apilimit' => $maxRequests,
                 'requests' => $usedRequests,
                 'downloadlimit' => $maxDownloads,
                 'grabs' => UserDownload::getDownloadRequests($uid),

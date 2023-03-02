@@ -68,11 +68,11 @@ class NZBContents
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'        => false,
-            'NNTP'        => null,
-            'Nfo'         => null,
-            'NZB'         => null,
-            'Settings'    => null,
+            'Echo' => false,
+            'NNTP' => null,
+            'Nfo' => null,
+            'NZB' => null,
+            'Settings' => null,
             'PostProcess' => null,
         ];
         $options += $defaults;
@@ -94,10 +94,6 @@ class NZBContents
      * Look for an .nfo file in the NZB, return the NFO message id.
      *
      *
-     * @param $guid
-     * @param $relID
-     * @param $groupID
-     * @param $groupName
      * @return bool|mixed
      *
      * @throws \Exception
@@ -143,9 +139,6 @@ class NZBContents
      * Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
      *
      *
-     * @param $guid
-     * @param $relID
-     * @param $groupID
      * @param  bool  $nfoCheck
      * @return array|false
      *
@@ -210,7 +203,6 @@ class NZBContents
     }
 
     /**
-     * @param $guid
      * @return bool|\SimpleXMLElement
      */
     public function LoadNZB($guid)
@@ -256,7 +248,6 @@ class NZBContents
      * @param  int  $groupID
      * @param  int  $nameStatus
      * @param  int  $show
-     * @return bool
      *
      * @throws \Exception
      */

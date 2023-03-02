@@ -39,15 +39,15 @@ if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'tr
     foreach ($qry as $releases) {
         DB::update(
             sprintf(
-                    '
+                '
 						UPDATE releases
 						SET consoleinfo_id = NULL, gamesinfo_id = 0, imdbid = NULL, musicinfo_id = NULL,
 							bookinfo_id = NULL, videos_id = 0, tv_episodes_id = 0, xxxinfo_id = 0, passwordstatus = -1, haspreview = -1,
 							jpgstatus = 0, videostatus = 0, audiostatus = 0, nfostatus = -1
 						WHERE id = %d',
-                    $releases->id
-                )
-            );
+                $releases->id
+            )
+        );
         $consoletools->overWritePrimary('Resetting Releases:  '.$consoletools->percentString(++$affected, $total));
     }
 }
@@ -276,7 +276,7 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
         $consoletools->overWritePrimary('Resetting XXX Releases:  '.$consoletools->percentString(
             ++$concount,
             $total
-            ));
+        ));
     }
     $colorCli->header(PHP_EOL.number_format($concount).' xxxinfo_IDs reset.');
 }
@@ -321,7 +321,7 @@ if ($ran === false) {
             .'php reset_postprocessing.php xxx true         ...: To reset all xxx.'.PHP_EOL
             .'php reset_postprocessing.php nfos true        ...: To reset all nfos.'.PHP_EOL
             .'php reset_postprocessing.php all true         ...: To reset everything.'.PHP_EOL
-        );
+    );
     exit();
 }
 echo PHP_EOL;

@@ -79,9 +79,6 @@ class Games
      */
     protected $_gameResults;
 
-    /**
-     * @var
-     */
     protected $_getGame;
 
     /**
@@ -104,9 +101,6 @@ class Games
      */
     protected $giantBomb;
 
-    /**
-     * @var
-     */
     protected $igdbSleep;
 
     /**
@@ -117,14 +111,13 @@ class Games
     /**
      * Games constructor.
      *
-     * @param  array  $options
      *
      * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'     => false,
+            'Echo' => false,
             'ColorCLI' => null,
             'Settings' => null,
         ];
@@ -147,7 +140,6 @@ class Games
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getGamesInfoById($id)
@@ -212,9 +204,6 @@ class Games
             ->paginate(config('nntmux.items_per_page'));
     }
 
-    /**
-     * @return int
-     */
     public function getCount(): int
     {
         $res = GamesInfo::query()->count(['id']);
@@ -223,14 +212,8 @@ class Games
     }
 
     /**
-     * @param $page
-     * @param    $cat
-     * @param    $start
-     * @param    $num
      * @param  string|array  $orderBy
      * @param  string  $maxAge
-     * @param  array  $excludedCats
-     * @return array
      *
      * @throws \Exception
      */
@@ -326,7 +309,6 @@ class Games
 
     /**
      * @param  string|array  $orderBy
-     * @return array
      */
     public function getGamesOrder($orderBy): array
     {
@@ -361,9 +343,6 @@ class Games
         return [$orderField, $orderSort];
     }
 
-    /**
-     * @return array
-     */
     public function getGamesOrdering(): array
     {
         return [
@@ -373,17 +352,11 @@ class Games
         ];
     }
 
-    /**
-     * @return array
-     */
     public function getBrowseByOptions(): array
     {
         return ['title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
     }
 
-    /**
-     * @return string
-     */
     public function getBrowseBy(): string
     {
         $browseBy = ' ';
@@ -403,17 +376,6 @@ class Games
 
     /**
      * Updates the game for game-edit.php.
-     *
-     * @param $id
-     * @param $title
-     * @param $asin
-     * @param $url
-     * @param $publisher
-     * @param $releaseDate
-     * @param $esrb
-     * @param $cover
-     * @param $trailerUrl
-     * @param $genreID
      */
     public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID): void
     {
@@ -429,7 +391,7 @@ class Games
                     'esrb' => $esrb,
                     'cover' => $cover,
                     'trailer' => $trailerUrl,
-                    'genres_id' =>$genreID,
+                    'genres_id' => $genreID,
                 ]
             );
     }
@@ -437,8 +399,6 @@ class Games
     /**
      * Process each game, updating game information from Steam and Giantbomb.
      *
-     * @param $gameInfo
-     * @return bool
      *
      * @throws \Exception
      * @throws \RuntimeException
@@ -795,7 +755,6 @@ class Games
             }
 
             foreach ($res as $arr) {
-
                 // Reset maxhitrequest
                 $this->maxHitRequest = false;
 
@@ -846,7 +805,6 @@ class Games
      */
     public function parseTitle($releaseName)
     {
-
         // Get name of the game from name of release.
         if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releaseName), $hits)) {
             // Replace dots, underscores, colons, or brackets with spaces.
@@ -872,7 +830,6 @@ class Games
     /**
      * See if genre name exists.
      *
-     * @param $gameGenre
      * @return bool|string
      */
     public function matchGenreName($gameGenre)
@@ -907,7 +864,6 @@ class Games
      * Matches Genres.
      *
      * @param  string  $genre
-     * @return string
      */
     protected function _matchGenre($genre = ''): string
     {

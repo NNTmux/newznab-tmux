@@ -38,71 +38,52 @@ class XML_Response
 
     /**
      * The RSS namespace used for the output.
-     *
-     * @var string
      */
     protected string $namespace;
 
     /**
      * The trailing URL parameters on the request.
-     *
-     * @var mixed
      */
     protected mixed $parameters;
 
     /**
      * The release we are adding to the stream.
-     *
-     * @var mixed
      */
     protected mixed $release;
 
     /**
      * The retrieved releases we are returning from the API call.
-     *
-     * @var mixed
      */
     protected mixed $releases;
 
     /**
      * The various server variables and active categories.
-     *
-     * @var mixed
      */
     protected mixed $server;
 
     /**
      * The XML formatting operation we are returning.
-     *
-     * @var mixed
      */
     protected mixed $type;
 
     /**
      * The XMLWriter Class.
-     *
-     * @var \XMLWriter
      */
     protected \XMLWriter $xml;
 
-    /**
-     * @var mixed
-     */
     protected mixed $offset;
 
     /**
      * XMLReturn constructor.
-     *
-     * @param  array  $options
      */
     public function __construct(array $options = [])
     {
         $defaults = [
             'Parameters' => null,
-            'Data'       => null,
-            'Server'     => null,
-            'Offset'     => null,
-            'Type'       => null,
+            'Data' => null,
+            'Server' => null,
+            'Offset' => null,
+            'Type' => null,
         ];
         $options += $defaults;
 
@@ -117,9 +98,6 @@ class XML_Response
         $this->xml->setIndent(true);
     }
 
-    /**
-     * @return bool|string
-     */
     public function returnXML(): bool|string
     {
         if ($this->xml) {

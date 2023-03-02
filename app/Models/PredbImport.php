@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport whereTitle($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\PredbImport newModelQuery()

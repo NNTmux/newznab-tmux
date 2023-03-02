@@ -128,6 +128,7 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideosId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideostatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereXxxinfoId($value)
+ *
  * @mixin \Eloquent
  *
  * @property int|null $movieinfo_id FK to movieinfo.id
@@ -312,20 +313,6 @@ class Release extends Model
     /**
      * Used for release edit page on site.
      *
-     * @param  int  $id
-     * @param  string  $name
-     * @param  string  $searchName
-     * @param  string  $fromName
-     * @param  int  $categoryId
-     * @param  int  $parts
-     * @param  int  $grabs
-     * @param  int  $size
-     * @param  string  $postedDate
-     * @param  string  $addedDate
-     * @param    $videoId
-     * @param    $episodeId
-     * @param  int  $imDbId
-     * @param  int  $aniDbId
      * @param  string  $tags
      *
      * @throws \Exception
@@ -376,7 +363,6 @@ class Release extends Model
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getCatByRelId($id)
@@ -384,19 +370,11 @@ class Release extends Model
         return self::whereId($id)->first(['categories_id']);
     }
 
-    /**
-     * @param $videoId
-     * @return int
-     */
     public static function removeVideoIdFromReleases($videoId): int
     {
         return self::whereVideosId($videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
     }
 
-    /**
-     * @param $anidbID
-     * @return int
-     */
     public static function removeAnidbIdFromReleases($anidbID): int
     {
         return self::whereAnidbid($anidbID)->update(['anidbid' => -1]);
@@ -493,21 +471,21 @@ class Release extends Model
         $releases = self::query()
            ->where('nzbstatus', '=', NZB::NZB_ADDED)
            ->select(
-                [
-                    'releases.id',
-                    'releases.name',
-                    'releases.searchname',
-                    'releases.size',
-                    'releases.guid',
-                    'releases.totalpart',
-                    'releases.postdate',
-                    'releases.adddate',
-                    'releases.grabs',
-                    'cp.title as parent_category',
-                    'c.title as sub_category',
-                    DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
-                ]
-            )
+               [
+                   'releases.id',
+                   'releases.name',
+                   'releases.searchname',
+                   'releases.size',
+                   'releases.guid',
+                   'releases.totalpart',
+                   'releases.postdate',
+                   'releases.adddate',
+                   'releases.grabs',
+                   'cp.title as parent_category',
+                   'c.title as sub_category',
+                   DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
+               ]
+           )
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->orderByDesc('releases.postdate')
@@ -519,7 +497,6 @@ class Release extends Model
     }
 
     /**
-     * @param $guid
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection|null|static|static[]
      */
     public static function getByGuid($guid)
@@ -589,8 +566,6 @@ class Release extends Model
     /**
      * Retrieve alternate release with same or similar searchname.
      *
-     * @param $guid
-     * @param $userid
      * @return false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
      *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
@@ -627,10 +602,6 @@ class Release extends Model
         return false;
     }
 
-    /**
-     * @param $guid
-     * @return bool
-     */
     public static function checkGuidForApi($guid): bool
     {
         $check = self::whereGuid($guid)->first();

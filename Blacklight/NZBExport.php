@@ -16,9 +16,6 @@ class NZBExport
      */
     protected $browser;
 
-    /**
-     * @var
-     */
     protected $retVal;
 
     /**
@@ -39,16 +36,15 @@ class NZBExport
     /**
      * NZBExport constructor.
      *
-     * @param  array  $options
      *
      * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Browser'  => false, // Started from browser?
-            'Echo'     => true, // Echo to CLI?
-            'NZB'      => null,
+            'Browser' => false, // Started from browser?
+            'Echo' => true, // Echo to CLI?
+            'NZB' => null,
             'Releases' => null,
             'Settings' => null,
         ];
@@ -61,7 +57,6 @@ class NZBExport
     }
 
     /**
-     * @param $params
      * @return bool|string
      */
     public function beginExport($params)
@@ -137,6 +132,7 @@ class NZBExport
                 if ($this->echoCLI) {
                     echo 'No releases found to export for group: '.$group['name'].PHP_EOL;
                 }
+
                 continue;
             }
             if ($this->echoCLI) {
@@ -149,7 +145,6 @@ class NZBExport
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $currentPath));
             }
             foreach ($releases as $release) {
-
                 // Get path to the NZB file.
                 $nzbFile = $this->nzb->NZBPath($release['guid']);
                 // Check if it exists.
@@ -157,6 +152,7 @@ class NZBExport
                     if ($this->echoCLI) {
                         echo 'Unable to find NZB for release with GUID: '.$release['guid'];
                     }
+
                     continue;
                 }
 
@@ -169,15 +165,17 @@ class NZBExport
                         if ($this->echoCLI) {
                             echo 'Unable to export NZB with GUID: '.$release['guid'];
                         }
+
                         continue;
                     }
-                    // If not, decompress it and create a file to store it in.
+                // If not, decompress it and create a file to store it in.
                 } else {
                     $nzbContents = Utility::unzipGzipFile($nzbFile);
                     if (! $nzbContents) {
                         if ($this->echoCLI) {
                             echo 'Unable to export NZB with GUID: '.$release['guid'];
                         }
+
                         continue;
                     }
                     $fh = fopen($currentFile.'.nzb', 'w');
@@ -211,10 +209,6 @@ class NZBExport
         return $this->browser ? $this->retVal : true;
     }
 
-    /**
-     * @param $date
-     * @return bool
-     */
     protected function checkDate($date): bool
     {
         if (! preg_match('/^(\d{2}\/){2}\d{4}$/', $date)) {
@@ -226,9 +220,6 @@ class NZBExport
         return true;
     }
 
-    /**
-     * @param $message
-     */
     protected function echoOut($message): void
     {
         if ($this->browser) {
@@ -238,10 +229,6 @@ class NZBExport
         }
     }
 
-    /**
-     * @param $filename
-     * @return string
-     */
     protected function safeFilename($filename): string
     {
         return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));

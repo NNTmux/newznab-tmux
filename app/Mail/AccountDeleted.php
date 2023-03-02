@@ -27,8 +27,6 @@ class AccountDeleted extends Mailable
 
     /**
      * Create a new message instance.
-     *
-     * @param $user
      */
     public function __construct($user)
     {

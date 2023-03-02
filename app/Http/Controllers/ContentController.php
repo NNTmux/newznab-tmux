@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 class ContentController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse|void
      *
      * @throws \Exception

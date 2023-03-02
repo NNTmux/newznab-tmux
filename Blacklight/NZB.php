@@ -21,11 +21,15 @@ use Illuminate\Support\Str;
 class NZB
 {
     public const NZB_NONE = 0; // Release has no NZB file yet.
+
     public const NZB_ADDED = 1; // Release had an NZB file created.
 
     protected const NZB_DTD_NAME = 'nzb';
+
     protected const NZB_DTD_PUBLIC = '-//newzBin//DTD NZB 1.1//EN';
+
     protected const NZB_DTD_EXTERNAL = 'http://www.newzbin.com/DTD/nzb/nzb-1.1.dtd';
+
     protected const NZB_XML_NS = 'http://www.newzbin.com/DTD/2003/nzb';
 
     /**
@@ -125,8 +129,6 @@ class NZB
      *
      *
      *
-     * @param  \App\Models\Release  $release
-     * @return bool
      *
      * @throws \Throwable
      */

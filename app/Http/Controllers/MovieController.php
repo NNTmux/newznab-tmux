@@ -10,9 +10,6 @@ use Illuminate\Support\Arr;
 class MovieController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     *
      * @throws \Exception
      */
     public function showMovies(Request $request, string $id = ''): void
@@ -33,7 +30,7 @@ class MovieController extends BasePageController
         $category = $request->has('imdb') ? -1 : ($request->has('t') ? $request->input('t') : Category::MOVIE_ROOT);
         if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
-                ->where(['title'=> $id, 'root_categories_id' => Category::MOVIE_ROOT])
+                ->where(['title' => $id, 'root_categories_id' => Category::MOVIE_ROOT])
                 ->first(['id']);
             $category = $cat !== null ? $cat['id'] : Category::MOVIE_ROOT;
         }
@@ -107,7 +104,7 @@ class MovieController extends BasePageController
 
         $this->smarty->assign(
             [
-                'resultsadd'=>  $movies,
+                'resultsadd' => $movies,
                 'results' => $results,
                 'covgroup' => 'movies',
             ]
@@ -128,9 +125,6 @@ class MovieController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     *
      * @throws \Exception
      */
     public function showTrailer(Request $request): \Illuminate\Http\JsonResponse

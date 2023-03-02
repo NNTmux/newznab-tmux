@@ -16,49 +16,34 @@ class AniDB
 
     /**
      * Whether or not to echo message output.
-     *
-     * @var bool
      */
     public bool $echooutput;
 
     /**
      * The directory to store AniDB covers.
-     *
-     * @var string
      */
     public string $imgSavePath;
 
     /**
      * The name of the nZEDb client for AniDB lookups.
-     *
-     * @var string
      */
     private string $apiKey;
 
     /**
      * Whether or not AniDB thinks our client is banned.
-     *
-     * @var bool
      */
     private bool $banned;
 
     /**
      * The last unixtime a full AniDB update was run.
-     *
-     * @var string
      */
     private string $lastUpdate;
 
     /**
      * The number of days between full AniDB updates.
-     *
-     * @var string
      */
     private string $updateInterval;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**
@@ -69,7 +54,7 @@ class AniDB
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'     => false,
+            'Echo' => false,
             'Settings' => null,
         ];
         $options += $defaults;
@@ -91,8 +76,6 @@ class AniDB
     /**
      * Main switch that initiates AniDB table population.
      *
-     * @param  string  $type
-     * @param  int|string  $aniDbId
      *
      * @throws \Exception
      */
@@ -109,7 +92,6 @@ class AniDB
     }
 
     /**
-     * @param $aniDbId
      * @return array|false
      *
      * @throws \Exception
@@ -176,10 +158,10 @@ class AniDB
             }
 
             $AniDBAPIArray += [
-                'type'        => isset($AniDBAPIXML->type[0]) ? (string) $AniDBAPIXML->type : '',
+                'type' => isset($AniDBAPIXML->type[0]) ? (string) $AniDBAPIXML->type : '',
                 'description' => isset($AniDBAPIXML->description) ? (string) $AniDBAPIXML->description : '',
-                'picture'     => isset($AniDBAPIXML->picture[0]) ? (string) $AniDBAPIXML->picture : '',
-                'epsarr'      => $episodeArray,
+                'picture' => isset($AniDBAPIXML->picture[0]) ? (string) $AniDBAPIXML->picture : '',
+                'epsarr' => $episodeArray,
             ];
 
             return $AniDBAPIArray;
@@ -188,12 +170,6 @@ class AniDB
         return false;
     }
 
-    /**
-     * @param  \SimpleXMLElement  $element
-     * @param  string|null  $property
-     * @param  bool  $children
-     * @return string
-     */
     private function processAPIResponseElement(\SimpleXMLElement $element, string $property = null, bool $children = false): string
     {
         $property = $property ?? 'name';
@@ -211,9 +187,6 @@ class AniDB
 
     /**
      * Requests and returns the API data from AniDB.
-     *
-     * @param $aniDbId
-     * @return string
      */
     private function getAniDbResponse($aniDbId): string
     {
@@ -228,9 +201,9 @@ class AniDB
 
         $curlOpts = [
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_HEADER         => 0,
-            CURLOPT_FAILONERROR    => 1,
-            CURLOPT_ENCODING       => 'gzip',
+            CURLOPT_HEADER => 0,
+            CURLOPT_FAILONERROR => 1,
+            CURLOPT_ENCODING => 'gzip',
         ];
 
         curl_setopt_array($ch, $curlOpts);
@@ -259,11 +232,6 @@ class AniDB
         }
     }
 
-    /**
-     * @param  array  $AniDBInfoArray
-     * @param $aniDbId
-     * @return string
-     */
     private function insertAniDBInfoEps($aniDbId, array $AniDBInfoArray = []): string
     {
         AnidbInfo::query()
@@ -291,11 +259,6 @@ class AniDB
         return $AniDBInfoArray['picture'];
     }
 
-    /**
-     * @param $aniDbId
-     * @param  array  $episodeArr
-     * @return void
-     */
     private function insertAniDBEpisodes($aniDbId, array $episodeArr = []): void
     {
         if (! empty($episodeArr)) {
@@ -369,8 +332,8 @@ class AniDB
             }
         } else {
             $this->colorCli->info(
-                    'AniDB has been updated within the past '.$this->updateInterval.' days. '.
-                    'Either set this value lower in Site Edit (at your own risk of being banned) or try again later.'
+                'AniDB has been updated within the past '.$this->updateInterval.' days. '.
+                'Either set this value lower in Site Edit (at your own risk of being banned) or try again later.'
             );
         }
     }
@@ -378,7 +341,6 @@ class AniDB
     /**
      * Directs flow for populating the AniDB Info/Episodes table.
      *
-     * @param  string  $aniDbId
      *
      * @throws \Exception
      */
@@ -396,15 +358,15 @@ class AniDB
 
                 if ($this->banned) {
                     $this->colorCli->error(
-                            'AniDB Banned, import will fail, please wait 24 hours before retrying.'
-                        );
+                        'AniDB Banned, import will fail, please wait 24 hours before retrying.'
+                    );
                     exit;
                 }
 
                 if ($AniDBAPIArray === false && $this->echooutput) {
                     $this->colorCli->info(
-                            'Anime ID: '.$anidb['anidbid'].' not available for update yet.'
-                        );
+                        'Anime ID: '.$anidb['anidbid'].' not available for update yet.'
+                    );
                 } else {
                     $this->updateAniChildTables($anidb['anidbid'], $AniDBAPIArray);
                 }
@@ -415,15 +377,15 @@ class AniDB
 
             if ($this->banned) {
                 $this->colorCli->error(
-                        'AniDB Banned, import will fail, please wait 24 hours before retrying.'
-                    );
+                    'AniDB Banned, import will fail, please wait 24 hours before retrying.'
+                );
                 exit;
             }
 
             if ($AniDBAPIArray === false && $this->echooutput) {
                 $this->colorCli->info(
-                        'Anime ID: '.$aniDbId.' not available for update yet.'
-                    );
+                    'Anime ID: '.$aniDbId.' not available for update yet.'
+                );
             } else {
                 $this->updateAniChildTables($aniDbId, $AniDBAPIArray);
             }
@@ -438,11 +400,6 @@ class AniDB
         Settings::query()->where(['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'last_full_update'])->update(['value' => time()]);
     }
 
-    /**
-     * @param $aniDbId
-     * @param  array  $AniDBInfoArray
-     * @return string
-     */
     private function updateAniDBInfoEps($aniDbId, array $AniDBInfoArray = []): string
     {
         AnidbInfo::query()
@@ -470,11 +427,6 @@ class AniDB
         return $AniDBInfoArray['picture'];
     }
 
-    /**
-     * @param $aniDbId
-     * @param  array  $AniDBInfoArray
-     * @return void
-     */
     private function updateAniChildTables($aniDbId, array $AniDBInfoArray = []): void
     {
         $check = AnidbInfo::query()->where('anidbid', $aniDbId)->first(['anidbid']);

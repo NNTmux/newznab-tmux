@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Log;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  *
  * @property string $crc32
@@ -53,9 +54,6 @@ class ReleaseFile extends Model
      */
     protected $primaryKey = 'releases_id';
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
@@ -65,7 +63,6 @@ class ReleaseFile extends Model
      * Get releasefiles row by id.
      *
      *
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getReleaseFiles($id)
@@ -74,7 +71,6 @@ class ReleaseFile extends Model
     }
 
     /**
-     * @param $guid
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getByGuid($guid)
@@ -89,14 +85,8 @@ class ReleaseFile extends Model
      * Add new files for a release ID.
      *
      *
-     * @param    $id
-     * @param    $name
-     * @param    $size
-     * @param    $createdTime
-     * @param    $hasPassword
      * @param  string  $hash
      * @param  string  $crc
-     * @return int
      *
      * @throws \Exception
      */

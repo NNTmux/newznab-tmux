@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereOrdinal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereRegex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex whereStatus($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryRegex newModelQuery()

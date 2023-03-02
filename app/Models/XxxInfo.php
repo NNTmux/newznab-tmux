@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereTrailers($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\XxxInfo newModelQuery()

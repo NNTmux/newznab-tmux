@@ -40,17 +40,17 @@ foreach ($itr as $filePath) {
 }
 
 $qry = ConsoleInfo::query()->where('cover', '=', 1)->value('id');
-    foreach ($qry as $rows) {
-        if (! is_file($path2covers.$rows['id'].'.jpg')) {
-            ConsoleInfo::query()->where(
-                [
-                    ['cover' => 1],
-                    ['id' => $rows['id']],
-                ]
-            )->update(['cover' => 0]);
-            $colorCli->info($path2covers.$rows['id'].'.jpg does not exist.');
-            $deleted++;
-        }
+foreach ($qry as $rows) {
+    if (! is_file($path2covers.$rows['id'].'.jpg')) {
+        ConsoleInfo::query()->where(
+            [
+                ['cover' => 1],
+                ['id' => $rows['id']],
+            ]
+        )->update(['cover' => 0]);
+        $colorCli->info($path2covers.$rows['id'].'.jpg does not exist.');
+        $deleted++;
     }
+}
 $colorCli->header($covers.' covers set.');
 $colorCli->header($deleted.' consoles unset.');

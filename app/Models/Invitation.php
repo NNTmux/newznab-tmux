@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation newModelQuery()
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
 class Invitation extends Model
 {
     public const DEFAULT_INVITES = 1;
+
     public const DEFAULT_INVITE_EXPIRY_DAYS = 7;
 
     /**
@@ -50,17 +52,12 @@ class Invitation extends Model
         return $this->belongsTo(User::class, 'users_id');
     }
 
-    /**
-     * @param  int  $uid
-     * @param  string  $inviteToken
-     */
     public static function addInvite(int $uid, string $inviteToken)
     {
         self::create(['guid' => $inviteToken, 'users_id' => $uid]);
     }
 
     /**
-     * @param $inviteToken
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getInvite($inviteToken)
@@ -73,9 +70,6 @@ class Invitation extends Model
         return self::query()->where('guid', $inviteToken)->first();
     }
 
-    /**
-     * @param $inviteToken
-     */
     public static function deleteInvite(string $inviteToken): void
     {
         self::query()->where('guid', $inviteToken)->delete();

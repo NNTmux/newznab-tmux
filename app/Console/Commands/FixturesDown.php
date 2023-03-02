@@ -22,6 +22,7 @@ class FixturesDown extends Command
         'release_naming_regexes',
         'settings',
     ];
+
     /**
      * The name and signature of the console command.
      *

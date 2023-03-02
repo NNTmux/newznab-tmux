@@ -28,9 +28,6 @@ class AdminBlacklistController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -66,9 +63,9 @@ class AdminBlacklistController extends BasePageController
                 if ($request->has('regex') && $request->has('groupname')) {
                     $regex += [
                         'groupname' => $request->input('groupname'),
-                        'regex'     => $request->input('regex'),
-                        'ordinal'   => 1,
-                        'status'    => 1,
+                        'regex' => $request->input('regex'),
+                        'ordinal' => 1,
+                        'status' => 1,
                     ];
                 }
                 break;
@@ -91,13 +88,13 @@ class AdminBlacklistController extends BasePageController
 
         $this->smarty->assign(
             [
-                'error'        => $error,
-                'regex'        => $regex,
-                'status_ids'   => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE],
+                'error' => $error,
+                'regex' => $regex,
+                'status_ids' => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE],
                 'status_names' => ['Yes', 'No'],
-                'optype_ids'   => [1, 2],
+                'optype_ids' => [1, 2],
                 'optype_names' => ['Black', 'White'],
-                'msgcol_ids'   => [
+                'msgcol_ids' => [
                     Binaries::BLACKLIST_FIELD_SUBJECT,
                     Binaries::BLACKLIST_FIELD_FROM,
                     Binaries::BLACKLIST_FIELD_MESSAGEID,

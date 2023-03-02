@@ -27,10 +27,6 @@ class SendInviteEmail implements ShouldQueue
 
     /**
      * SendInviteEmail constructor.
-     *
-     * @param $email
-     * @param $user
-     * @param $url
      */
     public function __construct($email, $user, $url)
     {

@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 class AdminShowsController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function index(Request $request): void
@@ -24,8 +22,8 @@ class AdminShowsController extends BasePageController
 
         $this->smarty->assign(
             [
-                'showname'          => $tvshowname,
-                'tvshowlist'        => Video::getRange($tvshowname),
+                'showname' => $tvshowname,
+                'tvshowlist' => Video::getRange($tvshowname),
             ]
         );
 
@@ -35,8 +33,6 @@ class AdminShowsController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     *
      * @throws \Exception
      */
     public function edit(Request $request): void
@@ -71,8 +67,6 @@ class AdminShowsController extends BasePageController
     }
 
     /**
-     * @param $id
-     *
      * @throws \Exception
      */
     public function destroy($id): void

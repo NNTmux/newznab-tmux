@@ -22,43 +22,43 @@
 return [
 
     // smarty file extension
-    'extension'                           => 'tpl',
+    'extension' => 'tpl',
 
     //
-    'debugging'                           => env('SMARTY_DEBUG', false),
+    'debugging' => env('SMARTY_DEBUG', false),
 
     // use cache
-    'caching'                             => env('SMARTY_CACHING', false),
+    'caching' => env('SMARTY_CACHING', false),
 
     //
-    'cache_lifetime'                      => env('SMARTY_CACHE_LIFE', 120),
+    'cache_lifetime' => env('SMARTY_CACHE_LIFE', 120),
 
     //
-    'compile_check'                       => env('SMARTY_COMPILE_CHECK', false),
+    'compile_check' => env('SMARTY_COMPILE_CHECK', false),
 
     // delimiters
     // default "{$smarty}"
-    'left_delimiter'                      => '{',
-    'right_delimiter'                     => '}',
+    'left_delimiter' => '{',
+    'right_delimiter' => '}',
 
     // path info
-    'template_path'                       => base_path().'/resources/views/themes',
+    'template_path' => base_path().'/resources/views/themes',
 
     // smarty cache directory
-    'cache_path'                          => storage_path().'/framework/smarty/cache',
+    'cache_path' => storage_path().'/framework/smarty/cache',
 
     // smarty template compiler
-    'compile_path'                        => storage_path().'/framework/smarty/templates_c',
+    'compile_path' => storage_path().'/framework/smarty/templates_c',
 
     // smarty plugins
-    'plugins_paths'                       => [
+    'plugins_paths' => [
         base_path().'/vendor/smarty/libs/plugins/',
         base_path().'/resources/smarty/plugins/',
 
     ],
 
     // smarty configure
-    'config_paths'                        => [
+    'config_paths' => [
         base_path().'/resources/smarty/config',
     ],
 
@@ -66,25 +66,25 @@ return [
      * for develop true
      * for production false
      */
-    'force_compile'                       => env('SMARTY_FORCE_COMPILE', false),
+    'force_compile' => env('SMARTY_FORCE_COMPILE', false),
 
     // smarty cache driver "file", "memcached", "redis"
-    'cache_driver'                        => env('SMARTY_CACHE_DRIVER', 'file'),
+    'cache_driver' => env('SMARTY_CACHE_DRIVER', 'file'),
 
     // memcached servers
-    'memcached'                           => [
+    'memcached' => [
         [
-            'host'   => '127.0.0.1',
-            'port'   => 11211,
+            'host' => '127.0.0.1',
+            'port' => 11211,
             'weight' => 100,
         ],
     ],
 
     // redis configure
-    'redis'                               => [
+    'redis' => [
         [
-            'host'     => env('REDIS_HOST', '127.0.0.1'),
-            'port'     => env('REDIS_PORT', '6379'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'port' => env('REDIS_PORT', '6379'),
             'database' => 0,
         ],
     ],

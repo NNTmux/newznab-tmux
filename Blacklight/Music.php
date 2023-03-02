@@ -82,7 +82,7 @@ class Music
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'     => false,
+            'Echo' => false,
             'Settings' => null,
         ];
         $options += $defaults;
@@ -103,7 +103,6 @@ class Music
     }
 
     /**
-     * @param $id
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getMusicInfo($id)
@@ -112,8 +111,6 @@ class Music
     }
 
     /**
-     * @param $artist
-     * @param $album
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getMusicInfoByName($artist, $album)
@@ -137,12 +134,6 @@ class Music
     }
 
     /**
-     * @param $page
-     * @param $cat
-     * @param $start
-     * @param $num
-     * @param $orderBy
-     * @param  array  $excludedCats
      * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getMusicRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): mixed
@@ -234,10 +225,6 @@ class Music
         return $return;
     }
 
-    /**
-     * @param $orderBy
-     * @return array
-     */
     public function getMusicOrder($orderBy): array
     {
         $order = ($orderBy === '') ? 'r.postdate' : $orderBy;
@@ -271,25 +258,16 @@ class Music
         return [$orderfield, $ordersort];
     }
 
-    /**
-     * @return array
-     */
     public function getMusicOrdering(): array
     {
         return ['artist_asc', 'artist_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc', 'files_asc', 'files_desc', 'stats_asc', 'stats_desc', 'year_asc', 'year_desc', 'genre_asc', 'genre_desc'];
     }
 
-    /**
-     * @return array
-     */
     public function getBrowseByOptions(): array
     {
         return ['artist' => 'artist', 'title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
     }
 
-    /**
-     * @return string
-     */
     public function getBrowseBy(): string
     {
         $browseby = ' ';
@@ -307,20 +285,6 @@ class Music
         return $browseby;
     }
 
-    /**
-     * @param $id
-     * @param $title
-     * @param $asin
-     * @param $url
-     * @param $salesrank
-     * @param $artist
-     * @param $publisher
-     * @param $releasedate
-     * @param $year
-     * @param $tracks
-     * @param $cover
-     * @param $genres_id
-     */
     public function update($id, $title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $year, $tracks, $cover, $genres_id): void
     {
         MusicInfo::query()->where('id', $id)->update(
@@ -341,8 +305,6 @@ class Music
     }
 
     /**
-     * @param    $title
-     * @param    $year
      * @param  null  $amazdata
      * @return int|mixed
      *
@@ -368,7 +330,7 @@ class Music
             $musicId = MusicInfo::query()->insertGetId(
                 [
                     'title' => $mus['title'],
-                    'asin' =>$mus['asin'],
+                    'asin' => $mus['asin'],
                     'url' => $mus['url'],
                     'salesrank' => $mus['salesrank'],
                     'artist' => $mus['artist'],
@@ -461,7 +423,7 @@ class Music
                 Category::MUSIC_LOSSLESS,
                 Category::MUSIC_OTHER,
                 $this->musicqty
-        )
+            )
         );
 
         if (! empty($res)) {
@@ -551,7 +513,6 @@ class Music
     }
 
     /**
-     * @param $nodeId
      * @return bool|string
      */
     public function matchBrowseNode($nodeId)

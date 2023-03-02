@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1])) {
     exit(
-            "Argument 1 is the index name, releases_rt and predb_rt are the only supported ones currently.\n".
-            "Argument 2 is optional, max number of rows to send to sphinx at a time, 10,000 is the default if not set.\n".
-            "              The value of 10,000 is good for the default sphinx.conf max_packet_size of 8M, if you want\n".
-            "              to raise this higher than 10,000, raise the sphinx.conf max_packet_size higher than  8M.\n".
-            "              If you have many releases, raise the sphinx.conf max_packet_size to 128M (the maximum), restart sphinx and\n".
-            "              and set Argument 2 to 250,000. This will speed up the script tremendously.\n"
+        "Argument 1 is the index name, releases_rt and predb_rt are the only supported ones currently.\n".
+        "Argument 2 is optional, max number of rows to send to sphinx at a time, 10,000 is the default if not set.\n".
+        "              The value of 10,000 is good for the default sphinx.conf max_packet_size of 8M, if you want\n".
+        "              to raise this higher than 10,000, raise the sphinx.conf max_packet_size higher than  8M.\n".
+        "              If you have many releases, raise the sphinx.conf max_packet_size to 128M (the maximum), restart sphinx and\n".
+        "              and set Argument 2 to 250,000. This will speed up the script tremendously.\n"
     );
 }
 

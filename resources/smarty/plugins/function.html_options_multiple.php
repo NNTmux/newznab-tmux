@@ -27,11 +27,14 @@ require_once 'load_plugin_dependency.php';
  *
  * @link http://www.smarty.net/manual/en/language.function.html.options.php {html_image}
  *      (Smarty online manual)
+ *
  * @author Monte Ohrt <monte at ohrt dot com>
  * @author Ralf Strehle (minor optimization) <ralf dot strehle at yahoo dot de>
- * @param array                    $params   parameters
- * @param Smarty_Internal_Template $template template object
+ *
+ * @param  array  $params   parameters
+ * @param  Smarty_Internal_Template  $template template object
  * @return string
+ *
  * @uses smarty_function_escape_special_chars()
  */
 function smarty_function_html_options_multiple($params, $template)
@@ -68,6 +71,7 @@ function smarty_function_html_options_multiple($params, $template)
                                 $_sel = smarty_function_escape_special_chars((string) $_sel->__toString());
                             } else {
                                 trigger_error("html_options_multiple: selected attribute contains an object of class '".get_class($_sel)."' without __toString() method", E_USER_NOTICE);
+
                                 continue;
                             }
                         } else {
@@ -97,8 +101,8 @@ function smarty_function_html_options_multiple($params, $template)
                     }
                     break;
                 }
-            // omit break; to fall through!
-            // no break
+                // omit break; to fall through!
+                // no break
             default:
                 if (! is_array($_val)) {
                     $extra .= ' '.$_key.'="'.smarty_function_escape_special_chars($_val).'"';

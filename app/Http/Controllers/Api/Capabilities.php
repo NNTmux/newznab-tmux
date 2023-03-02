@@ -31,9 +31,6 @@ use Blacklight\utility\Utility;
  */
 abstract class Capabilities
 {
-    /**
-     * @var \PDO
-     */
     public \PDO $pdo;
 
     /**
@@ -57,25 +54,18 @@ abstract class Capabilities
     }
 
     /**
-     * @param $data
-     * @param  array  $params
-     * @param  bool  $xml
-     * @param  int  $offset
-     * @param  string  $type
-     * @return void
-     *
      * @throws \Exception
      */
-    public function output($data, array $params, bool $xml = true, int $offset, string $type = ''): void
+    public function output($data, array $params, bool $xml, int $offset, string $type = ''): void
     {
         $this->type = $type;
 
         $options = [
             'Parameters' => $params,
-            'Data'       => $data,
-            'Server'     => $this->getForMenu(),
-            'Offset'     => $offset,
-            'Type'       => $type,
+            'Data' => $data,
+            'Server' => $this->getForMenu(),
+            'Offset' => $offset,
+            'Type' => $type,
         ];
 
         // Generate the XML Response
@@ -100,40 +90,39 @@ abstract class Capabilities
      /**
       * Collect and return various capability information for usage in API.
       *
-      * @return array
       *
       * @throws \Exception
       */
      public function getForMenu(): array
-    {
-        $serverroot = url('/');
+     {
+         $serverroot = url('/');
 
-        return [
-            'server' => [
-                'title'      => config('app.name'),
-                'strapline'  => Settings::settingValue('site.main.strapline'),
-                'email'      => config('mail.from.address'),
-                'meta'       => Settings::settingValue('site.main.metakeywords'),
-                'url'        => $serverroot,
-                'image'      => $serverroot.'/assets/images/tmux_logo.png',
-            ],
-            'limits' => [
-                'max'     => 100,
-                'default' => 100,
-            ],
-            'registration' => [
-                'available' => 'yes',
-                'open'      => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
-            ],
-            'searching' => [
-                'search'       => ['available' => 'yes', 'supportedParams' => 'q'],
-                'tv-search'    => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
-                'audio-search' => ['available' => 'no',  'supportedParams' => ''],
-            ],
-            'categories' => $this->type === 'caps'
-                    ? Category::getForMenu()
-                    : null,
-        ];
-    }
+         return [
+             'server' => [
+                 'title' => config('app.name'),
+                 'strapline' => Settings::settingValue('site.main.strapline'),
+                 'email' => config('mail.from.address'),
+                 'meta' => Settings::settingValue('site.main.metakeywords'),
+                 'url' => $serverroot,
+                 'image' => $serverroot.'/assets/images/tmux_logo.png',
+             ],
+             'limits' => [
+                 'max' => 100,
+                 'default' => 100,
+             ],
+             'registration' => [
+                 'available' => 'yes',
+                 'open' => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
+             ],
+             'searching' => [
+                 'search' => ['available' => 'yes', 'supportedParams' => 'q'],
+                 'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
+                 'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
+                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
+             ],
+             'categories' => $this->type === 'caps'
+                     ? Category::getForMenu()
+                     : null,
+         ];
+     }
 }

@@ -19,28 +19,23 @@ use Illuminate\Support\Str;
 class Binaries
 {
     public const OPTYPE_BLACKLIST = 1;
+
     public const OPTYPE_WHITELIST = 2;
 
     public const BLACKLIST_DISABLED = 0;
+
     public const BLACKLIST_ENABLED = 1;
 
     public const BLACKLIST_FIELD_SUBJECT = 1;
+
     public const BLACKLIST_FIELD_FROM = 2;
+
     public const BLACKLIST_FIELD_MESSAGEID = 3;
 
-    /**
-     * @var array
-     */
     public array $blackList = [];
 
-    /**
-     * @var array
-     */
     public array $whiteList = [];
 
-    /**
-     * @var int
-     */
     public int $messageBuffer;
 
     /**
@@ -60,80 +55,53 @@ class Binaries
 
     /**
      * Should we use header compression?
-     *
-     * @var bool
      */
     protected bool $_compressedHeaders;
 
     /**
      * Should we use part repair?
-     *
-     * @var bool
      */
     protected bool $_partRepair;
 
-    /**
-     * @var \Closure|\PDO
-     */
     protected \Closure|\PDO $_pdo;
 
     /**
      * How many days to go back on a new group?
-     *
-     * @var bool
      */
     protected bool $_newGroupScanByDays;
 
     /**
      * How many headers to download on new groups?
-     *
-     * @var int
      */
     protected int $_newGroupMessagesToScan;
 
     /**
      * How many days to go back on new groups?
-     *
-     * @var int
      */
     protected int $_newGroupDaysToScan;
 
     /**
      * How many headers to download per run of part repair?
-     *
-     * @var int
      */
     protected int $_partRepairLimit;
 
     /**
      * Echo to cli?
-     *
-     * @var bool
      */
     protected bool $_echoCLI;
 
     /**
      * Max tries to download headers.
-     *
-     * @var int
      */
     protected int $_partRepairMaxTries;
 
     /**
      * An array of BinaryBlacklist IDs that should have their activity date updated.
-     *
-     * @var array
      */
     protected array $_binaryBlacklistIdsToUpdate = [];
 
-    /**
-     * @var \DateTime
-     */
     protected \DateTime $startCleaning;
 
-    /**
-     * @var \DateTime
-     */
     protected \DateTime $startLoop;
 
     /**
@@ -146,14 +114,8 @@ class Binaries
      */
     protected int $timeCleaning;
 
-    /**
-     * @var \DateTime
-     */
     protected \DateTime $startPR;
 
-    /**
-     * @var \DateTime
-     */
     protected \DateTime $startUpdate;
 
     /**
@@ -216,13 +178,13 @@ class Binaries
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'                => true,
+            'Echo' => true,
             'CollectionsCleaning' => null,
-            'ColorCLI'            => null,
-            'Logger'              => null,
-            'Groups'              => null,
-            'NNTP'                => null,
-            'Settings'            => null,
+            'ColorCLI' => null,
+            'Logger' => null,
+            'Groups' => null,
+            'NNTP' => null,
+            'Settings' => null,
         ];
         $options += $defaults;
 
@@ -253,7 +215,6 @@ class Binaries
      * Download new headers for all active groups.
      *
      * @param  int  $maxHeaders  (Optional) How many headers to download max.
-     * @return void
      *
      * @throws \Exception
      * @throws \Throwable
@@ -312,7 +273,6 @@ class Binaries
      *
      * @param  array  $groupMySQL  Array of MySQL results for a single group.
      * @param  int  $maxHeaders  (Optional) How many headers to download max.
-     * @return void
      *
      * @throws \Exception
      * @throws \Throwable
@@ -425,18 +385,17 @@ class Binaries
                                 : number_format($this->_newGroupMessagesToScan).' messages'
                             ).' worth.'
                             : 'Group '.$groupNNTP['group'].' has '.number_format($realTotal).' new articles.'
-                        ).
-                        ' Leaving '.number_format($leaveOver).
-                        " for next pass.\nServer oldest: ".number_format($groupNNTP['first']).
-                        ' Server newest: '.number_format($groupNNTP['last']).
-                        ' Local newest: '.number_format($groupMySQL['last_record'])
-                    );
+                    ).
+                    ' Leaving '.number_format($leaveOver).
+                    " for next pass.\nServer oldest: ".number_format($groupNNTP['first']).
+                    ' Server newest: '.number_format($groupNNTP['last']).
+                    ' Local newest: '.number_format($groupMySQL['last_record'])
+                );
             }
 
             $done = false;
             // Get all the parts (in portions of $this->messageBuffer to not use too much memory).
             while (! $done) {
-
                 // Increment last until we reach $groupLast (group newest article).
                 if ($total > $this->messageBuffer) {
                     if ((string) ($first + $this->messageBuffer) > $groupLast) {
@@ -453,7 +412,7 @@ class Binaries
                         PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
                             ' to '.number_format($last).') from '.$groupMySQL['name'].' - ('.
                             number_format($groupLast - $last).' articles in queue).'
-                        );
+                    );
                 }
 
                 // Get article headers from newsgroup.
@@ -461,7 +420,6 @@ class Binaries
 
                 // Check if we fetched headers.
                 if (! empty($scanSummary)) {
-
                     // If new group, update first record & postdate
                     if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] === 0) {
                         $groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
@@ -522,7 +480,7 @@ class Binaries
                 $this->colorCli->primary(
                     PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
                         $endGroup.Str::plural(' second', $endGroup)
-                    );
+                );
             }
         } elseif ($this->_echoCLI) {
             $this->colorCli->primary(
@@ -530,7 +488,7 @@ class Binaries
                     ', last '.number_format($last).', grouplast '.number_format($groupMySQL['last_record']).
                     ', total '.number_format($total).")\n".'Server oldest: '.number_format($groupNNTP['first']).
                     ' Server newest: '.number_format($groupNNTP['last']).' Local newest: '.number_format($groupMySQL['last_record'])
-                );
+            );
         }
     }
 
@@ -572,7 +530,6 @@ class Binaries
 
         // If there was an error, try to reconnect.
         if ($this->_nntp::isError($headers)) {
-
             // Increment if part repair and return false.
             if ($partRepair) {
                 MissedPart::query()->where('groups_id', $this->groupMySQL['id'])->where('numberid', ((int) $this->first === (int) $this->last ? '= '.$this->first : 'IN ('.implode(',', range($this->first, $this->last)).')'))->increment('attempts', 1);
@@ -622,7 +579,6 @@ class Binaries
         $headersRepaired = $rangeNotReceived = $this->headersReceived = $this->headersNotInserted = [];
 
         foreach ($headers as $header) {
-
             // Check if we got the article or not.
             if (isset($header['Number'])) {
                 $this->headersReceived[] = $header['Number'];
@@ -630,6 +586,7 @@ class Binaries
                 if ($this->addToPartRepair) {
                     $rangeNotReceived[] = $header['Number'];
                 }
+
                 continue;
             }
 
@@ -660,12 +617,14 @@ class Binaries
                 }
             } else {
                 $this->notYEnc++;
+
                 continue;
             }
 
             // Filter subject based on black/white list.
             if ($this->isBlackListed($header, $this->groupMySQL['name'])) {
                 $this->headersBlackListed++;
+
                 continue;
             }
 
@@ -731,7 +690,7 @@ class Binaries
                     $this->colorCli->alternate(
                         'Server did not return '.$notReceivedCount.
                             ' articles from '.$this->groupMySQL['name'].'.'
-                        );
+                    );
                 }
             }
             unset($rangeNotReceived);
@@ -746,7 +705,6 @@ class Binaries
      * Parse headers into collections/binaries and store header data as parts.
      *
      *
-     * @param  array  $headers
      *
      * @throws \Exception
      * @throws \Throwable
@@ -763,7 +721,6 @@ class Binaries
         foreach ($headers as $this->header) {
             // Set up the info for inserting into parts/binaries/collections tables.
             if (! isset($articles[$this->header['matches'][1]])) {
-
                 // check whether file count should be ignored (XXX packs for now only).
                 $whitelistMatch = false;
                 if ($this->_ignoreFileCount($this->groupMySQL['name'], $this->header['matches'][1])) {
@@ -785,7 +742,6 @@ class Binaries
 
                 // If this header's collection key isn't in memory, attempt to insert the collection
                 if (! isset($collectionIDs[$this->header['CollectionKey']])) {
-
                     /* Date from header should be a string this format:
                      * 31 Mar 2014 15:36:04 GMT or 6 Oct 1998 04:38:40 -0500
                      * Still make sure it's not unix time, convert it to unix time if it is.
@@ -853,6 +809,7 @@ class Binaries
                         }
                         DB::rollBack();
                         DB::beginTransaction();
+
                         continue;
                     }
                     $collectionIDs[$this->header['CollectionKey']] = $collectionID;
@@ -885,6 +842,7 @@ class Binaries
                     }
                     DB::rollBack();
                     DB::beginTransaction();
+
                     continue;
                 }
 
@@ -944,10 +902,6 @@ class Binaries
 
     /**
      * Gets the First and Last Article Number and Date for the received headers.
-     *
-     * @param  array  $returnArray
-     * @param  array  $headers
-     * @param  int  $msgCount
      */
     protected function getHighLowArticleInfo(array &$returnArray, array $headers, int $msgCount): void
     {
@@ -995,7 +949,7 @@ class Binaries
             'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
-            );
+        );
     }
 
     /**
@@ -1044,7 +998,6 @@ class Binaries
      * Attempt to get missing article headers.
      *
      * @param  array  $groupArr  The info for this group from mysql.
-     * @return void
      *
      * @throws \Exception
      * @throws \Throwable
@@ -1072,7 +1025,7 @@ class Binaries
                     'Attempting to repair '.
                         number_format($missingCount).
                         ' parts.'
-                    );
+                );
             }
 
             // Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
@@ -1083,7 +1036,7 @@ class Binaries
                 if (($part->numberid - $firstPart) > ($this->messageBuffer / 4)) {
                     $ranges[] = [
                         'partfrom' => $firstPart,
-                        'partto'   => $lastNum,
+                        'partto' => $lastNum,
                         'partlist' => $partList,
                     ];
 
@@ -1096,7 +1049,7 @@ class Binaries
 
             $ranges[] = [
                 'partfrom' => $firstPart,
-                'partto'   => $lastNum,
+                'partto' => $lastNum,
                 'partlist' => $partList,
             ];
 
@@ -1152,7 +1105,7 @@ class Binaries
                     PHP_EOL.
                         number_format($partsRepaired).
                         ' parts repaired.'
-                    );
+                );
             }
         }
 
@@ -1194,8 +1147,8 @@ class Binaries
 						INNER JOIN parts p ON(b.id=p.binaries_id)
 						WHERE p.number = %s',
                     $currentPost
-                    )
-                );
+                )
+            );
             if (! empty($local) && \count($local) > 0) {
                 $date = $local[0]->date;
                 break;
@@ -1242,7 +1195,6 @@ class Binaries
      *
      * @param  int  $days  How many days back we want to go.
      * @param  array  $data  Group data from usenet.
-     * @return string
      *
      * @throws \Exception
      */
@@ -1269,7 +1221,7 @@ class Binaries
         if ($this->_echoCLI) {
             $this->colorCli->primary(
                 'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
-                );
+            );
         }
 
         // Pick the middle to start with
@@ -1328,7 +1280,7 @@ class Binaries
             $this->colorCli->primary(
                 PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
-                );
+            );
         }
 
         return $wantedArticle;
@@ -1339,7 +1291,6 @@ class Binaries
      *
      * @param  array  $numbers  The article numbers of the missing headers.
      * @param  int  $groupID  The ID of this groups.
-     * @return string
      */
     private function addMissingParts(array $numbers, int $groupID): string
     {
@@ -1358,7 +1309,6 @@ class Binaries
      *
      * @param  array  $numbers  The article numbers.
      * @param  int  $groupID  The ID of the group.
-     * @return void
      *
      * @throws \Throwable
      */
@@ -1375,16 +1325,11 @@ class Binaries
 
     /**
      * Are white or black lists loaded for a group name?
-     *
-     * @var array
      */
     protected array $_listsFound = [];
 
     /**
      * Get blacklist and cache it. Return if already cached.
-     *
-     * @param  string  $groupName
-     * @return void
      */
     protected function _retrieveBlackList(string $groupName): void
     {
@@ -1402,7 +1347,6 @@ class Binaries
      *
      * @param  array  $msg  The article header (OVER format).
      * @param  string  $groupName  The group name.
-     * @return bool
      */
     public function isBlackListed(array $msg, string $groupName): bool
     {
@@ -1416,8 +1360,8 @@ class Binaries
         $blackListed = false;
 
         $field = [
-            self::BLACKLIST_FIELD_SUBJECT   => $msg['Subject'],
-            self::BLACKLIST_FIELD_FROM      => $msg['From'],
+            self::BLACKLIST_FIELD_SUBJECT => $msg['Subject'],
+            self::BLACKLIST_FIELD_FROM => $msg['From'],
             self::BLACKLIST_FIELD_MESSAGEID => $msg['Message-ID'],
         ];
 
@@ -1457,7 +1401,6 @@ class Binaries
      * @param  int|string  $opType  Optional, get white or black lists (use Binaries constants).
      * @param  string  $groupName  Optional, group.
      * @param  bool  $groupRegex  Optional Join groups / binaryblacklist using regexp for equals.
-     * @return array
      */
     public function getBlacklist(bool $activeOnly = true, int|string $opType = -1, string $groupName = '', bool $groupRegex = false): array
     {
@@ -1487,7 +1430,6 @@ class Binaries
     }
 
     /**
-     * @param  int  $id
      * @return \App\Models\BinaryBlacklist|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
     public function getBlacklistByID(int $id)
@@ -1505,10 +1447,6 @@ class Binaries
         BinaryBlacklist::query()->where('id', $id)->delete();
     }
 
-    /**
-     * @param  array  $blacklistArray
-     * @return void
-     */
     public function updateBlacklist(array $blacklistArray): void
     {
         BinaryBlacklist::query()->where('id', $blacklistArray['id'])->update(
@@ -1525,8 +1463,6 @@ class Binaries
 
     /**
      * Adds a new blacklist from binary blacklist edit admin web page.
-     *
-     * @param  array  $blacklistArray
      */
     public function addBlacklist(array $blacklistArray): void
     {
@@ -1548,8 +1484,6 @@ class Binaries
      * @param  int  $collectionID  Collections table ID
      *
      * @note A trigger automatically deletes the parts/binaries.
-     *
-     * @return void
      *
      * @throws \Throwable
      */
@@ -1578,10 +1512,6 @@ class Binaries
 
     /**
      * Check if we should ignore the file count and return true or false.
-     *
-     * @param  string  $groupName
-     * @param  string  $subject
-     * @return bool
      */
     protected function _ignoreFileCount(string $groupName, string $subject): bool
     {
@@ -1593,10 +1523,6 @@ class Binaries
         return $ignore;
     }
 
-    /**
-     * @param $query
-     * @return bool
-     */
     protected function runQuery($query): bool
     {
         try {

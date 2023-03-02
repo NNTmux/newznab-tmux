@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereImdbid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUsersId($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie newModelQuery()
@@ -39,9 +40,6 @@ class UserMovie extends Model
     protected $dateFormat = false;
 
     /**
-     * @param    $uid
-     * @param    $imdbid
-     * @param  array  $catID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addMovie($uid, $imdbid, array $catID = [])
@@ -57,10 +55,6 @@ class UserMovie extends Model
             );
     }
 
-    /**
-     * @param $uid
-     * @return array
-     */
     public static function getMovies($uid): array
     {
         return self::query()
@@ -72,8 +66,6 @@ class UserMovie extends Model
     }
 
     /**
-     * @param $uid
-     * @param $imdbid
      * @return mixed
      */
     public static function delMovie($uid, $imdbid)
@@ -81,11 +73,6 @@ class UserMovie extends Model
         return self::query()->where(['users_id' => $uid, 'imdbid' => $imdbid])->delete();
     }
 
-    /**
-     * @param $uid
-     * @param $imdbid
-     * @return array
-     */
     public static function getMovie($uid, $imdbid): array
     {
         return self::query()
@@ -95,19 +82,11 @@ class UserMovie extends Model
             ->toArray();
     }
 
-    /**
-     * @param $uid
-     */
     public static function delMovieForUser($uid)
     {
         self::query()->where('users_id', $uid)->delete();
     }
 
-    /**
-     * @param $uid
-     * @param $imdbid
-     * @param  array  $catID
-     */
     public static function updateMovie($uid, $imdbid, array $catID = [])
     {
         self::query()

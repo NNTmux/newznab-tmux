@@ -20,9 +20,6 @@ class TraktTv extends TV
      */
     public $client;
 
-    /**
-     * @var
-     */
     public $time;
 
     /**
@@ -68,9 +65,6 @@ class TraktTv extends TV
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      *
-     * @param    $groupID
-     * @param    $guidChar
-     * @param    $process
      * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, $local = false): void
@@ -98,6 +92,7 @@ class TraktTv extends TV
                                     $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
                         }
                         $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
+
                         continue;
                     }
 
@@ -112,7 +107,6 @@ class TraktTv extends TV
                     }
 
                     if ($videoId === false && $lookupSetting) {
-
                         // If it doesn't exist locally and lookups are allowed lets try to get it.
                         if ($this->echooutput) {
                             $this->colorCli->primaryOver('Checking Trakt for previously failed title: ').
@@ -148,6 +142,7 @@ class TraktTv extends TV
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->colorCli->primary('Found TRAKT Match for Full Season!', true);
+
                             continue;
                         }
 
@@ -194,10 +189,6 @@ class TraktTv extends TV
 
     /**
      * Fetch banner from site.
-     *
-     * @param $videoId
-     * @param $siteID
-     * @return bool
      */
     public function getBanner($videoId, $siteID): bool
     {
@@ -237,7 +228,6 @@ class TraktTv extends TV
      * Retrieve poster image for TV episode from site using its API.
      *
      * @param  int  $videoId  ID from videos table.
-     * @return int
      */
     public function getPoster($videoId): int
     {
@@ -285,7 +275,6 @@ class TraktTv extends TV
         if (\is_array($response)) {
             foreach ($response as $show) {
                 if (! is_bool($show)) {
-
                     // Check for exact title match first and then terminate if found
                     if ($show['show']['title'] === $name) {
                         $highest = $show;
@@ -316,9 +305,6 @@ class TraktTv extends TV
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $show
-     * @return array
      */
     public function formatShowInfo($show): array
     {
@@ -328,20 +314,20 @@ class TraktTv extends TV
         $this->localizedTZ = $show['airs']['timezone'];
 
         return [
-            'type'      => parent::TYPE_TV,
-            'title'     => (string) $show['title'],
-            'summary'   => (string) $show['overview'],
-            'started'   => Time::localizeAirdate($show['first_aired'], $this->localizedTZ),
+            'type' => parent::TYPE_TV,
+            'title' => (string) $show['title'],
+            'summary' => (string) $show['overview'],
+            'started' => Time::localizeAirdate($show['first_aired'], $this->localizedTZ),
             'publisher' => (string) $show['network'],
-            'country'   => (string) $show['country'],
-            'source'    => parent::SOURCE_TRAKT,
-            'imdb'      => $imdb['imdbid'] ?? 0,
-            'tvdb'      => $show['ids']['tvdb'] ?? 0,
-            'trakt'     => (int) $show['ids']['trakt'],
-            'tvrage'    => $show['ids']['tvrage'] ?? 0,
-            'tvmaze'    => 0,
-            'tmdb'      => $show['ids']['tmdb'] ?? 0,
-            'aliases'   => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
+            'country' => (string) $show['country'],
+            'source' => parent::SOURCE_TRAKT,
+            'imdb' => $imdb['imdbid'] ?? 0,
+            'tvdb' => $show['ids']['tvdb'] ?? 0,
+            'trakt' => (int) $show['ids']['trakt'],
+            'tvrage' => $show['ids']['tvrage'] ?? 0,
+            'tvmaze' => 0,
+            'tmdb' => $show['ids']['tmdb'] ?? 0,
+            'aliases' => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
             'localzone' => $this->localizedTZ,
         ];
     }
@@ -349,19 +335,16 @@ class TraktTv extends TV
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
-     *
-     * @param $episode
-     * @return array
      */
     public function formatEpisodeInfo($episode): array
     {
         return [
-            'title'       => (string) $episode['title'],
-            'series'      => (int) $episode['season'],
-            'episode'     => (int) $episode['epsiode'],
+            'title' => (string) $episode['title'],
+            'series' => (int) $episode['season'],
+            'episode' => (int) $episode['epsiode'],
             'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', $episode['episode']),
-            'firstaired'  => Time::localizeAirdate($episode['first_aired'], $this->localizedTZ),
-            'summary'     => (string) $episode['overview'],
+            'firstaired' => Time::localizeAirdate($episode['first_aired'], $this->localizedTZ),
+            'summary' => (string) $episode['overview'],
         ];
     }
 }

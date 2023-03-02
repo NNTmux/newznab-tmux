@@ -38,8 +38,6 @@ class Regexes
     protected $_categoriesID = Category::OTHER_MISC;
 
     /**
-     * @param  array  $options
-     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -55,9 +53,6 @@ class Regexes
 
     /**
      * Add a new regex.
-     *
-     * @param  array  $data
-     * @return bool
      */
     public function addRegex(array $data): bool
     {
@@ -78,9 +73,6 @@ class Regexes
 
     /**
      * Update a regex with new info.
-     *
-     * @param  array  $data
-     * @return bool
      */
     public function updateRegex(array $data): bool
     {
@@ -105,7 +97,6 @@ class Regexes
      * Get a single regex using its id.
      *
      * @param  int  $id
-     * @return array
      */
     public function getRegexByID($id): array
     {
@@ -139,7 +130,6 @@ class Regexes
      * Get the count of regex in the DB.
      *
      * @param  string  $group_regex  Optional, keyword to find a group.
-     * @return int
      */
     public function getCount($group_regex = ''): int
     {
@@ -176,7 +166,6 @@ class Regexes
      * @param  string  $groupName
      * @param  string  $regex
      * @param  int  $limit
-     * @return array
      *
      * @throws \Exception
      */
@@ -218,10 +207,10 @@ class Regexes
                     $newCollectionHash = sha1($string.$row->fromname.$groupID.$files);
                     $data['New hash: '.$newCollectionHash.$string2][$row->binaryhash] = [
                         'new_collection_hash' => $newCollectionHash,
-                        'file_name'           => $row->name,
-                        'file_total_parts'    => $row->totalparts,
-                        'file_current_parts'  => $row->currentparts,
-                        'collection_poster'   => $row->fromname,
+                        'file_name' => $row->name,
+                        'file_total_parts' => $row->totalparts,
+                        'file_current_parts' => $row->currentparts,
+                        'collection_poster' => $row->fromname,
                         'old_collection_hash' => $row->collectionhash,
                     ];
 
@@ -239,12 +228,6 @@ class Regexes
     }
 
     /**
-     * @param $groupName
-     * @param $regex
-     * @param $displayLimit
-     * @param $queryLimit
-     * @return array
-     *
      * @throws \Exception
      */
     public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
@@ -269,7 +252,7 @@ class Regexes
                 $hit = $this->_matchRegex($regex, $row['name']);
                 if ($hit) {
                     $data[$row['id']] = [
-                        'subject'  => $row['name'],
+                        'subject' => $row['name'],
                         'old_name' => $row['searchname'],
                         'new_name' => $hit,
                     ];
@@ -286,9 +269,6 @@ class Regexes
     /**
      * This will try to find regex in the DB for a group and a usenet subject, attempt to match them and return the matches.
      *
-     * @param  string  $subject
-     * @param  string  $groupName
-     * @return string
      *
      * @throws \Exception
      */
@@ -321,18 +301,16 @@ class Regexes
     /**
      * Get the regex from the DB, cache them locally for 15 mins.
      * Cache them also in the cache server, as this script might be terminated.
-     *
-     * @param  string  $groupName
      */
     protected function _fetchRegex(string $groupName): void
     {
         // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
         $sql = sprintf(
-                'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
-                ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
-                $this->tableName,
-                $groupName
-            );
+            'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
+            ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
+            $this->tableName,
+            $groupName
+        );
 
         $this->_regexCache[$groupName]['regex'] = Cache::get(md5($sql));
         if ($this->_regexCache[$groupName]['regex'] !== null) {
@@ -350,7 +328,6 @@ class Regexes
      *
      * @param  string  $regex
      * @param  string  $subject
-     * @return string
      *
      * @throws \Exception
      */
@@ -384,7 +361,6 @@ class Regexes
      * Format part of a query.
      *
      * @param  string  $group_regex
-     * @return string
      */
     protected function _groupQueryString($group_regex): string
     {

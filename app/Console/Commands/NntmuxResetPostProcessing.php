@@ -23,6 +23,7 @@ class NntmuxResetPostProcessing extends Command
         'book',
         'misc',
     ];
+
     /**
      * The name and signature of the console command.
      *
@@ -36,6 +37,7 @@ class NntmuxResetPostProcessing extends Command
      * @var string
      */
     protected $description = 'Reset all, multiple or single release category postprocessing';
+
     /**
      * @var ColorCLI
      */

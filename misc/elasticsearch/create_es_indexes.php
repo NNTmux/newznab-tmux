@@ -7,7 +7,7 @@ if (\Elasticsearch::indices()->exists(['index' => 'releases'])) {
 }
 $releases_index = [
     'index' => 'releases',
-    'body'  => [
+    'body' => [
         'settings' => [
             'number_of_shards' => 2,
             'number_of_replicas' => 0,
@@ -65,7 +65,7 @@ if (\Elasticsearch::indices()->exists(['index' => 'predb'])) {
 }
 $predb_index = [
     'index' => 'predb',
-    'body'  => [
+    'body' => [
         'settings' => [
             'number_of_shards' => 2,
             'number_of_replicas' => 0,

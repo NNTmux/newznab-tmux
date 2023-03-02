@@ -14,6 +14,7 @@ class CollectionsCleaning
      * Used for matching endings in article subjects.
      *
      * @const
+     *
      * @string
      */
     public const REGEX_END = '[\-_\s]{0,3}yEnc$/ui';
@@ -22,6 +23,7 @@ class CollectionsCleaning
      * Used for matching file extension endings in article subjects.
      *
      * @const
+     *
      * @string
      */
     public const REGEX_FILE_EXTENSIONS = '([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z|\.par2)?(\d{1,3}\.rev"|\.vol\d+\+\d+.+?"|\.[A-Za-z0-9]{2,4}"|")';
@@ -30,7 +32,9 @@ class CollectionsCleaning
      * Used for matching size strings in article subjects.
      *
      * @example ' - 365.15 KB - '
+     *
      * @const
+     *
      * @string
      */
     public const REGEX_SUBJECT_SIZE = '[\-_\s]{0,3}\d+([.,]\d+)? [kKmMgG][bB][\-_\s]{0,3}';
@@ -50,29 +54,14 @@ class CollectionsCleaning
      */
     public const REGEX_MUSIC_MATCH = -20;
 
-    /**
-     * @var string
-     */
     public string $e0;
 
-    /**
-     * @var string
-     */
     public string $e1;
 
-    /**
-     * @var string
-     */
     public string $e2;
 
-    /**
-     * @var string
-     */
     public string $groupName = '';
 
-    /**
-     * @var string
-     */
     public string $subject = '';
 
     /**
@@ -96,10 +85,6 @@ class CollectionsCleaning
     }
 
     /**
-     * @param  string  $subject
-     * @param  string  $groupName
-     * @return array
-     *
      * @throws \Exception
      */
     public function collectionsCleaner(string $subject, string $groupName = ''): array
@@ -111,7 +96,7 @@ class CollectionsCleaning
         $potentialString = $this->_regexes->tryRegex($subject, $groupName);
         if ($potentialString) {
             return [
-                'id'   => $this->_regexes->matchedRegex,
+                'id' => $this->_regexes->matchedRegex,
                 'name' => $potentialString,
             ];
         }
@@ -121,9 +106,6 @@ class CollectionsCleaning
 
     /**
      * Cleans usenet subject before inserting, used for collection hash. If no regexes matched on collectionsCleaner.
-     *
-     *
-     * @return array
      */
     protected function generic(): array
     {
@@ -144,7 +126,7 @@ class CollectionsCleaning
 
             // Multi spaces.
             return [
-                'id'   => self::REGEX_GENERIC_MATCH,
+                'id' => self::REGEX_GENERIC_MATCH,
                 'name' => utf8_encode(trim(preg_replace('/\s\s+/', ' ', $cleanSubject))),
             ];
         } // Music groups.
@@ -153,7 +135,7 @@ class CollectionsCleaning
         $musicSubject = $this->musicSubject();
         if ($musicSubject !== false) {
             return [
-                'id'   => self::REGEX_MUSIC_MATCH,
+                'id' => self::REGEX_MUSIC_MATCH,
                 'name' => $musicSubject,
             ];
             // Parts/files
@@ -191,13 +173,13 @@ class CollectionsCleaning
             $newName = preg_replace(['/".+?"/', '/[a-z0-9]|'.$this->e0.'/i'], '', $this->subject);
 
             return [
-                'id'   => self::REGEX_MUSIC_MATCH,
+                'id' => self::REGEX_MUSIC_MATCH,
                 'name' => $cleanSubject.$newName.$x,
             ];
         }
 
         return [
-            'id'   => self::REGEX_MUSIC_MATCH,
+            'id' => self::REGEX_MUSIC_MATCH,
             'name' => $cleanSubject,
         ];
     }

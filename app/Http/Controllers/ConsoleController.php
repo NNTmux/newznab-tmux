@@ -11,10 +11,6 @@ use Illuminate\Support\Arr;
 class ConsoleController extends BasePageController
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     * @return \Illuminate\Http\JsonResponse
-     *
      * @throws \Exception
      */
     public function show(Request $request, string $id = ''): \Illuminate\Http\JsonResponse
@@ -100,7 +96,7 @@ class ConsoleController extends BasePageController
 
         $this->smarty->assign(
             [
-                'resultsadd'=>  $consoles,
+                'resultsadd' => $consoles,
                 'results' => $results,
                 'covgroup' => 'console',
             ]

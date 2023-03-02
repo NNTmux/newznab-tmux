@@ -31,7 +31,6 @@ class AdminMovieController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      *
      * @throws \Exception
@@ -79,9 +78,6 @@ class AdminMovieController extends BasePageController
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     *
      * @throws \Exception
      */
     public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -127,18 +123,18 @@ class AdminMovieController extends BasePageController
                     $request->merge(['backdrop' => file_exists($backdropLoc) ? 1 : 0]);
 
                     $movie->update([
-                        'actors'   => $request->input('actors'),
+                        'actors' => $request->input('actors'),
                         'backdrop' => $request->input('backdrop'),
-                        'cover'    => $request->input('cover'),
+                        'cover' => $request->input('cover'),
                         'director' => $request->input('director'),
-                        'genre'    => $request->input('genre'),
-                        'imdbid'   => $id,
+                        'genre' => $request->input('genre'),
+                        'imdbid' => $id,
                         'language' => $request->input('language'),
-                        'plot'     => $request->input('plot'),
-                        'rating'   => $request->input('rating'),
-                        'tagline'  => $request->input('tagline'),
-                        'title'    => $request->input('title'),
-                        'year'     => $request->input('year'),
+                        'plot' => $request->input('plot'),
+                        'rating' => $request->input('rating'),
+                        'tagline' => $request->input('tagline'),
+                        'title' => $request->input('title'),
+                        'year' => $request->input('year'),
                     ]);
 
                     $movieInfo = MovieInfo::query()->where('imdbid', $id)->first(['id']);

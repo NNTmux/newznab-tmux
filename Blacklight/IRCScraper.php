@@ -47,9 +47,6 @@ class IRCScraper extends IRCClient
      */
     protected $_nuked;
 
-    /**
-     * @var
-     */
     protected $_oldPre;
 
     /**
@@ -70,6 +67,7 @@ class IRCScraper extends IRCClient
      * @var \Blacklight\SphinxSearch
      */
     protected $sphinxsearch;
+
     /**
      * @var ElasticSearchSiteSearch
      */
@@ -113,26 +111,26 @@ class IRCScraper extends IRCClient
             );
         } else {
             $this->_ignoredChannels = [
-                '#a.b.cd.image'               => false,
-                '#a.b.console.ps3'            => false,
-                '#a.b.dvd'                    => false,
-                '#a.b.erotica'                => false,
-                '#a.b.flac'                   => false,
-                '#a.b.foreign'                => false,
-                '#a.b.games.nintendods'       => false,
-                '#a.b.inner-sanctum'          => false,
-                '#a.b.moovee'                 => false,
-                '#a.b.movies.divx'            => false,
-                '#a.b.sony.psp'               => false,
+                '#a.b.cd.image' => false,
+                '#a.b.console.ps3' => false,
+                '#a.b.dvd' => false,
+                '#a.b.erotica' => false,
+                '#a.b.flac' => false,
+                '#a.b.foreign' => false,
+                '#a.b.games.nintendods' => false,
+                '#a.b.inner-sanctum' => false,
+                '#a.b.moovee' => false,
+                '#a.b.movies.divx' => false,
+                '#a.b.sony.psp' => false,
                 '#a.b.sounds.mp3.complete_cd' => false,
-                '#a.b.teevee'                 => false,
-                '#a.b.games.wii'              => false,
-                '#a.b.warez'                  => false,
-                '#a.b.games.xbox360'          => false,
-                '#pre@corrupt'                => false,
-                '#scnzb'                      => false,
-                '#tvnzb'                      => false,
-                'srrdb'                       => false,
+                '#a.b.teevee' => false,
+                '#a.b.games.wii' => false,
+                '#a.b.warez' => false,
+                '#a.b.games.xbox360' => false,
+                '#pre@corrupt' => false,
+                '#scnzb' => false,
+                '#tvnzb' => false,
+                'srrdb' => false,
             ];
         }
 
@@ -166,7 +164,6 @@ class IRCScraper extends IRCClient
      */
     protected function _startScraping()
     {
-
         // Connect to IRC.
         if ($this->connect(config('irc_settings.scrape_irc_server'), config('irc_settings.scrape_irc_port'), config('irc_settings.scrape_irc_tls')) === false) {
             exit(
@@ -385,9 +382,9 @@ class IRCScraper extends IRCClient
         $query .= (! empty($this->_curPre['nuked']) ? 'nuked = '.$this->_curPre['nuked'].', ' : '');
         $query .= (! empty($this->_curPre['filename']) ? 'filename = '.escapeString($this->_curPre['filename']).', ' : '');
         $query .= (
-        (empty($this->_oldPre['category']) && ! empty($this->_curPre['category']))
-            ? 'category = '.escapeString($this->_curPre['category']).', '
-            : ''
+            (empty($this->_oldPre['category']) && ! empty($this->_curPre['category']))
+                ? 'category = '.escapeString($this->_curPre['category']).', '
+                : ''
         );
 
         if ($query === 'UPDATE predb SET ') {
@@ -496,16 +493,16 @@ class IRCScraper extends IRCClient
         $this->_oldPre = [];
         $this->_curPre =
             [
-                'title'    => '',
-                'size'     => '',
-                'predate'  => '',
+                'title' => '',
+                'size' => '',
+                'predate' => '',
                 'category' => '',
-                'source'   => '',
-                'group_id'  => '',
-                'reqid'    => '',
-                'nuked'    => '',
-                'reason'   => '',
-                'files'    => '',
+                'source' => '',
+                'group_id' => '',
+                'reqid' => '',
+                'nuked' => '',
+                'reason' => '',
+                'files' => '',
                 'filename' => '',
             ];
     }

@@ -49,21 +49,21 @@ foreach ($itr as $filePath) {
 }
 
 $qry = XxxInfo::query()->where('cover', '=', 1)->select(['id'])->get();
-    foreach ($qry as $rows) {
-        if (! is_file($path2covers.$rows['id'].'-cover.jpg')) {
-            XxxInfo::query()->where(['cover' => 1, 'id' => $rows['id']])->update(['cover' => 0]);
-            $colorCli->info($path2covers.$rows['id'].'-cover.jpg does not exist.');
-            $deleted++;
-        }
+foreach ($qry as $rows) {
+    if (! is_file($path2covers.$rows['id'].'-cover.jpg')) {
+        XxxInfo::query()->where(['cover' => 1, 'id' => $rows['id']])->update(['cover' => 0]);
+        $colorCli->info($path2covers.$rows['id'].'-cover.jpg does not exist.');
+        $deleted++;
     }
+}
 $qry1 = XxxInfo::query()->where('backdrop', '=', 1)->select(['id'])->get();
-    foreach ($qry1 as $rows) {
-        if (! is_file($path2covers.$rows['id'].'-backdrop.jpg')) {
-            XxxInfo::query()->where(['backdrop' => 1, 'id' => $rows['id']])->update(['backdrop' => 0]);
-            $colorCli->info($path2covers.$rows['id'].'-backdrop.jpg does not exist.');
-            $deleted++;
-        }
+foreach ($qry1 as $rows) {
+    if (! is_file($path2covers.$rows['id'].'-backdrop.jpg')) {
+        XxxInfo::query()->where(['backdrop' => 1, 'id' => $rows['id']])->update(['backdrop' => 0]);
+        $colorCli->info($path2covers.$rows['id'].'-backdrop.jpg does not exist.');
+        $deleted++;
     }
+}
 $colorCli->header($covers.' covers set.');
 $colorCli->header($updated.' backdrops set.');
 $colorCli->header($deleted.' movies unset.');

@@ -8,7 +8,9 @@
  * Type:     modifier<br>
  * Name:     magicurl<br>
  * Purpose:  turn www addresses into hyperlinks
+ *
  * @author   bb
+ *
  * @param string
  * @return string
  */

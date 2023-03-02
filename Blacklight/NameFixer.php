@@ -20,103 +20,86 @@ class NameFixer
 
     // Constants for name fixing status
     public const PROC_NFO_NONE = 0;
+
     public const PROC_NFO_DONE = 1;
+
     public const PROC_FILES_NONE = 0;
+
     public const PROC_FILES_DONE = 1;
+
     public const PROC_PAR2_NONE = 0;
+
     public const PROC_PAR2_DONE = 1;
+
     public const PROC_UID_NONE = 0;
+
     public const PROC_UID_DONE = 1;
+
     public const PROC_HASH16K_NONE = 0;
+
     public const PROC_HASH16K_DONE = 1;
+
     public const PROC_SRR_NONE = 0;
+
     public const PROC_SRR_DONE = 1;
+
     public const PROC_CRC_NONE = 0;
+
     public const PROC_CRC_DONE = 1;
 
     // Constants for overall rename status
     public const IS_RENAMED_NONE = 0;
+
     public const IS_RENAMED_DONE = 1;
 
     /**
      * Has the current release found a new name?
-     *
-     * @var bool
      */
     public bool $matched;
 
     /**
      * How many releases have got a new name?
-     *
-     * @var int
      */
     public int $fixed;
 
     /**
      * How many releases were checked.
-     *
-     * @var int
      */
     public int $checked;
 
     /**
      * Was the check completed?
-     *
-     * @var bool
      */
     public bool $done;
 
     /**
      * Do we want to echo info to CLI?
-     *
-     * @var bool
      */
     public bool $echoOutput;
 
     /**
      * Total releases we are working on.
-     *
-     * @var int
      */
     protected int $_totalReleases;
 
     /**
      * The cleaned filename we want to match.
-     *
-     * @var string
      */
     protected string $_fileName;
 
     /**
      * The release ID we are trying to rename.
-     *
-     * @var int
      */
     protected int $relid;
 
-    /**
-     * @var string
-     */
     protected string $othercats;
 
-    /**
-     * @var string
-     */
     protected string $timeother;
 
-    /**
-     * @var string
-     */
     protected string $timeall;
 
-    /**
-     * @var string
-     */
     protected string $fullother;
 
-    /**
-     * @var string
-     */
     protected string $fullall;
 
     /**
@@ -129,9 +112,6 @@ class NameFixer
      */
     public mixed $category;
 
-    /**
-     * @var \Blacklight\utility\Utility
-     */
     public Utility $text;
 
     /**
@@ -143,9 +123,7 @@ class NameFixer
      * @var \Blacklight\ColorCLI
      */
     protected ColorCLI $colorCli;
-    /**
-     * @var ElasticSearchSiteSearch
-     */
+
     private ElasticSearchSiteSearch $elasticsearch;
 
     /**
@@ -156,12 +134,12 @@ class NameFixer
     public function __construct(array $options = [])
     {
         $defaults = [
-            'Echo'         => true,
-            'Categorize'   => null,
+            'Echo' => true,
+            'Categorize' => null,
             'ConsoleTools' => null,
-            'Groups'       => null,
-            'Misc'         => null,
-            'Settings'     => null,
+            'Groups' => null,
+            'Misc' => null,
+            'Settings' => null,
             'SphinxSearch' => null,
         ];
         $options += $defaults;
@@ -185,11 +163,6 @@ class NameFixer
      * Attempts to fix release names using the NFO.
      *
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
      *
      * @throws \Exception
      */
@@ -238,22 +211,23 @@ class NameFixer
 
             foreach ($releases as $rel) {
                 $releaseRow = Release::fromQuery(
-                        sprintf(
-                            '
+                    sprintf(
+                        '
 							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 							WHERE rel.id = %d LIMIT 1',
-                            $rel->releases_id
-                        )
-                    );
+                        $rel->releases_id
+                    )
+                );
 
                 $this->checked++;
 
                 // Ignore encrypted NFOs.
                 if (preg_match('/^=newz\[NZB\]=\w+/', $releaseRow[0]->textstring)) {
                     $this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $rel->releases_id);
+
                     continue;
                 }
 
@@ -271,11 +245,6 @@ class NameFixer
      * Attempts to fix release names using the File name.
      *
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
      *
      * @throws \Exception
      */
@@ -338,11 +307,6 @@ class NameFixer
      * Attempts to fix release names using the rar file crc32 hash.
      *
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
      *
      * @throws \Exception
      */
@@ -405,11 +369,6 @@ class NameFixer
      * Attempts to fix XXX release names using the File name.
      *
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
      *
      * @throws \Exception
      */
@@ -469,11 +428,6 @@ class NameFixer
      * Attempts to fix release names using the SRR filename.
      *
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
      *
      * @throws \Exception
      */
@@ -537,9 +491,6 @@ class NameFixer
      * @param  int  $time  1: 24 hours, 2: no time limit
      * @param  int  $echo  1: change the name, anything else: preview of what could have been changed.
      * @param  int  $cats  1: other categories, 2: all categories
-     * @param    $nameStatus
-     * @param    $show
-     * @param  NNTP  $nntp
      *
      * @throws \Exception
      */
@@ -581,13 +532,13 @@ class NameFixer
             $this->consoletools->primary(number_format($total).' releases to process.');
             $Nfo = new Nfo();
             $nzbContents = new NZBContents(
-                    [
-                        'Echo'        => $this->echoOutput,
-                        'NNTP'        => $nntp,
-                        'Nfo'         => $Nfo,
-                        'PostProcess' => new PostProcess(['Nfo' => $Nfo]),
-                    ]
-                );
+                [
+                    'Echo' => $this->echoOutput,
+                    'NNTP' => $nntp,
+                    'Nfo' => $Nfo,
+                    'PostProcess' => new PostProcess(['Nfo' => $Nfo]),
+                ]
+            );
 
             foreach ($releases as $release) {
                 if ($nzbContents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, $nameStatus, $show)) {
@@ -607,11 +558,6 @@ class NameFixer
      * Attempts to fix release names using the mediainfo xml Unique_ID.
      *
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
      *
      * @throws \Exception
      */
@@ -678,12 +624,6 @@ class NameFixer
     }
 
     /**
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
-     *
      * @throws \Exception
      */
     public function fixNamesWithMediaMovieName($time, $echo, $cats, $nameStatus, $show): void
@@ -747,11 +687,6 @@ class NameFixer
      * Attempts to fix release names using the par2 hash_16K block.
      *
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
      *
      * @throws \Exception
      */
@@ -819,10 +754,6 @@ class NameFixer
     }
 
     /**
-     * @param $time
-     * @param $cats
-     * @param $query
-     * @param  int  $limit
      * @return false|\Illuminate\Database\Eloquent\Collection
      */
     protected function _getReleases($time, $cats, $query, int $limit = 0): \Illuminate\Database\Eloquent\Collection|bool
@@ -888,9 +819,6 @@ class NameFixer
         );
     }
 
-    /**
-     * @param  int  $show
-     */
     protected function _echoRenamed(int $show): void
     {
         if ($this->checked % 500 === 0 && $show === 1) {
@@ -911,14 +839,6 @@ class NameFixer
      * Update the release with the new information.
      *
      *
-     * @param    $release
-     * @param    $name
-     * @param    $method
-     * @param    $echo
-     * @param    $type
-     * @param  int  $nameStatus
-     * @param  bool  $show
-     * @param  int  $preId
      *
      * @throws \Exception
      */
@@ -1051,20 +971,20 @@ class NameFixer
                         }
                     } else {
                         $release->update(
-                                [
-                                    'videos_id' => 0,
-                                    'tv_episodes_id' => 0,
-                                    'imdbid' => null,
-                                    'musicinfo_id' => null,
-                                    'consoleinfo_id' => null,
-                                    'bookinfo_id' => null,
-                                    'anidbid' => null,
-                                    'predb_id' => $preId,
-                                    'searchname' => $newTitle,
-                                    'categories_id' => $determinedCategory['categories_id'],
-                                    'iscategorized' => 1,
-                                ]
-                            );
+                            [
+                                'videos_id' => 0,
+                                'tv_episodes_id' => 0,
+                                'imdbid' => null,
+                                'musicinfo_id' => null,
+                                'consoleinfo_id' => null,
+                                'bookinfo_id' => null,
+                                'anidbid' => null,
+                                'predb_id' => $preId,
+                                'searchname' => $newTitle,
+                                'categories_id' => $determinedCategory['categories_id'],
+                                'iscategorized' => 1,
+                            ]
+                        );
 
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->_releases_id);
@@ -1093,18 +1013,19 @@ class NameFixer
      *                       ]
      *
      * @static
+     *
      * @void
      */
     public static function echoChangedReleaseName(
         array $data =
         [
-            'new_name'     => '',
-            'old_name'     => '',
+            'new_name' => '',
+            'old_name' => '',
             'new_category' => '',
             'old_category' => '',
-            'group'        => '',
-            'releases_id'   => 0,
-            'method'       => '',
+            'group' => '',
+            'releases_id' => 0,
+            'method' => '',
         ]
     ): void {
         $colorCLI = new ColorCLI();
@@ -1122,11 +1043,6 @@ class NameFixer
     /**
      * Match a PreDB title to a release name or searchname using an exact full-text match.
      *
-     * @param $pre
-     * @param $echo
-     * @param $nameStatus
-     * @param $show
-     * @return int
      *
      * @throws \Exception
      */
@@ -1175,9 +1091,6 @@ class NameFixer
     }
 
     /**
-     * @param $preTitle
-     * @return string
-     *
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
@@ -1267,11 +1180,6 @@ class NameFixer
     /**
      * Match a release filename to a PreDB filename or title.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  int  $nameStatus
-     * @param  bool  $show
-     * @return int
      *
      * @throws \Exception
      */
@@ -1315,13 +1223,9 @@ class NameFixer
 
     /**
      * Cleans file names for PreDB Match.
-     *
-     *
-     * @return string
      */
     protected function _cleanMatchFiles(): string
     {
-
         // first strip all non-printing chars  from filename
         $this->_fileName = Utility::stripNonPrintingChars($this->_fileName);
 
@@ -1344,12 +1248,6 @@ class NameFixer
     /**
      * Match a Hash from the predb to a release.
      *
-     * @param  string  $hash
-     * @param    $release
-     * @param    $echo
-     * @param    $nameStatus
-     * @param    $show
-     * @return int
      *
      * @throws \Exception
      */
@@ -1393,12 +1291,6 @@ class NameFixer
     /**
      * Matches the hashes within the predb table to release files and subjects (names) which are hashed.
      *
-     * @param $time
-     * @param $echo
-     * @param $cats
-     * @param $nameStatus
-     * @param $show
-     * @return int
      *
      * @throws \Exception
      */
@@ -1461,13 +1353,6 @@ class NameFixer
     /**
      * Check the array using regex for a clean name.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param  int  $nameStatus
-     * @param  bool  $show
-     * @param  bool  $preId
-     * @return bool
      *
      * @throws \Exception
      */
@@ -1558,10 +1443,6 @@ class NameFixer
      * This function updates a single variable column in releases
      *  The first parameter is the column to update, the second is the value
      *  The final parameter is the ID of the release to update.
-     *
-     * @param  string  $column
-     * @param  int  $status
-     * @param  int  $id
      */
     public function _updateSingleColumn(string $column = '', int $status = 0, int $id = 0): void
     {
@@ -1573,11 +1454,8 @@ class NameFixer
     /**
      * Look for a TV name.
      *
-     * @param    $release
      * @param  bool  $echo
      * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1607,11 +1485,6 @@ class NameFixer
     /**
      * Look for a movie name.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1653,11 +1526,6 @@ class NameFixer
     /**
      * Look for a game name.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1683,11 +1551,6 @@ class NameFixer
     /**
      * Look for a app name.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1707,11 +1570,6 @@ class NameFixer
     /**
      * TV.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1731,11 +1589,6 @@ class NameFixer
     /**
      * Movies.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1755,12 +1608,6 @@ class NameFixer
     }
 
     /**
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
-     *
      * @throws \Exception
      */
     public function nfoCheckMus($release, bool $echo, string $type, $nameStatus, $show): void
@@ -1776,11 +1623,6 @@ class NameFixer
     /**
      * Title (year).
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1953,11 +1795,6 @@ class NameFixer
     /**
      * Games.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -1983,11 +1820,6 @@ class NameFixer
     /**
      * Misc.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
      *
      * @throws \Exception
      */
@@ -2024,12 +1856,6 @@ class NameFixer
     /**
      * Just for filenames.
      *
-     * @param    $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param    $nameStatus
-     * @param    $show
-     * @return bool
      *
      * @throws \Exception
      */
@@ -2123,12 +1949,6 @@ class NameFixer
      * Look for a name based on mediainfo xml Unique_ID.
      *
      *
-     * @param $release
-     * @param $echo
-     * @param $type
-     * @param $nameStatus
-     * @param $show
-     * @return bool
      *
      * @throws \Exception
      */
@@ -2153,15 +1973,15 @@ class NameFixer
                 $floor = round(($res['relsize'] - $release->relsize) / $res['relsize'] * 100, 1);
                 if ($floor >= -10 && $floor <= 10) {
                     $this->updateRelease(
-                            $release,
-                            $res->searchname,
-                            'uidCheck: Unique_ID',
-                            $echo,
-                            $type,
-                            $nameStatus,
-                            $show,
-                            $res->predb_id
-                        );
+                        $release,
+                        $res->searchname,
+                        'uidCheck: Unique_ID',
+                        $echo,
+                        $type,
+                        $nameStatus,
+                        $show,
+                        $res->predb_id
+                    );
 
                     return true;
                 }
@@ -2176,12 +1996,6 @@ class NameFixer
      * Look for a name based on mediainfo xml Unique_ID.
      *
      *
-     * @param $release
-     * @param $echo
-     * @param $type
-     * @param $nameStatus
-     * @param $show
-     * @return bool
      *
      * @throws \Exception
      */
@@ -2215,12 +2029,6 @@ class NameFixer
      * Look for a name based on xxx release filename.
      *
      *
-     * @param $release
-     * @param $echo
-     * @param $type
-     * @param $nameStatus
-     * @param $show
-     * @return bool
      *
      * @throws \Exception
      */
@@ -2246,14 +2054,14 @@ class NameFixer
             foreach ($result as $res) {
                 if (preg_match('/^.+?SDPORN/i', $res->textstring, $hit)) {
                     $this->updateRelease(
-                            $release,
-                            $hit['0'],
-                            'fileCheck: XXX SDPORN',
-                            $echo,
-                            $type,
-                            $nameStatus,
-                            $show
-                        );
+                        $release,
+                        $hit['0'],
+                        'fileCheck: XXX SDPORN',
+                        $echo,
+                        $type,
+                        $nameStatus,
+                        $show
+                    );
 
                     return true;
                 }
@@ -2268,12 +2076,6 @@ class NameFixer
      * Look for a name based on .srr release files extension.
      *
      *
-     * @param $release
-     * @param $echo
-     * @param $type
-     * @param $nameStatus
-     * @param $show
-     * @return bool
      *
      * @throws \Exception
      */
@@ -2299,14 +2101,14 @@ class NameFixer
             foreach ($result as $res) {
                 if (preg_match('/^(.*)\.srr$/i', $res->textstring, $hit)) {
                     $this->updateRelease(
-                            $release,
-                            $hit['1'],
-                            'fileCheck: SRR extension',
-                            $echo,
-                            $type,
-                            $nameStatus,
-                            $show
-                        );
+                        $release,
+                        $hit['1'],
+                        'fileCheck: SRR extension',
+                        $echo,
+                        $type,
+                        $nameStatus,
+                        $show
+                    );
 
                     return true;
                 }
@@ -2321,12 +2123,6 @@ class NameFixer
      * Look for a name based on par2 hash_16K block.
      *
      *
-     * @param $release
-     * @param $echo
-     * @param $type
-     * @param $nameStatus
-     * @param $show
-     * @return bool
      *
      * @throws \Exception
      */
@@ -2349,15 +2145,15 @@ class NameFixer
                 $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
                 if ($floor >= -5 && $floor <= 5) {
                     $this->updateRelease(
-                            $release,
-                            $res->searchname,
-                            'hashCheck: PAR2 hash_16K',
-                            $echo,
-                            $type,
-                            $nameStatus,
-                            $show,
-                            $res->predb_id
-                        );
+                        $release,
+                        $res->searchname,
+                        'hashCheck: PAR2 hash_16K',
+                        $echo,
+                        $type,
+                        $nameStatus,
+                        $show,
+                        $res->predb_id
+                    );
 
                     return true;
                 }
@@ -2372,12 +2168,6 @@ class NameFixer
      * Look for a name based on rar crc32 hash.
      *
      *
-     * @param $release
-     * @param $echo
-     * @param $type
-     * @param $nameStatus
-     * @param $show
-     * @return bool
      *
      * @throws \Exception
      */
@@ -2428,10 +2218,6 @@ class NameFixer
         $this->done = $this->matched = false;
     }
 
-    /**
-     * @param  string  $fileName
-     * @return array
-     */
     private function preMatch(string $fileName): array
     {
         $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+([\w\-.]+[\w]$)/i', $fileName, $hit);
@@ -2440,13 +2226,6 @@ class NameFixer
     }
 
     /**
-     * @param $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param  int  $nameStatus
-     * @param  bool  $show
-     * @return bool
-     *
      * @throws \Exception
      */
     public function preDbFileCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
@@ -2479,13 +2258,6 @@ class NameFixer
     }
 
     /**
-     * @param $release
-     * @param  bool  $echo
-     * @param  string  $type
-     * @param  int  $nameStatus
-     * @param  bool  $show
-     * @return bool
-     *
      * @throws \Exception
      */
     public function preDbTitleCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
@@ -2517,9 +2289,6 @@ class NameFixer
         return false;
     }
 
-    /**
-     * @return array|string|null
-     */
     private function cleanFileNames(): array|string|null
     {
         if (preg_match('/(\.[a-zA-Z]{2})?(\.4k|\.fullhd|\.hd|\.int|\.\d+)?$/i', $this->_fileName, $hit)) {
@@ -2552,7 +2321,6 @@ class NameFixer
     }
 
     /**
-     * @param $string
      * @return string|string[]
      */
     private function escapeString($string): array|string

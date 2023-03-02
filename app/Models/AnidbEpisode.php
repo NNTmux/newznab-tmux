@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeid($value)
+ *
  * @mixin \Eloquent
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode newModelQuery()

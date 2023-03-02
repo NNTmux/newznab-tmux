@@ -80,9 +80,6 @@ class UpdateNNTmux extends Command
         }
     }
 
-    /**
-     * @return bool
-     */
     private function appDown(): bool
     {
         if (App::isDownForMaintenance() === false) {
@@ -94,9 +91,6 @@ class UpdateNNTmux extends Command
         return false;
     }
 
-    /**
-     * @return bool
-     */
     private function stopTmux(): bool
     {
         if ((new Tmux())->isRunning() === true) {
