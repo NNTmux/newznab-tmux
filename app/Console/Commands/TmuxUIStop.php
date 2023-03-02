@@ -36,6 +36,8 @@ class TmuxUIStop extends Command
             $this->info('Killing active tmux session: '.$sessionName);
             if ($tmuxSession->successful()) {
                 $this->info('Tmux session killed successfully');
+            } else {
+                $this->info('No valid tmux sessions found');
             }
         }
     }

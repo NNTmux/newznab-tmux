@@ -6,6 +6,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Process;
 
 class TmuxUIStart extends Command
 {
@@ -35,10 +36,10 @@ class TmuxUIStart extends Command
         $tmux->startRunning();
 
         //check if session exists
-        $session = shell_exec("tmux list-session | grep $tmux_session");
-        if ($session === null) {
-            (new ColorCLI())->info('Starting the tmux server and monitor script.');
-            passthru('php '.app()->/* @scrutinizer ignore-call */ path().'/../misc/update/tmux/run.php');
+        $session = Process::run("tmux list-session | grep $tmux_session");
+        if ($session->exitCode() === 1) {
+            $this->info('Starting the tmux server and monitor script');
+            Process::forever()->tty()->run('php '.app()->/* @scrutinizer ignore-call */ path().'/../misc/update/tmux/run.php');
         }
     }
 }

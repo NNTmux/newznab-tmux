@@ -6,8 +6,8 @@ use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
 
 class InstallNntmux extends Command
 {
@@ -34,7 +34,6 @@ class InstallNntmux extends Command
     {
         parent::__construct();
     }
-
 
     public function handle()
     {

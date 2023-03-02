@@ -23,7 +23,6 @@ class UpdateNNTmux extends Command
      */
     protected $description = 'Update NNTmux installation';
 
-
     /**
      * @var array Decoded JSON updates file.
      */
