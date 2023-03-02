@@ -103,9 +103,6 @@ class TmuxOutput extends Tmux
         ];
     }
 
-    /**
-     * @return string
-     */
     protected function _getHeader(): string
     {
         $buffer = '';

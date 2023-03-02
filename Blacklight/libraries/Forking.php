@@ -12,10 +12,10 @@ use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Process\Process;
 use Opis\Closure\SerializableClosure;
 use Spatie\Async\Output\SerializableException;
 use Spatie\Async\Pool;
+use Symfony\Component\Process\Process;
 
 /**
  * Class Forking.
@@ -910,10 +910,6 @@ class Forking
     //////////////////////////////////////////// Various methods ///////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @param string $command
-     * @return string
-     */
     protected function _executeCommand(string $command): string
     {
         $process = Process::fromShellCommandline($command);
@@ -923,6 +919,7 @@ class Forking
                 echo $buffer;
             }
         });
+
         return $process->getOutput();
     }
 

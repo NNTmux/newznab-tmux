@@ -126,7 +126,6 @@ if (! function_exists('getUserBrowseOrder')) {
 }
 
 if (! function_exists('getUserBrowseOrdering')) {
-
     function getUserBrowseOrdering(): array
     {
         return [
