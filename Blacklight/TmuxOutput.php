@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Process;
  */
 class TmuxOutput extends Tmux
 {
-
     protected $_colourMasks;
 
     private $runVar;
