@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Opis\Closure\SerializableClosure;
 use Spatie\Async\Output\SerializableException;
 use Spatie\Async\Pool;
-use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Process;
 
 /**
  * Class Forking.
@@ -960,22 +960,14 @@ class Forking
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Execute a shell command.
-     *
-     * @param  string  $command
-     * @return string
+     * @param string $command
+     * @return void
      */
-    protected function _executeCommand(string $command): string
+    protected function _executeCommand(string $command): void
     {
-        $process = Process::fromShellCommandline($command);
-        $process->setTimeout(1800);
-        $process->run(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                echo $buffer;
-            }
+        Process::timeout(config('nntmux.multiprocessing_max_child_time'))->run($command, function (string $type, string $output) {
+            echo $output;
         });
-
-        return $process->getOutput();
     }
 
     /**
