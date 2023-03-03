@@ -7,6 +7,9 @@ namespace Blacklight;
  */
 class ConsoleTools extends ColorCLI
 {
+    /**
+     * @var int
+     */
     public int $lastMessageLength;
 
     /**
@@ -18,6 +21,11 @@ class ConsoleTools extends ColorCLI
         $this->lastMessageLength = 0;
     }
 
+    /**
+     * @param string $message
+     * @param bool $reset
+     * @return void
+     */
     public function overWriteHeader(string $message, bool $reset = false): void
     {
         if ($reset) {
@@ -32,6 +40,11 @@ class ConsoleTools extends ColorCLI
         $this->headerOver($message);
     }
 
+    /**
+     * @param string $message
+     * @param bool $reset
+     * @return void
+     */
     public function overWritePrimary(string $message, bool $reset = false): void
     {
         if ($reset) {
@@ -46,6 +59,11 @@ class ConsoleTools extends ColorCLI
         $this->primaryOver($message);
     }
 
+    /**
+     * @param string $message
+     * @param bool $reset
+     * @return void
+     */
     public function overWrite(string $message, bool $reset = false): void
     {
         if ($reset) {
@@ -66,6 +84,11 @@ class ConsoleTools extends ColorCLI
         $this->lastMessageLength += \strlen($message);
     }
 
+    /**
+     * @param int $cur
+     * @param int $total
+     * @return string
+     */
     public function percentString(int $cur, int $total): string
     {
         $percent = 100 * $cur / $total;
@@ -74,6 +97,12 @@ class ConsoleTools extends ColorCLI
         return sprintf($formatString, $cur, $total, $percent);
     }
 
+    /**
+     * @param int $first
+     * @param int $last
+     * @param int $total
+     * @return string
+     */
     public function percentString2(int $first, int $last, int $total): string
     {
         $percent1 = 100 * ($first - 1) / $total;

@@ -65,7 +65,7 @@ class CollectionsCleaning
     public string $subject = '';
 
     /**
-     * @var \Blacklight\Regexes
+     * @var Regexes
      */
     protected Regexes $_regexes;
 

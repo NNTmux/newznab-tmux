@@ -4,13 +4,19 @@ namespace Blacklight;
 
 use App\Models\Release;
 use Elastic\Elasticsearch\Exception\ElasticsearchException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use sspat\ESQuerySanitizer\Sanitizer;
 
 class ElasticSearchSiteSearch
 {
-    public function indexSearch(array|string $phrases, int $limit): mixed
+    /**
+     * @param array|string $phrases
+     * @param int $limit
+     * @return array|Collection
+     */
+    public function indexSearch(array|string $phrases, int $limit): array|Collection
     {
         $keywords = $this->sanitize($phrases);
 
@@ -45,7 +51,12 @@ class ElasticSearchSiteSearch
         }
     }
 
-    public function indexSearchApi(array|string $searchName, int $limit): array
+    /**
+     * @param array|string $searchName
+     * @param int $limit
+     * @return array|Collection
+     */
+    public function indexSearchApi(array|string $searchName, int $limit): array|Collection
     {
         $keywords = $this->sanitize($searchName);
         try {
@@ -80,9 +91,11 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * Search function used in TV, TV API, Movies and Anime searches.
+     * @param array|string $name
+     * @param int $limit
+     * @return array|Collection
      */
-    public function indexSearchTMA(array|string $name, int $limit): array
+    public function indexSearchTMA(array|string $name, int $limit): array|Collection
     {
         $keywords = $this->sanitize($name);
         try {
@@ -116,7 +129,11 @@ class ElasticSearchSiteSearch
         }
     }
 
-    public function predbIndexSearch(array|string $search): array|\Illuminate\Support\Collection
+    /**
+     * @param array|string $search
+     * @return array|Collection
+     */
+    public function predbIndexSearch(array|string $search): array|Collection
     {
         try {
             $search = [
@@ -141,6 +158,10 @@ class ElasticSearchSiteSearch
         }
     }
 
+    /**
+     * @param array $parameters
+     * @return void
+     */
     public function insertRelease(array $parameters): void
     {
         $searchNameDotless = str_replace(['.', '-'], ' ', $parameters['searchname']);
@@ -163,6 +184,10 @@ class ElasticSearchSiteSearch
         \Elasticsearch::index($data);
     }
 
+    /**
+     * @param int $id
+     * @return void
+     */
     public function updateRelease(int $id): void
     {
         $new = Release::query()
@@ -195,6 +220,10 @@ class ElasticSearchSiteSearch
         }
     }
 
+    /**
+     * @param $searchTerm
+     * @return array
+     */
     public function searchPreDb($searchTerm): array
     {
         $search = [
@@ -225,6 +254,10 @@ class ElasticSearchSiteSearch
         return $results;
     }
 
+    /**
+     * @param array $parameters
+     * @return void
+     */
     public function insertPreDb(array $parameters): void
     {
         $data = [
@@ -241,6 +274,10 @@ class ElasticSearchSiteSearch
         \Elasticsearch::index($data);
     }
 
+    /**
+     * @param array $parameters
+     * @return void
+     */
     public function updatePreDb(array $parameters): void
     {
         $data = [
@@ -261,6 +298,10 @@ class ElasticSearchSiteSearch
         \Elasticsearch::update($data);
     }
 
+    /**
+     * @param array|string $phrases
+     * @return string
+     */
     private function sanitize(array|string $phrases): string
     {
         if (! is_array($phrases)) {
@@ -274,9 +315,9 @@ class ElasticSearchSiteSearch
         foreach ($wordArray as $words) {
             $words = preg_split('/\s+/', $words);
             foreach ($words as $st) {
-                if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
+                if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
                     $str = $st;
-                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/(!|\+|\?|-|\*){2,}/', $st)) {
+                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
                     $str = $st;
                 } else {
                     $str = Sanitizer::escape($st);
@@ -290,7 +331,12 @@ class ElasticSearchSiteSearch
         return implode(' ', $keywords);
     }
 
-    protected function search(array $search, bool $fullResults = false): array|\Illuminate\Support\Collection
+    /**
+     * @param array $search
+     * @param bool $fullResults
+     * @return array
+     */
+    protected function search(array $search, bool $fullResults = false): array
     {
         $results = \Elasticsearch::search($search);
 
