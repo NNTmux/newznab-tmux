@@ -37,71 +37,43 @@ class NZB
      *
      * @var int
      */
-    protected $nzbSplitLevel;
+    protected int $nzbSplitLevel;
 
     /**
      * Path to store NZB files.
      *
      * @var string
      */
-    protected $siteNzbPath;
+    protected string $siteNzbPath;
 
     /**
      * Group id when writing NZBs.
      *
      * @var int
      */
-    protected $groupID;
+    protected int $groupID;
 
     /**
      * @var \PDO
      */
-    public $pdo;
+    public \PDO $pdo;
 
     /**
      * @var bool
      */
-    protected $_debug = false;
-
-    /**
-     * Base query for selecting collection data for writing NZB files.
-     *
-     * @var string
-     */
-    protected $_collectionsQuery;
-
-    /**
-     * Base query for selecting binary data for writing NZB files.
-     *
-     * @var string
-     */
-    protected $_binariesQuery;
-
-    /**
-     * Base query for selecting parts data for writing NZB files.
-     *
-     * @var string
-     */
-    protected $_partsQuery;
+    protected bool $_debug = false;
 
     /**
      * String used for head in NZB XML file.
      *
      * @var string
      */
-    protected $_nzbCommentString;
-
-    /**
-     * Names of CBP tables.
-     *
-     * @var array [string => string]
-     */
-    protected $_tableNames;
+    protected string $_nzbCommentString;
 
     /**
      * @var string
      */
-    protected $_siteCommentString;
+    protected string $_siteCommentString;
 
     /**
      * NZB constructor.
@@ -125,10 +97,8 @@ class NZB
     }
 
     /**
-     * Write an NZB to the hard drive for a single release.
-     *
-     *
-     *
+     * @param  \App\Models\Release  $release
+     * @return bool
      *
      * @throws \Throwable
      */
@@ -234,17 +204,14 @@ class NZB
             return false;
         }
         // Mark release as having NZB.
-        DB::transaction(function () use ($release, $nzb_guid) {
-            $release->update(['nzbstatus' => self::NZB_ADDED]);
-            if (! empty($nzb_guid)) {
-                $release->update(['nzb_guid' => DB::raw('UNHEX( '.escapeString(md5($nzb_guid)).' )')]);
-            }
-        }, 3);
+        $release->update(['nzbstatus' => self::NZB_ADDED]);
+        if (! empty($nzb_guid)) {
+            $release->update(['nzb_guid' => DB::raw('UNHEX( '.escapeString(md5($nzb_guid)).' )')]);
+        }
 
         // Delete CBP for release that has its NZB created.
-        DB::transaction(function () use ($release) {
-            Collection::query()->where('collections.releases_id', $release->id)->delete();
-        }, 3);
+        Collection::query()->where('collections.releases_id', $release->id)->delete();
+
         // Chmod to fix issues some users have with file permissions.
         chmod($path, 0777);
 
@@ -259,7 +226,7 @@ class NZB
      * @param  bool  $createIfNotExist  Create the folder if it doesn't exist.
      * @return string $nzbpath The path to store the NZB file.
      */
-    public function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist): string
+    public function buildNZBPath(string $releaseGuid, int $levelsToSplit, bool $createIfNotExist): string
     {
         $nzbPath = '';
 
@@ -284,7 +251,7 @@ class NZB
      * @param  bool  $createIfNotExist  Create the folder if it doesn't exist. (optional)
      * @return string Path+filename.
      */
-    public function getNZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false): string
+    public function getNZBPath(string $releaseGuid, int $levelsToSplit = 0, bool $createIfNotExist = false): string
     {
         if ($levelsToSplit === 0) {
             $levelsToSplit = $this->nzbSplitLevel;
@@ -300,7 +267,7 @@ class NZB
      * @return false|string On success: (string) Path+file name of the nzb.
      *                      On failure: false .
      */
-    public function NZBPath($releaseGuid)
+    public function NZBPath(string $releaseGuid): bool|string
     {
         $nzbFile = $this->getNZBPath($releaseGuid);
 
@@ -317,7 +284,7 @@ class NZB
      *                          'strip-count'    => True - Strip file/part count from file name to make the array key; False - Leave file name as is.
      * @return array $result Empty if not an NZB or the contents of the NZB.
      */
-    public function nzbFileList($nzb, array $options = []): array
+    public function nzbFileList(string $nzb, array $options = []): array
     {
         $defaults = [
             'no-file-key' => true,
