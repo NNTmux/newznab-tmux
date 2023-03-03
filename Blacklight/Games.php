@@ -161,7 +161,7 @@ class Games
     }
 
     /**
-     * @param string $title
+     * @param  string  $title
      * @return array|false
      */
     public function getGamesInfoByName(string $title): bool|array
@@ -224,8 +224,8 @@ class Games
     }
 
     /**
-     * @param array|string $orderBy
-     * @param string $maxAge
+     * @param  array|string  $orderBy
+     * @param  string  $maxAge
      *
      * @throws \Exception
      */
@@ -320,7 +320,7 @@ class Games
     }
 
     /**
-     * @param array|string $orderBy
+     * @param  array|string  $orderBy
      */
     public function getGamesOrder(array|string $orderBy): array
     {
@@ -415,6 +415,7 @@ class Games
     /**
      * @param $gameInfo
      * @return bool
+     *
      * @throws ModelException
      * @throws SdkException
      * @throws \JsonException
@@ -818,7 +819,7 @@ class Games
     /**
      * Parse the game release title.
      *
-     * @param string $releaseName
+     * @param  string  $releaseName
      * @return array|false
      */
     public function parseTitle(string $releaseName): bool|array
@@ -879,7 +880,7 @@ class Games
     }
 
     /**
-     * @param string $genre
+     * @param  string  $genre
      * @return string
      */
     protected function _matchGenre(string $genre = ''): string
