@@ -22,8 +22,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param string $message
-     * @param bool $reset
+     * @param  string  $message
+     * @param  bool  $reset
      * @return void
      */
     public function overWriteHeader(string $message, bool $reset = false): void
@@ -41,8 +41,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param string $message
-     * @param bool $reset
+     * @param  string  $message
+     * @param  bool  $reset
      * @return void
      */
     public function overWritePrimary(string $message, bool $reset = false): void
@@ -60,8 +60,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param string $message
-     * @param bool $reset
+     * @param  string  $message
+     * @param  bool  $reset
      * @return void
      */
     public function overWrite(string $message, bool $reset = false): void
@@ -85,8 +85,8 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param int $cur
-     * @param int $total
+     * @param  int  $cur
+     * @param  int  $total
      * @return string
      */
     public function percentString(int $cur, int $total): string
@@ -98,9 +98,9 @@ class ConsoleTools extends ColorCLI
     }
 
     /**
-     * @param int $first
-     * @param int $last
-     * @param int $total
+     * @param  int  $first
+     * @param  int  $last
+     * @param  int  $total
      * @return string
      */
     public function percentString2(int $first, int $last, int $total): string

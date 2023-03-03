@@ -12,8 +12,8 @@ use sspat\ESQuerySanitizer\Sanitizer;
 class ElasticSearchSiteSearch
 {
     /**
-     * @param array|string $phrases
-     * @param int $limit
+     * @param  array|string  $phrases
+     * @param  int  $limit
      * @return array|Collection
      */
     public function indexSearch(array|string $phrases, int $limit): array|Collection
@@ -52,8 +52,8 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array|string $searchName
-     * @param int $limit
+     * @param  array|string  $searchName
+     * @param  int  $limit
      * @return array|Collection
      */
     public function indexSearchApi(array|string $searchName, int $limit): array|Collection
@@ -91,8 +91,8 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array|string $name
-     * @param int $limit
+     * @param  array|string  $name
+     * @param  int  $limit
      * @return array|Collection
      */
     public function indexSearchTMA(array|string $name, int $limit): array|Collection
@@ -130,7 +130,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array|string $search
+     * @param  array|string  $search
      * @return array|Collection
      */
     public function predbIndexSearch(array|string $search): array|Collection
@@ -159,7 +159,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array $parameters
+     * @param  array  $parameters
      * @return void
      */
     public function insertRelease(array $parameters): void
@@ -185,7 +185,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param int $id
+     * @param  int  $id
      * @return void
      */
     public function updateRelease(int $id): void
@@ -255,7 +255,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array $parameters
+     * @param  array  $parameters
      * @return void
      */
     public function insertPreDb(array $parameters): void
@@ -275,7 +275,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array $parameters
+     * @param  array  $parameters
      * @return void
      */
     public function updatePreDb(array $parameters): void
@@ -299,7 +299,7 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array|string $phrases
+     * @param  array|string  $phrases
      * @return string
      */
     private function sanitize(array|string $phrases): string
@@ -332,8 +332,8 @@ class ElasticSearchSiteSearch
     }
 
     /**
-     * @param array $search
-     * @param bool $fullResults
+     * @param  array  $search
+     * @param  bool  $fullResults
      * @return array
      */
     protected function search(array $search, bool $fullResults = false): array

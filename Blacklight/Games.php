@@ -10,10 +10,16 @@ use App\Models\Settings;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Configuration;
 use DBorsatto\GiantBomb\Exception\ApiCallerException;
+use DBorsatto\GiantBomb\Exception\ModelException;
+use DBorsatto\GiantBomb\Exception\SdkException;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use MarcReichel\IGDBLaravel\Exceptions\InvalidParamsException;
+use MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException;
 use MarcReichel\IGDBLaravel\Models\Company;
 use MarcReichel\IGDBLaravel\Models\Game;
 
@@ -32,81 +38,84 @@ class Games
     /**
      * @var bool
      */
-    public $echoOutput;
+    public bool $echoOutput;
 
     /**
      * @var int|null|string
      */
-    public $gameQty;
+    public string|int|null $gameQty;
 
     /**
      * @var string
      */
-    public $imgSavePath;
+    public string $imgSavePath;
 
     /**
      * @var int
      */
-    public $matchPercentage;
+    public int $matchPercentage;
 
     /**
      * @var bool
      */
-    public $maxHitRequest;
+    public bool $maxHitRequest;
 
     /**
      * @var null|string
      */
-    public $publicKey;
+    public mixed $publicKey;
 
     /**
      * @var string
      */
-    public $renamed;
+    public string $renamed;
 
     /**
      * @var string
      */
-    protected $_classUsed;
+    protected string $_classUsed;
 
     /**
      * @var string
      */
-    protected $_gameID;
+    protected string $_gameID;
 
     /**
      * @var array|false
      */
-    protected $_gameResults;
+    protected array|false $_gameResults;
 
     protected $_getGame;
 
     /**
      * @var int
      */
-    protected $_resultsFound = 0;
+    protected int $_resultsFound = 0;
 
     /**
      * @var string
      */
-    public $catWhere;
+    public string $catWhere;
 
     /**
-     * @var \DBorsatto\GiantBomb\Configuration
+     * @var Configuration
      */
-    protected $config;
+    protected Configuration $config;
 
     /**
-     * @var \DBorsatto\GiantBomb\Client
+     * @var Client
      */
-    protected $giantBomb;
-
-    protected $igdbSleep;
+    protected Client $giantBomb;
 
     /**
-     * @var \Blacklight\ColorCLI
+     * @var int
      */
-    protected $colorCli;
+    protected int $igdbSleep;
+
+    /**
+     * @var ColorCLI
+     */
+    protected ColorCLI $colorCli;
 
     /**
      * Games constructor.
@@ -140,7 +149,7 @@ class Games
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public function getGamesInfoById($id)
     {
@@ -152,10 +161,10 @@ class Games
     }
 
     /**
-     * @param  string  $title
+     * @param string $title
      * @return array|false
      */
-    public function getGamesInfoByName($title)
+    public function getGamesInfoByName(string $title): bool|array
     {
         $bestMatch = false;
 
@@ -190,11 +199,11 @@ class Games
     }
 
     /**
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
      */
-    public function getRange()
+    public function getRange(): LengthAwarePaginator
     {
         return GamesInfo::query()
             ->select(['gi.*', 'g.title as genretitle'])
@@ -204,6 +213,9 @@ class Games
             ->paginate(config('nntmux.items_per_page'));
     }
 
+    /**
+     * @return int
+     */
     public function getCount(): int
     {
         $res = GamesInfo::query()->count(['id']);
@@ -212,12 +224,12 @@ class Games
     }
 
     /**
-     * @param  string|array  $orderBy
-     * @param  string  $maxAge
+     * @param array|string $orderBy
+     * @param string $maxAge
      *
      * @throws \Exception
      */
-    public function getGamesRange($page, $cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
+    public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): array
     {
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
@@ -308,41 +320,29 @@ class Games
     }
 
     /**
-     * @param  string|array  $orderBy
+     * @param array|string $orderBy
      */
-    public function getGamesOrder($orderBy): array
+    public function getGamesOrder(array|string $orderBy): array
     {
         $order = $orderBy === '' ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
-        switch ($orderArr[0]) {
-            case 'title':
-                $orderField = 'gi.title';
-                break;
-            case 'releasedate':
-                $orderField = 'gi.releasedate';
-                break;
-            case 'genre':
-                $orderField = 'gi.genres_id';
-                break;
-            case 'size':
-                $orderField = 'r.size';
-                break;
-            case 'files':
-                $orderField = 'r.totalpart';
-                break;
-            case 'stats':
-                $orderField = 'r.grabs';
-                break;
-            case 'posted':
-            default:
-                $orderField = 'r.postdate';
-                break;
-        }
+        $orderField = match ($orderArr[0]) {
+            'title' => 'gi.title',
+            'releasedate' => 'gi.releasedate',
+            'genre' => 'gi.genres_id',
+            'size' => 'r.size',
+            'files' => 'r.totalpart',
+            'stats' => 'r.grabs',
+            default => 'r.postdate',
+        };
         $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderField, $orderSort];
     }
 
+    /**
+     * @return string[]
+     */
     public function getGamesOrdering(): array
     {
         return [
@@ -352,11 +352,17 @@ class Games
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function getBrowseByOptions(): array
     {
         return ['title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
     }
 
+    /**
+     * @return string
+     */
     public function getBrowseBy(): string
     {
         $browseBy = ' ';
@@ -375,7 +381,17 @@ class Games
     }
 
     /**
-     * Updates the game for game-edit.php.
+     * @param $id
+     * @param $title
+     * @param $asin
+     * @param $url
+     * @param $publisher
+     * @param $releaseDate
+     * @param $esrb
+     * @param $cover
+     * @param $trailerUrl
+     * @param $genreID
+     * @return void
      */
     public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID): void
     {
@@ -397,12 +413,14 @@ class Games
     }
 
     /**
-     * Process each game, updating game information from Steam and Giantbomb.
-     *
-     *
-     * @throws \Exception
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
+     * @param $gameInfo
+     * @return bool
+     * @throws ModelException
+     * @throws SdkException
+     * @throws \JsonException
+     * @throws InvalidParamsException
+     * @throws MissingEndpointException
+     * @throws \ReflectionException
      */
     public function updateGamesInfo($gameInfo): bool
     {
@@ -800,10 +818,10 @@ class Games
     /**
      * Parse the game release title.
      *
-     * @param  string  $releaseName
+     * @param string $releaseName
      * @return array|false
      */
-    public function parseTitle($releaseName)
+    public function parseTitle(string $releaseName): bool|array
     {
         // Get name of the game from name of release.
         if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releaseName), $hits)) {
@@ -832,7 +850,7 @@ class Games
      *
      * @return bool|string
      */
-    public function matchGenreName($gameGenre)
+    public function matchGenreName($gameGenre): bool|string
     {
         $str = '';
 
@@ -861,11 +879,10 @@ class Games
     }
 
     /**
-     * Matches Genres.
-     *
-     * @param  string  $genre
+     * @param string $genre
+     * @return string
      */
-    protected function _matchGenre($genre = ''): string
+    protected function _matchGenre(string $genre = ''): string
     {
         $genreName = '';
         $a = str_replace('-', ' ', $genre);
