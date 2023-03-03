@@ -713,8 +713,6 @@ class Binaries
     {
         $binariesUpdate = $collectionIDs = $articles = [];
 
-        DB::beginTransaction();
-
         $partsQuery = $partsCheck = 'INSERT IGNORE INTO parts (binaries_id, number, messageid, partnumber, size) VALUES ';
 
         // Loop articles, figure out files/parts.
@@ -800,15 +798,12 @@ class Binaries
                         if (config('app.debug') === true) {
                             Log::error($e->getMessage());
                         }
-                        DB::rollBack();
                     }
 
                     if ($collectionID === false) {
                         if ($this->addToPartRepair) {
                             $this->headersNotInserted[] = $this->header['Number'];
                         }
-                        DB::rollBack();
-                        DB::beginTransaction();
 
                         continue;
                     }
@@ -833,15 +828,12 @@ class Binaries
                     if (config('app.debug') === true) {
                         Log::error($e->getMessage());
                     }
-                    DB::rollBack();
                 }
 
                 if ($binaryID === false) {
                     if ($this->addToPartRepair) {
                         $this->headersNotInserted[] = $this->header['Number'];
                     }
-                    DB::rollBack();
-                    DB::beginTransaction();
 
                     continue;
                 }
@@ -973,28 +965,6 @@ class Binaries
     }
 
     /**
-     * If we failed to insert Collections/Binaries/Parts, rollback the transaction and add the parts to part repair.
-     *
-     * @param  array  $headers  Array of headers containing sub-arrays with parts.
-     * @return array Array of article numbers to add to part repair.
-     *
-     * @throws \Exception
-     * @throws \Throwable
-     */
-    protected function _rollbackAddToPartRepair(array $headers): array
-    {
-        $headersNotInserted = [];
-        foreach ($headers as $header) {
-            foreach ($header as $file) {
-                $headersNotInserted[] = $file['Parts']['number'];
-            }
-        }
-        DB::rollBack();
-
-        return $headersNotInserted;
-    }
-
-    /**
      * Attempt to get missing article headers.
      *
      * @param  array  $groupArr  The info for this group from mysql.
@@ -1005,18 +975,7 @@ class Binaries
     public function partRepair(array $groupArr): void
     {
         // Get all parts in partrepair table.
-        $missingParts = [];
-        try {
-            $missingParts = DB::select(sprintf('
-				SELECT * FROM missed_parts
-				WHERE groups_id = %d AND attempts < %d
-				ORDER BY numberid ASC LIMIT %d', $groupArr['id'], $this->_partRepairMaxTries, $this->_partRepairLimit));
-        } catch (\PDOException $e) {
-            if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                $this->colorCli->notice('Deadlock occurred');
-                DB::rollBack();
-            }
-        }
+        $missingParts = MissedPart::select()->where(['groups_id' => $groupArr['id'], 'attempts' => $this->_partRepairMaxTries])->orderBy('numberid', 'asc')->limit($this->_partRepairLimit)->get()->toArray();
 
         $missingCount = \count($missingParts);
         if ($missingCount > 0) {
@@ -1110,15 +1069,7 @@ class Binaries
         }
 
         // Remove articles that we cant fetch after x attempts.
-        DB::transaction(function () use ($groupArr) {
-            DB::delete(
-                sprintf(
-                    'DELETE FROM missed_parts WHERE attempts >= %d AND groups_id = %d',
-                    $this->_partRepairMaxTries,
-                    $groupArr['id']
-                )
-            );
-        }, 10);
+        MissedPart::query()->where('attempts', '>=', $this->_partRepairMaxTries)->where('groups_id', $groupArr['id'])->delete();
     }
 
     /**
@@ -1314,13 +1265,7 @@ class Binaries
      */
     private function removeRepairedParts(array $numbers, int $groupID): void
     {
-        $sql = 'DELETE FROM missed_parts WHERE numberid in (';
-        foreach ($numbers as $number) {
-            $sql .= $number.',';
-        }
-        DB::transaction(static function () use ($groupID, $sql) {
-            DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
-        }, 10);
+        MissedPart::whereIn('numberid', $numbers)->where('groups_id', $groupID)->delete();
     }
 
     /**
@@ -1489,10 +1434,6 @@ class Binaries
      */
     public function delete(int $collectionID): void
     {
-        DB::transaction(static function () use ($collectionID) {
-            DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
-        }, 10);
-
         Collection::query()->where('id', $collectionID)->delete();
     }
 
