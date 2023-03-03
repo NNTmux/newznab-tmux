@@ -501,8 +501,7 @@ class Release extends Model
      */
     public static function getByGuid($guid)
     {
-        $sql = self::query()->with('tagged')
-            ->select(
+        $sql = self::query()->select(
                 [
                     'releases.*',
                     'g.name as group_name',
