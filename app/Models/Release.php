@@ -307,21 +307,22 @@ class Release extends Model
     }
 
     /**
-     * @param int $id
-     * @param string $name
-     * @param string $searchName
-     * @param string $fromName
-     * @param int $categoryId
-     * @param int $parts
-     * @param int $grabs
-     * @param int $size
-     * @param string $postedDate
-     * @param string $addedDate
+     * @param  int  $id
+     * @param  string  $name
+     * @param  string  $searchName
+     * @param  string  $fromName
+     * @param  int  $categoryId
+     * @param  int  $parts
+     * @param  int  $grabs
+     * @param  int  $size
+     * @param  string  $postedDate
+     * @param  string  $addedDate
      * @param $videoId
      * @param $episodeId
-     * @param int $imDbId
-     * @param int $aniDbId
+     * @param  int  $imDbId
+     * @param  int  $aniDbId
      * @return void
+     *
      * @throws \Exception
      */
     public static function updateRelease(int $id, string $name, string $searchName, string $fromName, int $categoryId, int $parts, int $grabs, int $size, string $postedDate, string $addedDate, $videoId, $episodeId, int $imDbId, int $aniDbId): void
