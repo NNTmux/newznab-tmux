@@ -30,8 +30,8 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
-     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
     public function edit(Request $request)

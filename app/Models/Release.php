@@ -133,7 +133,6 @@ use Illuminate\Support\Facades\DB;
  *
  * @property int|null $movieinfo_id FK to movieinfo.id
  * @property int $proc_crc32 Has the release been crc32 processed
- * @property mixed $tag_names
  * @property-read \Illuminate\Database\Eloquent\Collection
  * @property-read \Illuminate\Database\Eloquent\Collection
  *
@@ -142,9 +141,6 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release query()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereMovieinfoId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcCrc32($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release withAllTags($tagNames)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release withAnyTag($tagNames)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release withoutTags($tagNames)
  */
 class Release extends Model
 {
@@ -311,10 +307,21 @@ class Release extends Model
     }
 
     /**
-     * Used for release edit page on site.
-     *
-     * @param  string  $tags
-     *
+     * @param int $id
+     * @param string $name
+     * @param string $searchName
+     * @param string $fromName
+     * @param int $categoryId
+     * @param int $parts
+     * @param int $grabs
+     * @param int $size
+     * @param string $postedDate
+     * @param string $addedDate
+     * @param $videoId
+     * @param $episodeId
+     * @param int $imDbId
+     * @param int $aniDbId
+     * @return void
      * @throws \Exception
      */
     public static function updateRelease(int $id, string $name, string $searchName, string $fromName, int $categoryId, int $parts, int $grabs, int $size, string $postedDate, string $addedDate, $videoId, $episodeId, int $imDbId, int $aniDbId): void
