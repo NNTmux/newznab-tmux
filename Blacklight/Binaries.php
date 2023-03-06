@@ -711,185 +711,183 @@ class Binaries
      */
     protected function storeHeaders(array $headers = []): void
     {
-        $binariesUpdate = $collectionIDs = $articles = [];
+        DB::transaction(function () use ($headers) {
+            $binariesUpdate = $collectionIDs = $articles = [];
 
-        $partsQuery = $partsCheck = 'INSERT IGNORE INTO parts (binaries_id, number, messageid, partnumber, size) VALUES ';
+            $partsQuery = $partsCheck = 'INSERT IGNORE INTO parts (binaries_id, number, messageid, partnumber, size) VALUES ';
 
-        // Loop articles, figure out files/parts.
-        foreach ($headers as $this->header) {
-            // Set up the info for inserting into parts/binaries/collections tables.
-            if (! isset($articles[$this->header['matches'][1]])) {
-                // check whether file count should be ignored (XXX packs for now only).
-                $whitelistMatch = false;
-                if ($this->_ignoreFileCount($this->groupMySQL['name'], $this->header['matches'][1])) {
-                    $whitelistMatch = true;
-                    $fileCount[1] = $fileCount[3] = 0;
-                }
-
-                // Attempt to find the file count. If it is not found, set it to 0.
-                if (! $whitelistMatch && ! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $this->header['matches'][1], $fileCount)) {
-                    $fileCount[1] = $fileCount[3] = 0;
-                }
-
-                $collMatch = $this->_collectionsCleaning->collectionsCleaner(
-                    $this->header['matches'][1]
-                );
-
-                // Used to group articles together when forming the release.
-                $this->header['CollectionKey'] = $collMatch['name'].$fileCount[3];
-
-                // If this header's collection key isn't in memory, attempt to insert the collection
-                if (! isset($collectionIDs[$this->header['CollectionKey']])) {
-                    /* Date from header should be a string this format:
-                     * 31 Mar 2014 15:36:04 GMT or 6 Oct 1998 04:38:40 -0500
-                     * Still make sure it's not unix time, convert it to unix time if it is.
-                     */
-                    $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
-
-                    // Get the current unixtime from PHP.
-                    $now = now()->timestamp;
-
-                    $xrefsData = Collection::whereCollectionhash(sha1($this->header['CollectionKey']))->value('xref');
-
-                    $tempHeaderXrefs = [];
-                    foreach (explode(' ', $this->header['Xref']) as $headerXref) {
-                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $headerXref, $hit) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $hit)) {
-                            $tempHeaderXrefs[] = $hit[0];
-                        }
+            // Loop articles, figure out files/parts.
+            foreach ($headers as $this->header) {
+                // Set up the info for inserting into parts/binaries/collections tables.
+                if (! isset($articles[$this->header['matches'][1]])) {
+                    // check whether file count should be ignored (XXX packs for now only).
+                    $whitelistMatch = false;
+                    if ($this->_ignoreFileCount($this->groupMySQL['name'], $this->header['matches'][1])) {
+                        $whitelistMatch = true;
+                        $fileCount[1] = $fileCount[3] = 0;
                     }
 
-                    $tempXrefsData = [];
+                    // Attempt to find the file count. If it is not found, set it to 0.
+                    if (! $whitelistMatch && ! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $this->header['matches'][1], $fileCount)) {
+                        $fileCount[1] = $fileCount[3] = 0;
+                    }
 
-                    if ($xrefsData !== null) {
-                        foreach (explode(' ', $xrefsData) as $xrefData) {
-                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $xrefData, $match1) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $xrefData, $match1)) {
-                                $tempXrefsData[] = $match1[0];
+                    $collMatch = $this->_collectionsCleaning->collectionsCleaner(
+                        $this->header['matches'][1]
+                    );
+
+                    // Used to group articles together when forming the release.
+                    $this->header['CollectionKey'] = $collMatch['name'].$fileCount[3];
+
+                    // If this header's collection key isn't in memory, attempt to insert the collection
+                    if (! isset($collectionIDs[$this->header['CollectionKey']])) {
+                        /* Date from header should be a string this format:
+                         * 31 Mar 2014 15:36:04 GMT or 6 Oct 1998 04:38:40 -0500
+                         * Still make sure it's not unix time, convert it to unix time if it is.
+                         */
+                        $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
+
+                        // Get the current unixtime from PHP.
+                        $now = now()->timestamp;
+
+                        $xrefsData = Collection::whereCollectionhash(sha1($this->header['CollectionKey']))->value('xref');
+
+                        $tempHeaderXrefs = [];
+                        foreach (explode(' ', $this->header['Xref']) as $headerXref) {
+                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $headerXref, $hit) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $hit)) {
+                                $tempHeaderXrefs[] = $hit[0];
                             }
                         }
-                    }
 
-                    $finalXrefArray = [];
-                    foreach ($tempHeaderXrefs as $tempHeaderXref) {
-                        if (! in_array($tempHeaderXref, $tempXrefsData, false)) {
-                            $finalXrefArray[] = $tempHeaderXref;
+                        $tempXrefsData = [];
+
+                        if ($xrefsData !== null) {
+                            foreach (explode(' ', $xrefsData) as $xrefData) {
+                                if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $xrefData, $match1) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $xrefData, $match1)) {
+                                    $tempXrefsData[] = $match1[0];
+                                }
+                            }
                         }
-                    }
 
-                    $finaXref = implode(' ', $finalXrefArray);
+                        $finalXrefArray = [];
+                        foreach ($tempHeaderXrefs as $tempHeaderXref) {
+                            if (! in_array($tempHeaderXref, $tempXrefsData, false)) {
+                                $finalXrefArray[] = $tempHeaderXref;
+                            }
+                        }
 
-                    $xref = sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString($finaXref));
+                        $finaXref = implode(' ', $finalXrefArray);
 
-                    $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
-                    $unixtime = is_numeric($this->header['Date']) ? $date : $now;
+                        $xref = sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString($finaXref));
 
-                    $random = random_bytes(16);
+                        $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
+                        $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
-                    $collectionID = false;
+                        $random = random_bytes(16);
 
-                    try {
-                        DB::insert(sprintf("
+                        $collectionID = false;
+
+                        try {
+                            DB::insert(sprintf("
 							INSERT INTO collections (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)), escapeString(utf8_encode($this->header['From'])), $unixtime, escapeString(implode(' ', $tempHeaderXrefs)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
-                        $collectionID = $this->_pdo->lastInsertId();
-                        DB::commit();
+                            $collectionID = $this->_pdo->lastInsertId();
+                        } catch (\Throwable $e) {
+                            if (config('app.debug') === true) {
+                                Log::error($e->getMessage());
+                            }
+                        }
+
+                        if ($collectionID === false) {
+                            if ($this->addToPartRepair) {
+                                $this->headersNotInserted[] = $this->header['Number'];
+                            }
+
+                            continue;
+                        }
+                        $collectionIDs[$this->header['CollectionKey']] = $collectionID;
+                    } else {
+                        $collectionID = $collectionIDs[$this->header['CollectionKey']];
+                    }
+
+                    // Binary Hash should be unique to the group
+                    $hash = md5($this->header['matches'][1].$this->header['From'].$this->groupMySQL['id']);
+
+                    $binaryID = false;
+
+                    try {
+                        DB::insert(sprintf("
+						INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
+						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $hash, escapeString(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+                        $binaryID = $this->_pdo->lastInsertId();
                     } catch (\Throwable $e) {
                         if (config('app.debug') === true) {
                             Log::error($e->getMessage());
                         }
                     }
 
-                    if ($collectionID === false) {
+                    if ($binaryID === false) {
                         if ($this->addToPartRepair) {
                             $this->headersNotInserted[] = $this->header['Number'];
                         }
 
                         continue;
                     }
-                    $collectionIDs[$this->header['CollectionKey']] = $collectionID;
+
+                    $binariesUpdate[$binaryID]['Size'] = 0;
+                    $binariesUpdate[$binaryID]['Parts'] = 0;
+
+                    $articles[$this->header['matches'][1]]['CollectionID'] = $collectionID;
+                    $articles[$this->header['matches'][1]]['BinaryID'] = $binaryID;
                 } else {
-                    $collectionID = $collectionIDs[$this->header['CollectionKey']];
+                    $binaryID = $articles[$this->header['matches'][1]]['BinaryID'];
+                    $binariesUpdate[$binaryID]['Size'] += $this->header['Bytes'];
+                    $binariesUpdate[$binaryID]['Parts']++;
                 }
 
-                // Binary Hash should be unique to the group
-                $hash = md5($this->header['matches'][1].$this->header['From'].$this->groupMySQL['id']);
+                // In case there are quotes in the message id
+                $this->header['Message-ID'] = addslashes($this->header['Message-ID']);
 
-                $binaryID = false;
+                // Strip the < and >, saves space in DB.
+                $this->header['Message-ID'][0] = "'";
 
-                try {
-                    DB::insert(sprintf("
-						INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
-						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $hash, escapeString(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
-                    $binaryID = $this->_pdo->lastInsertId();
-                    DB::commit();
-                } catch (\Throwable $e) {
-                    if (config('app.debug') === true) {
-                        Log::error($e->getMessage());
-                    }
-                }
-
-                if ($binaryID === false) {
-                    if ($this->addToPartRepair) {
-                        $this->headersNotInserted[] = $this->header['Number'];
-                    }
-
-                    continue;
-                }
-
-                $binariesUpdate[$binaryID]['Size'] = 0;
-                $binariesUpdate[$binaryID]['Parts'] = 0;
-
-                $articles[$this->header['matches'][1]]['CollectionID'] = $collectionID;
-                $articles[$this->header['matches'][1]]['BinaryID'] = $binaryID;
-            } else {
-                $binaryID = $articles[$this->header['matches'][1]]['BinaryID'];
-                $binariesUpdate[$binaryID]['Size'] += $this->header['Bytes'];
-                $binariesUpdate[$binaryID]['Parts']++;
+                $partsQuery .=
+                    '('.$binaryID.','.$this->header['Number'].','.rtrim($this->header['Message-ID'], '>')."',".
+                    $this->header['matches'][2].','.$this->header['Bytes'].'),';
             }
 
-            // In case there are quotes in the message id
-            $this->header['Message-ID'] = addslashes($this->header['Message-ID']);
+            unset($headers); // Reclaim memory.
 
-            // Strip the < and >, saves space in DB.
-            $this->header['Message-ID'][0] = "'";
+            // Start of inserting into SQL.
+            $this->startUpdate = now();
 
-            $partsQuery .=
-                '('.$binaryID.','.$this->header['Number'].','.rtrim($this->header['Message-ID'], '>')."',".
-                $this->header['matches'][2].','.$this->header['Bytes'].'),';
-        }
+            // End of processing headers.
+            $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning);
+            $binariesQuery = $binariesCheck = 'INSERT INTO binaries (id, partsize, currentparts) VALUES ';
+            foreach ($binariesUpdate as $binaryID => $binary) {
+                $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
+            }
+            $binariesEnd = ' ON DUPLICATE KEY UPDATE partsize = VALUES(partsize) + partsize, currentparts = VALUES(currentparts) + currentparts';
+            $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
-        unset($headers); // Reclaim memory.
-
-        // Start of inserting into SQL.
-        $this->startUpdate = now();
-
-        // End of processing headers.
-        $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning);
-        $binariesQuery = $binariesCheck = 'INSERT INTO binaries (id, partsize, currentparts) VALUES ';
-        foreach ($binariesUpdate as $binaryID => $binary) {
-            $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
-        }
-        $binariesEnd = ' ON DUPLICATE KEY UPDATE partsize = VALUES(partsize) + partsize, currentparts = VALUES(currentparts) + currentparts';
-        $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
-
-        // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) {
-            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery(rtrim($partsQuery, ','))) {
-                DB::commit();
+            // Check if we got any binaries. If we did, try to insert them.
+            if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) {
+                if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery(rtrim($partsQuery, ','))) {
+                } else {
+                    if ($this->addToPartRepair) {
+                        $this->headersNotInserted += $this->headersReceived;
+                    }
+                }
             } else {
                 if ($this->addToPartRepair) {
                     $this->headersNotInserted += $this->headersReceived;
                 }
-                DB::rollBack();
             }
-        } else {
-            if ($this->addToPartRepair) {
-                $this->headersNotInserted += $this->headersReceived;
-            }
-            DB::rollBack();
-        }
+        }, 10);
+
     }
 
     /**
@@ -974,102 +972,104 @@ class Binaries
      */
     public function partRepair(array $groupArr): void
     {
-        // Get all parts in partrepair table.
-        $missingParts = MissedPart::select()->where(['groups_id' => $groupArr['id'], 'attempts' => $this->_partRepairMaxTries])->orderBy('numberid', 'asc')->limit($this->_partRepairLimit)->get()->toArray();
+        DB::transaction(function () use ($groupArr) {
+            // Get all parts in partrepair table.
+            $missingParts = MissedPart::select()->where(['groups_id' => $groupArr['id'], 'attempts' => $this->_partRepairMaxTries])->orderBy('numberid', 'asc')->limit($this->_partRepairLimit)->get()->toArray();
 
-        $missingCount = \count($missingParts);
-        if ($missingCount > 0) {
-            if ($this->_echoCLI) {
-                $this->colorCli->primary(
-                    'Attempting to repair '.
+            $missingCount = \count($missingParts);
+            if ($missingCount > 0) {
+                if ($this->_echoCLI) {
+                    $this->colorCli->primary(
+                        'Attempting to repair '.
                         number_format($missingCount).
                         ' parts.'
-                );
-            }
-
-            // Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
-            $ranges = $partList = [];
-            $firstPart = $lastNum = $missingParts[0]->numberid;
-
-            foreach ($missingParts as $part) {
-                if (($part->numberid - $firstPart) > ($this->messageBuffer / 4)) {
-                    $ranges[] = [
-                        'partfrom' => $firstPart,
-                        'partto' => $lastNum,
-                        'partlist' => $partList,
-                    ];
-
-                    $firstPart = $part->numberid;
-                    $partList = [];
-                }
-                $partList[] = $part->numberid;
-                $lastNum = $part->numberid;
-            }
-
-            $ranges[] = [
-                'partfrom' => $firstPart,
-                'partto' => $lastNum,
-                'partlist' => $partList,
-            ];
-
-            // Download missing parts in ranges.
-            foreach ($ranges as $range) {
-                $partFrom = $range['partfrom'];
-                $partTo = $range['partto'];
-                $partList = $range['partlist'];
-
-                if ($this->_echoCLI) {
-                    echo \chr(random_int(45, 46)).PHP_EOL;
+                    );
                 }
 
-                // Get article headers from newsgroup.
-                $this->scan($groupArr, $partFrom, $partTo, 'partrepair', $partList);
-            }
+                // Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
+                $ranges = $partList = [];
+                $firstPart = $lastNum = $missingParts[0]->numberid;
 
-            // Calculate parts repaired
-            $result = DB::select(
-                sprintf(
-                    '
+                foreach ($missingParts as $part) {
+                    if (($part->numberid - $firstPart) > ($this->messageBuffer / 4)) {
+                        $ranges[] = [
+                            'partfrom' => $firstPart,
+                            'partto' => $lastNum,
+                            'partlist' => $partList,
+                        ];
+
+                        $firstPart = $part->numberid;
+                        $partList = [];
+                    }
+                    $partList[] = $part->numberid;
+                    $lastNum = $part->numberid;
+                }
+
+                $ranges[] = [
+                    'partfrom' => $firstPart,
+                    'partto' => $lastNum,
+                    'partlist' => $partList,
+                ];
+
+                // Download missing parts in ranges.
+                foreach ($ranges as $range) {
+                    $partFrom = $range['partfrom'];
+                    $partTo = $range['partto'];
+                    $partList = $range['partlist'];
+
+                    if ($this->_echoCLI) {
+                        echo \chr(random_int(45, 46)).PHP_EOL;
+                    }
+
+                    // Get article headers from newsgroup.
+                    $this->scan($groupArr, $partFrom, $partTo, 'partrepair', $partList);
+                }
+
+                // Calculate parts repaired
+                $result = DB::select(
+                    sprintf(
+                        '
 					SELECT COUNT(id) AS num
 					FROM missed_parts
 					WHERE groups_id = %d
 					AND numberid <= %d',
-                    $groupArr['id'],
-                    $missingParts[$missingCount - 1]->numberid
-                )
-            );
-
-            $partsRepaired = 0;
-            if ($result > 0) {
-                $partsRepaired = ($missingCount - $result[0]->num);
-            }
-
-            // Update attempts on remaining parts for active group
-            if (isset($missingParts[$missingCount - 1]->id)) {
-                DB::update(
-                    sprintf(
-                        '
-						UPDATE missed_parts
-						SET attempts = attempts + 1
-						WHERE groups_id = %d
-						AND numberid <= %d',
                         $groupArr['id'],
                         $missingParts[$missingCount - 1]->numberid
                     )
                 );
-            }
 
-            if ($this->_echoCLI) {
-                $this->colorCli->primary(
-                    PHP_EOL.
+                $partsRepaired = 0;
+                if ($result > 0) {
+                    $partsRepaired = ($missingCount - $result[0]->num);
+                }
+
+                // Update attempts on remaining parts for active group
+                if (isset($missingParts[$missingCount - 1]->id)) {
+                    DB::update(
+                        sprintf(
+                            '
+						UPDATE missed_parts
+						SET attempts = attempts + 1
+						WHERE groups_id = %d
+						AND numberid <= %d',
+                            $groupArr['id'],
+                            $missingParts[$missingCount - 1]->numberid
+                        )
+                    );
+                }
+
+                if ($this->_echoCLI) {
+                    $this->colorCli->primary(
+                        PHP_EOL.
                         number_format($partsRepaired).
                         ' parts repaired.'
-                );
+                    );
+                }
             }
-        }
 
-        // Remove articles that we cant fetch after x attempts.
-        MissedPart::query()->where('attempts', '>=', $this->_partRepairMaxTries)->where('groups_id', $groupArr['id'])->delete();
+            // Remove articles that we cant fetch after x attempts.
+            MissedPart::query()->where('attempts', '>=', $this->_partRepairMaxTries)->where('groups_id', $groupArr['id'])->delete();
+        }, 10);
     }
 
     /**
@@ -1240,17 +1240,21 @@ class Binaries
     /**
      * Add article numbers from missing headers to DB.
      *
-     * @param  array  $numbers  The article numbers of the missing headers.
-     * @param  int  $groupID  The ID of this groups.
+     * @param  array  $numbers The article numbers of the missing headers.
+     * @param  int  $groupID The ID of this groups.
+     *
+     * @throws \Throwable
      */
     private function addMissingParts(array $numbers, int $groupID): string
     {
-        $insertStr = 'INSERT INTO missed_parts (numberid, groups_id) VALUES ';
-        foreach ($numbers as $number) {
-            $insertStr .= '('.$number.','.$groupID.'),';
-        }
+        DB::transaction(function () use ($numbers, $groupID) {
+            $insertStr = 'INSERT INTO missed_parts (numberid, groups_id) VALUES ';
+            foreach ($numbers as $number) {
+                $insertStr .= '('.$number.','.$groupID.'),';
+            }
 
-        DB::insert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
+            DB::insert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
+        }, 10);
 
         return $this->_pdo->lastInsertId();
     }
@@ -1466,24 +1470,26 @@ class Binaries
 
     protected function runQuery($query): bool
     {
-        try {
-            return DB::insert($query);
-        } catch (QueryException $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getMessage());
+        DB::transaction(function () use ($query) {
+            try {
+                return DB::insert($query);
+            } catch (QueryException $e) {
+                if (config('app.debug') === true) {
+                    Log::error($e->getMessage());
+                }
+                $this->colorCli->debug('Query error occurred.');
+            } catch (\PDOException $e) {
+                if (config('app.debug') === true) {
+                    Log::error($e->getMessage());
+                }
+                $this->colorCli->debug('Query error occurred.');
+            } catch (\Throwable $e) {
+                if (config('app.debug') === true) {
+                    Log::error($e->getMessage());
+                }
+                $this->colorCli->debug('Query error occurred.');
             }
-            $this->colorCli->debug('Query error occurred.');
-        } catch (\PDOException $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getMessage());
-            }
-            $this->colorCli->debug('Query error occurred.');
-        } catch (\Throwable $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getMessage());
-            }
-            $this->colorCli->debug('Query error occurred.');
-        }
+        });
 
         return false;
     }
