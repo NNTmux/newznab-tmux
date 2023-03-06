@@ -33,12 +33,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td><label for="tagnames">Category Tags:</label></td>
-				<td>
-					<input id="tagnames" class="long" name="tagnames" value="{implode(',', $release->tagNames())}"/>
-				</td>
-			</tr>
-			<tr>
 				<td><label for="totalpart">Parts:</label></td>
 				<td>
 					<input id="totalpart" class="short" name="totalpart" value="{$release.totalpart}"/>
