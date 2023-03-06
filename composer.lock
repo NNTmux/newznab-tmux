@@ -5884,16 +5884,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.15.3",
+            "version": "v4.15.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "570e980a201d8ed0236b0a62ddf2c9cbb2034039"
+                "reference": "6bb5176bc4af8bcb7d926f88718db9b96a2d4290"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/570e980a201d8ed0236b0a62ddf2c9cbb2034039",
-                "reference": "570e980a201d8ed0236b0a62ddf2c9cbb2034039",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/6bb5176bc4af8bcb7d926f88718db9b96a2d4290",
+                "reference": "6bb5176bc4af8bcb7d926f88718db9b96a2d4290",
                 "shasum": ""
             },
             "require": {
@@ -5934,9 +5934,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v4.15.3"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v4.15.4"
             },
-            "time": "2023-01-16T22:05:37+00:00"
+            "time": "2023-03-05T19:49:14+00:00"
         },
         {
             "name": "nunomaduro/termwind",
@@ -8661,16 +8661,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "3.13.1",
+            "version": "3.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "71c86fe4699a7f1a40c7d985f3dc7667045152f0"
+                "reference": "60dd3f74ab21cc2bf53f39bf7c342798bc185c23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/71c86fe4699a7f1a40c7d985f3dc7667045152f0",
-                "reference": "71c86fe4699a7f1a40c7d985f3dc7667045152f0",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/60dd3f74ab21cc2bf53f39bf7c342798bc185c23",
+                "reference": "60dd3f74ab21cc2bf53f39bf7c342798bc185c23",
                 "shasum": ""
             },
             "require": {
@@ -8728,7 +8728,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD-3-Clause"
+                "MIT"
             ],
             "authors": [
                 {
@@ -8749,7 +8749,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/3.13.1"
+                "source": "https://github.com/getsentry/sentry-php/tree/3.14.0"
             },
             "funding": [
                 {
@@ -8761,7 +8761,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-02-10T10:17:57+00:00"
+            "time": "2023-03-05T21:31:25+00:00"
         },
         {
             "name": "sentry/sentry-laravel",
@@ -13804,16 +13804,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.15.1",
+            "version": "5.15.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "90b9823d802f8af81985c595791e3e9dbc4c2d97"
+                "reference": "728fe3847c57f2d9cd4c53a8c26bc5522b42a1d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/90b9823d802f8af81985c595791e3e9dbc4c2d97",
-                "reference": "90b9823d802f8af81985c595791e3e9dbc4c2d97",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/728fe3847c57f2d9cd4c53a8c26bc5522b42a1d0",
+                "reference": "728fe3847c57f2d9cd4c53a8c26bc5522b42a1d0",
                 "shasum": ""
             },
             "require": {
@@ -13875,7 +13875,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.15.1"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.15.2"
             },
             "funding": [
                 {
@@ -13883,7 +13883,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-02T23:04:53+00:00"
+            "time": "2023-03-03T11:11:58+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -14733,16 +14733,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.14.6",
+            "version": "2.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "f7948baaa0330277c729714910336383286305da"
+                "reference": "3e8aebbca9f0ae6f618962c4ad514077fd365ab3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/f7948baaa0330277c729714910336383286305da",
-                "reference": "f7948baaa0330277c729714910336383286305da",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/3e8aebbca9f0ae6f618962c4ad514077fd365ab3",
+                "reference": "3e8aebbca9f0ae6f618962c4ad514077fd365ab3",
                 "shasum": ""
             },
             "require": {
@@ -14792,7 +14792,7 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.14.6"
+                "source": "https://github.com/filp/whoops/tree/2.15.0"
             },
             "funding": [
                 {
@@ -14800,7 +14800,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-11-02T16:23:29+00:00"
+            "time": "2023-03-03T12:00:00+00:00"
         },
         {
             "name": "friendsofphp/php-cs-fixer",
@@ -15465,34 +15465,35 @@
         },
         {
             "name": "nunomaduro/collision",
-            "version": "v7.0.5",
+            "version": "v7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/collision.git",
-                "reference": "5c654ee5fa187cf2f4cb226d773582ec6d402a55"
+                "reference": "2b97fed4950cf0ff148c18b853975ec8ea135e90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/5c654ee5fa187cf2f4cb226d773582ec6d402a55",
-                "reference": "5c654ee5fa187cf2f4cb226d773582ec6d402a55",
+                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/2b97fed4950cf0ff148c18b853975ec8ea135e90",
+                "reference": "2b97fed4950cf0ff148c18b853975ec8ea135e90",
                 "shasum": ""
             },
             "require": {
                 "filp/whoops": "^2.14.6",
                 "nunomaduro/termwind": "^1.15.1",
                 "php": "^8.1.0",
-                "symfony/console": "^6.2.5"
+                "symfony/console": "^6.2.7"
             },
             "require-dev": {
-                "laravel/framework": "^10.0.3",
-                "laravel/pint": "^1.5.0",
-                "laravel/sail": "^1.20.2",
+                "brianium/paratest": "^7.1.0",
+                "laravel/framework": "^10.2.0",
+                "laravel/pint": "^1.6.0",
+                "laravel/sail": "^1.21.1",
                 "laravel/sanctum": "^3.2.1",
-                "laravel/tinker": "^2.8.0",
+                "laravel/tinker": "^2.8.1",
                 "nunomaduro/larastan": "^2.4.1",
-                "orchestra/testbench-core": "^8.0.1",
+                "orchestra/testbench-core": "^8.0.3",
                 "pestphp/pest": "^2.0.0",
-                "phpunit/phpunit": "^10.0.9",
+                "phpunit/phpunit": "^10.0.14",
                 "sebastian/environment": "^6.0.0",
                 "spatie/laravel-ignition": "^2.0.0"
             },
@@ -15553,20 +15554,20 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-02-19T16:25:13+00:00"
+            "time": "2023-03-03T10:00:22+00:00"
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "2.4.1",
+            "version": "2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "238fdbfba3aae133cdec73e99826c9b0232141f7"
+                "reference": "072e2c9566ae000bf66c92384fc933b81885244b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/238fdbfba3aae133cdec73e99826c9b0232141f7",
-                "reference": "238fdbfba3aae133cdec73e99826c9b0232141f7",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/072e2c9566ae000bf66c92384fc933b81885244b",
+                "reference": "072e2c9566ae000bf66c92384fc933b81885244b",
                 "shasum": ""
             },
             "require": {
@@ -15580,11 +15581,11 @@
                 "illuminate/support": "^9.47.0 || ^10.0.0",
                 "php": "^8.0.2",
                 "phpmyadmin/sql-parser": "^5.6.0",
-                "phpstan/phpstan": "^1.9.8"
+                "phpstan/phpstan": "~1.10.3"
             },
             "require-dev": {
                 "nikic/php-parser": "^4.15.2",
-                "orchestra/testbench": "^7.19.0|^8.0.0",
+                "orchestra/testbench": "^7.19.0 || ^8.0.0",
                 "phpunit/phpunit": "^9.5.27"
             },
             "suggest": {
@@ -15629,7 +15630,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nunomaduro/larastan/issues",
-                "source": "https://github.com/nunomaduro/larastan/tree/2.4.1"
+                "source": "https://github.com/nunomaduro/larastan/tree/2.5.1"
             },
             "funding": [
                 {
@@ -15649,7 +15650,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-02-05T12:19:17+00:00"
+            "time": "2023-03-04T23:46:40+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -15934,16 +15935,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.3",
+            "version": "1.10.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "5419375b5891add97dc74be71e6c1c34baaddf64"
+                "reference": "8d39218664b45a4a42d5be66d2b63dcf8c149982"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/5419375b5891add97dc74be71e6c1c34baaddf64",
-                "reference": "5419375b5891add97dc74be71e6c1c34baaddf64",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/8d39218664b45a4a42d5be66d2b63dcf8c149982",
+                "reference": "8d39218664b45a4a42d5be66d2b63dcf8c149982",
                 "shasum": ""
             },
             "require": {
@@ -15973,7 +15974,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.10.3"
+                "source": "https://github.com/phpstan/phpstan/tree/1.10.4"
             },
             "funding": [
                 {
@@ -15989,20 +15990,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-25T14:47:13+00:00"
+            "time": "2023-03-06T13:39:20+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "10.0.1",
+            "version": "10.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "b9c21a93dd8c8eed79879374884ee733259475cc"
+                "reference": "20800e84296ea4732f9a125e08ce86b4004ae3e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/b9c21a93dd8c8eed79879374884ee733259475cc",
-                "reference": "b9c21a93dd8c8eed79879374884ee733259475cc",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/20800e84296ea4732f9a125e08ce86b4004ae3e4",
+                "reference": "20800e84296ea4732f9a125e08ce86b4004ae3e4",
                 "shasum": ""
             },
             "require": {
@@ -16024,8 +16025,8 @@
                 "phpunit/phpunit": "^10.0"
             },
             "suggest": {
-                "ext-pcov": "*",
-                "ext-xdebug": "*"
+                "ext-pcov": "PHP extension that provides line coverage",
+                "ext-xdebug": "PHP extension that provides line coverage as well as branch and path coverage"
             },
             "type": "library",
             "extra": {
@@ -16058,7 +16059,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/10.0.1"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/10.0.2"
             },
             "funding": [
                 {
@@ -16066,7 +16067,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-25T05:35:03+00:00"
+            "time": "2023-03-06T13:00:19+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -16411,16 +16412,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.15.19",
+            "version": "0.15.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "4b3a85382e890963a6d00e0ace8d09465f96e370"
+                "reference": "1cee8cc5d6d836e1bf9a3006d7b062adde3a6022"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/4b3a85382e890963a6d00e0ace8d09465f96e370",
-                "reference": "4b3a85382e890963a6d00e0ace8d09465f96e370",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/1cee8cc5d6d836e1bf9a3006d7b062adde3a6022",
+                "reference": "1cee8cc5d6d836e1bf9a3006d7b062adde3a6022",
                 "shasum": ""
             },
             "require": {
@@ -16452,9 +16453,15 @@
                 "MIT"
             ],
             "description": "Instant Upgrade and Automated Refactoring of any PHP code",
+            "keywords": [
+                "automation",
+                "dev",
+                "migration",
+                "refactoring"
+            ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.15.19"
+                "source": "https://github.com/rectorphp/rector/tree/0.15.21"
             },
             "funding": [
                 {
@@ -16462,7 +16469,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-28T10:47:53+00:00"
+            "time": "2023-03-06T11:44:29+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -17549,16 +17556,16 @@
         },
         {
             "name": "spatie/backtrace",
-            "version": "1.2.2",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/backtrace.git",
-                "reference": "7b34fee6c1ad45f8ee0498d17cd8ea9a076402c1"
+                "reference": "ec4dd16476b802dbdc6b4467f84032837e316b8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/backtrace/zipball/7b34fee6c1ad45f8ee0498d17cd8ea9a076402c1",
-                "reference": "7b34fee6c1ad45f8ee0498d17cd8ea9a076402c1",
+                "url": "https://api.github.com/repos/spatie/backtrace/zipball/ec4dd16476b802dbdc6b4467f84032837e316b8c",
+                "reference": "ec4dd16476b802dbdc6b4467f84032837e316b8c",
                 "shasum": ""
             },
             "require": {
@@ -17567,6 +17574,7 @@
             "require-dev": {
                 "ext-json": "*",
                 "phpunit/phpunit": "^9.3",
+                "spatie/phpunit-snapshot-assertions": "^4.2",
                 "symfony/var-dumper": "^5.1"
             },
             "type": "library",
@@ -17594,7 +17602,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/backtrace/tree/1.2.2"
+                "source": "https://github.com/spatie/backtrace/tree/1.4.0"
             },
             "funding": [
                 {
@@ -17606,7 +17614,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-02-21T08:29:12+00:00"
+            "time": "2023-03-04T08:57:24+00:00"
         },
         {
             "name": "spatie/flare-client-php",
@@ -18146,5 +18154,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
