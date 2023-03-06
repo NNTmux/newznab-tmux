@@ -21,7 +21,7 @@ Utility::clearScreen();
 //reset collections dateadded to now if dateadded > delay time check
 $colorCli->header('Resetting collections that have expired to this moment. This could take some time if many collections need to be reset');
 
-DB::transaction(function() use ($delaytimet){
+DB::transaction(function () use ($delaytimet) {
     Collection::query()->where('dateadded', '<', now()->subHours($delaytimet))->update(['dateadded' => now()]);
 }, 10);
 
