@@ -333,7 +333,7 @@ class Binaries
             // We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
             $leaveOver = $this->messageBuffer;
 
-            // If this is not a new group, go from our newest to the servers newest.
+        // If this is not a new group, go from our newest to the servers newest.
         } else {
             // Set our oldest wanted to our newest local article.
             $first = $groupMySQL['last_record'];
@@ -377,14 +377,14 @@ class Binaries
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
                     (
-                    (int) $groupMySQL['last_record'] === 0
-                        ? 'New group '.$groupNNTP['group'].' starting with '.
-                        (
-                        $this->_newGroupScanByDays
-                            ? $this->_newGroupDaysToScan.' days'
-                            : number_format($this->_newGroupMessagesToScan).' messages'
-                        ).' worth.'
-                        : 'Group '.$groupNNTP['group'].' has '.number_format($realTotal).' new articles.'
+                        (int) $groupMySQL['last_record'] === 0
+                            ? 'New group '.$groupNNTP['group'].' starting with '.
+                            (
+                                $this->_newGroupScanByDays
+                                    ? $this->_newGroupDaysToScan.' days'
+                                    : number_format($this->_newGroupMessagesToScan).' messages'
+                            ).' worth.'
+                            : 'Group '.$groupNNTP['group'].' has '.number_format($realTotal).' new articles.'
                     ).
                     ' Leaving '.number_format($leaveOver).
                     " for next pass.\nServer oldest: ".number_format($groupNNTP['first']).
@@ -963,28 +963,6 @@ class Binaries
             $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startLoop).'s').
             $this->colorCli->primary(' total.');
         }
-    }
-
-    /**
-     * If we failed to insert Collections/Binaries/Parts, rollback the transaction and add the parts to part repair.
-     *
-     * @param  array  $headers  Array of headers containing sub-arrays with parts.
-     * @return array Array of article numbers to add to part repair.
-     *
-     * @throws \Exception
-     * @throws \Throwable
-     */
-    protected function _rollbackAddToPartRepair(array $headers): array
-    {
-        $headersNotInserted = [];
-        foreach ($headers as $header) {
-            foreach ($header as $file) {
-                $headersNotInserted[] = $file['Parts']['number'];
-            }
-        }
-        DB::rollBack();
-
-        return $headersNotInserted;
     }
 
     /**
