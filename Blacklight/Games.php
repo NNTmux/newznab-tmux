@@ -35,29 +35,14 @@ class Games
         '(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?'.
         '(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
 
-    /**
-     * @var bool
-     */
     public bool $echoOutput;
 
-    /**
-     * @var int|null|string
-     */
     public string|int|null $gameQty;
 
-    /**
-     * @var string
-     */
     public string $imgSavePath;
 
-    /**
-     * @var int
-     */
     public int $matchPercentage;
 
-    /**
-     * @var bool
-     */
     public bool $maxHitRequest;
 
     /**
@@ -65,56 +50,26 @@ class Games
      */
     public mixed $publicKey;
 
-    /**
-     * @var string
-     */
     public string $renamed;
 
-    /**
-     * @var string
-     */
     protected string $_classUsed;
 
-    /**
-     * @var string
-     */
     protected string $_gameID;
 
-    /**
-     * @var array|false
-     */
     protected array|false $_gameResults;
 
     protected $_getGame;
 
-    /**
-     * @var int
-     */
     protected int $_resultsFound = 0;
 
-    /**
-     * @var string
-     */
     public string $catWhere;
 
-    /**
-     * @var Configuration
-     */
     protected Configuration $config;
 
-    /**
-     * @var Client
-     */
     protected Client $giantBomb;
 
-    /**
-     * @var int
-     */
     protected int $igdbSleep;
 
-    /**
-     * @var ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**
@@ -161,7 +116,6 @@ class Games
     }
 
     /**
-     * @param  string  $title
      * @return array|false
      */
     public function getGamesInfoByName(string $title): bool|array
@@ -199,8 +153,6 @@ class Games
     }
 
     /**
-     * @return LengthAwarePaginator
-     *
      * @throws \InvalidArgumentException
      */
     public function getRange(): LengthAwarePaginator
@@ -213,9 +165,6 @@ class Games
             ->paginate(config('nntmux.items_per_page'));
     }
 
-    /**
-     * @return int
-     */
     public function getCount(): int
     {
         $res = GamesInfo::query()->count(['id']);
@@ -224,9 +173,6 @@ class Games
     }
 
     /**
-     * @param  array|string  $orderBy
-     * @param  string  $maxAge
-     *
      * @throws \Exception
      */
     public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): array
@@ -319,9 +265,6 @@ class Games
         return $return;
     }
 
-    /**
-     * @param  array|string  $orderBy
-     */
     public function getGamesOrder(array|string $orderBy): array
     {
         $order = $orderBy === '' ? 'r.postdate' : $orderBy;
@@ -360,9 +303,6 @@ class Games
         return ['title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
     }
 
-    /**
-     * @return string
-     */
     public function getBrowseBy(): string
     {
         $browseBy = ' ';
@@ -380,19 +320,6 @@ class Games
         return $browseBy;
     }
 
-    /**
-     * @param $id
-     * @param $title
-     * @param $asin
-     * @param $url
-     * @param $publisher
-     * @param $releaseDate
-     * @param $esrb
-     * @param $cover
-     * @param $trailerUrl
-     * @param $genreID
-     * @return void
-     */
     public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID): void
     {
         GamesInfo::query()
@@ -413,9 +340,6 @@ class Games
     }
 
     /**
-     * @param $gameInfo
-     * @return bool
-     *
      * @throws ModelException
      * @throws SdkException
      * @throws \JsonException
@@ -819,7 +743,6 @@ class Games
     /**
      * Parse the game release title.
      *
-     * @param  string  $releaseName
      * @return array|false
      */
     public function parseTitle(string $releaseName): bool|array
@@ -848,8 +771,6 @@ class Games
 
     /**
      * See if genre name exists.
-     *
-     * @return bool|string
      */
     public function matchGenreName($gameGenre): bool|string
     {
@@ -879,10 +800,6 @@ class Games
         return ($str !== '') ? $str : false;
     }
 
-    /**
-     * @param  string  $genre
-     * @return string
-     */
     protected function _matchGenre(string $genre = ''): string
     {
         $genreName = '';

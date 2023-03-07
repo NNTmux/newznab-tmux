@@ -11,11 +11,6 @@ use sspat\ESQuerySanitizer\Sanitizer;
 
 class ElasticSearchSiteSearch
 {
-    /**
-     * @param  array|string  $phrases
-     * @param  int  $limit
-     * @return array|Collection
-     */
     public function indexSearch(array|string $phrases, int $limit): array|Collection
     {
         $keywords = $this->sanitize($phrases);
@@ -51,11 +46,6 @@ class ElasticSearchSiteSearch
         }
     }
 
-    /**
-     * @param  array|string  $searchName
-     * @param  int  $limit
-     * @return array|Collection
-     */
     public function indexSearchApi(array|string $searchName, int $limit): array|Collection
     {
         $keywords = $this->sanitize($searchName);
@@ -90,11 +80,6 @@ class ElasticSearchSiteSearch
         }
     }
 
-    /**
-     * @param  array|string  $name
-     * @param  int  $limit
-     * @return array|Collection
-     */
     public function indexSearchTMA(array|string $name, int $limit): array|Collection
     {
         $keywords = $this->sanitize($name);
@@ -129,10 +114,6 @@ class ElasticSearchSiteSearch
         }
     }
 
-    /**
-     * @param  array|string  $search
-     * @return array|Collection
-     */
     public function predbIndexSearch(array|string $search): array|Collection
     {
         try {
@@ -158,10 +139,6 @@ class ElasticSearchSiteSearch
         }
     }
 
-    /**
-     * @param  array  $parameters
-     * @return void
-     */
     public function insertRelease(array $parameters): void
     {
         $searchNameDotless = str_replace(['.', '-'], ' ', $parameters['searchname']);
@@ -184,10 +161,6 @@ class ElasticSearchSiteSearch
         \Elasticsearch::index($data);
     }
 
-    /**
-     * @param  int  $id
-     * @return void
-     */
     public function updateRelease(int $id): void
     {
         $new = Release::query()
@@ -220,10 +193,6 @@ class ElasticSearchSiteSearch
         }
     }
 
-    /**
-     * @param $searchTerm
-     * @return array
-     */
     public function searchPreDb($searchTerm): array
     {
         $search = [
@@ -254,10 +223,6 @@ class ElasticSearchSiteSearch
         return $results;
     }
 
-    /**
-     * @param  array  $parameters
-     * @return void
-     */
     public function insertPreDb(array $parameters): void
     {
         $data = [
@@ -274,10 +239,6 @@ class ElasticSearchSiteSearch
         \Elasticsearch::index($data);
     }
 
-    /**
-     * @param  array  $parameters
-     * @return void
-     */
     public function updatePreDb(array $parameters): void
     {
         $data = [
@@ -298,10 +259,6 @@ class ElasticSearchSiteSearch
         \Elasticsearch::update($data);
     }
 
-    /**
-     * @param  array|string  $phrases
-     * @return string
-     */
     private function sanitize(array|string $phrases): string
     {
         if (! is_array($phrases)) {
@@ -331,11 +288,6 @@ class ElasticSearchSiteSearch
         return implode(' ', $keywords);
     }
 
-    /**
-     * @param  array  $search
-     * @param  bool  $fullResults
-     * @return array
-     */
     protected function search(array $search, bool $fullResults = false): array
     {
         $results = \Elasticsearch::search($search);

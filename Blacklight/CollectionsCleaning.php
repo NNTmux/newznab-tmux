@@ -64,9 +64,6 @@ class CollectionsCleaning
 
     public string $subject = '';
 
-    /**
-     * @var Regexes
-     */
     protected Regexes $_regexes;
 
     /**

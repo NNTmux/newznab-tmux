@@ -34,45 +34,28 @@ class NZB
 
     /**
      * Levels deep to store NZB files.
-     *
-     * @var int
      */
     protected int $nzbSplitLevel;
 
     /**
      * Path to store NZB files.
-     *
-     * @var string
      */
     protected string $siteNzbPath;
 
     /**
      * Group id when writing NZBs.
-     *
-     * @var int
      */
     protected int $groupID;
 
-    /**
-     * @var \PDO
-     */
     public \PDO $pdo;
 
-    /**
-     * @var bool
-     */
     protected bool $_debug = false;
 
     /**
      * String used for head in NZB XML file.
-     *
-     * @var string
      */
     protected string $_nzbCommentString;
 
-    /**
-     * @var string
-     */
     protected string $_siteCommentString;
 
     /**
@@ -97,9 +80,6 @@ class NZB
     }
 
     /**
-     * @param  \App\Models\Release  $release
-     * @return bool
-     *
      * @throws \Throwable
      */
     public function writeNzbForReleaseId(Release $release): bool

@@ -307,22 +307,6 @@ class Release extends Model
     }
 
     /**
-     * @param  int  $id
-     * @param  string  $name
-     * @param  string  $searchName
-     * @param  string  $fromName
-     * @param  int  $categoryId
-     * @param  int  $parts
-     * @param  int  $grabs
-     * @param  int  $size
-     * @param  string  $postedDate
-     * @param  string  $addedDate
-     * @param $videoId
-     * @param $episodeId
-     * @param  int  $imDbId
-     * @param  int  $aniDbId
-     * @return void
-     *
      * @throws \Exception
      */
     public static function updateRelease(int $id, string $name, string $searchName, string $fromName, int $categoryId, int $parts, int $grabs, int $size, string $postedDate, string $addedDate, $videoId, $episodeId, int $imDbId, int $aniDbId): void
@@ -510,25 +494,25 @@ class Release extends Model
     public static function getByGuid($guid)
     {
         $sql = self::query()->select(
-                [
-                    'releases.*',
-                    'g.name as group_name',
-                    'v.title as showtitle',
-                    'v.tvdb',
-                    'v.trakt',
-                    'v.tvrage',
-                    'v.tvmaze',
-                    'v.source',
-                    'tvi.summary',
-                    'tvi.image',
-                    'tve.title',
-                    'tve.firstaired',
-                    'tve.se_complete',
-                    'cp.title as parent_category',
-                    'c.title as sub_category',
-                    DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names"),
-                ]
-            )
+            [
+                'releases.*',
+                'g.name as group_name',
+                'v.title as showtitle',
+                'v.tvdb',
+                'v.trakt',
+                'v.tvrage',
+                'v.tvmaze',
+                'v.source',
+                'tvi.summary',
+                'tvi.image',
+                'tve.title',
+                'tve.firstaired',
+                'tve.se_complete',
+                'cp.title as parent_category',
+                'c.title as sub_category',
+                DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names"),
+            ]
+        )
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
