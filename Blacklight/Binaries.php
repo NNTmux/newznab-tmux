@@ -721,15 +721,8 @@ class Binaries
         foreach ($headers as $this->header) {
             // Set up the info for inserting into parts/binaries/collections tables.
             if (! isset($articles[$this->header['matches'][1]])) {
-                // check whether file count should be ignored (XXX packs for now only).
-                $whitelistMatch = false;
-                if ($this->_ignoreFileCount($this->groupMySQL['name'], $this->header['matches'][1])) {
-                    $whitelistMatch = true;
-                    $fileCount[1] = $fileCount[3] = 0;
-                }
-
                 // Attempt to find the file count. If it is not found, set it to 0.
-                if (! $whitelistMatch && ! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $this->header['matches'][1], $fileCount)) {
+                if (! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $this->header['matches'][1], $fileCount)) {
                     $fileCount[1] = $fileCount[3] = 0;
                 }
 
@@ -1508,19 +1501,6 @@ class Binaries
         if ($this->_echoCLI) {
             $this->colorCli->$color($message.' ['.__CLASS__."::$method]");
         }
-    }
-
-    /**
-     * Check if we should ignore the file count and return true or false.
-     */
-    protected function _ignoreFileCount(string $groupName, string $subject): bool
-    {
-        $ignore = false;
-        if (($groupName === 'alt.binaries.erotica') && preg_match('/^\[\d+\]-\[FULL\]-\[#a\.b\.erotica@EFNet\]-\[ \d{2,3}_/', $subject)) {
-            $ignore = true;
-        }
-
-        return $ignore;
     }
 
     protected function runQuery($query): bool
