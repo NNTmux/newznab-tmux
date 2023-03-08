@@ -13,59 +13,59 @@ use Illuminate\Support\Facades\DB;
 class Backfill
 {
     /**
-     * @var \Blacklight\Binaries
+     * @var Binaries
      */
-    protected $_binaries;
+    protected Binaries $_binaries;
 
     /**
-     * @var \Blacklight\NNTP
+     * @var NNTP
      */
-    protected $_nntp;
+    protected NNTP $_nntp;
 
     /**
      * Should we use compression for headers?
      *
      * @var bool
      */
-    protected $_compressedHeaders;
+    protected bool $_compressedHeaders;
 
     /**
      * Log and or echo debug.
      *
      * @var bool
      */
-    protected $_debug = false;
+    protected bool $_debug = false;
 
     /**
      * Echo to cli?
      *
      * @var bool
      */
-    protected $_echoCLI;
+    protected bool $_echoCLI;
 
     /**
      * How far back should we go on safe back fill?
      *
      * @var string
      */
-    protected $_safeBackFillDate;
+    protected string $_safeBackFillDate;
 
     /**
      * @var string
      */
-    protected $_safePartRepair;
+    protected string $_safePartRepair;
 
     /**
      * Should we disable the group if we have backfilled far enough?
      *
      * @var bool
      */
-    protected $_disableBackfillGroup;
+    protected bool $_disableBackfillGroup;
 
     /**
-     * @var \Blacklight\ColorCLI
+     * @var ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * Constructor.
@@ -104,13 +104,13 @@ class Backfill
     }
 
     /**
-     * @param  string  $groupName
-     * @param  string|int  $articles
-     * @param  string  $type
+     * @param string $groupName
+     * @param int|string $articles
+     * @param string $type
      *
      * @throws \Throwable
      */
-    public function backfillAllGroups($groupName = '', $articles = '', $type = ''): void
+    public function backfillAllGroups(string $groupName = '', int|string $articles = '', string $type = ''): void
     {
         if ($groupName !== '') {
             $grp[] = UsenetGroup::getByName($groupName);
@@ -167,13 +167,13 @@ class Backfill
     /**
      * Backfill single group.
      *
-     * @param  array  $groupArr
-     * @param  int  $left
-     * @param  int|string  $articles
+     * @param array $groupArr
+     * @param int $left
+     * @param int|string $articles
      *
      * @throws \Throwable
      */
-    public function backfillGroup($groupArr, $left, $articles = ''): void
+    public function backfillGroup(array $groupArr, int $left, int|string $articles = ''): void
     {
         // Start time for this group.
         $startGroup = now()->timestamp;
@@ -333,26 +333,26 @@ class Backfill
     }
 
     /**
-     * @param  string  $articles
+     * @param int|string $articles
      *
      * @throws \Throwable
      */
-    public function safeBackfill($articles = ''): void
+    public function safeBackfill(int|string $articles = ''): void
     {
-        $groupname = UsenetGroup::query()
+        $groupName = UsenetGroup::query()
             ->whereBetween('first_record_postdate', [Carbon::createFromDate($this->_safeBackFillDate), now()])
             ->where('backfill', '=', 1)
             ->select(['name'])
             ->orderBy('name')
             ->first();
 
-        if ($groupname === null) {
+        if ($groupName === null) {
             $dMessage =
                 'No groups to backfill, they are all at the target date '.
                 $this->_safeBackFillDate.
                 ', or you have not enabled them to be backfilled in the groups page.'.PHP_EOL;
             exit($dMessage);
         }
-        $this->backfillAllGroups($groupname['name'], $articles);
+        $this->backfillAllGroups($groupName['name'], $articles);
     }
 }
