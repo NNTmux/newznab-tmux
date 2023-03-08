@@ -104,9 +104,9 @@ class Backfill
     }
 
     /**
-     * @param string $groupName
-     * @param int|string $articles
-     * @param string $type
+     * @param  string  $groupName
+     * @param  int|string  $articles
+     * @param  string  $type
      *
      * @throws \Throwable
      */
@@ -167,9 +167,9 @@ class Backfill
     /**
      * Backfill single group.
      *
-     * @param array $groupArr
-     * @param int $left
-     * @param int|string $articles
+     * @param  array  $groupArr
+     * @param  int  $left
+     * @param  int|string  $articles
      *
      * @throws \Throwable
      */
@@ -333,7 +333,7 @@ class Backfill
     }
 
     /**
-     * @param int|string $articles
+     * @param  int|string  $articles
      *
      * @throws \Throwable
      */
