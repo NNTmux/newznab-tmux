@@ -12,8 +12,8 @@ $tmuxPath = base_path().'/misc/update/tmux/';
 $import = Settings::settingValue('site.tmux.import') ?? 0;
 $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $seq = Settings::settingValue('site.tmux.sequential') ?? 0;
-$delaytimet = Settings::settingValue('..delaytime');
-$delaytimet = $delaytimet ? (int) $delaytimet : 2;
+$delaytime = Settings::settingValue('..delaytime');
+$delaytime = $delaytime ? (int) $delaytime : 2;
 $colorCli = new ColorCLI();
 
 Utility::clearScreen();
@@ -21,11 +21,11 @@ Utility::clearScreen();
 //reset collections dateadded to now if dateadded > delay time check
 $colorCli->header('Resetting collections that have expired to this moment. This could take some time if many collections need to be reset');
 
-DB::transaction(function () use ($delaytimet) {
-    Collection::query()->where('dateadded', '<', now()->subHours($delaytimet))->update(['dateadded' => now()]);
+DB::transaction(function () use ($delaytime) {
+    Collection::query()->where('dateadded', '<', now()->subHours($delaytime))->update(['dateadded' => now()]);
 }, 10);
 
-function command_exist($cmd)
+function command_exist($cmd): bool
 {
     $returnVal = Process::run("which $cmd 2>/dev/null");
 
@@ -43,7 +43,7 @@ foreach ($apps as &$value) {
 
 unset($value);
 
-function start_apps($tmux_session)
+function start_apps($tmux_session): void
 {
     $htop = Settings::settingValue('site.tmux.htop');
     $vnstat = Settings::settingValue('site.tmux.vnstat');
@@ -129,23 +129,23 @@ function attach($tmuxPath, $tmux_session): void
 
 //create tmux session
 
-$tmuxconfig = $tmuxPath.'tmux.conf';
+$tmuxConfig = $tmuxPath.'tmux.conf';
 
 if ((int) $seq === 1) {
-    Process::run("cd ${tmuxPath}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+    Process::run("cd ${tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_releases\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
     window_utilities($tmux_session);
     window_post($tmux_session);
 } elseif ((int) $seq === 2) {
-    Process::run("cd ${tmuxPath}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+    Process::run("cd ${tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;sequential\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
     window_stripped_utilities($tmux_session);
 } else {
-    Process::run("cd ${tmuxPath}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
+    Process::run("cd ${tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_binaries\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.2; tmux splitw -t $tmux_session:0 -v -p 67 'printf \"\033]2;backfill\033\"'");

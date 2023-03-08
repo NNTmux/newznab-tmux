@@ -18,7 +18,7 @@ use Blacklight\processing\ProcessReleases;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-// Are we coming from python or php ? $options[0] => (string): python|php
+
 // The type of process we want to do: $options[1] => (string): releases
 $options = explode('  ', $argv[1]);
 
@@ -38,7 +38,7 @@ switch ($options[1]) {
                     echo $e->getMessage();
                 }
                 try {
-                    (new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
+                    (new Backfill())->backfillAllGroups($options[2], ($options[3] == 1 ? '' : $value['value']));
                 } catch (Throwable $e) {
                     Log::error($e->getTraceAsString());
                     echo $e->getMessage();
@@ -324,7 +324,7 @@ switch ($options[1]) {
 
             // Create the connection here and pass, this is for post processing, so check for alternate.
             try {
-                $nntp = nntp(true);
+                $nntp = nntp();
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
@@ -414,15 +414,14 @@ function charCheck(string $char): bool
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param  bool  $alternate Use alternate NNTP provider.
  * @return NNTP
  *
  * @throws \Exception
  */
-function &nntp(bool $alternate = false): NNTP
+function &nntp(): NNTP
 {
     $nntp = new NNTP();
-    if (($alternate && (int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+    if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(false, true) : $nntp->doConnect()) !== true) {
         exit('ERROR: Unable to connect to usenet.'.PHP_EOL);
     }
 
