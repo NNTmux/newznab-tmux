@@ -12,59 +12,37 @@ use Illuminate\Support\Facades\DB;
  */
 class Backfill
 {
-    /**
-     * @var Binaries
-     */
     protected Binaries $_binaries;
 
-    /**
-     * @var NNTP
-     */
     protected NNTP $_nntp;
 
     /**
      * Should we use compression for headers?
-     *
-     * @var bool
      */
     protected bool $_compressedHeaders;
 
     /**
      * Log and or echo debug.
-     *
-     * @var bool
      */
     protected bool $_debug = false;
 
     /**
      * Echo to cli?
-     *
-     * @var bool
      */
     protected bool $_echoCLI;
 
     /**
      * How far back should we go on safe back fill?
-     *
-     * @var string
      */
     protected string $_safeBackFillDate;
 
-    /**
-     * @var string
-     */
     protected string $_safePartRepair;
 
     /**
      * Should we disable the group if we have backfilled far enough?
-     *
-     * @var bool
      */
     protected bool $_disableBackfillGroup;
 
-    /**
-     * @var ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**
@@ -104,10 +82,6 @@ class Backfill
     }
 
     /**
-     * @param  string  $groupName
-     * @param  int|string  $articles
-     * @param  string  $type
-     *
      * @throws \Throwable
      */
     public function backfillAllGroups(string $groupName = '', int|string $articles = '', string $type = ''): void
@@ -167,9 +141,6 @@ class Backfill
     /**
      * Backfill single group.
      *
-     * @param  array  $groupArr
-     * @param  int  $left
-     * @param  int|string  $articles
      *
      * @throws \Throwable
      */
@@ -333,8 +304,6 @@ class Backfill
     }
 
     /**
-     * @param  int|string  $articles
-     *
      * @throws \Throwable
      */
     public function safeBackfill(int|string $articles = ''): void
