@@ -32,6 +32,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('telescope:prune')->daily();
         $schedule->command('horizon:snapshot')->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('cloudflare:reload')->daily();
+        $schedule->command('cache:prune-stale-tags')->hourly();
         if (config('nntmux.purge_inactive_users') === true) {
             $schedule->job(new RemoveInactiveAccounts())->daily();
         }
