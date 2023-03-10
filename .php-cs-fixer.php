@@ -17,5 +17,4 @@ return (new \Jubeki\LaravelCodeStyle\Config())
             ->in(base_path('misc'))
     )
     ->setRules([
-        '@Laravel' => true,
     ]);

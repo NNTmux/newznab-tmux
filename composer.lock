@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f1514e943708d3f113a9422da42e9b70",
+    "content-hash": "8e8f20f6bc7a36a886f3c1ca5bbe52e2",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -275,26 +275,26 @@
         },
         {
             "name": "brick/math",
-            "version": "0.9.3",
+            "version": "0.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "ca57d18f028f84f777b2168cd1911b0dee2343ae"
+                "reference": "459f2781e1a08d52ee56b0b1444086e038561e3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/ca57d18f028f84f777b2168cd1911b0dee2343ae",
-                "reference": "ca57d18f028f84f777b2168cd1911b0dee2343ae",
+                "url": "https://api.github.com/repos/brick/math/zipball/459f2781e1a08d52ee56b0b1444086e038561e3f",
+                "reference": "459f2781e1a08d52ee56b0b1444086e038561e3f",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^7.1 || ^8.0"
+                "php": "^7.4 || ^8.0"
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "^2.2",
-                "phpunit/phpunit": "^7.5.15 || ^8.5 || ^9.0",
-                "vimeo/psalm": "4.9.2"
+                "phpunit/phpunit": "^9.0",
+                "vimeo/psalm": "4.25.0"
             },
             "type": "library",
             "autoload": {
@@ -319,19 +319,15 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.9.3"
+                "source": "https://github.com/brick/math/tree/0.10.2"
             },
             "funding": [
                 {
                     "url": "https://github.com/BenMorel",
                     "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/brick/math",
-                    "type": "tidelift"
                 }
             ],
-            "time": "2021-08-15T20:50:18+00:00"
+            "time": "2022-08-10T22:54:19+00:00"
         },
         {
             "name": "cache/adapter-common",
@@ -14935,29 +14931,27 @@
         },
         {
             "name": "jubeki/laravel-code-style",
-            "version": "1.2.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Jubeki/laravel-code-style.git",
-                "reference": "70a1d441b17fa6f506b5238c68b16c86f6d7028c"
+                "reference": "94be54e5cb86b983fe2b6d609e71d5a3ee12c471"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Jubeki/laravel-code-style/zipball/70a1d441b17fa6f506b5238c68b16c86f6d7028c",
-                "reference": "70a1d441b17fa6f506b5238c68b16c86f6d7028c",
+                "url": "https://api.github.com/repos/Jubeki/laravel-code-style/zipball/94be54e5cb86b983fe2b6d609e71d5a3ee12c471",
+                "reference": "94be54e5cb86b983fe2b6d609e71d5a3ee12c471",
                 "shasum": ""
             },
             "require": {
-                "friendsofphp/php-cs-fixer": "^3.11",
-                "illuminate/support": "^9.30 || ^10",
+                "friendsofphp/php-cs-fixer": "^3.14.4",
+                "illuminate/support": "^9.30 || ^10.0",
                 "php": "^8.0"
             },
             "require-dev": {
-                "brick/varexporter": "^0.3.2",
                 "laravel/framework": "^9.30 || ^10.0",
                 "orchestra/testbench": "^7.0 || ^8.0",
-                "phpunit/phpunit": "^9.5.10",
-                "styleci/sdk": "^1.3"
+                "phpunit/phpunit": "^9.5.10"
             },
             "type": "library",
             "extra": {
@@ -14989,16 +14983,15 @@
             "description": "Code formatting for Laravel projects",
             "homepage": "https://github.com/Jubeki/laravel-code-style",
             "keywords": [
-                "PSR-2",
                 "code-style",
                 "laravel",
                 "php-cs-fixer"
             ],
             "support": {
                 "issues": "https://github.com/Jubeki/laravel-code-style/issues",
-                "source": "https://github.com/Jubeki/laravel-code-style/tree/1.2.0"
+                "source": "https://github.com/Jubeki/laravel-code-style/tree/2.0.0"
             },
-            "time": "2023-01-18T05:12:06+00:00"
+            "time": "2023-02-22T09:51:07+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
