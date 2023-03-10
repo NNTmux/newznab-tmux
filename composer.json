@@ -47,7 +47,7 @@
     "b3rs3rk/steamfront": "dev-master",
     "bacon/bacon-qr-code": "^2.0",
     "bhuvidya/laravel-countries": "^9.0",
-    "brick/math": "^0.9",
+    "brick/math": "^0.10",
     "caneara/triggers": "^1.0",
     "canihavesomecoffee/thetvdbapi": "^2.0",
     "cviebrock/laravel-elasticsearch": "^9.0",
