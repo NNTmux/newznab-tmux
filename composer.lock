@@ -3096,16 +3096,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "8.0.2",
+            "version": "8.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/imdbphp.git",
-                "reference": "ba5b28456ec9c27eceeb066750377461370520a7"
+                "reference": "885d8c6c3743cd8654a36cdaba364ed096a2b5f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/imdbphp/zipball/ba5b28456ec9c27eceeb066750377461370520a7",
-                "reference": "ba5b28456ec9c27eceeb066750377461370520a7",
+                "url": "https://api.github.com/repos/DariusIII/imdbphp/zipball/885d8c6c3743cd8654a36cdaba364ed096a2b5f9",
+                "reference": "885d8c6c3743cd8654a36cdaba364ed096a2b5f9",
                 "shasum": ""
             },
             "require": {
@@ -3159,9 +3159,9 @@
             ],
             "description": "Library for retrieving film and tv information from IMDb",
             "support": {
-                "source": "https://github.com/DariusIII/imdbphp/tree/8.0.2"
+                "source": "https://github.com/DariusIII/imdbphp/tree/8.0.3"
             },
-            "time": "2023-02-16T20:42:02+00:00"
+            "time": "2023-03-10T13:36:23+00:00"
         },
         {
             "name": "intervention/image",
