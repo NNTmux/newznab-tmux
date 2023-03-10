@@ -121,7 +121,7 @@
     "driftingly/rector-laravel": "^0.16.1",
     "ergebnis/composer-normalize": "^2.30",
     "friendsofphp/php-cs-fixer": "^3.5",
-    "jubeki/laravel-code-style": "^1.0",
+    "jubeki/laravel-code-style": "^2.0",
     "laracasts/generators": "^2.0",
     "laravel/pint": "^1.6",
     "laravel/sail": "^1.21",
