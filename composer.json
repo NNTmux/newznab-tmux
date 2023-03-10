@@ -181,10 +181,6 @@
     },
     {
       "type": "vcs",
-      "url": "https://github.com/DariusIII/theTVDbAPI"
-    },
-    {
-      "type": "vcs",
       "url": "https://github.com/DariusIII/imdbphp"
     },
     {
