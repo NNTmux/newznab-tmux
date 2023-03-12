@@ -50,7 +50,7 @@
     "brick/math": "^0.10",
     "caneara/triggers": "^1.0",
     "canihavesomecoffee/thetvdbapi": "^2.0",
-    "cviebrock/laravel-elasticsearch": "^9.0",
+    "cviebrock/laravel-elasticsearch": "^10.0",
     "dariusiii/l5-fixtures": "^3.0",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
@@ -162,10 +162,6 @@
     {
       "type": "vcs",
       "url": "https://github.com/DariusIII/model"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/DariusIII/laravel-elasticsearch"
     },
     {
       "type": "vcs",
