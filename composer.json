@@ -122,7 +122,6 @@
     "ergebnis/composer-normalize": "^2.30",
     "friendsofphp/php-cs-fixer": "^3.5",
     "jubeki/laravel-code-style": "^2.0",
-    "laracasts/generators": "^2.0",
     "laravel/pint": "^1.6",
     "laravel/sail": "^1.21",
     "mockery/mockery": "^1.0",
@@ -153,15 +152,7 @@
     },
     {
       "type": "vcs",
-      "url": "https://github.com/DariusIII/laravel-geoip"
-    },
-    {
-      "type": "vcs",
       "url": "https://github.com/DariusIII/model"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/DariusIII/Laravel-5-Generators-Extended"
     },
     {
       "type": "vcs",
