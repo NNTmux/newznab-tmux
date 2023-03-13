@@ -160,17 +160,11 @@ class User extends Authenticatable
 
     public const ERR_SIGNUP_BADINVITECODE = -6;
 
-    public const ERR_SIGNUP_BADCAPTCHA = -7;
-
     public const SUCCESS = 1;
 
     public const ROLE_USER = 1;
 
     public const ROLE_ADMIN = 2;
-
-    public const ROLE_DISABLED = 3;
-
-    public const ROLE_MODERATOR = 4;
 
     /**
      * Users SELECT queue type.
