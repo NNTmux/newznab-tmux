@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "550054d21b6a424d3543c3607176dbcf",
+    "content-hash": "b16bccd93afe3448f3bf36ebf0cb216d",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2443,30 +2443,29 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "9.0.4",
+            "version": "10.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/NNTmux/laravel-caffeine.git",
-                "reference": "24a4613185bef6380a0bd3f49808225bb6eadba7"
+                "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
+                "reference": "00ce6549abc3ed57b9c4748d962c9a2263329371"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/NNTmux/laravel-caffeine/zipball/24a4613185bef6380a0bd3f49808225bb6eadba7",
-                "reference": "24a4613185bef6380a0bd3f49808225bb6eadba7",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/00ce6549abc3ed57b9c4748d962c9a2263329371",
+                "reference": "00ce6549abc3ed57b9c4748d962c9a2263329371",
                 "shasum": ""
             },
             "require": {
                 "illuminate/routing": "^10.0",
                 "illuminate/support": "^10.0",
-                "jenssegers/model": "^1.5"
+                "jenssegers/model": "dev-master@dev"
             },
             "require-dev": {
-                "orchestra/testbench": "^7.0",
-                "orchestra/testbench-browser-kit": "^7.0",
-                "orchestra/testbench-dusk": "^7.0",
-                "php-coveralls/php-coveralls": "^2.2",
-                "phpmd/phpmd": "^2.7",
-                "phpunit/phpunit": "^9.5"
+                "orchestra/testbench": "^8.0",
+                "orchestra/testbench-browser-kit": "^8.0",
+                "orchestra/testbench-dusk": "^8.0",
+                "phpmd/phpmd": "^2.13",
+                "phpunit/phpunit": "^10.0"
             },
             "type": "library",
             "extra": {
@@ -2481,11 +2480,7 @@
                     "GeneaLabs\\LaravelCaffeine\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "GeneaLabs\\LaravelCaffeine\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2497,15 +2492,16 @@
             ],
             "description": "Keeping Your Laravel Forms Awake",
             "support": {
-                "source": "https://github.com/NNTmux/laravel-caffeine/tree/9.0.4"
+                "issues": "https://github.com/GeneaLabs/laravel-caffeine/issues",
+                "source": "https://github.com/GeneaLabs/laravel-caffeine/tree/10.0.0"
             },
             "funding": [
                 {
-                    "type": "github",
-                    "url": "https://github.com/mikebronner"
+                    "url": "https://github.com/mikebronner",
+                    "type": "github"
                 }
             ],
-            "time": "2023-02-16T15:29:47+00:00"
+            "time": "2023-03-10T14:32:37+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -3306,13 +3302,13 @@
             "version": "2.6.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/imagecache.git",
-                "reference": "5c4e21edc2c813296997b902380957dc659c0f57"
+                "url": "https://github.com/Intervention/imagecache.git",
+                "reference": "86136575a62d3634b51f196a998fce4a583b49bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/imagecache/zipball/5c4e21edc2c813296997b902380957dc659c0f57",
-                "reference": "5c4e21edc2c813296997b902380957dc659c0f57",
+                "url": "https://api.github.com/repos/Intervention/imagecache/zipball/86136575a62d3634b51f196a998fce4a583b49bb",
+                "reference": "86136575a62d3634b51f196a998fce4a583b49bb",
                 "shasum": ""
             },
             "require": {
@@ -3332,11 +3328,7 @@
                     "Intervention\\Image\\": "src/Intervention/Image"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Intervention\\Image\\Test\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -3357,19 +3349,20 @@
                 "laravel"
             ],
             "support": {
-                "source": "https://github.com/DariusIII/imagecache/tree/2.6.0"
+                "issues": "https://github.com/Intervention/imagecache/issues",
+                "source": "https://github.com/Intervention/imagecache/tree/2.6.0"
             },
             "funding": [
                 {
-                    "type": "github",
-                    "url": "https://github.com/Intervention"
+                    "url": "https://paypal.me/interventionio",
+                    "type": "custom"
                 },
                 {
-                    "type": "custom",
-                    "url": "https://paypal.me/interventionio"
+                    "url": "https://github.com/Intervention",
+                    "type": "github"
                 }
             ],
-            "time": "2023-02-16T15:05:29+00:00"
+            "time": "2023-02-25T19:40:47+00:00"
         },
         {
             "name": "james-heinrich/getid3",
@@ -3557,7 +3550,7 @@
         },
         {
             "name": "jenssegers/model",
-            "version": "1.5.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/model.git",
@@ -3577,6 +3570,7 @@
                 "php-coveralls/php-coveralls": "*",
                 "phpunit/phpunit": "*"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {

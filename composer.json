@@ -60,7 +60,7 @@
     "doctrine/dbal": "^3.0",
     "fakerphp/faker": "^1.12",
     "foolz/sphinxql-query-builder": "^3.0",
-    "genealabs/laravel-caffeine": "^9.0",
+    "genealabs/laravel-caffeine": "^10.0",
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "^1.2",
     "guzzlehttp/guzzle": "^7.2",
@@ -153,19 +153,11 @@
     },
     {
       "type": "vcs",
-      "url": "https://github.com/DariusIII/imagecache"
-    },
-    {
-      "type": "vcs",
       "url": "https://github.com/DariusIII/laravel-geoip"
     },
     {
       "type": "vcs",
       "url": "https://github.com/DariusIII/model"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/NNTmux/laravel-caffeine"
     },
     {
       "type": "vcs",
