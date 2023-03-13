@@ -46,7 +46,7 @@
     "anhskohbo/no-captcha": "dev-master",
     "b3rs3rk/steamfront": "dev-master",
     "bacon/bacon-qr-code": "^2.0",
-    "bhuvidya/laravel-countries": "^9.0",
+    "bhuvidya/laravel-countries": "^10.0",
     "brick/math": "^0.10",
     "caneara/triggers": "^1.0",
     "canihavesomecoffee/thetvdbapi": "^2.0",
@@ -166,10 +166,6 @@
     {
       "type": "vcs",
       "url": "https://github.com/NNTmux/laravel-caffeine"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/NNTmux/laravel-countries"
     },
     {
       "type": "vcs",
