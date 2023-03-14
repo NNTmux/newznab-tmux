@@ -76,8 +76,8 @@ Run the docker init command
 
 Copy .env.example -> .env, configure .env, mandatory fields:
 - DB_*
-- SPHINX_HOST=manticore
-- SPHINX_PORT=9306
+- MANTICORESEARCH_HOST=manticore
+- MANTICORESEARCH_PORT=9306
 - NNTP_*
 - ADMIN_*
 - APP_TZ
