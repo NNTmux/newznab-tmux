@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1f0ffade75a7f67f087b5cd411b9190a",
+    "content-hash": "601981941f1ea32a230753d6a758613e",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -13580,16 +13580,16 @@
         },
         {
             "name": "ytake/laravel-smarty",
-            "version": "6.0.1",
+            "version": "7.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/Laravel.Smarty.git",
-                "reference": "2ed8bf16ce3696d9f1c5e4fd55818ed03346c652"
+                "url": "https://github.com/ytake/Laravel.Smarty.git",
+                "reference": "4a1bfb781c28b98469f77ad72441a478bb4af1a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/Laravel.Smarty/zipball/2ed8bf16ce3696d9f1c5e4fd55818ed03346c652",
-                "reference": "2ed8bf16ce3696d9f1c5e4fd55818ed03346c652",
+                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/4a1bfb781c28b98469f77ad72441a478bb4af1a5",
+                "reference": "4a1bfb781c28b98469f77ad72441a478bb4af1a5",
                 "shasum": ""
             },
             "require": {
@@ -13598,20 +13598,20 @@
                 "illuminate/events": "^10.0",
                 "illuminate/support": "^10.0",
                 "illuminate/view": "^10.0",
-                "php": "^8.0.2",
-                "smarty/smarty": "^4.1.0"
+                "php": "^8.1",
+                "smarty/smarty": "^4.3"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.6.0",
-                "pdepend/pdepend": "^2.10.2",
+                "friendsofphp/php-cs-fixer": "^3.14",
+                "pdepend/pdepend": "^2.12",
                 "phploc/phploc": "*",
-                "phpmd/phpmd": "@stable",
-                "phpstan/phpstan": "^1.4",
+                "phpmd/phpmd": "^2.13",
+                "phpstan/phpstan": "^1.9",
                 "phpunit/phpunit": "^9.5.10",
-                "predis/predis": "^1.0",
+                "predis/predis": "^2.1",
                 "sebastian/phpcpd": "*",
-                "slevomat/coding-standard": "^7.0.18",
-                "squizlabs/php_codesniffer": "^3.6.2",
+                "slevomat/coding-standard": "^8.8",
+                "squizlabs/php_codesniffer": "^3.7",
                 "symfony/console": "^6.0",
                 "symfony/framework-bundle": "^6.0"
             },
@@ -13633,29 +13633,7 @@
                     "Ytake\\LaravelSmarty\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "quality-assurance": [
-                    "php ./vendor/bin/phpunit",
-                    "php ./vendor/bin/phpcpd src/"
-                ],
-                "pdepend": [
-                    "php ./vendor/bin/pdepend  --summary-xml=tests/build/summary.xml --jdepend-chart=tests/quality-assurance/jdepend.svg --overview-pyramid=tests/quality-assurance/pyramid.svg src/"
-                ],
-                "loc": [
-                    "php ./vendor/bin/phploc src/ --log-xml=tests/quality-assurance/phploc.xml"
-                ],
-                "phpcs": [
-                    "./vendor/bin/phpcs src/ --report-full --report-source --colors"
-                ],
-                "analyse": [
-                    "./vendor/bin/phpstan analyse -c phpstan.neon"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -13675,9 +13653,16 @@
                 "view"
             ],
             "support": {
-                "source": "https://github.com/DariusIII/Laravel.Smarty/tree/6.0.1"
+                "issues": "https://github.com/ytake/Laravel.Smarty/issues",
+                "source": "https://github.com/ytake/Laravel.Smarty/tree/7.0.0"
             },
-            "time": "2023-02-16T14:43:22+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/ytake",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-03-15T03:51:25+00:00"
         }
     ],
     "packages-dev": [

@@ -111,7 +111,7 @@
     "vlucas/phpdotenv": "^5.0",
     "voku/simple_html_dom": "^4.3",
     "yab/laravel-scout-mysql-driver": "^5.0",
-    "ytake/laravel-smarty": "^6.0"
+    "ytake/laravel-smarty": "^7.0"
   },
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^2.4",
@@ -145,10 +145,6 @@
     {
       "type": "vcs",
       "url": "https://github.com/DariusIII/larainvite"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/DariusIII/Laravel.Smarty"
     },
     {
       "type": "vcs",
