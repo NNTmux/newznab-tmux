@@ -9,7 +9,7 @@ class TermsController extends BasePageController
      */
     public function terms(): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $title = 'Terms and Conditions';
         $meta_title = config('app.name').' - Terms and conditions';
         $meta_keywords = 'terms,conditions';

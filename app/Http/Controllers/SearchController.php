@@ -14,7 +14,7 @@ class SearchController extends BasePageController
      */
     public function search(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $releases = new Releases();
 
         $meta_title = 'Search Nzbs';

@@ -14,7 +14,7 @@ class BtcPaymentController extends BasePageController
      */
     public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $gateway_id = env('MYCELIUM_GATEWAY_ID');
         $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
 

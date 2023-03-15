@@ -21,7 +21,7 @@ class GetNzbController extends BasePageController
      */
     public function getNzb(Request $request): \STS\ZipStream\ZipStream|StreamedResponse|JsonResponse
     {
-        $this->setPrefs();
+        $this->setPreferences();
 
         // Page is accessible only by the rss token, or logged in users.
         if (Auth::check()) {

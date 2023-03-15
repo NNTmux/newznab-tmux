@@ -14,7 +14,7 @@ class BrowseController extends BasePageController
      */
     public function index()
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $releases = new Releases();
 
         $this->smarty->assign('category', -1);
@@ -61,7 +61,7 @@ class BrowseController extends BasePageController
      */
     public function show(string $parentCategory, string $id = 'All'): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $releases = new Releases();
 
         $parentId = RootCategory::query()->where('title', $parentCategory)->value('id');
@@ -155,7 +155,7 @@ class BrowseController extends BasePageController
      */
     public function group(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $releases = new Releases();
         if ($request->has('g')) {
             $group = $request->input('g');
@@ -194,7 +194,7 @@ class BrowseController extends BasePageController
      */
     public function tags(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $releases = new Releases();
         if ($request->has('tags')) {
             $tags = explode(',', $request->input('tags'));

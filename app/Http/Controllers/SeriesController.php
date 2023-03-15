@@ -15,7 +15,7 @@ class SeriesController extends BasePageController
      */
     public function index(Request $request, string $id = ''): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $releases = new Releases();
         $title = 'Series';
         $meta_title = 'View TV Series';

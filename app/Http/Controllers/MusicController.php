@@ -15,7 +15,7 @@ class MusicController extends BasePageController
      */
     public function show(Request $request, string $id = ''): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $music = new Music(['Settings' => $this->settings]);
         $gen = new Genres(['Settings' => $this->settings]);
 

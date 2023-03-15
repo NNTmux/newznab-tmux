@@ -44,7 +44,7 @@ class BasePageController extends Controller
     /**
      * @var \Illuminate\Foundation\Application|mixed
      */
-    public $smarty;
+    public mixed $smarty;
 
     /**
      * BasePageController constructor.
@@ -74,7 +74,7 @@ class BasePageController extends Controller
     /**
      * @throws \Exception
      */
-    protected function setPrefs(): void
+    protected function setPreferences(): void
     {
         if (Auth::check()) {
             $this->userdata = User::find(Auth::id());

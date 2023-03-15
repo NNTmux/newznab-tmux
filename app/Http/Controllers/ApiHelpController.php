@@ -16,7 +16,7 @@ class ApiHelpController extends BasePageController
      */
     public function index(): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $title = 'Api Help';
         $meta_title = 'Api Help Topics';
         $meta_keywords = 'view,nzb,api,details,help,json,rss,atom';
@@ -32,7 +32,7 @@ class ApiHelpController extends BasePageController
      */
     public function apiv2(): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $title = 'Api V2 Help';
         $meta_title = 'Api V2 Help Topics';
         $meta_keywords = 'view,nzb,api,details,help,json,rss,atom';

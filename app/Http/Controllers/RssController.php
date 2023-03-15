@@ -85,7 +85,7 @@ class RssController extends BasePageController
      */
     public function showRssDesc(): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $rss = new RSS(['Settings' => $this->settings]);
 
         $title = 'Rss Info';
@@ -129,7 +129,7 @@ class RssController extends BasePageController
      */
     public function cartRss(Request $request): \Illuminate\Http\JsonResponse|array
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         $user = $this->userCheck($request);
@@ -156,7 +156,7 @@ class RssController extends BasePageController
      */
     public function categoryFeedRss(Request $request): \Illuminate\Http\JsonResponse|array
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         if ($request->missing('id')) {

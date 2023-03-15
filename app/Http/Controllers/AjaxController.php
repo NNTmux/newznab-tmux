@@ -12,7 +12,7 @@ class AjaxController extends BasePageController
      */
     public function profile(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         if ($request->has('action') && (int) $request->input('action') === 1 && $request->has('emailto')) {
             $emailTo = $request->input('emailto');
             $ret = User::sendInvite(url('/'), $this->userdata->id, $emailTo);

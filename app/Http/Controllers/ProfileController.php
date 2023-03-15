@@ -25,7 +25,7 @@ class ProfileController extends BasePageController
      */
     public function show(Request $request)
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $sab = new SABnzbd($this);
 
         $userID = $this->userdata->id;
@@ -124,7 +124,7 @@ class ProfileController extends BasePageController
      */
     public function edit(Request $request)
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $sab = new SABnzbd($this);
         $nzbGet = new NZBGet($this);
 
@@ -271,7 +271,7 @@ class ProfileController extends BasePageController
                         if (! empty($request->input('email')) && $this->userdata->email !== $request->input('email')) {
                             $this->userdata->email = $request->input('email');
 
-                            $verify_user = User::find(Auth::id());
+                            $verify_user = $this->userdata;
 
                             UserVerification::generate($verify_user);
 
@@ -353,7 +353,7 @@ class ProfileController extends BasePageController
      */
     public function destroy(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $userId = $request->input('id');
 
         if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {

@@ -14,7 +14,7 @@ class CartController extends BasePageController
      */
     public function index(): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $meta_title = 'My Download Basket';
         $meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
         $meta_description = 'Manage Your Download Basket';
@@ -32,7 +32,7 @@ class CartController extends BasePageController
      */
     public function store(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $guids = explode(',', $request->input('id'));
 
         $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
@@ -56,7 +56,7 @@ class CartController extends BasePageController
      */
     public function destroy(array|string $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $ids = null;
         if (! empty($id) && ! \is_array($id)) {
             $ids = explode(',', $id);

@@ -14,7 +14,7 @@ class BooksController extends BasePageController
      */
     public function index(Request $request, string $id = ''): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $book = new Books(['Settings' => $this->settings]);
 
         $boocats = Category::getChildren(Category::BOOKS_ROOT);

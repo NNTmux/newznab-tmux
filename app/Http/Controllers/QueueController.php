@@ -15,7 +15,7 @@ class QueueController extends BasePageController
      */
     public function index(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
 
         $queueType = $error = '';
         $queue = null;
@@ -101,7 +101,7 @@ class QueueController extends BasePageController
      */
     public function nzbget()
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $nzbGet = new NZBGet($this);
 
         $output = '';
@@ -174,7 +174,7 @@ class QueueController extends BasePageController
      */
     public function sabnzbd()
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $sab = new SABnzbd($this);
 
         $output = '';
@@ -249,7 +249,7 @@ class QueueController extends BasePageController
      */
     public function nzbVortex()
     {
-        $this->setPrefs();
+        $this->setPreferences();
         try {
             if (isset($_GET['isAjax'])) {
                 $vortex = new NZBVortex;

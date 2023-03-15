@@ -12,7 +12,7 @@ class ContactUsController extends BasePageController
      */
     public function contact(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $this->validate($request, [
             'useremail' => 'required',
             'username' => 'required',
@@ -51,7 +51,7 @@ class ContactUsController extends BasePageController
      */
     public function showContactForm(string $msg = ''): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $title = 'Contact '.config('app.name');
         $meta_title = 'Contact '.config('app.name');
         $meta_keywords = 'contact us,contact,get in touch,email';

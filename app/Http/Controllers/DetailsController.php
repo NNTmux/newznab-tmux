@@ -32,18 +32,18 @@ class DetailsController extends BasePageController
      * @throws \Foolz\SphinxQL\Exception\ConnectionException
      * @throws \Foolz\SphinxQL\Exception\DatabaseException
      * @throws \Foolz\SphinxQL\Exception\SphinxQLException
+     * @throws \Exception
      */
     public function show(string $guid)
     {
-        $this->setPrefs();
+        $this->setPreferences();
 
         if ($guid !== null) {
             $releases = new Releases();
             $re = new ReleaseExtra;
             $data = Release::getByGuid($guid);
-            $user = User::find(Auth::id());
-            $cpapi = $user['cp_api'];
-            $cpurl = $user['cp_url'];
+            $cpapi = $this->userdata->cp_api;
+            $cpurl = $this->userdata->cp_url;
             $releaseRegex = '';
             if (! empty($data)) {
                 $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();

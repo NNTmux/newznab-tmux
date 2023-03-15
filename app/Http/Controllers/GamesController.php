@@ -14,7 +14,7 @@ class GamesController extends BasePageController
      */
     public function show(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $games = new Games(['Settings' => $this->settings]);
         $gen = new Genres(['Settings' => $this->settings]);
 

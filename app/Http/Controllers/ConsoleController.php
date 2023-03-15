@@ -15,7 +15,7 @@ class ConsoleController extends BasePageController
      */
     public function show(Request $request, string $id = ''): \Illuminate\Http\JsonResponse
     {
-        $this->setPrefs();
+        $this->setPreferences();
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
         }

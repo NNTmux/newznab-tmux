@@ -16,7 +16,7 @@ class SendReleaseController extends BasePageController
      */
     public function couchPotato(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         if (empty($request->input('id'))) {
             $this->show404();
         } else {
@@ -39,7 +39,7 @@ class SendReleaseController extends BasePageController
      */
     public function sabNzbd(Request $request)
     {
-        $this->setPrefs();
+        $this->setPreferences();
         if (empty($request->input('id'))) {
             $this->show404();
         }
@@ -64,7 +64,7 @@ class SendReleaseController extends BasePageController
      */
     public function nzbGet(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         if (empty($request->input('id'))) {
             $this->show404();
         }
@@ -93,13 +93,13 @@ class SendReleaseController extends BasePageController
      */
     public function queue(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         if (empty($request->input('id'))) {
             $this->show404();
         }
 
-        $user = User::find(Auth::id());
-        if ((int) $user['queuetype'] !== 2) {
+        $user = $this->userdata;
+        if ((int) $this->userdata->queuetype !== 2) {
             $sab = new SABnzbd($this);
             if (empty($sab->url)) {
                 $this->show404();

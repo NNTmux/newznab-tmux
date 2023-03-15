@@ -11,7 +11,7 @@ class BrowseGroupController extends BasePageController
      */
     public function show(): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
         $groupList = UsenetGroup::getGroupsRange('', true);
         $this->smarty->assign('results', $groupList);
 

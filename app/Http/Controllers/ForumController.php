@@ -16,7 +16,7 @@ class ForumController extends BasePageController
      */
     public function forum(Request $request)
     {
-        $this->setPrefs();
+        $this->setPreferences();
         if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
             Forumpost::add(0, $this->userdata->id, $request->input('addSubject'), $request->input('addMessage'));
 
@@ -70,7 +70,7 @@ class ForumController extends BasePageController
      */
     public function getPosts($id, Request $request)
     {
-        $this->setPrefs();
+        $this->setPreferences();
 
         if ($request->has('addMessage') && $this->isPostBack()) {
             Forumpost::add($id, $this->userdata->id, '', $request->input('addMessage'));
@@ -121,7 +121,7 @@ class ForumController extends BasePageController
      */
     public function edit(Request $request): void
     {
-        $this->setPrefs();
+        $this->setPreferences();
 
         if ($request->has('id') && ! empty($request->input('addMessage'))) {
             $parent = Forumpost::getPost($request->input('id'));
@@ -153,7 +153,7 @@ class ForumController extends BasePageController
      */
     public function destroy($id): \Illuminate\Http\RedirectResponse
     {
-        $this->setPrefs();
+        $this->setPreferences();
 
         if ($id) {
             Forumpost::deletePost($id);
