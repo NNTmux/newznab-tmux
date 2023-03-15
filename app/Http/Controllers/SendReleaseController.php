@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Blacklight\CouchPotato;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SendReleaseController extends BasePageController
 {

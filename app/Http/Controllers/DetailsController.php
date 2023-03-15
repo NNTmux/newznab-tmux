@@ -10,7 +10,6 @@ use App\Models\ReleaseFile;
 use App\Models\ReleaseNfo;
 use App\Models\ReleaseRegex;
 use App\Models\Settings;
-use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\Video;
 use Blacklight\AniDB;
@@ -22,7 +21,6 @@ use Blacklight\Music;
 use Blacklight\ReleaseExtra;
 use Blacklight\Releases;
 use Blacklight\XXX;
-use Illuminate\Support\Facades\Auth;
 
 class DetailsController extends BasePageController
 {
