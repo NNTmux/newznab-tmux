@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8fb727509db47bd372c211303448de4",
+    "content-hash": "1f0ffade75a7f67f087b5cd411b9190a",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3146,16 +3146,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "8.0.3",
+            "version": "v8.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/imdbphp.git",
-                "reference": "885d8c6c3743cd8654a36cdaba364ed096a2b5f9"
+                "url": "https://github.com/tboothman/imdbphp.git",
+                "reference": "7d4b65fe18693d791dace6a8eb88d18fdc5bbbff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/imdbphp/zipball/885d8c6c3743cd8654a36cdaba364ed096a2b5f9",
-                "reference": "885d8c6c3743cd8654a36cdaba364ed096a2b5f9",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/7d4b65fe18693d791dace6a8eb88d18fdc5bbbff",
+                "reference": "7d4b65fe18693d791dace6a8eb88d18fdc5bbbff",
                 "shasum": ""
             },
             "require": {
@@ -3165,7 +3165,7 @@
                 "ext-libxml": "*",
                 "ext-simplexml": "*",
                 "php": ">=5.6",
-                "psr/log": "^2.0",
+                "psr/log": "^1.0 || ^2.0",
                 "psr/simple-cache": "^1.0"
             },
             "require-dev": {
@@ -3181,37 +3181,16 @@
                     "Imdb\\": "src/Imdb"
                 }
             },
-            "scripts": {
-                "test": [
-                    "phpunit -c tests/phpunit.xml tests"
-                ],
-                "test:clean": [
-                    "php tests/clearCache.php && composer test"
-                ],
-                "phpstan": [
-                    "phpstan analyse --memory-limit 256M"
-                ],
-                "cs": [
-                    "php-cs-fixer fix --ansi --verbose --dry-run --diff"
-                ],
-                "cs:no-cache": [
-                    "php-cs-fixer fix --ansi --verbose --dry-run --diff --using-cache=no"
-                ],
-                "cs-fix": [
-                    "php-cs-fixer fix --ansi --verbose --diff"
-                ],
-                "style": [
-                    "@cs-fix"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
             "support": {
-                "source": "https://github.com/DariusIII/imdbphp/tree/8.0.3"
+                "issues": "https://github.com/tboothman/imdbphp/issues",
+                "source": "https://github.com/tboothman/imdbphp/tree/v8.1.0"
             },
-            "time": "2023-03-10T13:36:23+00:00"
+            "time": "2023-03-14T23:52:55+00:00"
         },
         {
             "name": "intervention/image",
@@ -9485,16 +9464,16 @@
         },
         {
             "name": "spatie/laravel-package-tools",
-            "version": "1.14.1",
+            "version": "1.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-package-tools.git",
-                "reference": "b477dd2f89d0751f0e51ffb3a70181f0bc7ab8df"
+                "reference": "bab62023a4745a61170ad5424184533685e73c2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/b477dd2f89d0751f0e51ffb3a70181f0bc7ab8df",
-                "reference": "b477dd2f89d0751f0e51ffb3a70181f0bc7ab8df",
+                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/bab62023a4745a61170ad5424184533685e73c2d",
+                "reference": "bab62023a4745a61170ad5424184533685e73c2d",
                 "shasum": ""
             },
             "require": {
@@ -9533,7 +9512,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-package-tools/issues",
-                "source": "https://github.com/spatie/laravel-package-tools/tree/1.14.1"
+                "source": "https://github.com/spatie/laravel-package-tools/tree/1.14.2"
             },
             "funding": [
                 {
@@ -9541,7 +9520,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-01-27T15:33:45+00:00"
+            "time": "2023-03-14T16:41:21+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -15518,16 +15497,16 @@
         },
         {
             "name": "nunomaduro/collision",
-            "version": "v7.1.1",
+            "version": "v7.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/collision.git",
-                "reference": "ec91efc82a40ca4224a53494e7e93775cebc39e5"
+                "reference": "f502ff3b2051124c89b4dd3a8a497ca65f3ce26c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/ec91efc82a40ca4224a53494e7e93775cebc39e5",
-                "reference": "ec91efc82a40ca4224a53494e7e93775cebc39e5",
+                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/f502ff3b2051124c89b4dd3a8a497ca65f3ce26c",
+                "reference": "f502ff3b2051124c89b4dd3a8a497ca65f3ce26c",
                 "shasum": ""
             },
             "require": {
@@ -15610,7 +15589,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-03-13T17:02:54+00:00"
+            "time": "2023-03-14T14:34:49+00:00"
         },
         {
             "name": "nunomaduro/larastan",
@@ -18210,5 +18189,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
