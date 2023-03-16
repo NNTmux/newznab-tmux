@@ -186,7 +186,7 @@ class Movie
         $this->config = new Config();
         $this->config->language = $this->lookuplanguage;
         $this->config->throwHttpExceptions = false;
-        $cacheDir = resource_path().'/tmp/imdb_cache';
+        $cacheDir = storage_path('framework/cache/imdb_cache');
         if (! File::isDirectory($cacheDir)) {
             File::makeDirectory($cacheDir, 0777, false, true);
         }
