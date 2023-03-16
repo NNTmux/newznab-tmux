@@ -154,23 +154,6 @@
 														data-original-title="Send to my Download Basket">
 												</i>
 											</a>
-											{if isset($sabintegrated) && $sabintegrated !=""}
-												<a href="#">
-													<i
-															id="guid{$result->guid}"
-															class="fa fa-share"
-															data-bs-toggle="tooltip"
-															data-bs-placement="top" title
-															data-original-title="Send to My Queue">
-													</i>
-												</a>
-											{/if}
-											{if $weHasVortex}
-												<a href="#" class="icon_vortex text-muted"><i
-															class="fa fa-share" data-bs-toggle="tooltip"
-															data-bs-placement="top" title
-															data-original-title="Send to NZBVortex"></i></a>
-											{/if}
 										</td>
 									</tr>
 								{/foreach}

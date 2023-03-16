@@ -232,41 +232,9 @@ Route::group(['middleware' => ['isVerified']], function () {
 
     Route::post('btc_payment_callback', [BtcPaymentController::class, 'callback'])->name('btc_payment_callback');
 
-    Route::get('queue', [QueueController::class, 'index'])->name('queue');
-
-    Route::post('queue', [QueueController::class, 'index'])->name('queue');
-
-    Route::get('nzbgetqueuedata', [QueueController::class, 'nzbget']);
-
-    Route::post('nzbgetqueuedata', [QueueController::class, 'nzbget']);
-
-    Route::get('sabqueuedata', [QueueController::class, 'sabnzbd']);
-
-    Route::post('sabqueuedata', [QueueController::class, 'sabnzbd']);
-
-    Route::get('sendtosab', [SendReleaseController::class, 'sabNzbd']);
-
-    Route::post('sendtosab', [SendReleaseController::class, 'sabNzbd']);
-
-    Route::get('sendtonzbget', [SendReleaseController::class, 'nzbGet']);
-
-    Route::post('sendtonzbget', [SendReleaseController::class, 'nzbGet']);
-
-    Route::get('sendtoqueue', [SendReleaseController::class, 'queue']);
-
-    Route::post('sendtoqueue', [SendReleaseController::class, 'queue']);
-
-    Route::get('sendtocouch', [SendReleaseController::class, 'couchPotato']);
-
-    Route::post('sendtocouch', [SendReleaseController::class, 'couchPotato']);
-
     Route::get('series/{id?}', [SeriesController::class, 'index'])->name('series');
 
     Route::post('series/{id?}', [SeriesController::class, 'index'])->name('series');
-
-    Route::get('nzbvortex', [QueueController::class, 'nzbvortex']);
-
-    Route::post('nzbvortex', [QueueController::class, 'nzbvortex']);
 
     Route::get('ajax_profile', [AjaxController::class, 'profile']);
 

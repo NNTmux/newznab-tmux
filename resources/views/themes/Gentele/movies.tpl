@@ -171,24 +171,6 @@
 																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
                                                                                 class="fa fa-shopping-basket"></i></span></a>
-																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
-																			  id="guid{$mguid[$m@index]}"
-																			  data-bs-toggle="tooltip" data-bs-placement="top"
-																			  title
-																			  data-original-title="Send to my Queue"><i
-																					class="fa fa-share"></i></span>
-																	{/if}
-																	{if !empty($cpurl) && !empty($cpapi)}
-																		<span
-																				id="imdb{$result->imdbid}"
-																				href="javascript:;"
-																				class="btn btn-hover btn-light btn-xs sendtocouch text-muted"
-																				data-bs-toggle="tooltip" data-bs-placement="top"
-																				title data-original-title="Send to CouchPotato">
-																			<i class="fa fa-bed"></i>
-																		</span>
-																	{/if}
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
@@ -315,24 +297,6 @@
 																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
                                                                                 class="fa fa-shopping-basket"></i></span></a>
-																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
-																			  id="guid{$mguid[$m@index]}"
-																			  data-bs-toggle="tooltip" data-bs-placement="top"
-																			  title
-																			  data-original-title="Send to my Queue"><i
-																					class="fa fa-share"></i></span>
-																	{/if}
-																	{if !empty($cpurl) && !empty($cpapi)}
-																		<span
-																				id="imdb{$result->imdbid}"
-																				href="javascript:;"
-																				class="btn btn-hover btn-light btn-xs sendtocouch text-muted"
-																				data-bs-toggle="tooltip" data-bs-placement="top"
-																				title data-original-title="Send to CouchPotato">
-																			<i class="fa fa-bed"></i>
-																		</span>
-																	{/if}
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">

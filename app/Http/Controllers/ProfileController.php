@@ -8,8 +8,6 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
-use Blacklight\NZBGet;
-use Blacklight\SABnzbd;
 use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -26,7 +24,6 @@ class ProfileController extends BasePageController
     public function show(Request $request)
     {
         $this->setPreferences();
-        $sab = new SABnzbd($this);
 
         $userID = $this->userdata->id;
         $privileged = $this->userdata->hasRole('Admin') || $this->userdata->hasRole('Moderator');
@@ -78,25 +75,10 @@ class ProfileController extends BasePageController
             ]
         );
 
-        $sabApiKeyTypes = [
-            SABnzbd::API_TYPE_NZB => 'Nzb Api Key',
-            SABnzbd::API_TYPE_FULL => 'Full Api Key',
-        ];
-        $sabPriorities = [
-            SABnzbd::PRIORITY_FORCE => 'Force', SABnzbd::PRIORITY_HIGH => 'High',
-            SABnzbd::PRIORITY_NORMAL => 'Normal', SABnzbd::PRIORITY_LOW => 'Low',
-        ];
-        $sabSettings = [1 => 'Site', 2 => 'Cookie'];
-
         // Pager must be fetched after the variables are assigned to smarty.
         $this->smarty->assign(
             [
                 'commentslist' => ReleaseComment::getCommentsForUserRange($userID),
-                'saburl' => $sab->url,
-                'sabapikey' => $sab->apikey,
-                'sabapikeytype' => $sab->apikeytype !== '' ? $sabApiKeyTypes[$sab->apikeytype] : '',
-                'sabpriority' => $sab->priority !== '' ? $sabPriorities[$sab->priority] : '',
-                'sabsetting' => $sabSettings[$sab->checkCookie() ? 2 : 1],
             ]
         );
 
@@ -125,8 +107,6 @@ class ProfileController extends BasePageController
     public function edit(Request $request)
     {
         $this->setPreferences();
-        $sab = new SABnzbd($this);
-        $nzbGet = new NZBGet($this);
 
         $action = $request->input('action') ?? 'view';
 
@@ -140,20 +120,12 @@ class ProfileController extends BasePageController
         switch ($action) {
             case 'newapikey':
                 User::updateRssKey($userid);
-
                 return redirect('profile');
                 break;
             case 'clearcookies':
-                $sab->unsetCookie();
-
                 return redirect('profileedit');
                 break;
             case 'submit':
-
-                if ($request->has('saburl') && ! Str::endsWith($request->input('saburl'), '/') && trim($request->input('saburl')) !== '') {
-                    $request->merge(['saburl' => $request->input('saburl').'/']);
-                }
-
                 $validator = Validator::make($request->all(), [
                     'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
                     'password' => ['nullable', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
@@ -161,15 +133,7 @@ class ProfileController extends BasePageController
 
                 if ($validator->fails()) {
                     $errorStr = implode('', Arr::collapse($validator->errors()->toArray()));
-                } elseif (! empty($request->input('nzbgeturl')) && $nzbGet->verifyURL($request->input('nzbgeturl')) === false) {
-                    $errorStr = 'The NZBGet URL you entered is invalid!';
-                } elseif (($request->missing('saburl') && $request->has('sabapikey')) || ($request->has('saburl') && $request->missing('sabapikey'))) {
-                    $errorStr = 'Insert a SABnzdb URL and API key.';
                 } else {
-                    if ($request->has('sabetting') && $request->input('sabsetting') === 2) {
-                        $sab->setCookie($request->input('saburl'), $request->input('sabapikey'), $request->input('sabpriority'), $request->input('sabapikeytype'));
-                    }
-
                     User::updateUser(
                         $userid,
                         $this->userdata->username,
@@ -184,18 +148,6 @@ class ProfileController extends BasePageController
                         $request->has('xxxview') ? 1 : 0,
                         $request->has('consoleview') ? 1 : 0,
                         $request->has('bookview') ? 1 : 0,
-                        $request->input('queuetypeids'),
-                        $request->input('nzbgeturl') ?? '',
-                        $request->input('nzbgetusername') ?? '',
-                        $request->input('nzbgetpassword') ?? '',
-                        $request->has('saburl') ? Str::finish($request->input('saburl'), '/') : '',
-                        $request->input('sabapikey') ?? '',
-                        $request->input('sabpriority') ?? '',
-                        $request->input('sabapikeytype') ?? '',
-                        $request->input('nzbvortex_server_url') ?? '',
-                        $request->input('nzbvortex_api_key') ?? '',
-                        $request->input('cp_url') ?? '',
-                        $request->input('cp_api') ?? '',
                         (int) Settings::settingValue('site.main.userselstyle') === 1 ? $request->input('style') : 'None'
                     );
 
@@ -300,45 +252,10 @@ class ProfileController extends BasePageController
         $this->smarty->assign('user', $this->userdata);
         $this->smarty->assign('userexccat', User::getCategoryExclusionById($userid));
 
-        $this->smarty->assign('saburl_selected', $sab->url);
-        $this->smarty->assign('sabapikey_selected', $sab->apikey);
-
-        $this->smarty->assign('sabapikeytype_ids', [SABnzbd::API_TYPE_NZB, SABnzbd::API_TYPE_FULL]);
-        $this->smarty->assign('sabapikeytype_names', ['Nzb Api Key', 'Full Api Key']);
-        $this->smarty->assign('sabapikeytype_selected', ($sab->apikeytype === '') ? SABnzbd::API_TYPE_NZB : $sab->apikeytype);
-
-        $this->smarty->assign('sabpriority_ids', [SABnzbd::PRIORITY_FORCE, SABnzbd::PRIORITY_HIGH, SABnzbd::PRIORITY_NORMAL, SABnzbd::PRIORITY_LOW, SABnzbd::PRIORITY_PAUSED]);
-        $this->smarty->assign('sabpriority_names', ['Force', 'High', 'Normal', 'Low', 'Paused']);
-        $this->smarty->assign('sabpriority_selected', ($sab->priority === '') ? SABnzbd::PRIORITY_NORMAL : $sab->priority);
-
-        $this->smarty->assign('sabsetting_ids', [1, 2]);
-        $this->smarty->assign('sabsetting_names', ['Site', 'Cookie']);
-        $this->smarty->assign('sabsetting_selected', ($sab->checkCookie() ? 2 : 1));
-
-        switch ($sab->integrated) {
-            case SABnzbd::INTEGRATION_TYPE_USER:
-                $queueTypes = ['None', 'Sabnzbd', 'NZBGet'];
-                $queueTypeIDs = [User::QUEUE_NONE, User::QUEUE_SABNZBD, User::QUEUE_NZBGET];
-                break;
-            case SABnzbd::INTEGRATION_TYPE_NONE:
-                $queueTypes = ['None', 'NZBGet'];
-                $queueTypeIDs = [User::QUEUE_NONE, User::QUEUE_NZBGET];
-                break;
-        }
-
-        $this->smarty->assign(
-            [
-                'queuetypes' => $queueTypes,
-                'queuetypeids' => $queueTypeIDs,
-            ]
-        );
-
         $meta_title = 'Edit User Profile';
         $meta_keywords = 'edit,profile,user,details';
         $meta_description = 'Edit User Profile for '.$this->userdata->username;
 
-        $this->smarty->assign('cp_url_selected', $this->userdata->cp_url);
-        $this->smarty->assign('cp_api_selected', $this->userdata->cp_api);
         $this->smarty->assign('yesno_ids', [1, 0]);
         $this->smarty->assign('yesno_names', ['Yes', 'No']);
 

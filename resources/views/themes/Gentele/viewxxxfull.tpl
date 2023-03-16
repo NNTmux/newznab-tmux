@@ -155,21 +155,6 @@
 																class="text-muted fa fa-shopping-basket" data-bs-toggle="tooltip"
 																data-bs-placement="top" title
 																data-original-title="Send to my download basket"></i></a>
-													{if isset($sabintegrated) && $sabintegrated !=""}
-														<a href="#">
-															<i	id="guid{$mguid[$m@index]}"
-																  class="icon_sab text-muted fa fa-share"
-																  data-bs-toggle="tooltip"
-																  data-bs-placement="top" title
-																  data-original-title="Send to my Queue">
-															</i>
-														</a>
-													{/if}
-													{if $weHasVortex}
-														<a href="#" class="icon_vortex text-muted"><i
-																	class="fa fa-share" data-bs-toggle="tooltip" data-bs-placement="top"
-																	title data-original-title="Send to NZBVortex"></i></a>
-													{/if}
 												</td>
 											</tr>
 										{/foreach}

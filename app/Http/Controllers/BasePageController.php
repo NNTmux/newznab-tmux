@@ -8,7 +8,6 @@ use App\Models\Forumpost;
 use App\Models\Settings;
 use App\Models\User;
 use Blacklight\Contents;
-use Blacklight\SABnzbd;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -211,11 +210,6 @@ class BasePageController extends Controller
             $this->smarty->assign('weHasVortex', false);
         }
 
-        $sab = new SABnzbd($this);
-        $this->smarty->assign('sabintegrated', $sab->integratedBool);
-        if ($sab->integratedBool && $sab->url !== '' && $sab->apikey !== '') {
-            $this->smarty->assign('sabapikeytype', $sab->apikeytype);
-        }
         if ($this->userdata->hasRole('Admin')) {
             $this->smarty->assign('isadmin', 'true');
         }

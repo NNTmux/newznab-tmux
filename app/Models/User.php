@@ -7,6 +7,10 @@ use App\Jobs\SendAccountWillExpireEmail;
 use App\Jobs\SendInviteEmail;
 use Carbon\CarbonImmutable;
 use DariusIII\Token\Facades\Token;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -54,7 +58,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $sabapikey
  * @property bool|null $sabapikeytype
  * @property bool|null $sabpriority
- * @property bool $queuetype Type of queue, Sab or NZBGet
  * @property string|null $nzbgeturl
  * @property string|null $nzbgetusername
  * @property string|null $nzbgetpassword
@@ -76,48 +79,47 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserRequest[] $request
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserSerie[] $series
  *
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiaccess($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereBookview($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereConsoleview($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCpApi($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCpUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereFirstname($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereGameview($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereGrabs($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereHost($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereInvitedby($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereInvites($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereLastlogin($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereLastname($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereMovieview($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereMusicview($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgetpassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgeturl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgetusername($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbvortexApiKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbvortexServerUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User wherePassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereQueuetype($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRememberToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereResetguid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRolechangedate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRsstoken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabapikey($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabapikeytype($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabpriority($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSaburl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereStyle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUserRolesId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUsername($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUserseed($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereXxxview($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerified($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiToken($value)
+ * @method static Builder|\App\Models\User whereApiaccess($value)
+ * @method static Builder|\App\Models\User whereBookview($value)
+ * @method static Builder|\App\Models\User whereConsoleview($value)
+ * @method static Builder|\App\Models\User whereCpApi($value)
+ * @method static Builder|\App\Models\User whereCpUrl($value)
+ * @method static Builder|\App\Models\User whereCreatedAt($value)
+ * @method static Builder|\App\Models\User whereEmail($value)
+ * @method static Builder|\App\Models\User whereFirstname($value)
+ * @method static Builder|\App\Models\User whereGameview($value)
+ * @method static Builder|\App\Models\User whereGrabs($value)
+ * @method static Builder|\App\Models\User whereHost($value)
+ * @method static Builder|\App\Models\User whereId($value)
+ * @method static Builder|\App\Models\User whereInvitedby($value)
+ * @method static Builder|\App\Models\User whereInvites($value)
+ * @method static Builder|\App\Models\User whereLastlogin($value)
+ * @method static Builder|\App\Models\User whereLastname($value)
+ * @method static Builder|\App\Models\User whereMovieview($value)
+ * @method static Builder|\App\Models\User whereMusicview($value)
+ * @method static Builder|\App\Models\User whereNotes($value)
+ * @method static Builder|\App\Models\User whereNzbgetpassword($value)
+ * @method static Builder|\App\Models\User whereNzbgeturl($value)
+ * @method static Builder|\App\Models\User whereNzbgetusername($value)
+ * @method static Builder|\App\Models\User whereNzbvortexApiKey($value)
+ * @method static Builder|\App\Models\User whereNzbvortexServerUrl($value)
+ * @method static Builder|\App\Models\User wherePassword($value)
+ * @method static Builder|\App\Models\User whereRememberToken($value)
+ * @method static Builder|\App\Models\User whereResetguid($value)
+ * @method static Builder|\App\Models\User whereRolechangedate($value)
+ * @method static Builder|\App\Models\User whereRsstoken($value)
+ * @method static Builder|\App\Models\User whereSabapikey($value)
+ * @method static Builder|\App\Models\User whereSabapikeytype($value)
+ * @method static Builder|\App\Models\User whereSabpriority($value)
+ * @method static Builder|\App\Models\User whereSaburl($value)
+ * @method static Builder|\App\Models\User whereStyle($value)
+ * @method static Builder|\App\Models\User whereUpdatedAt($value)
+ * @method static Builder|\App\Models\User whereUserRolesId($value)
+ * @method static Builder|\App\Models\User whereUsername($value)
+ * @method static Builder|\App\Models\User whereUserseed($value)
+ * @method static Builder|\App\Models\User whereXxxview($value)
+ * @method static Builder|\App\Models\User whereVerified($value)
+ * @method static Builder|\App\Models\User whereApiToken($value)
  *
  * @mixin \Eloquent
  *
@@ -134,15 +136,14 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read \Spatie\Permission\Models\Role $role
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
  *
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User permission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User role($roles, $guard = null)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmailVerifiedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRateLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRolesId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerificationToken($value)
+ * @method static Builder|\App\Models\User newModelQuery()
+ * @method static Builder|\App\Models\User newQuery()
+ * @method static Builder|\App\Models\User permission($permissions)
+ * @method static Builder|\App\Models\User query()
+ * @method static Builder|\App\Models\User whereEmailVerifiedAt($value)
+ * @method static Builder|\App\Models\User whereRateLimit($value)
+ * @method static Builder|\App\Models\User whereRolesId($value)
+ * @method static Builder|\App\Models\User whereVerificationToken($value)
  */
 class User extends Authenticatable
 {
@@ -297,36 +298,23 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  int  $id
-     * @param  string  $userName
-     * @param  string  $email
-     * @param  int  $grabs
-     * @param  int  $role
-     * @param  string  $notes
-     * @param  int  $invites
-     * @param  int  $movieview
-     * @param  int  $musicview
-     * @param  int  $gameview
-     * @param  int  $xxxview
-     * @param  int  $consoleview
-     * @param  int  $bookview
-     * @param  string  $queueType
-     * @param  string  $nzbgetURL
-     * @param  string  $nzbgetUsername
-     * @param  string  $nzbgetPassword
-     * @param  string  $saburl
-     * @param  string  $sabapikey
-     * @param  string  $sabpriority
-     * @param  string  $sabapikeytype
-     * @param  bool  $nzbvortexServerUrl
-     * @param  bool  $nzbvortexApiKey
-     * @param  bool  $cp_url
-     * @param  bool  $cp_api
-     * @param  string  $style
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @param int $id
+     * @param string $userName
+     * @param string $email
+     * @param int $grabs
+     * @param int $role
+     * @param string $notes
+     * @param int $invites
+     * @param int $movieview
+     * @param int $musicview
+     * @param int $gameview
+     * @param int $xxxview
+     * @param int $consoleview
+     * @param int $bookview
+     * @param string $style
+     * @return int
      */
-    public static function updateUser($id, $userName, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None'): int
+    public static function updateUser(int $id, string $userName, string $email, int $grabs, int $role, string $notes, int $invites, int $movieview, int $musicview, int $gameview, int $xxxview, int $consoleview, int $bookview, string $style = 'None'): int
     {
         $userName = trim($userName);
 
@@ -345,18 +333,6 @@ class User extends Authenticatable
             'consoleview' => $consoleview,
             'bookview' => $bookview,
             'style' => $style,
-            'queuetype' => $queueType,
-            'nzbgeturl' => $nzbgetURL,
-            'nzbgetusername' => $nzbgetUsername,
-            'nzbgetpassword' => $nzbgetPassword,
-            'saburl' => $saburl,
-            'sabapikey' => $sabapikey,
-            'sabapikeytype' => $sabapikeytype,
-            'sabpriority' => $sabpriority,
-            'nzbvortex_server_url' => $nzbvortexServerUrl,
-            'nzbvortex_api_key' => $nzbvortexApiKey,
-            'cp_url' => $cp_url,
-            'cp_api' => $cp_api,
             'rate_limit' => $rateLimit ? $rateLimit['rate_limit'] : 60,
         ];
 
@@ -373,7 +349,8 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @param string $userName
+     * @return User|Builder|Model|object|null
      */
     public static function getByUsername(string $userName)
     {
@@ -381,9 +358,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public static function getByEmail(string $email)
     {
@@ -393,7 +370,7 @@ class User extends Authenticatable
     /**
      * @return bool
      */
-    public static function updateUserRole(int $uid, int $role)
+    public static function updateUserRole(int $uid, int $role): bool
     {
         $roleQuery = Role::query()->where('id', $role)->first();
         $roleName = $roleQuery->name;
@@ -405,10 +382,10 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  int  $uid
-     * @param  int  $addYear
+     * @param int $uid
+     * @param int $addYear
      */
-    public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0): void
+    public static function updateUserRoleChangeDate(int $uid, $date = '', int $addYear = 0): void
     {
         $user = self::find($uid);
         $currRoleExp = $user->rolechangedate ?? now()->toDateTimeString();
@@ -444,16 +421,16 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  string  $userName
-     * @param  string  $email
-     * @param  string  $host
-     * @param  string  $role
-     * @param  bool  $apiRequests
+     * @param string $userName
+     * @param string $email
+     * @param string $host
+     * @param string $role
+     * @param bool $apiRequests
      * @return \Illuminate\Database\Eloquent\Collection
      *
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false)
+    public static function getRange($start, $offset, $orderBy, string $userName = '', string $email = '', string $host = '', string $role = '', bool $apiRequests = false)
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
@@ -499,38 +476,18 @@ class User extends Authenticatable
     {
         $order = (empty($orderBy) ? 'username_desc' : $orderBy);
         $orderArr = explode('_', $order);
-        switch ($orderArr[0]) {
-            case 'email':
-                $orderField = 'email';
-                break;
-            case 'host':
-                $orderField = 'host';
-                break;
-            case 'createdat':
-                $orderField = 'created_at';
-                break;
-            case 'lastlogin':
-                $orderField = 'lastlogin';
-                break;
-            case 'apiaccess':
-                $orderField = 'apiaccess';
-                break;
-            case 'grabs':
-                $orderField = 'grabs';
-                break;
-            case 'role':
-                $orderField = 'rolename';
-                break;
-            case 'rolechangedate':
-                $orderField = 'rolechangedate';
-                break;
-            case 'verification':
-                $orderField = 'verified';
-                break;
-            default:
-                $orderField = 'username';
-                break;
-        }
+        $orderField = match ($orderArr[0]) {
+            'email' => 'email',
+            'host' => 'host',
+            'createdat' => 'created_at',
+            'lastlogin' => 'lastlogin',
+            'apiaccess' => 'apiaccess',
+            'grabs' => 'grabs',
+            'role' => 'rolename',
+            'rolechangedate' => 'rolechangedate',
+            'verification' => 'verified',
+            default => 'username',
+        };
         $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderField, $orderSort];
@@ -541,11 +498,11 @@ class User extends Authenticatable
      *
      * Automatically update the hash if it needs to be.
      *
-     * @param  string  $password  Password to check against hash.
-     * @param  string|bool  $hash  Hash to check against password.
-     * @param  int  $userID  ID of the user.
+     * @param string $password  Password to check against hash.
+     * @param bool|string $hash  Hash to check against password.
+     * @param int $userID  ID of the user.
      */
-    public static function checkPassword($password, $hash, $userID = -1): bool
+    public static function checkPassword(string $password, bool|string $hash, int $userID = -1): bool
     {
         if (Hash::check($password, $hash) === false) {
             return false;
@@ -585,17 +542,18 @@ class User extends Authenticatable
     }
 
     /**
-     * @return mixed
+     * @param $password
+     * @return string
      */
-    public static function hashPassword($password)
+    public static function hashPassword($password): string
     {
         return Hash::make($password);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public static function getByPassResetGuid(string $guid)
     {
@@ -603,31 +561,15 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  int  $num
+     * @param int $num
      */
-    public static function incrementGrabs(int $id, $num = 1): void
+    public static function incrementGrabs(int $id, int $num = 1): void
     {
         self::find($id)->increment('grabs', $num);
     }
 
     /**
-     * Check if the user is in the database, and if their API key is good, return user data if so.
-     *
-     *
-     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
-     */
-    public static function getByIdAndRssToken($userID, $rssToken)
-    {
-        $user = self::query()->where(['id' => $userID, 'api_token' => $rssToken])->first();
-        if ($user === null) {
-            return false;
-        }
-
-        return $user;
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getByRssToken(string $rssToken)
     {
@@ -640,36 +582,30 @@ class User extends Authenticatable
     }
 
     /**
-     * Generate a random username.
-     */
-    public static function generateUsername(): string
-    {
-        return Str::random();
-    }
-
-    /**
-     * @param  int  $length
+     * @param int $length
      *
      * @throws \Exception
      */
-    public static function generatePassword($length = 15): string
+    public static function generatePassword(int $length = 15): string
     {
         return Token::random($length, true);
     }
 
     /**
-     * Register a new user.
-     *
-     * @param  int  $invites
-     * @param  string  $inviteCode
-     * @param  bool  $forceInviteMode
-     * @param  int  $role
-     * @param  bool  $validate
+     * @param $userName
+     * @param $password
+     * @param $email
+     * @param $host
+     * @param $notes
+     * @param int $invites
+     * @param string $inviteCode
+     * @param bool $forceInviteMode
+     * @param int $role
+     * @param bool $validate
      * @return bool|int|string
-     *
      * @throws \Exception
      */
-    public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER, $validate = true)
+    public static function signUp($userName, $password, $email, $host, $notes, int $invites = Invitation::DEFAULT_INVITES, string $inviteCode = '', bool $forceInviteMode = false, int $role = self::ROLE_USER, bool $validate = true): bool|int|string
     {
         $user = [
             'username' => trim($userName),
@@ -685,9 +621,7 @@ class User extends Authenticatable
             ]);
 
             if ($validator->fails()) {
-                $error = implode('', Arr::collapse($validator->errors()->toArray()));
-
-                return $error;
+                return implode('', Arr::collapse($validator->errors()->toArray()));
             }
         }
 
@@ -726,19 +660,19 @@ class User extends Authenticatable
     /**
      * Add a new user.
      *
-     * @param  string  $userName
-     * @param  string  $password
-     * @param  string  $email
-     * @param  int  $role
-     * @param  string  $notes
-     * @param  string  $host
-     * @param  int  $invites
-     * @param  int  $invitedBy
+     * @param string $userName
+     * @param string $password
+     * @param string $email
+     * @param int $role
+     * @param string $notes
+     * @param string $host
+     * @param int $invites
+     * @param int $invitedBy
      * @return bool|int
      *
      * @throws \Exception
      */
-    public static function add($userName, $password, $email, $role, $notes = '', $host = '', $invites = Invitation::DEFAULT_INVITES, $invitedBy = 0)
+    public static function add(string $userName, string $password, string $email, int $role, string $notes = '', string $host = '', int $invites = Invitation::DEFAULT_INVITES, int $invitedBy = 0)
     {
         $password = self::hashPassword($password);
         if (! $password) {
@@ -766,11 +700,11 @@ class User extends Authenticatable
     /**
      * Get the list of categories the user has excluded.
      *
-     * @param  int  $userID  ID of the user.
+     * @param int $userID  ID of the user.
      *
      * @throws \Exception
      */
-    public static function getCategoryExclusionById($userID): array
+    public static function getCategoryExclusionById(int $userID): array
     {
         $ret = [];
 
@@ -822,9 +756,7 @@ class User extends Authenticatable
             }
         }
 
-        $exclusion = Category::query()->whereIn('root_categories_id', $ret)->pluck('id')->toArray();
-
-        return $exclusion;
+        return Category::query()->whereIn('root_categories_id', $ret)->pluck('id')->toArray();
     }
 
     /**
@@ -870,27 +802,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Deletes old rows FROM the user_requests and user_downloads tables.
-     * if site->userdownloadpurgedays SET to 0 then all release history is removed but
-     * the download/request rows must remain for at least one day to allow the role based
-     * limits to apply.
-     *
-     * @param  int  $days
-     *
-     * @throws \Exception
-     */
-    public static function pruneRequestHistory($days = 0): void
-    {
-        if ($days === 0) {
-            $days = 1;
-            UserDownload::query()->update(['releases_id' => null]);
-        }
-
-        UserRequest::query()->where('timestamp', '<', now()->subDays($days))->delete();
-        UserDownload::query()->where('timestamp', '<', now()->subDays($days))->delete();
-    }
-
-    /**
      * Deletes users that have not verified their accounts for 3 or more days.
      */
     public static function deleteUnVerified(): void
@@ -898,7 +809,7 @@ class User extends Authenticatable
         static::whereVerified(0)->where('created_at', '<', now()->subDays(3))->delete();
     }
 
-    public function passwordSecurity(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function passwordSecurity(): HasOne
     {
         return $this->hasOne(PasswordSecurity::class);
     }

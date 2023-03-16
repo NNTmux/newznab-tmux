@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\User;
-use Blacklight\SABnzbd;
 use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -98,9 +97,6 @@ class AdminSiteController extends BasePageController
                 'Klingon', 'Norwegian', 'Polish', 'Russian', 'Spanish', 'Swedish',
             ]
         );
-
-        $this->smarty->assign('sabintegrationtype_ids', [SABnzbd::INTEGRATION_TYPE_USER, SABnzbd::INTEGRATION_TYPE_NONE]);
-        $this->smarty->assign('sabintegrationtype_names', ['User', 'None (Off)']);
 
         $this->smarty->assign('newgroupscan_names', ['Days', 'Posts']);
 

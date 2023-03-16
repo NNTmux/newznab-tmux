@@ -24,8 +24,6 @@ NNTmux improves upon the original design, implementing several new features incl
 - Intelligent local caching of metadata
 - Tmux (terminal session multiplexing) engine that provides thread, database and performance monitoring
 - Image and video samples
-- SABnzbd/NZBGet integration (web, API and pause/resume)
-- CouchPotato integration (web and API)
 
 
 ## Prerequisites

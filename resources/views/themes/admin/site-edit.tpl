@@ -271,23 +271,6 @@
 			</table>
 		</fieldset>
 
-
-		<fieldset>
-			<legend>Download Queue Integration Settings</legend>
-
-			<table class="input data table table-striped responsive-utilities jambo-table">
-				<tr>
-					<td style="width:160px;"><label for="sabintegrationtype">Integration Type</label>:</td>
-					<td>
-						{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$site->integrationtype separator='<br />'}
-						<div class="hint">Whether to allow integration with a SAB/NZBGet install or not<br/></div>
-					</td>
-				</tr>
-			</table>
-
-		</fieldset>
-
-
 		<fieldset>
 			<legend>Usenet Settings</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">

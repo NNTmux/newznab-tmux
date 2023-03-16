@@ -249,26 +249,6 @@
 													   id="guid{$release.guid}"></i> Send to Queue
 												</button>
 											{/if}
-											{if !empty($movie.imdbid)}
-												{if !empty($cpurl) && !empty($cpapi)}
-													<button
-															type="button"
-															id="imdb{$movie.imdbid}"
-															href="javascript:;"
-															class="btn btn-success btn-sm btn-info btn-transparent sendtocouch">
-														<i class="fa fa-bed"></i>
-														Send to CouchPotato
-													</button>
-												{/if}
-											{/if}
-											{if $weHasVortex}
-												<button type="button"
-														class="btn btn-success btn-sm btn-transparent vortexsend">
-													<i class="icon_sab fa fa-arrow-right"
-													   id="guid{$release.guid}"></i> Send to
-													NZBVortex
-												</button>
-											{/if}
 										</div>
 									</div>
 									<div class="col-md-9 small-gutter-left">

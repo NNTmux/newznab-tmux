@@ -119,22 +119,6 @@
                                                         <th>Downloads Total</th>
                                                         <td>{$user.grabs}</td>
                                                     </tr>
-                                                    {if $site->integrationtype == 2 && !$publicview}
-                                                        <tr>
-                                                            <th>SABnzbd Integration:</th>
-                                                            <td>
-                                                                <b>Url:</b> {if $saburl == ''}N/A{else}{$saburl}{/if}
-                                                                <br/>
-                                                                <b>Key:</b> {if $sabapikey == ''}N/A{else}{$sabapikey}{/if}
-                                                                <br/>
-                                                                <b>Type:</b> {if $sabapikeytype == ''}N/A{else}{$sabapikeytype}{/if}
-                                                                <br/>
-                                                                <b>Priority:</b> {if $sabpriority == ''}N/A{else}{$sabpriority}{/if}
-                                                                <br/>
-                                                                <b>Storage:</b> {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
-                                                            </td>
-                                                        </tr>
-                                                    {/if}
                                                     {if (isset($isadmin) && $isadmin === "true") || !$publicview}
                                                         <tr>
                                                             <th title="Not public">API/RSS Key</th>
