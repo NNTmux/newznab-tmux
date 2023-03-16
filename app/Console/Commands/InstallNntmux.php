@@ -93,9 +93,9 @@ class InstallNntmux extends Command
      */
     private function updatePaths()
     {
-        $covers_path = base_path().'/resources/covers/';
-        $nzb_path = base_path().'/resources/nzb/';
-        $tmp_path = base_path().'/resources/tmp/';
+        $covers_path = storage_path('covers');
+        $nzb_path = storage_path('nzb');
+        $tmp_path = resource_path('tmp');
         $unrar_path = $tmp_path.'unrar/';
 
         $nzbPathCheck = File::isWritable($nzb_path);

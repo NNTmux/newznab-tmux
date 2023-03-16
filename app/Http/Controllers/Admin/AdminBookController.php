@@ -53,7 +53,7 @@ class AdminBookController extends BasePageController
 
             switch ($action) {
                 case 'submit':
-                    $coverLoc = resource_path().'/covers/book/'.$id.'.jpg';
+                    $coverLoc = storage_path('covers/book/'.$id.'.jpg');
 
                     if ($_FILES['cover']['size'] > 0) {
                         $tmpName = $_FILES['cover']['tmp_name'];
