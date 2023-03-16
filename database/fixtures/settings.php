@@ -493,7 +493,7 @@ return [
         'section' => '',
         'subsection' => '',
         'name' => 'nzbpath',
-        'value' => '/home/darius/PhpstormProjects/newznab-tmux/resources/nzb/',
+        'value' => '/var/www/nntmux/storage/nzb/',
         'hint' => 'The directory where nzb files will be stored.',
         'setting' => 'nzbpath',
     ],

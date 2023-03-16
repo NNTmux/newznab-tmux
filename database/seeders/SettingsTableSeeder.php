@@ -501,7 +501,7 @@ class SettingsTableSeeder extends Seeder
                 'section' => '',
                 'subsection' => '',
                 'name' => 'nzbpath',
-                'value' => '/var/www/NNTmux/resources/nzb/',
+                'value' => '/var/www/NNTmux/storage/nzb/',
                 'hint' => 'The directory where nzb files will be stored.',
                 'setting' => 'nzbpath',
             ],
