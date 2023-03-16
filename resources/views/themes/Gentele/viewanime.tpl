@@ -77,13 +77,6 @@
 							data-bs-toggle="tooltip" data-bs-placement="top" title
 							data-original-title="Send to my Download Basket">
 						<i class="fa fa-shopping-basket"></i></button>
-
-					{if isset($sabintegrated) && $sabintegrated !=""}
-						<button type="button"
-								class="nzb_multi_operations_sab btn btn-sm btn-success"
-								data-bs-toggle="tooltip" data-bs-placement="top" title data-original-title="Send to Queue">
-							<i class="fa fa-share"></i></button>
-					{/if}
 					{if isset($isadmin)}
 						<input type="button"
 							   class="nzb_multi_operations_edit btn btn-sm btn-warning"

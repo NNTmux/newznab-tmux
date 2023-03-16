@@ -33,14 +33,6 @@
 											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
-
-									{if isset($sabintegrated) && $sabintegrated !=""}
-										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-bs-toggle="tooltip" data-bs-placement="top" title
-												data-original-title="Send to Queue">
-											<i class="fa fa-share"></i></button>
-									{/if}
 									{if isset($isadmin)}
 										<input type="button"
 											   class="nzb_multi_operations_edit btn btn-sm btn-warning"
@@ -203,14 +195,6 @@
 																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
                                                                                 class="fa fa-shopping-basket"></i></span></a>
-																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
-																			  id="guid{$mguid[$m@index]}"
-																			  data-bs-toggle="tooltip" data-bs-placement="top"
-																			  title
-																			  data-original-title="Send to my Queue"><i
-																					class="fa fa-share"></i></span>
-																	{/if}
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
@@ -369,14 +353,6 @@
 																		  data-bs-toggle="tooltip" data-bs-placement="top" title
 																		  data-original-title="Send to my download basket"><i
                                                                                 class="fa fa-shopping-basket"></i></span></a>
-																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
-																			  id="guid{$mguid[$m@index]}"
-																			  data-bs-toggle="tooltip" data-bs-placement="top"
-																			  title
-																			  data-original-title="Send to my Queue"><i
-																					class="fa fa-share"></i></span>
-																	{/if}
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
@@ -419,14 +395,6 @@
 											data-bs-toggle="tooltip" data-bs-placement="top" title
 											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
-
-									{if isset($sabintegrated) && $sabintegrated !=""}
-										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-success"
-												data-bs-toggle="tooltip" data-bs-placement="top" title
-												data-original-title="Send to Queue">
-											<i class="fa fa-share"></i></button>
-									{/if}
 									{if isset($isadmin)}
 										<input type="button"
 											   class="nzb_multi_operations_edit btn btn-sm btn-warning"

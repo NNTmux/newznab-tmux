@@ -297,23 +297,6 @@ class User extends Authenticatable
         return $res->count(['id']);
     }
 
-    /**
-     * @param int $id
-     * @param string $userName
-     * @param string $email
-     * @param int $grabs
-     * @param int $role
-     * @param string $notes
-     * @param int $invites
-     * @param int $movieview
-     * @param int $musicview
-     * @param int $gameview
-     * @param int $xxxview
-     * @param int $consoleview
-     * @param int $bookview
-     * @param string $style
-     * @return int
-     */
     public static function updateUser(int $id, string $userName, string $email, int $grabs, int $role, string $notes, int $invites, int $movieview, int $musicview, int $gameview, int $xxxview, int $consoleview, int $bookview, string $style = 'None'): int
     {
         $userName = trim($userName);
@@ -349,7 +332,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param string $userName
      * @return User|Builder|Model|object|null
      */
     public static function getByUsername(string $userName)
@@ -367,9 +349,6 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
-    /**
-     * @return bool
-     */
     public static function updateUserRole(int $uid, int $role): bool
     {
         $roleQuery = Role::query()->where('id', $role)->first();
@@ -381,10 +360,6 @@ class User extends Authenticatable
         return self::find($uid)->update(['roles_id' => $role]);
     }
 
-    /**
-     * @param int $uid
-     * @param int $addYear
-     */
     public static function updateUserRoleChangeDate(int $uid, $date = '', int $addYear = 0): void
     {
         $user = self::find($uid);
@@ -421,11 +396,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param string $userName
-     * @param string $email
-     * @param string $host
-     * @param string $role
-     * @param bool $apiRequests
      * @return \Illuminate\Database\Eloquent\Collection
      *
      * @throws \Throwable
@@ -498,9 +468,9 @@ class User extends Authenticatable
      *
      * Automatically update the hash if it needs to be.
      *
-     * @param string $password  Password to check against hash.
-     * @param bool|string $hash  Hash to check against password.
-     * @param int $userID  ID of the user.
+     * @param  string  $password  Password to check against hash.
+     * @param  bool|string  $hash  Hash to check against password.
+     * @param  int  $userID  ID of the user.
      */
     public static function checkPassword(string $password, bool|string $hash, int $userID = -1): bool
     {
@@ -541,10 +511,6 @@ class User extends Authenticatable
         return self::SUCCESS;
     }
 
-    /**
-     * @param $password
-     * @return string
-     */
     public static function hashPassword($password): string
     {
         return Hash::make($password);
@@ -560,9 +526,6 @@ class User extends Authenticatable
         return self::whereResetguid($guid)->first();
     }
 
-    /**
-     * @param int $num
-     */
     public static function incrementGrabs(int $id, int $num = 1): void
     {
         self::find($id)->increment('grabs', $num);
@@ -582,8 +545,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param int $length
-     *
      * @throws \Exception
      */
     public static function generatePassword(int $length = 15): string
@@ -592,17 +553,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $userName
-     * @param $password
-     * @param $email
-     * @param $host
-     * @param $notes
-     * @param int $invites
-     * @param string $inviteCode
-     * @param bool $forceInviteMode
-     * @param int $role
-     * @param bool $validate
-     * @return bool|int|string
      * @throws \Exception
      */
     public static function signUp($userName, $password, $email, $host, $notes, int $invites = Invitation::DEFAULT_INVITES, string $inviteCode = '', bool $forceInviteMode = false, int $role = self::ROLE_USER, bool $validate = true): bool|int|string
@@ -660,14 +610,6 @@ class User extends Authenticatable
     /**
      * Add a new user.
      *
-     * @param string $userName
-     * @param string $password
-     * @param string $email
-     * @param int $role
-     * @param string $notes
-     * @param string $host
-     * @param int $invites
-     * @param int $invitedBy
      * @return bool|int
      *
      * @throws \Exception
@@ -700,7 +642,7 @@ class User extends Authenticatable
     /**
      * Get the list of categories the user has excluded.
      *
-     * @param int $userID  ID of the user.
+     * @param  int  $userID  ID of the user.
      *
      * @throws \Exception
      */

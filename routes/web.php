@@ -66,10 +66,8 @@ use App\Http\Controllers\MyShowsController;
 use App\Http\Controllers\NfoController;
 use App\Http\Controllers\PasswordSecurityController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\SendReleaseController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
 

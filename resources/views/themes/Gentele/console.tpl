@@ -30,11 +30,6 @@
 										<input type="button"
 											   class="nzb_multi_operations_cart btn btn-sm btn-info"
 											   value="Send to my Download Basket"/>
-										{if isset($sabintegrated) && $sabintegrated !=""}
-											<input type="button"
-												   class="nzb_multi_operations_sab btn btn-sm btn-success"
-												   value="Send to Queue"/>
-										{/if}
 										{if isset($isadmin)}
 											<input type="button"
 												   class="nzb_multi_operations_edit btn btn-sm btn-warning"
@@ -166,14 +161,6 @@
 																			title="Send to my Download Basket"><i
 																				class="fa fa-shopping-basket"></i>
                                                                         </span></a>
-																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span
-																				id="guid{$result->guid}"
-																				class="btn btn-hover btn-light btn-xs icon_sab text-muted"
-																				title="Send to my Queue"><i
-																					class="fa fa-share"></i>
-																			</span>
-																	{/if}
 																</div>
 															</td>
 														</tr>
@@ -212,11 +199,6 @@
 										<input type="button"
 											   class="nzb_multi_operations_cart btn btn-sm btn-info"
 											   value="Send to my Download Basket"/>
-										{if isset($sabintegrated) && $sabintegrated !=""}
-											<input type="button"
-												   class="nzb_multi_operations_sab btn btn-sm btn-success"
-												   value="Send to Queue"/>
-										{/if}
 										{if isset($isadmin)}
 											<input type="button"
 												   class="nzb_multi_operations_edit btn btn-sm btn-warning"

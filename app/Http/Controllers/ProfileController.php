@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController
@@ -120,6 +119,7 @@ class ProfileController extends BasePageController
         switch ($action) {
             case 'newapikey':
                 User::updateRssKey($userid);
+
                 return redirect('profile');
                 break;
             case 'clearcookies':

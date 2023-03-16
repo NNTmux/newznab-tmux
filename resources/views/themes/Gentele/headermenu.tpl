@@ -280,9 +280,6 @@
                         <a href="{{url("/cart/index")}}"><i class="fa fa-shopping-basket"></i> My Download Basket</a>
                     </li>
                     <li class="dropdown-item">
-                        <a href="{{route('queue')}}"><i class="fa fa-list-alt"></i> My Queue</a>
-                    </li>
-                    <li class="dropdown-item">
                         <a href="{{route('mymovies')}}"><i class="fa fa-film"></i> My Movies</a>
                     </li>
                     <li class="dropdown-item">

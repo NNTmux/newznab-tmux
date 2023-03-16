@@ -242,13 +242,6 @@
                                             <a class="btn btn-success btn-sm btn-info btn-transparent"
                                                 href="{{url("/cart/add?id={$release.guid}")}}" target="_blank">
                                                         <i class="fa fa-shopping-basket guid"></i> Add to Cart</a>
-											{if isset($sabintegrated) && $sabintegrated !=""}
-												<button type="button"
-														class="btn btn-success btn-sm btn-transparent sabsend">
-													<i class="icon_sab fa fa-arrow-right"
-													   id="guid{$release.guid}"></i> Send to Queue
-												</button>
-											{/if}
 										</div>
 									</div>
 									<div class="col-md-9 small-gutter-left">
