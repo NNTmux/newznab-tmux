@@ -121,10 +121,8 @@ class ProfileController extends BasePageController
                 User::updateRssKey($userid);
 
                 return redirect('profile');
-                break;
             case 'clearcookies':
                 return redirect('profileedit');
-                break;
             case 'submit':
                 $validator = Validator::make($request->all(), [
                     'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
