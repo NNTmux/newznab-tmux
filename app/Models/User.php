@@ -400,7 +400,7 @@ class User extends Authenticatable
      *
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, string $userName = '', string $email = '', string $host = '', string $role = '', bool $apiRequests = false)
+    public static function getRange($start, $offset, $orderBy, string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false)
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
