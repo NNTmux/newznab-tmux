@@ -297,7 +297,7 @@ class User extends Authenticatable
         return $res->count(['id']);
     }
 
-    public static function updateUser(int $id, string $userName, ?string $email, int $grabs, int $role, string $notes, int $invites, int $movieview, int $musicview, int $gameview, int $xxxview, int $consoleview, int $bookview, string $style = 'None'): int
+    public static function updateUser(int $id, string $userName, ?string $email, int $grabs, int $role, ?string $notes, int $invites, int $movieview, int $musicview, int $gameview, int $xxxview, int $consoleview, int $bookview, string $style = 'None'): int
     {
         $userName = trim($userName);
 
