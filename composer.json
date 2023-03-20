@@ -81,6 +81,7 @@
     "laravel/ui": "^4.0",
     "laravelcollective/html": "^6.0",
     "league/climate": "^3.4",
+    "manticoresoftware/manticoresearch-php": "^3.0",
     "marcreichel/igdb-laravel": "^3.0",
     "mhor/php-mediainfo": "^5.0",
     "monicahq/laravel-cloudflare": "^3.2",
