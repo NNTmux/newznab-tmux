@@ -7,7 +7,6 @@ use Blacklight\ManticoreSearch;
 use Blacklight\NZB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -555,8 +554,6 @@ class Release extends Model
     }
 
     /**
-     * @param string $guid
-     * @param int $userid
      * @return \App\Models\Release|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
      */
     public static function getAlternate(string $guid, int $userid)
