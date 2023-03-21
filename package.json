@@ -18,7 +18,7 @@
         "laravel-mix": "^6.0.49",
         "lodash": "^4.17.21",
         "popper.js": "^1.16.1",
-        "prettier": "^2.8.4",
+        "prettier": "^2.8.6",
         "resolve-url-loader": "^5.0.0",
         "vue": "^3.2.47"
     },
@@ -39,9 +39,9 @@
         "jquery-migrate": "3.4.1",
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
-        "npm-check-updates": "^16.7.10",
+        "npm-check-updates": "^16.7.13",
         "pace-js": "^1.2.4",
-        "pnotify": "^4.0.1",
-        "tinymce": "^5.10.3"
+        "pnotify": "4.0.1",
+        "tinymce": "5.10.7"
     }
 }
