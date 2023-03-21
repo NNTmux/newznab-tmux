@@ -438,7 +438,6 @@ class Releases extends Release
      *
      *
      * @return array|Collection|mixed
-     *
      */
     public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0, array $tags = []): mixed
     {
@@ -473,7 +472,6 @@ class Releases extends Release
             $searchResult = $this->elasticSearch->indexSearch($phrases, $limit);
         } else {
             $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', '', [], $searchFields);
-
         }
 
         if (empty($searchResult)) {
@@ -556,7 +554,6 @@ class Releases extends Release
      *
      *
      * @return Collection|mixed
-     *
      */
     public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0, array $tags = []): mixed
     {
@@ -636,7 +633,6 @@ class Releases extends Release
      * Search for TV shows via API.
      *
      * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
-     *
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
@@ -771,7 +767,6 @@ class Releases extends Release
      *
      *
      * @return Collection|mixed
-     *
      */
     public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
@@ -900,7 +895,6 @@ class Releases extends Release
      *
      *
      * @return Collection|mixed
-     *
      */
     public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
     {
@@ -970,7 +964,6 @@ class Releases extends Release
      *
      *
      * @return Collection|mixed
-     *
      */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
@@ -1041,12 +1034,6 @@ class Releases extends Release
         return $releases;
     }
 
-    /**
-     * @param $currentID
-     * @param $name
-     * @param array $excludedCats
-     * @return bool|array
-     */
     public function searchSimilar($currentID, $name, array $excludedCats = []): bool|array
     {
         // Get the category for the parent of this release.

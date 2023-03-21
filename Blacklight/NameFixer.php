@@ -1090,7 +1090,6 @@ class NameFixer
         return $matching;
     }
 
-
     protected function _preFTsearchQuery($preTitle): string
     {
         $join = '';

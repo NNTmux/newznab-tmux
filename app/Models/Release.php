@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\NZB;
 use Blacklight\ManticoreSearch;
+use Blacklight\NZB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -558,7 +558,6 @@ class Release extends Model
      * Retrieve alternate release with same or similar searchname.
      *
      * @return false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
-     *
      */
     public static function getAlternate($guid, $userid)
     {

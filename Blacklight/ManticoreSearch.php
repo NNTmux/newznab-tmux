@@ -196,6 +196,7 @@ class ManticoreSearch
             foreach ($results as $doc) {
                 $result[] = $doc->getId();
             }
+
             return $result;
         } catch (ResponseException $exception) {
             return [];

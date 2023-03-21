@@ -102,7 +102,6 @@ class Predb extends Model
     /**
      * Attempts to match PreDB titles to releases.
      *
-     * @param bool|int|string $dateLimit
      *
      * @throws \RuntimeException
      */

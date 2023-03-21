@@ -53,8 +53,6 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
     public function movie(Request $request): JsonResponse

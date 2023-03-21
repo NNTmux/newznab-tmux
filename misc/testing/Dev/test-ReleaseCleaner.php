@@ -4,8 +4,8 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
 use App\Models\UsenetGroup;
-use Blacklight\ReleaseCleaning;
 use Blacklight\ManticoreSearch;
+use Blacklight\ReleaseCleaning;
 
 $message =
     'Shows old searchname vs new searchname for releases in a group using the releaseCleaning class. (Good for testing new regex)'.

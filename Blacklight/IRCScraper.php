@@ -68,9 +68,6 @@ class IRCScraper extends IRCClient
      */
     protected manticoreSearch $manticoreSearch;
 
-    /**
-     * @var ElasticSearchSiteSearch
-     */
     private ElasticSearchSiteSearch $elasticsearch;
 
     /**
