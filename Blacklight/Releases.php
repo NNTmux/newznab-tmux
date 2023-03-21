@@ -24,9 +24,9 @@ class Releases extends Release
     public const PASSWD_RAR = 1; // Definitely passworded.
 
     /**
-     * @var \Blacklight\SphinxSearch
+     * @var \Blacklight\ManticoreSearch
      */
-    public SphinxSearch $sphinxSearch;
+    public ManticoreSearch $manticoreSearch;
 
     public int $passwordStatus;
 
@@ -40,7 +40,7 @@ class Releases extends Release
     public function __construct()
     {
         parent::__construct();
-        $this->sphinxSearch = new SphinxSearch();
+        $this->manticoreSearch = new ManticoreSearch();
         $this->elasticSearch = new ElasticSearchSiteSearch();
     }
 
@@ -382,7 +382,7 @@ class Releases extends Release
             }
         } else {
             // Delete from sphinx.
-            $this->sphinxSearch->deleteRelease($identifiers);
+            $this->manticoreSearch->deleteRelease($identifiers);
         }
 
         // Delete from DB.
@@ -439,9 +439,6 @@ class Releases extends Release
      *
      * @return array|Collection|mixed
      *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0, array $tags = []): mixed
     {
@@ -475,9 +472,8 @@ class Releases extends Release
         if (config('nntmux.elasticsearch_enabled') === true) {
             $searchResult = $this->elasticSearch->indexSearch($phrases, $limit);
         } else {
-            $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
+            $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', '', [], $searchFields);
 
-            $searchResult = Arr::pluck($results, 'id');
         }
 
         if (empty($searchResult)) {
@@ -561,9 +557,6 @@ class Releases extends Release
      *
      * @return Collection|mixed
      *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0, array $tags = []): mixed
     {
@@ -571,7 +564,7 @@ class Releases extends Release
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchApi($searchName, $limit);
             } else {
-                $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
+                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $searchName, ['searchname']);
             }
         }
 
@@ -644,9 +637,6 @@ class Releases extends Release
      *
      * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
      *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
@@ -708,7 +698,7 @@ class Releases extends Release
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
-                $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
             }
 
             if (empty($searchResult)) {
@@ -782,9 +772,6 @@ class Releases extends Release
      *
      * @return Collection|mixed
      *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
@@ -846,7 +833,7 @@ class Releases extends Release
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
-                $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
             }
 
             if (empty($searchResult)) {
@@ -914,9 +901,6 @@ class Releases extends Release
      *
      * @return Collection|mixed
      *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
     {
@@ -924,7 +908,7 @@ class Releases extends Release
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
-                $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
             }
 
             if (empty($searchResult)) {
@@ -987,9 +971,6 @@ class Releases extends Release
      *
      * @return Collection|mixed
      *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
     {
@@ -997,7 +978,7 @@ class Releases extends Release
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
-                $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
             }
 
             if (empty($searchResult)) {
@@ -1061,9 +1042,10 @@ class Releases extends Release
     }
 
     /**
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
+     * @param $currentID
+     * @param $name
+     * @param array $excludedCats
+     * @return bool|array
      */
     public function searchSimilar($currentID, $name, array $excludedCats = []): bool|array
     {

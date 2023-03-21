@@ -27,9 +27,6 @@ class DetailsController extends BasePageController
     /**
      * @return \Illuminate\Http\RedirectResponse|void
      *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      * @throws \Exception
      */
     public function show(string $guid)

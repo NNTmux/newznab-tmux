@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\SphinxSearch;
+use Blacklight\ManticoreSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -129,7 +129,7 @@ class ReleaseFile extends Model
             if (config('nntmux.elasticsearch_enabled') === true) {
                 (new ElasticSearchSiteSearch())->updateRelease($id);
             } else {
-                (new SphinxSearch())->updateRelease($id);
+                (new ManticoreSearch())->updateRelease($id);
             }
         }
 

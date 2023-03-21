@@ -5,7 +5,7 @@ namespace App\Models;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\SphinxSearch;
+use Blacklight\ManticoreSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -102,11 +102,11 @@ class Predb extends Model
     /**
      * Attempts to match PreDB titles to releases.
      *
-     * @param  string|int|bool  $dateLimit
+     * @param bool|int|string $dateLimit
      *
      * @throws \RuntimeException
      */
-    public static function checkPre($dateLimit = false): void
+    public static function checkPre(bool|int|string $dateLimit = false): void
     {
         $consoleTools = new ConsoleTools();
         $updated = 0;
@@ -202,8 +202,8 @@ class Predb extends Model
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $ids = (new ElasticSearchSiteSearch())->predbIndexSearch($search);
             } else {
-                $sphinx = new SphinxSearch();
-                $ids = Arr::pluck($sphinx->searchIndexes('predb_rt', $search, ['title']), 'id');
+                $manticore = new ManticoreSearch();
+                $ids = Arr::pluck($manticore->searchIndexes('predb_rt', $search, ['title']), 'id');
             }
             $sql->whereIn('predb.id', $ids);
         }

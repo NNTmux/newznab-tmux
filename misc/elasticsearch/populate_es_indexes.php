@@ -15,7 +15,7 @@ if (! isset($argv[1])) {
 
 populate_indexes($argv[1], (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : 10000));
 
-// Bulk insert releases into sphinx RT index.
+// Bulk insert releases into ElasticSearch index.
 function populate_indexes($table, $max)
 {
     $allowedIndexes = ['releases', 'predb'];

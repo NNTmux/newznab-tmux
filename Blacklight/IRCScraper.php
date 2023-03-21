@@ -61,17 +61,17 @@ class IRCScraper extends IRCClient
      *
      * @var string|bool
      */
-    protected $_titleIgnoreRegex;
+    protected mixed $_titleIgnoreRegex;
 
     /**
-     * @var \Blacklight\SphinxSearch
+     * @var \Blacklight\ManticoreSearch
      */
-    protected $sphinxsearch;
+    protected manticoreSearch $manticoreSearch;
 
     /**
      * @var ElasticSearchSiteSearch
      */
-    private $elasticsearch;
+    private ElasticSearchSiteSearch $elasticsearch;
 
     /**
      * Construct.
@@ -145,7 +145,7 @@ class IRCScraper extends IRCClient
         }
 
         $this->elasticsearch = new ElasticSearchSiteSearch();
-        $this->sphinxsearch = new SphinxSearch();
+        $this->manticoreSearch = new manticoreSearch();
 
         $this->_groupList = [];
         $this->_silent = $silent;
@@ -302,7 +302,7 @@ class IRCScraper extends IRCClient
         if (config('nntmux.elasticsearch_enabled') === true) {
             $indexData = (new ElasticSearchSiteSearch())->predbIndexSearch($this->_curPre['title']);
         } else {
-            $indexData = $this->sphinxsearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
+            $indexData = $this->manticoreSearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
         }
         if (! empty($indexData) || empty($this->_curPre['title'])) {
             return;
@@ -352,7 +352,7 @@ class IRCScraper extends IRCClient
         if (config('nntmux.elasticsearch_enabled') === true) {
             $this->elasticsearch->insertPreDb($parameters);
         } else {
-            $this->sphinxsearch->insertPredb($parameters);
+            $this->manticoreSearch->insertPredb($parameters);
         }
 
         $this->_doEcho(true);
@@ -406,7 +406,7 @@ class IRCScraper extends IRCClient
         if (config('nntmux.elasticsearch_enabled') === true) {
             $this->elasticsearch->updatePreDb($parameters);
         } else {
-            $this->sphinxsearch->updatePreDb($parameters);
+            $this->manticoreSearch->updatePreDb($parameters);
         }
 
         $this->_doEcho(false);

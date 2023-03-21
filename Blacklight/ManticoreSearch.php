@@ -4,28 +4,20 @@ namespace Blacklight;
 
 use App\Models\Predb;
 use App\Models\Release;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
-use Foolz\SphinxQL\Exception\DatabaseException;
-use Foolz\SphinxQL\Exception\SphinxQLException;
-use Foolz\SphinxQL\Helper;
-use Foolz\SphinxQL\SphinxQL;
 use Illuminate\Support\Facades\DB;
+use Manticoresearch\Client;
+use Manticoresearch\Exceptions\ResponseException;
+use Manticoresearch\Exceptions\RuntimeException;
 
 /**
- * Class SphinxSearch.
+ * Class ManticoreSearch.
  */
-class SphinxSearch
+class ManticoreSearch
 {
-    public SphinxQL $sphinxQL;
-
-    protected Connection $connection;
-
     /**
      * @var \Illuminate\Config\Repository|mixed
      */
     protected mixed $config;
-
-    protected Helper $helper;
 
     /**
      * @var \Blacklight\ColorCLI
@@ -33,60 +25,40 @@ class SphinxSearch
     private ColorCLI $cli;
 
     /**
-     * Establish connection to SphinxQL.
-     *
-     * @throws \Exception
+     * Establishes a connection to ManticoreSearch HTTP port.
      */
     public function __construct()
     {
-        $this->connection = new Connection();
         $this->config = config('sphinxsearch');
-        $this->connection->setParams(['host' => $this->config['host'], 'port' => $this->config['port']]);
-        $this->sphinxQL = new SphinxQL($this->connection);
-        $this->helper = new Helper($this->connection);
+        $this->connection = ['host' => $this->config['host'], 'port' => $this->config['port']];
+        $this->manticoresearch = new Client($this->connection);
         $this->cli = new ColorCLI();
     }
 
     /**
-     * Insert release into Sphinx RT table.
-     *
-     *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
+     * Insert release into ManticoreSearch releases_rt realtime index
      */
     public function insertRelease(array $parameters): void
     {
         if ($parameters['id']) {
-            $this->sphinxQL
-                ->replace()
-                ->into($this->config['indexes']['releases'])
-                ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'categories_id' => (string) $parameters['categories_id'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
-                ->execute();
+            $this->manticoresearch->index($this->config['indexes']['releases'])
+                ->replaceDocument(['name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'categories_id' => (string) $parameters['categories_id'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']], $parameters['id']);
         }
     }
 
     /**
-     * Insert release into Sphinx RT table.
-     *
-     *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
+     * Insert release into Manticore RT table.
      */
     public function insertPredb(array $parameters): void
     {
         if ($parameters['id']) {
-            $this->sphinxQL
-                ->replace()
-                ->into($this->config['indexes']['predb'])
-                ->set(['id' => $parameters['id'], 'title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']])
-                ->execute();
+            $this->manticoresearch->index($this->config['indexes']['predb'])
+                ->replaceDocument(['title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']], $parameters['id']);
         }
     }
 
     /**
-     * Delete release from Sphinx RT tables.
+     * Delete release from Manticore RT tables.
      *
      * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
      */
@@ -99,7 +71,7 @@ class SphinxSearch
             }
         }
         if ($identifiers['i'] !== false) {
-            $this->sphinxQL->delete()->from([$this->config['indexes']['releases']])->where('id', '=', $identifiers['i']);
+            $this->manticoresearch->index($this->config['indexes']['releases'])->deleteDocument($identifiers['i']);
         }
     }
 
@@ -118,7 +90,7 @@ class SphinxSearch
     }
 
     /**
-     * Update Sphinx Relases index for given releases_id.
+     * Update Manticore Relases index for given releases_id.
      *
      *
      * @throws \Exception
@@ -138,7 +110,7 @@ class SphinxSearch
     }
 
     /**
-     * Update Sphinx Predb index for given predb_id.
+     * Update Manticore Predb index for given predb_id.
      *
      *
      * @throws \Exception
@@ -150,11 +122,6 @@ class SphinxSearch
         }
     }
 
-    /**
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
-     */
     public function truncateRTIndex(array $indexes = []): bool
     {
         if (empty($indexes)) {
@@ -164,8 +131,28 @@ class SphinxSearch
         }
         foreach ($indexes as $index) {
             if (\in_array($index, $this->config['indexes'], true)) {
-                $this->helper->truncateRtIndex($index)->execute();
-                $this->cli->info('Truncating index '.$index.' finished.');
+                try {
+                    $this->manticoresearch->index($index)->truncate();
+                    $this->cli->info('Truncating index '.$index.' finished.');
+                } catch (ResponseException $e) {
+                    if ($e->getMessage() === 'Invalid index') {
+                        if ($index === 'releases_rt') {
+                            $this->manticoresearch->index($index)->create([
+                                'name' => ['type' => 'string'],
+                                'searchname' => ['type' => 'string'],
+                                'fromname' => ['type' => 'string'],
+                                'filename' => ['type' => 'string'],
+                                'categories_id' => ['type' => 'integer'],
+                            ]);
+                        } elseif ($index === 'predb_rt') {
+                            $this->manticoresearch->index($index)->create([
+                                'title' => ['type' => 'string'],
+                                'filename' => ['type' => 'string'],
+                                'source' => ['type' => 'string'],
+                            ]);
+                        }
+                    }
+                }
             } else {
                 $this->cli->error('Unsupported index: '.$index);
             }
@@ -180,8 +167,8 @@ class SphinxSearch
     public function optimizeRTIndex(): void
     {
         foreach ($this->config['indexes'] as $index) {
-            $this->helper->flushRtIndex($index)->execute();
-            $this->helper->optimizeIndex($index)->execute();
+            $this->manticoresearch->index($index)->flush();
+            $this->manticoresearch->index($index)->optimize();
         }
     }
 
@@ -189,29 +176,30 @@ class SphinxSearch
      * @param  string  $rt_index  (releases_rt or predb_rt)
      * @param  string  $searchString  (what are we looking for?)
      * @param  array  $column  (one or multiple columns from the columns that exist in indexes)
-     *
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
      */
-    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): array
+    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): mixed
     {
-        $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(0, 10000)->orderBy('id', 'desc');
+        $result = [];
+        $query = $this->manticoresearch->index($rt_index)->search($searchString)->maxMatches(10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(10000)->sort('id', 'desc');
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
-                $query->match($key, $value, true);
+                $query->match($value, $key);
             }
         } elseif (! empty($searchString)) {
-            $query->match($column, $searchString, true);
+            $query->match($searchString, $column);
         } else {
             return [];
         }
 
         try {
-            return $query->execute()->fetchAllAssoc() ?? [];
-        } catch (SphinxQLException $exception) {
+            $results = $query->get();
+            foreach ($results as $doc) {
+                $result[] = $doc->getId();
+            }
+            return $result;
+        } catch (ResponseException $exception) {
             return [];
-        } catch (DatabaseException $databaseException) {
+        } catch (RuntimeException $exception) {
             return [];
         }
     }

@@ -18,7 +18,7 @@ use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
-use Blacklight\SphinxSearch;
+use Blacklight\ManticoreSearch;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
@@ -245,7 +245,7 @@ class ProcessAdditional
      */
     protected bool $_reverse;
 
-    protected SphinxSearch $sphinx;
+    protected ManticoreSearch $manticore;
 
     private FFMpeg $ffmpeg;
 
@@ -274,7 +274,7 @@ class ProcessAdditional
             'ReleaseExtra' => null,
             'ReleaseImage' => null,
             'Settings' => null,
-            'SphinxSearch' => null,
+            'ManticoreSearch' => null,
         ];
         $options += $defaults;
 
@@ -290,7 +290,7 @@ class ProcessAdditional
         $this->_releaseImage = $options['ReleaseImage'] ?? new ReleaseImage();
         $this->_par2Info = new Par2Info();
         $this->_nfo = $options['Nfo'] ?? new Nfo();
-        $this->sphinx = $options['SphinxSearch'] ?? new SphinxSearch();
+        $this->manticore = $options['ManticoreSearch'] ?? new ManticoreSearch();
         $this->elasticsearch = new ElasticSearchSiteSearch();
         $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
@@ -1040,7 +1040,7 @@ class ProcessAdditional
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $this->elasticsearch->updateRelease($this->_release->id);
             } else {
-                $this->sphinx->updateRelease($this->_release->id);
+                $this->manticore->updateRelease($this->_release->id);
             }
         }
 
@@ -1571,7 +1571,7 @@ class ProcessAdditional
                                     if (config('nntmux.elasticsearch_enabled') === true) {
                                         $this->elasticsearch->updateRelease($this->_release->id);
                                     } else {
-                                        $this->sphinx->updateRelease($this->_release->id);
+                                        $this->manticore->updateRelease($this->_release->id);
                                     }
 
                                     // Echo the changed name.

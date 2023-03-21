@@ -5,7 +5,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use App\Models\Release;
 use App\Models\UsenetGroup;
 use Blacklight\ReleaseCleaning;
-use Blacklight\SphinxSearch;
+use Blacklight\ManticoreSearch;
 
 $message =
     'Shows old searchname vs new searchname for releases in a group using the releaseCleaning class. (Good for testing new regex)'.
@@ -52,7 +52,7 @@ if (\count($releases) === 0) {
 }
 
 $releaseCleaner = new ReleaseCleaning();
-$sphinx = new SphinxSearch();
+$manticore = new ManticoreSearch();
 
 foreach ($releases as $release) {
     echo '.';
@@ -66,7 +66,7 @@ foreach ($releases as $release) {
 
         if ($rename === true) {
             Release::query()->where('id', '=', $release->id)->update(['searchname' => $newName]);
-            $sphinx->updateRelease($release->id);
+            $manticore->updateRelease($release->id);
         }
     }
 }

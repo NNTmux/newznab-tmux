@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Predb;
 use App\Models\Release;
-use Blacklight\SphinxSearch;
+use Blacklight\ManticoreSearch;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -21,13 +21,13 @@ if (! isset($argv[1])) {
 
 populate_rt($argv[1], (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : 10000));
 
-// Bulk insert releases into sphinx RT index.
+// Bulk insert releases into Manticore RT index.
 function populate_rt($table, $max)
 {
     $allowedIndexes = ['releases_rt', 'predb_rt'];
     if (\in_array($table, $allowedIndexes, true)) {
-        $sphinx = new SphinxSearch();
-        $sphinx->truncateRTIndex(Arr::wrap($table));
+        $manticore = new ManticoreSearch();
+        $manticore->truncateRTIndex(Arr::wrap($table));
         if ($table === 'releases_rt') {
             DB::statement('SET SESSION group_concat_max_len=16384;');
             $query = 'SELECT r.id, r.name, r.searchname, r.fromname, r.categories_id, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
@@ -77,7 +77,7 @@ function populate_rt($table, $max)
                 }
                 switch ($table) {
                     case 'releases_rt':
-                        $sphinx->insertRelease([
+                        $manticore->insertRelease([
                             'id' => $row->id,
                             'name' => $row->name,
                             'searchname' => $row->searchname,
@@ -88,7 +88,7 @@ function populate_rt($table, $max)
                         break;
 
                     case 'predb_rt':
-                        $sphinx->insertPredb([
+                        $manticore->insertPredb([
                             'id' => $row->id,
                             'title' => $row->title,
                             'filename' => $row->filename,

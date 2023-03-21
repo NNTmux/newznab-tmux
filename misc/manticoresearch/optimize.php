@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\SphinxSearch;
+use Blacklight\ManticoreSearch;
 
 try {
-    (new SphinxSearch())->optimizeRTIndex();
+    (new ManticoreSearch())->optimizeRTIndex();
 } catch (Exception $e) {
     echo $e->getMessage();
 }

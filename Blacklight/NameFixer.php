@@ -115,9 +115,9 @@ class NameFixer
     public Utility $text;
 
     /**
-     * @var \Blacklight\SphinxSearch
+     * @var \Blacklight\ManticoreSearch
      */
-    public mixed $sphinx;
+    public mixed $manticore;
 
     /**
      * @var \Blacklight\ColorCLI
@@ -140,7 +140,7 @@ class NameFixer
             'Groups' => null,
             'Misc' => null,
             'Settings' => null,
-            'SphinxSearch' => null,
+            'ManticoreSearch' => null,
         ];
         $options += $defaults;
 
@@ -155,7 +155,7 @@ class NameFixer
         $this->done = $this->matched = false;
         $this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => null]));
-        $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
+        $this->manticore = ($options['ManticoreSearch'] instanceof ManticoreSearch ? $options['ManticoreSearch'] : new ManticoreSearch());
         $this->elasticsearch = new ElasticSearchSiteSearch();
     }
 
@@ -967,7 +967,7 @@ class NameFixer
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->releases_id);
                         } else {
-                            $this->sphinx->updateRelease($release->releases_id);
+                            $this->manticore->updateRelease($release->releases_id);
                         }
                     } else {
                         $release->update(
@@ -989,7 +989,7 @@ class NameFixer
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->_releases_id);
                         } else {
-                            $this->sphinx->updateRelease($release->releases_id);
+                            $this->manticore->updateRelease($release->releases_id);
                         }
                     }
                 }
@@ -1090,17 +1090,13 @@ class NameFixer
         return $matching;
     }
 
-    /**
-     * @throws \Foolz\SphinxQL\Exception\ConnectionException
-     * @throws \Foolz\SphinxQL\Exception\DatabaseException
-     * @throws \Foolz\SphinxQL\Exception\SphinxQLException
-     */
+
     protected function _preFTsearchQuery($preTitle): string
     {
         $join = '';
 
         if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
-            $titleMatch = $this->sphinx->searchIndexes('releases_rt', $preTitle, ['name', 'searchname', 'filename']);
+            $titleMatch = $this->manticore->searchIndexes('releases_rt', $preTitle, ['name', 'searchname', 'filename']);
             if (! empty($titleMatch)) {
                 $join = implode(',', Arr::pluck($titleMatch, 'id'));
             }
@@ -1195,7 +1191,7 @@ class NameFixer
                 if (config('nntmux.elasticsearch_enabled') === true) {
                     $results = $this->elasticsearch->searchPreDb($preMatch[1]);
                 } else {
-                    $results = $this->sphinx->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
+                    $results = $this->manticore->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
                 }
                 if (! empty($results)) {
                     foreach ($results as $result) {
@@ -2244,7 +2240,7 @@ class NameFixer
                     }
                 }
             } else {
-                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $hit) {
+                foreach ($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $hit) {
                     if (! empty($hit)) {
                         $this->updateRelease($release, $hit['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $hit['id']);
 
@@ -2276,7 +2272,7 @@ class NameFixer
                     }
                 }
             } else {
-                foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $hit) {
+                foreach ($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['title']) as $hit) {
                     if (! empty($hit)) {
                         $this->updateRelease($release, $hit['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $hit['id']);
 
