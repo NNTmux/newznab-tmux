@@ -555,11 +555,11 @@ class Release extends Model
     }
 
     /**
-     * Retrieve alternate release with same or similar searchname.
-     *
-     * @return false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
+     * @param string $guid
+     * @param int $userid
+     * @return \App\Models\Release|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
      */
-    public static function getAlternate($guid, $userid)
+    public static function getAlternate(string $guid, int $userid)
     {
         $rel = self::whereGuid($guid)->first(['id', 'searchname', 'categories_id']);
 
@@ -574,9 +574,7 @@ class Release extends Model
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = (new ElasticSearchSiteSearch())->indexSearch($similar[1], 10);
             } else {
-                $results = (new ManticoreSearch())->searchIndexes('releases_rt', $similar[1]);
-
-                $searchResult = Arr::pluck($results, 'id');
+                $searchResult = (new ManticoreSearch())->searchIndexes('releases_rt', $similar[1]);
             }
 
             if (empty($searchResult)) {
