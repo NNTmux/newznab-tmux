@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc6c6758ae8cdec5729878690ee9e44c",
+    "content-hash": "4c41e3df239e17cffd5c4606f708d92a",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2312,63 +2312,6 @@
                 "source": "https://github.com/FakerPHP/Faker/tree/v1.21.0"
             },
             "time": "2022-12-13T13:54:32+00:00"
-        },
-        {
-            "name": "foolz/sphinxql-query-builder",
-            "version": "3.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/FoolCode/SphinxQL-Query-Builder.git",
-                "reference": "6c1b1b44c941989e39034a7b6a3f987e938cca7a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/FoolCode/SphinxQL-Query-Builder/zipball/6c1b1b44c941989e39034a7b6a3f987e938cca7a",
-                "reference": "6c1b1b44c941989e39034a7b6a3f987e938cca7a",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1 || ^8"
-            },
-            "replace": {
-                "foolz/sphinxql": "self.version"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7 || ^8 || ^9"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Foolz\\SphinxQL\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "foolz",
-                    "email": "support@foolz.us"
-                }
-            ],
-            "description": "A PHP query builder for SphinxQL. Uses MySQLi to connect to the Sphinx server.",
-            "homepage": "http://www.foolz.us",
-            "keywords": [
-                "database",
-                "query builder",
-                "search",
-                "sphinx",
-                "sphinxql",
-                "sql"
-            ],
-            "support": {
-                "email": "support@foolz.us",
-                "irc": "irc://irc.irchighway.net/fooldriver",
-                "issues": "https://github.com/FoolCode/SphinxQL-Query-Builder/issues",
-                "source": "https://github.com/FoolCode/SphinxQL-Query-Builder/tree/3.0.2"
-            },
-            "time": "2022-02-26T00:40:55+00:00"
         },
         {
             "name": "fruitcake/php-cors",
@@ -7895,16 +7838,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.2.4",
+            "version": "2.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "80d65e8e959dca6e968a54a0f51b74074ee6421e"
+                "reference": "c4af70893edbfb4e79bdb7e1499340046c585846"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/80d65e8e959dca6e968a54a0f51b74074ee6421e",
-                "reference": "80d65e8e959dca6e968a54a0f51b74074ee6421e",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/c4af70893edbfb4e79bdb7e1499340046c585846",
+                "reference": "c4af70893edbfb4e79bdb7e1499340046c585846",
                 "shasum": ""
             },
             "require": {
@@ -7958,7 +7901,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.2.4"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.2.5"
             },
             "funding": [
                 {
@@ -7966,7 +7909,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-04T16:25:15+00:00"
+            "time": "2023-03-20T18:47:39+00:00"
         },
         {
             "name": "psr/cache",
