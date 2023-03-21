@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c41e3df239e17cffd5c4606f708d92a",
+    "content-hash": "6f58a56d700c17c7bd4e6a4b5c8af99f",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3475,13 +3475,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/model.git",
-                "reference": "978748796b66a2a2eb53e5e0019be2f86e589492"
+                "url": "https://github.com/jenssegers/model.git",
+                "reference": "148133d79707cc818b914204048a9e7c64ff7353"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/model/zipball/978748796b66a2a2eb53e5e0019be2f86e589492",
-                "reference": "978748796b66a2a2eb53e5e0019be2f86e589492",
+                "url": "https://api.github.com/repos/jenssegers/model/zipball/148133d79707cc818b914204048a9e7c64ff7353",
+                "reference": "148133d79707cc818b914204048a9e7c64ff7353",
                 "shasum": ""
             },
             "require": {
@@ -3499,11 +3499,7 @@
                     "Jenssegers\\Model\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "classmap": [
-                    "tests/stubs"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -3521,9 +3517,10 @@
                 "model"
             ],
             "support": {
-                "source": "https://github.com/DariusIII/model/tree/1.5.1"
+                "issues": "https://github.com/jenssegers/model/issues",
+                "source": "https://github.com/jenssegers/model/tree/v1.5.1"
             },
-            "time": "2023-02-16T15:25:40+00:00"
+            "time": "2023-03-21T13:03:12+00:00"
         },
         {
             "name": "joshpinkney/tv-maze-php-api",
@@ -15542,16 +15539,16 @@
         },
         {
             "name": "nunomaduro/collision",
-            "version": "v7.3.1",
+            "version": "v7.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/collision.git",
-                "reference": "c2f3b0e82d5d8e79b44bb44fa5cedcb463dd7c64"
+                "reference": "9e111c8d8e88862d334879853dc849542e4b015a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/c2f3b0e82d5d8e79b44bb44fa5cedcb463dd7c64",
-                "reference": "c2f3b0e82d5d8e79b44bb44fa5cedcb463dd7c64",
+                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/9e111c8d8e88862d334879853dc849542e4b015a",
+                "reference": "9e111c8d8e88862d334879853dc849542e4b015a",
                 "shasum": ""
             },
             "require": {
@@ -15634,7 +15631,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-03-21T13:34:19+00:00"
+            "time": "2023-03-21T21:02:58+00:00"
         },
         {
             "name": "nunomaduro/larastan",
@@ -18206,6 +18203,7 @@
     "stability-flags": {
         "anhskohbo/no-captcha": 20,
         "b3rs3rk/steamfront": 20,
+        "jenssegers/model": 20,
         "joshpinkney/tv-maze-php-api": 20
     },
     "prefer-stable": true,

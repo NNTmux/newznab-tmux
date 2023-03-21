@@ -68,6 +68,7 @@
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "jamesmills/laravel-timezone": "^1.11",
+    "jenssegers/model": "dev-master",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "jrean/laravel-user-verification": "^11.0",
     "junaidnasir/larainvite": "^5.0",
@@ -145,10 +146,6 @@
     {
       "type": "vcs",
       "url": "https://github.com/DariusIII/larainvite"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/DariusIII/model"
     },
     {
       "type": "vcs",
