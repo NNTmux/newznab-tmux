@@ -185,11 +185,7 @@
     "sort-packages": true
   },
   "scripts": {
-    "post-install-cmd": [
-      "Blacklight\\build\\ComposerScripts::postInstall"
-    ],
     "post-update-cmd": [
-      "Blacklight\\build\\ComposerScripts::postUpdate",
       "@php artisan ide-helper:generate --ansi",
       "@php artisan vendor:publish --tag=laravel-assets --ansi"
     ],
