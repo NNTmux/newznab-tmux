@@ -30,11 +30,8 @@ class CreateContentTable extends Migration
             $table->index(['showinmenu', 'status', 'contenttype', 'role'], 'ix_showinmenu_status_contenttype_role');
         });
 
-        if (env('DB_CONNECTION') !== 'pgsql') {
-            DB::statement('ALTER TABLE content AUTO_INCREMENT = 100000;');
-        } else {
-            DB::statement('ALTER SEQUENCE content_id_seq RESTART 1000000;');
-        }
+        DB::statement('ALTER TABLE content AUTO_INCREMENT = 100000;');
+
     }
 
     /**

@@ -26,11 +26,8 @@ class CreateBinaryblacklistTable extends Migration
             $table->date('last_activity')->nullable();
         });
 
-        if (env('DB_CONNECTION') !== 'pgsql') {
-            DB::statement('ALTER TABLE binaryblacklist AUTO_INCREMENT = 100000;');
-        } else {
-            DB::statement('ALTER SEQUENCE binaryblacklist_id_seq RESTART 1000000;');
-        }
+        DB::statement('ALTER TABLE binaryblacklist AUTO_INCREMENT = 100000;');
+
     }
 
     /**

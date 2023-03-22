@@ -14,7 +14,7 @@ class CreateRoleExpirationEmailsTable extends Migration
     public function up()
     {
         Schema::create('role_expiration_emails', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->integer('users_id')->unique();
             $table->timestamps();
             $table->boolean('day')->default(false);

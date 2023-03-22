@@ -14,7 +14,7 @@ class CreatePaypalPaymentsTable extends Migration
     public function up()
     {
         Schema::create('paypal_payments', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->integer('users_id');
             $table->string('transaction_id');
             $table->timestamps();

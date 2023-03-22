@@ -25,11 +25,8 @@ class CreateCategoryRegexesTable extends Migration
             $table->smallInteger('categories_id')->unsigned()->default(10)->index('ix_category_regexes_categories_id')->comment('Which categories id to put the release in');
         });
 
-        if (env('DB_CONNECTION') !== 'pgsql') {
-            DB::statement('ALTER TABLE category_regexes AUTO_INCREMENT = 100000;');
-        } else {
-            DB::statement('ALTER SEQUENCE category_regexes_id_seq RESTART 1000000;');
-        }
+        DB::statement('ALTER TABLE category_regexes AUTO_INCREMENT = 100000;');
+
     }
 
     /**

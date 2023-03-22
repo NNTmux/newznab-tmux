@@ -24,11 +24,8 @@ class CreateCollectionRegexesTable extends Migration
             $table->integer('ordinal')->default(0)->index('ix_collection_regexes_ordinal')->comment('Order to run the regex in');
         });
 
-        if (env('DB_CONNECTION') !== 'pgsql') {
-            DB::statement('ALTER TABLE collection_regexes AUTO_INCREMENT = 100000;');
-        } else {
-            DB::statement('ALTER SEQUENCE collection_regexes_id_seq RESTART 1000000;');
-        }
+        DB::statement('ALTER TABLE collection_regexes AUTO_INCREMENT = 100000;');
+
     }
 
     /**

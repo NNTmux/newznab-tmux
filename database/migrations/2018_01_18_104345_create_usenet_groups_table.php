@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateGroupsTable extends Migration
+class CreateUsenetGroupsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateGroupsTable extends Migration
      */
     public function up()
     {
-        Schema::create('groups', function (Blueprint $table) {
+        Schema::create('usenet_groups', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->charset = 'utf8';
             $table->collation = 'utf8_unicode_ci';
@@ -31,11 +31,8 @@ class CreateGroupsTable extends Migration
             $table->string('description')->nullable()->default('');
         });
 
-        if (env('DB_CONNECTION') !== 'pgsql') {
-            DB::statement('ALTER TABLE groups AUTO_INCREMENT = 100000;');
-        } else {
-            DB::statement('ALTER SEQUENCE groups_id_seq RESTART 1000000;');
-        }
+        DB::statement('ALTER TABLE usenet_groups AUTO_INCREMENT = 100000;');
+
     }
 
     /**

@@ -32,8 +32,8 @@ class CreatePredbTable extends Migration
             $table->string('filename')->default('');
             $table->boolean('searched')->default(0)->index('ix_predb_searched');
             $table->index(['requestid', 'groups_id'], 'ix_predb_requestid');
+            $table->fullText('filename', 'ft_predb_filename');
         });
-        DB::statement('ALTER TABLE predb ADD FULLTEXT ft_predb_filename (filename)');
         Trigger::table('predb')->key('insert_hashes')->afterInsert(function () {
             return 'INSERT INTO predb_hashes (hash, predb_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), (UNHEX(SHA1(NEW.title)), NEW.id), (UNHEX(SHA2(NEW.title, 256)), NEW.id), (UNHEX(MD5(CONCAT(NEW.title, NEW.requestid))), NEW.id), (UNHEX(MD5(CONCAT(NEW.title, NEW.requestid, NEW.requestid))), NEW.id);';
         });

@@ -17,7 +17,7 @@ class CreateRootCategoriesTable extends Migration
             $table->engine = 'InnoDB';
             $table->charset = 'utf8';
             $table->collation = 'utf8_unicode_ci';
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('title');
             $table->integer('status')->default(1)->index('ix_root_categories_status');
             $table->boolean('disablepreview')->default(0);

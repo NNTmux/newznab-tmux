@@ -24,11 +24,9 @@ class CreateReleaseNamingRegexesTable extends Migration
             $table->integer('ordinal')->default(0)->index('ix_release_naming_regexes_ordinal')->comment('Order to run the regex in');
         });
 
-        if (env('DB_CONNECTION') !== 'pgsql') {
-            DB::statement('ALTER TABLE release_naming_regexes AUTO_INCREMENT = 100000;');
-        } else {
-            DB::statement('ALTER SEQUENCE release_naming_regexes_id_seq RESTART 1000000;');
-        }
+        DB::statement('ALTER TABLE release_naming_regexes AUTO_INCREMENT = 100000;');
+
+
     }
 
     /**

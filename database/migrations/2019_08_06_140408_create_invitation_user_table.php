@@ -13,7 +13,7 @@ class CreateInvitationUserTable extends Migration
     public function up()
     {
         Schema::create('user_invitations', function (Blueprint $table) {
-            $table->BigIncrements('id');
+            $table->id();
             $table->string('code')->index();
             $table->string('email');
             $table->BigInteger('user_id')->unsigned();

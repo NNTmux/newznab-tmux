@@ -30,9 +30,8 @@ class CreateGamesinfoTable extends Migration
             $table->string('trailer', 1000)->default('');
             $table->string('classused', 10)->default('steam');
             $table->timestamps();
+            $table->fullText('title', 'ix_title_ft');
         });
-
-        DB::statement('ALTER TABLE gamesinfo ADD FULLTEXT ix_title_ft(title)');
     }
 
     /**

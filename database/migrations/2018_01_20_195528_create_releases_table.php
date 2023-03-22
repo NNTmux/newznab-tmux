@@ -77,11 +77,10 @@ processed');
             $table->index(['haspreview', 'passwordstatus'], 'ix_releases_haspreview_passwordstatus');
             $table->index(['nfostatus', 'size'], 'ix_releases_nfostatus');
             $table->index(['dehashstatus', 'ishashed'], 'ix_releases_dehashstatus');
+            $table->binary('nzb_guid')->index('ix_releases_nzb_guid');
         });
 
         DB::statement('ALTER TABLE releases DROP PRIMARY KEY , ADD PRIMARY KEY (id, categories_id)');
-        DB::statement('ALTER TABLE releases ADD COLUMN nzb_guid BINARY(16) NULL');
-        DB::statement('ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid)');
 
         Trigger::table('releases')->key('check_insert')->beforeInsert(function () {
             return 'IF NEW.searchname REGEXP "[a-fA-F0-9]{32}" OR NEW.name REGEXP "[a-fA-F0-9]{32}" THEN SET NEW.ishashed = 1; END IF;';

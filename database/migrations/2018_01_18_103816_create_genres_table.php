@@ -22,11 +22,8 @@ class CreateGenresTable extends Migration
             $table->boolean('disabled')->default(0);
         });
 
-        if (env('DB_CONNECTION') !== 'pgsql') {
-            DB::statement('ALTER TABLE genres AUTO_INCREMENT = 100000;');
-        } else {
-            DB::statement('ALTER SEQUENCE genres_id_seq RESTART 1000000;');
-        }
+        DB::statement('ALTER TABLE genres AUTO_INCREMENT = 100000;');
+
     }
 
     /**

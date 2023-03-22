@@ -19,9 +19,8 @@ class CreateSteamAppsTable extends Migration
             $table->string('name')->default('')->comment('Steam application name');
             $table->integer('appid')->unsigned()->comment('Steam application id');
             $table->primary(['appid', 'name']);
+            $table->fullText('name', 'ix_name_ft');
         });
-
-        DB::statement('ALTER TABLE steam_apps ADD FULLTEXT ix_name_ft (name)');
     }
 
     /**
