@@ -3,7 +3,7 @@
 namespace Blacklight;
 
 use App\Models\Release;
-use Elastic\Elasticsearch\Exception\ElasticsearchException;
+use Elasticsearch\Common\Exceptions\ElasticsearchException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
