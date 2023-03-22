@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Invitation;
 use App\Models\Settings;
 use App\Models\User;
-use Blacklight\utility\Utility;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
