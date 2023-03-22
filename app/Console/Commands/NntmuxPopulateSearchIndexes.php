@@ -6,7 +6,6 @@ use App\Models\Predb;
 use App\Models\Release;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
-use Elasticsearch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
