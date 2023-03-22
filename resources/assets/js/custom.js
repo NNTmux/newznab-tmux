@@ -6,10 +6,10 @@
  *     // code here
  * });
  */
-(function($, sr) {
+(function ($, sr) {
     // debouncing function from John Hann
     // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
-    var debounce = function(func, threshold, execAsap) {
+    var debounce = function (func, threshold, execAsap) {
         var timeout;
 
         return function debounced() {
@@ -28,7 +28,7 @@
     };
 
     // smartresize
-    jQuery.fn[sr] = function(fn) {
+    jQuery.fn[sr] = function (fn) {
         return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr);
     };
 })(jQuery, 'smartresize');
@@ -40,9 +40,9 @@
 
 /* SIDEBAR */
 
-$(document).ready(function() {
+$(document).ready(function () {
     // TODO: This is some kind of easy fix, maybe we can improve this
-    var setContentHeight = function() {
+    var setContentHeight = function () {
         // reset height
         $RIGHT_COL.css('min-height', $(window).height());
 
@@ -57,11 +57,11 @@ $(document).ready(function() {
         $RIGHT_COL.css('min-height', contentHeight);
     };
 
-    $SIDEBAR_MENU.find('a').on('click', function(ev) {
+    $SIDEBAR_MENU.find('a').on('click', function (ev) {
         var $li = $(this).parent();
         if ($li.is('.active')) {
             $li.removeClass('active active-sm');
-            $('ul:first', $li).slideUp(function() {
+            $('ul:first', $li).slideUp(function () {
                 setContentHeight();
             });
         } else {
@@ -79,47 +79,39 @@ $(document).ready(function() {
             }
             $li.addClass('active');
 
-            $('ul:first', $li).slideDown(function() {});
+            $('ul:first', $li).slideDown(function () {});
         }
     });
 
     // toggle small or large menu
-    $MENU_TOGGLE.on('click', function() {
+    $MENU_TOGGLE.on('click', function () {
         if ($BODY.hasClass('nav-md')) {
             $SIDEBAR_MENU.find('li.active ul').hide();
-            $SIDEBAR_MENU
-                .find('li.active')
-                .addClass('active-sm')
-                .removeClass('active');
+            $SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
         } else {
             $SIDEBAR_MENU.find('li.active-sm ul').show();
-            $SIDEBAR_MENU
-                .find('li.active-sm')
-                .addClass('active')
-                .removeClass('active-sm');
+            $SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
         }
 
         $BODY.toggleClass('nav-md nav-sm');
 
         setContentHeight();
 
-        $('.dataTable').each(function() {
-            $(this)
-                .dataTable()
-                .fnDraw();
+        $('.dataTable').each(function () {
+            $(this).dataTable().fnDraw();
         });
     });
 
     // check active menu
 
-    var $cur_menu = $SIDEBAR_MENU.find('a').filter(function() {
+    var $cur_menu = $SIDEBAR_MENU.find('a').filter(function () {
         // find nav element with exact match
         return this.href == CURRENT_URL;
     });
 
     if ($cur_menu.length == 0) {
         // if no exact match, try to find best match
-        var $cur_menu = $SIDEBAR_MENU.find('a').filter(function() {
+        var $cur_menu = $SIDEBAR_MENU.find('a').filter(function () {
             return CURRENT_URL.startsWith(this.href) && this.href != '';
         });
 
@@ -139,14 +131,14 @@ $(document).ready(function() {
         .parent('li')
         .addClass('current-page')
         .parents('ul')
-        .slideDown(function() {
+        .slideDown(function () {
             setContentHeight();
         })
         .parent()
         .addClass('active');
 
     // recompute content when resizing
-    $(window).smartresize(function() {
+    $(window).smartresize(function () {
         setContentHeight();
     });
 
@@ -225,14 +217,7 @@ function init_flot_chart() {
             f < 30;
             f++
         )
-            d.push([
-                new Date(
-                    Date.today()
-                        .add(f)
-                        .days()
-                ).getTime(),
-                randNum() + f + f + 10,
-            ]);
+            d.push([new Date(Date.today().add(f).days()).getTime(), randNum() + f + f + 10]);
         var g = {
                 series: {
                     lines: {
@@ -310,7 +295,7 @@ function init_flot_chart() {
                     margin: [0, -25],
                     noColumns: 0,
                     labelBoxBorderColor: null,
-                    labelFormatter: function(a, b) {
+                    labelFormatter: function (a, b) {
                         return a + '&nbsp;&nbsp;';
                     },
                     width: 40,
@@ -419,10 +404,10 @@ function init_starrr() {
         $('.stars-existing').starrr({
             rating: 4,
         }),
-        $('.stars').on('starrr:change', function(a, b) {
+        $('.stars').on('starrr:change', function (a, b) {
             $('.stars-count').html(b);
         }),
-        $('.stars-existing').on('starrr:change', function(a, b) {
+        $('.stars-existing').on('starrr:change', function (a, b) {
             $('.stars-count-existing').html(b);
         }));
 }
@@ -511,7 +496,7 @@ function init_chart_doughnut() {
                 responsive: !1,
             },
         };
-        $('.canvasDoughnut').each(function() {
+        $('.canvasDoughnut').each(function () {
             var b = $(this);
             new Chart(b, a);
         });
@@ -562,38 +547,8 @@ function init_sparklines() {
         (console.log('init_sparklines'),
         $('.sparkline_one').sparkline(
             [
-                2,
-                4,
-                3,
-                4,
-                5,
-                4,
-                5,
-                4,
-                3,
-                4,
-                5,
-                6,
-                4,
-                5,
-                6,
-                3,
-                5,
-                4,
-                5,
-                4,
-                5,
-                4,
-                3,
-                4,
-                5,
-                6,
-                7,
-                5,
-                4,
-                3,
-                5,
-                6,
+                2, 4, 3, 4, 5, 4, 5, 4, 3, 4, 5, 6, 4, 5, 6, 3, 5, 4, 5, 4, 5, 4, 3, 4, 5, 6, 7, 5,
+                4, 3, 5, 6,
             ],
             {
                 type: 'bar',
@@ -961,7 +916,7 @@ function init_autocomplete() {
                 ZW: 'Zimbabwe',
                 ZZ: 'Unknown or Invalid Region',
             },
-            b = $.map(a, function(a, b) {
+            b = $.map(a, function (a, b) {
                 return {
                     value: a,
                     data: b,
@@ -980,39 +935,27 @@ function init_autosize() {
 function init_parsley() {
     if ('undefined' != typeof parsley) {
         console.log('init_parsley'),
-            $('parsley:field:validate', function() {
+            $('parsley:field:validate', function () {
                 a();
             }),
-            $('#demo-form .btn').on('click', function() {
-                $('#demo-form')
-                    .parsley()
-                    .validate(),
-                    a();
+            $('#demo-form .btn').on('click', function () {
+                $('#demo-form').parsley().validate(), a();
             });
-        var a = function() {
-            !0 ===
-            $('#demo-form')
-                .parsley()
-                .isValid()
+        var a = function () {
+            !0 === $('#demo-form').parsley().isValid()
                 ? ($('.bs-callout-info').removeClass('hidden'),
                   $('.bs-callout-warning').addClass('hidden'))
                 : ($('.bs-callout-info').addClass('hidden'),
                   $('.bs-callout-warning').removeClass('hidden'));
         };
-        $('parsley:field:validate', function() {
+        $('parsley:field:validate', function () {
             a();
         }),
-            $('#demo-form2 .btn').on('click', function() {
-                $('#demo-form2')
-                    .parsley()
-                    .validate(),
-                    a();
+            $('#demo-form2 .btn').on('click', function () {
+                $('#demo-form2').parsley().validate(), a();
             });
-        var a = function() {
-            !0 ===
-            $('#demo-form2')
-                .parsley()
-                .isValid()
+        var a = function () {
+            !0 === $('#demo-form2').parsley().isValid()
                 ? ($('.bs-callout-info').removeClass('hidden'),
                   $('.bs-callout-warning').addClass('hidden'))
                 : ($('.bs-callout-info').addClass('hidden'),
@@ -1072,7 +1015,7 @@ function init_wysiwyg() {
     }
     'undefined' != typeof $.fn.wysiwyg &&
         (console.log('init_wysiwyg'),
-        $('.editor-wrapper').each(function() {
+        $('.editor-wrapper').each(function () {
             var a = $(this).attr('id');
             $(this).wysiwyg({
                 toolbarSelector: '[data-target="#' + a + '"]',
@@ -1098,7 +1041,7 @@ function init_cropper() {
             j = {
                 aspectRatio: 16 / 9,
                 preview: '.img-preview',
-                crop: function(a) {
+                crop: function (a) {
                     c.val(Math.round(a.x)),
                         d.val(Math.round(a.y)),
                         e.val(Math.round(a.height)),
@@ -1111,22 +1054,22 @@ function init_cropper() {
         $('[data-toggle="tooltip"]').tooltip(),
             a
                 .on({
-                    'build.cropper': function(a) {
+                    'build.cropper': function (a) {
                         console.log(a.type);
                     },
-                    'built.cropper': function(a) {
+                    'built.cropper': function (a) {
                         console.log(a.type);
                     },
-                    'cropstart.cropper': function(a) {
+                    'cropstart.cropper': function (a) {
                         console.log(a.type, a.action);
                     },
-                    'cropmove.cropper': function(a) {
+                    'cropmove.cropper': function (a) {
                         console.log(a.type, a.action);
                     },
-                    'cropend.cropper': function(a) {
+                    'cropend.cropper': function (a) {
                         console.log(a.type, a.action);
                     },
-                    'crop.cropper': function(a) {
+                    'crop.cropper': function (a) {
                         console.log(
                             a.type,
                             a.x,
@@ -1138,7 +1081,7 @@ function init_cropper() {
                             a.scaleY
                         );
                     },
-                    'zoom.cropper': function(a) {
+                    'zoom.cropper': function (a) {
                         console.log(a.type, a.ratio);
                     },
                 })
@@ -1149,7 +1092,7 @@ function init_cropper() {
                 ($('button[data-method="rotate"]').prop('disabled', !0),
                 $('button[data-method="scale"]').prop('disabled', !0)),
             'undefined' == typeof b[0].download && b.addClass('disabled'),
-            $('.docs-toggles').on('change', 'input', function() {
+            $('.docs-toggles').on('change', 'input', function () {
                 var e,
                     f,
                     b = $(this),
@@ -1160,13 +1103,13 @@ function init_cropper() {
                         ? ((j[c] = b.prop('checked')),
                           (e = a.cropper('getCropBoxData')),
                           (f = a.cropper('getCanvasData')),
-                          (j.built = function() {
+                          (j.built = function () {
                               a.cropper('setCropBoxData', e), a.cropper('setCanvasData', f);
                           }))
                         : 'radio' === d && (j[c] = b.val()),
                     a.cropper('destroy').cropper(j));
             }),
-            $('.docs-buttons').on('click', '[data-method]', function() {
+            $('.docs-buttons').on('click', '[data-method]', function () {
                 var e,
                     f,
                     c = $(this),
@@ -1194,10 +1137,7 @@ function init_cropper() {
                             break;
                         case 'getCroppedCanvas':
                             f &&
-                                ($('#getCroppedCanvasModal')
-                                    .modal()
-                                    .find('.modal-body')
-                                    .html(f),
+                                ($('#getCroppedCanvasModal').modal().find('.modal-body').html(f),
                                 b.hasClass('disabled') || b.attr('href', f.toDataURL()));
                     }
                     if ($.isPlainObject(f) && e)
@@ -1208,7 +1148,7 @@ function init_cropper() {
                         }
                 }
             }),
-            $(document.body).on('keydown', function(b) {
+            $(document.body).on('keydown', function (b) {
                 if (a.data('cropper') && !(this.scrollTop > 300))
                     switch (b.which) {
                         case 37:
@@ -1228,7 +1168,7 @@ function init_cropper() {
             k = $('#inputImage'),
             l = window.URL || window.webkitURL;
         l
-            ? k.change(function() {
+            ? k.change(function () {
                   var c,
                       b = this.files;
                   a.data('cropper') &&
@@ -1238,7 +1178,7 @@ function init_cropper() {
                       /^image\/\w+$/.test(c.type)
                           ? ((m = l.createObjectURL(c)),
                             a
-                                .one('built.cropper', function() {
+                                .one('built.cropper', function () {
                                     l.revokeObjectURL(m);
                                 })
                                 .cropper('reset')
@@ -1246,10 +1186,7 @@ function init_cropper() {
                             k.val(''))
                           : window.alert('Please choose an image file.'));
               })
-            : k
-                  .prop('disabled', !0)
-                  .parent()
-                  .addClass('disabled');
+            : k.prop('disabled', !0).parent().addClass('disabled');
     }
 }
 
@@ -1257,14 +1194,14 @@ function init_knob() {
     if ('undefined' != typeof $.fn.knob) {
         console.log('init_knob'),
             $('.knob').knob({
-                change: function(a) {},
-                release: function(a) {
+                change: function (a) {},
+                release: function (a) {
                     console.log('release : ' + a);
                 },
-                cancel: function() {
+                cancel: function () {
                     console.log('cancel : ', this);
                 },
-                draw: function() {
+                draw: function () {
                     if ('tron' == this.$.data('skin')) {
                         this.cursorExt = 0.3;
                         var b,
@@ -1319,27 +1256,17 @@ function init_knob() {
             d = 0,
             e = $('div.idir'),
             f = $('div.ival'),
-            g = function() {
-                d++,
-                    e
-                        .show()
-                        .html('+')
-                        .fadeOut(),
-                    f.html(d);
+            g = function () {
+                d++, e.show().html('+').fadeOut(), f.html(d);
             },
-            h = function() {
-                d--,
-                    e
-                        .show()
-                        .html('-')
-                        .fadeOut(),
-                    f.html(d);
+            h = function () {
+                d--, e.show().html('-').fadeOut(), f.html(d);
             };
         $('input.infinite').knob({
             min: 0,
             max: 20,
             stopper: !1,
-            change: function() {
+            change: function () {
                 a > this.cv
                     ? b
                         ? (h(), (b = 0))
@@ -1424,16 +1351,12 @@ function init_IonRangeSlider() {
             max_interval: 50,
         }),
         $('.range_time24').ionRangeSlider({
-            min: +moment()
-                .subtract(12, 'hours')
-                .format('X'),
+            min: +moment().subtract(12, 'hours').format('X'),
             max: +moment().format('X'),
-            from: +moment()
-                .subtract(6, 'hours')
-                .format('X'),
+            from: +moment().subtract(6, 'hours').format('X'),
             grid: !0,
             force_edges: !0,
-            prettify: function(a) {
+            prettify: function (a) {
                 var b = moment(a, 'X');
                 return b.format('Do MMMM, HH:mm');
             },
@@ -1443,7 +1366,7 @@ function init_IonRangeSlider() {
 function init_daterangepicker() {
     if ('undefined' != typeof $.fn.daterangepicker) {
         console.log('init_daterangepicker');
-        var a = function(a, b, c) {
+        var a = function (a, b, c) {
                 console.log(a.toISOString(), b.toISOString(), c),
                     $('#reportrange span').html(
                         a.format('MMMM D, YYYY') + ' - ' + b.format('MMMM D, YYYY')
@@ -1469,12 +1392,8 @@ function init_daterangepicker() {
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [
-                        moment()
-                            .subtract(1, 'month')
-                            .startOf('month'),
-                        moment()
-                            .subtract(1, 'month')
-                            .endOf('month'),
+                        moment().subtract(1, 'month').startOf('month'),
+                        moment().subtract(1, 'month').endOf('month'),
                     ],
                 },
                 opens: 'left',
@@ -1508,20 +1427,18 @@ function init_daterangepicker() {
                 },
             };
         $('#reportrange span').html(
-            moment()
-                .subtract(29, 'days')
-                .format('MMMM D, YYYY') +
+            moment().subtract(29, 'days').format('MMMM D, YYYY') +
                 ' - ' +
                 moment().format('MMMM D, YYYY')
         ),
             $('#reportrange').daterangepicker(b, a),
-            $('#reportrange').on('show.daterangepicker', function() {
+            $('#reportrange').on('show.daterangepicker', function () {
                 console.log('show event fired');
             }),
-            $('#reportrange').on('hide.daterangepicker', function() {
+            $('#reportrange').on('hide.daterangepicker', function () {
                 console.log('hide event fired');
             }),
-            $('#reportrange').on('apply.daterangepicker', function(a, b) {
+            $('#reportrange').on('apply.daterangepicker', function (a, b) {
                 console.log(
                     'apply event fired, start/end dates are ' +
                         b.startDate.format('MMMM D, YYYY') +
@@ -1529,23 +1446,17 @@ function init_daterangepicker() {
                         b.endDate.format('MMMM D, YYYY')
                 );
             }),
-            $('#reportrange').on('cancel.daterangepicker', function(a, b) {
+            $('#reportrange').on('cancel.daterangepicker', function (a, b) {
                 console.log('cancel event fired');
             }),
-            $('#options1').click(function() {
-                $('#reportrange')
-                    .data('daterangepicker')
-                    .setOptions(b, a);
+            $('#options1').click(function () {
+                $('#reportrange').data('daterangepicker').setOptions(b, a);
             }),
-            $('#options2').click(function() {
-                $('#reportrange')
-                    .data('daterangepicker')
-                    .setOptions(optionSet2, a);
+            $('#options2').click(function () {
+                $('#reportrange').data('daterangepicker').setOptions(optionSet2, a);
             }),
-            $('#destroy').click(function() {
-                $('#reportrange')
-                    .data('daterangepicker')
-                    .remove();
+            $('#destroy').click(function () {
+                $('#reportrange').data('daterangepicker').remove();
             });
     }
 }
@@ -1553,7 +1464,7 @@ function init_daterangepicker() {
 function init_daterangepicker_right() {
     if ('undefined' != typeof $.fn.daterangepicker) {
         console.log('init_daterangepicker_right');
-        var a = function(a, b, c) {
+        var a = function (a, b, c) {
                 console.log(a.toISOString(), b.toISOString(), c),
                     $('#reportrange_right span').html(
                         a.format('MMMM D, YYYY') + ' - ' + b.format('MMMM D, YYYY')
@@ -1579,12 +1490,8 @@ function init_daterangepicker_right() {
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [
-                        moment()
-                            .subtract(1, 'month')
-                            .startOf('month'),
-                        moment()
-                            .subtract(1, 'month')
-                            .endOf('month'),
+                        moment().subtract(1, 'month').startOf('month'),
+                        moment().subtract(1, 'month').endOf('month'),
                     ],
                 },
                 opens: 'right',
@@ -1618,20 +1525,18 @@ function init_daterangepicker_right() {
                 },
             };
         $('#reportrange_right span').html(
-            moment()
-                .subtract(29, 'days')
-                .format('MMMM D, YYYY') +
+            moment().subtract(29, 'days').format('MMMM D, YYYY') +
                 ' - ' +
                 moment().format('MMMM D, YYYY')
         ),
             $('#reportrange_right').daterangepicker(b, a),
-            $('#reportrange_right').on('show.daterangepicker', function() {
+            $('#reportrange_right').on('show.daterangepicker', function () {
                 console.log('show event fired');
             }),
-            $('#reportrange_right').on('hide.daterangepicker', function() {
+            $('#reportrange_right').on('hide.daterangepicker', function () {
                 console.log('hide event fired');
             }),
-            $('#reportrange_right').on('apply.daterangepicker', function(a, b) {
+            $('#reportrange_right').on('apply.daterangepicker', function (a, b) {
                 console.log(
                     'apply event fired, start/end dates are ' +
                         b.startDate.format('MMMM D, YYYY') +
@@ -1639,23 +1544,17 @@ function init_daterangepicker_right() {
                         b.endDate.format('MMMM D, YYYY')
                 );
             }),
-            $('#reportrange_right').on('cancel.daterangepicker', function(a, b) {
+            $('#reportrange_right').on('cancel.daterangepicker', function (a, b) {
                 console.log('cancel event fired');
             }),
-            $('#options1').click(function() {
-                $('#reportrange_right')
-                    .data('daterangepicker')
-                    .setOptions(b, a);
+            $('#options1').click(function () {
+                $('#reportrange_right').data('daterangepicker').setOptions(b, a);
             }),
-            $('#options2').click(function() {
-                $('#reportrange_right')
-                    .data('daterangepicker')
-                    .setOptions(optionSet2, a);
+            $('#options2').click(function () {
+                $('#reportrange_right').data('daterangepicker').setOptions(optionSet2, a);
             }),
-            $('#destroy').click(function() {
-                $('#reportrange_right')
-                    .data('daterangepicker')
-                    .remove();
+            $('#destroy').click(function () {
+                $('#reportrange_right').data('daterangepicker').remove();
             });
     }
 }
@@ -1668,7 +1567,7 @@ function init_daterangepicker_single_call() {
                 singleDatePicker: !0,
                 singleClasses: 'picker_1',
             },
-            function(a, b, c) {
+            function (a, b, c) {
                 console.log(a.toISOString(), b.toISOString(), c);
             }
         ),
@@ -1677,7 +1576,7 @@ function init_daterangepicker_single_call() {
                 singleDatePicker: !0,
                 singleClasses: 'picker_2',
             },
-            function(a, b, c) {
+            function (a, b, c) {
                 console.log(a.toISOString(), b.toISOString(), c);
             }
         ),
@@ -1686,7 +1585,7 @@ function init_daterangepicker_single_call() {
                 singleDatePicker: !0,
                 singleClasses: 'picker_3',
             },
-            function(a, b, c) {
+            function (a, b, c) {
                 console.log(a.toISOString(), b.toISOString(), c);
             }
         ),
@@ -1695,7 +1594,7 @@ function init_daterangepicker_single_call() {
                 singleDatePicker: !0,
                 singleClasses: 'picker_4',
             },
-            function(a, b, c) {
+            function (a, b, c) {
                 console.log(a.toISOString(), b.toISOString(), c);
             }
         ));
@@ -1704,7 +1603,7 @@ function init_daterangepicker_single_call() {
 function init_daterangepicker_reservation() {
     'undefined' != typeof $.fn.daterangepicker &&
         (console.log('init_daterangepicker_reservation'),
-        $('#reservation').daterangepicker(null, function(a, b, c) {
+        $('#reservation').daterangepicker(null, function (a, b, c) {
             console.log(a.toISOString(), b.toISOString(), c);
         }),
         $('#reservation-time').daterangepicker({
@@ -1736,14 +1635,10 @@ function init_validator() {
             .on('blur', 'input[required], input.optional, select.required', validator.checkField)
             .on('change', 'select.required', validator.checkField)
             .on('keypress', 'input[required][pattern]', validator.keypress),
-        $('.multi.required').on('keyup blur', 'input', function() {
-            validator.checkField.apply(
-                $(this)
-                    .siblings()
-                    .last()[0]
-            );
+        $('.multi.required').on('keyup blur', 'input', function () {
+            validator.checkField.apply($(this).siblings().last()[0]);
         }),
-        $('form').submit(function(a) {
+        $('form').submit(function (a) {
             a.preventDefault();
             var b = !0;
             return validator.checkAll($(this)) || (b = !1), b && this.submit(), !1;
@@ -1756,15 +1651,14 @@ function init_PNotify() {
         new PNotify({
             title: 'PNotify',
             type: 'info',
-            text:
-                "Welcome. Try hovering over me. You can click things behind me, because I'm non-blocking.",
+            text: "Welcome. Try hovering over me. You can click things behind me, because I'm non-blocking.",
             nonblock: {
                 nonblock: !0,
             },
             addclass: 'dark',
             styling: 'bootstrap3',
             hide: !1,
-            before_close: function(a) {
+            before_close: function (a) {
                 return (
                     a.update({
                         title: a.options.title + ' - Enjoy your Stay',
@@ -1781,7 +1675,7 @@ function init_CustomNotification() {
     if ((console.log('run_customtabs'), 'undefined' != typeof CustomTabs)) {
         console.log('init_CustomTabs');
         var a = 10;
-        (TabbedNotification = function(b) {
+        (TabbedNotification = function (b) {
             var c =
                 "<div id='ntf" +
                 a +
@@ -1807,45 +1701,33 @@ function init_CustomNotification() {
                   CustomTabs(b))
                 : alert('doesnt exists');
         }),
-            (CustomTabs = function(a) {
+            (CustomTabs = function (a) {
                 $('.tabbed_notifications > div').hide(),
                     $('.tabbed_notifications > div:first-of-type').show(),
                     $('#custom_notifications').removeClass('dsp_none'),
-                    $('.notifications a').click(function(a) {
+                    $('.notifications a').click(function (a) {
                         a.preventDefault();
                         var b = $(this),
                             c = '#' + b.parents('.notifications').data('tabbed_notifications'),
-                            d = b
-                                .closest('li')
-                                .siblings()
-                                .children('a'),
+                            d = b.closest('li').siblings().children('a'),
                             e = b.attr('href');
                         d.removeClass('active'),
                             b.addClass('active'),
-                            $(c)
-                                .children('div')
-                                .hide(),
+                            $(c).children('div').hide(),
                             $(e).show();
                     });
             }),
             CustomTabs();
         var b = (idname = '');
-        $(document).on('click', '.notification_close', function(a) {
-            (idname = $(this)
-                .parent()
-                .parent()
-                .attr('id')),
+        $(document).on('click', '.notification_close', function (a) {
+            (idname = $(this).parent().parent().attr('id')),
                 (b = idname.substr(-2)),
                 $('#ntf' + b).remove(),
                 $('#ntlink' + b)
                     .parent()
                     .remove(),
-                $('.notifications a')
-                    .first()
-                    .addClass('active'),
-                $('#notif-group div')
-                    .first()
-                    .css('display', 'block');
+                $('.notifications a').first().addClass('active'),
+                $('#notif-group div').first().css('display', 'block');
         });
     }
 }
@@ -1862,18 +1744,16 @@ function init_EasyPieChart() {
                 lineWidth: 20,
                 trackWidth: 16,
                 lineCap: 'butt',
-                onStep: function(a, b, c) {
-                    $(this.el)
-                        .find('.percent')
-                        .text(Math.round(c));
+                onStep: function (a, b, c) {
+                    $(this.el).find('.percent').text(Math.round(c));
                 },
             });
         var a = (window.chart = $('.chart').data('easyPieChart'));
-        $('.js_update').on('click', function() {
+        $('.js_update').on('click', function () {
             a.update(200 * Math.random() - 100);
         });
         var b = $.fn.popover.Constructor.prototype.leave;
-        ($.fn.popover.Constructor.prototype.leave = function(a) {
+        ($.fn.popover.Constructor.prototype.leave = function (a) {
             var d,
                 e,
                 c =
@@ -1886,9 +1766,9 @@ function init_EasyPieChart() {
                 a.currentTarget &&
                     ((d = $(a.currentTarget).siblings('.popover')),
                     (e = c.timeout),
-                    d.one('mouseenter', function() {
+                    d.one('mouseenter', function () {
                         clearTimeout(e),
-                            d.one('mouseleave', function() {
+                            d.one('mouseleave', function () {
                                 $.fn.popover.Constructor.prototype.leave.call(c, c);
                             });
                     }));
@@ -2275,7 +2155,7 @@ function init_charts() {
 function init_compose() {
     'undefined' != typeof $.fn.slideToggle &&
         (console.log('init_compose'),
-        $('#compose, .compose-close').click(function() {
+        $('#compose, .compose-close').click(function () {
             $('.compose').slideToggle();
         }));
 }
@@ -2297,11 +2177,11 @@ function init_calendar() {
                 },
                 selectable: !0,
                 selectHelper: !0,
-                select: function(a, b, c) {
+                select: function (a, b, c) {
                     $('#fc_create').click(),
                         (e = a),
                         (ended = b),
-                        $('.antosubmit').on('click', function() {
+                        $('.antosubmit').on('click', function () {
                             var a = $('#title').val();
                             return (
                                 b && (ended = b),
@@ -2324,11 +2204,11 @@ function init_calendar() {
                             );
                         });
                 },
-                eventClick: function(a, b, c) {
+                eventClick: function (a, b, c) {
                     $('#fc_edit').click(),
                         $('#title2').val(a.title),
                         (f = $('#event_type').val()),
-                        $('.antosubmit2').on('click', function() {
+                        $('.antosubmit2').on('click', function () {
                             (a.title = $('#title2').val()),
                                 g.fullCalendar('updateEvent', a),
                                 $('.antoclose2').click();
@@ -2377,7 +2257,7 @@ function init_calendar() {
 function init_DataTables() {
     if ((console.log('run_datatables'), 'undefined' != typeof $.fn.DataTable)) {
         console.log('init_DataTables');
-        var a = function() {
+        var a = function () {
             $('#datatable-buttons').length &&
                 $('#datatable-buttons').DataTable({
                     dom: 'Bfrtip',
@@ -2406,10 +2286,10 @@ function init_DataTables() {
                     responsive: !0,
                 });
         };
-        (TableManageButtons = (function() {
+        (TableManageButtons = (function () {
             'use strict';
             return {
-                init: function() {
+                init: function () {
                     a();
                 },
             };
@@ -2439,7 +2319,7 @@ function init_DataTables() {
                 },
             ],
         }),
-            b.on('draw.dt', function() {
+            b.on('draw.dt', function () {
                 $('checkbox input').iCheck({
                     checkboxClass: 'icheckbox_flat-green',
                 });
@@ -2603,7 +2483,7 @@ function init_morris_charts() {
                 hideHover: 'auto',
                 labels: ['Y', 'Z', 'A'],
                 resize: !0,
-            }).on('click', function(a, b) {
+            }).on('click', function (a, b) {
                 console.log(a, b);
             }),
         $('#graph_area').length &&
@@ -2701,7 +2581,7 @@ function init_morris_charts() {
                     },
                 ],
                 colors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
-                formatter: function(a) {
+                formatter: function (a) {
                     return a + '%';
                 },
                 resize: !0,
@@ -2738,7 +2618,7 @@ function init_morris_charts() {
                 ],
                 resize: !0,
             }),
-            $MENU_TOGGLE.on('click', function() {
+            $MENU_TOGGLE.on('click', function () {
                 $(window).resize();
             })));
 }
@@ -2918,7 +2798,11 @@ function init_echarts() {
                 axisLine: {
                     show: !0,
                     lineStyle: {
-                        color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
+                        color: [
+                            [0.2, '#86b379'],
+                            [0.8, '#68a54a'],
+                            [1, '#408829'],
+                        ],
                         width: 8,
                     },
                 },
@@ -3258,7 +3142,7 @@ function init_echarts() {
                         },
                         axisLabel: {
                             show: !0,
-                            formatter: function(a) {
+                            formatter: function (a) {
                                 switch (a + '') {
                                     case '10':
                                         return 'a';
@@ -3470,7 +3354,7 @@ function init_echarts() {
                         type: 'scatter',
                         tooltip: {
                             trigger: 'item',
-                            formatter: function(a) {
+                            formatter: function (a) {
                                 return a.value.length > 1
                                     ? a.seriesName +
                                           ' :<br/>' +
@@ -3769,7 +3653,7 @@ function init_echarts() {
                         type: 'scatter',
                         tooltip: {
                             trigger: 'item',
-                            formatter: function(a) {
+                            formatter: function (a) {
                                 return a.value.length > 1
                                     ? a.seriesName +
                                           ' :<br/>' +
@@ -4488,7 +4372,7 @@ function init_echarts() {
                 },
                 tooltip: {
                     trigger: 'item',
-                    formatter: function(a) {
+                    formatter: function (a) {
                         var b = (a.value + '').split('.');
                         return (
                             (b =
@@ -5262,10 +5146,10 @@ function init_echarts() {
         }
     }
 }
-!(function(a, b) {
-    var c = function(a, b, c) {
+!(function (a, b) {
+    var c = function (a, b, c) {
         var d;
-        return function() {
+        return function () {
             function h() {
                 c || a.apply(f, g), (d = null);
             }
@@ -5274,7 +5158,7 @@ function init_echarts() {
             d ? clearTimeout(d) : c && a.apply(f, g), (d = setTimeout(h, b || 100));
         };
     };
-    jQuery.fn[b] = function(a) {
+    jQuery.fn[b] = function (a) {
         return a ? this.bind('resize', c(a)) : this.trigger(b);
     };
 })(jQuery, 'smartresize');
@@ -5288,112 +5172,90 @@ var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
     $RIGHT_COL = $('.right_col'),
     $NAV_MENU = $('.nav_menu'),
     $FOOTER = $('footer'),
-    randNum = function() {
+    randNum = function () {
         return Math.floor(21 * Math.random()) + 20;
     };
-$(document).ready(function() {
-    $('.collapse-link').on('click', function() {
+$(document).ready(function () {
+    $('.collapse-link').on('click', function () {
         var a = $(this).closest('.x_panel'),
             b = $(this).find('i'),
             c = a.find('.x_content');
         a.attr('style')
-            ? c.slideToggle(200, function() {
+            ? c.slideToggle(200, function () {
                   a.removeAttr('style');
               })
             : (c.slideToggle(200), a.css('height', 'auto')),
             b.toggleClass('fa-chevron-up fa-chevron-down');
     }),
-        $('.close-link').click(function() {
+        $('.close-link').click(function () {
             var a = $(this).closest('.x_panel');
             a.remove();
         });
 }),
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip({
             container: 'body',
         });
     }),
     $('.progress .progress-bar')[0] && $('.progress .progress-bar').progressbar(),
-    $(document).ready(function() {
+    $(document).ready(function () {
         if ($('.js-switch')[0]) {
             var a = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-            a.forEach(function(a) {
+            a.forEach(function (a) {
                 new Switchery(a, {
                     color: '#26B99A',
                 });
             });
         }
     }),
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('input.flat')[0] &&
-            $(document).ready(function() {
+            $(document).ready(function () {
                 $('input.flat').iCheck({
                     checkboxClass: 'icheckbox_flat-green',
                     radioClass: 'iradio_flat-green',
                 });
             });
     }),
-    $('table input').on('ifChecked', function() {
-        (checkState = ''),
-            $(this)
-                .parent()
-                .parent()
-                .parent()
-                .addClass('selected'),
-            countChecked();
+    $('table input').on('ifChecked', function () {
+        (checkState = ''), $(this).parent().parent().parent().addClass('selected'), countChecked();
     }),
-    $('table input').on('ifUnchecked', function() {
+    $('table input').on('ifUnchecked', function () {
         (checkState = ''),
-            $(this)
-                .parent()
-                .parent()
-                .parent()
-                .removeClass('selected'),
+            $(this).parent().parent().parent().removeClass('selected'),
             countChecked();
     });
 var checkState = '';
-$('.bulk_action input').on('ifChecked', function() {
-    (checkState = ''),
-        $(this)
-            .parent()
-            .parent()
-            .parent()
-            .addClass('selected'),
-        countChecked();
+$('.bulk_action input').on('ifChecked', function () {
+    (checkState = ''), $(this).parent().parent().parent().addClass('selected'), countChecked();
 }),
-    $('.bulk_action input').on('ifUnchecked', function() {
+    $('.bulk_action input').on('ifUnchecked', function () {
         (checkState = ''),
-            $(this)
-                .parent()
-                .parent()
-                .parent()
-                .removeClass('selected'),
+            $(this).parent().parent().parent().removeClass('selected'),
             countChecked();
     }),
-    $('.bulk_action input#check-all').on('ifChecked', function() {
+    $('.bulk_action input#check-all').on('ifChecked', function () {
         (checkState = 'all'), countChecked();
     }),
-    $('.bulk_action input#check-all').on('ifUnchecked', function() {
+    $('.bulk_action input#check-all').on('ifUnchecked', function () {
         (checkState = 'none'), countChecked();
     }),
-    $(document).ready(function() {
-        $('.expand').on('click', function() {
-            $(this)
-                .next()
-                .slideToggle(200),
+    $(document).ready(function () {
+        $('.expand').on('click', function () {
+            $(this).next().slideToggle(200),
                 ($expand = $(this).find('>:first-child')),
                 '+' == $expand.text() ? $expand.text('-') : $expand.text('+');
         });
     }),
     'undefined' != typeof NProgress &&
-        ($(document).ready(function() {
+        ($(document).ready(function () {
             NProgress.start();
         }),
-        $(window).load(function() {
+        $(window).load(function () {
             NProgress.done();
         }));
 var originalLeave = $.fn.popover.Constructor.prototype.leave;
-($.fn.popover.Constructor.prototype.leave = function(a) {
+($.fn.popover.Constructor.prototype.leave = function (a) {
     var c,
         d,
         b =
@@ -5406,9 +5268,9 @@ var originalLeave = $.fn.popover.Constructor.prototype.leave;
         a.currentTarget &&
             ((c = $(a.currentTarget).siblings('.popover')),
             (d = b.timeout),
-            c.one('mouseenter', function() {
+            c.one('mouseenter', function () {
                 clearTimeout(d),
-                    c.one('mouseleave', function() {
+                    c.one('mouseleave', function () {
                         $.fn.popover.Constructor.prototype.leave.call(b, b);
                     });
             }));
@@ -5421,7 +5283,7 @@ var originalLeave = $.fn.popover.Constructor.prototype.leave;
             hide: 400,
         },
     }),
-    $(document).ready(function() {
+    $(document).ready(function () {
         init_sparklines(),
             init_flot_chart(),
             init_wysiwyg(),

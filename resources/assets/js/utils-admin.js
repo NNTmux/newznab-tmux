@@ -14,9 +14,9 @@ function ajax_group_status(id, what) {
             url: base_url + '/admin/ajax?action=toggle_group_active_status&rand=' + rand_no,
             data: { group_id: id, group_status: what },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (what == 0) {
@@ -36,7 +36,7 @@ function ajax_group_status(id, what) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_group_status: ' + err);
             },
         });
@@ -59,9 +59,9 @@ function ajax_sharing_site_status(id, status) {
             url: base_url + '/admin/ajax?action=sharing_toggle_status&rand=' + rand_no,
             data: { site_id: id, site_status: status },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (status == 0) {
@@ -81,7 +81,7 @@ function ajax_sharing_site_status(id, status) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_sharing_site_status: ' + err);
             },
         });
@@ -104,9 +104,9 @@ function ajax_sharing_enabled(id, status) {
             url: base_url + '/admin/ajax?action=sharing_toggle_enabled&rand=' + rand_no,
             data: { enabled_status: status },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (status == 0) {
@@ -126,7 +126,7 @@ function ajax_sharing_enabled(id, status) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_sharing_enabled: ' + err);
             },
         });
@@ -149,9 +149,9 @@ function ajax_sharing_startposition(id, status) {
             url: base_url + '/admin/ajax?action=sharing_start_position&rand=' + rand_no,
             data: { start_position: status },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (status == 0) {
@@ -171,7 +171,7 @@ function ajax_sharing_startposition(id, status) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_sharing_startposition: ' + err);
             },
         });
@@ -191,15 +191,15 @@ function ajax_sharing_reset(id) {
         url: base_url + '/admin/ajax?action=sharing_reset_settings&rand=' + rand_no,
         data: { reset_settings: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
 
             // fade.. mm
             $('#message').fadeOut(5000);
             setTimeout('history.go(0);', 1500);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_sharing_reset: ' + err);
         },
     });
@@ -216,15 +216,15 @@ function ajax_sharing_site_purge(id) {
         url: base_url + '/admin/ajax?action=sharing_purge_site&rand=' + rand_no,
         data: { purge_site: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
 
             // fade.. mm
             $('#message').fadeOut(5000);
             setTimeout('history.go(0);', 1500);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_sharing_site_purge: ' + err);
         },
     });
@@ -244,9 +244,9 @@ function ajax_sharing_posting(id, status) {
             url: base_url + '/admin/ajax?action=sharing_toggle_posting&rand=' + rand_no,
             data: { posting_status: status },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (status == 0) {
@@ -266,7 +266,7 @@ function ajax_sharing_posting(id, status) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_sharing_posting: ' + err);
             },
         });
@@ -289,9 +289,9 @@ function ajax_sharing_fetching(id, status) {
             url: base_url + '/admin/ajax?action=sharing_toggle_fetching&rand=' + rand_no,
             data: { fetching_status: status },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (status == 0) {
@@ -311,7 +311,7 @@ function ajax_sharing_fetching(id, status) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_sharing_fetching: ' + err);
             },
         });
@@ -334,9 +334,9 @@ function ajax_sharing_auto(id, status) {
             url: base_url + '/admin/ajax?action=sharing_toggle_site_auto_enabling&rand=' + rand_no,
             data: { auto_status: status },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (status == 0) {
@@ -356,7 +356,7 @@ function ajax_sharing_auto(id, status) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_sharing_auto: ' + err);
             },
         });
@@ -379,9 +379,9 @@ function ajax_sharing_hide(id, status) {
             url: base_url + '/admin/ajax?action=sharing_toggle_hide_users&rand=' + rand_no,
             data: { hide_status: status },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (status == 0) {
@@ -401,7 +401,7 @@ function ajax_sharing_hide(id, status) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_sharing_hide: ' + err);
             },
         });
@@ -443,9 +443,9 @@ function ajax_backfill_status(id, what) {
             url: base_url + '/admin/ajax?action=toggle_group_backfill_status&rand=' + rand_no,
             data: { group_id: id, backfill_status: what },
             dataType: 'html',
-            success: function(data) {
+            success: function (data) {
                 $('div#message').html(data);
-                $('div#message').show('fast', function() {});
+                $('div#message').show('fast', function () {});
 
                 // switch some links around
                 if (what == 0) {
@@ -465,7 +465,7 @@ function ajax_backfill_status(id, what) {
                 // fade.. mm
                 $('#message').fadeOut(5000);
             },
-            error: function(xhr, err, e) {
+            error: function (xhr, err, e) {
                 alert('Error in ajax_backfill_status: ' + err);
             },
         });
@@ -486,13 +486,13 @@ function ajax_group_delete(id) {
         url: base_url + '/admin/ajax?action=group_edit_delete_single&rand=' + rand_no,
         data: { group_id: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#grouprow-' + id).fadeOut(2000);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_group_delete: ' + err);
         },
     });
@@ -510,13 +510,13 @@ function ajax_group_reset(id) {
         url: base_url + '/admin/ajax?action=group_edit_reset_single&rand=' + rand_no,
         data: { group_id: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#grouprow-' + id).fadeTo(2000, 0.5);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_group_reset: ' + err);
         },
     });
@@ -534,13 +534,13 @@ function ajax_group_purge(id) {
         url: base_url + '/admin/ajax?action=group_edit_purge_single&rand=' + rand_no,
         data: { group_id: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#grouprow-' + id).fadeTo(2000, 0.5);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_group_purge: ' + err);
         },
     });
@@ -558,13 +558,13 @@ function ajax_all_reset() {
         url: base_url + '/admin/ajax?action=group_edit_reset_all&rand=' + rand_no,
         data: 'All groups reset.',
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#grouprow-' + id).fadeTo(2000, 0.5);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_all_reset: ' + err);
         },
     });
@@ -580,13 +580,13 @@ function ajax_all_purge() {
         url: base_url + '/admin/ajax?action=group_edit_purge_all&rand=' + rand_no,
         data: 'All groups purged',
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#grouprow-' + id).fadeTo(2000, 0.5);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_all_purge: ' + err);
         },
     });
@@ -604,13 +604,13 @@ function ajax_binaryblacklist_delete(id) {
         url: base_url + '/admin/ajax?action=binary_blacklist_delete&rand=' + rand_no,
         data: { row_id: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#row-' + id).fadeOut(2000);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_binaryblacklist_delete: ' + err);
         },
     });
@@ -628,13 +628,13 @@ function ajax_category_regex_delete(id) {
         url: base_url + '/admin/ajax?action=category_regex_delete&rand=' + rand_no,
         data: { row_id: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#row-' + id).fadeOut(2000);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_category_regex_delete: ' + err);
         },
     });
@@ -652,13 +652,13 @@ function ajax_collection_regex_delete(id) {
         url: base_url + '/admin/ajax?action=collection_regex_delete&rand=' + rand_no,
         data: { row_id: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#row-' + id).fadeOut(2000);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_collection_regex_delete: ' + err);
         },
     });
@@ -676,25 +676,25 @@ function ajax_release_naming_regex_delete(id) {
         url: base_url + '/admin/ajax?action=release_naming_regex_delete&rand=' + rand_no,
         data: { row_id: id },
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
             $('div#message').html(data);
-            $('div#message').show('fast', function() {});
+            $('div#message').show('fast', function () {});
             $('#row-' + id).fadeOut(2000);
             $('#message').fadeOut(5000);
         },
-        error: function(xhr, err, e) {
+        error: function (xhr, err, e) {
             alert('Error in ajax_release_naming_regex_delete: ' + err);
         },
     });
 }
 
-jQuery(function($) {
-    $('#regexGroupSelect').change(function() {
+jQuery(function ($) {
+    $('#regexGroupSelect').change(function () {
         document.location = '?group=' + $('#regexGroupSelect option:selected').attr('value');
     });
 
     // misc
-    $('.confirm_action').click(function() {
+    $('.confirm_action').click(function () {
         return confirm('Are you sure?');
     });
 });
