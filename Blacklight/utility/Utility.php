@@ -31,30 +31,6 @@ class Utility
     }
 
     /**
-     * Check if user is running from CLI.
-     */
-    public static function isCLI(): bool
-    {
-        return strtolower(PHP_SAPI) === 'cli';
-    }
-
-    /**
-     * Strips non-printing characters from a string.
-     *
-     * Operates directly on the text string, but also returns the result for situations requiring a
-     * return value (use in ternary, etc.)/
-     *
-     * @param  string  $text  String variable to strip.
-     * @return string The stripped variable.
-     */
-    public static function stripNonPrintingChars(string &$text): string
-    {
-        $text = str_replace('/[[:^print:]]/', '', $text);
-
-        return $text;
-    }
-
-    /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
      * @return bool|string
@@ -132,6 +108,10 @@ class Utility
         return ['tls' => $options, 'ssl' => $options];
     }
 
+    /**
+     * @param array $options
+     * @return string
+     */
     public static function getCoverURL(array $options = []): string
     {
         $defaults = [
@@ -155,96 +135,6 @@ class Utility
         }
 
         return $fileSpec;
-    }
-
-    /**
-     * Converts XML to an associative array with namespace preservation -- use if intending to JSON encode.
-     *
-     * @author Tamlyn from Outlandish.com
-     *
-     * @param  \SimpleXMLElement  $xml  The SimpleXML parsed XML string data
-     * @return array The associate array of the XML namespaced file
-     */
-    public static function xmlToArray(\SimpleXMLElement $xml, array $options = []): array
-    {
-        $defaults = [
-            'namespaceSeparator' => ':', //you may want this to be something other than a colon
-            'attributePrefix' => '@',   //to distinguish between attributes and nodes with the same name
-            'alwaysArray' => [],   //array of xml tag names which should always become arrays
-            'autoArray' => true,        //only create arrays for tags which appear more than once
-            'textContent' => '$',       //key used for the text content of elements
-            'autoText' => true,         //skip textContent key if node has no attributes or child nodes
-            'keySearch' => false,       //optional search and replace on tag and attribute names
-            'keyReplace' => false,       //replace values for above search values (as passed to str_replace())
-        ];
-        $options = array_merge($defaults, $options);
-        $namespaces = $xml->getDocNamespaces();
-        $namespaces[''] = null; //add base (empty) namespace
-
-        $attributesArray = $tagsArray = [];
-        foreach ($namespaces as $prefix => $namespace) {
-            //get attributes from all namespaces
-            foreach ($xml->attributes($namespace) as $attributeName => $attribute) {
-                //replace characters in attribute name
-                if ($options['keySearch']) {
-                    $attributeName =
-                    str_replace($options['keySearch'], $options['keyReplace'], $attributeName);
-                }
-                $attributeKey = $options['attributePrefix']
-                    .($prefix ? $prefix.$options['namespaceSeparator'] : '')
-                    .$attributeName;
-                $attributesArray[$attributeKey] = (string) $attribute;
-            }
-            //get child nodes from all namespaces
-            foreach ($xml->children($namespace) as $childXml) {
-                //recurse into child nodes
-                $childArray = self::xmlToArray($childXml, $options);
-                $childTagName = key($childArray);
-                $childProperties = current($childArray);
-
-                //replace characters in tag name
-                if ($options['keySearch']) {
-                    $childTagName =
-                    str_replace($options['keySearch'], $options['keyReplace'], $childTagName);
-                }
-                //add namespace prefix, if any
-                if ($prefix) {
-                    $childTagName = $prefix.$options['namespaceSeparator'].$childTagName;
-                }
-
-                if (! isset($tagsArray[$childTagName])) {
-                    //only entry with this key
-                    //test if tags of this type should always be arrays, no matter the element count
-                    $tagsArray[$childTagName] =
-                        \in_array($childTagName, $options['alwaysArray'], false) || ! $options['autoArray']
-                            ? [$childProperties] : $childProperties;
-                } elseif (
-                    \is_array($tagsArray[$childTagName]) && array_is_list($tagsArray[$childTagName])
-                ) {
-                    //key already exists and is integer indexed array
-                    $tagsArray[$childTagName][] = $childProperties;
-                } else {
-                    //key exists so convert to integer indexed array with previous value in position 0
-                    $tagsArray[$childTagName] = [$tagsArray[$childTagName], $childProperties];
-                }
-            }
-        }
-
-        //get text content of node
-        $textContentArray = [];
-        $plainText = trim((string) $xml);
-        if ($plainText !== '') {
-            $textContentArray[$options['textContent']] = $plainText;
-        }
-
-        //stick it all together
-        $propertiesArray = ! $options['autoText'] || $attributesArray || $tagsArray || ($plainText === '')
-            ? array_merge($attributesArray, $tagsArray, $textContentArray) : $plainText;
-
-        //return node as array
-        return [
-            $xml->getName() => $propertiesArray,
-        ];
     }
 
     /**
@@ -297,7 +187,9 @@ class Utility
     }
 
     /**
-     * Display error/error code.
+     * @param int $errorCode
+     * @param string $errorText
+     * @return void
      */
     public static function showApiError(int $errorCode = 900, string $errorText = ''): void
     {
@@ -394,6 +286,10 @@ class Utility
         return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
     }
 
+    /**
+     * @param $tableName
+     * @return LengthAwarePaginator
+     */
     public static function getRange($tableName): LengthAwarePaginator
     {
         $range = DB::table($tableName);
@@ -402,12 +298,5 @@ class Utility
         }
 
         return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
-    }
-
-    public static function getCount($tableName): int
-    {
-        $res = DB::table($tableName)->count('id');
-
-        return $res === false ? 0 : $res;
     }
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\BasePageController;
 use Blacklight\NZBExport;
 use Blacklight\NZBImport;
 use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 
 class AdminNzbController extends BasePageController
@@ -70,7 +69,6 @@ class AdminNzbController extends BasePageController
      */
     public function export(Request $request): void
     {
-
         $this->setAdminPrefs();
         $rel = new Releases();
 

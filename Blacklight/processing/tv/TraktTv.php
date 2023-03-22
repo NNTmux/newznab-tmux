@@ -4,7 +4,6 @@ namespace Blacklight\processing\tv;
 
 use Blacklight\libraries\TraktAPI;
 use Blacklight\ReleaseImage;
-use Blacklight\utility\Time;
 use Illuminate\Support\Carbon;
 
 /**

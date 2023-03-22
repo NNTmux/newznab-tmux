@@ -5,7 +5,6 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use App\Models\Collection;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Process;
 
 $tmuxPath = base_path().'/misc/update/tmux/';

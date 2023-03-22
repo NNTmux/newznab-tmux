@@ -1222,7 +1222,7 @@ class NameFixer
     protected function _cleanMatchFiles(): string
     {
         // first strip all non-printing chars  from filename
-        $this->_fileName = Utility::stripNonPrintingChars($this->_fileName);
+        $this->_fileName = str_replace('/[[:^print:]]/', '', $this->_fileName);
 
         if ($this->_fileName !== '' && ! str_starts_with($this->_fileName, '.')) {
             $this->_fileName = match (true) {
