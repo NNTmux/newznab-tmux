@@ -21,15 +21,11 @@ class IRCScraper extends IRCClient
 
     /**
      * Array of current pre info.
-     *
-     * @var array
      */
     protected array $_curPre;
 
     /**
      * List of groups and their id's.
-     *
-     * @var array
      */
     protected array $_groupList;
 
@@ -42,20 +38,13 @@ class IRCScraper extends IRCClient
 
     /**
      * Is this pre nuked or un nuked?
-     *
-     * @var bool
      */
     protected bool $_nuked;
 
-    /**
-     * @var
-     */
     protected $_oldPre;
 
     /**
      * Run this in silent mode (no text output).
-     *
-     * @var bool
      */
     protected bool $_silent;
 
@@ -76,8 +65,8 @@ class IRCScraper extends IRCClient
     /**
      * Construct.
      *
-     * @param bool $silent  Run this in silent mode (no text output).
-     * @param bool $debug  Turn on debug? Shows sent/received socket buffer messages.
+     * @param  bool  $silent  Run this in silent mode (no text output).
+     * @param  bool  $debug  Turn on debug? Shows sent/received socket buffer messages.
      *
      * @throws \Exception
      */

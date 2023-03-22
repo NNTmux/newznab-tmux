@@ -18,14 +18,8 @@ class ManticoreSearch
      */
     protected mixed $config;
 
-    /**
-     * @var array
-     */
     protected array $connection;
 
-    /**
-     * @var \Manticoresearch\Client
-     */
     protected Client $manticoresearch;
 
     /**
