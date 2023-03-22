@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use App\Models\Predb;
 use App\Models\Release;
 use Illuminate\Support\Facades\DB;
 use Manticoresearch\Client;
@@ -18,6 +17,16 @@ class ManticoreSearch
      * @var \Illuminate\Config\Repository|mixed
      */
     protected mixed $config;
+
+    /**
+     * @var array
+     */
+    protected array $connection;
+
+    /**
+     * @var \Manticoresearch\Client
+     */
+    protected Client $manticoresearch;
 
     /**
      * @var \Blacklight\ColorCLI

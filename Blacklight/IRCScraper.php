@@ -17,36 +17,39 @@ class IRCScraper extends IRCClient
      *
      * @var string|bool
      */
-    protected $_categoryIgnoreRegex;
+    protected mixed $_categoryIgnoreRegex;
 
     /**
      * Array of current pre info.
      *
      * @var array
      */
-    protected $_curPre;
+    protected array $_curPre;
 
     /**
      * List of groups and their id's.
      *
      * @var array
      */
-    protected $_groupList;
+    protected array $_groupList;
 
     /**
      * Array of ignored channels.
      *
      * @var array
      */
-    protected $_ignoredChannels;
+    protected mixed $_ignoredChannels;
 
     /**
      * Is this pre nuked or un nuked?
      *
      * @var bool
      */
-    protected $_nuked;
+    protected bool $_nuked;
 
+    /**
+     * @var
+     */
     protected $_oldPre;
 
     /**
@@ -54,7 +57,7 @@ class IRCScraper extends IRCClient
      *
      * @var bool
      */
-    protected $_silent;
+    protected bool $_silent;
 
     /**
      * Regex to ignore PRE titles.
@@ -73,12 +76,12 @@ class IRCScraper extends IRCClient
     /**
      * Construct.
      *
-     * @param  bool  $silent  Run this in silent mode (no text output).
-     * @param  bool  $debug  Turn on debug? Shows sent/received socket buffer messages.
+     * @param bool $silent  Run this in silent mode (no text output).
+     * @param bool $debug  Turn on debug? Shows sent/received socket buffer messages.
      *
      * @throws \Exception
      */
-    public function __construct(&$silent, &$debug)
+    public function __construct(bool &$silent, bool &$debug)
     {
         if (config('irc_settings.scrape_irc_source_ignore')) {
             $this->_ignoredChannels = unserialize(
@@ -142,7 +145,7 @@ class IRCScraper extends IRCClient
         }
 
         $this->elasticsearch = new ElasticSearchSiteSearch();
-        $this->manticoreSearch = new manticoreSearch();
+        $this->manticoreSearch = new ManticoreSearch();
 
         $this->_groupList = [];
         $this->_silent = $silent;

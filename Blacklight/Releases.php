@@ -68,7 +68,6 @@ class Releases extends Release
 				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, g.name AS group_name
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
-				%s
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s %s %s %s %s %s
@@ -83,7 +82,6 @@ class Releases extends Release
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			GROUP BY r.id
 			ORDER BY %10\$s %11\$s",
-            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
