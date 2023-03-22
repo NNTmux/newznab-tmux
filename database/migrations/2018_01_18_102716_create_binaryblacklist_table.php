@@ -27,7 +27,6 @@ class CreateBinaryblacklistTable extends Migration
         });
 
         DB::statement('ALTER TABLE binaryblacklist AUTO_INCREMENT = 100000;');
-
     }
 
     /**

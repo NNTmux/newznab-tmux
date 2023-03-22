@@ -32,7 +32,6 @@ class CreateUsenetGroupsTable extends Migration
         });
 
         DB::statement('ALTER TABLE usenet_groups AUTO_INCREMENT = 100000;');
-
     }
 
     /**

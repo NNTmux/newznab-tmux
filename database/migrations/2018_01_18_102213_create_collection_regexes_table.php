@@ -25,7 +25,6 @@ class CreateCollectionRegexesTable extends Migration
         });
 
         DB::statement('ALTER TABLE collection_regexes AUTO_INCREMENT = 100000;');
-
     }
 
     /**

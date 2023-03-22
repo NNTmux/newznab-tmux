@@ -26,7 +26,6 @@ class CreateCategoryRegexesTable extends Migration
         });
 
         DB::statement('ALTER TABLE category_regexes AUTO_INCREMENT = 100000;');
-
     }
 
     /**

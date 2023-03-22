@@ -25,8 +25,6 @@ class CreateReleaseNamingRegexesTable extends Migration
         });
 
         DB::statement('ALTER TABLE release_naming_regexes AUTO_INCREMENT = 100000;');
-
-
     }
 
     /**

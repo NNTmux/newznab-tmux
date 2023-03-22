@@ -23,7 +23,6 @@ class CreateGenresTable extends Migration
         });
 
         DB::statement('ALTER TABLE genres AUTO_INCREMENT = 100000;');
-
     }
 
     /**

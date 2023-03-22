@@ -31,7 +31,6 @@ class CreateContentTable extends Migration
         });
 
         DB::statement('ALTER TABLE content AUTO_INCREMENT = 100000;');
-
     }
 
     /**

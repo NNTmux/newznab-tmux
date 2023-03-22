@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f58a56d700c17c7bd4e6a4b5c8af99f",
+    "content-hash": "f0cbb646147483a8138272a6f050f9d6",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -902,73 +902,6 @@
                 }
             ],
             "time": "2023-02-18T02:44:52+00:00"
-        },
-        {
-            "name": "dariusiii/l5-fixtures",
-            "version": "v3.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/l5-fixtures.git",
-                "reference": "da75077cd71dbc730aad26c05b8257e0a6286211"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/l5-fixtures/zipball/da75077cd71dbc730aad26c05b8257e0a6286211",
-                "reference": "da75077cd71dbc730aad26c05b8257e0a6286211",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/console": "^8.0|^9.0|^10.0",
-                "illuminate/database": "^8.0|^9.0|^10.0",
-                "illuminate/support": "^8.0|^9.0|^10.0",
-                "league/csv": "^9.0",
-                "league/flysystem": "^3.0",
-                "php": ">=8.0",
-                "symfony/yaml": "^6.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.2",
-                "phpunit/phpunit": "^8.0|^9.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "DariusIII\\L5Fixtures\\FixturesServiceProvider"
-                    ],
-                    "aliases": {
-                        "Fixtures": "DariusIII\\L5Fixtures\\FixturesFacade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "DariusIII\\L5Fixtures\\": "src/DariusIII/L5Fixtures/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Maycon Viana Bordin",
-                    "email": "mayconbordin@gmail.com"
-                }
-            ],
-            "description": "A fixtures package for Laravel",
-            "homepage": "https://github.com/dariusiii/l5-fixtures",
-            "keywords": [
-                "csv",
-                "fixtures",
-                "json",
-                "laravel",
-                "yaml"
-            ],
-            "support": {
-                "source": "https://github.com/DariusIII/l5-fixtures/tree/v3.1.0"
-            },
-            "time": "2023-02-16T15:42:24+00:00"
         },
         {
             "name": "dariusiii/php-itunes-api",
@@ -2386,22 +2319,22 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "10.0.0",
+            "version": "10.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
-                "reference": "00ce6549abc3ed57b9c4748d962c9a2263329371"
+                "reference": "b4cef52e57061846bab94a4ae5747463773f13ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/00ce6549abc3ed57b9c4748d962c9a2263329371",
-                "reference": "00ce6549abc3ed57b9c4748d962c9a2263329371",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/b4cef52e57061846bab94a4ae5747463773f13ec",
+                "reference": "b4cef52e57061846bab94a4ae5747463773f13ec",
                 "shasum": ""
             },
             "require": {
                 "illuminate/routing": "^10.0",
                 "illuminate/support": "^10.0",
-                "jenssegers/model": "dev-master@dev"
+                "jenssegers/model": "^1.5"
             },
             "require-dev": {
                 "orchestra/testbench": "^8.0",
@@ -2436,7 +2369,7 @@
             "description": "Keeping Your Laravel Forms Awake",
             "support": {
                 "issues": "https://github.com/GeneaLabs/laravel-caffeine/issues",
-                "source": "https://github.com/GeneaLabs/laravel-caffeine/tree/10.0.0"
+                "source": "https://github.com/GeneaLabs/laravel-caffeine/tree/10.0.1"
             },
             "funding": [
                 {
@@ -2444,7 +2377,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-10T14:32:37+00:00"
+            "time": "2023-03-21T23:22:16+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -3472,7 +3405,7 @@
         },
         {
             "name": "jenssegers/model",
-            "version": "dev-master",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/model.git",
@@ -3492,7 +3425,6 @@
                 "php-coveralls/php-coveralls": "*",
                 "phpunit/phpunit": "*"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -4679,93 +4611,6 @@
                 }
             ],
             "time": "2022-12-11T20:36:23+00:00"
-        },
-        {
-            "name": "league/csv",
-            "version": "9.9.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thephpleague/csv.git",
-                "reference": "b4418ede47fbd88facc34e40a16c8ce9153b961b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/csv/zipball/b4418ede47fbd88facc34e40a16c8ce9153b961b",
-                "reference": "b4418ede47fbd88facc34e40a16c8ce9153b961b",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "php": "^8.1.2"
-            },
-            "require-dev": {
-                "doctrine/collections": "^2.1.2",
-                "ext-dom": "*",
-                "ext-xdebug": "*",
-                "friendsofphp/php-cs-fixer": "^v3.14.3",
-                "phpbench/phpbench": "^1.2.8",
-                "phpstan/phpstan": "^1.10.4",
-                "phpstan/phpstan-deprecation-rules": "^1.1.2",
-                "phpstan/phpstan-phpunit": "^1.3.10",
-                "phpstan/phpstan-strict-rules": "^1.5.0",
-                "phpunit/phpunit": "^10.0.14"
-            },
-            "suggest": {
-                "ext-dom": "Required to use the XMLConverter and the HTMLConverter classes",
-                "ext-iconv": "Needed to ease transcoding CSV using iconv stream filters"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "9.x-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/functions_include.php"
-                ],
-                "psr-4": {
-                    "League\\Csv\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ignace Nyamagana Butera",
-                    "email": "nyamsprod@gmail.com",
-                    "homepage": "https://github.com/nyamsprod/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "CSV data manipulation made easy in PHP",
-            "homepage": "https://csv.thephpleague.com",
-            "keywords": [
-                "convert",
-                "csv",
-                "export",
-                "filter",
-                "import",
-                "read",
-                "transform",
-                "write"
-            ],
-            "support": {
-                "docs": "https://csv.thephpleague.com",
-                "issues": "https://github.com/thephpleague/csv/issues",
-                "rss": "https://github.com/thephpleague/csv/releases.atom",
-                "source": "https://github.com/thephpleague/csv"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/sponsors/nyamsprod",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-03-11T15:57:12+00:00"
         },
         {
             "name": "league/flysystem",
@@ -8916,16 +8761,16 @@
         },
         {
             "name": "sentry/sentry-laravel",
-            "version": "3.3.1",
+            "version": "3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-laravel.git",
-                "reference": "a530699461d6bcc9d11515ad0c97d683173d85b5"
+                "reference": "c502e8b9005990d03f5ec5cc852e98a27c26056d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/a530699461d6bcc9d11515ad0c97d683173d85b5",
-                "reference": "a530699461d6bcc9d11515ad0c97d683173d85b5",
+                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/c502e8b9005990d03f5ec5cc852e98a27c26056d",
+                "reference": "c502e8b9005990d03f5ec5cc852e98a27c26056d",
                 "shasum": ""
             },
             "require": {
@@ -8993,7 +8838,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-laravel/issues",
-                "source": "https://github.com/getsentry/sentry-laravel/tree/3.3.1"
+                "source": "https://github.com/getsentry/sentry-laravel/tree/3.3.2"
             },
             "funding": [
                 {
@@ -9005,7 +8850,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-03-20T14:21:23+00:00"
+            "time": "2023-03-22T10:51:03+00:00"
         },
         {
             "name": "smarty/smarty",
@@ -9579,16 +9424,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "5.9.1",
+            "version": "5.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "a88ed98c8937442737e0c50163682e832d608f13"
+                "reference": "5d0a703ece4636e6bde98eb85ac72b40aa6e42bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/a88ed98c8937442737e0c50163682e832d608f13",
-                "reference": "a88ed98c8937442737e0c50163682e832d608f13",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/5d0a703ece4636e6bde98eb85ac72b40aa6e42bc",
+                "reference": "5d0a703ece4636e6bde98eb85ac72b40aa6e42bc",
                 "shasum": ""
             },
             "require": {
@@ -9649,7 +9494,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-permission/issues",
-                "source": "https://github.com/spatie/laravel-permission/tree/5.9.1"
+                "source": "https://github.com/spatie/laravel-permission/tree/5.10.0"
             },
             "funding": [
                 {
@@ -9657,7 +9502,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-06T21:37:02+00:00"
+            "time": "2023-03-22T02:57:36+00:00"
         },
         {
             "name": "spatie/laravel-signal-aware-command",
@@ -13070,80 +12915,6 @@
             "time": "2023-02-24T10:42:00+00:00"
         },
         {
-            "name": "symfony/yaml",
-            "version": "v6.2.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "e8e6a1d59e050525f27a1f530aa9703423cb7f57"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/e8e6a1d59e050525f27a1f530aa9703423cb7f57",
-                "reference": "e8e6a1d59e050525f27a1f530aa9703423cb7f57",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.1",
-                "symfony/polyfill-ctype": "^1.8"
-            },
-            "conflict": {
-                "symfony/console": "<5.4"
-            },
-            "require-dev": {
-                "symfony/console": "^5.4|^6.0"
-            },
-            "suggest": {
-                "symfony/console": "For validating YAML files using the lint command"
-            },
-            "bin": [
-                "Resources/bin/yaml-lint"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Loads and dumps YAML files",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/yaml/tree/v6.2.7"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2023-02-16T09:57:23+00:00"
-        },
-        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "2.2.6",
             "source": {
@@ -16392,16 +16163,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.0.17",
+            "version": "10.0.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b75eddcabca052312ae38c8a2bc69ff1a7b89b77"
+                "reference": "582563ed2edc62d1455cdbe00ea49fe09428eef3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b75eddcabca052312ae38c8a2bc69ff1a7b89b77",
-                "reference": "b75eddcabca052312ae38c8a2bc69ff1a7b89b77",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/582563ed2edc62d1455cdbe00ea49fe09428eef3",
+                "reference": "582563ed2edc62d1455cdbe00ea49fe09428eef3",
                 "shasum": ""
             },
             "require": {
@@ -16473,7 +16244,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.0.17"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.0.18"
             },
             "funding": [
                 {
@@ -16489,20 +16260,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-03-20T14:42:33+00:00"
+            "time": "2023-03-22T06:15:31+00:00"
         },
         {
             "name": "rector/rector",
-            "version": "0.15.21",
+            "version": "0.15.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "1cee8cc5d6d836e1bf9a3006d7b062adde3a6022"
+                "reference": "5c499ec662a698d5042a3cdc936a4642ada35e19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/1cee8cc5d6d836e1bf9a3006d7b062adde3a6022",
-                "reference": "1cee8cc5d6d836e1bf9a3006d7b062adde3a6022",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/5c499ec662a698d5042a3cdc936a4642ada35e19",
+                "reference": "5c499ec662a698d5042a3cdc936a4642ada35e19",
                 "shasum": ""
             },
             "require": {
@@ -16542,7 +16313,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.15.21"
+                "source": "https://github.com/rectorphp/rector/tree/0.15.22"
             },
             "funding": [
                 {
@@ -16550,7 +16321,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-06T11:44:29+00:00"
+            "time": "2023-03-22T09:37:21+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -18148,6 +17919,80 @@
             "time": "2023-02-14T08:44:56+00:00"
         },
         {
+            "name": "symfony/yaml",
+            "version": "v6.2.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "e8e6a1d59e050525f27a1f530aa9703423cb7f57"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/e8e6a1d59e050525f27a1f530aa9703423cb7f57",
+                "reference": "e8e6a1d59e050525f27a1f530aa9703423cb7f57",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/polyfill-ctype": "^1.8"
+            },
+            "conflict": {
+                "symfony/console": "<5.4"
+            },
+            "require-dev": {
+                "symfony/console": "^5.4|^6.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "bin": [
+                "Resources/bin/yaml-lint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Loads and dumps YAML files",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/yaml/tree/v6.2.7"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-02-16T09:57:23+00:00"
+        },
+        {
             "name": "theseer/tokenizer",
             "version": "1.2.1",
             "source": {
@@ -18203,7 +18048,6 @@
     "stability-flags": {
         "anhskohbo/no-captcha": 20,
         "b3rs3rk/steamfront": 20,
-        "jenssegers/model": 20,
         "joshpinkney/tv-maze-php-api": 20
     },
     "prefer-stable": true,
@@ -18236,5 +18080,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
