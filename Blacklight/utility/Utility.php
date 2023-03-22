@@ -108,10 +108,6 @@ class Utility
         return ['tls' => $options, 'ssl' => $options];
     }
 
-    /**
-     * @param array $options
-     * @return string
-     */
     public static function getCoverURL(array $options = []): string
     {
         $defaults = [
@@ -186,11 +182,6 @@ class Utility
         return '';
     }
 
-    /**
-     * @param int $errorCode
-     * @param string $errorText
-     * @return void
-     */
     public static function showApiError(int $errorCode = 900, string $errorText = ''): void
     {
         $errorHeader = 'HTTP 1.1 400 Bad Request';
@@ -286,10 +277,6 @@ class Utility
         return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
     }
 
-    /**
-     * @param $tableName
-     * @return LengthAwarePaginator
-     */
     public static function getRange($tableName): LengthAwarePaginator
     {
         $range = DB::table($tableName);
