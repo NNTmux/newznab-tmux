@@ -194,6 +194,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function elasticPreDB()
     {
+        $elastic = new ElasticSearchSiteSearch();
         $total = Predb::count();
         if (! $total) {
             $this->warn('Could not get database information for predb table.');
@@ -213,9 +214,9 @@ class NntmuxPopulateSearchIndexes extends Command
             ->select('id', 'title', 'filename', 'source')
             ->groupBy('id')
             ->orderBy('id')
-            ->chunk($max, function ($pre) use ($manticore, $bar) {
+            ->chunk($max, function ($pre) use ($elastic, $bar) {
                 foreach ($pre as $p) {
-                    $manticore->insertPredb([
+                    $elastic->insertPredb([
                         'id' => $p->id,
                         'title' => $p->title,
                         'filename' => $p->filename,
