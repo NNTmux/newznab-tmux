@@ -6,6 +6,7 @@ use App\Models\Settings;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 
 /**
@@ -13,13 +14,6 @@ use Illuminate\Support\Str;
  */
 class Utility
 {
-    public static function clearScreen(): void
-    {
-        if (self::isCLI()) {
-            passthru('clear');
-        }
-    }
-
     public static function getThemesList(): array
     {
         $ignoredThemes = ['admin', 'shared'];
@@ -34,16 +28,6 @@ class Utility
         sort($themeList);
 
         return $themeList;
-    }
-
-    /**
-     * Detect if the command is accessible on the system.
-     */
-    public static function hasCommand($cmd): bool
-    {
-        $returnVal = shell_exec("which $cmd");
-
-        return $returnVal !== null;
     }
 
     /**
@@ -275,7 +259,7 @@ class Utility
     public static function fileInfo(string $path): string
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
-        if ($magicPath !== null && self::hasCommand('file')) {
+        if ($magicPath !== null && Process::run('which file')->successful()) {
             $magicSwitch = " -m $magicPath";
             $output = runCmd('file'.$magicSwitch.' -b "'.$path.'"');
         } else {

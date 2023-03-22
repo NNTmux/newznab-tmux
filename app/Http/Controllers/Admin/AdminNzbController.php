@@ -70,10 +70,6 @@ class AdminNzbController extends BasePageController
      */
     public function export(Request $request): void
     {
-        if (Utility::isCLI()) {
-            exit('This script is only for exporting from the web, use the script in misc/testing'.
-                PHP_EOL);
-        }
 
         $this->setAdminPrefs();
         $rel = new Releases();

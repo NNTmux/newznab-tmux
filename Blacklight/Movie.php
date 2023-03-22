@@ -550,7 +550,7 @@ class Movie
      */
     public function updateMovieInfo($imdbId): bool
     {
-        if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
+        if ($this->echooutput && $this->service !== '') {
             $this->colorCli->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB/iTunes using IMDB id: '.$imdbId);
         }
 
@@ -679,7 +679,7 @@ class Movie
             'year' => $mov['year'],
         ]);
 
-        if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
+        if ($this->echooutput && $this->service !== '') {
             PHP_EOL.$this->colorCli->headerOver('Added/updated movie: ').
                 $this->colorCli->primary(
                     $mov['title'].
@@ -725,7 +725,7 @@ class Movie
                     if (isset($art['name'])) {
                         $ret['title'] = $art['name'];
                     }
-                    if ($this->echooutput && Utility::isCLI()) {
+                    if ($this->echooutput) {
                         PHP_EOL.$this->colorCli->alternateOver('Fanart Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                     }
 
@@ -751,10 +751,6 @@ class Movie
         try {
             $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
         } catch (TmdbApiException|\ErrorException $error) {
-            if (Utility::isCLI()) {
-                $this->colorCli->error($error->getMessage());
-            }
-
             return false;
         }
 
@@ -835,7 +831,7 @@ class Movie
             } else {
                 $ret['backdrop'] = '';
             }
-            if ($this->echooutput && Utility::isCLI()) {
+            if ($this->echooutput) {
                 PHP_EOL.$this->colorCli->primaryOver('TMDb Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
             }
 
@@ -871,7 +867,7 @@ class Movie
                             'type' => $result->movietype() ?? '',
                         ];
 
-                        if ($this->echooutput && Utility::isCLI()) {
+                        if ($this->echooutput) {
                             PHP_EOL.$this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($title).PHP_EOL;
                         }
 
@@ -934,7 +930,7 @@ class Movie
                             return false;
                         }
 
-                        if ($this->echooutput && Utility::isCLI()) {
+                        if ($this->echooutput) {
                             PHP_EOL.$this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
 
@@ -983,7 +979,7 @@ class Movie
                             'boxOffice' => $resp->data->BoxOffice ?? '',
                         ];
 
-                        if ($this->echooutput && Utility::isCLI()) {
+                        if ($this->echooutput) {
                             PHP_EOL.$this->colorCli->alternateOver('OMDbAPI Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
 
@@ -1059,7 +1055,7 @@ class Movie
 
         if ($imdbId !== false) {
             $this->service = $service;
-            if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
+            if ($this->echooutput && $this->service !== '') {
                 PHP_EOL.$this->colorCli->primary($this->service.' found IMDBid: tt'.$imdbId, true);
             }
 
@@ -1145,7 +1141,7 @@ class Movie
                     $movieName .= ' ('.$this->currentYear.')';
                 }
 
-                if ($this->echooutput && Utility::isCLI()) {
+                if ($this->echooutput) {
                     $this->colorCli->primaryOver('Looking up: ').$this->colorCli->headerOver($movieName);
                 }
 

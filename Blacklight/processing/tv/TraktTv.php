@@ -5,6 +5,7 @@ namespace Blacklight\processing\tv;
 use Blacklight\libraries\TraktAPI;
 use Blacklight\ReleaseImage;
 use Blacklight\utility\Time;
+use Illuminate\Support\Carbon;
 
 /**
  * Class TraktTv.
@@ -317,7 +318,7 @@ class TraktTv extends TV
             'type' => parent::TYPE_TV,
             'title' => (string) $show['title'],
             'summary' => (string) $show['overview'],
-            'started' => Time::localizeAirdate($show['first_aired'], $this->localizedTZ),
+            'started' => Carbon::parse($show['first_aired'], $this->localizedTZ)->format('Y-m-d'),
             'publisher' => (string) $show['network'],
             'country' => (string) $show['country'],
             'source' => parent::SOURCE_TRAKT,
@@ -343,7 +344,7 @@ class TraktTv extends TV
             'series' => (int) $episode['season'],
             'episode' => (int) $episode['epsiode'],
             'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', $episode['episode']),
-            'firstaired' => Time::localizeAirdate($episode['first_aired'], $this->localizedTZ),
+            'firstaired' => Carbon::parse($episode['first_aired'], $this->localizedTZ)->format('Y-m-d'),
             'summary' => (string) $episode['overview'],
         ];
     }

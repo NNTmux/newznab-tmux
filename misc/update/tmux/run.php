@@ -16,7 +16,7 @@ $delaytime = Settings::settingValue('..delaytime');
 $delaytime = $delaytime ? (int) $delaytime : 2;
 $colorCli = new ColorCLI();
 
-Utility::clearScreen();
+Process::run('clear');
 
 //reset collections dateadded to now if dateadded > delay time check
 $colorCli->header('Resetting collections that have expired to this moment. This could take some time if many collections need to be reset');
