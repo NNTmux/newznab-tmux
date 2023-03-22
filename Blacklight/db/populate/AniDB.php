@@ -15,7 +15,7 @@ class AniDB
     private const CLIENT_VERSION = 2;
 
     /**
-     * Whether or not to echo message output.
+     * Whether to echo message output.
      */
     public bool $echooutput;
 
@@ -30,7 +30,7 @@ class AniDB
     private string $apiKey;
 
     /**
-     * Whether or not AniDB thinks our client is banned.
+     * Whether AniDB thinks our client is banned.
      */
     private bool $banned;
 
