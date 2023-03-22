@@ -50,7 +50,7 @@ class Releases extends Release
      *
      * @return Collection|mixed
      */
-    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, array $tags = []): mixed
+    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0): mixed
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
@@ -70,7 +70,7 @@ class Releases extends Release
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
-				%s %s %s %s %s %s
+				%s %s %s %s %s
 				ORDER BY %s %s %s
 			) r
 			LEFT JOIN categories c ON c.id = r.categories_id
@@ -84,7 +84,6 @@ class Releases extends Release
 			ORDER BY %10\$s %11\$s",
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
@@ -101,7 +100,7 @@ class Releases extends Release
         }
         $sql = self::fromQuery($qry);
         if (\count($sql) > 0) {
-            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName, $tags);
+            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -113,22 +112,20 @@ class Releases extends Release
     /**
      * Used for pager on browse page.
      */
-    public function getBrowseCount(array $cat, int $maxAge = -1, array $excludedCats = [], int|string $groupName = '', array $tags = []): int
+    public function getBrowseCount(array $cat, int $maxAge = -1, array $excludedCats = [], int|string $groupName = ''): int
     {
         return $this->getPagerCount(sprintf(
             'SELECT COUNT(r.id) AS count
 				FROM releases r
-				%s %s
+				%s
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s
-				%s %s %s %s ',
+				%s %s %s ',
             ($groupName !== -1 ? 'LEFT JOIN usenet_groups g ON g.id = r.groups_id' : ''),
-            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
             ($groupName !== -1 ? sprintf(' AND g.name = %s', escapeString($groupName)) : ''),
-            ! empty($tags) ? ' AND tt.tag_name IN ('.escapeString(implode(',', $tags)).')' : '',
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
@@ -437,7 +434,7 @@ class Releases extends Release
      *
      * @return array|Collection|mixed
      */
-    public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0, array $tags = []): mixed
+    public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0): mixed
     {
         $sizeRange = [
             1 => 1,
@@ -483,10 +480,9 @@ class Releases extends Release
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s',
+            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
-            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
@@ -517,8 +513,7 @@ class Releases extends Release
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			%s %s",
-            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+			%s",
             $whereSql
         );
         $sql = sprintf(
@@ -553,7 +548,7 @@ class Releases extends Release
      *
      * @return Collection|mixed
      */
-    public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0, array $tags = []): mixed
+    public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed
     {
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -566,10 +561,9 @@ class Releases extends Release
         $catQuery = Category::getCategorySearch($cat);
 
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s',
+            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
-            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
             $catQuery,
@@ -591,8 +585,7 @@ class Releases extends Release
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			%s %s",
-            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+			%s",
             $whereSql
         );
         $sql = sprintf(
@@ -632,7 +625,7 @@ class Releases extends Release
      *
      * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
      */
-    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
+    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
         $siteSQL = [];
         $showSql = '';
@@ -702,10 +695,9 @@ class Releases extends Release
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s %s',
+			%s %s %s %s %s %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
             (! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : '',
             (empty($searchResult)) ? Category::getCategorySearch($cat) : '',
@@ -732,8 +724,7 @@ class Releases extends Release
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s %s",
-            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+			%s",
             $whereSql
         );
         $sql = sprintf(
@@ -766,7 +757,7 @@ class Releases extends Release
      *
      * @return Collection|mixed
      */
-    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
+    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
         $siteSQL = [];
         $showSql = '';
@@ -836,10 +827,9 @@ class Releases extends Release
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s %s',
+			%s %s %s %s %s %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             Category::getCategorySearch($cat),
@@ -860,8 +850,7 @@ class Releases extends Release
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			%s %s",
-            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+			%s",
             $whereSql
         );
         $sql = sprintf(
@@ -963,7 +952,7 @@ class Releases extends Release
      *
      * @return Collection|mixed
      */
-    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], array $tags = []): mixed
+    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -981,11 +970,10 @@ class Releases extends Release
             'WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s %s %s',
+			%s %s %s %s %s %s %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', $imDbId) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
@@ -1005,8 +993,7 @@ class Releases extends Release
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s %s",
-            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
+			%s",
             $whereSql
         );
         $sql = sprintf(

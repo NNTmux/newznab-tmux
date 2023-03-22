@@ -69,7 +69,6 @@ class ApiV2Controller extends BasePageController
         $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
         $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
         $traktId = $request->has('traktid') && ! empty($request->input('traktid')) ? $request->input('traktid') : -1;
-        $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
 
         $relData = $releases->moviesSearch(
             $imdbId,
@@ -81,8 +80,7 @@ class ApiV2Controller extends BasePageController
             $api->categoryID(),
             $maxAge,
             $minSize,
-            $catExclusions,
-            $tags
+            $catExclusions
         );
 
         $time = UserRequest::whereUsersId($user->id)->min('timestamp');
@@ -116,7 +114,6 @@ class ApiV2Controller extends BasePageController
         $offset = $api->offset();
         $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $maxAge = $api->maxAge();
         $groupName = $api->group();
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
@@ -133,8 +130,7 @@ class ApiV2Controller extends BasePageController
                 $maxAge,
                 $catExclusions,
                 $categoryID,
-                $minSize,
-                $tags
+                $minSize
             );
         } else {
             $relData = $releases->getBrowseRange(
@@ -146,8 +142,7 @@ class ApiV2Controller extends BasePageController
                 $maxAge,
                 $catExclusions,
                 $groupName,
-                $minSize,
-                $tags
+                $minSize
             );
         }
 
@@ -181,7 +176,6 @@ class ApiV2Controller extends BasePageController
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $api->verifyEmptyParameter('id');
         $api->verifyEmptyParameter('vid');
         $api->verifyEmptyParameter('tvdbid');
@@ -226,8 +220,7 @@ class ApiV2Controller extends BasePageController
             $api->categoryID(),
             $maxAge,
             $minSize,
-            $catExclusions,
-            $tags
+            $catExclusions
         );
 
         $time = UserRequest::whereUsersId($user->id)->min('timestamp');

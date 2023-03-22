@@ -188,42 +188,4 @@ class BrowseController extends BasePageController
             $this->pagerender();
         }
     }
-
-    /**
-     * @throws \Exception
-     */
-    public function tags(Request $request): void
-    {
-        $this->setPreferences();
-        $releases = new Releases();
-        if ($request->has('tags')) {
-            $tags = explode(',', $request->input('tags'));
-            $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
-            $offset = ($page - 1) * config('nntmux.items_per_page');
-            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata->categoryexclusions, -1, 0, $tags);
-            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
-
-            $browse = [];
-
-            foreach ($results as $result) {
-                $browse[] = $result;
-            }
-
-            $this->smarty->assign(
-                [
-                    'results' => $results,
-                    'resultsadd' => $browse,
-                    'catname' => 'all',
-                ]
-            );
-            $meta_title = 'Browse Groups';
-            $meta_keywords = 'browse,nzb,description,details';
-            $meta_description = 'Browse Groups';
-            $content = $this->smarty->fetch('browse.tpl');
-
-            $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-
-            $this->pagerender();
-        }
-    }
 }

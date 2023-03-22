@@ -66,11 +66,6 @@ class SearchController extends BasePageController
                     url('/search?id='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType));
             }
 
-            $tags = [];
-            if ($request->has('tags')) {
-                $tags = explode(',', $request->input('tags'));
-            }
-
             $rslt = $releases->search(
                 $searchString,
                 -1,
@@ -84,10 +79,7 @@ class SearchController extends BasePageController
                 -1,
                 $this->userdata->categoryexclusions ?? [],
                 'basic',
-                $categoryID,
-                0,
-                $tags ?? []
-            );
+                $categoryID);
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
