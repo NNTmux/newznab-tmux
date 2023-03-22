@@ -269,14 +269,6 @@ class Utility
         exit($response);
     }
 
-    /**
-     * Simple function to reduce duplication in html string formatting.
-     */
-    public static function htmlfmt($string): string
-    {
-        return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
-    }
-
     public static function getRange($tableName): LengthAwarePaginator
     {
         $range = DB::table($tableName);

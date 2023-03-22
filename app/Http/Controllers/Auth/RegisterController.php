@@ -186,12 +186,12 @@ class RegisterController extends Controller
         }
         app('smarty.view')->assign(
             [
-                'username' => Utility::htmlfmt($userName),
-                'password' => Utility::htmlfmt($password),
-                'password_confirmation' => Utility::htmlfmt($confirmPassword),
-                'email' => Utility::htmlfmt($email),
-                'invitecode' => Utility::htmlfmt($inviteCode),
-                'invite_code_query' => Utility::htmlfmt($this->inviteCodeQuery),
+                'username' => e($userName),
+                'password' => e($password),
+                'password_confirmation' => e($confirmPassword),
+                'email' => e($email),
+                'invitecode' => e($inviteCode),
+                'invite_code_query' => e($this->inviteCodeQuery),
                 'showregister' => $showRegister,
             ]
         );
