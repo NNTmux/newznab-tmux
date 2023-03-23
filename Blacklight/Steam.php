@@ -27,14 +27,8 @@ class Steam
 
     protected $lastUpdate;
 
-    /**
-     * @var Main
-     */
     protected Main $steamFront;
 
-    /**
-     * @var ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**
@@ -61,7 +55,6 @@ class Steam
     /**
      * Gets all Information for the game.
      *
-     * @param int $appID
      * @return array|false
      */
     public function getAll(int $appID): bool|array
@@ -91,7 +84,7 @@ class Steam
     /**
      * Searches Steam Apps table for best title match -- prefers 100% match but returns highest over 90%.
      *
-     * @param string $searchTerm  The parsed game name from the release searchname
+     * @param  string  $searchTerm  The parsed game name from the release searchname
      * @return false|int $bestMatch The Best match from the given search term
      *
      * @throws \Exception

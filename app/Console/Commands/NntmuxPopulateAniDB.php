@@ -33,7 +33,7 @@ class NntmuxPopulateAniDB extends Command
             (new AniDB(['Echo' => true]))->populateTable('full');
         } elseif ($this->option('info') && is_numeric($this->option('anidbid'))) {
             (new AniDB(['Echo' => true]))->populateTable('info', $this->option('anidbid'));
-        } elseif ($this->option('info')){
+        } elseif ($this->option('info')) {
             (new AniDB(['Echo' => true]))->populateTable('info');
         }
         $this->info('AniDB tables populated with requested data');

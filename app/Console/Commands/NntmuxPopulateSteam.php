@@ -29,6 +29,5 @@ class NntmuxPopulateSteam extends Command
         $steam = new Steam();
 
         $steam->populateSteamAppsTable();
-
     }
 }
