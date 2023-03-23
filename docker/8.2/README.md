@@ -2,7 +2,7 @@
 
 **Author:** [Fossil01](https://github.com/Fossil01)
 
-The development environment contains the: App, MariaDB, Redis, Manticore and Mailpit containers. The app container is where nginx and PHP-FPM run and has a bind mount to the root directory of this project. Supervisord is used to run it all in the background.
+The development environment contains the: App, MariaDB, Redis, Manticore and Mailpit containers. The app container is where nginx and PHP-FPM run and has a bind mount to the root directory of this project. Supervisord is used to run it all in the background. Manticore can be switched out for Elasticsearch by commenting/uncommenting the corresponding lines in `docker-compose.yml`. Elasticsearch has security disabled by default.
 
 This container also houses several tools to run the indexing backend: tmux, ffmpeg, mediainfo, unrar etc. It also has MariaDB & Postgres clients, NodeJS & Yarn.
 
@@ -38,6 +38,7 @@ MAIL_HOST=mailpit
 MAIL_PORT=1025
 
 MANTICORESEARCH_HOST=manticore
+ELASTICSEARCH_HOST=elasticsearch
 ```
 
 ## Database
