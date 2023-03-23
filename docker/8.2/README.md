@@ -58,3 +58,32 @@ Sail will create a Docker network called `sail` with these ports mapped to your 
 - Vite: `5173`
 - Manticore: `9306`(SQL) & `9308`(HTTP)
 - Mailpit: `1025`(SMTP) & `8025`(WebUI)
+
+## Backups
+
+Optionally you can add this config to `docker-compose.yml` to have automated MariaDB backups. Just replace `DATABASE_NAME` with your own NNTmux database name.
+
+```yaml
+    backup:
+        image: fradelg/mysql-cron-backup
+        depends_on:
+        - mariadb
+        restart: always
+        volumes:
+        - ./docker/mariadb/backups:/backup
+        environment:
+        - MYSQL_USER=${DB_USERNAME}
+        - MYSQL_PASS=${DB_PASSWORD}
+        - MYSQL_DB=${DB_DATABASE}
+        - MYSQLDUMP_OPTS=--ignore-table=DATABASE_NAME.telescope_entries --ignore-table=DATABASE_NAME.telescope_entries_tags
+        - CRON_TIME=0 0 31 2 * # (To never run with cron use Feb 31st: 0 0 31 2 *)
+        - MYSQL_HOST=mariadb
+        - MYSQL_PORT=3306
+        - TIMEOUT=10s
+        - GZIP_LEVEL=9
+        - MAX_BACKUPS=5 # The number of backups to keep. When reaching the limit, the old backup will be discarded.
+        - INIT_BACKUP=0
+        - EXIT_BACKUP=1 # Make a backup whenever this container is gracefully stopped.
+        networks:
+            - sail
+```
