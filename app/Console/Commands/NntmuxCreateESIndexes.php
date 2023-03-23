@@ -121,6 +121,5 @@ class NntmuxCreateESIndexes extends Command
         $this->info($response);
 
         $this->info('All done! ElasticSearch indexes are created now.');
-
     }
 }
