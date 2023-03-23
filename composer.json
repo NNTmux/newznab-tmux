@@ -56,6 +56,7 @@
     "dariusiii/tmdb-laravel": "^6.0",
     "dariusiii/token": "^5.0",
     "dborsatto/php-giantbomb": "^2.0",
+    "divineomega/php-cli-progress-bar": "^2.1",
     "doctrine/dbal": "^3.0",
     "fakerphp/faker": "^1.12",
     "genealabs/laravel-caffeine": "^10.0",

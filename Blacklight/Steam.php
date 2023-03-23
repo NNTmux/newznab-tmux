@@ -5,6 +5,8 @@ namespace Blacklight;
 use App\Models\Settings;
 use App\Models\SteamApp;
 use b3rs3rk\steamfront\Main;
+use DivineOmega\CliProgressBar\ProgressBar;
+use Illuminate\Support\Arr;
 
 /**
  * Class Steam.
@@ -16,24 +18,24 @@ class Steam
     /**
      * @var string The parsed game name from searchname
      */
-    public $searchTerm;
+    public string $searchTerm;
 
     /**
      * @var int The ID of the Steam Game matched
      */
-    protected $steamGameID;
+    protected int $steamGameID;
 
     protected $lastUpdate;
 
     /**
-     * @var \b3rs3rk\steamfront\Main
+     * @var Main
      */
-    protected $steamFront;
+    protected Main $steamFront;
 
     /**
-     * @var \Blacklight\ColorCLI
+     * @var ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * Steam constructor.
@@ -59,15 +61,15 @@ class Steam
     /**
      * Gets all Information for the game.
      *
-     * @param  int  $appID
+     * @param int $appID
      * @return array|false
      */
-    public function getAll($appID)
+    public function getAll(int $appID): bool|array
     {
         $res = $this->steamFront->getAppDetails($appID);
 
         if ($res !== false) {
-            $result = [
+            return [
                 'title' => $res->name,
                 'description' => $res->description['short'] ?? null,
                 'cover' => $res->images['header'] ?? null,
@@ -79,13 +81,9 @@ class Steam
                 'releasedate' => $res->releasedate['date'] ?? null,
                 'genres' => $res->genres !== null ? implode(',', array_column($res->genres, 'description')) : '',
             ];
-
-            return $result;
         }
 
-        if ($res === false) {
-            $this->colorCli->notice('Steam did not return game data');
-        }
+        $this->colorCli->notice('Steam did not return game data');
 
         return false;
     }
@@ -93,19 +91,19 @@ class Steam
     /**
      * Searches Steam Apps table for best title match -- prefers 100% match but returns highest over 90%.
      *
-     * @param  string  $searchTerm  The parsed game name from the release searchname
+     * @param string $searchTerm  The parsed game name from the release searchname
      * @return false|int $bestMatch The Best match from the given search term
      *
      * @throws \Exception
      */
-    public function search($searchTerm)
+    public function search(string $searchTerm): bool|int
     {
         $bestMatch = false;
 
         if (empty($searchTerm)) {
             $this->colorCli->notice('Search term cannot be empty');
 
-            return $bestMatch;
+            return false;
         }
 
         $this->populateSteamAppsTable();
@@ -147,6 +145,7 @@ class Steam
      */
     public function populateSteamAppsTable(): void
     {
+        $bar = new ProgressBar();
         $lastUpdate = Settings::settingValue('APIs.Steam.last_update');
         $this->lastUpdate = $lastUpdate > 0 ? $lastUpdate : 0;
         if ((time() - (int) $this->lastUpdate) > 86400) {
@@ -155,25 +154,24 @@ class Steam
             $fullAppArray = $this->steamFront->getFullAppList();
             $inserted = $dupe = 0;
             $this->colorCli->info('Populating steam apps table');
-            foreach ($fullAppArray as $appsArray) {
-                foreach ($appsArray as $appArray) {
-                    foreach ($appArray as $app) {
-                        $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->first(['appid']);
-
-                        if ($dupeCheck === null) {
-                            SteamApp::query()->insert(['name' => $app['name'], 'appid' => $app['appid']]);
-                            $inserted++;
-                            if ($inserted % 500 === 0) {
-                                echo PHP_EOL.number_format($inserted).' apps inserted.'.PHP_EOL;
-                            } else {
-                                echo '.';
-                            }
-                        } else {
-                            $dupe++;
-                        }
+            $appsArray = Arr::pluck($fullAppArray, 'apps');
+            $max = count($appsArray[0]);
+            $bar->setMaxProgress($max);
+            foreach ($appsArray as $appArray) {
+                foreach ($appArray as $app) {
+                    $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->first(['appid']);
+                    if ($dupeCheck === null) {
+                        SteamApp::query()->insert(['name' => $app['name'], 'appid' => $app['appid']]);
+                        $inserted++;
+                    } else {
+                        $dupe++;
                     }
+                    $bar->advance()->display();
                 }
             }
+
+            $bar->complete();
+
             echo PHP_EOL.'Added '.$inserted.' new steam app(s), '.$dupe.' duplicates skipped'.PHP_EOL;
         }
     }
