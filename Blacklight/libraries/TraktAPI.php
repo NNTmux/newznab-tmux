@@ -3,6 +3,7 @@
 namespace Blacklight\libraries;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Str;
 
@@ -17,7 +18,7 @@ class TraktAPI
     /**
      * @var array
      */
-    private static $types = ['imdb', 'tmdb', 'trakt', 'tvdb'];
+    private static array $types = ['imdb', 'tmdb', 'trakt', 'tvdb'];
 
     /**
      * List of headers to send to Trakt.tv when making a request.
@@ -26,12 +27,12 @@ class TraktAPI
      *
      * @var array
      */
-    private $requestHeaders;
+    private array $requestHeaders;
 
     /**
-     * @var \GuzzleHttp\Client
+     * @var Client
      */
-    protected $client;
+    protected Client $client;
 
     /**
      * Construct. Assign passed request headers.  Headers should be complete with API key.
@@ -52,27 +53,19 @@ class TraktAPI
     }
 
     /**
-     * Fetches summary from trakt.tv for the TV show using the trakt ID/season/episode.
-     *
-     * @param  int  $id
-     * @param  string  $season
-     * @param  string  $ep
-     * @param  string  $type
-     * @return array|false
-     *
-     * @see    http://docs.trakt.apiary.io/#reference/episodes/summary/get-a-single-episode-for-a-show
+     * @param int $id
+     * @param string $season
+     * @param string $ep
+     * @param string $type
+     * @return bool|array
+     * @throws GuzzleException
      */
-    public function episodeSummary($id, $season = '', $ep = '', $type = 'min')
+    public function episodeSummary(int $id, string $season = '', string $ep = '', string $type = 'min'): bool|array
     {
-        switch ($type) {
-            case 'aliases':
-            case 'full':
-            case 'full,aliases':
-                $extended = $type;
-                break;
-            default:
-                $extended = 'min';
-        }
+        $extended = match ($type) {
+            'aliases', 'full', 'full,aliases' => $type,
+            default => 'min',
+        };
 
         $url = self::API_URL."shows/{$id}/seasons/{$season}/episodes/{$ep}";
 
@@ -85,13 +78,10 @@ class TraktAPI
     }
 
     /**
-     * Fetches weekend box office data from trakt.tv, updated every monday.
-     *
-     * @return array|false
-     *
-     * @see    http://docs.trakt.apiary.io/#reference/movies/box-office/get-the-weekend-box-office
+     * @return bool|array
+     * @throws GuzzleException+
      */
-    public function getBoxOffice()
+    public function getBoxOffice(): bool|array
     {
         $array = $this->getJsonArray(
             self::API_URL.'movies/boxoffice'
@@ -104,15 +94,12 @@ class TraktAPI
     }
 
     /**
-     * Fetches shows calendar from trakt.tv .
-     *
-     * @param  string  $start  Start date of calendar ie. 2015-09-01.Default value is today.
-     * @param  int  $days  Number of days to lookup ahead. Default value is 7 days
-     * @return array|false
-     *
-     * @see    http://docs.trakt.apiary.io/#reference/calendars/all-shows/get-shows
+     * @param string $start
+     * @param int $days
+     * @return bool|array
+     * @throws GuzzleException
      */
-    public function getCalendar($start = '', $days = 7)
+    public function getCalendar(string $start = '', int $days = 7): bool|array
     {
         $array = $this->getJsonArray(
             self::API_URL.'calendars/all/shows/'.$start.'/'.$days
@@ -125,16 +112,12 @@ class TraktAPI
     }
 
     /**
-     * Download JSON from Trakt, convert to array.
-     *
-     * @param  string  $URI  URI to download.
-     * @param  string  $extended  Extended info from trakt tv.
-     *                            Valid values:
-     *                            'min'         Returns enough info to match locally. (Default)
-     *                            'full'        Complete info for an item
+     * @param string $URI
+     * @param string $extended
      * @return array|false
+     * @throws GuzzleException
      */
-    private function getJsonArray($URI, $extended = 'min')
+    private function getJsonArray(string $URI, string $extended = 'min'): bool|array
     {
         if ($extended === '') {
             $extendedString = '';
@@ -170,27 +153,17 @@ class TraktAPI
     }
 
     /**
-     * Fetches summary from trakt.tv for the movie.
-     * Accept a title (the-big-lebowski-1998), a IMDB id, or a TMDB id.
-     *
-     * @param  string  $movie  Title or IMDB id.
-     * @param  string  $type  imdbid:      Return only the IMDB ID (returns string)
-     *                        full:        Return all extended properties. (returns array)
-     *
-     * @see    http://docs.trakt.apiary.io/#reference/movies/summary/get-a-movie
-     *
-     * @return array|string|false
+     * @param string $movie
+     * @param string $type
+     * @return array|bool|mixed
+     * @throws GuzzleException
      */
-    public function movieSummary($movie = '', $type = 'imdbid')
+    public function movieSummary(string $movie = '', string $type = 'imdbid'): mixed
     {
-        switch ($type) {
-            case 'full':
-                $extended = $type;
-                break;
-            case 'imdbid':
-            default:
-                $extended = 'min';
-        }
+        $extended = match ($type) {
+            'full' => $type,
+            default => 'min',
+        };
         $array = $this->getJsonArray(self::API_URL.'movies/'.Str::slug($movie), $extended);
         if (! $array) {
             return false;
@@ -203,12 +176,13 @@ class TraktAPI
     }
 
     /**
-     * @param  int|string  $id
-     * @param  string  $site
-     * @param  int|string  $type
-     * @return array|false|null
+     * @param int|string $id
+     * @param string $site
+     * @param int|string $type
+     * @return array|bool|void
+     * @throws GuzzleException
      */
-    public function searchId($id, $site = 'trakt', $type = 0)
+    public function searchId(int|string $id, string $site = 'trakt', int|string $type = 0)
     {
         if (! \in_array($site, self::$types, false) || ! ctype_digit($id)) {
             return;
@@ -236,17 +210,12 @@ class TraktAPI
     }
 
     /**
-     * Fetches summary from trakt.tv for the show by doing a search.
-     * Accepts a search string.
-     *
-     * @param  string  $show  title
-     * @param  string  $type  show
-     *
-     * @see    http://docs.trakt.apiary.io/#reference/search/get-text-query-results
-     *
-     * @return array|false
+     * @param string $show
+     * @param string $type
+     * @return array|bool
+     * @throws GuzzleException
      */
-    public function showSearch($show = '', $type = 'show')
+    public function showSearch(string $show = '', string $type = 'show'): bool|array
     {
         $searchUrl = self::API_URL.'search?query='.
                 Str::slug($show).
@@ -256,17 +225,12 @@ class TraktAPI
     }
 
     /**
-     * Fetches summary from trakt.tv for the show.
-     * Accepts a trakt slug (game-of-thrones), a IMDB id, or Trakt id.
-     *
-     * @param  string  $show  Title or IMDB id.
-     * @param  string  $type  full:        Return all extended properties. (returns array)
-     *
-     * @see    http://docs.trakt.apiary.io/#reference/shows/summary/get-a-single-show
-     *
-     * @return array|false|null
+     * @param string $show
+     * @param string $type
+     * @return array|bool|void
+     * @throws GuzzleException
      */
-    public function showSummary($show = '', $type = 'full')
+    public function showSummary(string $show = '', string $type = 'full')
     {
         if (empty($show)) {
             return;

@@ -40,10 +40,10 @@ class FanartTV
     /**
      * Getting movie pictures.
      *
-     * @param  string  $id
+     * @param string $id
      * @return array|false
      */
-    public function getMovieFanArt($id)
+    public function getMovieFanArt(string $id): bool|array
     {
         if ($this->apiKey !== '') {
             $fanArt = $this->_getUrl('movies/'.$id);
@@ -60,10 +60,10 @@ class FanartTV
     /**
      * Getting tv show pictures.
      *
-     * @param  string  $id
+     * @param string $id
      * @return array|false
      */
-    public function getTVFanart($id)
+    public function getTVFanart(string $id): bool|array
     {
         if ($this->apiKey !== '') {
             $fanArt = $this->_getUrl('tv/'.$id);
@@ -80,10 +80,10 @@ class FanartTV
     /**
      * The function making all the work using curl to call.
      *
-     * @param  string  $path
+     * @param string $path
      * @return false|array
      */
-    private function _getUrl($path)
+    private function _getUrl(string $path): bool|array
     {
         $url = $this->server.'/'.$path.'?api_key='.$this->apiKey;
 
