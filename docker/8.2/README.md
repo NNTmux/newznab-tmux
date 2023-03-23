@@ -16,7 +16,7 @@ Mailpit is used as a fake mailserver which catches all e-mails in one inbox. You
 
 - Docker & Docker Compose (Duh)
 - Github (scopeless) Token
-- Laravel Sail
+- [Laravel Sail](https://laravel.com/docs/10.x/sail)
 
 ## Setup
 
