@@ -106,11 +106,9 @@ class TVDB extends TV
                 }
 
                 if ($tvDbId === false && $lookupSetting) {
-                    // If it doesnt exist locally and lookups are allowed lets try to get it.
+                    // If it doesn't exist locally and lookups are allowed lets try to get it.
                     if ($this->echooutput) {
-                        $this->colorCli->primaryOver('Video ID for ').
-                                $this->colorCli->headerOver($release['cleanname']).
-                                $this->colorCli->primary(' not found in local db, checking web.', true);
+                        $this->colorCli->climate()->error('Video ID for '.$release['cleanname'].' not found in local db, checking web.');
                     }
 
                     // Check if we have a valid country and set it in the array
@@ -129,9 +127,7 @@ class TVDB extends TV
                         $tvDbId = (int) $tvdbShow['tvdb'];
                     }
                 } elseif ($this->echooutput && $tvDbId !== false) {
-                    $this->colorCli->primaryOver('Video ID for ').
-                            $this->colorCli->headerOver($release['cleanname']).
-                            $this->colorCli->primary(' found in local db, attempting episode match.', true);
+                    $this->colorCli->climate()->info('Video ID for '.$release['cleanname'].' found in local db, attempting episode match.');
                 }
 
                 if ((int) $videoId > 0 && (int) $tvDbId > 0) {
@@ -145,7 +141,7 @@ class TVDB extends TV
                     if ($episodeNo === 'all') {
                         // Set the video ID and leave episode 0
                         $this->setVideoIdFound($videoId, $row['id'], 0);
-                        $this->colorCli->primary('Found TVDB Match for Full Season!', true);
+                        $this->colorCli->climate()->info('Found TVDB Match for Full Season!');
 
                         continue;
                     }
@@ -176,7 +172,7 @@ class TVDB extends TV
                         // Mark the releases video and episode IDs
                         $this->setVideoIdFound($videoId, $row['id'], $episode);
                         if ($this->echooutput) {
-                            $this->colorCli->primary('Found TVDB Match!', true);
+                            $this->colorCli->climate()->info('Found TVDB Match!');
                         }
                     } else {
                         //Processing failed, set the episode ID to the next processing group
@@ -220,7 +216,7 @@ class TVDB extends TV
         try {
             $response = $this->client->search()->search($cleanName, ['type' => 'series']);
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->notice('Show not found on TVDB', true);
+            $this->colorCli->climate()->error('Show not found on TVDB');
         }
 
         if ($response === false && $country !== '') {
@@ -228,7 +224,7 @@ class TVDB extends TV
                 $response = $this->client->search()->search(rtrim(str_replace($country, '', $cleanName)));
             } catch (ResourceNotFoundException $e) {
                 $response = false;
-                $this->colorCli->notice('Show not found on TVDB', true);
+                $this->colorCli->climate()->error('Show not found on TVDB', true);
             }
         }
 
@@ -353,14 +349,14 @@ class TVDB extends TV
             $poster = $this->client->series()->artworks($show->tvdb_id);
             $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->notice('Poster image not found on TVDB', true);
+            $this->colorCli->climate()->error('Poster image not found on TVDB');
         }
 
         try {
             $imdbId = $this->client->series()->extended($show->tvdb_id);
             preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->notice('Show ImdbId not found on TVDB', true);
+            $this->colorCli->climate()->error('Show ImdbId not found on TVDB');
         }
 
         return [

@@ -119,9 +119,7 @@ class TVMaze extends TV
                         }
                     } else {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('Found local TVMaze match for: ').
-                                    $this->colorCli->headerOver($release['cleanname']).
-                                    $this->colorCli->primary('.  Attempting episode lookup!', true);
+                            $this->colorCli->climate()->info('Found local TVMaze match for: '.$release['cleanname'].'. Attempting episode lookup!');
                         }
                         $tvMazeId = $this->getSiteIDFromVideoID('tvmaze', $videoId);
                     }
@@ -136,7 +134,7 @@ class TVMaze extends TV
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
-                            $this->colorCli->primary('Found TVMaze Match for Full Season!', true);
+                            $this->colorCli->climate()->info('Found TVMaze Match for Full Season!', true);
 
                             continue;
                         }
@@ -167,7 +165,7 @@ class TVMaze extends TV
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->primary('Found TVMaze Match!', true);
+                                $this->colorCli->climate()->info('Found TVMaze Match!', true);
                             }
                         } else {
                             //Processing failed, set the episode ID to the next processing group

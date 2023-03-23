@@ -123,9 +123,8 @@ class TraktTv extends TV
                         }
                     } else {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('Found local TMDB match for: ').
-                                    $this->colorCli->headerOver($release['cleanname']).
-                                    $this->colorCli->primary('.  Attempting episode lookup!', true);
+                            $this->colorCli->climate()->info('Found local TMDB match for: '.$release['cleanname']);
+                            $this->colorCli->climate()->info(' Attempting episode lookup!');
                         }
                         $traktid = $this->getSiteIDFromVideoID('trakt', $videoId);
                         $this->localizedTZ = $this->getLocalZoneFromVideoID($videoId);
@@ -141,7 +140,7 @@ class TraktTv extends TV
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
-                            $this->colorCli->primary('Found TRAKT Match for Full Season!', true);
+                            $this->colorCli->climate()->info('Found TRAKT Match for Full Season!');
 
                             continue;
                         }
@@ -166,7 +165,7 @@ class TraktTv extends TV
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->primary('Found TRAKT Match!', true);
+                                $this->colorCli->climate()->info('Found TRAKT Match!');
                             }
                         } else {
                             //Processing failed, set the episode ID to the next processing group

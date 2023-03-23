@@ -39,16 +39,6 @@ class NntmuxResetPostProcessing extends Command
     protected $description = 'Reset all, multiple or single release category postprocessing';
 
     /**
-     * @var ColorCLI
-     */
-    private $colorCli;
-
-    /**
-     * @var ConsoleTools
-     */
-    private $consoleTools;
-
-    /**
      * Create a new command instance.
      *
      * @return void
@@ -56,8 +46,6 @@ class NntmuxResetPostProcessing extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->colorCli = new ColorCLI();
-        $this->consoleTools = new ConsoleTools();
     }
 
     /**
@@ -72,7 +60,10 @@ class NntmuxResetPostProcessing extends Command
             $affected = 0;
             $total = \count($qry);
             if ($total > 0) {
-                $this->colorCli->info('Resetting all postprocessing');
+                $bar = $this->output->createProgressBar($total);
+                $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+                $bar->start();
+                $this->info('Resetting all postprocessing');
                 foreach ($qry as $releases) {
                     Release::query()->where('id', $releases->id)->update(
                         [
@@ -93,10 +84,12 @@ class NntmuxResetPostProcessing extends Command
                             'nfostatus' => -1,
                         ]
                     );
-                    $this->consoleTools->overWritePrimary('Resetting Releases:  '.$this->consoleTools->percentString(++$affected, $total));
+                    $bar->advance();
                 }
+                $bar->finish();
+                $this->newLine();
             } else {
-                $this->colorCli->info('No releases to reset');
+                $this->info('No releases to reset');
             }
         } else {
             foreach ($this->option('category') as $option) {
@@ -138,6 +131,9 @@ class NntmuxResetPostProcessing extends Command
     {
         $qry = Release::query()->whereNotNull('consoleinfo_id')->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->get();
         $total = $qry->count();
+        $bar = $this->output->createProgressBar($total);
+        $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+        $bar->start();
         if ($total > 0) {
             $conCount = 0;
             foreach ($qry as $releases) {
@@ -145,11 +141,13 @@ class NntmuxResetPostProcessing extends Command
                     [
                         'consoleinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting console releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' consoleinfo_id\'s reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' consoleinfo_id\'s reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 
@@ -158,6 +156,9 @@ class NntmuxResetPostProcessing extends Command
         $qry = Release::query()->whereNotNull('movieinfo_id')->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])->get();
         $total = $qry->count();
         if ($total > 0) {
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
@@ -165,11 +166,13 @@ class NntmuxResetPostProcessing extends Command
                         'movieinfo_id' => null,
                         'imdbid' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting Movie releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' movieinfo_id\'s reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' movieinfo_id\'s reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 
@@ -178,17 +181,22 @@ class NntmuxResetPostProcessing extends Command
         $qry = Release::query()->whereNotNull('gamesinfo_id')->where('categories_id', '=', Category::PC_GAMES)->get();
         $total = $qry->count();
         if ($total > 0) {
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
                         'gamesinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting PC GAME releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' gamesinfo_id\'s reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' gamesinfo_id\'s reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 
@@ -197,17 +205,22 @@ class NntmuxResetPostProcessing extends Command
         $qry = Release::query()->whereNotNull('bookinfo_id')->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])->get();
         $total = $qry->count();
         if ($total > 0) {
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
                         'bookinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting book releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' bookinfo_id\'s reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' bookinfo_id\'s reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 
@@ -216,17 +229,22 @@ class NntmuxResetPostProcessing extends Command
         $qry = Release::query()->whereNotNull('musicinfo_id')->whereBetween('categories_id', [Category::MUSIC_ROOT, Category::MUSIC_OTHER])->get();
         $total = $qry->count();
         if ($total > 0) {
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
                         'musicinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting music releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' musicinfo_id\'s reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' musicinfo_id\'s reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 
@@ -235,17 +253,22 @@ class NntmuxResetPostProcessing extends Command
         $qry = Release::query()->whereNotNull('xxxinfo_id')->whereBetween('categories_id', [Category::XXX_ROOT, Category::XXX_OTHER])->get();
         $total = $qry->count();
         if ($total > 0) {
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
                         'xxxinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting xxx releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' xxxinfo_id\'s reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' xxxinfo_id\'s reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 
@@ -254,6 +277,9 @@ class NntmuxResetPostProcessing extends Command
         $qry = Release::query()->where('videos_id', '!=', 0)->where('tv_episodes_id', '!=', 0)->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])->get();
         $total = $qry->count();
         if ($total > 0) {
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
@@ -261,11 +287,13 @@ class NntmuxResetPostProcessing extends Command
                         'videos_id' => 0,
                         'tv_episodes_id' => 0,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting tv releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' video_id\'s reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' video_id\'s reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 
@@ -274,6 +302,9 @@ class NntmuxResetPostProcessing extends Command
         $qry = Release::query()->whereBetween('categories_id', [Category::OTHER_ROOT, Category::OTHER_HASHED])->get();
         $total = $qry->count();
         if ($total > 0) {
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
@@ -285,11 +316,13 @@ class NntmuxResetPostProcessing extends Command
                         'audiostatus' => 0,
                         'nfostatus' => -1,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting misc releases:  '.$this->consoleTools->percentString(++$conCount, $total));
+                $bar->advance();
             }
-            $this->colorCli->info(number_format($conCount).' misc releases reset.');
+            $bar->finish();
+            $this->newLine();
+            $this->info(number_format($conCount).' misc releases reset.');
         } else {
-            $this->colorCli->info('No releases to reset');
+            $this->info('No releases to reset');
         }
     }
 }

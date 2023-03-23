@@ -111,8 +111,8 @@ class TMDB extends TV
                         }
                     } else {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('Found local TMDB match for: '.$release['cleanname']);
-                            $this->colorCli->primary('.  Attempting episode lookup!', true);
+                            $this->colorCli->climate()->info('Found local TMDB match for: '.$release['cleanname']);
+                            $this->colorCli->climate()->info('.  Attempting episode lookup!');
                         }
                         $tmdbid = $this->getSiteIDFromVideoID('tmdb', $videoId);
                     }
@@ -127,7 +127,7 @@ class TMDB extends TV
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
-                            $this->colorCli->primary('Found TMDB Match for Full Season!', true);
+                            $this->colorCli->climate()->info('Found TMDB Match for Full Season!');
 
                             continue;
                         }
@@ -158,7 +158,7 @@ class TMDB extends TV
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->primary('Found TMDB Match!', true);
+                                $this->colorCli->climate()->info('Found TMDB Match!');
                             }
                         } else {
                             //Processing failed, set the episode ID to the next processing group

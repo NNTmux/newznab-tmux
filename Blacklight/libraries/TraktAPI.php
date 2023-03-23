@@ -15,23 +15,15 @@ class TraktAPI
 {
     protected const API_URL = 'https://api.trakt.tv/';
 
-    /**
-     * @var array
-     */
     private static array $types = ['imdb', 'tmdb', 'trakt', 'tvdb'];
 
     /**
      * List of headers to send to Trakt.tv when making a request.
      *
      * @see http://docs.trakt.apiary.io/#introduction/required-headers
-     *
-     * @var array
      */
     private array $requestHeaders;
 
-    /**
-     * @var Client
-     */
     protected Client $client;
 
     /**
@@ -53,11 +45,6 @@ class TraktAPI
     }
 
     /**
-     * @param int $id
-     * @param string $season
-     * @param string $ep
-     * @param string $type
-     * @return bool|array
      * @throws GuzzleException
      */
     public function episodeSummary(int $id, string $season = '', string $ep = '', string $type = 'min'): bool|array
@@ -78,7 +65,6 @@ class TraktAPI
     }
 
     /**
-     * @return bool|array
      * @throws GuzzleException+
      */
     public function getBoxOffice(): bool|array
@@ -94,9 +80,6 @@ class TraktAPI
     }
 
     /**
-     * @param string $start
-     * @param int $days
-     * @return bool|array
      * @throws GuzzleException
      */
     public function getCalendar(string $start = '', int $days = 7): bool|array
@@ -112,9 +95,8 @@ class TraktAPI
     }
 
     /**
-     * @param string $URI
-     * @param string $extended
      * @return array|false
+     *
      * @throws GuzzleException
      */
     private function getJsonArray(string $URI, string $extended = 'min'): bool|array
@@ -153,9 +135,8 @@ class TraktAPI
     }
 
     /**
-     * @param string $movie
-     * @param string $type
      * @return array|bool|mixed
+     *
      * @throws GuzzleException
      */
     public function movieSummary(string $movie = '', string $type = 'imdbid'): mixed
@@ -176,10 +157,8 @@ class TraktAPI
     }
 
     /**
-     * @param int|string $id
-     * @param string $site
-     * @param int|string $type
      * @return array|bool|void
+     *
      * @throws GuzzleException
      */
     public function searchId(int|string $id, string $site = 'trakt', int|string $type = 0)
@@ -210,9 +189,6 @@ class TraktAPI
     }
 
     /**
-     * @param string $show
-     * @param string $type
-     * @return array|bool
      * @throws GuzzleException
      */
     public function showSearch(string $show = '', string $type = 'show'): bool|array
@@ -225,9 +201,8 @@ class TraktAPI
     }
 
     /**
-     * @param string $show
-     * @param string $type
      * @return array|bool|void
+     *
      * @throws GuzzleException
      */
     public function showSummary(string $show = '', string $type = 'full')

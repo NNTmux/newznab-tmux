@@ -118,4 +118,9 @@ class ColorCLI
     {
         return $this->climate->progress();
     }
+
+    public function climate()
+    {
+        return $this->climate;
+    }
 }
