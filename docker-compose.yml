@@ -40,7 +40,6 @@ services:
             MYSQL_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         command:
-            --plugin-load-add='ha_sphinx'
             --max_allowed_packet=128M
             --group_concat_max_len=16384
             --max_connections=200 

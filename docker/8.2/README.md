@@ -25,7 +25,6 @@ Mailpit is used as a fake mailserver which catches all e-mails in one inbox. You
   - Make sure your `.gitignore` contains this line: `docker/8.2/var.ens`
 - `sail build --no-cache`
 - `sail up -d`
-- Manticore might require you to recreate the `SE` tables in your database to point to the Manticore container. Example: `CONNECTION='sphinx://manticore:9306/releases_rt'`
 
 ### You might have to edit your Laravel `.env` file:
 
@@ -50,8 +49,6 @@ DB_PASSWORD=
 ```
 
 You will need to manually import a SQL dump or run `sail artisan nntmux:install` if this is a new installation.
-
-The Sphinx plugin is already installed & loaded in MariaDB.
 
 ## Networking
 Sail will create a Docker network called `sail` with these ports mapped to your host:
