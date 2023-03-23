@@ -56,7 +56,7 @@ class Games
 
     protected string $_gameID;
 
-    protected array|false $_gameResults;
+    protected mixed $_gameResults;
 
     protected $_getGame;
 
