@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
 use Manticoresearch\Exceptions\RuntimeException;
+use Manticoresearch\Search;
 
 /**
  * Class ManticoreSearch.
@@ -22,6 +23,8 @@ class ManticoreSearch
 
     protected Client $manticoresearch;
 
+    protected Search $search;
+
     /**
      * @var \Blacklight\ColorCLI
      */
@@ -35,6 +38,7 @@ class ManticoreSearch
         $this->config = config('sphinxsearch');
         $this->connection = ['host' => $this->config['host'], 'port' => $this->config['port']];
         $this->manticoresearch = new Client($this->connection);
+        $this->search = new Search($this->manticoresearch);
         $this->cli = new ColorCLI();
     }
 
@@ -180,16 +184,16 @@ class ManticoreSearch
      * @param  string  $searchString  (what are we looking for?)
      * @param  array  $column  (one or multiple columns from the columns that exist in indexes)
      */
-    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): mixed
+    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): array
     {
         $result = [];
-        $query = $this->manticoresearch->index($rt_index)->search($searchString)->maxMatches(10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(10000)->sort('id', 'desc');
+        $query = $this->search->setIndex($rt_index)->maxMatches(10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
-                $query->match($value, $key);
+                $query->match(['query' => $value, 'operator' => 'and', 'column' => $key]);
             }
         } elseif (! empty($searchString)) {
-            $query->match($searchString, $column);
+            $query->match(['query' => $searchString, 'column' => $column, 'operator' => 'and']);
         } else {
             return [];
         }
