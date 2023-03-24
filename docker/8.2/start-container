@@ -12,6 +12,9 @@ chmod -R ugo+rw /.composer
 addgroup supervisor > /dev/null 2>&1
 usermod -a -G supervisor sail > /dev/null 2>&1
 
+# Set timezone
+ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 if [ $# -gt 0 ]; then
     exec gosu $WWWUSER "$@"
 else

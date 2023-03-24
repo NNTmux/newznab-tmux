@@ -20,9 +20,9 @@ Mailpit is used as a fake mailserver which catches all e-mails in one inbox. You
 
 ## Setup
 
-- Edit `vars.env` with your Github (scopeless) token
-  - See: https://github.com/settings/tokens/new?scopes=&description=Laravel+Dev+Env and set the expiration to **No expiration**
-  - Make sure your `.gitignore` contains this line: `docker/8.2/var.ens`
+- Edit your projects `.env` file and add a `COMPOSER_AUTH` entry.
+  - Get a Github token: https://github.com/settings/tokens/new?scopes=&description=NNTMux+Docker and set the expiration to **No expiration**
+  - Example: `COMPOSER_AUTH='{"github-oauth": {"github.com": "ghp_xxxxxxxx"}}'`
 - `sail build --no-cache`
 - `sail up -d`
 
