@@ -43,7 +43,7 @@ services:
         command:
             --max_allowed_packet=128M
             --group_concat_max_len=16384
-            --max_connections=200 
+            --max_connections=200
         volumes:
             - 'sail-mariadb:/var/lib/mysql'
             - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
@@ -103,20 +103,20 @@ services:
             - ./misc/manticoresearch/manticore.conf:/etc/manticoresearch/manticore.conf # uncomment if you use a custom config
         networks:
             - sail
-#    elasticsearch:
-#        image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
-#        environment:
-#            - TZ=${APP_TZ}
-#            - discovery.type=single-node
-#            - xpack.security.enabled=false
-#            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-#        ports:
-#            - 9200:9200
-#            - 9300:9300
-#        volumes:
-#            - sail-elasticsearch:/usr/share/elasticsearch/data
-#        networks:
-#            - sail 
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
+        environment:
+            - TZ=${APP_TZ}
+            - discovery.type=single-node
+            - xpack.security.enabled=false
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ports:
+            - 9200:9200
+            - 9300:9300
+        volumes:
+            - sail-elasticsearch:/usr/share/elasticsearch/data
+        networks:
+            - sail
 networks:
     sail:
         driver: bridge
@@ -127,5 +127,5 @@ volumes:
         driver: local
     sail-manticore:
         driver: local
- #   sail-elasticsearch:
- #       driver: local
+    sail-elasticsearch:
+        driver: local
