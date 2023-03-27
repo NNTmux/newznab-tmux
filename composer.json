@@ -175,7 +175,8 @@
       "composer/package-versions-deprecated": true,
       "captainhook/plugin-composer": true,
       "treeware/plant": true,
-      "ergebnis/composer-normalize": true
+      "ergebnis/composer-normalize": true,
+      "php-http/discovery": true
     },
     "discard-changes": true,
     "optimize-autoloader": true,
