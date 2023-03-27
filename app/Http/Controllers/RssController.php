@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -14,9 +15,11 @@ use Illuminate\Support\Carbon;
 class RssController extends BasePageController
 {
     /**
+     * @param Request $request
+     * @return JsonResponse|void
      * @throws \Throwable
      */
-    public function myMoviesRss(Request $request): \Illuminate\Http\JsonResponse|array
+    public function myMoviesRss(Request $request)
     {
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
@@ -37,9 +40,11 @@ class RssController extends BasePageController
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse|void
      * @throws \Throwable
      */
-    public function myShowsRss(Request $request): \Illuminate\Http\JsonResponse|array
+    public function myShowsRss(Request $request)
     {
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
@@ -56,9 +61,11 @@ class RssController extends BasePageController
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse|void
      * @throws \Throwable
      */
-    public function fullFeedRss(Request $request): \Illuminate\Http\JsonResponse|array
+    public function fullFeedRss(Request $request)
     {
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
@@ -127,7 +134,7 @@ class RssController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function cartRss(Request $request): \Illuminate\Http\JsonResponse|array
+    public function cartRss(Request $request): JsonResponse|array
     {
         $this->setPreferences();
         $rss = new RSS(['Settings' => $this->settings]);
@@ -154,7 +161,7 @@ class RssController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function categoryFeedRss(Request $request): \Illuminate\Http\JsonResponse|array
+    public function categoryFeedRss(Request $request): JsonResponse|array
     {
         $this->setPreferences();
         $rss = new RSS(['Settings' => $this->settings]);
@@ -185,7 +192,7 @@ class RssController extends BasePageController
     /**
      * @throws \Throwable
      */
-    private function userCheck(Request $request): \Illuminate\Http\JsonResponse|array
+    private function userCheck(Request $request): JsonResponse|array
     {
         if ($request->missing('api_token')) {
             return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);

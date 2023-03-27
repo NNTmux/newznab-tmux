@@ -8,43 +8,41 @@ use App\Models\UserMovie;
 use App\Models\UserSerie;
 use Blacklight\NZB;
 use Blacklight\Releases;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Class RSS -- contains specific functions for RSS.
  */
-class RSS extends Capabilities
+class RSS extends ApiController
 {
     /** Releases class.
      * @var Releases
      */
-    public $releases;
+    public Releases $releases;
 
     /**
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        parent::__construct($options);
-        $defaults = [
-            'Settings' => null,
-            'Releases' => null,
-        ];
-        $options += $defaults;
-
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
+        parent::__construct();
     }
 
     /**
-     * Get releases for RSS.
-     *
-     *
-     * @param  int  $userID
-     * @param  int  $airDate
-     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
+     * @param $cat
+     * @param $videosId
+     * @param $aniDbID
+     * @param int $userID
+     * @param int $airDate
+     * @param int $limit
+     * @param int $offset
+     * @return Release[]|Collection|mixed
      */
-    public function getRss($cat, $videosId, $aniDbID, $userID = 0, $airDate = -1, int $limit = 100, int $offset = 0)
+    public function getRss($cat, $videosId, $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
     {
         $catSearch = $cartSearch = '';
         $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
@@ -110,14 +108,14 @@ class RSS extends Capabilities
     }
 
     /**
-     * @param  int  $limit
-     * @param  int  $userID
-     * @param  int  $airDate
-     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     * @param int $limit
+     * @param int $userID
+     * @param array $excludedCats
+     * @param int $airDate
+     * @return Builder|Collection
      *
-     * @throws \Exception
      */
-    public function getShowsRss($limit, $userID = 0, array $excludedCats = [], $airDate = -1)
+    public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1)
     {
         $sql = sprintf(
             "
@@ -169,16 +167,12 @@ class RSS extends Capabilities
     }
 
     /**
-     * Get movies for RSS.
-     *
-     *
-     * @param  int  $limit
-     * @param  int  $userID
-     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
-     *
-     * @throws \Exception
+     * @param int $limit
+     * @param int $userID
+     * @param array $excludedCats
+     * @return Release[]|Collection|mixed
      */
-    public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = [])
+    public function getMyMoviesRss(int $limit, int $userID = 0, array $excludedCats = [])
     {
         $sql = sprintf(
             "
@@ -229,7 +223,7 @@ class RSS extends Capabilities
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null
+     * @return Model|\Illuminate\Database\Query\Builder|null
      */
     public function getFirstInstance($column, $table, $order)
     {

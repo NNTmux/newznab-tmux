@@ -4,23 +4,34 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
+use App\Models\Category;
 use App\Models\Release;
 use App\Models\ReleaseNfo;
+use App\Models\Settings;
+use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApiController extends BasePageController
 {
     /**
+     * @var string
+     */
+    private string $type;
+
+    /**
      * @throws \Throwable
      */
-    public function api(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function api(Request $request): StreamedResponse|Redirector|RedirectResponse
     {
         // API functions.
         $function = 's';
@@ -105,12 +116,11 @@ class ApiController extends BasePageController
         }
 
         $releases = new Releases();
-        $api = new API(['Settings' => $this->settings, 'Request' => $request]);
 
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $offset = $api->offset();
+        $offset = $this->offset();
 
         // Set API Parameters based on Request objects
         $params['extended'] = $request->has('extended') && (int) $request->input('extended') === 1 ? '1' : '0';
@@ -127,12 +137,12 @@ class ApiController extends BasePageController
         switch ($function) {
             // Search releases.
             case 's':
-                $api->verifyEmptyParameter('q');
-                $maxAge = $api->maxAge();
-                $groupName = $api->group();
+                $this->verifyEmptyParameter('q');
+                $maxAge = $this->maxAge();
+                $groupName = $this->group();
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
-                $categoryID = $api->categoryID();
-                $limit = $api->limit();
+                $categoryID = $this->categoryID();
+                $limit = $this->limit();
                 $searchArr = [
                     'searchname' => $request->input('q') ?? -1,
                     'name' => -1,
@@ -170,21 +180,21 @@ class ApiController extends BasePageController
                         $minSize
                     );
                 }
-                $api->output($relData, $params, $outputXML, $offset, 'api');
+                $this->output($relData, $params, $outputXML, $offset, 'api');
                 break;
                 // Search tv releases.
             case 'tv':
-                $api->verifyEmptyParameter('q');
-                $api->verifyEmptyParameter('vid');
-                $api->verifyEmptyParameter('tvdbid');
-                $api->verifyEmptyParameter('traktid');
-                $api->verifyEmptyParameter('rid');
-                $api->verifyEmptyParameter('tvmazeid');
-                $api->verifyEmptyParameter('imdbid');
-                $api->verifyEmptyParameter('tmdbid');
-                $api->verifyEmptyParameter('season');
-                $api->verifyEmptyParameter('ep');
-                $maxAge = $api->maxAge();
+                $this->verifyEmptyParameter('q');
+                $this->verifyEmptyParameter('vid');
+                $this->verifyEmptyParameter('tvdbid');
+                $this->verifyEmptyParameter('traktid');
+                $this->verifyEmptyParameter('rid');
+                $this->verifyEmptyParameter('tvmazeid');
+                $this->verifyEmptyParameter('imdbid');
+                $this->verifyEmptyParameter('tmdbid');
+                $this->verifyEmptyParameter('season');
+                $this->verifyEmptyParameter('ep');
+                $maxAge = $this->maxAge();
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
                 $siteIdArr = [
@@ -211,23 +221,23 @@ class ApiController extends BasePageController
                     $series,
                     $episode,
                     $airDate ?? '',
-                    $api->offset(),
-                    $api->limit(),
+                    $this->offset(),
+                    $this->limit(),
                     $request->input('q') ?? '',
-                    $api->categoryID(),
+                    $this->categoryID(),
                     $maxAge,
                     $minSize,
                     $catExclusions
                 );
 
-                $api->output($relData, $params, $outputXML, $offset, 'api');
+                $this->output($relData, $params, $outputXML, $offset, 'api');
                 break;
 
                 // Search movie releases.
             case 'm':
-                $api->verifyEmptyParameter('q');
-                $api->verifyEmptyParameter('imdbid');
-                $maxAge = $api->maxAge();
+                $this->verifyEmptyParameter('q');
+                $this->verifyEmptyParameter('imdbid');
+                $maxAge = $this->maxAge();
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
                 $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? (int) $request->input('imdbid') : -1;
@@ -238,28 +248,28 @@ class ApiController extends BasePageController
                     $imdbId,
                     $tmdbId,
                     $traktId,
-                    $api->offset(),
-                    $api->limit(),
+                    $this->offset(),
+                    $this->limit(),
                     $request->input('q') ?? '',
-                    $api->categoryID(),
+                    $this->categoryID(),
                     $maxAge,
                     $minSize,
                     $catExclusions
                 );
 
-                $api->addCoverURL(
+                $this->addCoverURL(
                     $relData,
                     function ($release) {
                         return Utility::getCoverURL(['type' => 'movies', 'id' => $release->imdbid]);
                     }
                 );
 
-                $api->output($relData, $params, $outputXML, $offset, 'api');
+                $this->output($relData, $params, $outputXML, $offset, 'api');
                 break;
 
                 // Get NZB.
             case 'g':
-                $api->verifyEmptyParameter('g');
+                $this->verifyEmptyParameter('g');
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $relData = Release::checkGuidForApi($request->input('id'));
                 if ($relData) {
@@ -278,7 +288,7 @@ class ApiController extends BasePageController
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $data = Release::getByGuid($request->input('id'));
 
-                $api->output($data, $params, $outputXML, $offset, 'api');
+                $this->output($data, $params, $outputXML, $offset, 'api');
                 break;
 
                 // Get an NFO file for an individual release.
@@ -310,8 +320,185 @@ class ApiController extends BasePageController
 
                 // Capabilities request.
             case 'c':
-                $api->output([], $params, $outputXML, $offset, 'caps');
+                $this->output([], $params, $outputXML, $offset, 'caps');
                 break;
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function output($data, array $params, bool $xml, int $offset, string $type = ''): void
+    {
+        $this->type = $type;
+        $options = [
+            'Parameters' => $params,
+            'Data' => $data,
+            'Server' => $this->getForMenu(),
+            'Offset' => $offset,
+            'Type' => $type,
+        ];
+
+        // Generate the XML Response
+        $response = (new XML_Response($options))->returnXML();
+
+        if ($xml) {
+            header('Content-type: text/xml');
+        } else {
+            // JSON encode the XMLWriter response
+            $response = json_encode(xml_to_array($response), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES);
+            header('Content-type: application/json');
+        }
+        if ($response === false) {
+            Utility::showApiError(201);
+        } else {
+            header('Content-Length: '.\strlen($response));
+            echo $response;
+            exit;
+        }
+    }
+
+    /**
+     * Collect and return various capability information for usage in API.
+     *
+     *
+     * @throws \Exception
+     */
+    public function getForMenu(): array
+    {
+        $serverroot = url('/');
+
+        return [
+            'server' => [
+                'title' => config('app.name'),
+                'strapline' => Settings::settingValue('site.main.strapline'),
+                'email' => config('mail.from.address'),
+                'meta' => Settings::settingValue('site.main.metakeywords'),
+                'url' => $serverroot,
+                'image' => $serverroot.'/assets/images/tmux_logo.png',
+            ],
+            'limits' => [
+                'max' => 100,
+                'default' => 100,
+            ],
+            'registration' => [
+                'available' => 'yes',
+                'open' => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
+            ],
+            'searching' => [
+                'search' => ['available' => 'yes', 'supportedParams' => 'q'],
+                'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
+                'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
+                'audio-search' => ['available' => 'no',  'supportedParams' => ''],
+            ],
+            'categories' => $this->type === 'caps'
+                ? Category::getForMenu()
+                : null,
+        ];
+    }
+
+    /**
+     * Verify maxage parameter.
+     *
+     * @return int $maxAge The maximum age of the release
+     */
+    public function maxAge(): int
+    {
+        $maxAge = -1;
+        if (request()->has('maxage')) {
+            if (! request()->filled('maxage')) {
+                Utility::showApiError(201, 'Incorrect parameter (maxage must not be empty)');
+            } elseif (! is_numeric(request()->input('maxage'))) {
+                Utility::showApiError(201, 'Incorrect parameter (maxage must be numeric)');
+            } else {
+                $maxAge = (int) request()->input('maxage');
+            }
+        }
+
+        return $maxAge;
+    }
+
+    /**
+     * Verify cat parameter.
+     */
+    public function categoryID(): array
+    {
+        $categoryID[] = -1;
+        if (request()->has('cat')) {
+            $categoryIDs = urldecode(request()->input('cat'));
+            // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
+            if (str_contains($categoryIDs, (string) Category::TV_HD) && ! str_contains($categoryIDs, (string) Category::TV_WEBDL) && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+                $categoryIDs .= (','.Category::TV_WEBDL);
+            }
+            $categoryID = explode(',', $categoryIDs);
+        }
+
+        return $categoryID;
+    }
+
+    /**
+     * Verify groupName parameter.
+     *
+     *
+     * @throws \Exception
+     */
+    public function group(): string|int|bool
+    {
+        $groupName = -1;
+        if (request()->has('group')) {
+            $group = UsenetGroup::isValidGroup(request()->input('group'));
+            if ($group !== false) {
+                $groupName = $group;
+            }
+        }
+
+        return $groupName;
+    }
+
+    /**
+     * Verify limit parameter.
+     */
+    public function limit(): int
+    {
+        $limit = 100;
+        if (request()->has('limit') && is_numeric(request()->input('limit'))) {
+            $limit = (int) request()->input('limit');
+        }
+
+        return $limit;
+    }
+
+    /**
+     * Verify offset parameter.
+     */
+    public function offset(): int
+    {
+        $offset = 0;
+        if (request()->has('offset') && is_numeric(request()->input('offset'))) {
+            $offset = (int) request()->input('offset');
+        }
+
+        return $offset;
+    }
+
+    /**
+     * Check if a parameter is empty.
+     */
+    public function verifyEmptyParameter(string $parameter): void
+    {
+        if (request()->has($parameter) && request()->isNotFilled($parameter)) {
+            Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
+        }
+    }
+
+    public function addCoverURL(&$releases, callable $getCoverURL): void
+    {
+        if ($releases && \count($releases)) {
+            foreach ($releases as $key => $release) {
+                if (isset($release->id)) {
+                    $release->coverurl = $getCoverURL($release);
+                }
+            }
         }
     }
 }
