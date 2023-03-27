@@ -19,43 +19,33 @@ class ReleaseImage
 {
     /**
      * Path to save ogg audio samples.
-     *
-     * @var string
      */
-    public $audSavePath;
+    public string $audSavePath;
 
     /**
      * Path to save video preview jpg pictures.
-     *
-     * @var string
      */
-    public $imgSavePath;
+    public string $imgSavePath;
 
     /**
      * Path to save large jpg pictures(xxx).
-     *
-     * @var string
      */
-    public $jpgSavePath;
+    public string $jpgSavePath;
 
     /**
      * Path to save movie jpg covers.
-     *
-     * @var string
      */
-    public $movieImgSavePath;
+    public string $movieImgSavePath;
 
     /**
      * Path to save video ogv files.
-     *
-     * @var string
      */
-    public $vidSavePath;
+    public string $vidSavePath;
 
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * ReleaseImage constructor.
@@ -70,10 +60,7 @@ class ReleaseImage
         $this->vidSavePath = NN_COVERS.'video'.DS;
     }
 
-    /**
-     * @return bool|\Intervention\Image\Image
-     */
-    protected function fetchImage($imgLoc)
+    protected function fetchImage(string $imgLoc): \Intervention\Image\Image|bool
     {
         try {
             $img = Image::make($imgLoc);
@@ -88,11 +75,15 @@ class ReleaseImage
 
             $img = false;
         } catch (NotReadableException $e) {
-            $this->colorCli->notice($e->getMessage());
+            $this->colorCli->climate()->info($e->getMessage());
 
             $img = false;
         } catch (ImageException $e) {
-            $this->colorCli->notice('Image error: '.$e->getMessage());
+            $this->colorCli->climate()->error('Image error: '.$e->getMessage());
+
+            $img = false;
+        } catch (\ImagickException $e) {
+            $this->colorCli->climate()->error('Image error: '.$e->getMessage());
 
             $img = false;
         }
@@ -111,7 +102,7 @@ class ReleaseImage
      * @param  bool  $saveThumb  Save a thumbnail of this image? (OPTIONAL)
      * @return int 1 on success, 0 on failure Used on site to check if there is an image.
      */
-    public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false): int
+    public function saveImage(string $imgName, string $imgLoc, string $imgSavePath, string $imgMaxWidth = '', string $imgMaxHeight = '', bool $saveThumb = false): int
     {
         $cover = $this->fetchImage($imgLoc);
 
@@ -155,7 +146,7 @@ class ReleaseImage
      *
      * @param  string  $guid  The GUID of the release.
      */
-    public function delete($guid): void
+    public function delete(string $guid): void
     {
         $thumb = $guid.'_thumb.jpg';
 
