@@ -15,8 +15,8 @@ use Illuminate\Support\Carbon;
 class RssController extends BasePageController
 {
     /**
-     * @param Request $request
      * @return JsonResponse|void
+     *
      * @throws \Throwable
      */
     public function myMoviesRss(Request $request)
@@ -40,8 +40,8 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse|void
+     *
      * @throws \Throwable
      */
     public function myShowsRss(Request $request)
@@ -61,8 +61,8 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse|void
+     *
      * @throws \Throwable
      */
     public function fullFeedRss(Request $request)

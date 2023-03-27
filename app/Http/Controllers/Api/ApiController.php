@@ -23,9 +23,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApiController extends BasePageController
 {
-    /**
-     * @var string
-     */
     private string $type;
 
     /**

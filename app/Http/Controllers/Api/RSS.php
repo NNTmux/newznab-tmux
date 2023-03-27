@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\DB;
 class RSS extends ApiController
 {
     /** Releases class.
-     * @var Releases
      */
     public Releases $releases;
 
@@ -33,13 +32,6 @@ class RSS extends ApiController
     }
 
     /**
-     * @param $cat
-     * @param $videosId
-     * @param $aniDbID
-     * @param int $userID
-     * @param int $airDate
-     * @param int $limit
-     * @param int $offset
      * @return Release[]|Collection|mixed
      */
     public function getRss($cat, $videosId, $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
@@ -108,12 +100,7 @@ class RSS extends ApiController
     }
 
     /**
-     * @param int $limit
-     * @param int $userID
-     * @param array $excludedCats
-     * @param int $airDate
      * @return Builder|Collection
-     *
      */
     public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1)
     {
@@ -167,9 +154,6 @@ class RSS extends ApiController
     }
 
     /**
-     * @param int $limit
-     * @param int $userID
-     * @param array $excludedCats
      * @return Release[]|Collection|mixed
      */
     public function getMyMoviesRss(int $limit, int $userID = 0, array $excludedCats = [])
