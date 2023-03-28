@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\DB;
  */
 class RSS extends ApiController
 {
-    /** Releases class.
+    /**
+     * @var \Blacklight\Releases
      */
     public Releases $releases;
 
@@ -29,6 +30,7 @@ class RSS extends ApiController
     public function __construct()
     {
         parent::__construct();
+        $this->releases = new Releases();
     }
 
     /**
