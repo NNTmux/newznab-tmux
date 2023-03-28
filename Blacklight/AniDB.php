@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\AnidbTitle;
 use App\Models\Category;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -11,30 +12,31 @@ use Illuminate\Support\Facades\DB;
  */
 class AniDB
 {
-    /**
-     * AniDB constructor.
-     */
     public function __construct()
     {
+
     }
 
     /**
      * Updates stored AniDB entries in the database.
      *
-     * @param  int  $anidbID
-     * @param  string  $title
-     * @param  string  $type
-     * @param  string  $startdate
-     * @param  string  $enddate
-     * @param  string  $related
-     * @param  string  $similar
-     * @param  string  $creators
-     * @param  string  $description
-     * @param  string  $rating
-     * @param  string  $categories
-     * @param  string  $characters
+     * @param int $anidbID
+     * @param string $title
+     * @param string $type
+     * @param string $startdate
+     * @param string $enddate
+     * @param string $related
+     * @param string $similar
+     * @param string $creators
+     * @param string $description
+     * @param string $rating
+     * @param string $categories
+     * @param string $characters
+     * @param string $epnos
+     * @param string $airdates
+     * @param string $episodetitles
      */
-    public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles): void
+    public function updateTitle(int $anidbID, string $title, string $type, string $startdate, string $enddate, string $related, string $similar, string $creators, string $description, string $rating, string $categories, string $characters, string $epnos, string $airdates, string $episodetitles): void
     {
         DB::update(
             sprintf(
@@ -66,9 +68,10 @@ class AniDB
     }
 
     /**
+     * @param int $anidbID
      * @throws \Throwable
      */
-    public function deleteTitle($anidbID): void
+    public function deleteTitle(int $anidbID): void
     {
         DB::transaction(function () use ($anidbID) {
             DB::delete(
@@ -89,10 +92,11 @@ class AniDB
      * Retrieves a list of Anime titles, optionally filtered by starting character and title.
      *
      *
-     * @param  string  $letter
-     * @param  string  $animetitle
+     * @param string $letter
+     * @param string $animeTitle
+     * @return array
      */
-    public function getAnimeList($letter = '', $animetitle = ''): array
+    public function getAnimeList(string $letter = '', string $animeTitle = ''): array
     {
         $rsql = $tsql = '';
 
@@ -103,8 +107,8 @@ class AniDB
             $rsql .= sprintf('AND at.title REGEXP %s', escapeString('^'.$letter));
         }
 
-        if ($animetitle !== '') {
-            $tsql .= sprintf('AND at.title LIKE %s', escapeString('%'.$animetitle.'%'));
+        if ($animeTitle !== '') {
+            $tsql .= sprintf('AND at.title LIKE %s', escapeString('%'.$animeTitle.'%'));
         }
 
         return DB::select(
@@ -130,14 +134,15 @@ class AniDB
      * Retrieves a range of Anime titles for site display.
      *
      *
-     * @param  string  $animetitle
+     * @param string $animeTitle
+     * @return LengthAwarePaginator
      */
-    public function getAnimeRange($animetitle = ''): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getAnimeRange(string $animeTitle = ''): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = AnidbTitle::query()
             ->where('at.lang', '=', 'en');
-        if ($animetitle !== '') {
-            $query->where('at.title', 'like', '%'.$animetitle.'%');
+        if ($animeTitle !== '') {
+            $query->where('at.title', 'like', '%'.$animeTitle.'%');
         }
         $query->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
                 ->from('anidb_titles as at')
@@ -152,9 +157,10 @@ class AniDB
      * Retrieves all info for a specific AniDB ID.
      *
      *
+     * @param int $anidbID
      * @return mixed
      */
-    public function getAnimeInfo($anidbID)
+    public function getAnimeInfo(int $anidbID): mixed
     {
         $animeInfo = DB::select(
             sprintf(
