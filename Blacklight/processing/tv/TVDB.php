@@ -19,7 +19,7 @@ class TVDB extends TV
     /**
      * @var string Authorization token for TVDB v2 API
      */
-    public string $token;
+    public string $token = '';
 
     /**
      * @string URL for show poster art
