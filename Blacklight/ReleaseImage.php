@@ -53,11 +53,11 @@ class ReleaseImage
     public function __construct()
     {
         $this->colorCli = new ColorCLI();
-        $this->audSavePath = NN_COVERS.'audiosample'.DS;
-        $this->imgSavePath = NN_COVERS.'preview'.DS;
-        $this->jpgSavePath = NN_COVERS.'sample'.DS;
-        $this->movieImgSavePath = NN_COVERS.'movies'.DS;
-        $this->vidSavePath = NN_COVERS.'video'.DS;
+        $this->audSavePath = storage_path('covers/audiosample/');
+        $this->imgSavePath = storage_path('covers/preview/');
+        $this->jpgSavePath = storage_path('covers/sample/');
+        $this->movieImgSavePath = storage_path('covers/movies/');
+        $this->vidSavePath = storage_path('covers/video/');
     }
 
     protected function fetchImage(string $imgLoc): \Intervention\Image\Image|bool

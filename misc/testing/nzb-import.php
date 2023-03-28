@@ -18,7 +18,7 @@ if (count($argv) !== 6) {
         'arg3 : Delete NZB when unsuccessfully imported.(not recommended) | true/false'.$n.
         'arg4 : Use NZB file name as release name.(not recommended)       | true/false'.$n.
         'arg5 : Import this many NZB files. (RECOMMENDED 100,000)         | a number'.$n.$n.
-        'ie: '.$_SERVER['_'].' '.__FILE__.' '.NN_ROOT.'nzbToImport'.DS.' true false false 1000'.$n
+        'ie: '.$_SERVER['_'].' '.__FILE__.' '.base_path('nzbToImport/ true false false 1000').$n
     );
 }
 

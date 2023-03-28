@@ -106,7 +106,7 @@ class Console
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
         $this->gameqty = (Settings::settingValue('..maxgamesprocessed') !== '') ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
         $this->sleeptime = (Settings::settingValue('..amazonsleep') !== '') ? (int) Settings::settingValue('..amazonsleep') : 1000;
-        $this->imgSavePath = NN_COVERS.'console'.DS;
+        $this->imgSavePath = storage_path('covers/console/');
         $this->renamed = (int) Settings::settingValue('..lookupgames') === 2;
 
         $this->failCache = [];

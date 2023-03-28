@@ -14,7 +14,7 @@ if ($argc === 1 || $argv[1] !== 'true') {
     exit();
 }
 
-$path2covers = NN_COVERS.'book'.DS;
+$path2covers = storage_path('covers/book/');
 
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {

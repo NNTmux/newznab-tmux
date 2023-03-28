@@ -227,7 +227,7 @@ class Tmux
 
     public function writelog($pane): ?string
     {
-        $path = NN_LOGS;
+        $path = storage_path('logs');
         $getDate = now()->format('Y_m_d');
         $logs = Settings::settingValue('site.tmux.write_logs') ?? 0;
         if ($logs === 1) {

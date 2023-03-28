@@ -22,7 +22,7 @@ if ($row !== null) {
 } else {
     exit("Unable to set Covers' constant!\n");
 }
-$path2covers = NN_COVERS.'movies'.DS;
+$path2covers = storage_path('covers/movies');
 
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {

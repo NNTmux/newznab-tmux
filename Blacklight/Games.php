@@ -92,7 +92,7 @@ class Games
 
         $this->publicKey = config('nntmux_api.giantbomb_api_key');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
-        $this->imgSavePath = NN_COVERS.'games'.DS;
+        $this->imgSavePath = storage_path('covers/games/');
         $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
         $this->maxHitRequest = false;

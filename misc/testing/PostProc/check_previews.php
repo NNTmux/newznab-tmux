@@ -24,7 +24,7 @@ if ($row !== null) {
     exit("Unable to determine covers path!\n");
 }
 
-$path2preview = NN_COVERS.'preview'.DS;
+$path2preview = storage_path('covers/preview');
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $releases = new Releases();

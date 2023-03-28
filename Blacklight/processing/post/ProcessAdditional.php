@@ -372,7 +372,7 @@ class ProcessAdditional
         $this->_processAudioInfo = $this->_processMediaInfo;
         $this->_processPasswords = ! empty(Settings::settingValue('..checkpasswordedrar')) && ! empty(Settings::settingValue('apps..unrarpath'));
 
-        $this->_audioSavePath = NN_COVERS.'audiosample'.DS;
+        $this->_audioSavePath = storage_path('covers/audiosample/');
 
         $this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
         $this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';

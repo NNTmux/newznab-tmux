@@ -14,7 +14,7 @@ if ($argc === 1 || $argv[1] !== 'true') {
     exit();
 }
 
-$path2covers = NN_COVERS.'console'.DS;
+$path2covers = storage_path('covers/console/');
 
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {

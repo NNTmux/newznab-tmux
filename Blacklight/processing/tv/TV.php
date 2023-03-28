@@ -87,7 +87,7 @@ abstract class TV extends Videos
         $this->colorCli = new ColorCLI();
         $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
         $this->tvqty = Settings::settingValue('..maxrageprocessed') !== '' ? (int) Settings::settingValue('..maxrageprocessed') : 75;
-        $this->imgSavePath = NN_COVERS.'tvshows'.DS;
+        $this->imgSavePath = storage_path('covers/tvshows/');
         $this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb'];
     }
 

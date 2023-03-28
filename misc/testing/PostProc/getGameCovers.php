@@ -27,7 +27,7 @@ if ($total > 0) {
             if ($gameData === false) {
                 $colorCli->primary($gameInfo['release'].' not found');
             } else {
-                if (file_exists(NN_COVERS.'games'.DS.$gameData.'.jpg')) {
+                if (file_exists(storage_path('covers/games/').$gameData.'.jpg')) {
                     $pdo->exec(sprintf('UPDATE gamesinfo SET cover = 1 WHERE id = %d', $arr['id']));
                 }
             }
