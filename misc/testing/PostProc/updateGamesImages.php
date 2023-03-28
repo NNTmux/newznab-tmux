@@ -3,10 +3,7 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\GamesInfo;
-use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
@@ -17,14 +14,6 @@ if ($argc === 1 || $argv[1] !== 'true') {
     exit();
 }
 
-$pdo = DB::connection()->getPdo();
-
-$row = Settings::settingValue('site.main.coverspath');
-if ($row !== null) {
-    Utility::setCoversConstant($row);
-} else {
-    exit("Unable to set Covers' constant!\n");
-}
 $path2covers = storage_path('covers/games/');
 
 $itr = File::allFiles($path2covers);

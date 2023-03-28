@@ -5,21 +5,12 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Movie;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
 $movie = new Movie(['Echo' => true]);
 $colorCli = new ColorCLI();
-
-$row = Settings::settingValue('site.main.coverspath');
-if ($row !== null) {
-    Utility::setCoversConstant($row);
-} else {
-    exit('Unable to determine covers path!'.PHP_EOL);
-}
 
 $path2cover = storage_path('covers/movies/');
 

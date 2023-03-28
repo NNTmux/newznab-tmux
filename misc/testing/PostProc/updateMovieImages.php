@@ -3,9 +3,7 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\MovieInfo;
-use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
@@ -16,12 +14,6 @@ if ($argc === 1 || $argv[1] !== 'true') {
     exit();
 }
 
-$row = Settings::settingValue('site.main.coverspath');
-if ($row !== null) {
-    Utility::setCoversConstant($row);
-} else {
-    exit("Unable to set Covers' constant!\n");
-}
 $path2covers = storage_path('covers/movies');
 
 $itr = File::allFiles($path2covers);
@@ -35,7 +27,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = MovieInfo::query()->where('imdbid', '=', $hit[1])->select(['imdbid'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath.' not found in db.');
+                    $colorCli->climate()->error($filePath.' not found in db.');
                 }
             }
         }
@@ -49,7 +41,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = MovieInfo::query()->where('imdbid', $match1[1])->select(['imdbid'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath->getPathname().' not found in db.');
+                    $colorCli->climate()->error($filePath->getPathname().' not found in db.');
                 }
             }
         }
@@ -68,10 +60,10 @@ $qry1 = MovieInfo::query()->where('backdrop', '=', 1)->select(['imdbid'])->get()
 foreach ($qry1 as $rows) {
     if (! is_file($path2covers.$rows['imdbid'].'-backdrop.jpg')) {
         MovieInfo::query()->where('backdrop', '=', 1)->where('imdbid', $rows['imdbid'])->update(['backdrop' => 0]);
-        $colorCli->info($path2covers.$rows['imdbid'].'-backdrop.jpg does not exist.');
+        $colorCli->climate()->info($path2covers.$rows['imdbid'].'-backdrop.jpg does not exist.');
         $deleted++;
     }
 }
-$colorCli->header($covers.' covers set.');
-$colorCli->header($updated.' backdrops set.');
-$colorCli->header($deleted.' movies unset.');
+$colorCli->climate()->info($covers.' covers set.');
+$colorCli->climate()->info($updated.' backdrops set.');
+$colorCli->climate()->info($deleted.' movies unset.');
