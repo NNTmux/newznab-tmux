@@ -14,27 +14,10 @@ class AniDB
 {
     public function __construct()
     {
-
     }
 
     /**
      * Updates stored AniDB entries in the database.
-     *
-     * @param int $anidbID
-     * @param string $title
-     * @param string $type
-     * @param string $startdate
-     * @param string $enddate
-     * @param string $related
-     * @param string $similar
-     * @param string $creators
-     * @param string $description
-     * @param string $rating
-     * @param string $categories
-     * @param string $characters
-     * @param string $epnos
-     * @param string $airdates
-     * @param string $episodetitles
      */
     public function updateTitle(int $anidbID, string $title, string $type, string $startdate, string $enddate, string $related, string $similar, string $creators, string $description, string $rating, string $categories, string $characters, string $epnos, string $airdates, string $episodetitles): void
     {
@@ -68,7 +51,6 @@ class AniDB
     }
 
     /**
-     * @param int $anidbID
      * @throws \Throwable
      */
     public function deleteTitle(int $anidbID): void
@@ -90,11 +72,6 @@ class AniDB
 
     /**
      * Retrieves a list of Anime titles, optionally filtered by starting character and title.
-     *
-     *
-     * @param string $letter
-     * @param string $animeTitle
-     * @return array
      */
     public function getAnimeList(string $letter = '', string $animeTitle = ''): array
     {
@@ -132,12 +109,8 @@ class AniDB
 
     /**
      * Retrieves a range of Anime titles for site display.
-     *
-     *
-     * @param string $animeTitle
-     * @return LengthAwarePaginator
      */
-    public function getAnimeRange(string $animeTitle = ''): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getAnimeRange(string $animeTitle = ''): LengthAwarePaginator
     {
         $query = AnidbTitle::query()
             ->where('at.lang', '=', 'en');
@@ -155,10 +128,6 @@ class AniDB
 
     /**
      * Retrieves all info for a specific AniDB ID.
-     *
-     *
-     * @param int $anidbID
-     * @return mixed
      */
     public function getAnimeInfo(int $anidbID): mixed
     {
