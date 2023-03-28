@@ -704,10 +704,8 @@ class Games
                 $gameInfo = $this->parseTitle($arr['searchname']);
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
-                        $this->colorCli->headerOver('Looking up: ').
-                            $this->colorCli->primary($gameInfo['title'].' (PC)');
+                        $this->colorCli->climate()->info('Looking up: '.$gameInfo['title'].' (PC)');
                     }
-
                     // Check for existing games entry.
                     $gameCheck = $this->getGamesInfoByName($gameInfo['title']);
 

@@ -227,7 +227,7 @@ class AniDB
         $cleanArr = $this->extractTitleEpisode($release->searchname);
 
         if (\is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
-            $this->colorCli->header(PHP_EOL.'Looking Up: ').
+            $this->colorCli->climate()->info(PHP_EOL.'Looking Up: ').
                 $this->colorCli->primary('   Title: '.$cleanArr['title'].PHP_EOL.
                     '   Episode: '.$cleanArr['epno']);
 

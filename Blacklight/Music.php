@@ -435,7 +435,7 @@ class Music
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        $this->colorCli->header('Looking up: '.$newname);
+                        $this->colorCli->climate()->info('Looking up: '.$newname);
                     }
 
                     // Do a local lookup first

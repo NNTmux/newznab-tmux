@@ -1142,7 +1142,7 @@ class Movie
                 }
 
                 if ($this->echooutput) {
-                    $this->colorCli->primaryOver('Looking up: ').$this->colorCli->headerOver($movieName);
+                    $this->colorCli->climate()->info('Looking up: '.$movieName);
                 }
 
                 $movieUpdated = false;

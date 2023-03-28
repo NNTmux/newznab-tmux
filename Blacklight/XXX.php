@@ -564,13 +564,13 @@ class XXX
                     $check = $this->checkXXXInfoExists($this->currentTitle);
                     if ($check === null) {
                         if ($this->echoOutput) {
-                            $this->colorCli->primaryOver('Looking up: ').$this->colorCli->headerOver($this->currentTitle);
+                            $this->colorCli->climate()->info('Looking up: '.$this->currentTitle);
                         }
 
-                        $this->colorCli->info('Local match not found, checking web!', true);
+                        $this->colorCli->climate()->info('Local match not found, checking web!');
                         $idcheck = $this->updateXXXInfo($this->currentTitle);
                     } else {
-                        $this->colorCli->info('Local match found for XXX Movie: '.$this->currentTitle, true);
+                        $this->colorCli->climate()->info('Local match found for XXX Movie: '.$this->currentTitle);
                         $idcheck = (int) $check['id'];
                     }
                 } else {

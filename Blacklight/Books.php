@@ -309,7 +309,7 @@ class Books
 
                 if ($bookInfo !== false) {
                     if ($this->echooutput) {
-                        $this->colorCli->headerOver('Looking up: ').$this->colorCli->primary($bookInfo);
+                        $this->colorCli->climate()->info('Looking up: '.$bookInfo);
                     }
 
                     // Do a local lookup first
@@ -318,7 +318,7 @@ class Books
                     if ($bookCheck === null && \in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            $this->colorCli->headerOver('Cached previous failure. Skipping.');
+                            $this->colorCli->climate()->info('Cached previous failure. Skipping.');
                         }
                         $bookId = -2;
                     } elseif ($bookCheck === null) {

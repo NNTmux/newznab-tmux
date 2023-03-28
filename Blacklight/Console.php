@@ -761,12 +761,7 @@ class Console
 
                 if ($gameInfo !== false) {
                     if ($this->echooutput) {
-                        $this->colorCli->headerOver('Looking up: ').
-                            $this->colorCli->primary(
-                                $gameInfo['title'].
-                                ' ('.
-                                $gameInfo['platform'].')'
-                            );
+                        $this->colorCli->climate()->info('Looking up: '.$gameInfo['title'].' ('.$gameInfo['platform'].')');
                     }
 
                     // Check for existing console entry.
@@ -775,7 +770,7 @@ class Console
                     if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            $this->colorCli->headerOver('Cached previous failure. Skipping.');
+                            $this->colorCli->climate()->info('Cached previous failure. Skipping.');
                         }
                         $gameId = -2;
                     } elseif ($gameCheck === false) {
