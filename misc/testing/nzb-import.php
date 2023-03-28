@@ -44,8 +44,8 @@ if ($argv[5] < 0) {
 
 $path = $argv[1];
 // Check if path ends with dir separator.
-if (substr($path, -1) !== DS) {
-    $path .= DS;
+if (! Str::endsWith($path, '/')) {
+    $path .= '/';
 }
 
 $files = new \RegexIterator(
