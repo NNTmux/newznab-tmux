@@ -19,9 +19,6 @@ use Illuminate\Support\Facades\DB;
  */
 class RSS extends ApiController
 {
-    /**
-     * @var \Blacklight\Releases
-     */
     public Releases $releases;
 
     /**
