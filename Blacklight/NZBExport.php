@@ -140,7 +140,7 @@ class NZBExport
             }
 
             // Create a path to store the new NZB files.
-            $currentPath = $path.$this->safeFilename($group['name']).DS;
+            $currentPath = $path.$this->safeFilename($group['name']).'/';
             if (! File::isDirectory($currentPath) && ! File::makeDirectory($currentPath) && ! File::isDirectory($currentPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $currentPath));
             }

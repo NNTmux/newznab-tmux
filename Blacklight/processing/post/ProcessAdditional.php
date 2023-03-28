@@ -327,7 +327,7 @@ class ProcessAdditional
             );
         }
 
-        $this->_showCLIReleaseID = (PHP_BINARY.' '.__DIR__.DS.'ProcessAdditional.php ReleaseID: ');
+        $this->_showCLIReleaseID = (PHP_BINARY.' '.__DIR__.'/ProcessAdditional.php ReleaseID: ');
 
         // Maximum amount of releases to fetch per run.
         $this->_queryLimit =
@@ -433,9 +433,9 @@ class ProcessAdditional
 
         // If we are doing per group, use the groupID has a inner path, so other scripts don't delete the files we are working on.
         if ($groupID !== '') {
-            $this->_mainTmpPath .= ($groupID.DS);
+            $this->_mainTmpPath .= ($groupID.'/');
         } elseif ($guidChar !== '') {
-            $this->_mainTmpPath .= ($guidChar.DS);
+            $this->_mainTmpPath .= ($guidChar.'/');
         }
 
         if (! File::isDirectory($this->_mainTmpPath)) {
@@ -634,7 +634,7 @@ class ProcessAdditional
     protected function _createTempFolder(): bool
     {
         // Per release defaults.
-        $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
+        $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.'/';
         if (! File::isDirectory($this->tmpPath)) {
             if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
