@@ -87,38 +87,18 @@ if (! function_exists('getUserBrowseOrder')) {
     {
         $order = ($orderBy === '' ? 'username_desc' : $orderBy);
         $orderArr = explode('_', $order);
-        switch ($orderArr[0]) {
-            case 'email':
-                $orderField = 'email';
-                break;
-            case 'host':
-                $orderField = 'host';
-                break;
-            case 'createdat':
-                $orderField = 'created_at';
-                break;
-            case 'lastlogin':
-                $orderField = 'lastlogin';
-                break;
-            case 'apiaccess':
-                $orderField = 'apiaccess';
-                break;
-            case 'apirequests':
-                $orderField = 'apirequests';
-                break;
-            case 'grabs':
-                $orderField = 'grabs';
-                break;
-            case 'roles_id':
-                $orderField = 'users_role_id';
-                break;
-            case 'rolechangedate':
-                $orderField = 'rolechangedate';
-                break;
-            default:
-                $orderField = 'username';
-                break;
-        }
+        $orderField = match ($orderArr[0]) {
+            'email' => 'email',
+            'host' => 'host',
+            'createdat' => 'created_at',
+            'lastlogin' => 'lastlogin',
+            'apiaccess' => 'apiaccess',
+            'apirequests' => 'apirequests',
+            'grabs' => 'grabs',
+            'roles_id' => 'users_role_id',
+            'rolechangedate' => 'rolechangedate',
+            default => 'username',
+        };
         $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderField, $orderSort];
