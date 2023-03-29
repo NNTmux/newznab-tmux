@@ -32,7 +32,6 @@ use App\Http\Controllers\Admin\AdminPredbController;
 use App\Http\Controllers\Admin\AdminReleaseNamingRegexesController;
 use App\Http\Controllers\Admin\AdminReleasesController;
 use App\Http\Controllers\Admin\AdminRoleController;
-use App\Http\Controllers\Admin\AdminSharingController;
 use App\Http\Controllers\Admin\AdminShowsController;
 use App\Http\Controllers\Admin\AdminSiteController;
 use App\Http\Controllers\Admin\AdminTmuxController;
@@ -355,8 +354,6 @@ Route::group(['middleware' => ['role:Admin', '2fa'], 'prefix' => 'admin', 'names
     Route::post('nzb-export', [AdminNzbController::class, 'export']);
     Route::get('predb', [AdminPredbController::class, 'index']);
     Route::post('predb', [AdminPredbController::class, 'index']);
-    Route::get('sharing', [AdminSharingController::class, 'index']);
-    Route::post('sharing', [AdminSharingController::class, 'index']);
     Route::get('group-list', [AdminGroupController::class, 'index']);
     Route::post('group-list', [AdminGroupController::class, 'index']);
     Route::get('group-edit', [AdminGroupController::class, 'edit']);
