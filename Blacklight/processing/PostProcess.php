@@ -21,7 +21,6 @@ use Blacklight\processing\tv\TMDB;
 use Blacklight\processing\tv\TraktTv;
 use Blacklight\processing\tv\TVDB;
 use Blacklight\processing\tv\TVMaze;
-use Blacklight\Sharing;
 use Blacklight\XXX;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Carbon;
@@ -92,7 +91,6 @@ class PostProcess
     {
         $this->processAdditional($nntp);
         $this->processNfos($nntp);
-        $this->processSharing($nntp);
         $this->processMovies();
         $this->processMusic();
         $this->processConsoles();
@@ -190,17 +188,6 @@ class PostProcess
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
             $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
         }
-    }
-
-    /**
-     * Process comments.
-     *
-     *
-     * @throws \Exception
-     */
-    public function processSharing(NNTP $nntp): void
-    {
-        (new Sharing(['NNTP' => $nntp]))->start();
     }
 
     /**

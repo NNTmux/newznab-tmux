@@ -183,16 +183,13 @@
         <a href="#submenu11" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-comment fa-fw mr-3"></span>
-                <span class="menu-collapsed">Comments & Sharing</span>
+                <span class="menu-collapsed">Comments</span>
                 <span class="submenu-icon ml-auto"></span>
             </div>
         </a>
         <div id='submenu11' class="collapse sidebar-submenu">
             <a href="{{url("/admin/comments-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Comments</span>
-            </a>
-            <a href="{{url("/admin/sharing")}}" class="list-group-item list-group-item-action bg-dark text-white">
-                <span class="menu-collapsed">Comment Sharing Settings</span>
             </a>
         </div>
         <a href="#submenu12" data-bs-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
