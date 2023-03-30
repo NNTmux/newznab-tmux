@@ -21,6 +21,5 @@ class RegisterRegisterRequest extends FormRequest
         } else {
             return [];
         }
-
     }
 }
