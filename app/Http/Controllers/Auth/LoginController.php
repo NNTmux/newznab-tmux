@@ -50,8 +50,8 @@ class LoginController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return RedirectResponse
+     *
      * @throws AuthenticationException
      */
     public function login(Request $request)
@@ -126,9 +126,9 @@ class LoginController extends Controller
         $meta_description = 'Login';
         $content = app('smarty.view')->fetch($theme.'/login.tpl');
         app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
+
         return app('smarty.view')->display($theme.'/basepage.tpl');
     }
-
 
     public function logout(Request $request)
     {
