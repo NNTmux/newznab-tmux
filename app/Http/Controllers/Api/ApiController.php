@@ -117,7 +117,7 @@ class ApiController extends BasePageController
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $offset = $this->offset();
+        $offset = $this->offset($request);
 
         // Set API Parameters based on Request objects
         $params['extended'] = $request->has('extended') && (int) $request->input('extended') === 1 ? '1' : '0';
@@ -218,7 +218,7 @@ class ApiController extends BasePageController
                     $series,
                     $episode,
                     $airDate ?? '',
-                    $this->offset(),
+                    $this->offset($request),
                     $this->limit(),
                     $request->input('q') ?? '',
                     $this->categoryID(),
@@ -245,7 +245,7 @@ class ApiController extends BasePageController
                     $imdbId,
                     $tmdbId,
                     $traktId,
-                    $this->offset(),
+                    $this->offset($request),
                     $this->limit(),
                     $request->input('q') ?? '',
                     $this->categoryID(),
