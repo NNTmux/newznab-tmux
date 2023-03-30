@@ -93,7 +93,6 @@ class Settings extends Model
     /**
      * @var string
      */
-    protected $table = 'settings';
 
     /**
      * @var bool

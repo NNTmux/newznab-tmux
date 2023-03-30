@@ -32,7 +32,6 @@ class UserRequest extends Model
     /**
      * @var string
      */
-    protected $table = 'user_requests';
 
     /**
      * @var bool

@@ -43,7 +43,6 @@ class ReleasesGroups extends Model
     /**
      * @var string
      */
-    protected $table = 'releases_groups';
 
     /**
      * @var bool
