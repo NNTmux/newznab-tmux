@@ -29,7 +29,7 @@ class AdminUserController extends BasePageController
 
         $ordering = getUserBrowseOrdering();
         $orderBy = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
-        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $variables = [
@@ -50,7 +50,7 @@ class AdminUserController extends BasePageController
             true
         );
 
-        $results = $this->paginate($rslt ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $this->smarty->assign(
             [

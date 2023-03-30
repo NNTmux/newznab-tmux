@@ -17,7 +17,7 @@ class ClearanceMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $user = Auth::user();
+        $user = $request->user();
 
         if ($user->hasAnyRole(['Admin', 'Moderator']) && ! $request->is(['Admin', 'Admin/*'])) {
             return $next($request);

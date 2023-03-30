@@ -42,8 +42,8 @@ class ForgotPasswordController extends Controller
     public function showLinkRequestForm(ShowLinkRequestFormForgotPasswordRequest $request): void
     {
         $sent = '';
-        $email = request()->input('email') ?? '';
-        $rssToken = request()->input('apikey') ?? '';
+        $email = $request->input('email') ?? '';
+        $rssToken = $request->input('apikey') ?? '';
         if (empty($email) && empty($rssToken)) {
             app('smarty.view')->assign('error', 'Missing parameter(email and/or apikey to send password reset');
         } else {

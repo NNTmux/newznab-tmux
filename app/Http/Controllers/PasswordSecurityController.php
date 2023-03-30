@@ -12,7 +12,7 @@ class PasswordSecurityController extends Controller
 {
     public function show2faForm(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
-        $user = Auth::user();
+        $user = $request->user();
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
@@ -37,7 +37,7 @@ class PasswordSecurityController extends Controller
      */
     public function generate2faSecret(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        $user = Auth::user();
+        $user = $request->user();
 
         // Add the secret key to the registration data
         PasswordSecurity::create(
@@ -58,7 +58,7 @@ class PasswordSecurityController extends Controller
      */
     public function enable2fa(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        $user = Auth::user();
+        $user = $request->user();
         $secret = $request->input('verify-code');
         $valid = \Google2FA::verifyKey($user->passwordSecurity->google2fa_secret, $secret);
         if ($valid) {
@@ -73,13 +73,13 @@ class PasswordSecurityController extends Controller
 
     public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        if (! (Hash::check($request->get('current-password'), Auth::user()->password))) {
+        if (! (Hash::check($request->get('current-password'), $request->user()->password))) {
             // The passwords matches
             return redirect()->back()->with('error', 'Your password does not match with your account password. Please try again.');
         }
 
         $validatedData = $request->validated();
-        $user = Auth::user();
+        $user = $request->user();
         $user->passwordSecurity->google2fa_enable = 0;
         $user->passwordSecurity->save();
 

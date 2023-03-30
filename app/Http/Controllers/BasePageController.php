@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Forumpost;
@@ -107,9 +108,9 @@ class BasePageController extends Controller
         );
     }
 
-    public function isPostBack(): bool
+    public function isPostBack(Request $request): bool
     {
-        return \request()->isMethod('POST');
+        return $request->isMethod('POST');
     }
 
     /**

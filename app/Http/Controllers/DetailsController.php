@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\DnzbFailure;
 use App\Models\Predb;
 use App\Models\Release;
@@ -29,7 +30,7 @@ class DetailsController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(string $guid)
+    public function show(Request $request, string $guid)
     {
         $this->setPreferences();
 
@@ -49,7 +50,7 @@ class DetailsController extends BasePageController
             }
 
             if ($this->isPostBack()) {
-                ReleaseComment::addComment($data['id'], $data['gid'], \request()->input('txtAddComment'), $this->userdata->id, \request()->ip());
+                ReleaseComment::addComment($data['id'], $data['gid'], $request->input('txtAddComment'), $this->userdata->id, $request->ip());
             }
 
             $nfo = ReleaseNfo::getReleaseNfo($data['id']);

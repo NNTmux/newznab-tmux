@@ -51,7 +51,7 @@ class MovieController extends BasePageController
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
         $ordering = $movie->getMovieOrdering();
-        $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
+        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $movies = [];
         $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
