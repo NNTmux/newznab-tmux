@@ -18,7 +18,7 @@ class AdminNzbController extends BasePageController
         $this->setAdminPrefs();
 
         $filesToProcess = [];
-        if ($this->isPostBack()) {
+        if ($this->isPostBack($request)) {
             $useNzbName = false;
             $deleteNZB = true;
             // Get the list of NZB files from php /tmp folder if nzb files were uploaded.
@@ -72,7 +72,7 @@ class AdminNzbController extends BasePageController
         $this->setAdminPrefs();
         $rel = new Releases();
 
-        if ($this->isPostBack()) {
+        if ($this->isPostBack($request)) {
             $path = $request->input('folder');
             $postFrom = ($request->input('postfrom') ?? '');
             $postTo = ($request->input('postto') ?? '');

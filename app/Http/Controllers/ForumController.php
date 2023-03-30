@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Auth;
 class ForumController extends BasePageController
 {
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     * @return \Illuminate\Http\RedirectResponse|void
      *
      * @throws \Exception
      */
-    public function forum(Request $request): RedirectResponse
+    public function forum(Request $request)
     {
         $this->setPreferences();
-        if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
+        if ($this->isPostBack($request) && $request->has('addMessage') && $request->has('addSubject')) {
             Forumpost::add(0, $this->userdata->id, $request->input('addSubject'), $request->input('addMessage'));
 
             return redirect()->to('forum');
@@ -73,7 +73,7 @@ class ForumController extends BasePageController
     {
         $this->setPreferences();
 
-        if ($request->has('addMessage') && $this->isPostBack()) {
+        if ($request->has('addMessage') && $this->isPostBack($request)) {
             Forumpost::add($id, $this->userdata->id, '', $request->input('addMessage'));
 
             return redirect('forumpost/'.$id.'#last');

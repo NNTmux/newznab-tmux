@@ -31,7 +31,7 @@ class DetailsController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request, string $guid): RedirectResponse
+    public function show(Request $request, string $guid)
     {
         $this->setPreferences();
 
@@ -50,7 +50,7 @@ class DetailsController extends BasePageController
                 return redirect()->back();
             }
 
-            if ($this->isPostBack()) {
+            if ($this->isPostBack($request)) {
                 ReleaseComment::addComment($data['id'], $data['gid'], $request->input('txtAddComment'), $this->userdata->id, $request->ip());
             }
 
