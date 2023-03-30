@@ -11,7 +11,7 @@
 
 use App\Http\Controllers\RssController;
 
-Route::middleware('auth:api')->group(['guard' => 'rss',], function () {
+Route::middleware(['auth:api', 'auth:rss'])->group(function () {
     Route::get('mymovies', [RssController::class, 'myMoviesRss']);
     Route::post('mymovies', [RssController::class, 'myMoviesRss']);
     Route::get('myshows', [RssController::class, 'myShowsRss']);

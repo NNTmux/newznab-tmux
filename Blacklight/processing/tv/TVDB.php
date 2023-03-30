@@ -207,19 +207,19 @@ class TVDB extends TV
      * @param  string  $country
      * @return array|bool
      */
-    protected function getShowInfo($cleanName, $country = ''): bool|array
+    protected function getShowInfo(string $name): bool|array
     {
         $return = $response = false;
         $highestMatch = 0;
         try {
-            $response = $this->client->search()->search($cleanName, ['type' => 'series']);
+            $response = $this->client->search()->search($name, ['type' => 'series']);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->climate()->error('Show not found on TVDB');
         }
 
         if ($response === false && $country !== '') {
             try {
-                $response = $this->client->search()->search(rtrim(str_replace($country, '', $cleanName)));
+                $response = $this->client->search()->search(rtrim(str_replace($country, '', $name)));
             } catch (ResourceNotFoundException $e) {
                 $response = false;
                 $this->colorCli->climate()->error('Show not found on TVDB', true);
@@ -232,13 +232,13 @@ class TVDB extends TV
             foreach ($response as $show) {
                 if ($this->checkRequiredAttr($show, 'tvdbS')) {
                     // Check for exact title match first and then terminate if found
-                    if (strtolower($show->name) === strtolower($cleanName)) {
+                    if (strtolower($show->name) === strtolower($name)) {
                         $highest = $show;
                         break;
                     }
 
                     // Check each show title for similarity and then find the highest similar value
-                    $matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
+                    $matchPercent = $this->checkMatch(strtolower($show->name), strtolower($name), self::MATCH_PROBABILITY);
 
                     // If new match has a higher percentage, set as new matched title
                     if ($matchPercent > $highestMatch) {
@@ -249,7 +249,7 @@ class TVDB extends TV
                     // Check for show aliases and try match those too
                     if (! empty($show->aliases)) {
                         foreach ($show->aliases as $key => $name) {
-                            $matchPercent = $this->checkMatch(strtolower($name), strtolower($cleanName), $matchPercent);
+                            $matchPercent = $this->checkMatch(strtolower($name), strtolower($name), $matchPercent);
                             if ($matchPercent > $highestMatch) {
                                 $highestMatch = $matchPercent;
                                 $highest = $show;

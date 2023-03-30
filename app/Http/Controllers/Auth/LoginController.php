@@ -81,9 +81,6 @@ class LoginController extends Controller
             }
 
             if ($user !== null) {
-                if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-                }
-
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
                 if (! $user->isVerified() || $user->isPendingVerification()) {
@@ -118,7 +115,7 @@ class LoginController extends Controller
         return $this->showLoginForm();
     }
 
-    public function showLoginForm(): void
+    public function showLoginForm()
     {
         $theme = Settings::settingValue('site.main.style');
 
@@ -127,14 +124,14 @@ class LoginController extends Controller
         $meta_description = 'Login';
         $content = app('smarty.view')->fetch($theme.'/login.tpl');
         app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-        app('smarty.view')->display($theme.'/basepage.tpl');
+        return app('smarty.view')->display($theme.'/basepage.tpl');
     }
 
     public function logout(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->guard()->logout();
 
-        $request->session()->flush();
+        $request->session()->invalidate();
         $request->session()->regenerate();
 
         return redirect()->to('login')->with('message', 'You have been logged out successfully');

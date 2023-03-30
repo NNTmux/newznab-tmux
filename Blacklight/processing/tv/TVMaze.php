@@ -213,27 +213,27 @@ class TVMaze extends TV
      *
      * @return array|false
      */
-    protected function getShowInfo(string $cleanName)
+    protected function getShowInfo(string $name)
     {
         $return = $response = false;
 
         // TVMaze does NOT like shows with the year in them even without the parentheses
         // Do this for the API Search only as a local lookup should require it
-        $cleanName = preg_replace('# \((19|20)\d{2}\)$#', '', $cleanName);
+        $name = preg_replace('# \((19|20)\d{2}\)$#', '', $name);
 
         //Try for the best match with AKAs embedded
-        $response = $this->client->singleSearchAkas($cleanName);
+        $response = $this->client->singleSearchAkas($name);
 
         sleep(1);
 
         if (\is_array($response)) {
-            $return = $this->matchShowInfo($response, $cleanName);
+            $return = $this->matchShowInfo($response, $name);
         }
         if ($return === false) {
             //Try for the best match via full search (no AKAs can be returned but the search is better)
-            $response = $this->client->search($cleanName);
+            $response = $this->client->search($name);
             if (\is_array($response)) {
-                $return = $this->matchShowInfo($response, $cleanName);
+                $return = $this->matchShowInfo($response, $name);
             }
         }
         //If we didn't get any aliases do a direct alias lookup

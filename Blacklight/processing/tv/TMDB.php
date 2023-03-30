@@ -183,12 +183,12 @@ class TMDB extends TV
      *
      * @return array|false
      */
-    protected function getShowInfo(string $cleanName): bool|array
+    protected function getShowInfo(string $name): bool|array
     {
         $return = $response = false;
 
         try {
-            $response = TmdbClient::getSearchApi()->searchTv($cleanName);
+            $response = TmdbClient::getSearchApi()->searchTv($name);
         } catch (TmdbApiException|\ErrorException $e) {
             return false;
         }
@@ -196,7 +196,7 @@ class TMDB extends TV
         sleep(1);
 
         if (\is_array($response) && ! empty($response['results'])) {
-            $return = $this->matchShowInfo($response['results'], $cleanName);
+            $return = $this->matchShowInfo($response['results'], $name);
         }
 
         return $return;

@@ -121,7 +121,7 @@ class Settings extends Model
      *
      * @return mixed
      */
-    public function __get(string $key)
+    public function __get($key)
     {
         $override = self::query()->where('name', $key)->first();
 
