@@ -11,11 +11,16 @@ class RegisterRegisterRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'g-recaptcha-response' => [
-                'required',
-                'captcha',
-            ],
-        ];
+        if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
+            return [
+                'g-recaptcha-response' => [
+                    'required',
+                    'captcha',
+                ],
+            ];
+        } else {
+            return [];
+        }
+
     }
 }

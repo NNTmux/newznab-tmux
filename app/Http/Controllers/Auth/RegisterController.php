@@ -129,8 +129,6 @@ class RegisterController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
         ]);
 
-        if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-        }
 
         if ($validator->fails()) {
             $error = implode('', Arr::collapse($validator->errors()->toArray()));

@@ -18,6 +18,8 @@ class LoginLoginRequest extends FormRequest
                     'captcha',
                 ],
             ];
+        } else {
+            return [];
         }
     }
 }
