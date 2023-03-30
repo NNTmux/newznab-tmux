@@ -33,8 +33,6 @@ class SendInvite extends Mailable
 
     /**
      * SendInvite constructor.
-     *
-     * @param  \App\Models\User  $user
      */
     public function __construct(User $user, $invite)
     {
@@ -47,7 +45,6 @@ class SendInvite extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
      *
      * @throws \Exception
      */

@@ -41,9 +41,6 @@ class UserSerie extends Model
      */
     protected $dateFormat = false;
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');

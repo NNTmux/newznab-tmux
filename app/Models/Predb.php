@@ -152,7 +152,6 @@ class Predb extends Model
     /**
      * Try to match a single release to a PreDB title when the release is created.
      *
-     * @param  string  $cleanerName
      * @return array|false Array with title/id from PreDB if found, false if not found.
      */
     public static function matchPre(string $cleanerName)
@@ -184,7 +183,6 @@ class Predb extends Model
     }
 
     /**
-     * @param  string  $search
      * @return mixed
      *
      * @throws \Exception
@@ -235,17 +233,11 @@ class Predb extends Model
         return self::query()->where('id', $preID)->first();
     }
 
-    /**
-     * @return string
-     */
     public function searchableAs(): string
     {
         return 'ft_predb_filename';
     }
 
-    /**
-     * @return array
-     */
     public function toSearchableArray(): array
     {
         return [

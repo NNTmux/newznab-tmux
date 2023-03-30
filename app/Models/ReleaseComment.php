@@ -67,17 +67,11 @@ class ReleaseComment extends Model
      */
     protected $dateFormat = false;
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
@@ -94,9 +88,6 @@ class ReleaseComment extends Model
         return self::query()->where('id', $id)->first();
     }
 
-    /**
-     * @return array
-     */
     public static function getComments($id): array
     {
         return self::query()->where('releases_id', $id)->orderByDesc('created_at')->get()->toArray();
@@ -155,9 +146,6 @@ class ReleaseComment extends Model
 
     /**
      * Get release_comments rows by limit.
-     *
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getCommentsRange(): LengthAwarePaginator
     {
@@ -188,9 +176,6 @@ class ReleaseComment extends Model
         return $res;
     }
 
-    /**
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
     public static function getCommentsForUserRange($uid): LengthAwarePaginator
     {
         return self::query()

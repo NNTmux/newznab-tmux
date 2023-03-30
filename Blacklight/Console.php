@@ -121,8 +121,6 @@ class Console
     }
 
     /**
-     * @param  string  $title
-     * @param  string  $platform
      * @return false|\Illuminate\Database\Eloquent\Model
      */
     public function getConsoleInfoByName(string $title, string $platform)
@@ -297,9 +295,6 @@ class Console
         return $browseBy;
     }
 
-    /**
-     * @param  string  $review
-     */
     public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genres_id, string $review = 'review'): void
     {
         $releasedate = $releasedate !== '' ? $releasedate : 'null';
@@ -512,8 +507,6 @@ class Console
     /**
      * This function sets the platform retrieved
      *  from the release to the Amazon equivalent.
-     *
-     * @param  string  $platform
      */
     protected function _replacePlatform(string $platform): string
     {

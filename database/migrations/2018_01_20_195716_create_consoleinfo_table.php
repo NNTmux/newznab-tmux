@@ -7,8 +7,6 @@ class CreateConsoleinfoTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -35,8 +33,6 @@ class CreateConsoleinfoTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

@@ -50,7 +50,6 @@ class LoginController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException

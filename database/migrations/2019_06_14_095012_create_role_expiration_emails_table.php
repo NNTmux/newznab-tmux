@@ -8,8 +8,6 @@ class CreateRoleExpirationEmailsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -25,8 +23,6 @@ class CreateRoleExpirationEmailsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

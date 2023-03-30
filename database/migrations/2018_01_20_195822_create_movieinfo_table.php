@@ -7,8 +7,6 @@ class CreateMovieinfoTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -40,8 +38,6 @@ class CreateMovieinfoTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

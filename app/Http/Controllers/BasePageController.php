@@ -168,9 +168,6 @@ class BasePageController extends Controller
         return view('errors.tokenError')->with('Error', 'Token mismatch');
     }
 
-    /**
-     * @param  string  $retry
-     */
     public function show429(string $retry = '')
     {
         abort(429, $retry);

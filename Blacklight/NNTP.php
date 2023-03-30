@@ -376,9 +376,6 @@ class NNTP extends \Net_NNTP_Client
     /**
      * Fetch an overview of article(s) in the currently selected group.
      *
-     * @param  string  $range
-     * @param  bool  $names
-     * @param  bool  $forceNames
      * @return mixed On success : (array)  Multidimensional array with article headers.
      *
      * @throws \Exception

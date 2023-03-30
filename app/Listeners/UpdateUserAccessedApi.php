@@ -19,8 +19,6 @@ class UpdateUserAccessedApi
 
     /**
      * Handle the event.
-     *
-     * @return void
      */
     public function handle(UserAccessedApi $event): void
     {

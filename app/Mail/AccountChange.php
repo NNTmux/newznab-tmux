@@ -28,8 +28,6 @@ class AccountChange extends Mailable
 
     /**
      * AccountChange constructor.
-     *
-     * @param  \App\Models\User  $user
      */
     public function __construct(User $user)
     {
@@ -41,7 +39,6 @@ class AccountChange extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
      *
      * @throws \Exception
      */

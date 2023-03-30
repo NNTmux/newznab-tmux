@@ -198,65 +198,41 @@ class User extends Authenticatable
      */
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'roles_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function request(): HasMany
     {
         return $this->hasMany(UserRequest::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function download(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function release(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function series(): HasMany
     {
         return $this->hasMany(UserSerie::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function invitation(): HasMany
     {
         return $this->hasMany(Invitation::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function failedRelease(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function comment(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'users_id');
@@ -270,12 +246,6 @@ class User extends Authenticatable
         self::find($id)->delete();
     }
 
-    /**
-     * @param  string  $role
-     * @param  string  $username
-     * @param  string  $host
-     * @param  string  $email
-     */
     public static function getCount(string $role = '', string $username = '', string $host = '', string $email = ''): int
     {
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
@@ -398,7 +368,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
      *
      * @throws \Throwable
      */

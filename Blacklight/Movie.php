@@ -213,7 +213,6 @@ class Movie
      * Get movie releases with covers for movie browse page.
      *
      *
-     * @param  int  $maxAge
      * @return array|mixed
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [])
@@ -376,7 +375,6 @@ class Movie
     /**
      * Get trailer using IMDB Id.
      *
-     * @param  int  $imdbId
      * @return bool|string
      *
      * @throws \Exception
@@ -408,7 +406,6 @@ class Movie
     /**
      * Parse trakt info, insert into DB.
      *
-     * @param  array  $data
      * @return mixed
      */
     public function parseTraktTv(array &$data)
@@ -514,11 +511,6 @@ class Movie
     /**
      * Returns a tmdb, imdb or trakt variable, the one that is set. Empty string if both not set.
      *
-     * @param  string  $variable1
-     * @param  string  $variable2
-     * @param  string  $variable3
-     * @param  string  $variable4
-     * @param  string  $variable5
      * @return array|string
      */
     protected function setVariables(string $variable1, string $variable2, string $variable3, string $variable4, string $variable5)
@@ -741,7 +733,6 @@ class Movie
      * Fetch info for IMDB id from TMDB.
      *
      *
-     * @param  bool  $text
      * @return array|false
      */
     public function fetchTMDBProperties($imdbId, bool $text = false)
@@ -999,7 +990,6 @@ class Movie
     }
 
     /**
-     * @param  string  $title
      * @return array|bool
      *
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
@@ -1086,9 +1076,6 @@ class Movie
      * Process releases with no IMDB id's.
      *
      *
-     * @param  string  $groupID
-     * @param  string  $guidChar
-     * @param  int  $lookupIMDB
      *
      * @throws \Exception
      */
@@ -1277,8 +1264,6 @@ class Movie
 
     /**
      * Parse a movie name from a release search name.
-     *
-     * @param  string  $releaseName
      */
     protected function parseMovieSearchName(string $releaseName): bool
     {

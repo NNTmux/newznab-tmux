@@ -139,7 +139,6 @@ class NZBContents
      * Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
      *
      *
-     * @param  bool  $nfoCheck
      * @return array|false
      *
      * @throws \Exception
@@ -243,11 +242,6 @@ class NZBContents
     /**
      * Attempts to get the releasename from a par2 file.
      *
-     * @param  string  $guid
-     * @param  int  $relID
-     * @param  int  $groupID
-     * @param  int  $nameStatus
-     * @param  int  $show
      *
      * @throws \Exception
      */

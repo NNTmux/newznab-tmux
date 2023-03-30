@@ -11,8 +11,6 @@ class AddVerificationToUserTable extends Migration
 {
     /**
      * Determine the user table name.
-     *
-     * @return string
      */
     public function getUserTableName(): string
     {
@@ -23,8 +21,6 @@ class AddVerificationToUserTable extends Migration
 
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -36,8 +32,6 @@ class AddVerificationToUserTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

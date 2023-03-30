@@ -164,25 +164,16 @@ class Release extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function group(): BelongsTo
     {
         return $this->belongsTo(UsenetGroup::class, 'groups_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function download(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function userRelease(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'releases_id');
@@ -193,73 +184,46 @@ class Release extends Model
         return $this->hasMany(ReleaseFile::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'categories_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function predb(): BelongsTo
     {
         return $this->belongsTo(Predb::class, 'predb_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function failed(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'release_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function releaseExtra(): HasMany
     {
         return $this->hasMany(ReleaseExtraFull::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
     public function nfo(): HasOne
     {
         return $this->hasOne(ReleaseNfo::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function comment(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function releaseGroup(): HasMany
     {
         return $this->hasMany(ReleasesGroups::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function video(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'videos_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function episode(): BelongsTo
     {
         return $this->belongsTo(TvEpisode::class, 'tv_episodes_id');
@@ -345,7 +309,6 @@ class Release extends Model
     }
 
     /**
-     * @param  string  $guid
      *
      * @throws \Exception
      */
@@ -541,9 +504,6 @@ class Release extends Model
 
     /**
      * Get a range of releases. used in admin manage list.
-     *
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getFailedRange(): LengthAwarePaginator
     {

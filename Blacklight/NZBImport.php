@@ -241,7 +241,6 @@ class NZBImport
     }
 
     /**
-     * @param  bool  $useNzbName
      *
      * @throws \Exception
      */
@@ -456,8 +455,6 @@ class NZBImport
 
     /**
      * Echo message to browser or CLI.
-     *
-     * @param  string  $message
      */
     protected function echoOut(string $message): void
     {

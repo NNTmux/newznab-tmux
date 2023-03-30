@@ -67,9 +67,6 @@ class ReleaseExtra
         return ReleaseSubtitle::query()->where('releases_id', $id)->select([DB::raw("GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs")])->orderBy('subsid')->first();
     }
 
-    /**
-     * @param  string  $guid
-     */
     public function getBriefByGuid(string $guid): array
     {
         return DB::select(sprintf("SELECT containerformat, videocodec, videoduration, videoaspect,
@@ -318,10 +315,6 @@ class ReleaseExtra
         }
     }
 
-    /**
-     * @param  int  $releaseID
-     * @param  string  $uniqueId
-     */
     public function addUID(int $releaseID, string $uniqueId): void
     {
         $dupecheck = ReleaseUnique::query()->where('releases_id', $releaseID)->orWhere([

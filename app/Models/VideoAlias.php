@@ -35,9 +35,6 @@ class VideoAlias extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function video(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'videos_id');

@@ -219,8 +219,6 @@ class Geary
      * Endpoint.
      *
      * Construct an endpoint URL
-     *
-     * @param  string  $method
      */
     private function endpoint(string $method): string
     {
@@ -255,8 +253,6 @@ class Geary
      * Get Header.
      *
      * Get single data from header
-     *
-     * @param  string  $name
      */
     private function get_header(string $name): string
     {
@@ -277,8 +273,6 @@ class Geary
      * Prepare Header.
      *
      * Add data to header for authentication purpose
-     *
-     * @param  array  $data
      */
     private function prepare_header(array $data): array
     {
@@ -304,7 +298,6 @@ class Geary
      *
      * Send a signed HTTP request
      *
-     * @param  array  $data
      * @return mixed
      */
     private function send_signed_request(array $data)

@@ -85,8 +85,6 @@ class ReleaseFile extends Model
      * Add new files for a release ID.
      *
      *
-     * @param  string  $hash
-     * @param  string  $crc
      *
      * @throws \Exception
      */

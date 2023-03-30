@@ -8,8 +8,6 @@ class AddTimestampsToVideosAliases extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -20,8 +18,6 @@ class AddTimestampsToVideosAliases extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

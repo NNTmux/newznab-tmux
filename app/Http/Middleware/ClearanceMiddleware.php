@@ -12,8 +12,6 @@ class ClearanceMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
      *
      * @throws \Exception
      */

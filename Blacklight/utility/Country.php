@@ -32,7 +32,6 @@ class Country
     /**
      * Get a country code for a country name.
      *
-     * @param  string  $country
      * @return mixed
      */
     public static function countryCode(string $country)

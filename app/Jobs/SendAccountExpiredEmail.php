@@ -22,8 +22,6 @@ class SendAccountExpiredEmail implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param  \App\Models\User  $user
      */
     public function __construct(User $user)
     {
@@ -32,8 +30,6 @@ class SendAccountExpiredEmail implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {

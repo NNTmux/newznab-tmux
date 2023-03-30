@@ -37,8 +37,6 @@ class Genres
     }
 
     /**
-     * @param  string  $type
-     * @param  bool  $activeOnly
      * @return array|mixed
      */
     public function getGenres(string $type = '', bool $activeOnly = false)
@@ -66,10 +64,6 @@ class Genres
         return $genresArray;
     }
 
-    /**
-     * @param  string  $type
-     * @param  bool  $activeOnly
-     */
     private function getListQuery(string $type = '', bool $activeOnly = false): string
     {
         if (! empty($type)) {

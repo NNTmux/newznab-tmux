@@ -1037,7 +1037,6 @@ class ReleaseRemover
     /**
      * Delete releases from the database.
      *
-     * @return true
      *
      * @throws \Exception
      */
@@ -1257,8 +1256,6 @@ class ReleaseRemover
 
     /**
      * Check if the user wants to run the current query.
-     *
-     * @return bool
      */
     protected function checkUserResponse(): bool
     {
@@ -1287,8 +1284,6 @@ class ReleaseRemover
 
     /**
      * Remove multiple spaces and trim leading spaces.
-     *
-     * @param  string  $string
      */
     protected function cleanSpaces(string $string): string
     {
@@ -1331,7 +1326,6 @@ class ReleaseRemover
     }
 
     /**
-     * @param  string  $dbRegex
      * @return bool|mixed|string
      */
     protected function extractSrchFromRegx(string $dbRegex = '')

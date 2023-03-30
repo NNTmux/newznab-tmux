@@ -45,17 +45,11 @@ class UserDownload extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
@@ -64,7 +58,6 @@ class UserDownload extends Model
     /**
      * Get the COUNT of how many NZB's the user has downloaded in the past day.
      *
-     * @param  int  $userID
      *
      * @throws \Exception
      */

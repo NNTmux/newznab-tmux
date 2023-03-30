@@ -64,8 +64,6 @@ class TraktTv extends TV
     /**
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
@@ -197,9 +195,6 @@ class TraktTv extends TV
     /**
      * Retrieve info of TV episode from site using its API.
      *
-     * @param  int  $siteId
-     * @param  int  $series
-     * @param  int  $episode
      * @return array|false False on failure, an array of information fields otherwise.
      */
     public function getEpisodeInfo(int $siteId, int $series, int $episode)

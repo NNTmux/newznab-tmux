@@ -27,9 +27,6 @@ class SendPasswordResetEmail implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param  \App\Models\User  $user
-     * @param  string  $newPass
      */
     public function __construct(User $user, string $newPass)
     {
@@ -39,8 +36,6 @@ class SendPasswordResetEmail implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {

@@ -60,8 +60,6 @@ class TVDB extends TV
     /**
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {

@@ -401,7 +401,6 @@ class Music
     }
 
     /**
-     * @param  bool  $local
      *
      * @throws \Exception
      */
@@ -481,7 +480,6 @@ class Music
     }
 
     /**
-     * @param  string  $releaseName
      * @return array|false
      */
     public function parseArtist(string $releaseName)
@@ -618,7 +616,6 @@ class Music
     }
 
     /**
-     * @param  string  $title
      * @return array|bool
      *
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException

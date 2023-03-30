@@ -55,11 +55,6 @@ class Forumpost extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @param  int  $locked
-     * @param  int  $sticky
-     * @param  int  $replies
-     */
     public static function add($parentId, $userid, $subject, $message, int $locked = 0, int $sticky = 0, int $replies = 0): int
     {
         if ($message === '') {
@@ -139,7 +134,6 @@ class Forumpost extends Model
      *
      *
      * @param $start
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getBrowseRange(): LengthAwarePaginator
     {

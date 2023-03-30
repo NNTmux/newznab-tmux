@@ -119,7 +119,6 @@ class AniDB
     /**
      * Selects episode info for a local match.
      *
-     * @param  int  $episode
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     private function checkAniDBInfo($anidbId, int $episode = -1)
@@ -153,7 +152,6 @@ class AniDB
     /**
      * Extracts anime title and episode info from release searchname.
      *
-     * @param  string  $cleanName
      * @return array $hits
      */
     private function extractTitleEpisode(string $cleanName = ''): array
@@ -194,7 +192,6 @@ class AniDB
      * Retrieves AniDB Info using a cleaned name.
      *
      *
-     * @param  string  $searchName
      * @return mixed
      */
     private function getAnidbByName(string $searchName = '')

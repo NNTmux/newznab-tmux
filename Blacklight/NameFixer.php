@@ -1449,8 +1449,6 @@ class NameFixer
     /**
      * Look for a TV name.
      *
-     * @param  bool  $echo
-     * @param  string  $type
      *
      * @throws \Exception
      */

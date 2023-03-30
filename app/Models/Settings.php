@@ -119,7 +119,6 @@ class Settings extends Model
     /**
      * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get(string $key)

@@ -41,8 +41,6 @@ class TMDB extends TV
     /**
      * Main processing director function for TMDB
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
     public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
@@ -183,7 +181,6 @@ class TMDB extends TV
      * Calls the API to perform initial show name match to TMDB title
      * Returns a formatted array of show data or false if no match.
      *
-     * @param  string  $cleanName
      * @return array|false
      */
     protected function getShowInfo(string $cleanName): bool|array
@@ -284,11 +281,6 @@ class TMDB extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param  int  $tmdbid
-     * @param  int  $season
-     * @param  int  $episode
-     * @param  string  $airdate
-     * @param  int  $videoId
      * @return array|false
      */
     protected function getEpisodeInfo(int $tmdbid, int $season, int $episode, string $airdate = '', int $videoId = 0): bool|array

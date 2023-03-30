@@ -85,8 +85,6 @@ class XXX
 
     /**
      * Get XXX releases with covers for xxx browse page.
-     *
-     * @param  int  $maxAge
      */
     public function getXXXRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = []): array
     {

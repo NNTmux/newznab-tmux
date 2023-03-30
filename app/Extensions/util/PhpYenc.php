@@ -25,9 +25,6 @@ namespace App\Extensions\util;
  */
 class PhpYenc
 {
-    /**
-     * @param  bool  $ignore
-     */
     public static function decode(&$text, bool $ignore = false): bool|string
     {
         $crc = '';

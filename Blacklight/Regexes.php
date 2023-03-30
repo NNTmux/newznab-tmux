@@ -95,8 +95,6 @@ class Regexes
 
     /**
      * Get a single regex using its id.
-     *
-     * @param  int  $id
      */
     public function getRegexByID(int $id): array
     {
@@ -104,7 +102,6 @@ class Regexes
     }
 
     /**
-     * @param  string  $group_regex
      * @return mixed
      */
     public function getRegex(string $group_regex = '')
@@ -147,7 +144,6 @@ class Regexes
     /**
      * Delete a regex using its id.
      *
-     * @param  int  $id
      *
      * @throws \Throwable
      */
@@ -163,9 +159,6 @@ class Regexes
      *
      * Requires table per group to be on.
      *
-     * @param  string  $groupName
-     * @param  string  $regex
-     * @param  int  $limit
      *
      * @throws \Exception
      */
@@ -326,8 +319,6 @@ class Regexes
      *
      * Requires at least 1 named captured group.
      *
-     * @param  string  $regex
-     * @param  string  $subject
      *
      * @throws \Exception
      */
@@ -359,8 +350,6 @@ class Regexes
 
     /**
      * Format part of a query.
-     *
-     * @param  string  $group_regex
      */
     protected function _groupQueryString(string $group_regex): string
     {

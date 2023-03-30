@@ -7,8 +7,6 @@ class CreateUserDownloadsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,8 +25,6 @@ class CreateUserDownloadsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

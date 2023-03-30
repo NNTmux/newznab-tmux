@@ -39,8 +39,6 @@ class AccountWillExpire extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
     public function build(): static
     {

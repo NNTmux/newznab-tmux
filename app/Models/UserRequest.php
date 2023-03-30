@@ -49,9 +49,6 @@ class UserRequest extends Model
      */
     protected $fillable = ['id', 'users_id', 'request', 'hosthash', 'timestamp'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
@@ -70,7 +67,6 @@ class UserRequest extends Model
     /**
      * Get the quantity of API requests in the last day for the users_id.
      *
-     * @param  int  $userID
      *
      * @throws \Exception
      * @throws \Throwable

@@ -97,7 +97,6 @@ class ReleaseCleaning
     }
 
     /**
-     * @param  bool  $usePre
      * @return array|false|string
      *
      * @throws \Exception
@@ -402,9 +401,6 @@ class ReleaseCleaning
 
     // Run at the end because this can be dangerous. In the future it's better to make these per group. There should not be numbers after yEnc because we remove them as well before inserting (even when importing).
 
-    /**
-     * @return array
-     */
     public function generic(): array
     {
         // This regex gets almost all of the predb release names also keep in mind that not every subject ends with yEnc, some are truncated, because of the 255 character limit and some have extra charaters tacked onto the end, like (5/10).

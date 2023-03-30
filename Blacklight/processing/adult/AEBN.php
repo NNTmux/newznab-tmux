@@ -141,8 +141,6 @@ class AEBN extends AdultMovies
 
     /**
      * Gets the product information.
-     *
-     * @param  bool  $extras
      */
     protected function productInfo(bool $extras = false): array
     {
@@ -187,8 +185,6 @@ class AEBN extends AdultMovies
 
     /**
      * Searches for a XXX name.
-     *
-     * @param  string  $movie
      */
     public function processSite(string $movie): bool
     {

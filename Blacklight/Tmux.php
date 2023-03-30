@@ -195,9 +195,6 @@ class Tmux
         return $sql;
     }
 
-    /**
-     * @return int
-     */
     public function updateItem($setting, $value): int
     {
         return Settings::query()->where('setting', '=', $setting)->update(['value' => $value]);
@@ -261,7 +258,6 @@ class Tmux
      * Returns random bool, weighted by $chance.
      *
      *
-     * @param  int  $chance
      *
      * @throws \Exception
      */
@@ -288,9 +284,6 @@ class Tmux
     }
 
     /**
-     * @param  string  $db_name
-     * @param  string  $ppmax
-     * @param  string  $ppmin
      *
      * @throws \Exception
      */

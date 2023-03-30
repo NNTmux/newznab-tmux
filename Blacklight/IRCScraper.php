@@ -403,8 +403,6 @@ class IRCScraper extends IRCClient
 
     /**
      * Echo new or update pre to CLI.
-     *
-     * @param  bool  $new
      */
     protected function _doEcho(bool $new = true)
     {
@@ -460,7 +458,6 @@ class IRCScraper extends IRCClient
     /**
      * Get a group id for a group name.
      *
-     * @param  string  $groupName
      * @return mixed
      */
     protected function _getGroupID(string $groupName)

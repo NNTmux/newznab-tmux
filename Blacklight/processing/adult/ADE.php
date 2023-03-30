@@ -165,7 +165,6 @@ class ADE extends AdultMovies
     /**
      * Gets Product Information and/or Features.
      *
-     * @param  bool  $extras
      * @return array - ProductInfo/Extras = features
      */
     protected function productInfo(bool $extras = false): array
@@ -202,7 +201,6 @@ class ADE extends AdultMovies
     /**
      * Searches xxx name.
      *
-     * @param  string  $movie
      * @return bool - True if releases has 90% match, else false
      */
     public function processSite(string $movie): bool

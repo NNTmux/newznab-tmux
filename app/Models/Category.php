@@ -267,17 +267,11 @@ class Category extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return HasMany
-     */
     public function releases(): HasMany
     {
         return $this->hasMany(Release::class, 'categories_id');
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(RootCategory::class, 'root_categories_id');
@@ -308,9 +302,6 @@ class Category extends Model
         return $result;
     }
 
-    /**
-     * @return string
-     */
     public static function getCategorySearch(array $cat = []): string
     {
         $categories = [];

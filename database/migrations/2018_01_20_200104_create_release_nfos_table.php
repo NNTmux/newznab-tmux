@@ -7,8 +7,6 @@ class CreateReleaseNfosTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -24,8 +22,6 @@ class CreateReleaseNfosTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

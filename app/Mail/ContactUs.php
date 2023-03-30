@@ -26,7 +26,6 @@ class ContactUs extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
      *
      * @throws \Exception
      */

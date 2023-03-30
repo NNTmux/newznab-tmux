@@ -108,9 +108,6 @@ class ADM extends AdultMovies
 
     /**
      * Get Product Information and Director.
-     *
-     *
-     * @param  bool  $extras
      */
     protected function productInfo(bool $extras = false): array
     {

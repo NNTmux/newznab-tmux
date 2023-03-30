@@ -8,8 +8,6 @@ class CreateFirewallTable extends Migration
 {
     /**
      * Run the migration.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -26,8 +24,6 @@ class CreateFirewallTable extends Migration
 
     /**
      * Reverse the migration.
-     *
-     * @return void
      */
     public function down(): void
     {

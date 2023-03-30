@@ -143,9 +143,6 @@ class NntmuxPopulateSearchIndexes extends Command
         $this->newLine();
     }
 
-    /**
-     * @return void
-     */
     private function elasticReleases(): void
     {
         $elastic = new ElasticSearchSiteSearch();
@@ -189,9 +186,6 @@ class NntmuxPopulateSearchIndexes extends Command
         $this->info('Done');
     }
 
-    /**
-     * @return void
-     */
     private function elasticPreDB(): void
     {
         $elastic = new ElasticSearchSiteSearch();

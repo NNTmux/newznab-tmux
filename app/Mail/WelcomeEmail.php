@@ -28,8 +28,6 @@ class WelcomeEmail extends Mailable
 
     /**
      * Create a new message instance.
-     *
-     * @param  \App\Models\User  $user
      */
     public function __construct(User $user)
     {
@@ -40,8 +38,6 @@ class WelcomeEmail extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
     public function build(): static
     {

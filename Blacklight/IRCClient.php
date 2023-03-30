@@ -213,8 +213,6 @@ class IRCClient
 
     /**
      * Amount of times to retry before giving up when connecting.
-     *
-     * @param  int  $retries
      */
     public function setConnectionRetries(int $retries)
     {
@@ -245,7 +243,6 @@ class IRCClient
      * @param  string  $hostname  Host name of the IRC server (can be a IP or a name).
      * @param  int  $port  Port number of the IRC server.
      * @param  bool  $tls  Use encryption for the socket transport? (make sure the port is right).
-     * @return bool
      */
     public function connect(string $hostname, int $port = 6667, bool $tls = false): bool
     {
@@ -301,7 +298,6 @@ class IRCClient
      * @param  string  $userName  The user name - visible in the host name.
      * @param  string  $realName  The real name - visible in the WhoIs.
      * @param  null  $password  The password  - some servers require a password.
-     * @return bool
      */
     public function login(string $nickName, string $userName, string $realName, $password = null): bool
     {
@@ -384,7 +380,6 @@ class IRCClient
      * Quit from IRC.
      *
      * @param  string  $message  Optional disconnect message.
-     * @return bool
      */
     public function quit(string $message = null): bool
     {
@@ -439,7 +434,6 @@ class IRCClient
      *
      * @param  array  $channels  Array of channels with their passwords (null if the channel doesn't need a password).
      *                           array( '#exampleChannel' => 'thePassword', '#exampleChan2' => null );
-     * @return bool
      */
     public function joinChannels(array $channels = []): bool
     {
@@ -470,9 +464,6 @@ class IRCClient
 
     /**
      * Join a channel.
-     *
-     * @param  string  $channel
-     * @param  string  $password
      */
     protected function _joinChannel(string $channel, string $password)
     {
@@ -481,8 +472,6 @@ class IRCClient
 
     /**
      * Send PONG to a host.
-     *
-     * @param  string  $host
      */
     protected function _pong(string $host)
     {
@@ -498,8 +487,6 @@ class IRCClient
 
     /**
      * Send PING to a host.
-     *
-     * @param  string  $host
      */
     protected function _ping(string $host)
     {
@@ -553,9 +540,6 @@ class IRCClient
 
     /**
      * Send a command to the IRC server.
-     *
-     * @param  string  $command
-     * @return bool
      */
     protected function _writeSocket(string $command): bool
     {
@@ -629,8 +613,6 @@ class IRCClient
 
     /**
      * Check if we are connected to the IRC server.
-     *
-     * @return bool
      */
     protected function _connected(): bool
     {
@@ -639,9 +621,6 @@ class IRCClient
 
     /**
      * Strips control characters from a IRC message.
-     *
-     * @param  string  $text
-     * @return string
      */
     protected function _stripControlCharacters(string $text): string
     {

@@ -93,9 +93,6 @@ class Books
         return BookInfo::query()->where('id', $id)->first();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Model
-     */
     public function getBookInfoByName($title): Model
     {
         //only used to get a count of words

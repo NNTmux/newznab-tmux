@@ -28,8 +28,6 @@ class Handler extends ExceptionHandler
 
     /**
      * Catch errors with Sentry.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -44,7 +42,6 @@ class Handler extends ExceptionHandler
      * Report or log an exception.
      *
      *
-     * @param  \Exception  $exception
      * @return void
      *
      * @throws \Throwable

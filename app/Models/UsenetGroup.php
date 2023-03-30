@@ -93,9 +93,6 @@ class UsenetGroup extends Model
         $this->allasmgr = (int) Settings::settingValue('..allasmgr') === 1;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'groups_id');
@@ -229,9 +226,7 @@ class UsenetGroup extends Model
     }
 
     /**
-     * @param  string  $groupname
      * @param  null  $active
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getGroupsRange(string $groupname = '', $active = null): LengthAwarePaginator
     {
@@ -252,9 +247,6 @@ class UsenetGroup extends Model
 
     /**
      * Update an existing group.
-     *
-     *
-     * @return int
      */
     public static function updateGroup($group): int
     {
@@ -420,9 +412,6 @@ class UsenetGroup extends Model
     /**
      * Adds new newsgroups based on a regular expression match against USP available.
      *
-     * @param  string  $groupList
-     * @param  int  $active
-     * @param  int  $backfill
      * @return array|string
      *
      * @throws \Exception
