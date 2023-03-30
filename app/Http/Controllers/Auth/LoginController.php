@@ -6,7 +6,9 @@ use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
 use App\Models\Settings;
 use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -48,10 +50,9 @@ class LoginController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|null
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
-     * @throws \Illuminate\Validation\ValidationException
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws AuthenticationException
      */
     public function login(Request $request)
     {
@@ -74,11 +75,7 @@ class LoginController extends Controller
         }
 
         if ($validator->passes()) {
-            $user = User::getByUsername($request->input('username'));
-            if ($user === null) {
-                $user = User::getByEmail($request->input('username'));
-            }
-
+            $user = User::query()->orWhere(['username' => $request->input('username'), 'email' => $request->input('username')])->first();
             if ($user !== null) {
                 if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
                     $this->validate($request, [
@@ -120,7 +117,7 @@ class LoginController extends Controller
         return $this->showLoginForm();
     }
 
-    public function showLoginForm(): void
+    public function showLoginForm()
     {
         $theme = Settings::settingValue('site.main.style');
 
@@ -129,15 +126,17 @@ class LoginController extends Controller
         $meta_description = 'Login';
         $content = app('smarty.view')->fetch($theme.'/login.tpl');
         app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-        app('smarty.view')->display($theme.'/basepage.tpl');
+        return app('smarty.view')->display($theme.'/basepage.tpl');
     }
 
-    public function logout(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
-    {
-        $this->guard()->logout();
 
-        $request->session()->flush();
-        $request->session()->regenerate();
+    public function logout(Request $request)
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
 
         return redirect('login')->with('message', 'You have been logged out successfully');
     }
