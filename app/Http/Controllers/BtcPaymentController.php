@@ -39,7 +39,7 @@ class BtcPaymentController extends BasePageController
                     // Redirect to a payment gateway
                     $url = 'https://gateway.gear.mycelium.com/pay/'.$order->payment_id;
 
-                    return redirect($url);
+                    return redirect()->to($url);
                 }
                 break;
             case 'view':

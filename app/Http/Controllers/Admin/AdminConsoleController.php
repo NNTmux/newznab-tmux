@@ -69,7 +69,7 @@ class AdminConsoleController extends BasePageController
 
                     $console->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('salesrank'), $request->input('platform'), $request->input('publisher'), $request->input('releasedate'), $request->input('esrb'), $request->input('cover'), $request->input('genre'));
 
-                    return redirect('admin/console-list.');
+                    return redirect()->to('admin/console-list.');
                     break;
                 case 'view':
                 default:

@@ -100,7 +100,7 @@ class AdminGroupController extends BasePageController
                     UsenetGroup::updateGroup($request->all());
                 }
 
-                return redirect('admin/group-list');
+                return redirect()->to('admin/group-list');
                 break;
 
             case 'view':

@@ -117,6 +117,6 @@ class AdminContentController extends BasePageController
 
         $referrer = $request->server('HTTP_REFERER');
 
-        return redirect($referrer);
+        return redirect()->to($referrer);
     }
 }

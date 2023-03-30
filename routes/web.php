@@ -372,5 +372,5 @@ Route::group(['middleware' => ['role_or_permission:Admin|Moderator|edit release'
 });
 
 Route::post('2faVerify', function () {
-    return redirect(URL()->previous());
+    return redirect()->to(URL()->previous());
 })->name('2faVerify')->middleware('2fa');

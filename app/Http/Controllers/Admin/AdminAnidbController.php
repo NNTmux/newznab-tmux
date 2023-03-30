@@ -68,7 +68,7 @@ class AdminAnidbController extends BasePageController
                     $request->input('episodetitles')
                 );
 
-                return redirect('admin/anidb-list');
+                return redirect()->to('admin/anidb-list');
                 break;
 
             case 'view':

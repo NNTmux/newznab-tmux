@@ -152,7 +152,7 @@ class AdminUserController extends BasePageController
                 }
 
                 if ($ret >= 0) {
-                    return redirect('admin/user-list');
+                    return redirect()->to('admin/user-list');
                 }
 
                 switch ($ret) {
@@ -218,14 +218,14 @@ class AdminUserController extends BasePageController
 
             $user->delete();
 
-            return redirect('admin/user-list');
+            return redirect()->to('admin/user-list');
         }
 
         if ($request->has('redir')) {
-            return redirect($request->input('redir'));
+            return redirect()->to($request->input('redir'));
         }
 
-        return redirect($request->server('HTTP_REFERER'));
+        return redirect()->to($request->server('HTTP_REFERER'));
     }
 
     /**

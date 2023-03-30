@@ -57,7 +57,7 @@ class AdminSiteController extends BasePageController
                 if ($error === '') {
                     $site = $ret;
 
-                    return redirect('admin/site-edit');
+                    return redirect()->to('admin/site-edit');
                 }
 
                 $this->smarty->assign('error', $error);

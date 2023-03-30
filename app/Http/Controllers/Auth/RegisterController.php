@@ -168,7 +168,7 @@ class RegisterController extends Controller
                     );
                     Invite::consume($inviteCode);
 
-                    return $this->registered($request, $user) ?: redirect($this->redirectPath())->with('info', 'Your Account has been created. You will receive a separate verification email shortly.');
+                    return $this->registered($request, $user) ?: redirect()->to($this->redirectPath())->with('info', 'Your Account has been created. You will receive a separate verification email shortly.');
                 }
                 break;
             case 'view':

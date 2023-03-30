@@ -61,13 +61,13 @@ class AdminMovieController extends BasePageController
                     }
                 }
                 if (($request->has('update') && (int) $request->input('update') === 1)) {
-                    return back()->withInput();
+                    return redirect()->back()->withInput();
                 }
 
-                return redirect('/admin/movie-list');
+                return redirect()->to('/admin/movie-list');
             }
 
-            return redirect('/admin/movie-list');
+            return redirect()->to('/admin/movie-list');
         }
 
         $content = $this->smarty->fetch('movie-add.tpl');
@@ -142,7 +142,7 @@ class AdminMovieController extends BasePageController
                         Release::query()->where('imdbid', $id)->update(['movieinfo_id' => $movieInfo->id]);
                     }
 
-                    return redirect('admin/movie-list');
+                    return redirect()->to('admin/movie-list');
                     break;
                 case 'view':
                 default:

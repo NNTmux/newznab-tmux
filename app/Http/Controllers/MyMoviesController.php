@@ -32,13 +32,13 @@ class MyMoviesController extends BasePageController
             case 'delete':
                 $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
                 if (! $movie) {
-                    return redirect('/mymovies');
+                    return redirect()->to('/mymovies');
                 }
                 UserMovie::delMovie($this->userdata->id, $imdbid);
                 if ($request->has('from')) {
                     header('Location:'.url($request->input('from')));
                 } else {
-                    return redirect('/mymovies');
+                    return redirect()->to('/mymovies');
                 }
 
                 break;
@@ -46,22 +46,22 @@ class MyMoviesController extends BasePageController
             case 'doadd':
                 $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
                 if ($movie) {
-                    return redirect('/mymovies');
+                    return redirect()->to('/mymovies');
                 }
 
                 $movie = $mv->getMovieInfo($imdbid);
                 if (! $movie) {
-                    return redirect('/mymovies');
+                    return redirect()->to('/mymovies');
                 }
 
                 if ($action === 'doadd') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
                     UserMovie::addMovie($this->userdata->id, $imdbid, $category);
                     if ($request->has('from')) {
-                        return redirect($request->input('from'));
+                        return redirect()->to($request->input('from'));
                     }
 
-                    return redirect('/mymovies');
+                    return redirect()->to('/mymovies');
                 }
 
                 $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
@@ -88,17 +88,17 @@ class MyMoviesController extends BasePageController
                 $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
 
                 if (! $movie) {
-                    return redirect('/mymovies');
+                    return redirect()->to('/mymovies');
                 }
 
                 if ($action === 'doedit') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
                     UserMovie::updateMovie($this->userdata->id, $imdbid, $category);
                     if ($request->has('from')) {
-                        return redirect($request->input('from'));
+                        return redirect()->to($request->input('from'));
                     }
 
-                    return redirect('mymovies');
+                    return redirect()->to('mymovies');
                 }
 
                 $tmpcats = Category::getChildren(Category::MOVIE_ROOT);

@@ -48,7 +48,7 @@ class PasswordSecurityController extends Controller
             ]
         );
 
-        return redirect('2fa')->with('success', 'Secret Key is generated, Please verify Code to Enable 2FA');
+        return redirect()->to('2fa')->with('success', 'Secret Key is generated, Please verify Code to Enable 2FA');
     }
 
     /**
@@ -65,10 +65,10 @@ class PasswordSecurityController extends Controller
             $user->passwordSecurity->google2fa_enable = 1;
             $user->passwordSecurity->save();
 
-            return redirect('2fa')->with('success', '2FA is Enabled Successfully.');
+            return redirect()->to('2fa')->with('success', '2FA is Enabled Successfully.');
         }
 
-        return redirect('2fa')->with('error', 'Invalid Verification Code, Please try again.');
+        return redirect()->to('2fa')->with('error', 'Invalid Verification Code, Please try again.');
     }
 
     public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
@@ -83,6 +83,6 @@ class PasswordSecurityController extends Controller
         $user->passwordSecurity->google2fa_enable = 0;
         $user->passwordSecurity->save();
 
-        return redirect('2fa')->with('success', '2FA is now Disabled.');
+        return redirect()->to('2fa')->with('success', '2FA is now Disabled.');
     }
 }
