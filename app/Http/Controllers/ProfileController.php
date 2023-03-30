@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
 use App\Models\Settings;
@@ -103,7 +104,7 @@ class ProfileController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): RedirectResponse
     {
         $this->setPreferences();
 
@@ -120,9 +121,9 @@ class ProfileController extends BasePageController
             case 'newapikey':
                 User::updateRssKey($userid);
 
-                return redirect('profile');
+                return redirect()->to('profile');
             case 'clearcookies':
-                return redirect('profileedit');
+                return redirect()->to('profileedit');
             case 'submit':
                 $validator = Validator::make($request->all(), [
                     'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
@@ -229,11 +230,11 @@ class ProfileController extends BasePageController
 
                             Auth::logout();
 
-                            return redirect('login')->with('info', 'You will be able to login after you verify your new email address');
+                            return redirect()->to('login')->with('info', 'You will be able to login after you verify your new email address');
                         }
                     }
 
-                    return redirect('profile')->with('success', 'Profile changes saved');
+                    return redirect()->to('profile')->with('success', 'Profile changes saved');
                 }
                 break;
 
@@ -279,7 +280,7 @@ class ProfileController extends BasePageController
         }
 
         if ($this->userdata->hasRole('Admin')) {
-            return redirect('profile');
+            return redirect()->to('profile');
         }
 
         return view('errors.badboy')->with('warning', 'Dont try to delete another user account!');

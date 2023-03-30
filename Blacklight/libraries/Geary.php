@@ -48,7 +48,7 @@ class Geary
      * @param  string  $gateway_id  Your API key obtained from https://admin.gear.mycelium.com/gateways
      * @param  string  $gateway_secret  Your API secret obtained from https://admin.gear.mycelium.com/gateways
      */
-    public function __construct($gateway_id, $gateway_secret)
+    public function __construct(string $gateway_id, string $gateway_secret)
     {
         $this->gateway_id = $gateway_id;
         $this->gateway_secret = $gateway_secret;
@@ -66,7 +66,7 @@ class Geary
      *                         normally in satoshis
      * @return mixed
      */
-    public function create_order($amount, $keychain_id, $callback_data)
+    public function create_order(float $amount, $keychain_id, $callback_data)
     {
         $request = $this->endpoint('orders');
         $params = [
@@ -92,7 +92,7 @@ class Geary
      * @param  int  $id  Id is an existing order ID or payment ID
      * @return mixed
      */
-    public function cancel_order($id)
+    public function cancel_order(int $id)
     {
         $request = $this->endpoint('orders');
 
@@ -113,7 +113,7 @@ class Geary
      * @param  int  $payment_id  Id is an existing payment ID
      * @return mixed
      */
-    public function check_order($payment_id)
+    public function check_order(int $payment_id)
     {
         $request_uri = $this->endpoint('orders');
 
@@ -173,7 +173,7 @@ class Geary
      *
      * @param  int  $id  Id is an existing order ID
      */
-    public function order_websocket_link($id): string
+    public function order_websocket_link(int $id): string
     {
         return "wss://gateway.gear.mycelium.com/gateways/{$this->gateway_id}/orders/$id/websocket";
     }
@@ -219,10 +219,8 @@ class Geary
      * Endpoint.
      *
      * Construct an endpoint URL
-     *
-     * @param  string  $method
      */
-    private function endpoint($method): string
+    private function endpoint(string $method): string
     {
         return "/gateways/{$this->gateway_id}/$method";
     }
@@ -255,10 +253,8 @@ class Geary
      * Get Header.
      *
      * Get single data from header
-     *
-     * @param  string  $name
      */
-    private function get_header($name): string
+    private function get_header(string $name): string
     {
         $headers = getAllHeaders();
 
@@ -277,10 +273,8 @@ class Geary
      * Prepare Header.
      *
      * Add data to header for authentication purpose
-     *
-     * @param  array  $data
      */
-    private function prepare_header($data): array
+    private function prepare_header(array $data): array
     {
         $params = $data['params'];
         $params_query = ! \is_array($params) ? "/$params" : '?'.http_build_query($params);
@@ -304,10 +298,9 @@ class Geary
      *
      * Send a signed HTTP request
      *
-     * @param  array  $data
      * @return mixed
      */
-    private function send_signed_request($data)
+    private function send_signed_request(array $data)
     {
         $ch = curl_init();
         $url = self::API_URL.$data['request_uri'];

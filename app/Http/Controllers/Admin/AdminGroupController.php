@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\UsenetGroup;
 use Illuminate\Http\Request;
@@ -67,7 +68,7 @@ class AdminGroupController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): RedirectResponse
     {
         $this->setAdminPrefs();
 
@@ -100,7 +101,7 @@ class AdminGroupController extends BasePageController
                     UsenetGroup::updateGroup($request->all());
                 }
 
-                return redirect('admin/group-list');
+                return redirect()->to('admin/group-list');
                 break;
 
             case 'view':

@@ -9,10 +9,8 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
 {
     /**
      * Auto generated seed file.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         DB::table('release_naming_regexes')->delete();
 

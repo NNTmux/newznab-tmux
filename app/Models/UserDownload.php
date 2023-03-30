@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -44,18 +45,12 @@ class UserDownload extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function release()
+    public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
@@ -63,11 +58,10 @@ class UserDownload extends Model
     /**
      * Get the COUNT of how many NZB's the user has downloaded in the past day.
      *
-     * @param  int  $userID
      *
      * @throws \Exception
      */
-    public static function getDownloadRequests($userID): int
+    public static function getDownloadRequests(int $userID): int
     {
         // Clear old requests.
         self::whereUsersId($userID)->where('timestamp', '<', now()->subDay())->delete();
@@ -81,7 +75,7 @@ class UserDownload extends Model
      */
     public static function getDownloadRequestsForUser($userID)
     {
-        return self::whereUsersId($userID)->with('release')->orderBy('timestamp', 'DESC')->get();
+        return self::whereUsersId($userID)->with('release')->orderByDesc('timestamp')->get();
     }
 
     /**

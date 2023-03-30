@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -54,12 +55,7 @@ class Forumpost extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @param  int  $locked
-     * @param  int  $sticky
-     * @param  int  $replies
-     */
-    public static function add($parentId, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0): int
+    public static function add($parentId, $userid, $subject, $message, int $locked = 0, int $sticky = 0, int $replies = 0): int
     {
         if ($message === '') {
             return -1;
@@ -138,16 +134,15 @@ class Forumpost extends Model
      *
      *
      * @param $start
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getBrowseRange()
+    public static function getBrowseRange(): LengthAwarePaginator
     {
         return self::query()
             ->where('forumpost.parentid', '=', 0)
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
             ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
             ->select(['forumpost.*', 'users.username', 'roles.name as rolename'])
-            ->orderBy('forumpost.updated_at', 'desc')
+            ->orderByDesc('forumpost.updated_at')
             ->paginate(config('nntmux.items_per_page'));
     }
 
@@ -201,7 +196,7 @@ class Forumpost extends Model
             ->where('forumpost.users_id', $uid)
             ->select(['forumpost.*', 'users.username'])
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
-            ->orderBy('forumpost.created_at', 'desc');
+            ->orderByDesc('forumpost.created_at');
         if ($start !== false) {
             $range->limit($num)->offset($start);
         }

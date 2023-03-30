@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use Illuminate\Database\Eloquent\Model;
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
@@ -92,10 +93,7 @@ class Books
         return BookInfo::query()->where('id', $id)->first();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function getBookInfoByName($title)
+    public function getBookInfoByName($title): Model
     {
         //only used to get a count of words
         $searchWords = '';
@@ -276,7 +274,7 @@ class Books
                     Release::query()->where('nzbstatus', '=', NZB::NZB_ADDED)
                         ->whereNull('bookinfo_id')
                         ->whereIn('categories_id', [$iValue])
-                    ->orderBy('postdate', 'desc')
+                    ->orderByDesc('postdate')
                     ->limit($this->bookqty)
                     ->get(['searchname', 'id', 'categories_id']), $iValue
                 );

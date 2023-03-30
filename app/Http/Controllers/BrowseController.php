@@ -12,7 +12,7 @@ class BrowseController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->setPreferences();
         $releases = new Releases();
@@ -20,12 +20,12 @@ class BrowseController extends BasePageController
         $this->smarty->assign('category', -1);
 
         $ordering = $releases->getBrowseOrdering();
-        $orderBy = request()->has('ob') && ! empty(request()->input('ob')) ? request()->input('ob') : '';
-        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+        $orderBy = $request->has('ob') && ! empty($request->input('ob')) ? $request->input('ob') : '';
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, -1);
-        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $this->smarty->assign('catname', 'All');
 
@@ -59,7 +59,7 @@ class BrowseController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(string $parentCategory, string $id = 'All'): void
+    public function show(Request $request, string $parentCategory, string $id = 'All'): void
     {
         $this->setPreferences();
         $releases = new Releases();
@@ -83,12 +83,12 @@ class BrowseController extends BasePageController
         $this->smarty->assign('category', $category);
 
         $ordering = $releases->getBrowseOrdering();
-        $orderBy = request()->has('ob') && ! empty(request()->input('ob')) ? request()->input('ob') : '';
-        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+        $orderBy = $request->has('ob') && ! empty($request->input('ob')) ? $request->input('ob') : '';
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, $grp);
-        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $browse = [];
 
@@ -159,10 +159,10 @@ class BrowseController extends BasePageController
         $releases = new Releases();
         if ($request->has('g')) {
             $group = $request->input('g');
-            $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+            $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
             $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata->categoryexclusions, $group);
-            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $browse = [];
 

@@ -20,7 +20,7 @@ require_once \dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
  */
 class InstallTest extends \PHPUnit\Framework\TestCase
 {
-    public function testFullInstall()
+    public function testFullInstall(): void
     {
         passthru('php '.base_path().'/artisan migrate:fresh --seed');
 

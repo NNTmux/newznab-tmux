@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
 use App\Models\Settings;
@@ -48,12 +50,11 @@ class LoginController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function login(Request $request)
+    public function login(LoginLoginRequest $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'username' => ['required'],
@@ -68,7 +69,7 @@ class LoginController extends Controller
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            Session::flash('message', 'You have failed to login too many times.Try again in '.$this->decayMinutes().' minutes.');
+            $request->session()->flash('message', 'You have failed to login too many times.Try again in '.$this->decayMinutes().' minutes.');
 
             return $this->showLoginForm();
         }
@@ -81,21 +82,18 @@ class LoginController extends Controller
 
             if ($user !== null) {
                 if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-                    $this->validate($request, [
-                        'g-recaptcha-response' => ['required', 'captcha'],
-                    ]);
                 }
 
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
                 if (! $user->isVerified() || $user->isPendingVerification()) {
-                    Session::flash('message', 'You have not verified your email address!');
+                    $request->session()->flash('message', 'You have not verified your email address!');
 
                     return $this->showLoginForm();
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                    $userIp = (int) Settings::settingValue('..storeuserips') === 1 ? (request()->ip() ?? request()->getClientIp()) : '';
+                    $userIp = (int) Settings::settingValue('..storeuserips') === 1 ? ($request->ip() ?? $request->getClientIp()) : '';
                     event(new UserLoggedIn($user, $userIp));
 
                     Auth::logoutOtherDevices($request->input('password'));
@@ -105,17 +103,17 @@ class LoginController extends Controller
                 }
 
                 $this->incrementLoginAttempts($request);
-                Session::flash('message', 'Username or email and password combination used does not match our records!');
+                $request->session()->flash('message', 'Username or email and password combination used does not match our records!');
             } else {
                 $this->incrementLoginAttempts($request);
-                Session::flash('message', 'Username or email used do not match our records!');
+                $request->session()->flash('message', 'Username or email used do not match our records!');
             }
 
             return $this->showLoginForm();
         }
 
         $this->incrementLoginAttempts($request);
-        Session::flash('message', implode('', Arr::collapse($validator->errors()->toArray())));
+        $request->session()->flash('message', implode('', Arr::collapse($validator->errors()->toArray())));
 
         return $this->showLoginForm();
     }
@@ -139,6 +137,6 @@ class LoginController extends Controller
         $request->session()->flush();
         $request->session()->regenerate();
 
-        return redirect('login')->with('message', 'You have been logged out successfully');
+        return redirect()->to('login')->with('message', 'You have been logged out successfully');
     }
 }

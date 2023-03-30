@@ -7,10 +7,8 @@ class CreateReleaseCommentsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('release_comments', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -41,10 +39,8 @@ class CreateReleaseCommentsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('release_comments');
     }

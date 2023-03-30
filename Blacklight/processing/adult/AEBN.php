@@ -141,10 +141,8 @@ class AEBN extends AdultMovies
 
     /**
      * Gets the product information.
-     *
-     * @param  bool  $extras
      */
-    protected function productInfo($extras = false): array
+    protected function productInfo(bool $extras = false): array
     {
         if ($ret = $this->_html->find('div#md-detailsLeft', 0)) {
             foreach ($ret->find('div') as $div) {
@@ -187,10 +185,8 @@ class AEBN extends AdultMovies
 
     /**
      * Searches for a XXX name.
-     *
-     * @param  string  $movie
      */
-    public function processSite($movie): bool
+    public function processSite(string $movie): bool
     {
         if (empty($movie)) {
             return false;

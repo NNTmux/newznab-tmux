@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -61,26 +63,17 @@ class Video extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function alias()
+    public function alias(): HasMany
     {
         return $this->hasMany(VideoAlias::class, 'videos_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function release()
+    public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'videos_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function episode()
+    public function episode(): HasMany
     {
         return $this->hasMany(TvEpisode::class, 'videos_id');
     }
@@ -102,12 +95,8 @@ class Video extends Model
 
     /**
      * Retrieves a range of all shows for the show-edit admin list.
-     *
-     *
-     * @param  string  $showname
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getRange($showname = '')
+    public static function getRange(string $showname = ''): LengthAwarePaginator
     {
         $sql = self::query()
             ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
@@ -122,11 +111,8 @@ class Video extends Model
 
     /**
      * Returns a count of all shows -- usually used by pager.
-     *
-     *
-     * @param  string  $showname
      */
-    public static function getCount($showname = ''): int
+    public static function getCount(string $showname = ''): int
     {
         $res = self::query()->join('tv_info', 'videos.id', '=', 'tv_info.videos_id');
 
@@ -139,11 +125,8 @@ class Video extends Model
 
     /**
      * Retrieves and returns a list of shows with eligible releases.
-     *
-     * @param  string  $letter
-     * @param  string  $showname
      */
-    public static function getSeriesList($uid, $letter = '', $showname = ''): array
+    public static function getSeriesList($uid, string $letter = '', string $showname = ''): array
     {
         if (($letter !== '') && $letter === '0-9') {
             $letter = '[0-9]';

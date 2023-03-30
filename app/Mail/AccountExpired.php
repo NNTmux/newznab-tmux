@@ -29,11 +29,10 @@ class AccountExpired extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
      *
      * @throws \Exception
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->siteEmail)->subject('Account expired')->view('emails.accountExpired')->with(['account' => $this->user->role->name, 'username' => $this->user->username, 'site' => $this->siteTitle]);
     }

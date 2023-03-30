@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -32,10 +33,8 @@ class PasswordReset extends Mailable
 
     /**
      * PasswordReset constructor.
-     *
-     * @param  \App\Models\User  $user
      */
-    public function __construct($user, $newPass)
+    public function __construct(User $user, $newPass)
     {
         $this->user = $user;
         $this->newPass = $newPass;
@@ -46,11 +45,10 @@ class PasswordReset extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
      *
      * @throws \Exception
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->siteEmail)->subject('Password reset')->view('emails.passwordReset')->with(['newPass' => $this->newPass, 'userName' => $this->user->username, 'site' => $this->siteTitle]);
     }

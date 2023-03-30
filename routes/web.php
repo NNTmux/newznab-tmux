@@ -86,13 +86,13 @@ Route::get('login', [LoginController::class, 'showLoginForm']);
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::group(['middleware' => ['isVerified']], function () {
+Route::middleware('isVerified')->group(function () {
     Route::get('resetpassword', [ResetPasswordController::class, 'reset']);
     Route::post('resetpassword', [ResetPasswordController::class, 'reset']);
 
     Route::get('profile', [ProfileController::class, 'show']);
 
-    Route::group(['prefix' => 'browse'], function () {
+    Route::prefix('browse')->group(function () {
         Route::get('tags', [BrowseController::class, 'tags']);
         Route::get('group', [BrowseController::class, 'group']);
         Route::get('All', [BrowseController::class, 'index']);
@@ -132,7 +132,7 @@ Route::group(['middleware' => ['isVerified']], function () {
 
     Route::post('failed', [FailedReleasesController::class, 'failed'])->name('failed');
 
-    Route::group(['middleware' => 'clearance'], function () {
+    Route::middleware('clearance')->group(function () {
         Route::get('Games', [GamesController::class, 'show'])->name('Games');
         Route::post('Games', [GamesController::class, 'show'])->name('Games');
 
@@ -247,7 +247,7 @@ Route::get('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware
 
 Route::post('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware('role:Admin');
 
-Route::group(['middleware' => ['role:Admin', '2fa'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
+Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::get('index', [AdminPageController::class, 'index']);
     Route::get('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
     Route::post('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
@@ -366,11 +366,11 @@ Route::group(['middleware' => ['role:Admin', '2fa'], 'prefix' => 'admin', 'names
     Route::post('group-list-inactive', [AdminGroupController::class, 'inactive']);
 });
 
-Route::group(['middleware' => ['role_or_permission:Admin|Moderator|edit release'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
+Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {
     Route::get('release-edit', [AdminReleasesController::class, 'edit']);
     Route::post('release-edit', [AdminReleasesController::class, 'edit']);
 });
 
 Route::post('2faVerify', function () {
-    return redirect(URL()->previous());
+    return redirect()->to(URL()->previous());
 })->name('2faVerify')->middleware('2fa');

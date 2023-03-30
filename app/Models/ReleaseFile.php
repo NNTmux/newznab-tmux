@@ -85,12 +85,10 @@ class ReleaseFile extends Model
      * Add new files for a release ID.
      *
      *
-     * @param  string  $hash
-     * @param  string  $crc
      *
      * @throws \Exception
      */
-    public static function addReleaseFiles($id, $name, $size, $createdTime, $hasPassword, $hash = '', $crc = ''): int
+    public static function addReleaseFiles($id, $name, $size, $createdTime, $hasPassword, string $hash = '', string $crc = ''): int
     {
         // Check if we already have this data in table
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', $name)->first();

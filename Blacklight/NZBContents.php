@@ -139,12 +139,11 @@ class NZBContents
      * Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
      *
      *
-     * @param  bool  $nfoCheck
      * @return array|false
      *
      * @throws \Exception
      */
-    public function parseNZB($guid, $relID, $groupID, $nfoCheck = false)
+    public function parseNZB($guid, $relID, $groupID, bool $nfoCheck = false)
     {
         $nzbFile = $this->LoadNZB($guid);
         if ($nzbFile !== false) {
@@ -243,15 +242,10 @@ class NZBContents
     /**
      * Attempts to get the releasename from a par2 file.
      *
-     * @param  string  $guid
-     * @param  int  $relID
-     * @param  int  $groupID
-     * @param  int  $nameStatus
-     * @param  int  $show
      *
      * @throws \Exception
      */
-    public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show): bool
+    public function checkPAR2(string $guid, int $relID, int $groupID, int $nameStatus, int $show): bool
     {
         $nzbFile = $this->LoadNZB($guid);
         if ($nzbFile !== false) {

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use App\Mail\NewAccountCreatedEmail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,20 +22,16 @@ class SendNewRegisteredAccountMail implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param  \App\Models\User  $user
      */
-    public function __construct($user)
+    public function __construct(User $user)
     {
         $this->user = $user;
     }
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         Mail::to(config('mail.from.address'))->send(new NewAccountCreatedEmail($this->user));
     }

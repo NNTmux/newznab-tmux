@@ -57,7 +57,7 @@ class AdminSiteController extends BasePageController
                 if ($error === '') {
                     $site = $ret;
 
-                    return redirect('admin/site-edit');
+                    return redirect()->to('admin/site-edit');
                 }
 
                 $this->smarty->assign('error', $error);
@@ -164,7 +164,7 @@ class AdminSiteController extends BasePageController
 
         $this->smarty->assign('themelist', Utility::getThemesList());
 
-        if (! str_contains(env('NNTP_SERVER'), 'astra')) {
+        if (! str_contains(config('settings.nntp_server'), 'astra')) {
             $this->smarty->assign('compress_headers_warning', 'compress_headers_warning');
         }
 
@@ -199,7 +199,7 @@ class AdminSiteController extends BasePageController
         $usersbymonth = User::getUsersByMonth();
         $this->smarty->assign('usersbymonth', $usersbymonth);
 
-        $usersbyrole = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderBy('users_count', 'desc')->get();
+        $usersbyrole = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderByDesc('users_count')->get();
         $this->smarty->assign('usersbyrole', $usersbyrole);
         $this->smarty->assign('totusers', 0);
         $this->smarty->assign('totrusers', 0);

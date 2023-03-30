@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Http\RedirectResponse;
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
@@ -245,7 +246,7 @@ class ApiV2Controller extends BasePageController
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      */
-    public function getNzb(Request $request)
+    public function getNzb(Request $request): RedirectResponse
     {
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         event(new UserAccessedApi($user));

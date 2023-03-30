@@ -11,10 +11,8 @@ class AddVerificationToUserTable extends Migration
 {
     /**
      * Determine the user table name.
-     *
-     * @return string
      */
-    public function getUserTableName()
+    public function getUserTableName(): string
     {
         $user_model = config('auth.providers.users.model', App\Models\User::class);
 
@@ -23,10 +21,8 @@ class AddVerificationToUserTable extends Migration
 
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table($this->getUserTableName(), function (Blueprint $table) {
             $table->boolean('verified')->default(false);
@@ -36,10 +32,8 @@ class AddVerificationToUserTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table($this->getUserTableName(), function (Blueprint $table) {
             $table->dropColumn('verified');

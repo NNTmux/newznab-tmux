@@ -26,7 +26,7 @@ class TmuxUIStart extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $tmux = new Tmux();
         $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;

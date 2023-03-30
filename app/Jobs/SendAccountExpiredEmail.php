@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use App\Mail\AccountExpired;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,20 +22,16 @@ class SendAccountExpiredEmail implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param  \App\Models\User  $user
      */
-    public function __construct($user)
+    public function __construct(User $user)
     {
         $this->user = $user;
     }
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         Mail::to($this->user->email)->send(new AccountExpired($this->user));
     }

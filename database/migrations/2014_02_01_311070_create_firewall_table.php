@@ -8,10 +8,8 @@ class CreateFirewallTable extends Migration
 {
     /**
      * Run the migration.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('firewall', function (Blueprint $table) {
             $table->increments('id');
@@ -26,10 +24,8 @@ class CreateFirewallTable extends Migration
 
     /**
      * Reverse the migration.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('firewall');
     }

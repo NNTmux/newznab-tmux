@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
@@ -35,7 +36,7 @@ class AdminMovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): RedirectResponse
     {
         if (! \defined('STDOUT')) {
             \define('STDOUT', fopen('php://stdout', 'wb'));
@@ -61,13 +62,13 @@ class AdminMovieController extends BasePageController
                     }
                 }
                 if (($request->has('update') && (int) $request->input('update') === 1)) {
-                    return back()->withInput();
+                    return redirect()->back()->withInput();
                 }
 
-                return redirect('/admin/movie-list');
+                return redirect()->to('/admin/movie-list');
             }
 
-            return redirect('/admin/movie-list');
+            return redirect()->to('/admin/movie-list');
         }
 
         $content = $this->smarty->fetch('movie-add.tpl');
@@ -142,7 +143,7 @@ class AdminMovieController extends BasePageController
                         Release::query()->where('imdbid', $id)->update(['movieinfo_id' => $movieInfo->id]);
                     }
 
-                    return redirect('admin/movie-list');
+                    return redirect()->to('admin/movie-list');
                     break;
                 case 'view':
                 default:

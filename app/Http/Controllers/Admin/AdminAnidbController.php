@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\BasePageController;
 use App\Models\Release;
 use Blacklight\AniDB;
@@ -11,7 +12,7 @@ class AdminAnidbController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index(Request $request): void
     {
         $this->setAdminPrefs();
 
@@ -19,8 +20,8 @@ class AdminAnidbController extends BasePageController
         $title = $meta_title = 'AniDB List';
 
         $aname = '';
-        if (request()->has('animetitle') && ! empty(request()->input('animetitle'))) {
-            $aname = request()->input('animetitle');
+        if ($request->has('animetitle') && ! empty($request->input('animetitle'))) {
+            $aname = $request->input('animetitle');
         }
 
         $this->smarty->assign('animetitle', $aname);
@@ -38,36 +39,36 @@ class AdminAnidbController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function edit(int $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function edit(Request $request, int $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setAdminPrefs();
 
         $AniDB = new AniDB();
 
         // Set the current action.
-        $action = request()->input('action') ?? 'view';
+        $action = $request->input('action') ?? 'view';
 
         switch ($action) {
             case 'submit':
                 $AniDB->updateTitle(
-                    request()->input('anidbid'),
-                    request()->input('title'),
-                    request()->input('type'),
-                    request()->input('startdate'),
-                    request()->input('enddate'),
-                    request()->input('related'),
-                    request()->input('similar'),
-                    request()->input('creators'),
-                    request()->input('description'),
-                    request()->input('rating'),
-                    request()->input('categories'),
-                    request()->input('characters'),
-                    request()->input('epnos'),
-                    request()->input('airdates'),
-                    request()->input('episodetitles')
+                    $request->input('anidbid'),
+                    $request->input('title'),
+                    $request->input('type'),
+                    $request->input('startdate'),
+                    $request->input('enddate'),
+                    $request->input('related'),
+                    $request->input('similar'),
+                    $request->input('creators'),
+                    $request->input('description'),
+                    $request->input('rating'),
+                    $request->input('categories'),
+                    $request->input('characters'),
+                    $request->input('epnos'),
+                    $request->input('airdates'),
+                    $request->input('episodetitles')
                 );
 
-                return redirect('admin/anidb-list');
+                return redirect()->to('admin/anidb-list');
                 break;
 
             case 'view':
@@ -94,13 +95,13 @@ class AdminAnidbController extends BasePageController
      *
      * @throws \Exception
      */
-    public function destroy(int $id): void
+    public function destroy(Request $request, int $id): void
     {
         $this->setAdminPrefs();
 
         $success = false;
 
-        if (request()->has('id')) {
+        if ($request->has('id')) {
             $success = Release::removeAnidbIdFromReleases($id);
             $this->smarty->assign('anidbid', $id);
         }

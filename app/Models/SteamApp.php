@@ -44,18 +44,12 @@ class SteamApp extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return string
-     */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'ix_name_ft';
     }
 
-    /**
-     * @return array
-     */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'name' => $this->name,

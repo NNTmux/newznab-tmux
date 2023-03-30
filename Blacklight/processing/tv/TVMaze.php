@@ -49,10 +49,8 @@ class TVMaze extends TV
     /**
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
-    public function processSite($groupID, $guidChar, $process, $local = false): void
+    public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVMAZE);
 
@@ -213,10 +211,9 @@ class TVMaze extends TV
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param  string  $cleanName
      * @return array|false
      */
-    protected function getShowInfo($cleanName)
+    protected function getShowInfo(string $cleanName)
     {
         $return = $response = false;
 
@@ -296,7 +293,7 @@ class TVMaze extends TV
      *
      * @param  int  $videoId  -- the local Video ID
      */
-    public function getPoster($videoId): int
+    public function getPoster(int $videoId): int
     {
         $ri = new ReleaseImage();
 
@@ -319,14 +316,9 @@ class TVMaze extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param  int  $tvMazeId
-     * @param  int  $season
-     * @param  int  $episode
-     * @param  string  $airDate
-     * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tvMazeId, $season, $episode, $airDate = '', $videoId = 0)
+    protected function getEpisodeInfo(int $tvMazeId, int $season, int $episode, string $airDate = '', int $videoId = 0)
     {
         $return = $response = false;
 

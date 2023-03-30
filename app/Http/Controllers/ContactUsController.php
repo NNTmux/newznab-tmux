@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ContactContactURequest;
 use App\Jobs\SendContactUsEmail;
 use Illuminate\Http\Request;
 
@@ -10,13 +11,9 @@ class ContactUsController extends BasePageController
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function contact(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
+    public function contact(ContactContactURequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|null
     {
         $this->setPreferences();
-        $this->validate($request, [
-            'useremail' => 'required',
-            'username' => 'required',
-        ]);
 
         if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
             $this->validate($request, [

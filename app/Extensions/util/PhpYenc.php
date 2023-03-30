@@ -25,10 +25,7 @@ namespace App\Extensions\util;
  */
 class PhpYenc
 {
-    /**
-     * @param  bool  $ignore
-     */
-    public static function decode(&$text, $ignore = false): bool|string
+    public static function decode(&$text, bool $ignore = false): bool|string
     {
         $crc = '';
         // Extract the yEnc string itself.

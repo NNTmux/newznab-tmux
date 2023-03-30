@@ -39,10 +39,8 @@ class AccountWillExpire extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->siteEmail)->subject('Account about to expire')->view('emails.accountAboutToExpire')->with(['account' => $this->user->role->name, 'username' => $this->user->username, 'site' => $this->siteTitle, 'days' => $this->days]);
     }

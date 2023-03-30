@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+use Illuminate\Http\Request;
 use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Forumpost;
@@ -107,9 +109,9 @@ class BasePageController extends Controller
         );
     }
 
-    public function isPostBack(): bool
+    public function isPostBack(Request $request): bool
     {
-        return \request()->isMethod('POST');
+        return $request->isMethod('POST');
     }
 
     /**
@@ -117,7 +119,7 @@ class BasePageController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show404($message = null)
+    public function show404($message = null): View
     {
         if ($message !== null) {
             return view('errors.404')->with('Message', $message);
@@ -129,7 +131,7 @@ class BasePageController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show403()
+    public function show403(): View
     {
         return view('errors.403');
     }
@@ -137,7 +139,7 @@ class BasePageController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show503()
+    public function show503(): View
     {
         return view('errors.503')->with('Error', 'Service temporarily unavailable');
     }
@@ -145,7 +147,7 @@ class BasePageController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showBadBoy()
+    public function showBadBoy(): View
     {
         return view('errors.badboy')->with('Message', 'This is not you account.');
     }
@@ -153,7 +155,7 @@ class BasePageController extends Controller
     /**
      * Show maintenance page.
      */
-    public function showMaintenance()
+    public function showMaintenance(): View
     {
         return view('errors.maintenance')->with('Message', 'We are performing an site maintenance.');
     }
@@ -161,15 +163,12 @@ class BasePageController extends Controller
     /**
      * Show Security token mismatch page.
      */
-    public function showTokenError()
+    public function showTokenError(): View
     {
         return view('errors.tokenError')->with('Error', 'Token mismatch');
     }
 
-    /**
-     * @param  string  $retry
-     */
-    public function show429($retry = '')
+    public function show429(string $retry = '')
     {
         abort(429, $retry);
     }

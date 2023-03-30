@@ -213,7 +213,7 @@ class RSS extends ApiController
         return DB::table($table)
             ->select([$column])
             ->where($column, '>', 0)
-            ->orderBy($order, 'asc')
+            ->orderBy($order)
             ->first();
     }
 }

@@ -8,10 +8,8 @@ class AddForeignCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::disableForeignKeyConstraints();
         Schema::table('categories', function (Blueprint $table) {
@@ -23,10 +21,8 @@ class AddForeignCategoriesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::disableForeignKeyConstraints();
         Schema::table('categories', function (Blueprint $table) {

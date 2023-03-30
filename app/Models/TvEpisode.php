@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -55,10 +56,7 @@ class TvEpisode extends Model
         return $this->belongsTo(Video::class, 'videos_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function release()
+    public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'tv_episodes_id');
     }

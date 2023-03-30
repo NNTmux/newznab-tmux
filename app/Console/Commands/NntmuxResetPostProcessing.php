@@ -48,10 +48,8 @@ class NntmuxResetPostProcessing extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         if (empty($this->option('category'))) {
             $qry = Release::query()->select(['id'])->get();

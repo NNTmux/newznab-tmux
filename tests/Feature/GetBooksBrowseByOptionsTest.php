@@ -10,7 +10,7 @@ class GetBooksBrowseByOptionsTest extends TestCase
     /**
      * @throws \Exception
      */
-    public function testBookBrowseByTest()
+    public function testBookBrowseByTest(): void
     {
         $books = (new Books())->getBrowseByOptions();
         $this->assertArrayHasKey('author', $books);

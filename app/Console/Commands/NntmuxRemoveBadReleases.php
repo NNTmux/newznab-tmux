@@ -35,11 +35,10 @@ class NntmuxRemoveBadReleases extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
      *
      * @throws \Exception
      */
-    public function handle()
+    public function handle(): void
     {
         Release::query()->where('passwordstatus', '=', -2)->delete();
 

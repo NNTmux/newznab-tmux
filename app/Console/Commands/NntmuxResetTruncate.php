@@ -36,7 +36,7 @@ class NntmuxResetTruncate extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         UsenetGroup::query()->update(['first_record' => 0, 'first_record_postdate' => null, 'last_record' => 0, 'last_record_postdate' => null, 'last_updated' => null]);
         $this->info('Reseting all groups completed.');

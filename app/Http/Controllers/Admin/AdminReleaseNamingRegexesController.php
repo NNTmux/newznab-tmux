@@ -69,7 +69,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
                     $regexes->updateRegex($request->all());
                 }
 
-                return redirect('admin/release_naming_regexes-list');
+                return redirect()->to('admin/release_naming_regexes-list');
                 break;
 
             case 'view':

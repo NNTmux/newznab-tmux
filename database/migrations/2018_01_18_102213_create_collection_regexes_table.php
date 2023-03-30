@@ -7,10 +7,8 @@ class CreateCollectionRegexesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('collection_regexes', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -29,10 +27,8 @@ class CreateCollectionRegexesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('collection_regexes');
     }

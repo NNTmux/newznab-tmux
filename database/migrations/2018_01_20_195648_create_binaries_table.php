@@ -7,10 +7,8 @@ class CreateBinariesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('binaries', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -32,10 +30,8 @@ class CreateBinariesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('binaries');
     }

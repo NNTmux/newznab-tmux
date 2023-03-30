@@ -119,10 +119,9 @@ class AniDB
     /**
      * Selects episode info for a local match.
      *
-     * @param  int  $episode
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
-    private function checkAniDBInfo($anidbId, $episode = -1)
+    private function checkAniDBInfo($anidbId, int $episode = -1)
     {
         return AnidbEpisode::query()->where(
             [
@@ -153,10 +152,9 @@ class AniDB
     /**
      * Extracts anime title and episode info from release searchname.
      *
-     * @param  string  $cleanName
      * @return array $hits
      */
-    private function extractTitleEpisode($cleanName = ''): array
+    private function extractTitleEpisode(string $cleanName = ''): array
     {
         $cleanName = str_replace('_', ' ', $cleanName);
 
@@ -194,10 +192,9 @@ class AniDB
      * Retrieves AniDB Info using a cleaned name.
      *
      *
-     * @param  string  $searchName
      * @return mixed
      */
-    private function getAnidbByName($searchName = '')
+    private function getAnidbByName(string $searchName = '')
     {
         return DB::selectOne(
             sprintf(

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Models\Forumpost;
 use App\Models\Settings;
 use Illuminate\Http\Request;
@@ -14,13 +15,13 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function forum(Request $request)
+    public function forum(Request $request): RedirectResponse
     {
         $this->setPreferences();
         if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
             Forumpost::add(0, $this->userdata->id, $request->input('addSubject'), $request->input('addMessage'));
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         $lock = $unlock = null;
@@ -36,13 +37,13 @@ class ForumController extends BasePageController
         if ($lock !== null) {
             Forumpost::lockUnlockTopic($lock, 1);
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         if ($unlock !== null) {
             Forumpost::lockUnlockTopic($unlock, 0);
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         $results = Forumpost::getBrowseRange();
@@ -68,7 +69,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function getPosts($id, Request $request)
+    public function getPosts($id, Request $request): RedirectResponse
     {
         $this->setPreferences();
 
@@ -80,7 +81,7 @@ class ForumController extends BasePageController
 
         $results = Forumpost::getPosts($id);
         if (\count($results) === 0) {
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         $meta_title = 'Forum Post';
@@ -110,10 +111,10 @@ class ForumController extends BasePageController
         if ($id !== null) {
             Forumpost::deleteParent($id);
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
-        return redirect('forum');
+        return redirect()->to('forum');
     }
 
     /**

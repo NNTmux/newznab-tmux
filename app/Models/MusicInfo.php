@@ -76,18 +76,12 @@ class MusicInfo extends Model
         return $this->belongsTo(Genre::class, 'genres_id');
     }
 
-    /**
-     * @return string
-     */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'ix_musicinfo_artist_title_ft';
     }
 
-    /**
-     * @return array
-     */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'artist' => $this->artist,
