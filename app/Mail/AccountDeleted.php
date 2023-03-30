@@ -36,7 +36,6 @@ class AccountDeleted extends Mailable
     }
 
     /**
-     *
      * @throws \Exception
      */
     public function build(): static

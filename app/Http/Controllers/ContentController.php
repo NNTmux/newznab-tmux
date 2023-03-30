@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Blacklight\Contents;
 use Illuminate\Http\Request;
 
 class ContentController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse|void
+     *
      * @throws \Exception
      */
     public function show(Request $request)

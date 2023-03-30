@@ -12,10 +12,10 @@ class RegisterRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-'g-recaptcha-response' => [
-'required',
-'captcha',
-],
-];
+            'g-recaptcha-response' => [
+                'required',
+                'captcha',
+            ],
+        ];
     }
 }

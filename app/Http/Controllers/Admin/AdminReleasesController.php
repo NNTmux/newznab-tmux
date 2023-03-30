@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Models\Release;
 use Blacklight\Releases;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminReleasesController extends BasePageController
@@ -90,7 +90,7 @@ class AdminReleasesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function destroy($id): \Illuminate\Http\RedirectResponse
+    public function destroy($id): RedirectResponse
     {
         if ($id) {
             $releases = new Releases();

@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Collection;
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Jobs\SendInviteEmail;
 use Carbon\CarbonImmutable;
 use DariusIII\Token\Facades\Token;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
@@ -368,7 +368,6 @@ class User extends Authenticatable
     }
 
     /**
-     *
      * @throws \Throwable
      */
     public static function getRange($start, $offset, $orderBy, string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false): Collection

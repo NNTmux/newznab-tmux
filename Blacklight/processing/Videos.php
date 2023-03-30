@@ -40,9 +40,6 @@ abstract class Videos
 
     protected const TYPE_ANIME = 2; // Type of video is a Anime
 
-    /**
-     * @var bool
-     */
     public bool $echooutput;
 
     /**
@@ -70,19 +67,12 @@ abstract class Videos
     /**
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
-     *
-     * @param int $groupID
-     * @param string $guidChar
-     * @param $process
-     * @param bool $local
      */
     abstract protected function processSite(int $groupID, string $guidChar, int $process, bool $local = false): void;
 
     /**
      * Get video info from a Video ID and column.
      *
-     * @param string $siteColumn
-     * @param int $videoID
      * @return array|false False if invalid site, or ID not found; Site id value otherwise.
      */
     protected function getSiteIDFromVideoID(string $siteColumn, int $videoID): bool|array
@@ -99,7 +89,6 @@ abstract class Videos
     /**
      * Get TV show local timezone from a Video ID.
      *
-     * @param int $videoID
      * @return string Empty string if no query return or tz style timezone
      */
     protected function getLocalZoneFromVideoID(int $videoID): string
@@ -111,11 +100,6 @@ abstract class Videos
 
     /**
      * Get video info from a Site ID and column.
-     *
-     *
-     * @param string $siteColumn
-     * @param int $siteID
-     * @return bool|int
      */
     protected function getVideoIDFromSiteID(string $siteColumn, int $siteID): bool|int
     {
@@ -128,7 +112,6 @@ abstract class Videos
     }
 
     /**
-     * @param int $source
      * @return $this|array|bool|false|\Illuminate\Database\Eloquent\Model|mixed|null
      */
     public function getByTitle(string $title, $type, int $source = 0): mixed
@@ -199,10 +182,6 @@ abstract class Videos
         return false;
     }
 
-    /**
-     * @param int $source
-     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
-     */
     public function getTitleExact(string $title, int $type, int $source = 0): \Illuminate\Database\Eloquent\Model|bool|null|static
     {
         $return = false;
@@ -236,7 +215,6 @@ abstract class Videos
     /**
      * Supplementary function for getByTitle that queries for a like match.
      *
-     * @param int $source
      * @return array|false
      */
     public function getTitleLoose($title, $type, int $source = 0): bool|array
@@ -276,9 +254,6 @@ abstract class Videos
     /**
      * Supplementary function for getByTitle that replaces special chars to find an exact match.
      * Add more ->whereRaw() methods if needed. Might slow TV PP down though.
-     *
-     * @param int $source
-     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public function getAlternativeTitleExact(string $title, int $type, int $source = 0): \Illuminate\Database\Eloquent\Model|bool|null|static
     {

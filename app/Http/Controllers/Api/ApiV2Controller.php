@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\RedirectResponse;
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
@@ -17,6 +16,7 @@ use App\Transformers\DetailsTransformer;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 

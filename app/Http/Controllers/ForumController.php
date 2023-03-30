@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use App\Models\Forumpost;
 use App\Models\Settings;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -104,7 +104,7 @@ class ForumController extends BasePageController
         $this->pagerender();
     }
 
-    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $id = $request->input('id') + 0;
 
@@ -152,7 +152,7 @@ class ForumController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function destroy($id): \Illuminate\Http\RedirectResponse
+    public function destroy($id): RedirectResponse
     {
         $this->setPreferences();
 

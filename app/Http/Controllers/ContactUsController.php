@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactContactURequest;
 use App\Jobs\SendContactUsEmail;
-use Illuminate\Http\Request;
 
 class ContactUsController extends BasePageController
 {

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Jobs\SendAccountChangedEmail;
 use App\Models\Invitation;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
@@ -212,7 +212,7 @@ class AdminUserController extends BasePageController
         $this->adminrender();
     }
 
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
@@ -232,7 +232,7 @@ class AdminUserController extends BasePageController
     /**
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
-    public function resendVerification(Request $request): \Illuminate\Http\RedirectResponse
+    public function resendVerification(Request $request): RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
@@ -246,7 +246,7 @@ class AdminUserController extends BasePageController
         return redirect()->back()->with('error', 'User is invalid');
     }
 
-    public function verify(Request $request): \Illuminate\Http\RedirectResponse
+    public function verify(Request $request): RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));

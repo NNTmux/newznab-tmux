@@ -284,7 +284,6 @@ class Tmux
     }
 
     /**
-     *
      * @throws \Exception
      */
     public function proc_query($qry, $bookreqids, string $db_name, string $ppmax = '', string $ppmin = ''): bool|string

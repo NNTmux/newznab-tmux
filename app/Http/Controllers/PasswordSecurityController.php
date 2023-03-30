@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Disable2faPasswordSecurityRequest;
 use App\Models\PasswordSecurity;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class PasswordSecurityController extends Controller

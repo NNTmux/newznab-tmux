@@ -401,7 +401,6 @@ class Music
     }
 
     /**
-     *
      * @throws \Exception
      */
     public function processMusicReleases(bool $local = false)

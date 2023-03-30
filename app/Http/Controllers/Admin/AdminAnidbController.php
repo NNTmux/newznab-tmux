@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\BasePageController;
 use App\Models\Release;
 use Blacklight\AniDB;
+use Illuminate\Http\Request;
 
 class AdminAnidbController extends BasePageController
 {

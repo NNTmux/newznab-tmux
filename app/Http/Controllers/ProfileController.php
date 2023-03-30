@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
 use App\Models\Settings;
@@ -10,6 +9,7 @@ use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
 use Blacklight\utility\Utility;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -267,7 +267,7 @@ class ProfileController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function destroy(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Illuminate\Http\RedirectResponse
+    public function destroy(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Routing\Redirector|\Illuminate\View\View|RedirectResponse
     {
         $this->setPreferences();
         $userId = $request->input('id');

@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
 use Blacklight\NZB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -309,7 +309,6 @@ class Release extends Model
     }
 
     /**
-     *
      * @throws \Exception
      */
     public static function updateGrab(string $guid): void

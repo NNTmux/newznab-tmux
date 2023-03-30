@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use Blacklight\Contents;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminContentController extends BasePageController
@@ -109,7 +109,7 @@ class AdminContentController extends BasePageController
         $this->adminrender();
     }
 
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if ($request->has('id')) {
             $contents = new Contents();

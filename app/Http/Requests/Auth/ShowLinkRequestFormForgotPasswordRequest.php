@@ -12,8 +12,8 @@ class ShowLinkRequestFormForgotPasswordRequest extends FormRequest
     public function rules(): array
     {
         return ['g-recaptcha-response' => [
-                'required',
-                'captcha',
-            ],];
+            'required',
+            'captcha',
+        ], ];
     }
 }

@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -50,7 +49,6 @@ class LoginController extends Controller
     }
 
     /**
-     *
      * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -124,10 +122,11 @@ class LoginController extends Controller
         $meta_description = 'Login';
         $content = app('smarty.view')->fetch($theme.'/login.tpl');
         app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
+
         return app('smarty.view')->display($theme.'/basepage.tpl');
     }
 
-    public function logout(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function logout(Request $request): \Illuminate\Routing\Redirector|RedirectResponse
     {
         $this->guard()->logout();
 

@@ -10,7 +10,6 @@ use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 

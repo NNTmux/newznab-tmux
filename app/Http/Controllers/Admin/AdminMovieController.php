@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use Blacklight\Movie;
 use Blacklight\utility\Utility;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminMovieController extends BasePageController
@@ -81,7 +81,7 @@ class AdminMovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function edit(Request $request): \Illuminate\Routing\Redirector|RedirectResponse
     {
         $this->setAdminPrefs();
 

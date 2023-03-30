@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Models\Invitation;
 use App\Models\Settings;
 use App\Models\User;

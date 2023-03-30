@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Blacklight\ColorCLI;
 use Blacklight\NNTP;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 /**

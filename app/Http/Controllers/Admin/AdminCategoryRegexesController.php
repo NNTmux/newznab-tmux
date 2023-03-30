@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use Blacklight\Regexes;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminCategoryRegexesController extends BasePageController

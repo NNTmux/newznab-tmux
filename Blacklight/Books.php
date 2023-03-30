@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
@@ -10,6 +9,7 @@ use App\Models\Settings;
 use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 use DariusIII\ItunesApi\iTunes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 

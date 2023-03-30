@@ -241,7 +241,6 @@ class NZBImport
     }
 
     /**
-     *
      * @throws \Exception
      */
     protected function scanNZBFile(&$nzbXML, bool $useNzbName = false): bool

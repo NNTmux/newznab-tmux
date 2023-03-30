@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Requests\Auth\ShowLinkRequestFormForgotPasswordRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ShowLinkRequestFormForgotPasswordRequest;
 use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\Settings;
 use App\Models\User;
 use DariusIII\Token\Facades\Token;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
-use Illuminate\Http\Request;
 
 class ForgotPasswordController extends Controller
 {

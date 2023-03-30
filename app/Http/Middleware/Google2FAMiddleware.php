@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Http\Request;
 use App\Support\Google2FAAuthenticator;
 use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class Google2FAMiddleware
 {
