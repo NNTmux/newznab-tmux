@@ -387,7 +387,7 @@ class Release extends Model
             ->selectRaw('SUM(grabs) as grabs')
             ->groupBy('id', 'searchname', 'adddate')
             ->havingRaw('SUM(grabs) > 0')
-            ->orderBy('grabs', 'desc')
+            ->orderByDesc('grabs')
             ->limit(10)
             ->get();
 
@@ -412,7 +412,7 @@ class Release extends Model
             ->selectRaw('SUM(comments) AS comments')
             ->groupBy('id', 'searchname', 'adddate')
             ->havingRaw('SUM(comments) > 0')
-            ->orderBy('comments', 'desc')
+            ->orderByDesc('comments')
             ->limit(10)
             ->get();
 
@@ -548,7 +548,7 @@ class Release extends Model
             ->rightJoin('dnzb_failures', 'dnzb_failures.release_id', '=', 'releases.id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
-            ->orderBy('postdate', 'desc');
+            ->orderByDesc('postdate');
 
         return $failedList->paginate(config('nntmux.items_per_page'));
     }
@@ -578,7 +578,7 @@ class Release extends Model
                 return false;
             }
 
-            return self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->whereIn('releases.id', $searchResult)->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderBy('releases.postdate', 'desc')->first(['guid']);
+            return self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->whereIn('releases.id', $searchResult)->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderByDesc('releases.postdate')->first(['guid']);
         }
 
         return false;

@@ -81,7 +81,7 @@ class UserDownload extends Model
      */
     public static function getDownloadRequestsForUser($userID)
     {
-        return self::whereUsersId($userID)->with('release')->orderBy('timestamp', 'DESC')->get();
+        return self::whereUsersId($userID)->with('release')->orderByDesc('timestamp')->get();
     }
 
     /**

@@ -97,7 +97,7 @@ class ReleaseComment extends Model
      */
     public static function getComments($id)
     {
-        return self::query()->where('releases_id', $id)->orderBy('created_at', 'desc')->get()->toArray();
+        return self::query()->where('releases_id', $id)->orderByDesc('created_at')->get()->toArray();
     }
 
     public static function getCommentCount(): int
@@ -162,7 +162,7 @@ class ReleaseComment extends Model
         $range = self::query()
             ->select(['release_comments.*', 'releases.guid'])
             ->leftJoin('releases', 'releases.id', '=', 'release_comments.releases_id')
-            ->orderBy('release_comments.created_at', 'desc');
+            ->orderByDesc('release_comments.created_at');
 
         return $range->paginate(config('nntmux.items_per_page'));
     }
@@ -196,7 +196,7 @@ class ReleaseComment extends Model
             ->join('releases as r', 'r.id', '=', 'release_comments.releases_id')
             ->leftJoin('users as u', 'u.id', '=', 'release_comments.users_id')
             ->where('users_id', $uid)
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->paginate(config('nntmux.items_per_page'));
     }
 }

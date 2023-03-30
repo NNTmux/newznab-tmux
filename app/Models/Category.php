@@ -301,7 +301,7 @@ class Category extends Model
             ->select(['root_categories_id', DB::raw('COUNT(r.id) as count'), 'title'])
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
             ->groupBy('title')
-            ->orderBy('count', 'desc')
+            ->orderByDesc('count')
             ->get();
 
         Cache::put(md5('RecentlyAdded'), $result, $expiresAt);

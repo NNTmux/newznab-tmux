@@ -147,7 +147,7 @@ class Forumpost extends Model
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
             ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
             ->select(['forumpost.*', 'users.username', 'roles.name as rolename'])
-            ->orderBy('forumpost.updated_at', 'desc')
+            ->orderByDesc('forumpost.updated_at')
             ->paginate(config('nntmux.items_per_page'));
     }
 
@@ -201,7 +201,7 @@ class Forumpost extends Model
             ->where('forumpost.users_id', $uid)
             ->select(['forumpost.*', 'users.username'])
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
-            ->orderBy('forumpost.created_at', 'desc');
+            ->orderByDesc('forumpost.created_at');
         if ($start !== false) {
             $range->limit($num)->offset($start);
         }

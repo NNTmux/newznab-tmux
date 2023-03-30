@@ -199,7 +199,7 @@ class AdminSiteController extends BasePageController
         $usersbymonth = User::getUsersByMonth();
         $this->smarty->assign('usersbymonth', $usersbymonth);
 
-        $usersbyrole = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderBy('users_count', 'desc')->get();
+        $usersbyrole = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderByDesc('users_count')->get();
         $this->smarty->assign('usersbyrole', $usersbyrole);
         $this->smarty->assign('totusers', 0);
         $this->smarty->assign('totrusers', 0);

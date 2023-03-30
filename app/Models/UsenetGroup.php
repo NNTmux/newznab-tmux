@@ -149,7 +149,7 @@ class UsenetGroup extends Model
                 return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('name')->get();
                 break;
             case 'date':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('first_record_postdate', 'DESC')->get();
+                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderByDesc('first_record_postdate')->get();
                 break;
             default:
                 return [];

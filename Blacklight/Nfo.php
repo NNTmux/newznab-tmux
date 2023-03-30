@@ -265,7 +265,7 @@ class Nfo
 
         $res = $qry
             ->orderBy('nfostatus')
-            ->orderBy('postdate', 'desc')
+            ->orderByDesc('postdate')
             ->limit($this->nzbs)
             ->get(['id', 'guid', 'groups_id', 'name']);
 
