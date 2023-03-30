@@ -15,8 +15,8 @@ class BtcPaymentController extends BasePageController
     public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
     {
         $this->setPreferences();
-        $gateway_id = env('MYCELIUM_GATEWAY_ID');
-        $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
+        $gateway_id = config('settings.mycelium_gateway_id');
+        $gateway_secret = config('settings.mycelium_gateway_secret');
 
         $action = $request->input('action') ?? 'view';
         $donation = Role::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
@@ -63,8 +63,8 @@ class BtcPaymentController extends BasePageController
      */
     public function callback(): void
     {
-        $gateway_id = env('MYCELIUM_GATEWAY_ID');
-        $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
+        $gateway_id = config('settings.mycelium_gateway_id');
+        $gateway_secret = config('settings.mycelium_gateway_secret');
 
         $geary = new Geary($gateway_id, $gateway_secret);
         $order = $geary->check_order_callback();

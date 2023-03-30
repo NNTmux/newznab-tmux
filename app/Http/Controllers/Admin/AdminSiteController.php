@@ -164,7 +164,7 @@ class AdminSiteController extends BasePageController
 
         $this->smarty->assign('themelist', Utility::getThemesList());
 
-        if (! str_contains(env('NNTP_SERVER'), 'astra')) {
+        if (! str_contains(config('settings.nntp_server'), 'astra')) {
             $this->smarty->assign('compress_headers_warning', 'compress_headers_warning');
         }
 

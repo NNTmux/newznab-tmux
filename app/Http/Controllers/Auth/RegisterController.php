@@ -232,7 +232,7 @@ class RegisterController extends Controller
         app('smarty.view')->assign('invite_code_query', $this->inviteCodeQuery);
         $theme = Settings::settingValue('site.main.style');
 
-        $nocaptcha = env('NOCAPTCHA_ENABLED');
+        $nocaptcha = config('settings.nocaptcha_enabled');
 
         $meta_title = 'Register';
         $meta_keywords = 'register,signup,registration';
