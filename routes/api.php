@@ -15,17 +15,17 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\ApiInformController;
 use App\Http\Controllers\Api\ApiV2Controller;
 
-Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
+Route::prefix('v1')->namespace('Api')->group(function () {
     Route::get('api', [ApiController::class, 'api']);
     Route::post('api', [ApiController::class, 'api']);
 });
 
-Route::group(['prefix' => 'v2', 'namespace' => 'Api'], function () {
+Route::prefix('v2')->namespace('Api')->group(function () {
     Route::get('capabilities', [ApiV2Controller::class, 'capabilities']);
     Route::post('capabilities', [ApiV2Controller::class, 'capabilities']);
 });
 
-Route::group(['prefix' => 'v2', 'namespace' => 'Api', 'middleware' => ['auth:api', 'throttle:rate_limit,1']], function () {
+Route::prefix('v2')->namespace('Api')->middleware('auth:api', 'throttle:rate_limit,1')->group(function () {
     Route::get('movies', [ApiV2Controller::class, 'movie']);
     Route::post('movies', [ApiV2Controller::class, 'movie']);
     Route::get('search', [ApiV2Controller::class, 'apiSearch']);
@@ -38,7 +38,7 @@ Route::group(['prefix' => 'v2', 'namespace' => 'Api', 'middleware' => ['auth:api
     Route::post('details', [ApiV2Controller::class, 'details']);
 });
 
-Route::group(['prefix' => 'inform', 'namespace' => 'Api', 'middleware' => ['auth:api']], function () {
+Route::prefix('inform')->namespace('Api')->middleware('auth:api')->group(function () {
     Route::get('release', [ApiInformController::class, 'release']);
     Route::post('release', [ApiInformController::class, 'release']);
 });
