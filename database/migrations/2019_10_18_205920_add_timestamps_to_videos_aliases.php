@@ -11,7 +11,7 @@ class AddTimestampsToVideosAliases extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('videos_aliases', function (Blueprint $table) {
             $table->timestamps();
@@ -23,7 +23,7 @@ class AddTimestampsToVideosAliases extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('videos_aliases', function (Blueprint $table) {
             $table->timestamps();

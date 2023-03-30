@@ -41,7 +41,7 @@ class ForgottenPassword extends Mailable
      *
      * @throws \Exception
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->siteEmail)->subject('Forgotten password reset')->view('emails.forgottenPassword')->with(['resetLink' => $this->resetLink, 'site' => $this->siteTitle]);
     }

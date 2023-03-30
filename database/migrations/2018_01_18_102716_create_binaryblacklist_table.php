@@ -10,7 +10,7 @@ class CreateBinaryblacklistTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('binaryblacklist', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -34,7 +34,7 @@ class CreateBinaryblacklistTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('binaryblacklist');
     }

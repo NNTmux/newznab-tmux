@@ -11,7 +11,7 @@ class UpdateUserMoviesTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('user_movies', function (Blueprint $table) {
             $table->string('imdbid', 100)->change();
@@ -23,7 +23,7 @@ class UpdateUserMoviesTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('user_movies', function (Blueprint $table) {
             $table->unsignedMediumInteger('imdbid')->change();

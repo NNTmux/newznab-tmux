@@ -216,7 +216,7 @@ class Movie
      * @param  int  $maxAge
      * @return array|mixed
      */
-    public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
+    public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
@@ -381,7 +381,7 @@ class Movie
      *
      * @throws \Exception
      */
-    public function getTrailer($imdbId)
+    public function getTrailer(int $imdbId)
     {
         $trailer = MovieInfo::query()->where('imdbid', $imdbId)->where('trailer', '<>', '')->first(['trailer']);
         if ($trailer !== null) {
@@ -411,7 +411,7 @@ class Movie
      * @param  array  $data
      * @return mixed
      */
-    public function parseTraktTv(&$data)
+    public function parseTraktTv(array &$data)
     {
         if (empty($data['ids']['imdb'])) {
             return false;
@@ -521,7 +521,7 @@ class Movie
      * @param  string  $variable5
      * @return array|string
      */
-    protected function setVariables($variable1, $variable2, $variable3, $variable4, $variable5)
+    protected function setVariables(string $variable1, string $variable2, string $variable3, string $variable4, string $variable5)
     {
         if (! empty($variable1)) {
             return $variable1;
@@ -744,7 +744,7 @@ class Movie
      * @param  bool  $text
      * @return array|false
      */
-    public function fetchTMDBProperties($imdbId, $text = false)
+    public function fetchTMDBProperties($imdbId, bool $text = false)
     {
         $lookupId = $text === false && (\strlen($imdbId) === 7 || strlen($imdbId) === 8) ? 'tt'.$imdbId : $imdbId;
 
@@ -1005,7 +1005,7 @@ class Movie
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      * @throws \Exception
      */
-    public function fetchItunesMovieProperties($title)
+    public function fetchItunesMovieProperties(string $title)
     {
         $movie = true;
         try {
@@ -1046,7 +1046,7 @@ class Movie
      *
      * @throws \Exception
      */
-    public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
+    public function doMovieUpdate(string $buffer, string $service, int $id, int $processImdb = 1): string
     {
         $imdbId = false;
         if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $hits)) {
@@ -1092,7 +1092,7 @@ class Movie
      *
      * @throws \Exception
      */
-    public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1): void
+    public function processMovieReleases(string $groupID = '', string $guidChar = '', int $lookupIMDB = 1): void
     {
         if ($lookupIMDB === 0) {
             return;
@@ -1280,7 +1280,7 @@ class Movie
      *
      * @param  string  $releaseName
      */
-    protected function parseMovieSearchName($releaseName): bool
+    protected function parseMovieSearchName(string $releaseName): bool
     {
         $name = $year = '';
         $followingList = '[^\w]((1080|480|720)p|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[ ._-]?264|xvid)[^\w]';

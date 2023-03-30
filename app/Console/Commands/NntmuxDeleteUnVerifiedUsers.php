@@ -36,7 +36,7 @@ class NntmuxDeleteUnVerifiedUsers extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Deleting unverified users.');
         User::deleteUnVerified();

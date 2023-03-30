@@ -405,7 +405,7 @@ class Music
      *
      * @throws \Exception
      */
-    public function processMusicReleases($local = false)
+    public function processMusicReleases(bool $local = false)
     {
         $res = DB::select(
             sprintf(
@@ -484,7 +484,7 @@ class Music
      * @param  string  $releaseName
      * @return array|false
      */
-    public function parseArtist($releaseName)
+    public function parseArtist(string $releaseName)
     {
         if (preg_match('/(.+?)(\d{1,2} \d{1,2} )?\(?(19\d{2}|20[0-1][\d])\b/', $releaseName, $name)) {
             $result = [];
@@ -624,7 +624,7 @@ class Music
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      * @throws \Exception
      */
-    protected function fetchItunesMusicProperties($title)
+    protected function fetchItunesMusicProperties(string $title)
     {
         $mus = true;
         // Load genres.

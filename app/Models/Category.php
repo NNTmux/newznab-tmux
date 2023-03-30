@@ -270,7 +270,7 @@ class Category extends Model
     /**
      * @return HasMany
      */
-    public function releases()
+    public function releases(): HasMany
     {
         return $this->hasMany(Release::class, 'categories_id');
     }
@@ -278,7 +278,7 @@ class Category extends Model
     /**
      * @return BelongsTo
      */
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(RootCategory::class, 'root_categories_id');
     }
@@ -311,7 +311,7 @@ class Category extends Model
     /**
      * @return string
      */
-    public static function getCategorySearch(array $cat = [])
+    public static function getCategorySearch(array $cat = []): string
     {
         $categories = [];
         // If multiple categories were sent in a single array position, slice and add them

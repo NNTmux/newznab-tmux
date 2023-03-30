@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +17,7 @@ class ClearanceMiddleware
      *
      * @throws \Exception
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
 

@@ -10,7 +10,7 @@ class CreateShortGroupsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('short_groups', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -29,7 +29,7 @@ class CreateShortGroupsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('short_groups');
     }

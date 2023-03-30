@@ -40,7 +40,7 @@ class AccountDeleted extends Mailable
      *
      * @throws \Exception
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->siteEmail)->subject('User Account Deleted')->view('emails.accountDelete')->with(['username' => $this->user->username, 'site' => $this->siteTitle]);
     }

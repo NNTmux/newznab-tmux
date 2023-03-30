@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -68,7 +70,7 @@ class ReleaseComment extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function release()
+    public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
@@ -76,7 +78,7 @@ class ReleaseComment extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }
@@ -95,7 +97,7 @@ class ReleaseComment extends Model
     /**
      * @return array
      */
-    public static function getComments($id)
+    public static function getComments($id): array
     {
         return self::query()->where('releases_id', $id)->orderByDesc('created_at')->get()->toArray();
     }
@@ -157,7 +159,7 @@ class ReleaseComment extends Model
      *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getCommentsRange()
+    public static function getCommentsRange(): LengthAwarePaginator
     {
         $range = self::query()
             ->select(['release_comments.*', 'releases.guid'])
@@ -189,7 +191,7 @@ class ReleaseComment extends Model
     /**
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getCommentsForUserRange($uid)
+    public static function getCommentsForUserRange($uid): LengthAwarePaginator
     {
         return self::query()
             ->select(['release_comments.*', 'r.guid', 'r.searchname', 'u.username'])

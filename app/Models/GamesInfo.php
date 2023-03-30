@@ -68,7 +68,7 @@ class GamesInfo extends Model
     /**
      * @return string
      */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'ix_title_ft';
     }
@@ -76,7 +76,7 @@ class GamesInfo extends Model
     /**
      * @return array
      */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'title' => $this->title,

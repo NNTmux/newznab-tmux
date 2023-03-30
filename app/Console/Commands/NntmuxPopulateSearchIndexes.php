@@ -36,7 +36,7 @@ class NntmuxPopulateSearchIndexes extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         if ($this->option('releases') && $this->option('manticore')) {
             $this->manticoreReleases();
@@ -146,7 +146,7 @@ class NntmuxPopulateSearchIndexes extends Command
     /**
      * @return void
      */
-    private function elasticReleases()
+    private function elasticReleases(): void
     {
         $elastic = new ElasticSearchSiteSearch();
         $total = Release::count();
@@ -192,7 +192,7 @@ class NntmuxPopulateSearchIndexes extends Command
     /**
      * @return void
      */
-    private function elasticPreDB()
+    private function elasticPreDB(): void
     {
         $elastic = new ElasticSearchSiteSearch();
         $total = Predb::count();

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -50,7 +51,7 @@ class PredbHash extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function predb()
+    public function predb(): BelongsTo
     {
         return $this->belongsTo(Predb::class, 'predb_id');
     }

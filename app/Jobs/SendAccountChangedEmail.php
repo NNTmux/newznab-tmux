@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use App\Mail\AccountChange;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,7 +25,7 @@ class SendAccountChangedEmail implements ShouldQueue
      *
      * @param  \App\Models\User  $user
      */
-    public function __construct($user)
+    public function __construct(User $user)
     {
         $this->user = $user;
     }
@@ -34,7 +35,7 @@ class SendAccountChangedEmail implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         Mail::to($this->user->email)->send(new AccountChange($this->user));
     }

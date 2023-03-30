@@ -12,7 +12,7 @@ class CategoryRegexesTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         DB::table('category_regexes')->delete();
 

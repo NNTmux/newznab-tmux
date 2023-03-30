@@ -70,7 +70,7 @@ class ReleaseExtra
     /**
      * @param  string  $guid
      */
-    public function getBriefByGuid($guid): array
+    public function getBriefByGuid(string $guid): array
     {
         return DB::select(sprintf("SELECT containerformat, videocodec, videoduration, videoaspect,
                         CONCAT(video_data.videowidth,'x',video_data.videoheight,' @',format(videoframerate,0),'fps') AS size,
@@ -322,7 +322,7 @@ class ReleaseExtra
      * @param  int  $releaseID
      * @param  string  $uniqueId
      */
-    public function addUID($releaseID, $uniqueId): void
+    public function addUID(int $releaseID, string $uniqueId): void
     {
         $dupecheck = ReleaseUnique::query()->where('releases_id', $releaseID)->orWhere([
             'releases_id' => $releaseID,

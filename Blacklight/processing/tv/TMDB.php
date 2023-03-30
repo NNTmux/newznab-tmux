@@ -44,7 +44,7 @@ class TMDB extends TV
      *
      * @param  bool  $local
      */
-    public function processSite($groupID, $guidChar, $process, $local = false): void
+    public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
@@ -186,7 +186,7 @@ class TMDB extends TV
      * @param  string  $cleanName
      * @return array|false
      */
-    protected function getShowInfo($cleanName): bool|array
+    protected function getShowInfo(string $cleanName): bool|array
     {
         $return = $response = false;
 
@@ -261,7 +261,7 @@ class TMDB extends TV
      *
      * @param  int  $videoId  -- the local Video ID
      */
-    public function getPoster($videoId): int
+    public function getPoster(int $videoId): int
     {
         $ri = new ReleaseImage();
 
@@ -291,7 +291,7 @@ class TMDB extends TV
      * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tmdbid, $season, $episode, $airdate = '', $videoId = 0): bool|array
+    protected function getEpisodeInfo(int $tmdbid, int $season, int $episode, string $airdate = '', int $videoId = 0): bool|array
     {
         $return = false;
 

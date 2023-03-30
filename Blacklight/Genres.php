@@ -41,7 +41,7 @@ class Genres
      * @param  bool  $activeOnly
      * @return array|mixed
      */
-    public function getGenres($type = '', $activeOnly = false)
+    public function getGenres(string $type = '', bool $activeOnly = false)
     {
         $sql = $this->getListQuery($type, $activeOnly);
         $genres = Cache::get(md5($sql));
@@ -70,7 +70,7 @@ class Genres
      * @param  string  $type
      * @param  bool  $activeOnly
      */
-    private function getListQuery($type = '', $activeOnly = false): string
+    private function getListQuery(string $type = '', bool $activeOnly = false): string
     {
         if (! empty($type)) {
             $typesql = sprintf(' AND g.type = %d', $type);

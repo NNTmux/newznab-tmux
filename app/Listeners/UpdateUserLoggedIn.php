@@ -22,7 +22,7 @@ class UpdateUserLoggedIn
      *
      * @return void
      */
-    public function handle(UserLoggedIn $event)
+    public function handle(UserLoggedIn $event): void
     {
         User::find($event->user->id)->update(
             [

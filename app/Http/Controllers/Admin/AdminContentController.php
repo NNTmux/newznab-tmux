@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use Blacklight\Contents;
@@ -32,7 +33,7 @@ class AdminContentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): RedirectResponse
     {
         $this->setAdminPrefs();
         $contents = new Contents();

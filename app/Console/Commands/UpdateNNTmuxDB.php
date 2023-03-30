@@ -28,7 +28,7 @@ class UpdateNNTmuxDB extends Command
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): void
     {
         // also prevent web access.
         $this->output->writeln('<info>Updating database</info>');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
@@ -35,7 +36,7 @@ class AdminMovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): RedirectResponse
     {
         if (! \defined('STDOUT')) {
             \define('STDOUT', fopen('php://stdout', 'wb'));

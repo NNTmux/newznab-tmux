@@ -35,7 +35,7 @@ class Country
      * @param  string  $country
      * @return mixed
      */
-    public static function countryCode($country)
+    public static function countryCode(string $country)
     {
         if (\strlen($country) > 2) {
             $code = CountryModel::whereFullName($country)->orWhere('name', $country)->first(['iso_3166_2']);

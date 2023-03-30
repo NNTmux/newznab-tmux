@@ -38,7 +38,7 @@ class NntmuxResetDb extends Command
     /**
      * @throws \Exception
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
             $timestart = now();

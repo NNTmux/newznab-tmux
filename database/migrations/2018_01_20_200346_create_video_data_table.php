@@ -10,7 +10,7 @@ class CreateVideoDataTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('video_data', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -36,7 +36,7 @@ class CreateVideoDataTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('video_data');
     }

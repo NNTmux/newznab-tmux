@@ -79,7 +79,7 @@ class MusicInfo extends Model
     /**
      * @return string
      */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'ix_musicinfo_artist_title_ft';
     }
@@ -87,7 +87,7 @@ class MusicInfo extends Model
     /**
      * @return array
      */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'artist' => $this->artist,

@@ -10,7 +10,7 @@ class CreateUsenetGroupsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('usenet_groups', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -39,7 +39,7 @@ class CreateUsenetGroupsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('groups');
     }

@@ -144,7 +144,7 @@ class NZBContents
      *
      * @throws \Exception
      */
-    public function parseNZB($guid, $relID, $groupID, $nfoCheck = false)
+    public function parseNZB($guid, $relID, $groupID, bool $nfoCheck = false)
     {
         $nzbFile = $this->LoadNZB($guid);
         if ($nzbFile !== false) {
@@ -251,7 +251,7 @@ class NZBContents
      *
      * @throws \Exception
      */
-    public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show): bool
+    public function checkPAR2(string $guid, int $relID, int $groupID, int $nameStatus, int $show): bool
     {
         $nzbFile = $this->LoadNZB($guid);
         if ($nzbFile !== false) {

@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use Illuminate\Database\Eloquent\Model;
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
@@ -95,7 +96,7 @@ class Books
     /**
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function getBookInfoByName($title)
+    public function getBookInfoByName($title): Model
     {
         //only used to get a count of words
         $searchWords = '';

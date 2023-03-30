@@ -42,7 +42,7 @@ class NewAccountCreatedEmail extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->siteEmail)->subject('New account registered')->view('emails.newAccountCreated')->with(['username' => $this->user->username, 'site' => $this->siteTitle]);
     }

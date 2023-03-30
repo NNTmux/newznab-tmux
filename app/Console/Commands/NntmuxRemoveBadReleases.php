@@ -39,7 +39,7 @@ class NntmuxRemoveBadReleases extends Command
      *
      * @throws \Exception
      */
-    public function handle()
+    public function handle(): void
     {
         Release::query()->where('passwordstatus', '=', -2)->delete();
 

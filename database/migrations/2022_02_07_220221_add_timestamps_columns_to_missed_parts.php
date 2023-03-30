@@ -11,7 +11,7 @@ class AddTimestampsColumnsToMissedParts extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('missed_parts', function (Blueprint $table) {
             $table->timestamps();
@@ -23,7 +23,7 @@ class AddTimestampsColumnsToMissedParts extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('missed_parts', function (Blueprint $table) {
             $table->timestamps();

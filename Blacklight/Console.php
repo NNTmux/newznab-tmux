@@ -125,7 +125,7 @@ class Console
      * @param  string  $platform
      * @return false|\Illuminate\Database\Eloquent\Model
      */
-    public function getConsoleInfoByName($title, $platform)
+    public function getConsoleInfoByName(string $title, string $platform)
     {
         //only used to get a count of words
         $searchWords = '';
@@ -300,7 +300,7 @@ class Console
     /**
      * @param  string  $review
      */
-    public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genres_id, $review = 'review'): void
+    public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genres_id, string $review = 'review'): void
     {
         $releasedate = $releasedate !== '' ? $releasedate : 'null';
         $review = $review === 'review' ? $review : substr($review, 0, 3000);
@@ -515,7 +515,7 @@ class Console
      *
      * @param  string  $platform
      */
-    protected function _replacePlatform($platform): string
+    protected function _replacePlatform(string $platform): string
     {
         switch (strtoupper($platform)) {
             case 'X360':

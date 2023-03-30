@@ -88,7 +88,7 @@ class Nfo
      * @param  string  $str  The string with a Show ID.
      * @return array|false Return array with show ID and site source or false on failure.
      */
-    public function parseShowId($str)
+    public function parseShowId(string $str)
     {
         $return = false;
 
@@ -128,7 +128,7 @@ class Nfo
      *
      * @throws \Exception
      */
-    public function isNFO(&$possibleNFO, $guid): bool
+    public function isNFO(&$possibleNFO, string $guid): bool
     {
         if ($possibleNFO === false) {
             return false;
@@ -195,7 +195,7 @@ class Nfo
      *
      * @throws \Exception
      */
-    public function addAlternateNfo(&$nfo, $release, $nntp): bool
+    public function addAlternateNfo(string &$nfo, $release, NNTP $nntp): bool
     {
         if ($release->id > 0 && $this->isNFO($nfo, $release->guid)) {
             $check = ReleaseNfo::whereReleasesId($release->id)->first(['releases_id']);
@@ -240,7 +240,7 @@ class Nfo
      *
      * @throws \Exception
      */
-    public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1): int
+    public function processNfoFiles($nntp, string $groupID = '', string $guidChar = '', int $processImdb = 1, int $processTv = 1): int
     {
         $ret = 0;
 

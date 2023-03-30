@@ -11,7 +11,7 @@ class Disable2faPasswordSecurityRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return ['current-password' => [
                 'required',

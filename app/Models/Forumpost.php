@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -59,7 +60,7 @@ class Forumpost extends Model
      * @param  int  $sticky
      * @param  int  $replies
      */
-    public static function add($parentId, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0): int
+    public static function add($parentId, $userid, $subject, $message, int $locked = 0, int $sticky = 0, int $replies = 0): int
     {
         if ($message === '') {
             return -1;
@@ -140,7 +141,7 @@ class Forumpost extends Model
      * @param $start
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getBrowseRange()
+    public static function getBrowseRange(): LengthAwarePaginator
     {
         return self::query()
             ->where('forumpost.parentid', '=', 0)

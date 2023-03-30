@@ -11,7 +11,7 @@ class RemoveTextHash extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('release_comments', function (Blueprint $table) {
             $sm = Schema::getConnection()->getDoctrineSchemaManager();
@@ -30,7 +30,7 @@ class RemoveTextHash extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('release_comments', function (Blueprint $table) {
             $table->string('text_hash', 32)->default('');

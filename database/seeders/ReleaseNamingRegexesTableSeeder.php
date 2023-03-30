@@ -12,7 +12,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         DB::table('release_naming_regexes')->delete();
 

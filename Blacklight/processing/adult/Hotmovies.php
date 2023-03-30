@@ -103,7 +103,7 @@ class Hotmovies extends AdultMovies
      *
      * @param  bool  $extras
      */
-    protected function productInfo($extras = false): array
+    protected function productInfo(bool $extras = false): array
     {
         $studio = false;
         $director = false;
@@ -203,7 +203,7 @@ class Hotmovies extends AdultMovies
      * @param  string  $movie
      * @return bool , true if search >= 90%
      */
-    public function processSite($movie): bool
+    public function processSite(string $movie): bool
     {
         if (empty($movie)) {
             return false;

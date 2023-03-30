@@ -34,7 +34,7 @@ class SendAccountWillExpireEmail implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         Mail::to($this->user->email)->send(new AccountWillExpire($this->user, $this->days));
     }

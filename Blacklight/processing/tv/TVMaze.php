@@ -52,7 +52,7 @@ class TVMaze extends TV
      *
      * @param  bool  $local
      */
-    public function processSite($groupID, $guidChar, $process, $local = false): void
+    public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVMAZE);
 
@@ -216,7 +216,7 @@ class TVMaze extends TV
      * @param  string  $cleanName
      * @return array|false
      */
-    protected function getShowInfo($cleanName)
+    protected function getShowInfo(string $cleanName)
     {
         $return = $response = false;
 
@@ -296,7 +296,7 @@ class TVMaze extends TV
      *
      * @param  int  $videoId  -- the local Video ID
      */
-    public function getPoster($videoId): int
+    public function getPoster(int $videoId): int
     {
         $ri = new ReleaseImage();
 
@@ -326,7 +326,7 @@ class TVMaze extends TV
      * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tvMazeId, $season, $episode, $airDate = '', $videoId = 0)
+    protected function getEpisodeInfo(int $tvMazeId, int $season, int $episode, string $airDate = '', int $videoId = 0)
     {
         $return = $response = false;
 

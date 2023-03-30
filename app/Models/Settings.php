@@ -122,7 +122,7 @@ class Settings extends Model
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         $override = self::query()->where('name', $key)->first();
 
@@ -144,7 +144,7 @@ class Settings extends Model
      *
      * @throws \RuntimeException
      */
-    public static function toTree($excludeUnsectioned = true): array
+    public static function toTree(bool $excludeUnsectioned = true): array
     {
         $results = self::cursor()->remember();
 
@@ -195,7 +195,7 @@ class Settings extends Model
      * @return bool|null TRUE if Db version is greater than or eaqual to $requiredVersion,
      *                   false if not, and null if the version isn't available to check against.
      */
-    public function isDbVersionAtLeast($requiredVersion): ?bool
+    public function isDbVersionAtLeast(string $requiredVersion): ?bool
     {
         $this->fetchDbVersion();
         if (empty($this->dbVersion)) {

@@ -155,7 +155,7 @@ class Predb extends Model
      * @param  string  $cleanerName
      * @return array|false Array with title/id from PreDB if found, false if not found.
      */
-    public static function matchPre($cleanerName)
+    public static function matchPre(string $cleanerName)
     {
         if (empty($cleanerName)) {
             return false;
@@ -189,7 +189,7 @@ class Predb extends Model
      *
      * @throws \Exception
      */
-    public static function getAll($search = '')
+    public static function getAll(string $search = '')
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $predb = Cache::get(md5($search));
@@ -238,7 +238,7 @@ class Predb extends Model
     /**
      * @return string
      */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'ft_predb_filename';
     }
@@ -246,7 +246,7 @@ class Predb extends Model
     /**
      * @return array
      */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'filename' => $this->filename,

@@ -67,7 +67,7 @@ class TraktTv extends TV
      *
      * @param  bool  $local
      */
-    public function processSite($groupID, $guidChar, $process, $local = false): void
+    public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TRAKT);
 
@@ -202,7 +202,7 @@ class TraktTv extends TV
      * @param  int  $episode
      * @return array|false False on failure, an array of information fields otherwise.
      */
-    public function getEpisodeInfo($siteId, $series, $episode)
+    public function getEpisodeInfo(int $siteId, int $series, int $episode)
     {
         $return = false;
 
@@ -228,7 +228,7 @@ class TraktTv extends TV
      *
      * @param  int  $videoId  ID from videos table.
      */
-    public function getPoster($videoId): int
+    public function getPoster(int $videoId): int
     {
         $hascover = 0;
         $ri = new ReleaseImage();

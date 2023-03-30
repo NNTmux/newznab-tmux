@@ -13,7 +13,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         parent::boot();
 
@@ -29,7 +29,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      *
      * @return void
      */
-    protected function gate()
+    protected function gate(): void
     {
         Gate::define('viewHorizon', function ($user) {
             return in_array($user->email, [
@@ -43,7 +43,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -47,7 +48,7 @@ class UserDownload extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }
@@ -55,7 +56,7 @@ class UserDownload extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function release()
+    public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
@@ -67,7 +68,7 @@ class UserDownload extends Model
      *
      * @throws \Exception
      */
-    public static function getDownloadRequests($userID): int
+    public static function getDownloadRequests(int $userID): int
     {
         // Clear old requests.
         self::whereUsersId($userID)->where('timestamp', '<', now()->subDay())->delete();

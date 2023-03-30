@@ -10,7 +10,7 @@ class CreateForumpostTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('forumpost', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -35,7 +35,7 @@ class CreateForumpostTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('forumpost');
     }

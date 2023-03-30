@@ -10,7 +10,7 @@ class CreateReleaseRegexesTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('release_regexes', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -28,7 +28,7 @@ class CreateReleaseRegexesTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('release_regexes');
     }

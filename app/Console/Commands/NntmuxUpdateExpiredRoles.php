@@ -36,7 +36,7 @@ class NntmuxUpdateExpiredRoles extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Updating expired roles.');
         $this->info('Updating users that will have their roles expire or are already expired');

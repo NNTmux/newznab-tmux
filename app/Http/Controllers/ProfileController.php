@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
 use App\Models\Settings;
@@ -103,7 +104,7 @@ class ProfileController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): RedirectResponse
     {
         $this->setPreferences();
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
@@ -54,7 +55,7 @@ class LoginController extends Controller
      * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function login(LoginLoginRequest $request)
+    public function login(LoginLoginRequest $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'username' => ['required'],

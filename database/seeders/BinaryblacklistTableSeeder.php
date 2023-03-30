@@ -12,7 +12,7 @@ class BinaryblacklistTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         DB::table('binaryblacklist')->delete();
 

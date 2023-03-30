@@ -1454,7 +1454,7 @@ class NameFixer
      *
      * @throws \Exception
      */
-    public function tvCheck($release, $echo, $type, $nameStatus, $show): void
+    public function tvCheck($release, bool $echo, string $type, $nameStatus, $show): void
     {
         $result = [];
 

@@ -406,7 +406,7 @@ class IRCScraper extends IRCClient
      *
      * @param  bool  $new
      */
-    protected function _doEcho($new = true)
+    protected function _doEcho(bool $new = true)
     {
         if (! $this->_silent) {
             $nukeString = '';
@@ -463,7 +463,7 @@ class IRCScraper extends IRCClient
      * @param  string  $groupName
      * @return mixed
      */
-    protected function _getGroupID($groupName)
+    protected function _getGroupID(string $groupName)
     {
         if (! isset($this->_groupList[$groupName])) {
             $group = UsenetGroup::query()->where('name', $groupName)->first(['id']);

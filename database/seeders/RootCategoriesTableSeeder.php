@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class RootCategoriesTableSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         DB::table('root_categories')->delete();
 

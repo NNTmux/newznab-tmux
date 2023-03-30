@@ -22,7 +22,7 @@ class UpdateUserAccessedApi
      *
      * @return void
      */
-    public function handle(UserAccessedApi $event)
+    public function handle(UserAccessedApi $event): void
     {
         User::find($event->user->id)->update(['apiaccess' => now()]);
     }

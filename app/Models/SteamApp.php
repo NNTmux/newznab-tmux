@@ -47,7 +47,7 @@ class SteamApp extends Model
     /**
      * @return string
      */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'ix_name_ft';
     }
@@ -55,7 +55,7 @@ class SteamApp extends Model
     /**
      * @return array
      */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'name' => $this->name,

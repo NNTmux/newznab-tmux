@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Collection;
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Jobs\SendInviteEmail;
@@ -198,7 +201,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function role()
+    public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'roles_id');
     }
@@ -206,7 +209,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function request()
+    public function request(): HasMany
     {
         return $this->hasMany(UserRequest::class, 'users_id');
     }
@@ -214,7 +217,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function download()
+    public function download(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'users_id');
     }
@@ -222,7 +225,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function release()
+    public function release(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'users_id');
     }
@@ -230,7 +233,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function series()
+    public function series(): HasMany
     {
         return $this->hasMany(UserSerie::class, 'users_id');
     }
@@ -238,7 +241,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function invitation()
+    public function invitation(): HasMany
     {
         return $this->hasMany(Invitation::class, 'users_id');
     }
@@ -246,7 +249,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function failedRelease()
+    public function failedRelease(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'users_id');
     }
@@ -254,7 +257,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function comment()
+    public function comment(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'users_id');
     }
@@ -273,7 +276,7 @@ class User extends Authenticatable
      * @param  string  $host
      * @param  string  $email
      */
-    public static function getCount($role = '', $username = '', $host = '', $email = ''): int
+    public static function getCount(string $role = '', string $username = '', string $host = '', string $email = ''): int
     {
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
@@ -399,7 +402,7 @@ class User extends Authenticatable
      *
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false)
+    public static function getRange($start, $offset, $orderBy, string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false): Collection
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);

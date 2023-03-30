@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Models\Forumpost;
 use App\Models\Settings;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function forum(Request $request)
+    public function forum(Request $request): RedirectResponse
     {
         $this->setPreferences();
         if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
@@ -68,7 +69,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function getPosts($id, Request $request)
+    public function getPosts($id, Request $request): RedirectResponse
     {
         $this->setPreferences();
 

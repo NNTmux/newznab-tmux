@@ -30,7 +30,7 @@ class ContactUs extends Mailable
      *
      * @throws \Exception
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->mailFrom)->subject('Contact form submitted')->replyTo($this->mailFrom)->view('emails.contactUs')->with(['mailBody' => $this->mailBody]);
     }

@@ -6,7 +6,7 @@ use Tests\TestCase;
 
 class SettingsTest extends TestCase
 {
-    public function testSettingValue()
+    public function testSettingValue(): void
     {
         $name = config('app.name');
 

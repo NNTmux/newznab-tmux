@@ -48,7 +48,7 @@ class ReleaseNfo extends Model
      * @param  bool  $getNfoString
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
-    public static function getReleaseNfo($id, $getNfoString = true)
+    public static function getReleaseNfo($id, bool $getNfoString = true)
     {
         $nfo = self::query()->where('releases_id', $id)->whereNotNull('nfo')->select(['releases_id']);
         if ($getNfoString === true) {

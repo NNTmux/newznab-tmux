@@ -88,7 +88,7 @@ class XXX
      *
      * @param  int  $maxAge
      */
-    public function getXXXRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
+    public function getXXXRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = []): array
     {
         $catSrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {

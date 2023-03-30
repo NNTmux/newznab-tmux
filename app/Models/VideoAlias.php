@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -37,7 +38,7 @@ class VideoAlias extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function video()
+    public function video(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'videos_id');
     }

@@ -356,7 +356,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function selectGroup($group, $articles = false, bool $force = false): mixed
+    public function selectGroup(string $group, bool $articles = false, bool $force = false): mixed
     {
         $connected = $this->_checkConnection(false);
         if ($connected !== true) {
@@ -384,7 +384,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function getOverview($range = null, $names = true, $forceNames = true): mixed
+    public function getOverview(string $range = null, bool $names = true, bool $forceNames = true): mixed
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -507,7 +507,7 @@ class NNTP extends \Net_NNTP_Client
      *
      * @throws \Exception
      */
-    public function getGroups($wildMat = null)
+    public function getGroups(string $wildMat = null)
     {
         // Enabled header compression if not enabled.
         $this->_enableCompression();
@@ -1300,7 +1300,7 @@ class NNTP extends \Net_NNTP_Client
      * @return mixed (bool)   On success: True when posting allowed, otherwise false.
      *               (object) On failure: pear_error
      */
-    public function connect($host = null, $encryption = null, $port = null, $timeout = 15, int $socketTimeout = 120): mixed
+    public function connect(string $host = null, $encryption = null, int $port = null, int $timeout = 15, int $socketTimeout = 120): mixed
     {
         if ($this->_isConnected()) {
             return $this->throwError('Already connected, disconnect first!', null);

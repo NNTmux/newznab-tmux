@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -35,7 +36,7 @@ class SendInvite extends Mailable
      *
      * @param  \App\Models\User  $user
      */
-    public function __construct($user, $invite)
+    public function __construct(User $user, $invite)
     {
         $this->user = $user;
         $this->invite = $invite;
@@ -50,7 +51,7 @@ class SendInvite extends Mailable
      *
      * @throws \Exception
      */
-    public function build()
+    public function build(): static
     {
         return $this->from($this->siteEmail)->subject('Invite received')->view('emails.sendinvite')->with(['invite' => $this->invite, 'username' => $this->user['username'], 'site' => $this->siteTitle, 'email' => $this->user['email']]);
     }

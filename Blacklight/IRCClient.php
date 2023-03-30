@@ -188,7 +188,7 @@ class IRCClient
      *
      * @param  int  $timeout  Seconds.
      */
-    public function setSocketTimeout($timeout)
+    public function setSocketTimeout(int $timeout)
     {
         if (! is_numeric($timeout)) {
             echo 'ERROR: IRC socket timeout must be a number!'.PHP_EOL;
@@ -202,7 +202,7 @@ class IRCClient
      *
      * @param  int  $timeout  Seconds.
      */
-    public function setConnectionTimeout($timeout)
+    public function setConnectionTimeout(int $timeout)
     {
         if (! is_numeric($timeout)) {
             echo 'ERROR: IRC connection timeout must be a number!'.PHP_EOL;
@@ -216,7 +216,7 @@ class IRCClient
      *
      * @param  int  $retries
      */
-    public function setConnectionRetries($retries)
+    public function setConnectionRetries(int $retries)
     {
         if (! is_numeric($retries)) {
             echo 'ERROR: IRC connection retries must be a number!'.PHP_EOL;
@@ -230,7 +230,7 @@ class IRCClient
      *
      * @param  int  $delay  Seconds.
      */
-    public function setReConnectDelay($delay)
+    public function setReConnectDelay(int $delay)
     {
         if (! is_numeric($delay)) {
             echo 'ERROR: IRC reconnect delay must be a number!'.PHP_EOL;
@@ -247,7 +247,7 @@ class IRCClient
      * @param  bool  $tls  Use encryption for the socket transport? (make sure the port is right).
      * @return bool
      */
-    public function connect($hostname, $port = 6667, $tls = false)
+    public function connect(string $hostname, int $port = 6667, bool $tls = false): bool
     {
         $this->_alreadyLoggedIn = false;
         $transport = ($tls === true ? 'tls' : 'tcp');
@@ -303,7 +303,7 @@ class IRCClient
      * @param  null  $password  The password  - some servers require a password.
      * @return bool
      */
-    public function login($nickName, $userName, $realName, $password = null)
+    public function login(string $nickName, string $userName, string $realName, $password = null): bool
     {
         if (! $this->_connected()) {
             echo 'ERROR: You must connect to IRC first!'.PHP_EOL;
@@ -386,7 +386,7 @@ class IRCClient
      * @param  string  $message  Optional disconnect message.
      * @return bool
      */
-    public function quit($message = null)
+    public function quit(string $message = null): bool
     {
         if ($this->_connected()) {
             $this->_writeSocket('QUIT'.($message === null ? '' : ' :'.$message));
@@ -441,7 +441,7 @@ class IRCClient
      *                           array( '#exampleChannel' => 'thePassword', '#exampleChan2' => null );
      * @return bool
      */
-    public function joinChannels($channels = [])
+    public function joinChannels(array $channels = []): bool
     {
         $this->_channels = $channels;
 
@@ -474,7 +474,7 @@ class IRCClient
      * @param  string  $channel
      * @param  string  $password
      */
-    protected function _joinChannel($channel, $password)
+    protected function _joinChannel(string $channel, string $password)
     {
         $this->_writeSocket('JOIN '.$channel.(empty($password) ? '' : ' '.$password));
     }
@@ -484,7 +484,7 @@ class IRCClient
      *
      * @param  string  $host
      */
-    protected function _pong($host)
+    protected function _pong(string $host)
     {
         if ($this->_writeSocket('PONG '.$host) === false) {
             $this->_reconnect();
@@ -501,7 +501,7 @@ class IRCClient
      *
      * @param  string  $host
      */
-    protected function _ping($host)
+    protected function _ping(string $host)
     {
         $pong = $this->_writeSocket('PING '.$host);
 
@@ -557,7 +557,7 @@ class IRCClient
      * @param  string  $command
      * @return bool
      */
-    protected function _writeSocket($command)
+    protected function _writeSocket(string $command): bool
     {
         $command .= "\r\n";
         for ($written = 0, $writtenMax = \strlen($command); $written < $writtenMax; $written += $fWrite) {
@@ -632,7 +632,7 @@ class IRCClient
      *
      * @return bool
      */
-    protected function _connected()
+    protected function _connected(): bool
     {
         return \is_resource($this->_socket) && ! feof($this->_socket);
     }
@@ -643,7 +643,7 @@ class IRCClient
      * @param  string  $text
      * @return string
      */
-    protected function _stripControlCharacters($text)
+    protected function _stripControlCharacters(string $text): string
     {
         return preg_replace(
             [
