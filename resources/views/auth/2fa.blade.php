@@ -32,7 +32,7 @@
 
                         @if(!($data['user']->passwordSecurity))
                             <form class="form-horizontal" method="POST" action="{{ route('generate2faSecret') }}">
-                                {{ csrf_field() }}
+                                @csrf
                                 <div class="form-group">
                                     <div class="col-md-6 col-md-offset-4">
                                         <button type="submit" class="btn btn-primary">
@@ -47,7 +47,7 @@
                             <br/><br/>
                             <strong>2.Enter the pin the code to Enable 2FA</strong><br/><br/>
                             <form class="form-horizontal" method="POST" action="{{ route('enable2fa') }}">
-                                {{ csrf_field() }}
+                                @csrf
 
                                 <div class="form-group{{ $errors->has('verify-code') ? ' has-error' : '' }}">
                                     <label for="verify-code" class="col-md-4 control-label">Authenticator Code</label>
@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="col-md-6 col-md-offset-5">
 
-                                    {{ csrf_field() }}
+                                    @csrf
                                     <button type="submit" class="btn btn-primary ">Disable 2FA</button>
                                 </div>
                             </form>
