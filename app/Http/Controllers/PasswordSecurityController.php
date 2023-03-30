@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Disable2faPasswordSecurityRequest;
 use App\Models\PasswordSecurity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,16 +71,14 @@ class PasswordSecurityController extends Controller
         return redirect('2fa')->with('error', 'Invalid Verification Code, Please try again.');
     }
 
-    public function disable2fa(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if (! (Hash::check($request->get('current-password'), Auth::user()->password))) {
             // The passwords matches
             return redirect()->back()->with('error', 'Your password does not match with your account password. Please try again.');
         }
 
-        $validatedData = $request->validate([
-            'current-password' => 'required',
-        ]);
+        $validatedData = $request->validated();
         $user = Auth::user();
         $user->passwordSecurity->google2fa_enable = 0;
         $user->passwordSecurity->save();

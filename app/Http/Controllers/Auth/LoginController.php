@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
 use App\Models\Settings;
@@ -53,7 +54,7 @@ class LoginController extends Controller
      * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function login(Request $request)
+    public function login(LoginLoginRequest $request)
     {
         $validator = Validator::make($request->all(), [
             'username' => ['required'],
@@ -81,9 +82,6 @@ class LoginController extends Controller
 
             if ($user !== null) {
                 if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-                    $this->validate($request, [
-                        'g-recaptcha-response' => ['required', 'captcha'],
-                    ]);
                 }
 
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';

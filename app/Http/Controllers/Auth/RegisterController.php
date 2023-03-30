@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Invitation;
 use App\Models\Settings;
@@ -112,7 +113,7 @@ class RegisterController extends Controller
      *
      * @throws ValidationException
      */
-    public function register(Request $request)
+    public function register(RegisterRegisterRequest $request)
     {
         $error = $userName = $password = $confirmPassword = $email = $inviteCode = '';
         $showRegister = 1;
@@ -129,9 +130,6 @@ class RegisterController extends Controller
         ]);
 
         if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-            $this->validate($request, [
-                'g-recaptcha-response' => ['required', 'captcha'],
-            ]);
         }
 
         if ($validator->fails()) {
