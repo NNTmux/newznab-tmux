@@ -247,7 +247,7 @@ Route::get('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware
 
 Route::post('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware('role:Admin');
 
-Route::middleware('role:Admin', '2fa')->prefix('admin')->namespace('Admin')->group(function () {
+Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::get('index', [AdminPageController::class, 'index']);
     Route::get('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
     Route::post('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
@@ -366,7 +366,7 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->namespace('Admin')->gro
     Route::post('group-list-inactive', [AdminGroupController::class, 'inactive']);
 });
 
-Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->namespace('Admin')->group(function () {
+Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {
     Route::get('release-edit', [AdminReleasesController::class, 'edit']);
     Route::post('release-edit', [AdminReleasesController::class, 'edit']);
 });
