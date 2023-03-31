@@ -23,13 +23,13 @@ class Google2FAAuthenticator extends Authenticator
     /**
      * @return mixed
      *
-     * @throws \PragmaRX\Google2FALaravel\Exceptions\InvalidSecretKey
+     * @throws InvalidSecretKey
      */
     protected function getGoogle2FASecretKey()
     {
         $secret = $this->getUser()->passwordSecurity->{$this->config('otp_secret_column')};
 
-        if (is_null($secret) || empty($secret)) {
+        if (empty($secret)) {
             throw new InvalidSecretKey('Secret key cannot be empty.');
         }
 

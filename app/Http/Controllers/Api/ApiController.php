@@ -14,6 +14,7 @@ use App\Models\UserDownload;
 use App\Models\UserRequest;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -26,9 +27,11 @@ class ApiController extends BasePageController
     private string $type;
 
     /**
+     * @param Request $request
+     * @return Application|\Illuminate\Foundation\Application|RedirectResponse|Redirector|StreamedResponse|void
      * @throws \Throwable
      */
-    public function api(Request $request): StreamedResponse|Redirector|RedirectResponse
+    public function api(Request $request)
     {
         // API functions.
         $function = 's';
@@ -134,12 +137,12 @@ class ApiController extends BasePageController
         switch ($function) {
             // Search releases.
             case 's':
-                $this->verifyEmptyParameter('q');
-                $maxAge = $this->maxAge();
-                $groupName = $this->group();
+                $this->verifyEmptyParameter($request, 'q');
+                $maxAge = $this->maxAge($request);
+                $groupName = $this->group($request);
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
-                $categoryID = $this->categoryID();
-                $limit = $this->limit();
+                $categoryID = $this->categoryID($request);
+                $limit = $this->limit($request);
                 $searchArr = [
                     'searchname' => $request->input('q') ?? -1,
                     'name' => -1,
@@ -181,17 +184,17 @@ class ApiController extends BasePageController
                 break;
                 // Search tv releases.
             case 'tv':
-                $this->verifyEmptyParameter('q');
-                $this->verifyEmptyParameter('vid');
-                $this->verifyEmptyParameter('tvdbid');
-                $this->verifyEmptyParameter('traktid');
-                $this->verifyEmptyParameter('rid');
-                $this->verifyEmptyParameter('tvmazeid');
-                $this->verifyEmptyParameter('imdbid');
-                $this->verifyEmptyParameter('tmdbid');
-                $this->verifyEmptyParameter('season');
-                $this->verifyEmptyParameter('ep');
-                $maxAge = $this->maxAge();
+                $this->verifyEmptyParameter($request, 'q');
+                $this->verifyEmptyParameter($request, 'vid');
+                $this->verifyEmptyParameter($request,'tvdbid');
+                $this->verifyEmptyParameter($request,'traktid');
+                $this->verifyEmptyParameter($request,'rid');
+                $this->verifyEmptyParameter($request,'tvmazeid');
+                $this->verifyEmptyParameter($request,'imdbid');
+                $this->verifyEmptyParameter($request,'tmdbid');
+                $this->verifyEmptyParameter($request,'season');
+                $this->verifyEmptyParameter($request,'ep');
+                $maxAge = $this->maxAge($request);
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
                 $siteIdArr = [
@@ -219,9 +222,9 @@ class ApiController extends BasePageController
                     $episode,
                     $airDate ?? '',
                     $this->offset($request),
-                    $this->limit(),
+                    $this->limit($request),
                     $request->input('q') ?? '',
-                    $this->categoryID(),
+                    $this->categoryID($request),
                     $maxAge,
                     $minSize,
                     $catExclusions
@@ -232,9 +235,9 @@ class ApiController extends BasePageController
 
                 // Search movie releases.
             case 'm':
-                $this->verifyEmptyParameter('q');
-                $this->verifyEmptyParameter('imdbid');
-                $maxAge = $this->maxAge();
+                $this->verifyEmptyParameter($request,'q');
+                $this->verifyEmptyParameter($request,'imdbid');
+                $maxAge = $this->maxAge($request);
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
                 $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? (int) $request->input('imdbid') : -1;
@@ -246,9 +249,9 @@ class ApiController extends BasePageController
                     $tmdbId,
                     $traktId,
                     $this->offset($request),
-                    $this->limit(),
+                    $this->limit($request),
                     $request->input('q') ?? '',
-                    $this->categoryID(),
+                    $this->categoryID($request),
                     $maxAge,
                     $minSize,
                     $catExclusions
@@ -266,7 +269,7 @@ class ApiController extends BasePageController
 
                 // Get NZB.
             case 'g':
-                $this->verifyEmptyParameter('g');
+                $this->verifyEmptyParameter($request,'g');
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $relData = Release::checkGuidForApi($request->input('id'));
                 if ($relData) {
@@ -298,8 +301,8 @@ class ApiController extends BasePageController
                 $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
                 $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
-                if ($rel !== null) {
-                    if ($data !== null) {
+                if ($rel->isNotEmpty()) {
+                    if ($data->isNotEmpty()) {
                         if ($request->has('o') && $request->input('o') === 'file') {
                             return response()->streamDownload(function () use ($data) {
                                 echo $data['nfo'];

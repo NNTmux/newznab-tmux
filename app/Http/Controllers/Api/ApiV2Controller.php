@@ -22,6 +22,13 @@ use Illuminate\Support\Carbon;
 
 class ApiV2Controller extends BasePageController
 {
+    private ApiController $api;
+
+    public function __construct()
+    {
+        $this->api = new ApiController();
+    }
+
     public function capabilities(): JsonResponse
     {
         $category = Category::getForApi();
@@ -58,11 +65,10 @@ class ApiV2Controller extends BasePageController
      */
     public function movie(Request $request): JsonResponse
     {
-        $api = new API();
         $releases = new Releases();
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $maxAge = $api->maxAge();
+        $maxAge = $this->api->maxAge($request);
         $catExclusions = User::getCategoryExclusionForApi($request);
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         event(new UserAccessedApi($user));
@@ -75,10 +81,10 @@ class ApiV2Controller extends BasePageController
             $imdbId,
             $tmdbId,
             $traktId,
-            $api->offset(),
-            $api->limit(),
+            $this->api->offset($request),
+            $this->api->limit($request),
             $request->input('id') ?? '',
-            $api->categoryID(),
+            $this->api->categoryID($request),
             $maxAge,
             $minSize,
             $catExclusions
@@ -109,18 +115,17 @@ class ApiV2Controller extends BasePageController
      */
     public function apiSearch(Request $request): JsonResponse
     {
-        $api = new API();
         $releases = new Releases();
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
-        $offset = $api->offset();
+        $offset = $this->api->offset($request);
         $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $maxAge = $api->maxAge();
-        $groupName = $api->group();
+        $maxAge = $this->api->maxAge($request);
+        $groupName = $this->api->group($request);
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         event(new UserAccessedApi($user));
-        $categoryID = $api->categoryID();
-        $limit = $api->limit();
+        $categoryID = $this->api->categoryID($request);
+        $limit = $this->api->limit($request);
 
         if ($request->has('id')) {
             $relData = $releases->apiSearch(
@@ -172,22 +177,21 @@ class ApiV2Controller extends BasePageController
      */
     public function tv(Request $request): JsonResponse
     {
-        $api = new API();
         $releases = new Releases();
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $api->verifyEmptyParameter('id');
-        $api->verifyEmptyParameter('vid');
-        $api->verifyEmptyParameter('tvdbid');
-        $api->verifyEmptyParameter('traktid');
-        $api->verifyEmptyParameter('rid');
-        $api->verifyEmptyParameter('tvmazeid');
-        $api->verifyEmptyParameter('imdbid');
-        $api->verifyEmptyParameter('tmdbid');
-        $api->verifyEmptyParameter('season');
-        $api->verifyEmptyParameter('ep');
-        $maxAge = $api->maxAge();
+        $this->api->verifyEmptyParameter($request,'id');
+        $this->api->verifyEmptyParameter($request,'vid');
+        $this->api->verifyEmptyParameter($request,'tvdbid');
+        $this->api->verifyEmptyParameter($request,'traktid');
+        $this->api->verifyEmptyParameter($request,'rid');
+        $this->api->verifyEmptyParameter($request,'tvmazeid');
+        $this->api->verifyEmptyParameter($request,'imdbid');
+        $this->api->verifyEmptyParameter($request,'tmdbid');
+        $this->api->verifyEmptyParameter($request,'season');
+        $this->api->verifyEmptyParameter($request,'ep');
+        $maxAge = $this->api->maxAge($request);
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         event(new UserAccessedApi($user));
 
@@ -215,10 +219,10 @@ class ApiV2Controller extends BasePageController
             $series,
             $episode,
             $airDate ?? '',
-            $api->offset(),
-            $api->limit(),
+            $this->api->offset($request),
+            $this->api->limit($request),
             $request->input('id') ?? '',
-            $api->categoryID(),
+            $this->api->categoryID($request),
             $maxAge,
             $minSize,
             $catExclusions

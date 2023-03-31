@@ -164,7 +164,7 @@ class Utility
         return '';
     }
 
-    public static function showApiError(int $errorCode = 900, string $errorText = ''): void
+    public static function showApiError(int $errorCode = 900, string $errorText = '')
     {
         $errorHeader = 'HTTP 1.1 400 Bad Request';
         if ($errorText === '') {
@@ -243,12 +243,7 @@ class Utility
         $response =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
-        header('Content-type: text/xml');
-        header('Content-Length: '.\strlen($response));
-        header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
-        header($errorHeader);
-
-        exit($response);
+        return response($response)->header('Content-type', 'text/xml')->header('Content-Length', strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $errorHeader);
     }
 
     public static function getRange($tableName): LengthAwarePaginator
