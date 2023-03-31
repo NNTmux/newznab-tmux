@@ -27,8 +27,8 @@ class ApiController extends BasePageController
     private string $type;
 
     /**
-     * @param Request $request
      * @return Application|\Illuminate\Foundation\Application|RedirectResponse|Redirector|StreamedResponse|void
+     *
      * @throws \Throwable
      */
     public function api(Request $request)
@@ -186,14 +186,14 @@ class ApiController extends BasePageController
             case 'tv':
                 $this->verifyEmptyParameter($request, 'q');
                 $this->verifyEmptyParameter($request, 'vid');
-                $this->verifyEmptyParameter($request,'tvdbid');
-                $this->verifyEmptyParameter($request,'traktid');
-                $this->verifyEmptyParameter($request,'rid');
-                $this->verifyEmptyParameter($request,'tvmazeid');
-                $this->verifyEmptyParameter($request,'imdbid');
-                $this->verifyEmptyParameter($request,'tmdbid');
-                $this->verifyEmptyParameter($request,'season');
-                $this->verifyEmptyParameter($request,'ep');
+                $this->verifyEmptyParameter($request, 'tvdbid');
+                $this->verifyEmptyParameter($request, 'traktid');
+                $this->verifyEmptyParameter($request, 'rid');
+                $this->verifyEmptyParameter($request, 'tvmazeid');
+                $this->verifyEmptyParameter($request, 'imdbid');
+                $this->verifyEmptyParameter($request, 'tmdbid');
+                $this->verifyEmptyParameter($request, 'season');
+                $this->verifyEmptyParameter($request, 'ep');
                 $maxAge = $this->maxAge($request);
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
@@ -235,8 +235,8 @@ class ApiController extends BasePageController
 
                 // Search movie releases.
             case 'm':
-                $this->verifyEmptyParameter($request,'q');
-                $this->verifyEmptyParameter($request,'imdbid');
+                $this->verifyEmptyParameter($request, 'q');
+                $this->verifyEmptyParameter($request, 'imdbid');
                 $maxAge = $this->maxAge($request);
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
@@ -269,7 +269,7 @@ class ApiController extends BasePageController
 
                 // Get NZB.
             case 'g':
-                $this->verifyEmptyParameter($request,'g');
+                $this->verifyEmptyParameter($request, 'g');
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $relData = Release::checkGuidForApi($request->input('id'));
                 if ($relData) {
