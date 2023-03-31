@@ -37,7 +37,7 @@ class MyShowsController extends BasePageController
                 if ($request->has('from')) {
                     header('Location:'.url($request->input('from')));
                 } else {
-                    return redirect('myshows');
+                    return redirect()->to('myshows');
                 }
 
                 break;
@@ -45,22 +45,22 @@ class MyShowsController extends BasePageController
             case 'doadd':
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
                 if ($show) {
-                    return redirect('myshows');
+                    return redirect()->to('myshows');
                 }
 
                 $show = Video::getByVideoID($videoId);
                 if (! $show) {
-                    return redirect('myshows');
+                    return redirect()->to('myshows');
                 }
 
                 if ($action === 'doadd') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
                     UserSerie::addShow($this->userdata->id, $videoId, $category);
                     if ($request->has('from')) {
-                        return redirect($request->input('from'));
+                        return redirect()->to($request->input('from'));
                     }
 
-                    return redirect('myshows');
+                    return redirect()->to('myshows');
                 }
 
                 $tmpcats = Category::getChildren(Category::TV_ROOT);
@@ -89,17 +89,17 @@ class MyShowsController extends BasePageController
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
 
                 if (! $show) {
-                    return redirect('myshows');
+                    return redirect()->to('myshows');
                 }
 
                 if ($action === 'doedit') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
                     UserSerie::updateShow($this->userdata->id, $videoId, $category);
                     if ($request->has('from')) {
-                        return redirect($request->input('from'));
+                        return redirect()->to($request->input('from'));
                     }
 
-                    return redirect('myshows');
+                    return redirect()->to('myshows');
                 }
 
                 $tmpcats = Category::getChildren(Category::TV_ROOT);
@@ -175,14 +175,14 @@ class MyShowsController extends BasePageController
 
         $releases = new Releases();
 
-        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
         $ordering = $releases->getBrowseOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $browseCount = $releases->getShowsCount($shows, -1, $this->userdata->categoryexclusions);
 
         $rslt = $releases->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions);
-        $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $this->smarty->assign('covgroup', '');
 

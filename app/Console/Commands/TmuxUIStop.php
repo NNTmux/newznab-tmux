@@ -26,7 +26,7 @@ class TmuxUIStop extends Command
     /**
      * @throws \Exception
      */
-    public function handle()
+    public function handle(): void
     {
         $tmux = new Tmux();
         $tmux->stopIfRunning();

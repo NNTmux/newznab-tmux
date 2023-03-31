@@ -40,10 +40,7 @@ abstract class Videos
 
     protected const TYPE_ANIME = 2; // Type of video is a Anime
 
-    /**
-     * @var bool
-     */
-    public $echooutput;
+    public bool $echooutput;
 
     /**
      * @var array sites	The sites that we have an ID columns for in our video table.
@@ -53,7 +50,7 @@ abstract class Videos
     /**
      * @var array Temp Array of cached failed lookups
      */
-    public $titleCache;
+    public array $titleCache;
 
     public function __construct(array $options = [])
     {
@@ -70,19 +67,15 @@ abstract class Videos
     /**
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
-    abstract protected function processSite($groupID, $guidChar, $process, $local = false): void;
+    abstract protected function processSite(int $groupID, string $guidChar, int $process, bool $local = false): void;
 
     /**
      * Get video info from a Video ID and column.
      *
-     * @param  string  $siteColumn
-     * @param  int  $videoID
      * @return array|false False if invalid site, or ID not found; Site id value otherwise.
      */
-    protected function getSiteIDFromVideoID($siteColumn, $videoID)
+    protected function getSiteIDFromVideoID(string $siteColumn, int $videoID): bool|array
     {
         if (\in_array($siteColumn, self::$sites, false)) {
             $result = Video::query()->where('id', $videoID)->first([$siteColumn]);
@@ -96,10 +89,9 @@ abstract class Videos
     /**
      * Get TV show local timezone from a Video ID.
      *
-     * @param  int  $videoID
      * @return string Empty string if no query return or tz style timezone
      */
-    protected function getLocalZoneFromVideoID($videoID): string
+    protected function getLocalZoneFromVideoID(int $videoID): string
     {
         $result = TvInfo::query()->where('videos_id', $videoID)->first(['localzone']);
 
@@ -108,11 +100,8 @@ abstract class Videos
 
     /**
      * Get video info from a Site ID and column.
-     *
-     *
-     * @return bool|int
      */
-    protected function getVideoIDFromSiteID($siteColumn, $siteID)
+    protected function getVideoIDFromSiteID(string $siteColumn, int $siteID): bool|int
     {
         $result = null;
         if (\in_array($siteColumn, self::$sites, false)) {
@@ -123,10 +112,9 @@ abstract class Videos
     }
 
     /**
-     * @param  int  $source
      * @return $this|array|bool|false|\Illuminate\Database\Eloquent\Model|mixed|null
      */
-    public function getByTitle($title, $type, $source = 0)
+    public function getByTitle(string $title, $type, int $source = 0): mixed
     {
         // Check if we already have an entry for this show.
         $res = $this->getTitleExact($title, $type, $source);
@@ -194,11 +182,7 @@ abstract class Videos
         return false;
     }
 
-    /**
-     * @param  int  $source
-     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
-     */
-    public function getTitleExact($title, $type, $source = 0)
+    public function getTitleExact(string $title, int $type, int $source = 0): \Illuminate\Database\Eloquent\Model|bool|null|static
     {
         $return = false;
         if (! empty($title)) {
@@ -231,10 +215,9 @@ abstract class Videos
     /**
      * Supplementary function for getByTitle that queries for a like match.
      *
-     * @param  int  $source
      * @return array|false
      */
-    public function getTitleLoose($title, $type, $source = 0)
+    public function getTitleLoose($title, $type, int $source = 0): bool|array
     {
         $return = false;
 
@@ -271,11 +254,8 @@ abstract class Videos
     /**
      * Supplementary function for getByTitle that replaces special chars to find an exact match.
      * Add more ->whereRaw() methods if needed. Might slow TV PP down though.
-     *
-     * @param  int  $source
-     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
-    public function getAlternativeTitleExact($title, $type, $source = 0)
+    public function getAlternativeTitleExact(string $title, int $type, int $source = 0): \Illuminate\Database\Eloquent\Model|bool|null|static
     {
         $return = false;
         if (! empty($title)) {
@@ -328,7 +308,7 @@ abstract class Videos
      *
      * @return VideoAlias[]|bool|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function getAliases(int $videoId, string $alias = '')
+    public function getAliases(int $videoId, string $alias = ''): mixed
     {
         $return = false;
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));

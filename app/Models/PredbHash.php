@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\PredbHash.
@@ -47,10 +48,7 @@ class PredbHash extends Model
      */
     protected $primaryKey = 'hash';
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function predb()
+    public function predb(): BelongsTo
     {
         return $this->belongsTo(Predb::class, 'predb_id');
     }

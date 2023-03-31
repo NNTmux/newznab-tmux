@@ -340,8 +340,6 @@ class Releases extends Release
      *
      * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
      *                              false)]
-     * @param  \Blacklight\NZB  $nzb
-     * @param  \Blacklight\ReleaseImage  $releaseImage
      *
      * @throws \Exception
      */

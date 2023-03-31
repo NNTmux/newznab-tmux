@@ -7,6 +7,7 @@ use App\Models\MovieInfo;
 use App\Models\Release;
 use Blacklight\Movie;
 use Blacklight\utility\Utility;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminMovieController extends BasePageController
@@ -35,7 +36,7 @@ class AdminMovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): RedirectResponse
     {
         if (! \defined('STDOUT')) {
             \define('STDOUT', fopen('php://stdout', 'wb'));
@@ -61,13 +62,13 @@ class AdminMovieController extends BasePageController
                     }
                 }
                 if (($request->has('update') && (int) $request->input('update') === 1)) {
-                    return back()->withInput();
+                    return redirect()->back()->withInput();
                 }
 
-                return redirect('/admin/movie-list');
+                return redirect()->to('/admin/movie-list');
             }
 
-            return redirect('/admin/movie-list');
+            return redirect()->to('/admin/movie-list');
         }
 
         $content = $this->smarty->fetch('movie-add.tpl');
@@ -80,7 +81,7 @@ class AdminMovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function edit(Request $request): \Illuminate\Routing\Redirector|RedirectResponse
     {
         $this->setAdminPrefs();
 
@@ -142,7 +143,7 @@ class AdminMovieController extends BasePageController
                         Release::query()->where('imdbid', $id)->update(['movieinfo_id' => $movieInfo->id]);
                     }
 
-                    return redirect('admin/movie-list');
+                    return redirect()->to('admin/movie-list');
                     break;
                 case 'view':
                 default:

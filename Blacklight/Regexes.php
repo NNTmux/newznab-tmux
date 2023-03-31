@@ -95,19 +95,16 @@ class Regexes
 
     /**
      * Get a single regex using its id.
-     *
-     * @param  int  $id
      */
-    public function getRegexByID($id): array
+    public function getRegexByID(int $id): array
     {
         return (array) Arr::first(DB::select(sprintf('SELECT * FROM %s WHERE id = %d LIMIT 1', $this->tableName, $id)));
     }
 
     /**
-     * @param  string  $group_regex
      * @return mixed
      */
-    public function getRegex($group_regex = '')
+    public function getRegex(string $group_regex = '')
     {
         if ($this->tableName === 'collection_regexes') {
             $table = CollectionRegex::class;
@@ -131,7 +128,7 @@ class Regexes
      *
      * @param  string  $group_regex  Optional, keyword to find a group.
      */
-    public function getCount($group_regex = ''): int
+    public function getCount(string $group_regex = ''): int
     {
         $query = DB::select(
             sprintf(
@@ -147,11 +144,10 @@ class Regexes
     /**
      * Delete a regex using its id.
      *
-     * @param  int  $id
      *
      * @throws \Throwable
      */
-    public function deleteRegex($id): void
+    public function deleteRegex(int $id): void
     {
         DB::transaction(function () use ($id) {
             DB::delete(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
@@ -163,13 +159,10 @@ class Regexes
      *
      * Requires table per group to be on.
      *
-     * @param  string  $groupName
-     * @param  string  $regex
-     * @param  int  $limit
      *
      * @throws \Exception
      */
-    public function testCollectionRegex($groupName, $regex, $limit): array
+    public function testCollectionRegex(string $groupName, string $regex, int $limit): array
     {
         $groupID = UsenetGroup::getIDByName($groupName);
 
@@ -326,12 +319,10 @@ class Regexes
      *
      * Requires at least 1 named captured group.
      *
-     * @param  string  $regex
-     * @param  string  $subject
      *
      * @throws \Exception
      */
-    protected function _matchRegex($regex, $subject): string
+    protected function _matchRegex(string $regex, string $subject): string
     {
         $returnString = '';
         if (preg_match($regex, $subject, $hits) && \count($hits) > 0) {
@@ -359,10 +350,8 @@ class Regexes
 
     /**
      * Format part of a query.
-     *
-     * @param  string  $group_regex
      */
-    protected function _groupQueryString($group_regex): string
+    protected function _groupQueryString(string $group_regex): string
     {
         return $group_regex ? ('WHERE group_regex LIKE '.escapeString('%'.$group_regex.'%')) : '';
     }

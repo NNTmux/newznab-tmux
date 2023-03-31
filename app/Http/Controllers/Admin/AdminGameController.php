@@ -69,7 +69,7 @@ class AdminGameController extends BasePageController
 
                     $games->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('publisher'), $request->input('releasedate'), $request->input('esrb'), $request->input('cover'), $request->input('trailerurl'), $request->input('genre'));
 
-                    return redirect('admin/game-list');
+                    return redirect()->to('admin/game-list');
 
                     break;
 

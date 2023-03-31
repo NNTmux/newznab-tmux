@@ -7,7 +7,9 @@ use Blacklight\NNTP;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -91,10 +93,7 @@ class UsenetGroup extends Model
         $this->allasmgr = (int) Settings::settingValue('..allasmgr') === 1;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function release()
+    public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'groups_id');
     }
@@ -149,7 +148,7 @@ class UsenetGroup extends Model
                 return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('name')->get();
                 break;
             case 'date':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('first_record_postdate', 'DESC')->get();
+                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderByDesc('first_record_postdate')->get();
                 break;
             default:
                 return [];
@@ -197,7 +196,7 @@ class UsenetGroup extends Model
      * @param  string  $name  The group name.
      * @return false|int false on failure, groups_id on success.
      */
-    public static function getIDByName($name)
+    public static function getIDByName(string $name)
     {
         $res = self::query()->where('name', $name)->first(['id']);
 
@@ -211,7 +210,7 @@ class UsenetGroup extends Model
      * @param  int  $active  Constrain query to active status
      * @return mixed
      */
-    public static function getGroupsCount($groupname = '', $active = -1)
+    public static function getGroupsCount(string $groupname = '', int $active = -1)
     {
         $res = self::query();
 
@@ -227,11 +226,9 @@ class UsenetGroup extends Model
     }
 
     /**
-     * @param  string  $groupname
      * @param  null  $active
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getGroupsRange($groupname = '', $active = null)
+    public static function getGroupsRange(string $groupname = '', $active = null): LengthAwarePaginator
     {
         $groups = self::query()->groupBy('id')->orderBy('name');
 
@@ -250,11 +247,8 @@ class UsenetGroup extends Model
 
     /**
      * Update an existing group.
-     *
-     *
-     * @return int
      */
-    public static function updateGroup($group)
+    public static function updateGroup($group): int
     {
         return self::query()->where('id', $group['id'])->update(
             [
@@ -278,7 +272,7 @@ class UsenetGroup extends Model
      * @param  string  $groupName  The full name of the usenet group being evaluated
      * @return string|bool The name of the group replacing shorthand prefix or false if groupname was malformed
      */
-    public static function isValidGroup($groupName)
+    public static function isValidGroup(string $groupName)
     {
         if (preg_match('/^([\w\-]+\.)+[\w\-]+$/i', $groupName)) {
             return preg_replace('/^a\.b\./i', 'alt.binaries.', $groupName, 1);
@@ -418,14 +412,11 @@ class UsenetGroup extends Model
     /**
      * Adds new newsgroups based on a regular expression match against USP available.
      *
-     * @param  string  $groupList
-     * @param  int  $active
-     * @param  int  $backfill
      * @return array|string
      *
      * @throws \Exception
      */
-    public static function addBulk($groupList, $active = 1, $backfill = 1)
+    public static function addBulk(string $groupList, int $active = 1, int $backfill = 1)
     {
         if (preg_match('/^\s*$/m', $groupList)) {
             $ret = 'No group list provided.';
@@ -477,7 +468,7 @@ class UsenetGroup extends Model
      * @param  string  $column  Which column active/backfill
      * @param  int  $status  Which status we are setting
      */
-    public static function updateGroupStatus($id, $column, $status = 0): string
+    public static function updateGroupStatus(int $id, string $column, int $status = 0): string
     {
         self::query()->where('id', $id)->update(
             [
@@ -493,7 +484,7 @@ class UsenetGroup extends Model
      *
      * @param  int  $id  The Group ID to disable
      */
-    public static function disableIfNotExist($id): void
+    public static function disableIfNotExist(int $id): void
     {
         self::updateGroupStatus($id, 'active');
         (new ColorCLI())->error('Group does not exist on server, disabling');

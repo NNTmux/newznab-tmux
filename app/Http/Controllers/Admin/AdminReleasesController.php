@@ -6,6 +6,7 @@ use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Models\Release;
 use Blacklight\Releases;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminReleasesController extends BasePageController
@@ -34,7 +35,7 @@ class AdminReleasesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): RedirectResponse
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Release Edit';
@@ -89,7 +90,7 @@ class AdminReleasesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function destroy($id): \Illuminate\Http\RedirectResponse
+    public function destroy($id): RedirectResponse
     {
         if ($id) {
             $releases = new Releases();

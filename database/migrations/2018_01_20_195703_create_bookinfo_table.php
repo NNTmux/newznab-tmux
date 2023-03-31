@@ -7,10 +7,8 @@ class CreateBookinfoTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('bookinfo', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -37,10 +35,8 @@ class CreateBookinfoTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('bookinfo');
     }

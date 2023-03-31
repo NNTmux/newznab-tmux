@@ -22,7 +22,7 @@
 
                         <strong>Enter the pin from Google Authenticator Enable 2FA</strong><br/><br/>
                         <form class="form-horizontal" action="{{ route('2faVerify') }}" method="POST">
-                            {{ csrf_field() }}
+                            @csrf
                             <div class="form-group{{ $errors->has('one_time_password-code') ? ' has-error' : '' }}">
                                 <label for="one_time_password" class="col-md-4 control-label">One Time Password</label>
                                 <div class="col-md-6">

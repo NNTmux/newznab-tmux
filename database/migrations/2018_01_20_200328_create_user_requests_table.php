@@ -7,10 +7,8 @@ class CreateUserRequestsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('user_requests', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -27,10 +25,8 @@ class CreateUserRequestsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('user_requests');
     }

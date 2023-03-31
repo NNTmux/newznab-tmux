@@ -16,11 +16,10 @@ class UserServiceObserver
     /**
      * Handle the user "created" event.
      *
-     * @return void
      *
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
-    public function created(User $user)
+    public function created(User $user): void
     {
         $roleData = Role::query()->where('id', $user->roles_id);
         $rateLimit = $roleData->value('rate_limit');

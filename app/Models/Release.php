@@ -5,8 +5,12 @@ namespace App\Models;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
 use Blacklight\NZB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -160,26 +164,17 @@ class Release extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function group()
+    public function group(): BelongsTo
     {
         return $this->belongsTo(UsenetGroup::class, 'groups_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function download()
+    public function download(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function userRelease()
+    public function userRelease(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'releases_id');
     }
@@ -189,74 +184,47 @@ class Release extends Model
         return $this->hasMany(ReleaseFile::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'categories_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function predb()
+    public function predb(): BelongsTo
     {
         return $this->belongsTo(Predb::class, 'predb_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function failed()
+    public function failed(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'release_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function releaseExtra()
+    public function releaseExtra(): HasMany
     {
         return $this->hasMany(ReleaseExtraFull::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function nfo()
+    public function nfo(): HasOne
     {
         return $this->hasOne(ReleaseNfo::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function comment()
+    public function comment(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function releaseGroup()
+    public function releaseGroup(): HasMany
     {
         return $this->hasMany(ReleasesGroups::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function video()
+    public function video(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'videos_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function episode()
+    public function episode(): BelongsTo
     {
         return $this->belongsTo(TvEpisode::class, 'tv_episodes_id');
     }
@@ -341,11 +309,9 @@ class Release extends Model
     }
 
     /**
-     * @param  string  $guid
-     *
      * @throws \Exception
      */
-    public static function updateGrab($guid): void
+    public static function updateGrab(string $guid): void
     {
         $updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
         if ($updateGrabs) {
@@ -387,7 +353,7 @@ class Release extends Model
             ->selectRaw('SUM(grabs) as grabs')
             ->groupBy('id', 'searchname', 'adddate')
             ->havingRaw('SUM(grabs) > 0')
-            ->orderBy('grabs', 'desc')
+            ->orderByDesc('grabs')
             ->limit(10)
             ->get();
 
@@ -412,7 +378,7 @@ class Release extends Model
             ->selectRaw('SUM(comments) AS comments')
             ->groupBy('id', 'searchname', 'adddate')
             ->havingRaw('SUM(comments) > 0')
-            ->orderBy('comments', 'desc')
+            ->orderByDesc('comments')
             ->limit(10)
             ->get();
 
@@ -537,18 +503,15 @@ class Release extends Model
 
     /**
      * Get a range of releases. used in admin manage list.
-     *
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getFailedRange()
+    public static function getFailedRange(): LengthAwarePaginator
     {
         $failedList = self::query()
             ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', 'cp.title as parent_category', 'c.title as sub_category', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
             ->rightJoin('dnzb_failures', 'dnzb_failures.release_id', '=', 'releases.id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
-            ->orderBy('postdate', 'desc');
+            ->orderByDesc('postdate');
 
         return $failedList->paginate(config('nntmux.items_per_page'));
     }
@@ -578,7 +541,7 @@ class Release extends Model
                 return false;
             }
 
-            return self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->whereIn('releases.id', $searchResult)->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderBy('releases.postdate', 'desc')->first(['guid']);
+            return self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->whereIn('releases.id', $searchResult)->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderByDesc('releases.postdate')->first(['guid']);
         }
 
         return false;

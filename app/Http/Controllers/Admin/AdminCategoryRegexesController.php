@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use Blacklight\Regexes;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminCategoryRegexesController extends BasePageController
@@ -41,7 +42,7 @@ class AdminCategoryRegexesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): RedirectResponse
     {
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'category_regexes']);
@@ -83,7 +84,7 @@ class AdminCategoryRegexesController extends BasePageController
                     $regexes->updateRegex($request->all());
                 }
 
-                return redirect('admin/category_regexes-list');
+                return redirect()->to('admin/category_regexes-list');
                 break;
 
             case 'view':

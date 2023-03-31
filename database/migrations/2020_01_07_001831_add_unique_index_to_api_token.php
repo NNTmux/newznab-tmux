@@ -8,10 +8,8 @@ class AddUniqueIndexToApiToken extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
             $table->unique('api_token', 'ux_users_api_token');
@@ -20,10 +18,8 @@ class AddUniqueIndexToApiToken extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropUnique('ux_users_api_token');

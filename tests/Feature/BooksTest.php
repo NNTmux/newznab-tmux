@@ -10,7 +10,7 @@ class BooksTest extends TestCase
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      * @throws \Exception
      */
-    public function testFetchItunesBookProperties()
+    public function testFetchItunesBookProperties(): void
     {
         $book = (new \Blacklight\Books())->fetchItunesBookProperties('The Volunteer');
 

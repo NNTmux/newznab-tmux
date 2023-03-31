@@ -41,10 +41,8 @@ class TMDB extends TV
     /**
      * Main processing director function for TMDB
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
-    public function processSite($groupID, $guidChar, $process, $local = false): void
+    public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
@@ -183,15 +181,14 @@ class TMDB extends TV
      * Calls the API to perform initial show name match to TMDB title
      * Returns a formatted array of show data or false if no match.
      *
-     * @param  string  $cleanName
      * @return array|false
      */
-    protected function getShowInfo($cleanName): bool|array
+    protected function getShowInfo(string $name): bool|array
     {
         $return = $response = false;
 
         try {
-            $response = TmdbClient::getSearchApi()->searchTv($cleanName);
+            $response = TmdbClient::getSearchApi()->searchTv($name);
         } catch (TmdbApiException|\ErrorException $e) {
             return false;
         }
@@ -199,7 +196,7 @@ class TMDB extends TV
         sleep(1);
 
         if (\is_array($response) && ! empty($response['results'])) {
-            $return = $this->matchShowInfo($response['results'], $cleanName);
+            $return = $this->matchShowInfo($response['results'], $name);
         }
 
         return $return;
@@ -261,7 +258,7 @@ class TMDB extends TV
      *
      * @param  int  $videoId  -- the local Video ID
      */
-    public function getPoster($videoId): int
+    public function getPoster(int $videoId): int
     {
         $ri = new ReleaseImage();
 
@@ -284,14 +281,9 @@ class TMDB extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param  int  $tmdbid
-     * @param  int  $season
-     * @param  int  $episode
-     * @param  string  $airdate
-     * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tmdbid, $season, $episode, $airdate = '', $videoId = 0): bool|array
+    protected function getEpisodeInfo(int $tmdbid, int $season, int $episode, string $airdate = '', int $videoId = 0): bool|array
     {
         $return = false;
 

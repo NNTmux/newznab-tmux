@@ -93,7 +93,6 @@ class Settings extends Model
     /**
      * @var string
      */
-    protected $table = 'settings';
 
     /**
      * @var bool
@@ -120,7 +119,6 @@ class Settings extends Model
     /**
      * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function __get($key)
@@ -145,7 +143,7 @@ class Settings extends Model
      *
      * @throws \RuntimeException
      */
-    public static function toTree($excludeUnsectioned = true): array
+    public static function toTree(bool $excludeUnsectioned = true): array
     {
         $results = self::cursor()->remember();
 
@@ -196,7 +194,7 @@ class Settings extends Model
      * @return bool|null TRUE if Db version is greater than or eaqual to $requiredVersion,
      *                   false if not, and null if the version isn't available to check against.
      */
-    public function isDbVersionAtLeast($requiredVersion): ?bool
+    public function isDbVersionAtLeast(string $requiredVersion): ?bool
     {
         $this->fetchDbVersion();
         if (empty($this->dbVersion)) {

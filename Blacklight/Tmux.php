@@ -195,10 +195,7 @@ class Tmux
         return $sql;
     }
 
-    /**
-     * @return int
-     */
-    public function updateItem($setting, $value)
+    public function updateItem($setting, $value): int
     {
         return Settings::query()->where('setting', '=', $setting)->update(['value' => $value]);
     }
@@ -261,11 +258,10 @@ class Tmux
      * Returns random bool, weighted by $chance.
      *
      *
-     * @param  int  $chance
      *
      * @throws \Exception
      */
-    public function rand_bool($loop, $chance = 60): bool
+    public function rand_bool($loop, int $chance = 60): bool
     {
         $usecache = Settings::settingValue('site.tmux.usecache') ?? 0;
         if ($loop === 1 || $usecache === 0) {
@@ -288,13 +284,9 @@ class Tmux
     }
 
     /**
-     * @param  string  $db_name
-     * @param  string  $ppmax
-     * @param  string  $ppmin
-     *
      * @throws \Exception
      */
-    public function proc_query($qry, $bookreqids, $db_name, $ppmax = '', $ppmin = ''): bool|string
+    public function proc_query($qry, $bookreqids, string $db_name, string $ppmax = '', string $ppmin = ''): bool|string
     {
         switch ((int) $qry) {
             case 1:

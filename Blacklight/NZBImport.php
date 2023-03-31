@@ -129,7 +129,7 @@ class NZBImport
      *
      * @throws \Exception
      */
-    public function beginImport($filesToProcess, $useNzbName = false, $delete = true, $deleteFailed = true)
+    public function beginImport(array $filesToProcess, $useNzbName = false, bool $delete = true, bool $deleteFailed = true)
     {
         // Get all the groups in the DB.
         if (! $this->getAllGroups()) {
@@ -241,11 +241,9 @@ class NZBImport
     }
 
     /**
-     * @param  bool  $useNzbName
-     *
      * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, $useNzbName = false): bool
+    protected function scanNZBFile(&$nzbXML, bool $useNzbName = false): bool
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
@@ -456,10 +454,8 @@ class NZBImport
 
     /**
      * Echo message to browser or CLI.
-     *
-     * @param  string  $message
      */
-    protected function echoOut($message): void
+    protected function echoOut(string $message): void
     {
         if ($this->browser) {
             $this->retVal .= $message.'<br />';

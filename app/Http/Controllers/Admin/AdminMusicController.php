@@ -68,7 +68,7 @@ class AdminMusicController extends BasePageController
 
                     $music->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('salesrank'), $request->input('artist'), $request->input('publisher'), $request->input('releasedate'), $request->input('year'), $request->input('tracks'), $request->input('cover'), $request->input('genre'));
 
-                    return redirect('admin/music-list');
+                    return redirect()->to('admin/music-list');
 
                     break;
                 case 'view':

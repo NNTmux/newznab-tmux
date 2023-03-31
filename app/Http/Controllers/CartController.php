@@ -38,7 +38,7 @@ class CartController extends BasePageController
         $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
 
         if (empty($data)) {
-            return redirect('/cart/index');
+            return redirect()->to('/cart/index');
         }
 
         foreach ($data as $d) {
@@ -48,7 +48,7 @@ class CartController extends BasePageController
             }
         }
 
-        return redirect('/cart/index');
+        return redirect()->to('/cart/index');
     }
 
     /**
@@ -65,13 +65,13 @@ class CartController extends BasePageController
         }
 
         if (! empty($ids) && UsersRelease::delCartByGuid($ids, $this->userdata->id)) {
-            return redirect('/cart/index');
+            return redirect()->to('/cart/index');
         }
 
         if (! $id) {
-            return redirect('/cart/index');
+            return redirect()->to('/cart/index');
         }
 
-        return redirect('/cart/index');
+        return redirect()->to('/cart/index');
     }
 }

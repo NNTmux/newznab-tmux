@@ -8,10 +8,8 @@ class UpdateImdbColumnVideosTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('videos', function (Blueprint $table) {
             $table->string('imdb', 100)->default(0)->comment('ID number for IMDB site (without the \'tt\' prefix).')->change();
@@ -20,10 +18,8 @@ class UpdateImdbColumnVideosTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('videos', function (Blueprint $table) {
             $table->integer('imdb')->unsigned()->default(0)->index('ix_videos_imdb')->comment('ID number for IMDB site (without the \'tt\' prefix).');

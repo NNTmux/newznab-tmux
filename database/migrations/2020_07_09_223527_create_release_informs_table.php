@@ -8,10 +8,8 @@ class CreateReleaseInformsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('release_informs', function (Blueprint $table) {
             $table->id();
@@ -24,10 +22,8 @@ class CreateReleaseInformsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('release_informs');
     }

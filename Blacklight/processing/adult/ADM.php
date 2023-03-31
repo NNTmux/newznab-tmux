@@ -74,7 +74,7 @@ class ADM extends AdultMovies
      *
      * @return array - boxcover,backcover
      */
-    protected function covers()
+    protected function covers(): array
     {
         $baseUrl = 'http://www.adultdvdmarketplace.com/';
         if ($ret = $this->_html->find('a[rel=fancybox-button]', 0)) {
@@ -108,11 +108,8 @@ class ADM extends AdultMovies
 
     /**
      * Get Product Information and Director.
-     *
-     *
-     * @param  bool  $extras
      */
-    protected function productInfo($extras = false): array
+    protected function productInfo(bool $extras = false): array
     {
         foreach ($this->_html->find('ul.list-unstyled li') as $li) {
             $category = explode(':', $li->plaintext);

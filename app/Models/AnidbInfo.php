@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\AnidbInfo.
@@ -75,18 +76,12 @@ class AnidbInfo extends Model
      */
     protected $table = 'anidb_info';
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function title()
+    public function title(): BelongsTo
     {
         return $this->belongsTo(AnidbTitle::class, 'anidbid');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function episode()
+    public function episode(): BelongsTo
     {
         return $this->belongsTo(AnidbEpisode::class, 'anidbid');
     }

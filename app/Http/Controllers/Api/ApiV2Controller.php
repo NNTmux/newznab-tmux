@@ -16,6 +16,7 @@ use App\Transformers\DetailsTransformer;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -245,7 +246,7 @@ class ApiV2Controller extends BasePageController
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      */
-    public function getNzb(Request $request)
+    public function getNzb(Request $request): RedirectResponse
     {
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         event(new UserAccessedApi($user));

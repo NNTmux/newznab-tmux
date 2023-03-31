@@ -68,7 +68,7 @@ class ADE extends AdultMovies
      *
      * @return array - url, streamid, basestreamingurl
      */
-    protected function trailers()
+    protected function trailers(): array
     {
         $this->_response = getRawHtml(self::ADE.$this->_trailers.$this->_directUrl);
         $this->_html->loadHtml($this->_response);
@@ -100,7 +100,7 @@ class ADE extends AdultMovies
      *
      * @return array - Boxcover and backcover
      */
-    protected function covers()
+    protected function covers(): array
     {
         if ($ret = $this->_html->find('div#Boxcover, img[itemprop=image]', 1)) {
             $this->_res['boxcover'] = preg_replace('/m\.jpg/', 'h.jpg', $ret->src);
@@ -115,7 +115,7 @@ class ADE extends AdultMovies
      *
      * @return array - plot
      */
-    protected function synopsis()
+    protected function synopsis(): array
     {
         $ret = $this->_html->findOne('meta[name=og:description]')->content;
         if ($ret !== false) {
@@ -165,10 +165,9 @@ class ADE extends AdultMovies
     /**
      * Gets Product Information and/or Features.
      *
-     * @param  bool  $extras
      * @return array - ProductInfo/Extras = features
      */
-    protected function productInfo($extras = false)
+    protected function productInfo(bool $extras = false): array
     {
         $dofeature = null;
         $this->_tmpResponse = str_ireplace('Section ProductInfo', 'spdinfo', $this->_response);
@@ -202,10 +201,9 @@ class ADE extends AdultMovies
     /**
      * Searches xxx name.
      *
-     * @param  string  $movie
      * @return bool - True if releases has 90% match, else false
      */
-    public function processSite($movie): bool
+    public function processSite(string $movie): bool
     {
         if (empty($movie)) {
             return false;

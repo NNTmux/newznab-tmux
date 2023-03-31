@@ -8,10 +8,8 @@ class CreateReleasesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('releases', function (Blueprint $table) {
             $table->engine = 'InnoDB';
@@ -92,10 +90,8 @@ processed');
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('releases');
     }

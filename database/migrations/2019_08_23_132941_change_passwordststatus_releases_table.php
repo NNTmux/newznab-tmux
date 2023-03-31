@@ -8,10 +8,8 @@ class ChangePasswordststatusReleasesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('releases', function (Blueprint $table) {
             $table->smallInteger('passwordstatus')->default(-1)->change();
@@ -20,10 +18,8 @@ class ChangePasswordststatusReleasesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('releases', function (Blueprint $table) {
             $table->boolean('passwordstatus')->default(0)->change();

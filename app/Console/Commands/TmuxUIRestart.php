@@ -33,7 +33,7 @@ class TmuxUIRestart extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->call('tmux-ui:stop', ['--kill' => true]);
         $this->call('tmux-ui:start');

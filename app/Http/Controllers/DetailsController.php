@@ -21,6 +21,7 @@ use Blacklight\Music;
 use Blacklight\ReleaseExtra;
 use Blacklight\Releases;
 use Blacklight\XXX;
+use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
 {
@@ -29,7 +30,7 @@ class DetailsController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(string $guid)
+    public function show(Request $request, string $guid)
     {
         $this->setPreferences();
 
@@ -48,8 +49,8 @@ class DetailsController extends BasePageController
                 return redirect()->back();
             }
 
-            if ($this->isPostBack()) {
-                ReleaseComment::addComment($data['id'], $data['gid'], \request()->input('txtAddComment'), $this->userdata->id, \request()->ip());
+            if ($this->isPostBack($request)) {
+                ReleaseComment::addComment($data['id'], $data['gid'], $request->input('txtAddComment'), $this->userdata->id, $request->ip());
             }
 
             $nfo = ReleaseNfo::getReleaseNfo($data['id']);

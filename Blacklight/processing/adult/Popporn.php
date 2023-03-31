@@ -139,10 +139,9 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * @param  bool  $extras
      * @return array|mixed
      */
-    protected function productInfo($extras = false)
+    protected function productInfo(bool $extras = false)
     {
         $country = false;
         if ($ret = $this->_html->findOne('div#lside')) {
@@ -230,10 +229,8 @@ class Popporn extends AdultMovies
 
     /**
      * Gets categories.
-     *
-     * @return array
      */
-    protected function genres()
+    protected function genres(): array
     {
         $genres = [];
         if ($ret = $this->_html->find('div[id=thekeywords], p[class=keywords]', 1)) {
@@ -249,10 +246,9 @@ class Popporn extends AdultMovies
     /**
      * Searches for match against searchterm.
      *
-     * @param  string  $movie
      * @return bool , true if search >= 90%
      */
-    public function processSite($movie): bool
+    public function processSite(string $movie): bool
     {
         if (! empty($movie)) {
             $this->_trailUrl = self::TRAILINGSEARCH.$movie;

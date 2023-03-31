@@ -28,7 +28,6 @@ class DnzbFailure extends Model
     /**
      * @var string
      */
-    protected $table = 'dnzb_failures';
 
     /**
      * @var bool

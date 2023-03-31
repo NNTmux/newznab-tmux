@@ -3,21 +3,20 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ClearanceMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
      *
      * @throws \Exception
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        $user = Auth::user();
+        $user = $request->user();
 
         if ($user->hasAnyRole(['Admin', 'Moderator']) && ! $request->is(['Admin', 'Admin/*'])) {
             return $next($request);

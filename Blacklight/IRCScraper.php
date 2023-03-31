@@ -403,10 +403,8 @@ class IRCScraper extends IRCClient
 
     /**
      * Echo new or update pre to CLI.
-     *
-     * @param  bool  $new
      */
-    protected function _doEcho($new = true)
+    protected function _doEcho(bool $new = true)
     {
         if (! $this->_silent) {
             $nukeString = '';
@@ -460,10 +458,9 @@ class IRCScraper extends IRCClient
     /**
      * Get a group id for a group name.
      *
-     * @param  string  $groupName
      * @return mixed
      */
-    protected function _getGroupID($groupName)
+    protected function _getGroupID(string $groupName)
     {
         if (! isset($this->_groupList[$groupName])) {
             $group = UsenetGroup::query()->where('name', $groupName)->first(['id']);

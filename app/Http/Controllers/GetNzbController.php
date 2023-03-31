@@ -10,7 +10,6 @@ use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -24,7 +23,7 @@ class GetNzbController extends BasePageController
         $this->setPreferences();
 
         // Page is accessible only by the rss token, or logged in users.
-        if (Auth::check()) {
+        if ($request->user()) {
             $uid = $this->userdata->id;
             $maxDownloads = $this->userdata->role->downloadrequests;
             $rssToken = $this->userdata->api_token;

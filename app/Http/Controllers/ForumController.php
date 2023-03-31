@@ -4,23 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Forumpost;
 use App\Models\Settings;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ForumController extends BasePageController
 {
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     * @return \Illuminate\Http\RedirectResponse|void
      *
      * @throws \Exception
      */
     public function forum(Request $request)
     {
         $this->setPreferences();
-        if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
+        if ($this->isPostBack($request) && $request->has('addMessage') && $request->has('addSubject')) {
             Forumpost::add(0, $this->userdata->id, $request->input('addSubject'), $request->input('addMessage'));
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         $lock = $unlock = null;
@@ -36,13 +37,13 @@ class ForumController extends BasePageController
         if ($lock !== null) {
             Forumpost::lockUnlockTopic($lock, 1);
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         if ($unlock !== null) {
             Forumpost::lockUnlockTopic($unlock, 0);
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         $results = Forumpost::getBrowseRange();
@@ -68,11 +69,11 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function getPosts($id, Request $request)
+    public function getPosts($id, Request $request): RedirectResponse
     {
         $this->setPreferences();
 
-        if ($request->has('addMessage') && $this->isPostBack()) {
+        if ($request->has('addMessage') && $this->isPostBack($request)) {
             Forumpost::add($id, $this->userdata->id, '', $request->input('addMessage'));
 
             return redirect('forumpost/'.$id.'#last');
@@ -80,7 +81,7 @@ class ForumController extends BasePageController
 
         $results = Forumpost::getPosts($id);
         if (\count($results) === 0) {
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
         $meta_title = 'Forum Post';
@@ -103,17 +104,17 @@ class ForumController extends BasePageController
         $this->pagerender();
     }
 
-    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $id = $request->input('id') + 0;
 
         if ($id !== null) {
             Forumpost::deleteParent($id);
 
-            return redirect('forum');
+            return redirect()->to('forum');
         }
 
-        return redirect('forum');
+        return redirect()->to('forum');
     }
 
     /**
@@ -151,7 +152,7 @@ class ForumController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function destroy($id): \Illuminate\Http\RedirectResponse
+    public function destroy($id): RedirectResponse
     {
         $this->setPreferences();
 

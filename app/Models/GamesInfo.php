@@ -65,18 +65,12 @@ class GamesInfo extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return string
-     */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'ix_title_ft';
     }
 
-    /**
-     * @return array
-     */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'title' => $this->title,

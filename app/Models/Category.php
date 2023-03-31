@@ -251,7 +251,6 @@ class Category extends Model
     /**
      * @var string
      */
-    protected $table = 'categories';
 
     /**
      * @var bool
@@ -268,18 +267,12 @@ class Category extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return HasMany
-     */
-    public function releases()
+    public function releases(): HasMany
     {
         return $this->hasMany(Release::class, 'categories_id');
     }
 
-    /**
-     * @return BelongsTo
-     */
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(RootCategory::class, 'root_categories_id');
     }
@@ -301,7 +294,7 @@ class Category extends Model
             ->select(['root_categories_id', DB::raw('COUNT(r.id) as count'), 'title'])
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
             ->groupBy('title')
-            ->orderBy('count', 'desc')
+            ->orderByDesc('count')
             ->get();
 
         Cache::put(md5('RecentlyAdded'), $result, $expiresAt);
@@ -309,10 +302,7 @@ class Category extends Model
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    public static function getCategorySearch(array $cat = [])
+    public static function getCategorySearch(array $cat = []): string
     {
         $categories = [];
         // If multiple categories were sent in a single array position, slice and add them

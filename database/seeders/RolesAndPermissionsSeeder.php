@@ -10,10 +10,8 @@ class RolesAndPermissionsSeeder extends Seeder
 {
     /**
      * Run the database seeders.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Reset cached roles and permissions
         app('cache')->forget('spatie.permission.cache');

@@ -67,7 +67,7 @@ class AdminCollectionRegexesController extends BasePageController
                     $regexes->updateRegex($request->all());
                 }
 
-                return redirect('admin/collection_regexes-list');
+                return redirect()->to('admin/collection_regexes-list');
                 break;
 
             case 'view':

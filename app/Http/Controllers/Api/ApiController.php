@@ -117,7 +117,7 @@ class ApiController extends BasePageController
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $offset = $this->offset();
+        $offset = $this->offset($request);
 
         // Set API Parameters based on Request objects
         $params['extended'] = $request->has('extended') && (int) $request->input('extended') === 1 ? '1' : '0';
@@ -218,7 +218,7 @@ class ApiController extends BasePageController
                     $series,
                     $episode,
                     $airDate ?? '',
-                    $this->offset(),
+                    $this->offset($request),
                     $this->limit(),
                     $request->input('q') ?? '',
                     $this->categoryID(),
@@ -245,7 +245,7 @@ class ApiController extends BasePageController
                     $imdbId,
                     $tmdbId,
                     $traktId,
-                    $this->offset(),
+                    $this->offset($request),
                     $this->limit(),
                     $request->input('q') ?? '',
                     $this->categoryID(),
@@ -399,16 +399,16 @@ class ApiController extends BasePageController
      *
      * @return int $maxAge The maximum age of the release
      */
-    public function maxAge(): int
+    public function maxAge(Request $request): int
     {
         $maxAge = -1;
-        if (request()->has('maxage')) {
-            if (! request()->filled('maxage')) {
+        if ($request->has('maxage')) {
+            if (! $request->filled('maxage')) {
                 Utility::showApiError(201, 'Incorrect parameter (maxage must not be empty)');
-            } elseif (! is_numeric(request()->input('maxage'))) {
+            } elseif (! is_numeric($request->input('maxage'))) {
                 Utility::showApiError(201, 'Incorrect parameter (maxage must be numeric)');
             } else {
-                $maxAge = (int) request()->input('maxage');
+                $maxAge = (int) $request->input('maxage');
             }
         }
 
@@ -418,11 +418,11 @@ class ApiController extends BasePageController
     /**
      * Verify cat parameter.
      */
-    public function categoryID(): array
+    public function categoryID(Request $request): array
     {
         $categoryID[] = -1;
-        if (request()->has('cat')) {
-            $categoryIDs = urldecode(request()->input('cat'));
+        if ($request->has('cat')) {
+            $categoryIDs = urldecode($request->input('cat'));
             // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
             if (str_contains($categoryIDs, (string) Category::TV_HD) && ! str_contains($categoryIDs, (string) Category::TV_WEBDL) && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
                 $categoryIDs .= (','.Category::TV_WEBDL);
@@ -439,11 +439,11 @@ class ApiController extends BasePageController
      *
      * @throws \Exception
      */
-    public function group(): string|int|bool
+    public function group(Request $request): string|int|bool
     {
         $groupName = -1;
-        if (request()->has('group')) {
-            $group = UsenetGroup::isValidGroup(request()->input('group'));
+        if ($request->has('group')) {
+            $group = UsenetGroup::isValidGroup($request->input('group'));
             if ($group !== false) {
                 $groupName = $group;
             }
@@ -455,11 +455,11 @@ class ApiController extends BasePageController
     /**
      * Verify limit parameter.
      */
-    public function limit(): int
+    public function limit(Request $request): int
     {
         $limit = 100;
-        if (request()->has('limit') && is_numeric(request()->input('limit'))) {
-            $limit = (int) request()->input('limit');
+        if ($request->has('limit') && is_numeric($request->input('limit'))) {
+            $limit = (int) $request->input('limit');
         }
 
         return $limit;
@@ -468,11 +468,11 @@ class ApiController extends BasePageController
     /**
      * Verify offset parameter.
      */
-    public function offset(): int
+    public function offset(Request $request): int
     {
         $offset = 0;
-        if (request()->has('offset') && is_numeric(request()->input('offset'))) {
-            $offset = (int) request()->input('offset');
+        if ($request->has('offset') && is_numeric($request->input('offset'))) {
+            $offset = (int) $request->input('offset');
         }
 
         return $offset;
@@ -481,9 +481,9 @@ class ApiController extends BasePageController
     /**
      * Check if a parameter is empty.
      */
-    public function verifyEmptyParameter(string $parameter): void
+    public function verifyEmptyParameter(Request $request, string $parameter): void
     {
-        if (request()->has($parameter) && request()->isNotFilled($parameter)) {
+        if ($request->has($parameter) && $request->isNotFilled($parameter)) {
             Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
         }
     }

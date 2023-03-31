@@ -49,10 +49,8 @@ class TVMaze extends TV
     /**
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
-    public function processSite($groupID, $guidChar, $process, $local = false): void
+    public function processSite($groupID, $guidChar, $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVMAZE);
 
@@ -213,30 +211,29 @@ class TVMaze extends TV
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param  string  $cleanName
      * @return array|false
      */
-    protected function getShowInfo($cleanName)
+    protected function getShowInfo(string $name)
     {
         $return = $response = false;
 
         // TVMaze does NOT like shows with the year in them even without the parentheses
         // Do this for the API Search only as a local lookup should require it
-        $cleanName = preg_replace('# \((19|20)\d{2}\)$#', '', $cleanName);
+        $name = preg_replace('# \((19|20)\d{2}\)$#', '', $name);
 
         //Try for the best match with AKAs embedded
-        $response = $this->client->singleSearchAkas($cleanName);
+        $response = $this->client->singleSearchAkas($name);
 
         sleep(1);
 
         if (\is_array($response)) {
-            $return = $this->matchShowInfo($response, $cleanName);
+            $return = $this->matchShowInfo($response, $name);
         }
         if ($return === false) {
             //Try for the best match via full search (no AKAs can be returned but the search is better)
-            $response = $this->client->search($cleanName);
+            $response = $this->client->search($name);
             if (\is_array($response)) {
-                $return = $this->matchShowInfo($response, $cleanName);
+                $return = $this->matchShowInfo($response, $name);
             }
         }
         //If we didn't get any aliases do a direct alias lookup
@@ -296,7 +293,7 @@ class TVMaze extends TV
      *
      * @param  int  $videoId  -- the local Video ID
      */
-    public function getPoster($videoId): int
+    public function getPoster(int $videoId): int
     {
         $ri = new ReleaseImage();
 
@@ -319,14 +316,9 @@ class TVMaze extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param  int  $tvMazeId
-     * @param  int  $season
-     * @param  int  $episode
-     * @param  string  $airDate
-     * @param  int  $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tvMazeId, $season, $episode, $airDate = '', $videoId = 0)
+    protected function getEpisodeInfo(int $tvMazeId, int $season, int $episode, string $airDate = '', int $videoId = 0)
     {
         $return = $response = false;
 

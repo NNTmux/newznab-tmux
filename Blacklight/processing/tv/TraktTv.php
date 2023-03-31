@@ -64,10 +64,8 @@ class TraktTv extends TV
     /**
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
-     *
-     * @param  bool  $local
      */
-    public function processSite($groupID, $guidChar, $process, $local = false): void
+    public function processSite($groupID, $guidChar, int $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TRAKT);
 
@@ -195,14 +193,9 @@ class TraktTv extends TV
     }
 
     /**
-     * Retrieve info of TV episode from site using its API.
-     *
-     * @param  int  $siteId
-     * @param  int  $series
-     * @param  int  $episode
-     * @return array|false False on failure, an array of information fields otherwise.
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getEpisodeInfo($siteId, $series, $episode)
+    public function getEpisodeInfo(int $siteId, int $series, int $episode): array|bool
     {
         $return = false;
 
@@ -228,7 +221,7 @@ class TraktTv extends TV
      *
      * @param  int  $videoId  ID from videos table.
      */
-    public function getPoster($videoId): int
+    public function getPoster(int $videoId): int
     {
         $hascover = 0;
         $ri = new ReleaseImage();
@@ -252,12 +245,11 @@ class TraktTv extends TV
     }
 
     /**
-     * Retrieve info of TV programme from site using it's API.
+     * @return array|false
      *
-     * @param  string|null|array  $name  Title of programme to look up. Usually a cleaned up version from releases table.
-     * @return array|false False on failure, an array of information fields otherwise.
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getShowInfo($name)
+    public function getShowInfo(string $name): array|bool
     {
         $return = $response = false;
         $highestMatch = 0;

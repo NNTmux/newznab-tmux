@@ -28,10 +28,8 @@ class Handler extends ExceptionHandler
 
     /**
      * Catch errors with Sentry.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->reportable(function (Throwable $e) {
             if (app()->bound('sentry')) {
@@ -44,7 +42,6 @@ class Handler extends ExceptionHandler
      * Report or log an exception.
      *
      *
-     * @param  \Exception  $exception
      * @return void
      *
      * @throws \Throwable

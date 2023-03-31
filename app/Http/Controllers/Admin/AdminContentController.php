@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use Blacklight\Contents;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminContentController extends BasePageController
@@ -32,7 +33,7 @@ class AdminContentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): RedirectResponse
     {
         $this->setAdminPrefs();
         $contents = new Contents();
@@ -108,7 +109,7 @@ class AdminContentController extends BasePageController
         $this->adminrender();
     }
 
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if ($request->has('id')) {
             $contents = new Contents();
@@ -117,6 +118,6 @@ class AdminContentController extends BasePageController
 
         $referrer = $request->server('HTTP_REFERER');
 
-        return redirect($referrer);
+        return redirect()->to($referrer);
     }
 }

@@ -147,7 +147,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    public function removeByCriteria($arguments)
+    public function removeByCriteria(array $arguments)
     {
         $this->delete = true;
         $this->ignoreUserCheck = false;
@@ -212,7 +212,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    public function removeCrap($delete, $time, $type = '', $blacklistID = '')
+    public function removeCrap(bool $delete, $time, string $type = '', $blacklistID = '')
     {
         $timeStart = now();
         $this->delete = $delete;
@@ -1037,7 +1037,6 @@ class ReleaseRemover
     /**
      * Delete releases from the database.
      *
-     * @return true
      *
      * @throws \Exception
      */
@@ -1089,7 +1088,7 @@ class ReleaseRemover
      * @param  string  $argument  User argument.
      * @return string|false
      */
-    protected function formatCriteriaQuery($argument)
+    protected function formatCriteriaQuery(string $argument)
     {
         // Check if the user wants to ignore the check.
         if ($argument === 'ignore') {
@@ -1257,10 +1256,8 @@ class ReleaseRemover
 
     /**
      * Check if the user wants to run the current query.
-     *
-     * @return bool
      */
-    protected function checkUserResponse()
+    protected function checkUserResponse(): bool
     {
         if ($this->ignoreUserCheck || $this->browser) {
             return true;
@@ -1287,10 +1284,8 @@ class ReleaseRemover
 
     /**
      * Remove multiple spaces and trim leading spaces.
-     *
-     * @param  string  $string
      */
-    protected function cleanSpaces($string): string
+    protected function cleanSpaces(string $string): string
     {
         return trim(preg_replace('/\s{2,}/', ' ', $string));
     }
@@ -1301,7 +1296,7 @@ class ReleaseRemover
      * @param  string  $string  The string to format.
      * @param  string  $type  The column name.
      */
-    protected function formatLike($string, $type): string
+    protected function formatLike(string $string, string $type): string
     {
         $newString = explode(' ', $string);
         if (\count($newString) > 1) {
@@ -1331,10 +1326,9 @@ class ReleaseRemover
     }
 
     /**
-     * @param  string  $dbRegex
      * @return bool|mixed|string
      */
-    protected function extractSrchFromRegx($dbRegex = '')
+    protected function extractSrchFromRegx(string $dbRegex = '')
     {
         $regexMatch = '';
 

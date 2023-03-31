@@ -47,7 +47,7 @@ class AdminCategoryController extends BasePageController
                     $request->input('maxsizetoformrelease')
                 );
 
-                return redirect('admin/category-list');
+                return redirect()->to('admin/category-list');
                 break;
             case 'view':
             default:

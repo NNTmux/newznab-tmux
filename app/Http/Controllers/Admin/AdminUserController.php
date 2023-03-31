@@ -6,6 +6,7 @@ use App\Http\Controllers\BasePageController;
 use App\Jobs\SendAccountChangedEmail;
 use App\Models\Invitation;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
@@ -29,7 +30,7 @@ class AdminUserController extends BasePageController
 
         $ordering = getUserBrowseOrdering();
         $orderBy = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
-        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $variables = [
@@ -50,7 +51,7 @@ class AdminUserController extends BasePageController
             true
         );
 
-        $results = $this->paginate($rslt ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $this->smarty->assign(
             [
@@ -79,7 +80,7 @@ class AdminUserController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): RedirectResponse
     {
         $this->setAdminPrefs();
 
@@ -152,7 +153,7 @@ class AdminUserController extends BasePageController
                 }
 
                 if ($ret >= 0) {
-                    return redirect('admin/user-list');
+                    return redirect()->to('admin/user-list');
                 }
 
                 switch ($ret) {
@@ -211,27 +212,27 @@ class AdminUserController extends BasePageController
         $this->adminrender();
     }
 
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
 
             $user->delete();
 
-            return redirect('admin/user-list');
+            return redirect()->to('admin/user-list');
         }
 
         if ($request->has('redir')) {
-            return redirect($request->input('redir'));
+            return redirect()->to($request->input('redir'));
         }
 
-        return redirect($request->server('HTTP_REFERER'));
+        return redirect()->to($request->server('HTTP_REFERER'));
     }
 
     /**
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
-    public function resendVerification(Request $request): \Illuminate\Http\RedirectResponse
+    public function resendVerification(Request $request): RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
@@ -245,7 +246,7 @@ class AdminUserController extends BasePageController
         return redirect()->back()->with('error', 'User is invalid');
     }
 
-    public function verify(Request $request): \Illuminate\Http\RedirectResponse
+    public function verify(Request $request): RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));

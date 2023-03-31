@@ -28,7 +28,6 @@ class ReleaseSubtitle extends Model
     /**
      * @var string
      */
-    protected $table = 'release_subtitles';
 
     /**
      * @var bool

@@ -8,8 +8,11 @@ use App\Jobs\SendInviteEmail;
 use Carbon\CarbonImmutable;
 use DariusIII\Token\Facades\Token;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
@@ -179,7 +182,6 @@ class User extends Authenticatable
     /**
      * @var string
      */
-    protected $table = 'users';
 
     /**
      * @var bool
@@ -196,66 +198,42 @@ class User extends Authenticatable
      */
     protected $guarded = [];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function role()
+    public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'roles_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function request()
+    public function request(): HasMany
     {
         return $this->hasMany(UserRequest::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function download()
+    public function download(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function release()
+    public function release(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function series()
+    public function series(): HasMany
     {
         return $this->hasMany(UserSerie::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function invitation()
+    public function invitation(): HasMany
     {
         return $this->hasMany(Invitation::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function failedRelease()
+    public function failedRelease(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'users_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function comment()
+    public function comment(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'users_id');
     }
@@ -268,13 +246,7 @@ class User extends Authenticatable
         self::find($id)->delete();
     }
 
-    /**
-     * @param  string  $role
-     * @param  string  $username
-     * @param  string  $host
-     * @param  string  $email
-     */
-    public static function getCount($role = '', $username = '', $host = '', $email = ''): int
+    public static function getCount(string $role = '', string $username = '', string $host = '', string $email = ''): int
     {
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
@@ -396,11 +368,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     *
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false)
+    public static function getRange($start, $offset, $orderBy, string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false): Collection
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
@@ -717,7 +687,7 @@ class User extends Authenticatable
      */
     public static function getTopGrabbers()
     {
-        return self::query()->selectRaw('id, username, SUM(grabs) as grabs')->groupBy('id', 'username')->having('grabs', '>', 0)->orderBy('grabs', 'desc')->limit(10)->get();
+        return self::query()->selectRaw('id, username, SUM(grabs) as grabs')->groupBy('id', 'username')->having('grabs', '>', 0)->orderByDesc('grabs')->limit(10)->get();
     }
 
     /**
@@ -725,7 +695,7 @@ class User extends Authenticatable
      */
     public static function getUsersByMonth()
     {
-        return self::query()->whereNotNull('created_at')->where('created_at', '<>', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderBy('created_at', 'desc')->get();
+        return self::query()->whereNotNull('created_at')->where('created_at', '<>', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderByDesc('created_at')->get();
     }
 
     /**

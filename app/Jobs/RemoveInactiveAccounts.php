@@ -25,10 +25,8 @@ class RemoveInactiveAccounts implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         User::query()->where('lastlogin', '<', now()->subMonths(6))->where('apiaccess', '<', now()->subMonths(6))->where('roles_id', '=', 1)->delete();
         User::query()->where('lastlogin', '<', now()->subMonths(6))->whereNull('apiaccess')->where('roles_id', '=', 1)->delete();

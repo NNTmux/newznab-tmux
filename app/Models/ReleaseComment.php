@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\ReleaseComment.
@@ -65,18 +67,12 @@ class ReleaseComment extends Model
      */
     protected $dateFormat = false;
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function release()
+    public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }
@@ -92,12 +88,9 @@ class ReleaseComment extends Model
         return self::query()->where('id', $id)->first();
     }
 
-    /**
-     * @return array
-     */
-    public static function getComments($id)
+    public static function getComments($id): array
     {
-        return self::query()->where('releases_id', $id)->orderBy('created_at', 'desc')->get()->toArray();
+        return self::query()->where('releases_id', $id)->orderByDesc('created_at')->get()->toArray();
     }
 
     public static function getCommentCount(): int
@@ -153,16 +146,13 @@ class ReleaseComment extends Model
 
     /**
      * Get release_comments rows by limit.
-     *
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getCommentsRange()
+    public static function getCommentsRange(): LengthAwarePaginator
     {
         $range = self::query()
             ->select(['release_comments.*', 'releases.guid'])
             ->leftJoin('releases', 'releases.id', '=', 'release_comments.releases_id')
-            ->orderBy('release_comments.created_at', 'desc');
+            ->orderByDesc('release_comments.created_at');
 
         return $range->paginate(config('nntmux.items_per_page'));
     }
@@ -186,17 +176,14 @@ class ReleaseComment extends Model
         return $res;
     }
 
-    /**
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public static function getCommentsForUserRange($uid)
+    public static function getCommentsForUserRange($uid): LengthAwarePaginator
     {
         return self::query()
             ->select(['release_comments.*', 'r.guid', 'r.searchname', 'u.username'])
             ->join('releases as r', 'r.id', '=', 'release_comments.releases_id')
             ->leftJoin('users as u', 'u.id', '=', 'release_comments.users_id')
             ->where('users_id', $uid)
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->paginate(config('nntmux.items_per_page'));
     }
 }
