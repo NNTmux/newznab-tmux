@@ -5,33 +5,22 @@ namespace Blacklight;
 use App\Models\UsenetGroup;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 /**
  * Class NZBExport.
  */
 class NZBExport
 {
-    /**
-     * @var mixed
-     */
-    protected $browser;
+    protected mixed $browser;
 
     protected $retVal;
 
-    /**
-     * @var NZB
-     */
-    protected $nzb;
+    protected NZB $nzb;
 
-    /**
-     * @var Releases
-     */
-    protected $releases;
+    protected Releases $releases;
 
-    /**
-     * @var bool
-     */
-    protected $echoCLI;
+    protected bool $echoCLI;
 
     /**
      * NZBExport constructor.
@@ -70,8 +59,8 @@ class NZBExport
         $path = $params[0];
 
         // Check if the path ends with dir separator.
-        if (substr($path, -1) !== DS) {
-            $path .= DS;
+        if (! Str::endsWith($path, '/')) {
+            $path .= '/';
         }
 
         // Check if it's a directory.
@@ -202,9 +191,9 @@ class NZBExport
     }
 
     /**
-     * @return bool|string
+     * @return true
      */
-    protected function returnValue()
+    protected function returnValue(): bool
     {
         return $this->browser ? $this->retVal : true;
     }

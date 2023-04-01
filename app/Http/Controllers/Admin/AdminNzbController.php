@@ -7,6 +7,7 @@ use Blacklight\NZBExport;
 use Blacklight\NZBImport;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminNzbController extends BasePageController
 {
@@ -39,8 +40,8 @@ class AdminNzbController extends BasePageController
 
                 // Get the path the user set in the browser if he put one.
                 $path = ($request->has('folder') ? $request->input('folder') : '');
-                if (substr($path, \strlen($path) - 1) !== DS) {
-                    $path .= DS;
+                if (! Str::endsWith($path, '/')) {
+                    $path .= '/';
                 }
 
                 // Get the files from the user specified path.

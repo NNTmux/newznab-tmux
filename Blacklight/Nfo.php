@@ -78,7 +78,7 @@ class Nfo
 
         $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {
-            $this->tmpPath .= DS;
+            $this->tmpPath .= '/';
         }
     }
 
