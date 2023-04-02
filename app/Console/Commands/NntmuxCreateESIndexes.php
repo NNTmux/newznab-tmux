@@ -83,7 +83,7 @@ class NntmuxCreateESIndexes extends Command
 
         $response = Elasticsearch::indices()->create($releases_index);
 
-        $this->info($response);
+        $this->info('Index releases created successfully');
         if (Elasticsearch::indices()->exists(['index' => 'predb'])) {
             Elasticsearch::indices()->delete(['index' => 'predb']);
         }
@@ -118,7 +118,7 @@ class NntmuxCreateESIndexes extends Command
 
         $response = Elasticsearch::indices()->create($predb_index);
 
-        $this->info($response);
+        $this->info('Index predb created successfully');
 
         $this->info('All done! ElasticSearch indexes are created now.');
     }
