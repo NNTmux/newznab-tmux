@@ -447,7 +447,6 @@ class IRCClient
 
         if (! empty($channels)) {
             foreach ($channels as $channel => $password) {
-
                 $this->_joinChannel($channel, $password ?? '');
             }
         }

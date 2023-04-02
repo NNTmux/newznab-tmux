@@ -187,7 +187,7 @@ class TraktTv extends TV
     /**
      * Fetch banner from site.
      */
-    public function getBanner($videoId, $siteID): bool
+    public function getBanner($videoId, $siteId): bool
     {
         return false;
     }
@@ -223,25 +223,25 @@ class TraktTv extends TV
      */
     public function getPoster(int $videoId): int
     {
-        $hascover = 0;
+        $hasCover = 0;
         $ri = new ReleaseImage();
 
         if ($this->posterUrl !== '') {
             // Try to get the Poster
-            $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
+            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
         }
 
         // Couldn't get poster, try fan art instead
-        if ($hascover !== 1 && $this->fanartUrl !== '') {
-            $hascover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath, '', '');
+        if ($hasCover !== 1 && $this->fanartUrl !== '') {
+            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath, '', '');
         }
 
         // Mark it retrieved if we saved an image
-        if ($hascover === 1) {
+        if ($hasCover === 1) {
             $this->setCoverFound($videoId);
         }
 
-        return $hascover;
+        return $hasCover;
     }
 
     /**

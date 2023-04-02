@@ -9,17 +9,17 @@ abstract class AdultMovies
     /**
      * @var \voku\helper\HtmlDomParser
      */
-    protected $_html;
+    protected HtmlDomParser $_html;
 
     /**
      * @var string
      */
-    protected $_title;
+    protected string $_title;
 
     /**
      * @var string
      */
-    protected $_directUrl;
+    protected string $_directUrl;
 
     /**
      * AdultMovies constructor.
@@ -30,48 +30,48 @@ abstract class AdultMovies
     }
 
     /**
-     * @param  bool  $extras
-     * @return mixed
+     * @param bool $extras
+     * @return array|mixed
      */
-    abstract protected function productInfo($extras = false);
+    abstract protected function productInfo(bool $extras = false): mixed;
 
     /**
      * @return mixed
      */
-    abstract protected function covers();
+    abstract protected function covers(): mixed;
 
     /**
      * @return mixed
      */
-    abstract protected function synopsis();
+    abstract protected function synopsis(): mixed;
 
     /**
      * @return mixed
      */
-    abstract protected function cast();
+    abstract protected function cast(): mixed;
 
     /**
      * @return mixed
      */
-    abstract protected function genres();
+    abstract protected function genres(): mixed;
 
     /**
-     * @param  string  $movie
+     * @param string $movie
      * @return mixed
      */
-    abstract public function processSite($movie);
+    abstract public function processSite(string $movie): mixed;
 
     /**
      * @return mixed
      */
-    abstract protected function trailers();
+    abstract protected function trailers(): mixed;
 
     /**
      * Gets all information.
      *
      * @return array|false
      */
-    public function getAll()
+    public function getAll(): bool|array
     {
         $results = [];
         if ($this->_directUrl !== null) {

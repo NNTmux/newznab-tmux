@@ -9,14 +9,14 @@ class Popporn extends AdultMovies
      *
      * @var string string
      */
-    public $cookie = '';
+    public string $cookie = '';
 
     /**
      * Set this for what you are searching for.
      *
      * @var string
      */
-    protected $searchTerm = '';
+    protected string $searchTerm = '';
 
     /**
      * Override if 18 years+ or older
@@ -34,7 +34,7 @@ class Popporn extends AdultMovies
      *
      * @var string
      */
-    protected $_directUrl = '';
+    protected string $_directUrl = '';
 
     /**
      * Curl Raw Html.
@@ -46,21 +46,21 @@ class Popporn extends AdultMovies
      *
      * @var array
      */
-    protected $_res = [];
+    protected array $_res = [];
 
     /**
      * This is set in the getAll method.
      *
      * @var string
      */
-    protected $_title = '';
+    protected string $_title = '';
 
     /**
      * Add this to popurl to get results.
      *
      * @var string
      */
-    protected $_trailUrl = '';
+    protected string $_trailUrl = '';
 
     private $_postParams;
 
@@ -91,9 +91,9 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * @return array|mixed
+     * @return mixed
      */
-    protected function synopsis()
+    protected function synopsis(): mixed
     {
         if ($ret = $this->_html->find('div[id=product-info] ,h3[class=highlight]', 1)) {
             if ($ret->next_sibling()->plaintext) {
@@ -113,9 +113,9 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * @return array|mixed
+     * @return mixed
      */
-    protected function trailers()
+    protected function trailers(): mixed
     {
         if ($ret = $this->_html->findOne('input#thickbox-trailer-link')) {
             $ret->value = trim($ret->value);
@@ -139,9 +139,10 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * @return array|mixed
+     * @param bool $extras
+     * @return mixed
      */
-    protected function productInfo(bool $extras = false)
+    protected function productInfo(bool $extras = false): mixed
     {
         $country = false;
         if ($ret = $this->_html->findOne('div#lside')) {

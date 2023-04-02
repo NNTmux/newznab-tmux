@@ -40,7 +40,7 @@ class Hotmovies extends AdultMovies
      *
      * @var string
      */
-    protected $_directUrl = '';
+    protected string $_directUrl = '';
 
     /**
      * Sets the link to get in curl.
@@ -73,9 +73,9 @@ class Hotmovies extends AdultMovies
      *
      * @var string
      */
-    protected $_title = '';
+    protected string $_title = '';
 
-    protected function trailers()
+    protected function trailers(): mixed
     {
         // TODO: Implement trailers() method.
 
@@ -101,7 +101,7 @@ class Hotmovies extends AdultMovies
     /**
      * Process ProductInfo.
      */
-    protected function productInfo(bool $extras = false): array
+    protected function productInfo(bool $extras = false): mixed
     {
         $studio = false;
         $director = false;
@@ -166,7 +166,7 @@ class Hotmovies extends AdultMovies
         $genres = [];
         if ($ret = $this->_html->findOne('div.categories')) {
             foreach ($ret->find('a') as $e) {
-                if (strpos($e->title, ' -> ') !== false) {
+                if (str_contains($e->title, ' -> ')) {
                     $e = explode(' -> ', $e->plaintext);
                     $genres[] = trim($e[1]);
                 }
@@ -181,9 +181,9 @@ class Hotmovies extends AdultMovies
      * Get Box Cover Images.
      *
      *
-     * @return array|false|mixed
+     * @return mixed
      */
-    protected function covers()
+    protected function covers(): mixed
     {
         if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
             $this->_res['boxcover'] = trim($ret->src);

@@ -27,7 +27,7 @@ class AEBN extends AdultMovies
      *
      * @var string
      */
-    protected $_directUrl = '';
+    protected string $_directUrl = '';
 
     /**
      * Raw Html response from curl.
@@ -60,15 +60,15 @@ class AEBN extends AdultMovies
      *
      * @var string
      */
-    protected $_title = '';
+    protected string $_title = '';
 
     /**
      * Gets Trailer URL .. will be processed in XXX insertswf.
      *
      *
-     * @return array|mixed
+     * @return mixed
      */
-    protected function trailers()
+    protected function trailers(): mixed
     {
         $ret = $this->_html->find('a[itemprop=trailer]', 0);
         if (! empty($ret) && preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $hits)) {
@@ -142,7 +142,7 @@ class AEBN extends AdultMovies
     /**
      * Gets the product information.
      */
-    protected function productInfo(bool $extras = false): array
+    protected function productInfo(bool $extras = false): mixed
     {
         if ($ret = $this->_html->find('div#md-detailsLeft', 0)) {
             foreach ($ret->find('div') as $div) {

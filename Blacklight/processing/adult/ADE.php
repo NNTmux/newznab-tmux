@@ -12,14 +12,14 @@ class ADE extends AdultMovies
      *
      * @var string
      */
-    protected $directLink = '';
+    protected string $directLink = '';
 
     /**
      * Search keyword.
      *
      * @var string
      */
-    protected $searchTerm = '';
+    protected string $searchTerm = '';
 
     /**
      * Define ADE Url here.
@@ -31,17 +31,17 @@ class ADE extends AdultMovies
      *
      * @var string
      */
-    protected $_directUrl = '';
+    protected string $_directUrl = '';
 
     /**
      * Sets the title in the getAll method.
      *
      * @var string
      */
-    protected $_title = '';
+    protected string $_title = '';
 
     /** Trailing urls */
-    protected $_dvdQuery = '/dvd/search?q=';
+    protected string $_dvdQuery = '/dvd/search?q=';
 
     protected $_scenes = '/scenes';
 
@@ -147,9 +147,9 @@ class ADE extends AdultMovies
     /**
      * Gets Genres, if exists return array else return false.
      *
-     * @return mixed array - Genres
+     * @return mixed - Genres
      */
-    protected function genres()
+    protected function genres(): mixed
     {
         $genres = [];
         foreach ($this->_html->find('[Label="Category"]') as $a) {
@@ -163,11 +163,10 @@ class ADE extends AdultMovies
     }
 
     /**
-     * Gets Product Information and/or Features.
-     *
-     * @return array - ProductInfo/Extras = features
+     * @param bool $extras
+     * @return mixed
      */
-    protected function productInfo(bool $extras = false): array
+    protected function productInfo(bool $extras = false): mixed
     {
         $dofeature = null;
         $this->_tmpResponse = str_ireplace('Section ProductInfo', 'spdinfo', $this->_response);

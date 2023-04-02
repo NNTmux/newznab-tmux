@@ -20,35 +20,35 @@ class ADM extends AdultMovies
      *
      * @var string string
      */
-    public $cookie = '';
+    public string $cookie = '';
 
     /**
      * Direct Link given from outside url doesn't do a search.
      *
      * @var string
      */
-    protected $directLink = '';
+    protected string $directLink = '';
 
     /**
      * Set this for what you are searching for.
      *
      * @var string
      */
-    protected $searchTerm = '';
+    protected string $searchTerm = '';
 
     /**
      * Sets the directurl for the return results array.
      *
      * @var string
      */
-    protected $_directUrl = '';
+    protected string $_directUrl = '';
 
     /**
      * Results returned from each method.
      *
      * @var array
      */
-    protected $_res = [];
+    protected array $_res = [];
 
     /**
      * Curl Raw Html.
@@ -60,14 +60,14 @@ class ADM extends AdultMovies
      *
      * @var string
      */
-    protected $_trailUrl = '';
+    protected string $_trailUrl = '';
 
     /**
      * This is set in the getAll method.
      *
      * @var string
      */
-    protected $_title = '';
+    protected string $_title = '';
 
     /**
      * Get Box Cover Images.
@@ -109,7 +109,7 @@ class ADM extends AdultMovies
     /**
      * Get Product Information and Director.
      */
-    protected function productInfo(bool $extras = false): array
+    protected function productInfo(bool $extras = false): mixed
     {
         foreach ($this->_html->find('ul.list-unstyled li') as $li) {
             $category = explode(':', $li->plaintext);
@@ -175,7 +175,7 @@ class ADM extends AdultMovies
      *
      * @return bool - true if search = 100%
      */
-    public function processSite($movie): bool
+    public function processSite(string $movie): bool
     {
         $result = false;
         if (! empty($movie)) {
@@ -209,7 +209,7 @@ class ADM extends AdultMovies
         return $result;
     }
 
-    protected function trailers()
+    protected function trailers(): mixed
     {
         // TODO: Implement trailers() method.
 

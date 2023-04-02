@@ -41,7 +41,7 @@ class TVMaze extends TV
     /**
      * Fetch banner from site.
      */
-    public function getBanner($videoId, $siteID): bool
+    public function getBanner($videoId, $siteId): bool
     {
         return false;
     }
