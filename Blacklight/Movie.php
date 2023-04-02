@@ -509,11 +509,14 @@ class Movie
     }
 
     /**
-     * Returns a tmdb, imdb or trakt variable, the one that is set. Empty string if both not set.
-     *
+     * @param string|array $variable1
+     * @param string|array $variable2
+     * @param string|array $variable3
+     * @param string|array $variable4
+     * @param string|array $variable5
      * @return array|string
      */
-    protected function setVariables(string $variable1, string $variable2, string $variable3, string $variable4, string $variable5)
+    protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5)
     {
         if (! empty($variable1)) {
             return $variable1;
