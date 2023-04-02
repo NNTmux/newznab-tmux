@@ -447,7 +447,8 @@ class IRCClient
 
         if (! empty($channels)) {
             foreach ($channels as $channel => $password) {
-                $this->_joinChannel($channel, $password);
+
+                $this->_joinChannel($channel, $password ?? '');
             }
         }
 
@@ -465,7 +466,7 @@ class IRCClient
     /**
      * Join a channel.
      */
-    protected function _joinChannel(string $channel, string $password)
+    protected function _joinChannel(string $channel, string $password): void
     {
         $this->_writeSocket('JOIN '.$channel.(empty($password) ? '' : ' '.$password));
     }
