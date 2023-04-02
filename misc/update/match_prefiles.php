@@ -5,7 +5,7 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 
-if (! isset($argv[1]) && ($argv[1] !== 'full' || ! is_numeric($argv[1]))) {
+if (empty($argv[1]) && ($argv[1] !== 'full' || ! is_numeric($argv[1]))) {
     exit(
         (new ColorCLI())->error(
             PHP_EOL
