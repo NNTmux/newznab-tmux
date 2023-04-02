@@ -7792,16 +7792,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.2.5",
+            "version": "2.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "c4af70893edbfb4e79bdb7e1499340046c585846"
+                "reference": "426181572a4938873d7e4823ac0ea1fd0c7fabb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/c4af70893edbfb4e79bdb7e1499340046c585846",
-                "reference": "c4af70893edbfb4e79bdb7e1499340046c585846",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/426181572a4938873d7e4823ac0ea1fd0c7fabb9",
+                "reference": "426181572a4938873d7e4823ac0ea1fd0c7fabb9",
                 "shasum": ""
             },
             "require": {
@@ -7855,7 +7855,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.2.5"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.2.6"
             },
             "funding": [
                 {
@@ -7863,7 +7863,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-20T18:47:39+00:00"
+            "time": "2023-04-01T01:18:52+00:00"
         },
         {
             "name": "psr/cache",
@@ -15898,16 +15898,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.9",
+            "version": "1.10.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "9b13dafe3d66693d20fe5729c3dde1d31bb64703"
+                "reference": "f1e22c9b17a879987f8743d81533250a5fff47f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9b13dafe3d66693d20fe5729c3dde1d31bb64703",
-                "reference": "9b13dafe3d66693d20fe5729c3dde1d31bb64703",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/f1e22c9b17a879987f8743d81533250a5fff47f9",
+                "reference": "f1e22c9b17a879987f8743d81533250a5fff47f9",
                 "shasum": ""
             },
             "require": {
@@ -15956,7 +15956,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-03-30T08:58:01+00:00"
+            "time": "2023-04-01T17:06:15+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
