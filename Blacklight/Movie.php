@@ -509,11 +509,6 @@ class Movie
     }
 
     /**
-     * @param string|array $variable1
-     * @param string|array $variable2
-     * @param string|array $variable3
-     * @param string|array $variable4
-     * @param string|array $variable5
      * @return array|string
      */
     protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5)
