@@ -24,29 +24,21 @@ class ADM extends AdultMovies
 
     /**
      * Direct Link given from outside url doesn't do a search.
-     *
-     * @var string
      */
     protected string $directLink = '';
 
     /**
      * Set this for what you are searching for.
-     *
-     * @var string
      */
     protected string $searchTerm = '';
 
     /**
      * Sets the directurl for the return results array.
-     *
-     * @var string
      */
     protected string $_directUrl = '';
 
     /**
      * Results returned from each method.
-     *
-     * @var array
      */
     protected array $_res = [];
 
@@ -57,15 +49,11 @@ class ADM extends AdultMovies
 
     /**
      * Add this to popurl to get results.
-     *
-     * @var string
      */
     protected string $_trailUrl = '';
 
     /**
      * This is set in the getAll method.
-     *
-     * @var string
      */
     protected string $_title = '';
 

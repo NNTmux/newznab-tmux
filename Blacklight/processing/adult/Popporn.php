@@ -13,8 +13,6 @@ class Popporn extends AdultMovies
 
     /**
      * Set this for what you are searching for.
-     *
-     * @var string
      */
     protected string $searchTerm = '';
 
@@ -31,8 +29,6 @@ class Popporn extends AdultMovies
 
     /**
      * Sets the directurl for the return results array.
-     *
-     * @var string
      */
     protected string $_directUrl = '';
 
@@ -43,22 +39,16 @@ class Popporn extends AdultMovies
 
     /**
      * Results returned from each method.
-     *
-     * @var array
      */
     protected array $_res = [];
 
     /**
      * This is set in the getAll method.
-     *
-     * @var string
      */
     protected string $_title = '';
 
     /**
      * Add this to popurl to get results.
-     *
-     * @var string
      */
     protected string $_trailUrl = '';
 
@@ -90,9 +80,6 @@ class Popporn extends AdultMovies
         return $this->_res;
     }
 
-    /**
-     * @return mixed
-     */
     protected function synopsis(): mixed
     {
         if ($ret = $this->_html->find('div[id=product-info] ,h3[class=highlight]', 1)) {
@@ -112,9 +99,6 @@ class Popporn extends AdultMovies
         return $this->_res;
     }
 
-    /**
-     * @return mixed
-     */
     protected function trailers(): mixed
     {
         if ($ret = $this->_html->findOne('input#thickbox-trailer-link')) {
@@ -138,10 +122,6 @@ class Popporn extends AdultMovies
         return $this->_res;
     }
 
-    /**
-     * @param bool $extras
-     * @return mixed
-     */
     protected function productInfo(bool $extras = false): mixed
     {
         $country = false;

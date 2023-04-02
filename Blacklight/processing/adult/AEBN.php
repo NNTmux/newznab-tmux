@@ -24,8 +24,6 @@ class AEBN extends AdultMovies
 
     /**
      * Direct Url in getAll method.
-     *
-     * @var string
      */
     protected string $_directUrl = '';
 
@@ -57,16 +55,11 @@ class AEBN extends AdultMovies
 
     /**
      * Sets title in getAll method.
-     *
-     * @var string
      */
     protected string $_title = '';
 
     /**
      * Gets Trailer URL .. will be processed in XXX insertswf.
-     *
-     *
-     * @return mixed
      */
     protected function trailers(): mixed
     {

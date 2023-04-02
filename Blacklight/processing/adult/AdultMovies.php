@@ -6,19 +6,10 @@ use voku\helper\HtmlDomParser;
 
 abstract class AdultMovies
 {
-    /**
-     * @var \voku\helper\HtmlDomParser
-     */
     protected HtmlDomParser $_html;
 
-    /**
-     * @var string
-     */
     protected string $_title;
 
-    /**
-     * @var string
-     */
     protected string $_directUrl;
 
     /**
@@ -30,40 +21,20 @@ abstract class AdultMovies
     }
 
     /**
-     * @param bool $extras
      * @return array|mixed
      */
     abstract protected function productInfo(bool $extras = false): mixed;
 
-    /**
-     * @return mixed
-     */
     abstract protected function covers(): mixed;
 
-    /**
-     * @return mixed
-     */
     abstract protected function synopsis(): mixed;
 
-    /**
-     * @return mixed
-     */
     abstract protected function cast(): mixed;
 
-    /**
-     * @return mixed
-     */
     abstract protected function genres(): mixed;
 
-    /**
-     * @param string $movie
-     * @return mixed
-     */
     abstract public function processSite(string $movie): mixed;
 
-    /**
-     * @return mixed
-     */
     abstract protected function trailers(): mixed;
 
     /**

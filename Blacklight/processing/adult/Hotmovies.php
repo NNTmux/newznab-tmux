@@ -37,8 +37,6 @@ class Hotmovies extends AdultMovies
 
     /**
      * Sets the direct url in the getAll method.
-     *
-     * @var string
      */
     protected string $_directUrl = '';
 
@@ -70,8 +68,6 @@ class Hotmovies extends AdultMovies
 
     /**
      * Sets the title in the getAll method.
-     *
-     * @var string
      */
     protected string $_title = '';
 
@@ -179,9 +175,6 @@ class Hotmovies extends AdultMovies
 
     /**
      * Get Box Cover Images.
-     *
-     *
-     * @return mixed
      */
     protected function covers(): mixed
     {

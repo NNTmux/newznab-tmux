@@ -9,15 +9,11 @@ class ADE extends AdultMovies
 {
     /**
      * If a direct link is given parse it rather then search.
-     *
-     * @var string
      */
     protected string $directLink = '';
 
     /**
      * Search keyword.
-     *
-     * @var string
      */
     protected string $searchTerm = '';
 
@@ -28,15 +24,11 @@ class ADE extends AdultMovies
 
     /**
      * Direct Url returned in getAll method.
-     *
-     * @var string
      */
     protected string $_directUrl = '';
 
     /**
      * Sets the title in the getAll method.
-     *
-     * @var string
      */
     protected string $_title = '';
 
@@ -162,10 +154,6 @@ class ADE extends AdultMovies
         return $this->_res;
     }
 
-    /**
-     * @param bool $extras
-     * @return mixed
-     */
     protected function productInfo(bool $extras = false): mixed
     {
         $dofeature = null;
