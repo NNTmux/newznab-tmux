@@ -124,7 +124,7 @@ while ($runVar['counts']['iterations'] > 0) {
             echo $e;
         }
         try {
-            $newOldQry = $tRun->proc_query(6, null, null);
+            $newOldQry = $tRun->proc_query(6, null, $db_name);
         } catch (Exception $e) {
             echo $e;
         }
