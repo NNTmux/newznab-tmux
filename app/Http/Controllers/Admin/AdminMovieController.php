@@ -102,7 +102,7 @@ class AdminMovieController extends BasePageController
             switch ($action) {
                 case 'submit':
                     $coverLoc = storage_path('covers/movies/'.$id.'-cover.jpg');
-                    $backdropLoc = storage_path('covers/movies/'.$id.'-backdrop.jpg.jpg');
+                    $backdropLoc = storage_path('covers/movies/'.$id.'-backdrop.jpg');
 
                     if ($_FILES['cover']['size'] > 0) {
                         $tmpName = $_FILES['cover']['tmp_name'];
