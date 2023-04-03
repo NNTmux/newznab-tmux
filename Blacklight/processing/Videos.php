@@ -111,7 +111,6 @@ abstract class Videos
         return $result !== null ? $result->id : false;
     }
 
-
     public function getByTitle(string $title, int $type, int $source = 0)
     {
         // Check if we already have an entry for this show.
@@ -181,9 +180,6 @@ abstract class Videos
     }
 
     /**
-     * @param string $title
-     * @param int $type
-     * @param int $source
      * @return int
      */
     public function getTitleExact(string $title, int $type, int $source = 0)
@@ -217,9 +213,6 @@ abstract class Videos
     }
 
     /**
-     * @param $title
-     * @param $type
-     * @param int $source
      * @return int|mixed
      */
     public function getTitleLoose($title, $type, int $source = 0): mixed
@@ -257,9 +250,6 @@ abstract class Videos
     }
 
     /**
-     * @param string $title
-     * @param int $type
-     * @param int $source
      * @return int|mixed
      */
     public function getAlternativeTitleExact(string $title, int $type, int $source = 0): mixed
