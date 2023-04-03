@@ -10,10 +10,14 @@ use App\Models\Settings;
 use Blacklight\libraries\FanartTV;
 use Blacklight\processing\tv\TraktTv;
 use Blacklight\utility\Utility;
+use DariusIII\ItunesApi\Exceptions\InvalidProviderException;
 use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -44,111 +48,67 @@ class Movie
 
     /**
      * Current title being passed through various sites/api's.
-     *
-     * @var string
      */
-    protected $currentTitle = '';
+    protected string $currentTitle = '';
 
     /**
      * Current year of parsed search name.
-     *
-     * @var string
      */
-    protected $currentYear = '';
+    protected string $currentYear = '';
 
     /**
      * Current release id of parsed search name.
-     *
-     * @var string
      */
-    protected $currentRelID = '';
+    protected string $currentRelID = '';
 
-    /**
-     * @var string
-     */
-    protected $showPasswords;
+    protected string $showPasswords;
 
-    /**
-     * @var \Blacklight\ReleaseImage
-     */
-    protected $releaseImage;
+    protected ReleaseImage $releaseImage;
 
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    protected $client;
+    protected Client $client;
 
     /**
      * Language to fetch from IMDB.
-     *
-     * @var string
      */
-    protected $lookuplanguage;
+    protected string $lookuplanguage;
 
-    /**
-     * @var \Blacklight\libraries\FanartTV
-     */
-    public $fanart;
+    public FanartTV $fanart;
 
     /**
      * @var null|string
      */
-    public $fanartapikey;
+    public mixed $fanartapikey;
 
     /**
      * @var null|string
      */
-    public $omdbapikey;
+    public mixed $omdbapikey;
 
     /**
      * @var bool
      */
     public $imdburl;
 
-    /**
-     * @var int
-     */
-    public $movieqty;
+    public int $movieqty;
 
-    /**
-     * @var bool
-     */
-    public $echooutput;
+    public bool $echooutput;
 
-    /**
-     * @var string
-     */
-    public $imgSavePath;
+    public string $imgSavePath;
 
-    /**
-     * @var string
-     */
-    public $service;
+    public string $service;
 
-    /**
-     * @var \Blacklight\processing\tv\TraktTv
-     */
-    public $traktTv;
+    public TraktTv $traktTv;
 
-    /**
-     * @var OMDbAPI|null
-     */
-    public $omdbApi;
+    public ?OMDbAPI $omdbApi;
 
-    /**
-     * @var \Imdb\Config
-     */
-    private $config;
+    private Config $config;
 
     /**
      * @var null|string
      */
-    protected $traktcheck;
+    protected mixed $traktcheck;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * @param  array  $options  Class instances / Echo to CLI.
@@ -197,12 +157,12 @@ class Movie
         $this->showPasswords = (new Releases())->showPasswords();
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->imgSavePath = storage_path('covers/movies');
+        $this->imgSavePath = storage_path('covers/movies/');
         $this->service = '';
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
+     * @return Builder|Model|null|object
      */
     public function getMovieInfo($imdbId)
     {
@@ -324,21 +284,12 @@ class Movie
     protected function getMovieOrder($orderBy): array
     {
         $orderArr = explode('_', (($orderBy === '') ? 'MAX(r.postdate)' : $orderBy));
-        switch ($orderArr[0]) {
-            case 'title':
-                $orderField = 'm.title';
-                break;
-            case 'year':
-                $orderField = 'm.year';
-                break;
-            case 'rating':
-                $orderField = 'm.rating';
-                break;
-            case 'posted':
-            default:
-                $orderField = 'MAX(r.postdate)';
-                break;
-        }
+        $orderField = match ($orderArr[0]) {
+            'title' => 'm.title',
+            'year' => 'm.year',
+            'rating' => 'm.rating',
+            default => 'MAX(r.postdate)',
+        };
 
         return [$orderField, isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
     }
@@ -378,6 +329,7 @@ class Movie
      * @return bool|string
      *
      * @throws \Exception
+     * @throws GuzzleException
      */
     public function getTrailer(int $imdbId)
     {
@@ -869,7 +821,7 @@ class Movie
                 return false;
             }
 
-            $ret = [
+            return [
                 'title' => $title,
                 'tagline' => $result->tagline() ?? '',
                 'plot' => Arr::get($result->plot_split(), '0.plot'),
@@ -880,8 +832,6 @@ class Movie
                 'language' => $result->language() ?? '',
                 'type' => $result->movietype() ?? '',
             ];
-
-            return $ret;
         }
 
         return false;
@@ -893,6 +843,7 @@ class Movie
      * @return array|false
      *
      * @throws \Exception
+     * @throws GuzzleException
      */
     public function fetchTraktTVProperties($imdbId)
     {
@@ -990,7 +941,7 @@ class Movie
     /**
      * @return array|bool
      *
-     * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
+     * @throws InvalidProviderException
      * @throws \Exception
      */
     public function fetchItunesMovieProperties(string $title)
@@ -1037,7 +988,7 @@ class Movie
     public function doMovieUpdate(string $buffer, string $service, int $id, int $processImdb = 1): string
     {
         $imdbId = false;
-        if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $hits)) {
+        if (preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $hits)) {
             $imdbId = $hits['imdbid'];
         }
 
@@ -1076,6 +1027,7 @@ class Movie
      *
      *
      * @throws \Exception
+     * @throws GuzzleException
      */
     public function processMovieReleases(string $groupID = '', string $guidChar = '', int $lookupIMDB = 1): void
     {
