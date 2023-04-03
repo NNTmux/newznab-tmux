@@ -4,6 +4,7 @@ namespace Blacklight\processing\tv;
 
 use Blacklight\libraries\TraktAPI;
 use Blacklight\ReleaseImage;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Carbon;
 
 /**
@@ -16,30 +17,30 @@ class TraktTv extends TV
     private const MATCH_PROBABILITY = 75;
 
     /**
-     * @var \Blacklight\libraries\TraktAPI
+     * @var TraktAPI
      */
-    public $client;
+    public TraktAPI $client;
 
     public $time;
 
     /**
      * @string URL for show poster art
      */
-    public $posterUrl = '';
+    public string $posterUrl = '';
 
     /**
      * The URL to grab the TV fanart.
      *
      * @var string
      */
-    public $fanartUrl;
+    public string $fanartUrl;
 
     /**
      * The localized (network airing) timezone of the show.
      *
      * @var string
      */
-    private $localizedTZ;
+    private string $localizedTZ;
 
     /**
      * Construct. Set up API key.
@@ -193,7 +194,7 @@ class TraktTv extends TV
     }
 
     /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function getEpisodeInfo(int $siteId, int $series, int $episode): array|bool
     {
@@ -247,7 +248,7 @@ class TraktTv extends TV
     /**
      * @return array|false
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function getShowInfo(string $name): array|bool
     {

@@ -3,9 +3,11 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
+use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
 use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
  * Class TVDB -- functions used to post process releases against TVDB.
@@ -198,14 +200,16 @@ class TVDB extends TV
         return false;
     }
 
-    /*
+    /**
      * Calls the API to perform initial show name match to TVDB title
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param  string  $cleanName
-     * @param  string  $country
+     * @param string $name
      * @return array|bool
+     * @throws UnauthorizedException
+     * @throws ParseException
+     * @throws ExceptionInterface
      */
     protected function getShowInfo(string $name): bool|array
     {
@@ -214,16 +218,8 @@ class TVDB extends TV
         try {
             $response = $this->client->search()->search($name, ['type' => 'series']);
         } catch (ResourceNotFoundException $e) {
+            $response = false;
             $this->colorCli->climate()->error('Show not found on TVDB');
-        }
-
-        if ($response === false && $country !== '') {
-            try {
-                $response = $this->client->search()->search(rtrim(str_replace($country, '', $name)));
-            } catch (ResourceNotFoundException $e) {
-                $response = false;
-                $this->colorCli->climate()->error('Show not found on TVDB', true);
-            }
         }
 
         sleep(1);
@@ -285,17 +281,17 @@ class TVDB extends TV
         return $hasCover;
     }
 
-    /*
+    /**
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param  int  $tvDbId
-     * @param  int  $season
-     * @param  int  $episode
-     * @param  int  $videoId
+     * @param int $tvDbId
+     * @param int $season
+     * @param int $episode
+     * @param int $videoId
      * @return array|false
      */
-    protected function getEpisodeInfo($tvDbId, $season, $episode, $videoId = 0): bool|array
+    protected function getEpisodeInfo(int $tvDbId, int $season, int $episode, int $videoId = 0): bool|array
     {
         $return = $response = false;
 
@@ -334,12 +330,15 @@ class TVDB extends TV
         return $return;
     }
 
-    /*
+    /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
      *
      * @param $show
      * @return array
+     * @throws ExceptionInterface
+     * @throws ParseException
+     * @throws UnauthorizedException
      */
     protected function formatShowInfo($show): array
     {

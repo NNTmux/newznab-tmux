@@ -17,14 +17,14 @@ class TVMaze extends TV
     /**
      * Client for TVMaze API.
      *
-     * @var \JPinkney\TVMaze\TVMaze
+     * @var Client
      */
-    public $client;
+    public Client $client;
 
     /**
      * @string URL for show poster art
      */
-    public $posterUrl = '';
+    public string $posterUrl = '';
 
     /**
      * TVMaze constructor.
@@ -211,9 +211,9 @@ class TVMaze extends TV
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @return array|false
+     * @return array|bool
      */
-    protected function getShowInfo(string $name)
+    protected function getShowInfo(string $name): array|bool
     {
         $return = $response = false;
 
@@ -313,12 +313,14 @@ class TVMaze extends TV
     }
 
     /**
-     * Gets the specific episode info for the parsed release after match
-     * Returns a formatted array of episode data or false if no match.
-     *
-     * @return array|false
+     * @param int $tvMazeId
+     * @param int $season
+     * @param int $episode
+     * @param string $airDate
+     * @param int $videoId
+     * @return array|bool
      */
-    protected function getEpisodeInfo(int $tvMazeId, int $season, int $episode, string $airDate = '', int $videoId = 0)
+    protected function getEpisodeInfo(int $tvMazeId, int $season, int $episode, string $airDate = '', int $videoId = 0): array|bool
     {
         $return = $response = false;
 
