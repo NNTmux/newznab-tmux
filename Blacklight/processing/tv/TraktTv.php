@@ -98,7 +98,7 @@ class TraktTv extends TV
                         $lookupSetting = true;
                     }
 
-                    if ($videoId === false && $lookupSetting) {
+                    if ($videoId === 0 && $lookupSetting) {
                         // If it doesn't exist locally and lookups are allowed lets try to get it.
                         if ($this->echooutput) {
                             $this->colorCli->primaryOver('Checking Trakt for previously failed title: ').

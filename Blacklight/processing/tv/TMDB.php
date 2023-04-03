@@ -84,7 +84,7 @@ class TMDB extends TV
                     }
 
                     // If lookups are allowed lets try to get it.
-                    if ($videoId === false && $lookupSetting) {
+                    if ($videoId === 0 && $lookupSetting) {
                         if ($this->echooutput) {
                             $this->colorCli->primaryOver('Checking TMDB for previously failed title: ').
                                     $this->colorCli->headerOver($release['cleanname']).

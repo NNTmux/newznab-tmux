@@ -95,7 +95,7 @@ class TVDB extends TV
                 // Find the Video ID if it already exists by checking the title.
                 $videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
 
-                if ($videoId !== false) {
+                if ($videoId !== 0) {
                     $tvDbId = $this->getSiteByID('tvdb', $videoId);
                 }
 

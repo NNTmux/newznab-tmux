@@ -86,7 +86,7 @@ class TVMaze extends TV
                     //$local = true, $lookupsetting = false and vice versa
                     $lookupSetting = $local !== true;
 
-                    if ($videoId === false && $lookupSetting) {
+                    if ($videoId === 0 && $lookupSetting) {
                         // If lookups are allowed lets try to get it.
                         if ($this->echooutput) {
                             $this->colorCli->primaryOver('Checking TVMaze for previously failed title: ').

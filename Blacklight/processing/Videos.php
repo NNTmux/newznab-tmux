@@ -111,27 +111,25 @@ abstract class Videos
         return $result !== null ? $result->id : false;
     }
 
-    /**
-     * @return $this|array|bool|false|\Illuminate\Database\Eloquent\Model|mixed|null
-     */
-    public function getByTitle(string $title, $type, int $source = 0): mixed
+
+    public function getByTitle(string $title, int $type, int $source = 0)
     {
         // Check if we already have an entry for this show.
         $res = $this->getTitleExact($title, $type, $source);
-        if ($res) {
+        if ($res !== 0) {
             return $res;
         }
 
         // Check alt. title (Strip ' and :) Maybe strip more in the future.
         $res = $this->getAlternativeTitleExact($title, $type, $source);
-        if ($res) {
+        if ($res !== 0) {
             return $res;
         }
 
         $title2 = str_ireplace(' and ', ' & ', $title);
         if ((string) $title !== (string) $title2) {
             $res = $this->getTitleExact($title2, $type, $source);
-            if ($res) {
+            if ($res !== 0) {
                 return $res;
             }
             $pieces = explode(' ', $title2);
@@ -140,7 +138,7 @@ abstract class Videos
                 $title2 .= str_ireplace(["'", '!'], '', $piece).'%';
             }
             $res = $this->getTitleLoose($title2, $type, $source);
-            if ($res) {
+            if ($res !== 0) {
                 return $res;
             }
         }
@@ -150,8 +148,8 @@ abstract class Videos
         $title2 = str_ireplace('er', 're', $title);
         if ((string) $title !== (string) $title2) {
             $res = $this->getTitleExact($title2, $type, $source);
-            if ($res) {
-                return $res['id'];
+            if ($res !== 0) {
+                return $res;
             }
             $pieces = explode(' ', $title2);
             $title2 = '%';
@@ -159,7 +157,7 @@ abstract class Videos
                 $title2 .= str_ireplace(["'", '!'], '', $piece).'%';
             }
             $res = $this->getTitleLoose($title2, $type, $source);
-            if ($res) {
+            if ($res !== 0) {
                 return $res;
             }
         } else {
@@ -173,26 +171,32 @@ abstract class Videos
                     $title2 .= str_ireplace(["'", '!'], '', $piece).'%';
                 }
                 $res = $this->getTitleLoose($title2, $type, $source);
-                if ($res) {
+                if ($res !== 0) {
                     return $res;
                 }
             }
         }
 
-        return false;
+        return 0;
     }
 
-    public function getTitleExact(string $title, int $type, int $source = 0): \Illuminate\Database\Eloquent\Model|bool|null|static
+    /**
+     * @param string $title
+     * @param int $type
+     * @param int $source
+     * @return int
+     */
+    public function getTitleExact(string $title, int $type, int $source = 0)
     {
-        $return = false;
+        $return = 0;
         if (! empty($title)) {
             $sql = Video::query()->where(['title' => $title, 'type' => $type]);
             if ($source > 0) {
                 $sql->where('source', $source);
             }
-            $query = $sql->first();
+            $query = $sql->first()->toArray();
             if (! empty($query)) {
-                $return = $query->id;
+                $return = $query['id'];
             }
             // Try for an alias
             if (empty($return)) {
@@ -202,9 +206,9 @@ abstract class Videos
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
                 }
-                $query = $sql->first();
+                $query = $sql->first()->toArray();
                 if (! empty($query)) {
-                    $return = $query->id;
+                    $return = $query['id'];
                 }
             }
         }
@@ -213,13 +217,14 @@ abstract class Videos
     }
 
     /**
-     * Supplementary function for getByTitle that queries for a like match.
-     *
-     * @return array|false
+     * @param $title
+     * @param $type
+     * @param int $source
+     * @return int|mixed
      */
-    public function getTitleLoose($title, $type, int $source = 0): bool|array
+    public function getTitleLoose($title, $type, int $source = 0): mixed
     {
-        $return = false;
+        $return = 0;
 
         if (! empty($title)) {
             $sql = Video::query()
@@ -228,9 +233,9 @@ abstract class Videos
             if ($source > 0) {
                 $sql->where('source', $source);
             }
-            $query = $sql->first();
+            $query = $sql->first()->toArray();
             if (! empty($query)) {
-                $return = $query->id;
+                $return = $query['id'];
             }
             // Try for an alias
             if (empty($return)) {
@@ -241,9 +246,9 @@ abstract class Videos
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
                 }
-                $query = $sql->first();
+                $query = $sql->first()->toArray();
                 if (! empty($query)) {
-                    $return = $query->id;
+                    $return = $query['id'];
                 }
             }
         }
@@ -252,12 +257,14 @@ abstract class Videos
     }
 
     /**
-     * Supplementary function for getByTitle that replaces special chars to find an exact match.
-     * Add more ->whereRaw() methods if needed. Might slow TV PP down though.
+     * @param string $title
+     * @param int $type
+     * @param int $source
+     * @return int|mixed
      */
-    public function getAlternativeTitleExact(string $title, int $type, int $source = 0): \Illuminate\Database\Eloquent\Model|bool|null|static
+    public function getAlternativeTitleExact(string $title, int $type, int $source = 0): mixed
     {
-        $return = false;
+        $return = 0;
         if (! empty($title)) {
             if ($source > 0) {
                 $query = DB::table('videos')
@@ -265,16 +272,16 @@ abstract class Videos
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
                 ->where('type', '=', $type)
                 ->where('source', '=', $source)
-                ->first();
+                ->first()->toArray();
             } else {
                 $query = DB::table('videos')
                 ->whereRaw("REPLACE(title,'\'','') = ?", $title)
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
                 ->where('type', '=', $type)
-                ->first();
+                ->first()->toArray();
             }
             if (! empty($query)) {
-                $return = $query->id;
+                $return = $query['id'];
             }
         }
 
