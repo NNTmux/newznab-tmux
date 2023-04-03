@@ -38,9 +38,6 @@ define('NET_NNTP_PROTOCOL_RESPONSECODE_TLS_FAILED_NEGOTIATION', 580);
 
 class NNTP extends \Net_NNTP_Client
 {
-    /**
-     * @var ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     protected bool $_debugBool;
@@ -104,9 +101,6 @@ class NNTP extends \Net_NNTP_Client
      */
     protected int $_socketTimeout = 120;
 
-    /**
-     * @var Tmux
-     */
     protected Tmux $_tmux;
 
     /**
