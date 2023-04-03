@@ -280,11 +280,6 @@ class TVDB extends TV
     }
 
     /**
-     * @param int $tvDbId
-     * @param int $season
-     * @param int $episode
-     * @param int $videoId
-     * @return bool|array
      * @throws \CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException
      * @throws \CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
