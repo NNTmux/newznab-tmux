@@ -148,7 +148,7 @@ class TVDB extends TV
 
                     // Download all episodes if new show to reduce API/bandwidth usage
                     if (! $this->countEpsByVideoID($videoId)) {
-                        $this->getEpisodeInfo($tvDbId, -1, -1, '', $videoId);
+                        $this->getEpisodeInfo($tvDbId, -1, -1, $videoId);
                     }
 
                     // Check if we have the episode for this video ID
@@ -160,7 +160,7 @@ class TVDB extends TV
                             $tvDbId,
                             $seasonNo,
                             $episodeNo,
-                            $release['airdate']
+                            $videoId
                         );
 
                         if ($tvdbEpisode) {
@@ -280,10 +280,14 @@ class TVDB extends TV
     }
 
     /**
-     * Gets the specific episode info for the parsed release after match
-     * Returns a formatted array of episode data or false if no match.
-     *
-     * @return array|false
+     * @param int $tvDbId
+     * @param int $season
+     * @param int $episode
+     * @param int $videoId
+     * @return bool|array
+     * @throws \CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException
+     * @throws \CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
     protected function getEpisodeInfo(int $tvDbId, int $season, int $episode, int $videoId = 0): bool|array
     {
