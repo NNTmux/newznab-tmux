@@ -16,8 +16,6 @@ class TVMaze extends TV
 
     /**
      * Client for TVMaze API.
-     *
-     * @var Client
      */
     public Client $client;
 
@@ -209,9 +207,6 @@ class TVMaze extends TV
     /**
      * Calls the API to perform initial show name match to TVDB title
      * Returns a formatted array of show data or false if no match.
-     *
-     *
-     * @return array|bool
      */
     protected function getShowInfo(string $name): array|bool
     {
@@ -312,14 +307,6 @@ class TVMaze extends TV
         return $hasCover;
     }
 
-    /**
-     * @param int $tvMazeId
-     * @param int $season
-     * @param int $episode
-     * @param string $airDate
-     * @param int $videoId
-     * @return array|bool
-     */
     protected function getEpisodeInfo(int $tvMazeId, int $season, int $episode, string $airDate = '', int $videoId = 0): array|bool
     {
         $return = $response = false;

@@ -16,9 +16,6 @@ class TraktTv extends TV
 {
     private const MATCH_PROBABILITY = 75;
 
-    /**
-     * @var TraktAPI
-     */
     public TraktAPI $client;
 
     public $time;
@@ -30,15 +27,11 @@ class TraktTv extends TV
 
     /**
      * The URL to grab the TV fanart.
-     *
-     * @var string
      */
     public string $fanartUrl;
 
     /**
      * The localized (network airing) timezone of the show.
-     *
-     * @var string
      */
     private string $localizedTZ;
 

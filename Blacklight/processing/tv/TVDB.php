@@ -205,8 +205,6 @@ class TVDB extends TV
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param string $name
-     * @return array|bool
      * @throws UnauthorizedException
      * @throws ParseException
      * @throws ExceptionInterface
@@ -285,10 +283,6 @@ class TVDB extends TV
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @param int $tvDbId
-     * @param int $season
-     * @param int $episode
-     * @param int $videoId
      * @return array|false
      */
     protected function getEpisodeInfo(int $tvDbId, int $season, int $episode, int $videoId = 0): bool|array
@@ -334,8 +328,6 @@ class TVDB extends TV
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
      *
-     * @param $show
-     * @return array
      * @throws ExceptionInterface
      * @throws ParseException
      * @throws UnauthorizedException

@@ -93,7 +93,11 @@ class Books
         return BookInfo::query()->where('id', $id)->first();
     }
 
-    public function getBookInfoByName($title): Model
+    /**
+     * @param string $title
+     * @return Model|null
+     */
+    public function getBookInfoByName(string $title): ?Model
     {
         //only used to get a count of words
         $searchWords = '';
