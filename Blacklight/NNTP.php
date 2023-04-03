@@ -39,7 +39,7 @@ define('NET_NNTP_PROTOCOL_RESPONSECODE_TLS_FAILED_NEGOTIATION', 580);
 class NNTP extends \Net_NNTP_Client
 {
     /**
-     * @var \Blacklight\ColorCLI
+     * @var ColorCLI
      */
     protected ColorCLI $colorCli;
 
@@ -105,7 +105,7 @@ class NNTP extends \Net_NNTP_Client
     protected int $_socketTimeout = 120;
 
     /**
-     * @var \Blacklight\Tmux
+     * @var Tmux
      */
     protected Tmux $_tmux;
 
@@ -232,7 +232,7 @@ class NNTP extends \Net_NNTP_Client
                     ': '.
                     $cError;
 
-                return $this->throwError($this->colorCli->error($message));
+                return $this->throwError($this->colorCli->climate()->error($message));
             }
 
             // If we are connected, try to authenticate.
@@ -270,7 +270,7 @@ class NNTP extends \Net_NNTP_Client
                             $userName.
                             ' ('.$aError.')';
 
-                        return $this->throwError($this->colorCli->error($message));
+                        return $this->throwError($this->colorCli->climate()->error($message));
                     }
                 }
             }
@@ -294,7 +294,7 @@ class NNTP extends \Net_NNTP_Client
         // If we somehow got out of the loop, return an error.
         $message = 'Unable to connect to '.$this->_currentServer.$enc;
 
-        return $this->throwError($this->colorCli->error($message));
+        return $this->throwError($this->colorCli->climate()->error($message));
     }
 
     /**
@@ -356,7 +356,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function selectGroup(string $group, bool $articles = false, bool $force = false): mixed
+    public function selectGroup($group, $articles = false, $force = false)
     {
         $connected = $this->_checkConnection(false);
         if ($connected !== true) {
@@ -381,7 +381,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function getOverview(string $range = null, bool $names = true, bool $forceNames = true): mixed
+    public function getOverview($range = null, $names = true, $forceNames = true)
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -418,7 +418,7 @@ class NNTP extends \Net_NNTP_Client
      *                         All newer than article number: "679871775-"
      *                         All older than article number: "-679871775"
      *                         Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
-     * @return array|string|\Blacklight\NNTP Multi-dimensional Array of headers on success, PEAR object on failure.
+     * @return array|string|NNTP Multi-dimensional Array of headers on success, PEAR object on failure.
      *
      * @throws \Exception
      */
@@ -504,7 +504,7 @@ class NNTP extends \Net_NNTP_Client
      *
      * @throws \Exception
      */
-    public function getGroups(string $wildMat = null)
+    public function getGroups($wildMat = null)
     {
         // Enabled header compression if not enabled.
         $this->_enableCompression();
@@ -613,7 +613,7 @@ class NNTP extends \Net_NNTP_Client
         } else {
             $message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: '.gettype($identifiers);
 
-            return $this->throwError($this->colorCli->error($message));
+            return $this->throwError($this->colorCli->climate()->error($message));
         }
 
         if ($aConnected === true) {
@@ -785,7 +785,7 @@ class NNTP extends \Net_NNTP_Client
         if (! $this->_postingAllowed) {
             $message = 'You do not have the right to post articles on server '.$this->_currentServer;
 
-            return $this->throwError($this->colorCli->error($message));
+            return $this->throwError($this->colorCli->climate()->error($message));
         }
 
         $connected = $this->_checkConnection();
@@ -797,13 +797,13 @@ class NNTP extends \Net_NNTP_Client
         if (\strlen($subject) > 510) {
             $message = 'Max length of subject is 510 chars.';
 
-            return $this->throwError($this->colorCli->error($message));
+            return $this->throwError($this->colorCli->climate()->error($message));
         }
 
         if (\strlen($from) > 510) {
             $message = 'Max length of from is 510 chars.';
 
-            return $this->throwError($this->colorCli->error($message));
+            return $this->throwError($this->colorCli->climate()->error($message));
         }
 
         // Check if the group is string or array.
@@ -857,7 +857,7 @@ class NNTP extends \Net_NNTP_Client
             $message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
 
             if ($this->_echo) {
-                $this->colorCli->error($message);
+                $this->colorCli->climate()->error($message);
             }
             $nntp->doQuit();
         }
@@ -1019,7 +1019,7 @@ class NNTP extends \Net_NNTP_Client
                     if (! empty($deComp)) {
                         $bytesReceived = \strlen($data);
                         if ($this->_echo && $bytesReceived > 10240) {
-                            $this->colorCli->primaryOver(
+                            $this->colorCli->climate()->primaryOver(
                                 'Received '.round($bytesReceived / 1024).
                                 'KB from group ('.$this->group().').'
                             );
@@ -1032,7 +1032,7 @@ class NNTP extends \Net_NNTP_Client
                     }
                     $message = 'Decompression of OVER headers failed.';
 
-                    return $this->throwError($this->colorCli->error($message), 1000);
+                    return $this->throwError($this->colorCli->climate()->error($message), 1000);
                 }
                 // The buffer was not empty, so we know this was not the real ending, so reset $possibleTerm.
                 $possibleTerm = false;
@@ -1050,7 +1050,7 @@ class NNTP extends \Net_NNTP_Client
                 if (empty($buffer)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
 
-                    return $this->throwError($this->colorCli->error($message), 1000);
+                    return $this->throwError($this->colorCli->climate()->error($message), 1000);
                 }
             }
 
@@ -1066,7 +1066,7 @@ class NNTP extends \Net_NNTP_Client
 
         $message = 'Unspecified error while downloading OVER headers.';
 
-        return $this->throwError($this->colorCli->error($message), 1000);
+        return $this->throwError($this->colorCli->climate()->error($message), 1000);
     }
 
     /**
@@ -1297,7 +1297,7 @@ class NNTP extends \Net_NNTP_Client
      * @return mixed (bool)   On success: True when posting allowed, otherwise false.
      *               (object) On failure: pear_error
      */
-    public function connect(string $host = null, $encryption = null, int $port = null, int $timeout = 15, int $socketTimeout = 120): mixed
+    public function connect($host = null, $encryption = null, $port = null, $timeout = 15, $socketTimeout = 120)
     {
         if ($this->_isConnected()) {
             return $this->throwError('Already connected, disconnect first!', null);
