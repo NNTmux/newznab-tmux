@@ -16,17 +16,16 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, bcmath, soap, intl, gd, exif, iconv
           coverage: none
 
-      - name: Copy env file
-        run:
-          cp .env.test .env  
-
-      - name: Prepare Laravel Application
-        run: |
-          cp .env.test .env
-          php artisan key:generate
-
       - name: Run composer install
         run: composer install -n --prefer-dist
+
+      - name: Copy env file
+        run:
+          cp .env.test .env
+
+      - name: Prepare Laravel Application
+        run:
+          php artisan key:generate
 
       - name: Run tests
         run: php artisan test
