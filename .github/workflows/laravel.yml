@@ -15,8 +15,8 @@ jobs:
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: TEST
-          MYSQL_USER: TEST
-          MYSQL_PASSWORD: TEST
+          MYSQL_USER:
+          MYSQL_PASSWORD:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -29,7 +29,7 @@ jobs:
         extensions: gd, intl, memcached, sodium
         composer: v2
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Copy environment file
       run: cp .env.example .env
