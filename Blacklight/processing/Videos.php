@@ -183,9 +183,6 @@ abstract class Videos
         return 0;
     }
 
-    /**
-     * @return int
-     */
     public function getTitleExact(string $title, int $type, int $source = 0): int
     {
         $return = 0;
