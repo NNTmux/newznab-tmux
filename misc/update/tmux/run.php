@@ -66,11 +66,11 @@ function start_apps($tmux_session): void
     }
 
     if ((int) $vnstat === 1 && command_exist('vnstat')) {
-        Process::run("tmux new-window -t $tmux_session -n vnstat 'printf \"\033]2;vnstat\033\" && watch -n10 \"vnstat ${vnstat_args}\"'");
+        Process::run("tmux new-window -t $tmux_session -n vnstat 'printf \"\033]2;vnstat\033\" && watch -n10 \"vnstat {$vnstat_args}\"'");
     }
 
     if ((int) $tcptrack === 1 && command_exist('tcptrack')) {
-        Process::run("tmux new-window -t $tmux_session -n tcptrack 'printf \"\033]2;tcptrack\033\" && tcptrack ${tcptrack_args}'");
+        Process::run("tmux new-window -t $tmux_session -n tcptrack 'printf \"\033]2;tcptrack\033\" && tcptrack {$tcptrack_args}'");
     }
 
     if ((int) $bwmng === 1 && command_exist('bwm-ng')) {
@@ -131,20 +131,20 @@ function attach($tmuxPath, $tmux_session): void
 $tmuxConfig = $tmuxPath.'tmux.conf';
 
 if ((int) $seq === 1) {
-    Process::run("cd ${tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+    Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_releases\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
     window_utilities($tmux_session);
     window_post($tmux_session);
 } elseif ((int) $seq === 2) {
-    Process::run("cd ${tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+    Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;sequential\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
     window_stripped_utilities($tmux_session);
 } else {
-    Process::run("cd ${tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
+    Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_binaries\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.2; tmux splitw -t $tmux_session:0 -v -p 67 'printf \"\033]2;backfill\033\"'");

@@ -186,11 +186,11 @@ class TmuxRun extends Tmux
                 );
             } else {
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-                shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by no Fix Release Names to process\"'");
+                shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by no Fix Release Names to process\"'");
             }
         } else {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by Fix Release Names\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by Fix Release Names\"'");
         }
     }
 
@@ -227,18 +227,18 @@ class TmuxRun extends Tmux
 
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.2 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][2]} has been disabled/terminated in Admin Disable Music/Books/Console/XXX\"'");
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][2]} has been disabled/terminated in Admin Disable Music/Books/Console/XXX\"'");
                 break;
             case (int) $runVar['settings']['post_amazon'] === 1 && (int) $runVar['counts']['now']['processmusic'] === 0 &&
             (int) $runVar['counts']['now']['processbooks'] === 0 && (int) $runVar['counts']['now']['processconsole'] === 0 && (int) $runVar['counts']['now']['processgames'] === 0 && (int) $runVar['counts']['now']['processxxx'] === 0:
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.2 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][2]} has been disabled/terminated by No Music/Books/Console/Games/XXX to process\"'");
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][2]} has been disabled/terminated by No Music/Books/Console/Games/XXX to process\"'");
                 break;
             default:
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.2 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][2]} has been disabled/terminated by Postprocess Amazon\"'");
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][2]} has been disabled/terminated by Postprocess Amazon\"'");
         }
     }
 
@@ -270,7 +270,7 @@ class TmuxRun extends Tmux
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec(
                     "tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.1 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated in Admin Disable Music/Books/Console/XXX\"'"
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated in Admin Disable Music/Books/Console/XXX\"'"
                 );
                 break;
             case ((int) $runVar['settings']['post_amazon'] === 1) && ((int) $runVar['counts']['now']['processmusic'] === 0)
@@ -280,14 +280,14 @@ class TmuxRun extends Tmux
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec(
                     "tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.1 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated by No Music/Books/Console/Games/XXX to process\"'"
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated by No Music/Books/Console/Games/XXX to process\"'"
                 );
                 break;
             default:
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec(
                     "tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.1 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated by Postprocess Amazon\"'"
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated by Postprocess Amazon\"'"
                 );
         }
     }
@@ -312,12 +312,12 @@ class TmuxRun extends Tmux
             case (int) $runVar['settings']['post_non'] !== 0 && (int) $runVar['counts']['now']['processmovies'] === 0 && (int) $runVar['counts']['now']['processtv'] === 0 && (int) $runVar['counts']['now']['processanime'] === 0:
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.1 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][1]} has been disabled/terminated by No Movies/TV/Anime to process\"'");
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][1]} has been disabled/terminated by No Movies/TV/Anime to process\"'");
                 break;
             default:
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.1 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][1]} has been disabled/terminated by Postprocess Non-Amazon\"'");
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][1]} has been disabled/terminated by Postprocess Non-Amazon\"'");
         }
     }
 
@@ -336,10 +336,10 @@ class TmuxRun extends Tmux
             );
         } elseif ($runVar['killswitch']['pp'] === true) {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][2]} has been disabled/terminated by Exceeding Limits\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][2]} has been disabled/terminated by Exceeding Limits\"'");
         } else {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][2]} has been disabled/terminated by Binaries\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][2]} has been disabled/terminated by Binaries\"'");
         }
     }
 
@@ -363,10 +363,10 @@ class TmuxRun extends Tmux
             );
         } elseif (($runVar['killswitch']['coll'] === true) || ($runVar['killswitch']['pp'] === true)) {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.3 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][3]} has been disabled/terminated by Exceeding Limits\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.3 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][3]} has been disabled/terminated by Exceeding Limits\"'");
         } else {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.3 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][3]} has been disabled/terminated by Backfill\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.3 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][3]} has been disabled/terminated by Backfill\"'");
         }
     }
 
@@ -384,7 +384,7 @@ class TmuxRun extends Tmux
             );
         } else {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.4 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][4]} has been disabled/terminated by Releases\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.4 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][4]} has been disabled/terminated by Releases\"'");
         }
     }
 
@@ -413,10 +413,10 @@ class TmuxRun extends Tmux
             );
         } elseif ($runVar['killswitch']['pp'] === true) {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.1 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][1]} has been disabled/terminated by Exceeding Limits\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.1 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][1]} has been disabled/terminated by Exceeding Limits\"'");
         } else {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.1 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][1]} has been disabled/terminated by Import\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.1 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][1]} has been disabled/terminated by Import\"'");
         }
     }
 
@@ -434,7 +434,7 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['two'][0]);
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec(
-                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.0 'echo \"\033[38;5;${color}m\"; \
+                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.0 'echo \"\033[38;5;{$color}m\"; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php add $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer']}' 2>&1 1> /dev/null"
                 );
                 $runVar['timers']['timer3'] = time();
@@ -461,11 +461,11 @@ class TmuxRun extends Tmux
             case ((int) $runVar['settings']['post'] !== 0) && ((int) $runVar['counts']['now']['processnfo'] === 0) && ((int) $runVar['counts']['now']['work'] === 0):
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.0 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][0]} has been disabled/terminated by No Misc/Nfo to process\"'");
+					'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][0]} has been disabled/terminated by No Misc/Nfo to process\"'");
                 break;
             default:
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-                shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.0 'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][0]} has been disabled/terminated by Postprocess Additional\"'");
+                shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.0 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][0]} has been disabled/terminated by Postprocess Additional\"'");
         }
     }
 
@@ -525,7 +525,7 @@ class TmuxRun extends Tmux
             case 'Disabled':
             default:
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-                shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.1 'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated by Remove Crap Releases\"'");
+                shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.1 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated by Remove Crap Releases\"'");
         }
     }
 
@@ -536,7 +536,7 @@ class TmuxRun extends Tmux
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.2 \
-		'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][2]} has been disabled/terminated by Update TV/Theater\"'");
+		'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][2]} has been disabled/terminated by Update TV/Theater\"'");
     }
 
     /**
@@ -546,7 +546,7 @@ class TmuxRun extends Tmux
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 \
-			'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by Update TV/Theater\"'");
+			'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by Update TV/Theater\"'");
     }
 
     /**
@@ -609,14 +609,14 @@ class TmuxRun extends Tmux
         } elseif (($runVar['killswitch']['pp'] === true) && (int) $runVar['settings']['releases_run'] !== 0) {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
             shell_exec(
-                "tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;${color}m\"; \
+                "tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;{$color}m\"; \
 				echo \"\nbinaries and backfill has been disabled/terminated by Exceeding Limits\"; \
 				{$runVar['scripts']['releases']} $log; date +\"{$this->_dateFormat}\"; echo \"\nbinaries and backfill has been disabled/terminated by Exceeding Limits\"; \
 				{$runVar['commands']['_sleep']} {$runVar['settings']['seq_timer']}' 2>&1 1> /dev/null"
             );
         } elseif ($runVar['killswitch']['pp'] === true) {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][2]} has been disabled/terminated by Exceeding Limits\"'");
+            shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][2]} has been disabled/terminated by Exceeding Limits\"'");
         }
     }
 
@@ -627,13 +627,13 @@ class TmuxRun extends Tmux
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         for ($g = 1; $g <= 4; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
         }
         for ($g = 0; $g <= 3; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
         }
         for ($g = 0; $g <= 2; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][$g]} has been disabled/terminated by Running\"'");
         }
     }
 
@@ -644,13 +644,13 @@ class TmuxRun extends Tmux
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         for ($g = 1; $g <= 2; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
         }
         for ($g = 0; $g <= 3; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
         }
         for ($g = 0; $g <= 2; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['two'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:2.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['two'][$g]} has been disabled/terminated by Running\"'");
         }
     }
 
@@ -661,10 +661,10 @@ class TmuxRun extends Tmux
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         for ($g = 1; $g <= 2; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
         }
         for ($g = 0; $g <= 1; $g++) {
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
+            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
         }
     }
 
@@ -672,14 +672,14 @@ class TmuxRun extends Tmux
     {
         if ((int) $runVar['constants']['run_ircscraper'] === 1) {
             //Check to see if the pane is dead, if so respawn it.
-            if ((int) shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") === 1) {
+            if ((int) shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:{$pane} | grep ^0 | grep -c dead") === 1) {
                 shell_exec(
-                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
+                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:{$pane}.0 ' \
 					{$runVar['commands']['_phpn']} {$runVar['paths']['scraper']} true'"
                 );
             }
         } else {
-            shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 'echo \"\nIRCScraper has been disabled/terminated by IRCSCraper\"'");
+            shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:{$pane}.0 'echo \"\nIRCScraper has been disabled/terminated by IRCSCraper\"'");
         }
     }
 
@@ -687,9 +687,9 @@ class TmuxRun extends Tmux
     {
         $sharing = (array) Arr::first(DB::select('SELECT enabled, posting, fetching FROM sharing'));
 
-        if (! empty($sharing) && (int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
+        if (! empty($sharing) && (int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:{$pane} | grep ^0 | grep -c dead") == 1) {
             shell_exec(
-                "tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
+                "tmux respawnp -t{$runVar['constants']['tmux_session']}:{$pane}.0 ' \
                     {$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/multiprocessing/postprocess.php sha; \
                     {$runVar['commands']['_sleep']} {$runVar['settings']['sharing_timer']}' 2>&1 1> /dev/null"
             );
