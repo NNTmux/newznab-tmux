@@ -15,7 +15,7 @@ class ForumController extends BasePageController
      *
      * @throws \Exception
      */
-    public function forum(Request $request)
+    public function forum(Request $request): RedirectResponse
     {
         $this->setPreferences();
         if ($this->isPostBack($request) && $request->has('addMessage') && $request->has('addSubject')) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Blacklight\Contents;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,7 @@ class ContentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): JsonResponse
     {
         $this->setPreferences();
         $contents = new Contents();
