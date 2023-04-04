@@ -192,7 +192,7 @@ abstract class Videos
                 $sql->where('source', $source);
             }
             $query = $sql->first();
-            if ($query->isNotEmpty()) {
+            if (! empty($query)) {
                 $result = $query->toArray();
                 $return = $result['id'];
             }
@@ -205,7 +205,7 @@ abstract class Videos
                     $sql->where('videos.source', $source);
                 }
                 $query = $sql->first();
-                if ($query->isNotEmpty()) {
+                if (! empty($query)) {
                     $result = $query->toArray();
                     $return = $result['id'];
                 }
@@ -230,7 +230,7 @@ abstract class Videos
                 $sql->where('source', $source);
             }
             $query = $sql->first();
-            if ($query->isNotEmpty()) {
+            if (! empty($query)) {
                 $result = $query->toArray();
                 $return = $result['id'];
             }
@@ -244,7 +244,7 @@ abstract class Videos
                     $sql->where('videos.source', $source);
                 }
                 $query = $sql->first();
-                if ($query->isNotEmpty()) {
+                if (! empty($query)) {
                     $result = $query->toArray();
                     $return = $result['id'];
                 }
@@ -275,7 +275,7 @@ abstract class Videos
                 ->where('type', '=', $type)
                 ->first();
             }
-            if ($query->isNotEmpty()) {
+            if (! empty($query)) {
                 $result = $query->toArray();
                 $return = $result['id'];
             }
