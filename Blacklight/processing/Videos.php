@@ -193,8 +193,8 @@ abstract class Videos
             }
             $query = $sql->first();
             if ($query->isNotEmpty()) {
-                $query = $query->toArray();
-                $return = $query['id'];
+                $result = $query->toArray();
+                $return = $result['id'];
             }
             // Try for an alias
             if (empty($return)) {
@@ -206,8 +206,8 @@ abstract class Videos
                 }
                 $query = $sql->first();
                 if ($query->isNotEmpty()) {
-                    $query = $query->toArray();
-                    $return = $query['id'];
+                    $result = $query->toArray();
+                    $return = $result['id'];
                 }
             }
         }
@@ -229,9 +229,10 @@ abstract class Videos
             if ($source > 0) {
                 $sql->where('source', $source);
             }
-            $query = $sql->first()->toArray();
-            if (! empty($query)) {
-                $return = $query['id'];
+            $query = $sql->first();
+            if ($query->isNotEmpty()) {
+                $result = $query->toArray();
+                $return = $result['id'];
             }
             // Try for an alias
             if (empty($return)) {
@@ -242,9 +243,10 @@ abstract class Videos
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
                 }
-                $query = $sql->first()->toArray();
-                if (! empty($query)) {
-                    $return = $query['id'];
+                $query = $sql->first();
+                if ($query->isNotEmpty()) {
+                    $result = $query->toArray();
+                    $return = $result['id'];
                 }
             }
         }
@@ -265,16 +267,17 @@ abstract class Videos
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
                 ->where('type', '=', $type)
                 ->where('source', '=', $source)
-                ->first()->toArray();
+                ->first();
             } else {
                 $query = DB::table('videos')
                 ->whereRaw("REPLACE(title,'\'','') = ?", $title)
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
                 ->where('type', '=', $type)
-                ->first()->toArray();
+                ->first();
             }
-            if (! empty($query)) {
-                $return = $query['id'];
+            if ($query->isNotEmpty()) {
+                $result = $query->toArray();
+                $return = $result['id'];
             }
         }
 
