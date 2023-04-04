@@ -424,9 +424,9 @@ class ProcessReleases
      }
 
      foreach ($collections as $collection) {
-         $cleanRelName = mb_convert_encoding(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject), 'UTF-8');
+         $cleanRelName = mb_convert_encoding(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject), 'UTF-8', mb_list_encodings());
          $fromName = mb_convert_encoding(
-             trim($collection->fromname, "'"), 'UTF-8'
+             trim($collection->fromname, "'"), 'UTF-8', mb_list_encodings()
          );
 
          // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
@@ -467,7 +467,7 @@ class ProcessReleases
              $releaseID = Release::insertRelease(
                  [
                      'name' => $cleanRelName,
-                     'searchname' => ! empty($cleanedName) ? mb_convert_encoding($cleanedName, 'UTF-8') : $cleanRelName,
+                     'searchname' => ! empty($cleanedName) ? mb_convert_encoding($cleanedName, 'UTF-8', mb_list_encodings()) : $cleanRelName,
                      'totalpart' => $collection->totalfiles,
                      'groups_id' => $collection->groups_id,
                      'guid' => createGUID(),

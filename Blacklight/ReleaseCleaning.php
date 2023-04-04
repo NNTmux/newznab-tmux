@@ -444,7 +444,7 @@ class ReleaseCleaning
         //Replace multiple spaces with 1 space
         $cleanerName = preg_replace('/\s\s+/i', ' ', $cleanerName);
         //Remove invalid characters.
-        $cleanerName = trim(mb_convert_encoding(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName), 'UTF-8'));
+        $cleanerName = trim(mb_convert_encoding(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName), 'UTF-8', mb_list_encodings()));
 
         return $cleanerName;
     }

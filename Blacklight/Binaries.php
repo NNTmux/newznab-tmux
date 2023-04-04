@@ -786,7 +786,7 @@ class Binaries
 							INSERT INTO collections (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(mb_convert_encoding($this->header['matches'][1], 'UTF-8'), 0, 255)), escapeString(mb_convert_encoding($this->header['From'], 'UTF-8')), $unixtime, escapeString(implode(' ', $tempHeaderXrefs)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings()), 0, 255)), escapeString(mb_convert_encoding($this->header['From'], 'UTF-8', mb_list_encodings())), $unixtime, escapeString(implode(' ', $tempHeaderXrefs)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
@@ -819,7 +819,7 @@ class Binaries
                     DB::insert(sprintf("
 						INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $hash, escapeString(mb_convert_encoding($this->header['matches'][1], 'UTF-8')), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $hash, escapeString(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings())), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {

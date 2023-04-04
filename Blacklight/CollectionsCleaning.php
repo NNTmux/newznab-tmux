@@ -124,7 +124,7 @@ class CollectionsCleaning
             // Multi spaces.
             return [
                 'id' => self::REGEX_GENERIC_MATCH,
-                'name' => mb_convert_encoding(trim(preg_replace('/\s\s+/', ' ', $cleanSubject)), 'UTF-8'),
+                'name' => mb_convert_encoding(trim(preg_replace('/\s\s+/', ' ', $cleanSubject)), 'UTF-8', mb_list_encodings()),
             ];
         } // Music groups.
 
@@ -150,7 +150,7 @@ class CollectionsCleaning
             '/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |.vol\d+\+\d+|.part\d+/i',
         ], ' ', $this->subject);
         // Multi spaces.
-        $cleanSubject = mb_convert_encoding(trim(preg_replace('/\s\s+/i', ' ', $cleanSubject)), 'UTF-8');
+        $cleanSubject = mb_convert_encoding(trim(preg_replace('/\s\s+/i', ' ', $cleanSubject)), 'UTF-8', mb_list_encodings());
         // If the subject is too similar to another because it is so short, try to extract info from the subject.
         if (\strlen($cleanSubject) <= 10 || preg_match('/^[\-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
             $x = '';
