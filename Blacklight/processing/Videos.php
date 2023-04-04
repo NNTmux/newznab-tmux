@@ -107,7 +107,7 @@ abstract class Videos
         if (\in_array($siteColumn, self::$sites, false)) {
             $result = Video::query()->where($siteColumn, $siteID)->first();
         }
-        if ($result->isNotEmpty()) {
+        if (! empty($result)) {
             $query = $result->toArray();
             $result = $query['id'];
         }
