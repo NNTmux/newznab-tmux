@@ -145,8 +145,10 @@ class TVDB extends TV
                         $this->getPoster($videoId);
                     } else { // Check Fanart.tv for poster
                         $poster = $this->fanart->getTVFanart($tvDbId);
-                        $this->posterUrl = collect($poster['tvposter'])->sortByDesc('likes')[0]['url'];
-                        $this->getPoster($videoId);
+                        if ($poster) {
+                            $this->posterUrl = collect($poster['tvposter'])->sortByDesc('likes')[0]['url'];
+                            $this->getPoster($videoId);
+                        }
                     }
 
                     $seasonNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', $release['season']) : '');
