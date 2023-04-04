@@ -168,13 +168,13 @@ class TVDB extends TV
                     }
 
                     // Check if we have the episode for this video ID
-                    $episode = $this->getBySeasonEp($videoId, $seasonNo, (int) $episodeNo, $release['airdate']);
+                    $episode = $this->getBySeasonEp($videoId,(int) $seasonNo, (int) $episodeNo, $release['airdate']);
 
                     if ($episode === false && $lookupSetting) {
                         // Send the request for the episode to TVDB
                         $tvdbEpisode = $this->getEpisodeInfo(
                             $tvDbId,
-                            $seasonNo,
+                            (int) $seasonNo,
                             (int) $episodeNo,
                             $videoId
                         );
