@@ -103,12 +103,16 @@ abstract class Videos
      */
     protected function getVideoIDFromSiteID(string $siteColumn, int $siteID): bool|int
     {
-        $result = null;
+        $result = false;
         if (\in_array($siteColumn, self::$sites, false)) {
-            $result = Video::query()->where($siteColumn, $siteID)->first(['id']);
+            $result = Video::query()->where($siteColumn, $siteID)->first();
+        }
+        if ($result->isNotEmpty()) {
+            $query = $result->toArray();
+            $result = $query['id'];
         }
 
-        return $result !== null ? $result->id : false;
+        return $result;
     }
 
     public function getByTitle(string $title, int $type, int $source = 0)
@@ -182,7 +186,7 @@ abstract class Videos
     /**
      * @return int
      */
-    public function getTitleExact(string $title, int $type, int $source = 0)
+    public function getTitleExact(string $title, int $type, int $source = 0): int
     {
         $return = 0;
         if (! empty($title)) {
@@ -190,8 +194,9 @@ abstract class Videos
             if ($source > 0) {
                 $sql->where('source', $source);
             }
-            $query = $sql->first()->toArray();
-            if (! empty($query)) {
+            $query = $sql->first();
+            if ($query->isNotEmpty()) {
+                $query = $query->toArray();
                 $return = $query['id'];
             }
             // Try for an alias
@@ -202,8 +207,9 @@ abstract class Videos
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
                 }
-                $query = $sql->first()->toArray();
-                if (! empty($query)) {
+                $query = $sql->first();
+                if ($query->isNotEmpty()) {
+                    $query = $query->toArray();
                     $return = $query['id'];
                 }
             }
