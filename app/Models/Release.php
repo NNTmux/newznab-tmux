@@ -276,7 +276,7 @@ class Release extends Model
     /**
      * @throws \Exception
      */
-    public static function updateRelease(int $id, string $name, string $searchName, string $fromName, int $categoryId, int $parts, int $grabs, int $size, string $postedDate, string $addedDate, $videoId, $episodeId, int $imDbId, int $aniDbId): void
+    public static function updateRelease($id, $name, $searchName, $fromName, $categoryId, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbId, $aniDbId): void
     {
         $movieInfoId = null;
         if (! empty($imDbId)) {
