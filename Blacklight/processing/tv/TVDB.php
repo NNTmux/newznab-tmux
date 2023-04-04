@@ -119,7 +119,7 @@ class TVDB extends TV
                     );
 
                     // Get the show from TVDB
-                    $tvdbShow = $this->getShowInfo((string) $release['cleanname'], $country);
+                    $tvdbShow = $this->getShowInfo((string) $release['cleanname']);
 
                     if (\is_array($tvdbShow)) {
                         $tvdbShow['country'] = $country;
