@@ -1178,13 +1178,11 @@ class ProcessAdditional
                                     File::delete($file);
                                     break;
 
-                                case
-                                (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo) && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
+                                case (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo) && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
                                     $this->_processVideoFile($file);
                                     break;
 
-                                case
-                                (! $this->_foundAudioSample || ! $this->_foundAudioInfo) && preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
+                                case (! $this->_foundAudioSample || ! $this->_foundAudioInfo) && preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
                                     switch ($fileType[0]) {
                                         case 'FLAC':
                                             $fileType = 'FLAC';

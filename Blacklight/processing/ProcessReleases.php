@@ -681,8 +681,7 @@ class ProcessReleases
 
         // CBP older than retention.
         if ($this->echoCLI) {
-            echo
-                $this->consoleTools->header('Process Releases -> Delete finished collections.'.PHP_EOL).
+            echo $this->consoleTools->header('Process Releases -> Delete finished collections.'.PHP_EOL).
                 $this->consoleTools->primary(sprintf(
                     'Deleting collections/binaries/parts older than %d hours.',
                     Settings::settingValue('..partretentionhours')

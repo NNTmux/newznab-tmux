@@ -179,8 +179,7 @@ class IRCScraper extends IRCClient
         $this->joinChannels($channels);
 
         if (! $this->_silent) {
-            echo
-                '['.
+            echo '['.
                 date('r').
                 '] [Scraping of IRC channels for ('.
                 config('irc_settings.scrape_irc_server').
@@ -431,8 +430,7 @@ class IRCScraper extends IRCClient
                 $nukeString .= '['.$this->_curPre['reason'].'] ';
             }
 
-            echo
-                '['.
+            echo '['.
                 date('r').
                 ($new ? '] [ Added Pre ] [' : '] [Updated Pre] [').
                 $this->_curPre['source'].

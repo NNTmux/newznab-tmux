@@ -214,8 +214,7 @@ class NZBContents
         $nzbContents = Utility::unzipGzipFile($nzbPath);
         if (! $nzbContents) {
             if ($this->echooutput) {
-                echo
-                    PHP_EOL.
+                echo PHP_EOL.
                     'Unable to decompress: '.
                     $nzbPath.
                     ' - '.

@@ -76,7 +76,7 @@ class Categorize
 
     public function byGroupName($groupName): bool
     {
-        switch(true) {
+        switch (true) {
             case preg_match('/alt\.binaries\.erotica([.]\w+)?/i', $groupName):
                 if ($this->isXxx()) {
                     return true;
