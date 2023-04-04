@@ -109,10 +109,12 @@ abstract class Videos
         }
         if (! empty($result)) {
             $query = $result->toArray();
-            $result = $query['id'];
+            return $query['id'];
         }
 
-        return $result;
+        return false;
+
+
     }
 
     public function getByTitle(string $title, int $type, int $source = 0)
