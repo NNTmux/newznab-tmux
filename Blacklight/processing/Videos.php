@@ -263,14 +263,14 @@ abstract class Videos
         $return = 0;
         if (! empty($title)) {
             if ($source > 0) {
-                $query = DB::table('videos')
+                $query = Video::query()
                 ->whereRaw("REPLACE(title,'\'','') = ?", $title)
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
                 ->where('type', '=', $type)
                 ->where('source', '=', $source)
                 ->first();
             } else {
-                $query = DB::table('videos')
+                $query = Video::query()
                 ->whereRaw("REPLACE(title,'\'','') = ?", $title)
                 ->orWhereRaw("REPLACE(title,':','') = ?", $title)
                 ->where('type', '=', $type)
@@ -278,7 +278,7 @@ abstract class Videos
             }
             if (! empty($query)) {
                 $result = $query->toArray();
-                $return = $result['id'];
+                return $result['id'];
             }
         }
 
