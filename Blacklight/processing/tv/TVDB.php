@@ -3,6 +3,7 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
+use Blacklight\libraries\FanartTV;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
@@ -32,6 +33,10 @@ class TVDB extends TV
      * @bool Do a local lookup only if server is down
      */
     private bool $local;
+    
+    private FanartTV $fanart;
+
+    private mixed $fanartapikey;
 
     /**
      * TVDB constructor.
@@ -56,6 +61,11 @@ class TVDB extends TV
 
         if ($this->token !== '') {
             $this->client->setToken($this->token);
+        }
+        
+        $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
+        if ($this->fanartapikey !== null) {
+            $this->fanart = new FanartTV($this->fanartapikey);
         }
     }
 
@@ -131,7 +141,11 @@ class TVDB extends TV
                 }
 
                 if ((int) $videoId > 0 && (int) $tvDbId > 0) {
-                    if (! empty($tvdbShow['poster'])) {
+                    if (! empty($tvdbShow['poster'])) { // Use TVDB poster if available
+                        $this->getPoster($videoId);
+                    } else { // Check Fanart.tv for poster
+                        $poster = $this->fanart->getTVFanart($tvDbId);
+                        $this->posterUrl = collect($poster['tvposter'])->sortByDesc('likes')[0]['url'];
                         $this->getPoster($videoId);
                     }
 
