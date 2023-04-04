@@ -16,12 +16,12 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, bcmath, soap, intl, gd, exif, iconv
           coverage: none
 
-      - name: Run composer install
-        run: composer install -n --prefer-dist
-
       - name: Copy env file
         run:
           cp .env.test .env
+
+      - name: Run composer install
+        run: composer install -n --prefer-dist
 
       - name: Prepare Laravel Application
         run:
