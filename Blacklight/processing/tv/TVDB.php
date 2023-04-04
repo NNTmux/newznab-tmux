@@ -168,14 +168,14 @@ class TVDB extends TV
                     }
 
                     // Check if we have the episode for this video ID
-                    $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
+                    $episode = $this->getBySeasonEp($videoId, $seasonNo, (int) $episodeNo, $release['airdate']);
 
                     if ($episode === false && $lookupSetting) {
                         // Send the request for the episode to TVDB
                         $tvdbEpisode = $this->getEpisodeInfo(
                             $tvDbId,
                             $seasonNo,
-                            $episodeNo,
+                            (int) $episodeNo,
                             $videoId
                         );
 
@@ -352,7 +352,7 @@ class TVDB extends TV
         try {
             $poster = $this->client->series()->artworks($show->tvdb_id);
             // Grab the image with the highest score where type == 2
-            $poster = collect($poster)->where('type', 2)->sortByDesc('score')->first();  
+            $poster = collect($poster)->where('type', 2)->sortByDesc('score')->first();
             $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->climate()->error('Poster image not found on TVDB');
