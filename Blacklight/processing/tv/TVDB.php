@@ -349,6 +349,8 @@ class TVDB extends TV
     {
         try {
             $poster = $this->client->series()->artworks($show->tvdb_id);
+            // Grab the image with the highest score where type == 2
+            $poster = collect($poster)->where('type', 2)->sortByDesc('score')->first();  
             $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->climate()->error('Poster image not found on TVDB');
