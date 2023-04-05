@@ -40,7 +40,7 @@ class AdminUserController extends BasePageController
             'role' => $request->has('role') ? $request->input('role') : '',
         ];
 
-        $rslt = User::getRange(
+        $result = User::getRange(
             $offset,
             config('nntmux.items_per_page'),
             $orderBy,
@@ -51,7 +51,7 @@ class AdminUserController extends BasePageController
             true
         );
 
-        $results = $this->paginate($rslt ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+        $results = $this->paginate($result ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $this->smarty->assign(
             [
@@ -76,11 +76,11 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
-     *
+     * @param Request $request
+     * @return RedirectResponse|void
      * @throws \Exception
      */
-    public function edit(Request $request): RedirectResponse
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
 
