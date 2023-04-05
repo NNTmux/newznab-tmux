@@ -246,7 +246,7 @@ class User extends Authenticatable
         self::find($id)->delete();
     }
 
-    public static function getCount($role = null, string $username = '', string $host = '', string $email = ''): int
+    public static function getCount(string|null $role = null, string|null $username = '', string|null $host = '', string|null $email = ''): int
     {
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
