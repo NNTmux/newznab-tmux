@@ -49,7 +49,14 @@ class ManticoreSearch
     {
         if ($parameters['id']) {
             $this->manticoresearch->index($this->config['indexes']['releases'])
-                ->replaceDocument(['name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'categories_id' => (string) $parameters['categories_id'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']], $parameters['id']);
+                ->replaceDocument(
+                    [
+                        'name' => $parameters['name'],
+                        'searchname' => $parameters['searchname'],
+                        'fromname' => $parameters['fromname'],
+                        'categories_id' => (string) $parameters['categories_id'],
+                        'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'],
+                    ], $parameters['id']);
         }
     }
 
@@ -109,10 +116,11 @@ class ManticoreSearch
                 ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
                 ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
                 ->groupBy('releases.id')
-                ->first()->toArray();
+                ->first();
 
         if ($new !== null) {
-            $this->insertRelease($new);
+            $release = $new->toArray();
+            $this->insertRelease($release);
         }
     }
 
