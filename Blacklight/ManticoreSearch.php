@@ -209,10 +209,14 @@ class ManticoreSearch
         try {
             $results = $query->get();
             foreach ($results as $doc) {
-                $result[] = $doc->getId();
-            }
+                if ($rt_index === 'releases_rt') {
+                    $result[] = $doc->getId();
+                } else {
+                    $result[] = $doc->getData();
+                }
 
-            return $result;
+                return $result;
+            }
         } catch (ResponseException $exception) {
             return [];
         } catch (RuntimeException $exception) {
