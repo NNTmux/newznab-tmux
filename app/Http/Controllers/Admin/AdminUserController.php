@@ -76,8 +76,8 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @param Request $request
      * @return RedirectResponse|void
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
