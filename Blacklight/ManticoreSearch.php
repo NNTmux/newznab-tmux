@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use App\Models\Release;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
@@ -194,7 +195,8 @@ class ManticoreSearch
      */
     public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): array
     {
-        $result = [];
+        $resultId = [];
+        $resultData = [];
         $query = $this->search->setIndex($rt_index)->maxMatches(10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
@@ -210,17 +212,26 @@ class ManticoreSearch
             $results = $query->get();
             foreach ($results as $doc) {
                 if ($rt_index === 'releases_rt') {
-                    $result[] = $doc->getId();
+                    $resultId[] = [
+                        'id' => $doc->getId(),
+                    ];
                 } else {
-                    $result[] = $doc->getData();
+                    $resultId[] = [
+                        'id' => $doc->getId(),
+                    ];
                 }
+                $resultData[] = [
+                    'data' => $doc->getData(),
+                ];
 
-                return $result;
+                return array_merge(Arr::get($resultId, '0'), Arr::get($resultData, '0.data'));
             }
         } catch (ResponseException $exception) {
             return [];
         } catch (RuntimeException $exception) {
             return [];
         }
+
+        return [];
     }
 }

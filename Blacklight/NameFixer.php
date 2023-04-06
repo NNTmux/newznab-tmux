@@ -1097,7 +1097,7 @@ class NameFixer
         if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
             $titleMatch = $this->manticore->searchIndexes('releases_rt', $preTitle, ['name', 'searchname', 'filename']);
             if (! empty($titleMatch)) {
-                $join = implode(',', Arr::pluck($titleMatch, 'id'));
+                $join = implode(',', Arr::get($titleMatch, 'id'));
             }
         }
 

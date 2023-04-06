@@ -465,6 +465,9 @@ class Releases extends Release
             $searchResult = $this->elasticSearch->indexSearch($phrases, $limit);
         } else {
             $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', '', [], $searchFields);
+            if (! empty($searchResult)) {
+                $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+            }
         }
 
         if (empty($searchResult)) {
@@ -553,6 +556,9 @@ class Releases extends Release
                 $searchResult = $this->elasticSearch->indexSearchApi($searchName, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $searchName, ['searchname']);
+                if (! empty($searchResult)) {
+                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+                }
             }
         }
 
@@ -684,6 +690,9 @@ class Releases extends Release
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
+                if (! empty($searchResult)) {
+                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+                }
             }
 
             if (empty($searchResult)) {
@@ -816,6 +825,9 @@ class Releases extends Release
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
+                if (! empty($searchResult)) {
+                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+                }
             }
 
             if (empty($searchResult)) {
@@ -888,6 +900,9 @@ class Releases extends Release
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
+                if (! empty($searchResult)) {
+                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+                }
             }
 
             if (empty($searchResult)) {
@@ -957,6 +972,9 @@ class Releases extends Release
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
+                if (! empty($searchResult)) {
+                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+                }
             }
 
             if (empty($searchResult)) {

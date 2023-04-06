@@ -200,7 +200,7 @@ class Predb extends Model
                 $ids = (new ElasticSearchSiteSearch())->predbIndexSearch($search);
             } else {
                 $manticore = new ManticoreSearch();
-                $ids = Arr::pluck($manticore->searchIndexes('predb_rt', $search, ['title']), 'id');
+                $ids = Arr::get($manticore->searchIndexes('predb_rt', $search, ['title']), 'id');
             }
             $sql->whereIn('predb.id', $ids);
         }
