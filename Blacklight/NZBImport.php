@@ -121,15 +121,11 @@ class NZBImport
     }
 
     /**
-     * @param  array  $filesToProcess  List of NZB files to import.
-     * @param  bool|string  $useNzbName  Use the NZB file name as release name?
-     * @param  bool  $delete  Delete the NZB when done?
-     * @param  bool  $deleteFailed  Delete the NZB if failed importing?
-     * @return string|bool
+     * @return bool|string
      *
-     * @throws \Exception
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function beginImport(array $filesToProcess, $useNzbName = false, bool $delete = true, bool $deleteFailed = true)
+    public function beginImport($filesToProcess, $useNzbName = false, $delete = true, $deleteFailed = true)
     {
         // Get all the groups in the DB.
         if (! $this->getAllGroups()) {
@@ -241,9 +237,11 @@ class NZBImport
     }
 
     /**
+     * @return bool
+     *
      * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, bool $useNzbName = false): bool
+    protected function scanNZBFile(&$nzbXML, $useNzbName = false)
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
@@ -363,7 +361,7 @@ class NZBImport
      *
      * @throws \Exception
      */
-    protected function insertNZB($nzbDetails): bool
+    protected function insertNZB($nzbDetails)
     {
         // Make up a GUID for the release.
         $this->relGuid = createGUID();
@@ -432,7 +430,7 @@ class NZBImport
     /**
      * Get all groups in the DB.
      */
-    protected function getAllGroups(): bool
+    protected function getAllGroups()
     {
         $this->allGroups = [];
         $groups = UsenetGroup::query()->get(['id', 'name']);

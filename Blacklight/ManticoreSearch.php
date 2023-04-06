@@ -210,6 +210,7 @@ class ManticoreSearch
                     'data' => $doc->getData(),
                 ];
             }
+
             return array_merge(Arr::get($resultId, '0'), Arr::get($resultData, '0.data'));
         } catch (ResponseException $exception) {
             return [];
