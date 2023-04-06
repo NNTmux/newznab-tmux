@@ -104,13 +104,7 @@ class ManticoreSearch
         return str_replace($from, $to, $string);
     }
 
-    /**
-     * Update Manticore Relases index for given releases_id.
-     *
-     *
-     * @throws \Exception
-     */
-    public function updateRelease(int $releaseID): void
+    public function updateRelease(int|string $releaseID): void
     {
         $new = Release::query()
                 ->where('releases.id', $releaseID)
