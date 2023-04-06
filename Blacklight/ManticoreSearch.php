@@ -183,11 +183,13 @@ class ManticoreSearch
     }
 
     /**
-     * @param  string  $rt_index  (releases_rt or predb_rt)
-     * @param  string  $searchString  (what are we looking for?)
-     * @param  array  $column  (one or multiple columns from the columns that exist in indexes)
+     * @param string $rt_index
+     * @param string $searchString
+     * @param array $column
+     * @param array $searchArray
+     * @return array|\ArrayAccess
      */
-    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): array
+    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = [])
     {
         $resultId = [];
         $resultData = [];
@@ -205,27 +207,18 @@ class ManticoreSearch
         try {
             $results = $query->get();
             foreach ($results as $doc) {
-                if ($rt_index === 'releases_rt') {
-                    $resultId[] = [
-                        'id' => $doc->getId(),
-                    ];
-                } else {
-                    $resultId[] = [
-                        'id' => $doc->getId(),
-                    ];
-                }
+                $resultId[] = [
+                    'id' => $doc->getId(),
+                ];
                 $resultData[] = [
                     'data' => $doc->getData(),
                 ];
-
-                return array_merge(Arr::get($resultId, '0'), Arr::get($resultData, '0.data'));
             }
+            return array_merge(Arr::get($resultId, '0'), Arr::get($resultData, '0.data'));
         } catch (ResponseException $exception) {
             return [];
         } catch (RuntimeException $exception) {
             return [];
         }
-
-        return [];
     }
 }
