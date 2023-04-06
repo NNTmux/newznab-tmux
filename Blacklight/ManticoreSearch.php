@@ -183,10 +183,6 @@ class ManticoreSearch
     }
 
     /**
-     * @param string $rt_index
-     * @param string $searchString
-     * @param array $column
-     * @param array $searchArray
      * @return array|\ArrayAccess
      */
     public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = [])
