@@ -78,8 +78,8 @@ class NntmuxPopulateSearchIndexes extends Command
         $bar->start();
 
         DB::table('releases')
-            ->orderBy('id')
-            ->join('release_files', 'releases.id', '=', 'release_files.releases_id')
+            ->orderByDesc('id')
+            ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
             ->select('releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id')
             ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
             ->groupBy('id')
@@ -160,8 +160,8 @@ class NntmuxPopulateSearchIndexes extends Command
 
         DB::statement('SET SESSION group_concat_max_len=16384;');
         DB::table('releases')
-            ->orderBy('id')
-            ->join('release_files', 'releases.id', '=', 'release_files.releases_id')
+            ->orderByDesc('id')
+            ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
             ->select('releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', 'releases.postdate')
             ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
             ->groupBy('id')
