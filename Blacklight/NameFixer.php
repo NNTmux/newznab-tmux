@@ -842,7 +842,7 @@ class NameFixer
      *
      * @throws \Exception
      */
-    public function updateRelease($release, $name, $method, $echo, $type, int $nameStatus, bool $show, int $preId = 0): void
+    public function updateRelease($release, $name, $method, $echo, $type, $nameStatus, $show, $preId = 0): void
     {
         if (\is_array($release)) {
             $release = (object) $release;

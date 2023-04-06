@@ -100,11 +100,11 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     * @return \Illuminate\Http\RedirectResponse|void
      *
-     * @throws \Exception
+     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
-    public function edit(Request $request): RedirectResponse
+    public function edit(Request $request)
     {
         $this->setPreferences();
 
