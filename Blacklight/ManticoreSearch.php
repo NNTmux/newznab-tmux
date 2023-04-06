@@ -211,7 +211,10 @@ class ManticoreSearch
                 ];
             }
 
-            return array_merge(Arr::get($resultId, '0'), Arr::get($resultData, '0.data'));
+            return [
+                'id' => Arr::pluck($resultId, 'id'),
+                'data' => Arr::pluck($resultData, 'data'),
+            ];
         } catch (ResponseException $exception) {
             return [];
         } catch (RuntimeException $exception) {
