@@ -907,8 +907,8 @@ class NameFixer
 
                 $newTitle = substr($newName, 0, 299);
 
-                if ($echo == true) {
-                    if ($nameStatus == true) {
+                if ($echo === true) {
+                    if ($nameStatus === true) {
                         $status = '';
                         switch ($type) {
                             case 'NFO, ':
@@ -2265,7 +2265,6 @@ class NameFixer
                 $predbSearch = Arr::get($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']), 'data');
                 if (! empty($predbSearch)) {
                     foreach ($predbSearch as $hit) {
-                        echo 'PredbFileCheck: ';
                         if (! empty($hit)) {
                             $this->updateRelease($release, $hit['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show);
 
@@ -2302,7 +2301,6 @@ class NameFixer
                 $results = Arr::get($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['title']), 'data');
                 if (! empty($results)) {
                     foreach ($results as $hit) {
-                        echo 'PredbTitleCheck: ';
                         if (! empty($hit)) {
                             $this->updateRelease($release, $hit['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show);
 
