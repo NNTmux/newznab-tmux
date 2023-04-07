@@ -224,9 +224,9 @@ class AniDB
         $cleanArr = $this->extractTitleEpisode($release->searchname);
 
         if (\is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
-            $this->colorCli->climate()->info(PHP_EOL.'Looking Up: ').
-                $this->colorCli->primary('   Title: '.$cleanArr['title'].PHP_EOL.
-                    '   Episode: '.$cleanArr['epno']);
+            $this->colorCli->climate()->info('Looking Up:
+                     Title: '.$cleanArr['title'].
+                '    Episode: '.$cleanArr['epno']);
 
             // get anidb number for the title of the name
             $anidbId = $this->getAnidbByName($cleanArr['title']);
