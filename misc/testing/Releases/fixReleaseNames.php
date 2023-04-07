@@ -26,7 +26,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     } elseif ($argv[3] === 'predb_id') {
         $other = 3;
     }
-    $setStatus = $argv[4] === 'yes' ? 1 : 2;
+    $setStatus = $argv[4] === 'yes';
 
     $show = isset($argv[5]) && $argv[5] === 'show' ? 1 : 2;
     if ($argv[1] === 7 || $argv[1] === 8) {

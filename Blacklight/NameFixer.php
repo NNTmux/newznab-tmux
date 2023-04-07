@@ -488,13 +488,14 @@ class NameFixer
     /**
      * Attempts to fix release names using the Par2 File.
      *
-     * @param  int  $time  1: 24 hours, 2: no time limit
-     * @param  int  $echo  1: change the name, anything else: preview of what could have been changed.
-     * @param  int  $cats  1: other categories, 2: all categories
+     * @param    $time 1: 24 hours, 2: no time limit
+     * @param    $echo 1: change the name, anything else: preview of what could have been changed.
+     * @param    $cats 1: other categories, 2: all categories
+     * @param  \Blacklight\NNTP  $nntp
      *
      * @throws \Exception
      */
-    public function fixNamesWithPar2(int $time, int $echo, int $cats, $nameStatus, $show, NNTP $nntp): void
+    public function fixNamesWithPar2($time, $echo, $cats, $nameStatus, $show, NNTP $nntp): void
     {
         $this->_echoStartMessage($time, 'par2 files');
 
@@ -906,8 +907,8 @@ class NameFixer
 
                 $newTitle = substr($newName, 0, 299);
 
-                if ($echo === true) {
-                    if ($nameStatus === 1) {
+                if ($echo == true) {
+                    if ($nameStatus == true) {
                         $status = '';
                         switch ($type) {
                             case 'NFO, ':
@@ -964,13 +965,19 @@ class NameFixer
                             }
                         }
 
+                        Release::query()
+                            ->where('id', $release->releases_id)
+                            ->update($updateColumns);
+
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->releases_id);
                         } else {
                             $this->manticore->updateRelease($release->releases_id);
                         }
                     } else {
-                        $release->update(
+                        Release::query()
+                            ->where('id', $release->releases_id)
+                            ->update(
                             [
                                 'videos_id' => 0,
                                 'tv_episodes_id' => 0,
@@ -1079,8 +1086,6 @@ class NameFixer
                 if ($pre['title'] !== $row->searchname) {
                     $this->updateRelease($row, $pre['title'], 'Title Match source: '.$pre['source'], $echo, 'PreDB FT Exact, ', $nameStatus, $show, $pre['predb_id']);
                     $matching++;
-                } else {
-                    $this->_updateSingleColumn('predb_id', $pre['predb_id'], $row->releases_id);
                 }
             }
         } elseif ($total >= 16) {
@@ -1180,6 +1185,7 @@ class NameFixer
      */
     public function matchPreDbFiles($release, bool $echo, int $nameStatus, bool $show): int
     {
+
         $matching = 0;
 
         foreach (explode('||', $release->filename) as $key => $fileName) {
@@ -1190,7 +1196,7 @@ class NameFixer
                 if (config('nntmux.elasticsearch_enabled') === true) {
                     $results = $this->elasticsearch->searchPreDb($preMatch[1]);
                 } else {
-                    $results = $this->manticore->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
+                    $results = Arr::get($this->manticore->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']), 'data');
                 }
                 if (! empty($results)) {
                     foreach ($results as $result) {
@@ -1200,7 +1206,7 @@ class NameFixer
                                 $this->_fileName = $result['filename'];
                                 $release->filename = $this->_fileName;
                                 if ($result['title'] !== $release->searchname) {
-                                    $this->updateRelease($release, $result['title'], 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
+                                    $this->updateRelease($release, $result['title'], 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show);
                                 } else {
                                     $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
                                 }
@@ -1353,6 +1359,7 @@ class NameFixer
      */
     public function checkName($release, bool $echo, string $type, int $nameStatus, bool $show, bool $preId = false): bool
     {
+
         // Get pre style name from releases.name
         if (preg_match_all(self::PREDB_REGEX, $release->textstring, $hits) && ! preg_match('/Source\s\:/i', $release->textstring)) {
             foreach ($hits as $hit) {
@@ -1407,7 +1414,7 @@ class NameFixer
             }
 
             // set NameFixer process flags after run
-            if ($nameStatus === 1 && ! $this->matched) {
+            if ($nameStatus === true && ! $this->matched) {
                 switch ($type) {
                     case 'NFO, ':
                         $this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release->releases_id);
@@ -1439,7 +1446,7 @@ class NameFixer
      *  The first parameter is the column to update, the second is the value
      *  The final parameter is the ID of the release to update.
      */
-    public function _updateSingleColumn(string $column = '', int $status = 0, int $id = 0): void
+    public function _updateSingleColumn($column = '', $status = 0, $id = 0): void
     {
         if ((string) $column !== '' && (int) $id !== 0) {
             Release::query()->where('id', $id)->update([$column => $status]);
@@ -1454,6 +1461,7 @@ class NameFixer
      */
     public function tvCheck($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1483,6 +1491,7 @@ class NameFixer
      */
     public function movieCheck($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1524,6 +1533,7 @@ class NameFixer
      */
     public function gameCheck($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1549,6 +1559,7 @@ class NameFixer
      */
     public function appCheck($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1568,6 +1579,7 @@ class NameFixer
      */
     public function nfoCheckTV($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1587,6 +1599,7 @@ class NameFixer
      */
     public function nfoCheckMov($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1605,6 +1618,7 @@ class NameFixer
      */
     public function nfoCheckMus($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id && preg_match('/(?:\s{2,})(.+?-FM-\d{2}-\d{2})/i', $release->textstring, $result)) {
@@ -1621,6 +1635,7 @@ class NameFixer
      */
     public function nfoCheckTY($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id && preg_match('/(\w[\-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $release->textstring, $result) && ! preg_match('/\.pdf|Audio ?Book/i', $release->textstring)) {
@@ -1793,6 +1808,7 @@ class NameFixer
      */
     public function nfoCheckG($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1818,6 +1834,7 @@ class NameFixer
      */
     public function nfoCheckMisc($release, bool $echo, string $type, $nameStatus, $show): void
     {
+
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/Supplier.+?IGUANA/i', $release->textstring)) {
                 $releaseName = '';
@@ -1854,6 +1871,7 @@ class NameFixer
      */
     public function fileCheck($release, bool $echo, string $type, $nameStatus, $show): bool
     {
+
         $result = [];
 
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
@@ -1947,6 +1965,7 @@ class NameFixer
      */
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
     {
+
         if (! empty($release->uid) && ! $this->done && $this->relid !== (int) $release->releases_id) {
             $result = Release::fromQuery(sprintf(
                 '
@@ -1994,6 +2013,7 @@ class NameFixer
      */
     public function mediaMovieNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
+
         $newName = '';
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/<Movie_name>(.+)<\/Movie_name>/i', $release->mediainfo, $hit)) {
@@ -2027,6 +2047,7 @@ class NameFixer
      */
     public function xxxNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
+
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
             $result = Release::fromQuery(
                 sprintf(
@@ -2074,6 +2095,7 @@ class NameFixer
      */
     public function srrNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
+
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
             $result = Release::fromQuery(
                 sprintf(
@@ -2121,6 +2143,7 @@ class NameFixer
      */
     public function hashCheck($release, $echo, $type, $nameStatus, $show): bool
     {
+
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
             $result = Release::fromQuery(sprintf(
                 '
@@ -2166,6 +2189,7 @@ class NameFixer
      */
     public function crcCheck($release, $echo, $type, $nameStatus, $show): bool
     {
+
         if (! $this->done && $this->relid !== (int) $release->releases_id && $release->textstring !== '') {
             $result = Release::fromQuery(
                 sprintf(
@@ -2221,8 +2245,9 @@ class NameFixer
     /**
      * @throws \Exception
      */
-    public function preDbFileCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
+    public function preDbFileCheck($release, bool $echo, string $type, $nameStatus, bool $show): bool
     {
+
         $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
         $this->cleanFileNames();
@@ -2237,11 +2262,15 @@ class NameFixer
                     }
                 }
             } else {
-                foreach ($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $hit) {
-                    if (! empty($hit)) {
-                        $this->updateRelease($release, $hit['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $hit['id']);
+                $predbSearch = Arr::get($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']), 'data');
+                if (! empty($predbSearch)) {
+                    foreach ($predbSearch as $hit) {
+                        echo 'PredbFileCheck: ';
+                        if (! empty($hit)) {
+                            $this->updateRelease($release, $hit['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show);
 
-                        return true;
+                            return true;
+                        }
                     }
                 }
             }
@@ -2255,6 +2284,7 @@ class NameFixer
      */
     public function preDbTitleCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
     {
+
         $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
         $this->cleanFileNames();
@@ -2269,11 +2299,15 @@ class NameFixer
                     }
                 }
             } else {
-                foreach ($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['title']) as $hit) {
-                    if (! empty($hit)) {
-                        $this->updateRelease($release, $hit['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $hit['id']);
+                $results = Arr::get($this->manticore->searchIndexes('predb_rt', $this->_fileName, ['title']), 'data');
+                if (! empty($results)) {
+                    foreach ($results as $hit) {
+                        echo 'PredbTitleCheck: ';
+                        if (! empty($hit)) {
+                            $this->updateRelease($release, $hit['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show);
 
-                        return true;
+                            return true;
+                        }
                     }
                 }
             }
