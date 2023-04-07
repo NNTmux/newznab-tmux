@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\UsenetGroup;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminGroupController extends BasePageController
@@ -64,11 +63,11 @@ class AdminGroupController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     * @return \Illuminate\Http\RedirectResponse|void
      *
      * @throws \Exception
      */
-    public function edit(Request $request): RedirectResponse
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
 
