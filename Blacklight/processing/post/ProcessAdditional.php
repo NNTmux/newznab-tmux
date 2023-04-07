@@ -928,14 +928,14 @@ class ProcessAdditional
                 if (preg_match(NameFixer::PREDB_REGEX, $rarFileName[0], $hit)) {
                     $preCheck = Predb::whereTitle($hit[0])->first();
                     $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                    (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($hit[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', 1, true, $this->_release->preid);
+                    (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($hit[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
                 } elseif (! empty($dataSummary['archives']) && ! empty($dataSummary['archives'][$rarFileName[0]]['file_list'])) {
                     $archiveData = $dataSummary['archives'][$rarFileName[0]]['file_list'];
                     $archiveFileName = Arr::pluck($archiveData, 'name');
                     if (preg_match(NameFixer::PREDB_REGEX, $archiveFileName[0], $match2)) {
                         $preCheck = Predb::whereTitle($match2[0])->first();
                         $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                        (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($match2[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', 1, true, $this->_release->preid);
+                        (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($match2[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
                     }
                 }
             }
