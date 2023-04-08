@@ -1183,7 +1183,7 @@ class NameFixer
      *
      * @throws \Exception
      */
-    public function matchPreDbFiles($release, bool $echo, int $nameStatus, bool $show): int
+    public function matchPreDbFiles($release, bool $echo, $nameStatus, bool $show): int
     {
 
         $matching = 0;
@@ -1357,7 +1357,7 @@ class NameFixer
      *
      * @throws \Exception
      */
-    public function checkName($release, bool $echo, string $type, int $nameStatus, bool $show, bool $preId = false): bool
+    public function checkName($release, bool $echo, string $type, $nameStatus, bool $show, bool $preId = false): bool
     {
 
         // Get pre style name from releases.name
@@ -2281,7 +2281,7 @@ class NameFixer
     /**
      * @throws \Exception
      */
-    public function preDbTitleCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
+    public function preDbTitleCheck($release, bool $echo, string $type, $nameStatus, bool $show): bool
     {
 
         $this->_fileName = $release->textstring;
