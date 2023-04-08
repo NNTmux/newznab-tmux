@@ -43,17 +43,19 @@ class SearchController extends BasePageController
             $searchString = [];
             switch (true) {
                 case $request->filled('subject'):
-                    $searchString['searchname'] = (string) $request->input('subject');
+                    $searchString['searchname'] = (string) $request->input('subject') ?? [];
                     $this->smarty->assign('subject', $searchString['searchname']);
                     break;
                 case $request->filled('id'):
-                    $searchString['searchname'] = (string) $request->input('id');
+                    $searchString['searchname'] = (string) $request->input('id') ?? [];
                     $this->smarty->assign('id', $searchString['searchname']);
                     break;
                 case $request->filled('search'):
-                    $searchString['searchname'] = (string) $request->input('search');
+                    $searchString['searchname'] = (string) $request->input('search') ?? [];
                     $this->smarty->assign('search', $searchString['searchname']);
                     break;
+                default:
+                    $searchString['searchname'] = '';
             }
 
             $categoryID[] = -1;

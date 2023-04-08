@@ -186,13 +186,14 @@ class ManticoreSearch
     {
         $resultId = [];
         $resultData = [];
-        $query = $this->search->setIndex($rt_index)->maxMatches(10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
+        $query = $this->search->setIndex($rt_index)->option('boolean_simplify', 1)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
-                $query->match(['query' => $value, 'operator' => 'and', 'column' => $key]);
+                    $query->search('@@relaxed @'.$key.' '.$value);
             }
         } elseif (! empty($searchString)) {
-            $query->match(['query' => $searchString, 'column' => $column, 'operator' => 'and']);
+                $searchColumns = ! empty($column) ? '@'.implode('', $column) : '';
+                $query->search('@@relaxed'.$searchColumns.' '.$searchString);
         } else {
             return [];
         }
