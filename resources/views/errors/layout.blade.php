@@ -1,47 +1,53 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>
-        @yield('title')
-    </title>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
+        <title>@yield('title')</title>
 
-    <style>
-        html, body {
-            height: 100%;
-        }
+        <!-- Styles -->
+        <style>
+            html, body {
+                background-color: #fff;
+                color: #636b6f;
+                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+                font-weight: 100;
+                height: 100vh;
+                margin: 0;
+            }
 
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            color: #B0BEC5;
-            display: table;
-            font-weight: 100;
-            font-family: \'Lato\', sans-serif;
-        }
+            .full-height {
+                height: 100vh;
+            }
 
-        .container {
-            text-align: center;
-            display: table-cell;
-            vertical-align: middle;
-        }
+            .flex-center {
+                align-items: center;
+                display: flex;
+                justify-content: center;
+            }
 
-        .content {
-            text-align: center;
-            display: inline-block;
-        }
+            .position-ref {
+                position: relative;
+            }
 
-        .title {
-            font-size: 72px;
-            margin-bottom: 40px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    @yield('content')
-</div>
-</body>
+            .content {
+                text-align: center;
+            }
+
+            .title {
+                font-size: 36px;
+                padding: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="flex-center position-ref full-height">
+            <div class="content">
+                <div class="title">
+                    @yield('message')
+                </div>
+            </div>
+        </div>
+    </body>
 </html>

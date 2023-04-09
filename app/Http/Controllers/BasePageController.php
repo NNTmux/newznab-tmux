@@ -128,51 +128,6 @@ class BasePageController extends Controller
         return view('errors.404');
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function show403(): View
-    {
-        return view('errors.403');
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function show503(): View
-    {
-        return view('errors.503')->with('Error', 'Service temporarily unavailable');
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function showBadBoy(): View
-    {
-        return view('errors.badboy')->with('Message', 'This is not you account.');
-    }
-
-    /**
-     * Show maintenance page.
-     */
-    public function showMaintenance(): View
-    {
-        return view('errors.maintenance')->with('Message', 'We are performing an site maintenance.');
-    }
-
-    /**
-     * Show Security token mismatch page.
-     */
-    public function showTokenError(): View
-    {
-        return view('errors.tokenError')->with('Error', 'Token mismatch');
-    }
-
-    public function show429(string $retry = '')
-    {
-        abort(429, $retry);
-    }
-
     public function render(): void
     {
         $this->smarty->display($this->page_template);
