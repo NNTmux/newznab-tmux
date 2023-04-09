@@ -98,8 +98,8 @@ class ManticoreSearch
      */
     public static function escapeString(string $string): string
     {
-        $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', "'"];
-        $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\=', "\'"];
+        $from = ['\\', '(', ')', '@', '~', '"', '&', '/', '$', '=', "'"];
+        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\'"];
 
         return str_replace($from, $to, $string);
     }
@@ -186,14 +186,14 @@ class ManticoreSearch
     {
         $resultId = [];
         $resultData = [];
-        $query = $this->search->setIndex($rt_index)->option('boolean_simplify', 1)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
+        $query = $this->search->setIndex($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
-                    $query->search('@@relaxed @'.$key.' '.$value);
+                    $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
             }
         } elseif (! empty($searchString)) {
                 $searchColumns = ! empty($column) ? '@'.implode('', $column) : '';
-                $query->search('@@relaxed'.$searchColumns.' '.$searchString);
+                $query->search('@@relaxed'.$searchColumns.' '.self::escapeString($searchString));
         } else {
             return [];
         }
