@@ -98,10 +98,18 @@ class ManticoreSearch
      */
     public static function escapeString(string $string): string
     {
-        $from = ['\\', '(', ')', '@', '~', '"', '&', '/', '$', '=', "'"];
-        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\'"];
+        if ($string === '*') {
+            return '';
+        }
 
-        return str_replace($from, $to, $string);
+        $from = ['\\', '(', ')', '@', '~', '"', '&', '/', '$', '=', "'", '--', '[', ']'];
+        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\', '\--", '\[', '\]'];
+
+        $string = str_replace($from, $to, $string);
+        $string = Str::replaceLast('!', '', $string);
+        $string = Str::replaceLast('-', '', $string);
+
+        return $string;
     }
 
     public function updateRelease(int|string $releaseID): void
