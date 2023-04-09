@@ -29,11 +29,11 @@ class AdminContentController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      *
      * @throws \Exception
      */
-    public function create(Request $request): RedirectResponse
+    public function create(Request $request)
     {
         $this->setAdminPrefs();
         $contents = new Contents();
