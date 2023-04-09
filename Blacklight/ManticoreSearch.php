@@ -107,8 +107,9 @@ class ManticoreSearch
         $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\', '\--", '\[', '\]'];
 
         $string = str_replace($from, $to, $string);
-        $string = Str::replaceLast('!', '', $string);
-        $string = Str::replaceLast('-', '', $string);
+        // Remove these characaters if they are the last chars in $string
+        $string = Str::of($string)->rtrim('-');
+        $string = Str::of($string)->rtrim('!');
 
         return $string;
     }
