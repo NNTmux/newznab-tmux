@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Models\Release;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
 use Manticoresearch\Exceptions\RuntimeException;
