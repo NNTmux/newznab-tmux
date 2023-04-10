@@ -23,9 +23,9 @@ class ManticoreSearch
 
     protected array $connection;
 
-    protected Client $manticoresearch;
+    public Client $manticoresearch;
 
-    protected Search $search;
+    public Search $search;
 
     /**
      * @var \Blacklight\ColorCLI
