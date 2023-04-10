@@ -62,6 +62,7 @@ class NntmuxPopulateSearchIndexes extends Command
     {
         $manticore = new ManticoreSearch();
         $manticore->truncateRTIndex(Arr::wrap('releases_rt'));
+        $data = [];
         $total = Release::count();
         if (! $total) {
             $this->warn('Could not get database information for releases table.');
@@ -77,24 +78,25 @@ class NntmuxPopulateSearchIndexes extends Command
         $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
         $bar->start();
 
-        DB::table('releases')
+        Release::query()
             ->orderByDesc('id')
             ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
-            ->select('releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id')
+            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id'])
             ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
             ->groupBy('id')
-            ->chunk($max, function ($releases) use ($manticore, $bar) {
+            ->chunk($max, function ($releases) use ($manticore, $bar, $data) {
                 foreach ($releases as $r) {
-                    $manticore->insertRelease([
+                    $data[] = [
                         'id' => $r->id,
                         'name' => $r->name,
                         'searchname' => $r->searchname,
                         'fromname' => $r->fromname,
                         'categories_id' => (string) $r->categories_id,
                         'filename' => $r->filename,
-                    ]);
+                    ];
                     $bar->advance();
                 }
+                $manticore->manticoresearch->index('releases_rt')->replaceDocuments($data);
             });
         $bar->finish();
         $this->newLine();
@@ -107,6 +109,7 @@ class NntmuxPopulateSearchIndexes extends Command
     {
         $manticore = new ManticoreSearch();
         $manticore->truncateRTIndex(['predb_rt']);
+        $data = [];
 
         $total = Predb::count();
         if (! $total) {
@@ -122,21 +125,21 @@ class NntmuxPopulateSearchIndexes extends Command
         $bar = $this->output->createProgressBar($total);
         $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
         $bar->start();
-
-        DB::table('predb')
-            ->select('id', 'title', 'filename', 'source')
+        Predb::query()
+            ->select(['id', 'title', 'filename', 'source'])
             ->groupBy('id')
             ->orderBy('id')
-            ->chunk($max, function ($pre) use ($manticore, $bar) {
+            ->chunk($max, function ($pre) use ($manticore, $bar, $data) {
                 foreach ($pre as $p) {
-                    $manticore->insertPredb([
+                    $data[] = [
                         'id' => $p->id,
                         'title' => $p->title,
                         'filename' => $p->filename,
                         'source' => $p->source,
-                    ]);
+                    ];
                     $bar->advance();
                 }
+                $manticore->manticoresearch->index('predb_rt')->replaceDocuments($data);
             });
 
         $bar->finish();
@@ -145,6 +148,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function elasticReleases(): void
     {
+        $data = ['body' => []];
         $elastic = new ElasticSearchSiteSearch();
         $total = Release::count();
         if (! $total) {
@@ -159,16 +163,22 @@ class NntmuxPopulateSearchIndexes extends Command
         $bar->start();
 
         DB::statement('SET SESSION group_concat_max_len=16384;');
-        DB::table('releases')
+       Release::query()
             ->orderByDesc('id')
             ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
-            ->select('releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', 'releases.postdate')
+            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', 'releases.postdate'])
             ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
             ->groupBy('id')
-            ->chunk($max, function ($releases) use ($elastic, $bar) {
+            ->chunk($max, function ($releases) use ($bar, $data) {
                 foreach ($releases as $r) {
                     $searchName = str_replace(['.', '-'], ' ', $r->searchname);
-                    $elastic->insertRelease([
+                    $data['body'][] = [
+                        'index' => [
+                            '_index' => 'releases',
+                            '_id' => $r->id,
+                        ],
+                    ];
+                    $data['body'][] = [
                         'id' => $r->id,
                         'name' => $r->name,
                         'searchname' => $r->searchname,
@@ -177,9 +187,10 @@ class NntmuxPopulateSearchIndexes extends Command
                         'categories_id' => $r->categories_id,
                         'filename' => $r->filename,
                         'postdate' => $r->postdate,
-                    ]);
+                    ];
                     $bar->advance();
                 }
+                \Elasticsearch::bulk($data);
             });
         $bar->finish();
         $this->newLine();
@@ -188,6 +199,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function elasticPreDB(): void
     {
+        $data = ['body' => []];
         $elastic = new ElasticSearchSiteSearch();
         $total = Predb::count();
         if (! $total) {
@@ -203,21 +215,27 @@ class NntmuxPopulateSearchIndexes extends Command
         $bar = $this->output->createProgressBar($total);
         $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
         $bar->start();
-
-        DB::table('predb')
-            ->select('id', 'title', 'filename', 'source')
+        Predb::query()
+            ->select(['id', 'title', 'filename', 'source'])
             ->groupBy('id')
             ->orderBy('id')
-            ->chunk($max, function ($pre) use ($elastic, $bar) {
+            ->chunk($max, function ($pre) use ($bar, $data) {
                 foreach ($pre as $p) {
-                    $elastic->insertPredb([
+                    $data['body'][] = [
+                        'index' => [
+                            '_index' => 'predb',
+                            '_id' => $p->id,
+                        ],
+                    ];
+                    $data['body'][] = [
                         'id' => $p->id,
                         'title' => $p->title,
                         'filename' => $p->filename,
                         'source' => $p->source,
-                    ]);
+                    ];
                     $bar->advance();
                 }
+                \Elasticsearch::bulk($data);
             });
 
         $bar->finish();
