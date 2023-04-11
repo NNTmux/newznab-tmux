@@ -70,7 +70,7 @@ class IRCScraper extends IRCClient
      *
      * @throws \Exception
      */
-    public function __construct(bool &$silent, bool &$debug)
+    public function __construct(bool $silent, bool $debug)
     {
         if (config('irc_settings.scrape_irc_source_ignore')) {
             $this->_ignoredChannels = unserialize(
@@ -143,15 +143,10 @@ class IRCScraper extends IRCClient
         $this->_startScraping();
     }
 
-    public function __destruct()
-    {
-        parent::__destruct();
-    }
-
     /**
      * Main method for scraping.
      */
-    protected function _startScraping()
+    protected function _startScraping(): void
     {
         // Connect to IRC.
         if ($this->connect(config('irc_settings.scrape_irc_server'), config('irc_settings.scrape_irc_port'), config('irc_settings.scrape_irc_tls')) === false) {
@@ -197,6 +192,8 @@ class IRCScraper extends IRCClient
 
     /**
      * Process bot messages, insert/update PREs.
+     *
+     * @throws \Exception
      */
     protected function processChannelMessages(): void
     {
@@ -267,8 +264,10 @@ class IRCScraper extends IRCClient
 
     /**
      * Check if we already have the PRE, update if we have it, insert if not.
+     *
+     * @throws \Exception
      */
-    protected function _checkForDupe()
+    protected function _checkForDupe(): void
     {
         $this->_oldPre = Predb::query()->where('title', $this->_curPre['title'])->select(['category', 'size'])->first();
         if ($this->_oldPre === null) {
@@ -285,7 +284,7 @@ class IRCScraper extends IRCClient
      *
      * @throws \Exception
      */
-    protected function _insertNewPre()
+    protected function _insertNewPre(): void
     {
         if (config('nntmux.elasticsearch_enabled') === true) {
             $indexData = (new ElasticSearchSiteSearch())->predbIndexSearch($this->_curPre['title']);
@@ -352,7 +351,7 @@ class IRCScraper extends IRCClient
      *
      * @throws \Exception
      */
-    protected function _updatePre()
+    protected function _updatePre(): void
     {
         if (empty($this->_curPre['title'])) {
             return;
@@ -403,7 +402,7 @@ class IRCScraper extends IRCClient
     /**
      * Echo new or update pre to CLI.
      */
-    protected function _doEcho(bool $new = true)
+    protected function _doEcho(bool $new = true): void
     {
         if (! $this->_silent) {
             $nukeString = '';
@@ -456,9 +455,10 @@ class IRCScraper extends IRCClient
     /**
      * Get a group id for a group name.
      *
+     * @param string $groupName
      * @return mixed
      */
-    protected function _getGroupID(string $groupName)
+    protected function _getGroupID(string $groupName): mixed
     {
         if (! isset($this->_groupList[$groupName])) {
             $group = UsenetGroup::query()->where('name', $groupName)->first(['id']);
@@ -471,7 +471,7 @@ class IRCScraper extends IRCClient
     /**
      * After updating or inserting new PRE, reset these.
      */
-    protected function _resetPreVariables()
+    protected function _resetPreVariables(): void
     {
         $this->_nuked = false;
         $this->_oldPre = [];

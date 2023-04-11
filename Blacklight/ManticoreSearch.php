@@ -239,9 +239,11 @@ class ManticoreSearch
             ];
         } catch (ResponseException $exception) {
             Log::error($exception->getMessage());
+
             return [];
         } catch (RuntimeException $exception) {
             Log::error($exception->getMessage());
+
             return [];
         }
     }
