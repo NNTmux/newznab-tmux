@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Models\Release;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
@@ -50,15 +51,22 @@ class ManticoreSearch
     public function insertRelease(array $parameters): void
     {
         if ($parameters['id']) {
-            $this->manticoresearch->index($this->config['indexes']['releases'])
-                ->replaceDocument(
-                    [
-                        'name' => $parameters['name'],
-                        'searchname' => $parameters['searchname'],
-                        'fromname' => $parameters['fromname'],
-                        'categories_id' => (string) $parameters['categories_id'],
-                        'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'],
-                    ], $parameters['id']);
+            try {
+                $this->manticoresearch->index($this->config['indexes']['releases'])
+                    ->replaceDocument(
+                        [
+                            'name' => $parameters['name'],
+                            'searchname' => $parameters['searchname'],
+                            'fromname' => $parameters['fromname'],
+                            'categories_id' => (string) $parameters['categories_id'],
+                            'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'],
+                        ], $parameters['id']);
+            } catch (ResponseException $re) {
+                Log::error($re->getMessage());
+            } catch (\RuntimeException $ru) {
+                Log::error($ru->getMessage());
+            }
+
         }
     }
 
@@ -67,10 +75,17 @@ class ManticoreSearch
      */
     public function insertPredb(array $parameters): void
     {
-        if ($parameters['id']) {
-            $this->manticoresearch->index($this->config['indexes']['predb'])
-                ->replaceDocument(['title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']], $parameters['id']);
+        try {
+            if ($parameters['id']) {
+                $this->manticoresearch->index($this->config['indexes']['predb'])
+                    ->replaceDocument(['title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']], $parameters['id']);
+            }
+        } catch (ResponseException $re) {
+            Log::error($re->getMessage());
+        } catch (\RuntimeException $ru) {
+            Log::error($ru->getMessage());
         }
+
     }
 
     /**
@@ -196,19 +211,18 @@ class ManticoreSearch
     {
         $resultId = [];
         $resultData = [];
-        $query = $this->search->setIndex($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
-        if (! empty($searchArray)) {
-            foreach ($searchArray as $key => $value) {
+        try {
+            $query = $this->search->setIndex($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
+            if (! empty($searchArray)) {
+                foreach ($searchArray as $key => $value) {
                     $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
-            }
-        } elseif (! empty($searchString)) {
+                }
+            } elseif (! empty($searchString)) {
                 $searchColumns = ! empty($column) ? '@'.implode('', $column) : '';
                 $query->search('@@relaxed'.$searchColumns.' '.self::escapeString($searchString));
-        } else {
-            return [];
-        }
-
-        try {
+            } else {
+                return [];
+            }
             $results = $query->get();
             foreach ($results as $doc) {
                 $resultId[] = [
@@ -224,8 +238,10 @@ class ManticoreSearch
                 'data' => Arr::pluck($resultData, 'data'),
             ];
         } catch (ResponseException $exception) {
+            Log::error($exception->getMessage());
             return [];
         } catch (RuntimeException $exception) {
+            Log::error($exception->getMessage());
             return [];
         }
     }
