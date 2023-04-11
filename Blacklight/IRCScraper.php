@@ -454,9 +454,6 @@ class IRCScraper extends IRCClient
 
     /**
      * Get a group id for a group name.
-     *
-     * @param string $groupName
-     * @return mixed
      */
     protected function _getGroupID(string $groupName): mixed
     {
