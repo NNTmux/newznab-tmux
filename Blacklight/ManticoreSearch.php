@@ -65,6 +65,8 @@ class ManticoreSearch
                 Log::error($re->getMessage());
             } catch (\RuntimeException $ru) {
                 Log::error($ru->getMessage());
+            } catch (\Throwable $exception) {
+                Log::error($exception->getMessage());
             }
 
         }
@@ -84,6 +86,8 @@ class ManticoreSearch
             Log::error($re->getMessage());
         } catch (\RuntimeException $ru) {
             Log::error($ru->getMessage());
+        } catch (\Throwable $exception) {
+            Log::error($exception->getMessage());
         }
 
     }
@@ -242,6 +246,10 @@ class ManticoreSearch
 
             return [];
         } catch (RuntimeException $exception) {
+            Log::error($exception->getMessage());
+
+            return [];
+        } catch (\Throwable $exception) {
             Log::error($exception->getMessage());
 
             return [];
