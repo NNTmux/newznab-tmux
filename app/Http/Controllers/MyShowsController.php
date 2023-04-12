@@ -12,9 +12,11 @@ use Illuminate\Http\Request;
 class MyShowsController extends BasePageController
 {
     /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
      * @throws \Exception
      */
-    public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function show(Request $request)
     {
         $this->setPreferences();
         $action = $request->input('action') ?? '';
