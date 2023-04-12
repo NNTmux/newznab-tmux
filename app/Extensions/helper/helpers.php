@@ -11,6 +11,8 @@ use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use sspat\ESQuerySanitizer\Sanitizer;
 use Symfony\Component\Process\Process;
 use Zip as ZipStream;
 
@@ -429,5 +431,35 @@ if (! function_exists('release_flag')) {
         }
 
         return '';
+    }
+    if (! function_exists('sanitize')) {
+        function sanitize(array|string $phrases, array $doNotSanitize = []): string
+        {
+            if (! is_array($phrases)) {
+                $wordArray = explode(' ', str_replace('.', ' ', $phrases));
+            } else {
+                $wordArray = $phrases;
+            }
+
+            $keywords = [];
+            $tempWords = [];
+            foreach ($wordArray as $words) {
+                $words = preg_split('/\s+/', $words);
+                foreach ($words as $st) {
+                    if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
+                        $str = $st;
+                    } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
+                        $str = $st;
+                    } else {
+                        $str = Sanitizer::escape($st, $doNotSanitize);
+                    }
+                    $tempWords[] = $str;
+                }
+
+                $keywords = $tempWords;
+            }
+
+            return implode(' ', $keywords);
+        }
     }
 }

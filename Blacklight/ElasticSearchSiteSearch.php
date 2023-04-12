@@ -6,14 +6,12 @@ use App\Models\Release;
 use Elasticsearch\Common\Exceptions\ElasticsearchException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use sspat\ESQuerySanitizer\Sanitizer;
 
 class ElasticSearchSiteSearch
 {
     public function indexSearch(array|string $phrases, int $limit): array|Collection
     {
-        $keywords = $this->sanitize($phrases);
+        $keywords = sanitize($phrases);
 
         try {
             $search = [
@@ -48,7 +46,7 @@ class ElasticSearchSiteSearch
 
     public function indexSearchApi(array|string $searchName, int $limit): array|Collection
     {
-        $keywords = $this->sanitize($searchName);
+        $keywords = sanitize($searchName);
         try {
             $search = [
                 'scroll' => '30s',
@@ -82,7 +80,7 @@ class ElasticSearchSiteSearch
 
     public function indexSearchTMA(array|string $name, int $limit): array|Collection
     {
-        $keywords = $this->sanitize($name);
+        $keywords = sanitize($name);
         try {
             $search = [
                 'scroll' => '30s',
@@ -257,35 +255,6 @@ class ElasticSearchSiteSearch
         ];
 
         \Elasticsearch::update($data);
-    }
-
-    private function sanitize(array|string $phrases): string
-    {
-        if (! is_array($phrases)) {
-            $wordArray = explode(' ', str_replace('.', ' ', $phrases));
-        } else {
-            $wordArray = $phrases;
-        }
-
-        $keywords = [];
-        $tempWords = [];
-        foreach ($wordArray as $words) {
-            $words = preg_split('/\s+/', $words);
-            foreach ($words as $st) {
-                if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
-                    $str = $st;
-                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
-                    $str = $st;
-                } else {
-                    $str = Sanitizer::escape($st);
-                }
-                $tempWords[] = $str;
-            }
-
-            $keywords = $tempWords;
-        }
-
-        return implode(' ', $keywords);
     }
 
     protected function search(array $search, bool $fullResults = false): array
