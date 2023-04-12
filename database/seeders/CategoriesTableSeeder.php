@@ -568,7 +568,7 @@ class CategoriesTableSeeder extends Seeder
                 'maxsizetoformrelease' => 0,
             ],
             62 => [
-                'id' => 6070,
+                'id' => 6050,
                 'title' => 'Packs',
                 'root_categories_id' => 6000,
                 'status' => 1,
