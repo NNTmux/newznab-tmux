@@ -62,7 +62,6 @@ class BasePageController extends Controller
         foreach (Arr::get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
             $this->smarty->addPluginsDir($plugins);
         }
-        $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
 
         $this->smarty->assign('serverroot', url('/'));
     }
