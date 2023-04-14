@@ -50,25 +50,14 @@ class XXX
      */
     protected ColorCLI $colorCli;
 
-    /**
-     * @param  array  $options  Echo to cli / Class instances.
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'ReleaseImage' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->releaseImage = new ReleaseImage();
         $this->colorCli = new ColorCLI();
 
         $this->movieQty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = (new Releases())->showPasswords();
-        $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echoOutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/xxx/');
         $this->cookie = resource_path('tmp/xxx.cookie');
     }

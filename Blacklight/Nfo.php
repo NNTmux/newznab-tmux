@@ -59,7 +59,7 @@ class Nfo
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     /**
      * Default constructor.

@@ -36,15 +36,11 @@ class TraktTv extends TV
     private string $localizedTZ;
 
     /**
-     * Construct. Set up API key.
-     *
-     * @param  array  $options  Class instances.
-     *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
         $clientId = config('nntmux_api.trakttv_api_key');
         $requestHeaders = [
             'Content-Type' => 'application/json',

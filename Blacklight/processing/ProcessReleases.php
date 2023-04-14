@@ -12,7 +12,7 @@ use App\Models\ReleasesGroups;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\Categorize;
-use Blacklight\ConsoleTools;
+use Blacklight\ColorCLI;
 use Blacklight\Genres;
 use Blacklight\NNTP;
 use Blacklight\NZB;
@@ -58,7 +58,7 @@ class ProcessReleases
 
     public \PDO $pdo;
 
-    public ConsoleTools $consoleTools;
+    public ColorCLI $colorCLI;
 
     public NZB $nzb;
 
@@ -73,32 +73,15 @@ class ProcessReleases
      */
     private int $collectionTimeout;
 
-    /**
-     * @param  array  $options  Class instances / Echo to cli ?
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => true,
-            'ConsoleTools' => null,
-            'Groups' => null,
-            'NZB' => null,
-            'ReleaseCleaning' => null,
-            'ReleaseImage' => null,
-            'Releases' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
+        $this->echoCLI = config('nntmux.echocli');
 
-        $this->echoCLI = ($options['Echo'] && config('nntmux.echocli'));
-
-        $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
-        $this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning());
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->colorCLI = new ColorCLI();
+        $this->nzb = new NZB();
+        $this->releaseCleaning = new ReleaseCleaning();
+        $this->releases = new Releases();
+        $this->releaseImage = new ReleaseImage();
 
         $dummy = Settings::settingValue('..delaytime');
         $this->collectionDelayTime = ($dummy !== '' ? (int) $dummy : 2);
@@ -110,7 +93,7 @@ class ProcessReleases
         $this->completion = ($dummy !== '' ? (int) $dummy : 0);
         if ($this->completion > 100) {
             $this->completion = 100;
-            $this->consoleTools->error(PHP_EOL.'You have an invalid setting for completion. It cannot be higher than 100.');
+            $this->colorCLI->error(PHP_EOL.'You have an invalid setting for completion. It cannot be higher than 100.');
         }
         $this->collectionTimeout = (int) Settings::settingValue('indexer.processing.collection_timeout');
     }
@@ -122,12 +105,12 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    public function processReleases(int $categorize, int $postProcess, string $groupName, NNTP $nntp, bool $echooutput): int
+    public function processReleases(int $categorize, int $postProcess, string $groupName, NNTP $nntp): int
     {
-        $this->echoCLI = ($echooutput && config('nntmux.echocli'));
+        $this->echoCLI = config('nntmux.echocli');
         $groupID = '';
 
-        if (! empty($groupName) && $groupName !== 'mgr') {
+        if (! empty($groupName)) {
             $groupInfo = UsenetGroup::getByName($groupName);
             if ($groupInfo !== null) {
                 $groupID = $groupInfo['id'];
@@ -135,12 +118,12 @@ class ProcessReleases
         }
 
         if ($this->echoCLI) {
-            $this->consoleTools->header('Starting release update process ('.now()->format('Y-m-d H:i:s').')');
+            $this->colorCLI->header('Starting release update process ('.now()->format('Y-m-d H:i:s').')');
         }
 
         if (! file_exists(Settings::settingValue('..nzbpath'))) {
             if ($this->echoCLI) {
-                $this->consoleTools->error('Bad or missing nzb directory - '.Settings::settingValue('..nzbpath'));
+                $this->colorCLI->error('Bad or missing nzb directory - '.Settings::settingValue('..nzbpath'));
             }
 
             return 0;
@@ -210,8 +193,8 @@ class ProcessReleases
                 Release::query()->where('id', $release->id)->update(['categories_id' => $catId['categories_id'], 'iscategorized' => 1]);
                 $categorized++;
                 if ($this->echoCLI) {
-                    $this->consoleTools->overWritePrimary(
-                        'Categorizing: '.$this->consoleTools->percentString($categorized, $total)
+                    $this->colorCLI->overWritePrimary(
+                        'Categorizing: '.$this->colorCLI->percentString($categorized, $total)
                     );
                 }
             }
@@ -232,7 +215,7 @@ class ProcessReleases
         $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Attempting to find complete collections.');
+            $this->colorCLI->header('Process Releases -> Attempting to find complete collections.');
         }
 
         $where = (! empty($groupID) ? ' AND c.groups_id = '.$groupID.' ' : ' ');
@@ -255,7 +238,7 @@ class ProcessReleases
 
             $totalTime = now()->diffInSeconds($startTime);
 
-            $this->consoleTools->primary(
+            $this->colorCLI->primary(
                 ($count ?? 0).' collections were found to be complete. Time: '.
                 $totalTime.Str::plural(' second', $totalTime),
                 true
@@ -272,7 +255,7 @@ class ProcessReleases
         $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Calculating collection sizes (in bytes).');
+            $this->colorCLI->header('Process Releases -> Calculating collection sizes (in bytes).');
         }
         // Get the total size in bytes of the collection for collections where filecheck = 2.
         DB::transaction(function () use ($groupID, $startTime) {
@@ -295,12 +278,12 @@ class ProcessReleases
                 )
             );
             if ($checked > 0 && $this->echoCLI) {
-                $this->consoleTools->primary(
+                $this->colorCLI->primary(
                     $checked.' collections set to filecheck = 3(size calculated)',
                     true
                 );
                 $totalTime = now()->diffInSeconds($startTime);
-                $this->consoleTools->primary($totalTime.Str::plural(' second', $totalTime), true);
+                $this->colorCLI->primary($totalTime.Str::plural(' second', $totalTime), true);
             }
         }, 10);
     }
@@ -314,7 +297,7 @@ class ProcessReleases
         $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.');
+            $this->colorCLI->header('Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.');
         }
 
         $groupID === '' ? $groupIDs = UsenetGroup::getActiveIDs() : $groupIDs = [['id' => $groupID]];
@@ -386,7 +369,7 @@ class ProcessReleases
                     $totalTime = now()->diffInSeconds($startTime);
 
                     if ($this->echoCLI) {
-                        $this->consoleTools->primary('Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).' collections: '.PHP_EOL.$minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.' with less files than site/group settings in: '.$totalTime.Str::plural(' second', $totalTime), true);
+                        $this->colorCLI->primary('Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).' collections: '.PHP_EOL.$minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.' with less files than site/group settings in: '.$totalTime.Str::plural(' second', $totalTime), true);
                     }
                 }, 10);
             }
@@ -407,7 +390,7 @@ class ProcessReleases
      $returnCount = $duplicate = 0;
 
      if ($this->echoCLI) {
-         $this->consoleTools->header('Process Releases -> Create releases from complete collections.');
+         $this->colorCLI->header('Process Releases -> Create releases from complete collections.');
      }
      $collectionsQuery = Collection::query()
          ->where('collections.filecheck', self::COLLFC_SIZED)
@@ -420,7 +403,7 @@ class ProcessReleases
          ->limit($this->releaseCreationLimit);
      $collections = $collectionsQuery->get();
      if ($this->echoCLI && $collections->count() > 0) {
-         $this->consoleTools->primary(\count($collections).' Collections ready to be converted to releases.', true);
+         $this->colorCLI->primary(\count($collections).' Collections ready to be converted to releases.', true);
      }
 
      foreach ($collections as $collection) {
@@ -555,7 +538,7 @@ class ProcessReleases
      $totalTime = now()->diffInSeconds($startTime);
 
      if ($this->echoCLI) {
-         $this->consoleTools->primary(
+         $this->colorCLI->primary(
              PHP_EOL.
              number_format($returnCount).
              ' Releases added and '.
@@ -581,7 +564,7 @@ class ProcessReleases
         $startTime = now()->toImmutable();
 
         if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
+            $this->colorCLI->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
         }
 
         $releasesQuery = Release::query()->with('category.parent')->where('nzbstatus', '=', 0);
@@ -607,7 +590,7 @@ class ProcessReleases
         $totalTime = now()->diffInSeconds($startTime);
 
         if ($this->echoCLI) {
-            $this->consoleTools->primary(
+            $this->colorCLI->primary(
                 number_format($nzbCount).' NZBs created/Collections deleted in '.
                 $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
                 'Total time: '.$totalTime.Str::plural(' second', $totalTime),
@@ -631,7 +614,7 @@ class ProcessReleases
     {
         $startTime = now()->toImmutable();
         if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Categorize releases.');
+            $this->colorCLI->header('Process Releases -> Categorize releases.');
         }
         $type = match ((int) $categorize) {
             2 => 'searchname',
@@ -645,7 +628,7 @@ class ProcessReleases
         $totalTime = now()->diffInSeconds($startTime);
 
         if ($this->echoCLI) {
-            $this->consoleTools->primary($totalTime.Str::plural(' second', $totalTime));
+            $this->colorCLI->primary($totalTime.Str::plural(' second', $totalTime));
         }
     }
 
@@ -662,7 +645,7 @@ class ProcessReleases
         if ((int) $postProcess === 1) {
             (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
         } elseif ($this->echoCLI) {
-            $this->consoleTools->info(
+            $this->colorCLI->info(
                 'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
                 'If you are using tmux or screen they might have their own scripts running Post-processing.'
             );
@@ -681,8 +664,8 @@ class ProcessReleases
 
         // CBP older than retention.
         if ($this->echoCLI) {
-            echo $this->consoleTools->header('Process Releases -> Delete finished collections.'.PHP_EOL).
-                $this->consoleTools->primary(sprintf(
+            echo $this->colorCLI->header('Process Releases -> Delete finished collections.'.PHP_EOL).
+                $this->colorCLI->primary(sprintf(
                     'Deleting collections/binaries/parts older than %d hours.',
                     Settings::settingValue('..partretentionhours')
                 ), true);
@@ -702,7 +685,7 @@ class ProcessReleases
             $totalTime = $firstQuery->diffInSeconds($startTime);
 
             if ($this->echoCLI) {
-                $this->consoleTools->primary(
+                $this->colorCLI->primary(
                     'Finished deleting '.$deleted.' old collections/binaries/parts in '.
                     $totalTime.Str::plural(' second', $totalTime),
                     true
@@ -714,7 +697,7 @@ class ProcessReleases
             if (random_int(0, 200) <= 1) {
                 // CBP collection orphaned with no binaries or parts.
                 if ($this->echoCLI) {
-                    echo $this->consoleTools->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).$this->consoleTools->primary('Deleting orphaned collections.');
+                    echo $this->colorCLI->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).$this->colorCLI->primary('Deleting orphaned collections.');
                 }
 
                 $deleted = 0;
@@ -728,12 +711,12 @@ class ProcessReleases
                 $totalTime = now()->diffInSeconds($firstQuery);
 
                 if ($this->echoCLI) {
-                    $this->consoleTools->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
+                    $this->colorCLI->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
                 }
             }
 
             if ($this->echoCLI) {
-                $this->consoleTools->primary('Deleting collections that were missed after NZB creation.', true);
+                $this->colorCLI->primary('Deleting collections that were missed after NZB creation.', true);
             }
 
             $deleted = 0;
@@ -750,7 +733,7 @@ class ProcessReleases
             $totalTime = $fourthQuery->diffInSeconds($startTime);
 
             if ($this->echoCLI) {
-                $this->consoleTools->primary('Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime), true);
+                $this->colorCLI->primary('Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime), true);
             }
         }, 10);
     }
@@ -771,7 +754,7 @@ class ProcessReleases
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
         if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.');
+            $this->colorCLI->header('Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.');
         }
 
         $groupIDs = $groupID === '' ? UsenetGroup::getActiveIDs() : [['id' => $groupID]];
@@ -806,7 +789,7 @@ class ProcessReleases
         $totalTime = now()->diffInSeconds($startTime);
 
         if ($this->echoCLI) {
-            $this->consoleTools->primary(
+            $this->colorCLI->primary(
                 'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).
                 ' releases: '.PHP_EOL.
                 $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
@@ -834,7 +817,7 @@ class ProcessReleases
 
         // Delete old releases and finished collections.
         if ($this->echoCLI) {
-            $this->consoleTools->header('Process Releases -> Delete old releases and passworded releases.');
+            $this->colorCLI->header('Process Releases -> Delete old releases and passworded releases.');
         }
 
         // Releases past retention.
@@ -934,7 +917,7 @@ class ProcessReleases
         }
 
         if ($this->echoCLI) {
-            $this->consoleTools->primary(
+            $this->colorCLI->primary(
                 'Removed releases: '.
                 number_format($retentionDeleted).
                 ' past retention, '.
@@ -967,7 +950,7 @@ class ProcessReleases
             );
             if ($totalDeleted > 0) {
                 $totalTime = now()->diffInSeconds($startTime);
-                $this->consoleTools->primary(
+                $this->colorCLI->primary(
                     'Removed '.number_format($totalDeleted).' releases in '.
                     $totalTime.Str::plural(' second', $totalTime),
                     true
@@ -1206,7 +1189,7 @@ class ProcessReleases
             }
             $obj = $objQuery->delete();
             if ($this->echoCLI && $obj > 0) {
-                $this->consoleTools->primary('Deleted '.$obj.' broken/stuck collections.', true);
+                $this->colorCLI->primary('Deleted '.$obj.' broken/stuck collections.', true);
             }
         }, 10);
     }

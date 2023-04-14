@@ -110,17 +110,11 @@ class NNTP extends \Net_NNTP_Client
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => true,
-            'Logger' => null,
-        ];
-        $options += $defaults;
-
         parent::__construct();
 
-        $this->_echo = ($options['Echo'] && config('nntmux.echocli'));
+        $this->_echo = config('nntmux.echocli');
         $this->_tmux = new Tmux();
         $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
         $this->colorCli = new ColorCLI();

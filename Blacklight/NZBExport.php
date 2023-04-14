@@ -28,21 +28,11 @@ class NZBExport
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Browser' => false, // Started from browser?
-            'Echo' => true, // Echo to CLI?
-            'NZB' => null,
-            'Releases' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->browser = $options['Browser'];
-        $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
+        $this->echoCLI = config('nntmux.echocli');
+        $this->releases = new Releases();
+        $this->nzb = new NZB();
     }
 
     /**
@@ -195,7 +185,7 @@ class NZBExport
      */
     protected function returnValue(): bool
     {
-        return $this->browser ? $this->retVal : true;
+        return true;
     }
 
     protected function checkDate($date): bool
@@ -211,9 +201,7 @@ class NZBExport
 
     protected function echoOut($message): void
     {
-        if ($this->browser) {
-            $this->retVal .= $message.'<br />';
-        } elseif ($this->echoCLI) {
+        if ($this->echoCLI) {
             echo $message.PHP_EOL;
         }
     }

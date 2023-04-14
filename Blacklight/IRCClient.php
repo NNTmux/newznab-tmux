@@ -14,73 +14,53 @@ class IRCClient
 {
     /**
      * Hostname IRC server used when connecting.
-     *
-     * @var string
      */
-    protected $_remote_host = '';
+    protected string $_remote_host = '';
 
     /**
      * Port number IRC server.
-     *
-     * @var int
      */
-    protected $_remote_port = 6667;
+    protected int $_remote_port = 6667;
 
     /**
      * Socket transport type for the IRC server.
-     *
-     * @var string
      */
-    protected $_remote_transport = 'tcp';
+    protected string $_remote_transport = 'tcp';
 
     /**
      * Hostname the IRC server sent us back.
-     *
-     * @var string
      */
-    protected $_remote_host_received = '';
+    protected string $_remote_host_received = '';
 
     /**
      * String used when creating the stream socket.
-     *
-     * @var string
      */
-    protected $_remote_socket_string = '';
+    protected string $_remote_socket_string = '';
 
     /**
      * Are we using tls/ssl?
-     *
-     * @var bool
      */
-    protected $_remote_tls = false;
+    protected bool $_remote_tls = false;
 
     /**
      * Time in seconds to timeout on connect.
-     *
-     * @var int
      */
-    protected $_remote_connection_timeout = 30;
+    protected int $_remote_connection_timeout = 30;
 
     /**
      * Time in seconds before we timeout when sending/receiving a command.
-     *
-     * @var int
      */
-    protected $_socket_timeout = 180;
+    protected int $_socket_timeout = 180;
 
     /**
      * How many times to retry when connecting to IRC.
-     *
-     * @var int
      */
-    protected $_reconnectRetries = 3;
+    protected int $_reconnectRetries = 3;
 
     /**
      * Seconds to delay when reconnecting fails.
-     *
-     * @var int
      */
-    protected $_reconnectDelay = 5;
+    protected int $_reconnectDelay = 5;
 
     /**
      * Stream socket client.
@@ -94,7 +74,7 @@ class IRCClient
      *
      * @var string
      */
-    protected $_buffer = null;
+    protected ?string $_buffer = null;
 
     /**
      * When someone types something into a channel, buffer it.
@@ -105,73 +85,53 @@ class IRCClient
      * );.
      *
      * @note   Used with the processChannelMessages() function.
-     *
-     * @var array
      */
-    protected $_channelData = [];
+    protected array $_channelData = [];
 
     /**
      * Nick name when we log in.
-     *
-     * @var string
      */
-    protected $_nickName;
+    protected string $_nickName;
 
     /**
      * User name when we log in.
-     *
-     * @var string
      */
-    protected $_userName;
+    protected string $_userName;
 
     /**
      * "Real" name when we log in.
-     *
-     * @var string
      */
-    protected $_realName;
+    protected string $_realName;
 
     /**
      * Password when we log in.
-     *
-     * @var string
      */
-    protected $_password;
+    protected string $_password;
 
     /**
      * List of channels and passwords to join.
-     *
-     * @var array
      */
-    protected $_channels;
+    protected array $_channels;
 
     /**
      * Last time we received a ping or sent a ping to the server.
-     *
-     * @var int
      */
-    protected $_lastPing;
+    protected int $_lastPing;
 
     /**
      * How many times we've tried to reconnect to IRC.
-     *
-     * @var int
      */
-    protected $_currentRetries = 0;
+    protected int $_currentRetries = 0;
 
     /**
      * Turns on or off debugging.
-     *
-     * @var bool
      */
-    protected $_debug = true;
+    protected bool $_debug = true;
 
     /**
      * Are we already logged in to IRC?
-     *
-     * @var bool
      */
-    protected $_alreadyLoggedIn = false;
+    protected bool $_alreadyLoggedIn = false;
 
     /**
      * Disconnect from IRC.

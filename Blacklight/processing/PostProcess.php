@@ -48,33 +48,15 @@ class PostProcess
 
     private Nfo $Nfo;
 
-    /**
-     * Constructor.
-     *
-     * @param  array  $options  Pass in class instances.
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => true,
-            'Logger' => null,
-            'Groups' => null,
-            'NameFixer' => null,
-            'Nfo' => null,
-            'ReleaseFiles' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
         // Various.
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echooutput = config('nntmux.echocli');
 
         // Class instances.
         $this->_par2Info = new Par2Info();
-        $this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Groups' => null]));
-        $this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo());
+        $this->nameFixer = new NameFixer();
+        $this->Nfo = new Nfo();
 
         // Site settings.
         $this->addpar2 = (int) Settings::settingValue('..addpar2') !== 0;

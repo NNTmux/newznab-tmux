@@ -74,20 +74,9 @@ class Music
      */
     protected $colorCli;
 
-    /**
-     * @param  array  $options  Class instances/ echo to CLI.
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echooutput = config('nntmux.echocli');
 
         $this->colorCli = new ColorCLI();
 

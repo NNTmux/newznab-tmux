@@ -75,9 +75,9 @@ abstract class TV extends Videos
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
         $this->colorCli = new ColorCLI();
         $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
         $this->tvqty = Settings::settingValue('..maxrageprocessed') !== '' ? (int) Settings::settingValue('..maxrageprocessed') : 75;

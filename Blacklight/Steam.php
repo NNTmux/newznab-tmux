@@ -37,11 +37,8 @@ class Steam
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = ['DB' => null];
-        $options += $defaults;
-
         $this->steamFront = new Main(
             [
                 'country_code' => 'us',

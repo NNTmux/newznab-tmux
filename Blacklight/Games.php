@@ -78,15 +78,9 @@ class Games
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'ColorCLI' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-        $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echoOutput = config('nntmux.echocli');
 
         $this->colorCli = new ColorCLI();
 

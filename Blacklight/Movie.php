@@ -111,22 +111,12 @@ class Movie
     protected ColorCLI $colorCli;
 
     /**
-     * @param  array  $options  Class instances / Echo to CLI.
-     *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'Logger' => null,
-            'ReleaseImage' => null,
-            'Settings' => null,
-            'TMDb' => null,
-        ];
-        $options += $defaults;
 
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->releaseImage = new ReleaseImage();
         $this->colorCli = new ColorCLI();
         $this->traktcheck = config('nntmux_api.trakttv_api_key');
         if ($this->traktcheck !== null) {
@@ -156,7 +146,7 @@ class Movie
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
         $this->showPasswords = (new Releases())->showPasswords();
 
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echooutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/movies/');
         $this->service = '';
     }

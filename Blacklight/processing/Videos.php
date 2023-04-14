@@ -51,15 +51,9 @@ abstract class Videos
      */
     public array $titleCache;
 
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echooutput = config('nntmux.echocli');
         $this->titleCache = [];
     }
 

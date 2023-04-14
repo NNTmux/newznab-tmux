@@ -50,42 +50,14 @@ class NZBContents
      */
     protected $alternateNNTP;
 
-    /**
-     * Construct.
-     *
-     * @param  array  $options
-     *                          array(
-     *                          'Echo'        => bool        ; To echo to CLI or not.
-     *                          'NNTP'        => NNTP        ; Class NNTP.
-     *                          'Nfo'         => Nfo         ; Class Nfo.
-     *                          'NZB'         => NZB         ; Class NZB.
-     *                          'Settings'    => DB          ; Class Blacklight\db\DB.
-     *                          'PostProcess' => PostProcess ; Class PostProcess.
-     *                          )
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'NNTP' => null,
-            'Nfo' => null,
-            'NZB' => null,
-            'Settings' => null,
-            'PostProcess' => null,
-        ];
-        $options += $defaults;
 
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->echooutput]));
-        $this->nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
-        $this->pp = (
-            $options['PostProcess'] instanceof PostProcess
-            ? $options['PostProcess']
-            : new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo])
-        );
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
+        $this->echooutput = config('nntmux.echocli');
+        $this->nntp = new NNTP();
+        $this->nfo = new Nfo();
+        $this->pp = new PostProcess();
+        $this->nzb = new NZB();
         $this->lookuppar2 = (int) Settings::settingValue('..lookuppar2') === 1;
         $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
     }

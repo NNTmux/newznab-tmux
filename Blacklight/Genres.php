@@ -23,17 +23,8 @@ class Genres
 
     public const STATUS_DISABLED = 1;
 
-    /**
-     * @param  array  $options  Class instances.
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Settings' => null,
-        ];
-        $options += $defaults;
     }
 
     /**

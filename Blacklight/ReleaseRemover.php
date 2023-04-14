@@ -13,126 +13,71 @@ use Illuminate\Support\Facades\DB;
  */
 class ReleaseRemover
 {
-    /**
-     * @var string
-     */
-    protected $blacklistID;
+    protected string $blacklistID;
 
-    /**
-     * Is is run from the browser?
-     *
-     * @var bool
-     */
-    protected $browser;
+    protected ColorCLI $colorCLI;
 
-    /**
-     * @var \Blacklight\ConsoleTools
-     */
-    protected $consoleTools;
+    protected string $crapTime = '';
 
-    /**
-     * @var string
-     */
-    protected $crapTime = '';
+    protected bool $delete;
 
-    /**
-     * @var bool
-     */
-    protected $delete;
+    protected int $deletedCount = 0;
 
-    /**
-     * @var int
-     */
-    protected $deletedCount = 0;
-
-    /**
-     * @var bool
-     */
-    protected $echoCLI;
+    protected bool $echoCLI;
 
     /**
      * If an error occurred, store it here.
-     *
-     * @var string
      */
-    protected $error;
+    protected string $error;
 
     /**
      * Ignore user check?
-     *
-     * @var bool
      */
-    protected $ignoreUserCheck;
+    protected bool $ignoreUserCheck;
 
-    /**
-     * @var string
-     */
-    protected $method = '';
+    protected string $method = '';
 
     /**
      * The query we will use to select unwanted releases.
-     *
-     * @var string
      */
-    protected $query;
+    protected string $query;
 
     /**
      * @var \Blacklight\Releases
      */
-    protected $releases;
+    protected Releases $releases;
 
     /**
      * Result of the select query.
-     *
-     * @var array
      */
-    protected $result;
+    protected array $result;
 
     /**
      * @var \Blacklight\NZB
      */
-    private $nzb;
+    private NZB $nzb;
 
     /**
      * @var \Blacklight\ReleaseImage
      */
-    private $releaseImage;
+    private ReleaseImage $releaseImage;
 
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
-    /**
-     * Construct.
-     *
-     * @param  array  $options  Class instances / various options.
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Browser' => false, // Are we coming from the web script.
-            'ConsoleTools' => null,
-            'Echo' => true, // Echo to CLI?
-            'NZB' => null,
-            'ReleaseImage' => null,
-            'Releases' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->colorCLI = new ColorCLI();
+        $this->releases = new Releases();
+        $this->nzb = new NZB();
+        $this->releaseImage = new ReleaseImage();
 
         $this->query = '';
         $this->error = '';
         $this->ignoreUserCheck = false;
-        $this->browser = $options['Browser'];
-        $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
+        $this->echoCLI = config('nntmux.echocli');
     }
 
     /**
@@ -185,19 +130,11 @@ class ReleaseRemover
         $this->deleteReleases();
 
         if ($this->echoCLI) {
-            $this->consoleTools->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            $this->consoleTools->header(now()->diffInSeconds($timeStart).' seconds', true);
+            $this->colorCLI->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
+            $this->colorCLI->header(now()->diffInSeconds($timeStart).' seconds', true);
         }
 
-        return $this->browser
-            ?
-            'Success! '.
-            ($this->delete ? 'Deleted ' : 'Would have deleted ').
-            $this->deletedCount.
-            ' release(s) in '.
-            now()->diffInSeconds($timeStart).' seconds'
-            :
-            true;
+        return true;
     }
 
     /**
@@ -228,7 +165,7 @@ class ReleaseRemover
 
         if ($time === 'full') {
             if ($this->echoCLI) {
-                $this->consoleTools->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.', true);
+                $this->colorCLI->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.', true);
             }
         } else {
             if (! is_numeric($time)) {
@@ -237,7 +174,7 @@ class ReleaseRemover
                 return $this->returnError();
             }
             if ($this->echoCLI) {
-                $this->consoleTools->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).', true);
+                $this->colorCLI->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).', true);
             }
             $this->crapTime = ' AND r.adddate > (NOW() - INTERVAL '.$time.' HOUR)';
         }
@@ -315,19 +252,11 @@ class ReleaseRemover
         }
 
         if ($this->echoCLI) {
-            $this->consoleTools->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            $this->consoleTools->header(now()->diffInSeconds($timeStart).' seconds', true);
+            $this->colorCLI->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
+            $this->colorCLI->header(now()->diffInSeconds($timeStart).' seconds', true);
         }
 
-        return $this->browser
-            ?
-            'Success! '.
-            ($this->delete ? 'Deleted ' : 'Would have deleted ').
-            $this->deletedCount.
-            ' release(s) in '.
-            now()->diffInSeconds($timeStart).' seconds'
-            :
-            true;
+        return true;
     }
 
     /**
@@ -810,7 +739,7 @@ class ReleaseRemover
                 }
 
                 // Provide useful output of operations
-                $this->consoleTools->header(
+                $this->colorCLI->header(
                     sprintf(
                         'Finding crap releases for %s: Using %s method against release %s.'.
                             '%s',
@@ -844,7 +773,7 @@ class ReleaseRemover
                 $this->deleteReleases();
             }
         } else {
-            $this->consoleTools->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.", true);
+            $this->colorCLI->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.", true);
         }
 
         return true;
@@ -914,7 +843,7 @@ class ReleaseRemover
                 $ftUsing = PHP_EOL;
 
                 // Provide useful output of operations
-                $this->consoleTools->header(
+                $this->colorCLI->header(
                     sprintf(
                         'Finding crap releases for %s: Using %s method against release filenames.'.PHP_EOL.
                             '%s',
@@ -1047,10 +976,10 @@ class ReleaseRemover
             if ($this->delete) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 if ($this->echoCLI) {
-                    $this->consoleTools->primary('Deleting: '.$this->method.': '.$release->searchname, true);
+                    $this->colorCLI->primary('Deleting: '.$this->method.': '.$release->searchname, true);
                 }
             } elseif ($this->echoCLI) {
-                $this->consoleTools->primary('Would be deleting: '.$this->method.': '.$release->searchname, true);
+                $this->colorCLI->primary('Would be deleting: '.$this->method.': '.$release->searchname, true);
             }
             $deletedCount++;
         }
@@ -1259,12 +1188,12 @@ class ReleaseRemover
      */
     protected function checkUserResponse(): bool
     {
-        if ($this->ignoreUserCheck || $this->browser) {
+        if ($this->ignoreUserCheck) {
             return true;
         }
 
         // Print the query to the user, ask them if they want to continue using it.
-        $this->consoleTools->primary(
+        $this->colorCLI->primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
             PHP_EOL.$this->query.';'.PHP_EOL.
             'If you are satisfied, type yes and press enter. Anything else will exit.',
@@ -1274,7 +1203,7 @@ class ReleaseRemover
         // Check the users response.
         $userInput = trim(fgets(fopen('php://stdin', 'rtb')));
         if ($userInput !== 'yes') {
-            $this->consoleTools->primary('You typed: "'.$userInput.'", the program will exit.', true);
+            $this->colorCLI->primary('You typed: "'.$userInput.'", the program will exit.', true);
 
             return false;
         }
@@ -1314,19 +1243,15 @@ class ReleaseRemover
      */
     protected function returnError()
     {
-        if ($this->browser) {
-            return $this->error.'<br />';
-        }
-
         if ($this->echoCLI && $this->error !== '') {
-            $this->consoleTools->error($this->error, true);
+            $this->colorCLI->error($this->error, true);
         }
 
         return false;
     }
 
     /**
-     * @return bool|mixed|string
+     * @return array|string|string[]
      */
     protected function extractSrchFromRegx(string $dbRegex = '')
     {

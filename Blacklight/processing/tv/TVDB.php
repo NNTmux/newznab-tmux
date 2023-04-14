@@ -44,9 +44,9 @@ class TVDB extends TV
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
         $this->client = new TheTVDbAPI();
         $this->local = false;
 

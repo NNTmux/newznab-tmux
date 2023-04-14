@@ -261,36 +261,21 @@ class ProcessAdditional
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'Categorize' => null,
-            'Groups' => null,
-            'NameFixer' => null,
-            'Nfo' => null,
-            'NNTP' => null,
-            'NZB' => null,
-            'ReleaseExtra' => null,
-            'ReleaseImage' => null,
-            'Settings' => null,
-            'ManticoreSearch' => null,
-        ];
-        $options += $defaults;
+        $this->_echoCLI = config('nntmux.echocli');
 
-        $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli') && (strtolower(PHP_SAPI) === 'cli'));
+        $this->_nntp = new NNTP();
 
-        $this->_nntp = $options['NNTP'] ?? new NNTP(['Echo' => $this->_echoCLI]);
-
-        $this->_nzb = $options['NZB'] ?? new NZB();
+        $this->_nzb = new NZB();
         $this->_archiveInfo = new ArchiveInfo();
-        $this->_categorize = $options['Categorize'] ?? new Categorize();
-        $this->_nameFixer = $options['NameFixer'] ?? new NameFixer(['Echo' => $this->_echoCLI, 'Categorize' => $this->_categorize]);
-        $this->_releaseExtra = $options['ReleaseExtra'] ?? new ReleaseExtra();
-        $this->_releaseImage = $options['ReleaseImage'] ?? new ReleaseImage();
+        $this->_categorize = new Categorize();
+        $this->_nameFixer = new NameFixer();
+        $this->_releaseExtra = new ReleaseExtra();
+        $this->_releaseImage = new ReleaseImage();
         $this->_par2Info = new Par2Info();
-        $this->_nfo = $options['Nfo'] ?? new Nfo();
-        $this->manticore = $options['ManticoreSearch'] ?? new ManticoreSearch();
+        $this->_nfo = new Nfo();
+        $this->manticore = new ManticoreSearch();
         $this->elasticsearch = new ElasticSearchSiteSearch();
         $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();

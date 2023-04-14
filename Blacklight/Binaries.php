@@ -175,28 +175,17 @@ class Binaries
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => true,
-            'CollectionsCleaning' => null,
-            'ColorCLI' => null,
-            'Logger' => null,
-            'Groups' => null,
-            'NNTP' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
         $this->startUpdate = now();
         $this->timeCleaning = 0;
 
-        $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
+        $this->_echoCLI = config('nntmux.echocli');
 
         $this->_pdo = DB::connection()->getPdo();
-        $this->colorCli = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
-        $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->colorCli, 'ColorCLI' => $this->colorCli]));
-        $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning());
+        $this->colorCli = new ColorCLI();
+        $this->_nntp = new NNTP();
+        $this->_collectionsCleaning = new CollectionsCleaning();
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
             (int) Settings::settingValue('..maxmssgs') : 20000;

@@ -87,36 +87,15 @@ class NZBImport
      */
     protected $colorCli;
 
-    /**
-     * Construct.
-     *
-     * @param  array  $options  Class instances / various options.
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Browser' => false,    // Was this started from the browser?
-            'Echo' => true,    // Echo to CLI?
-            'Binaries' => null,
-            'Categorize' => null,
-            'NZB' => null,
-            'ReleaseCleaning' => null,
-            'Releases' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
-        $this->binaries = ($options['Binaries'] instanceof Binaries ? $options['Binaries'] : new Binaries(['Echo' => $this->echoCLI]));
-        $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize());
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
-        $this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning());
+        $this->echoCLI = config('nntmux.echocli');
+        $this->binaries = new Binaries();
+        $this->category = new Categorize();
+        $this->nzb = new NZB();
+        $this->releaseCleaner = new ReleaseCleaning();
         $this->colorCli = new ColorCLI();
-
         $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
-        $this->browser = $options['Browser'];
         $this->retVal = '';
     }
 

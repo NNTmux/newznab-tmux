@@ -45,33 +45,12 @@ class Backfill
 
     protected ColorCLI $colorCli;
 
-    /**
-     * Constructor.
-     *
-     * @param  array  $options  Class instances / Echo to cli?
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => true,
-            'Logger' => null,
-            'Groups' => null,
-            'NNTP' => null,
-            'Settings' => null,
-        ];
-        $options += $defaults;
+        $this->_echoCLI = config('nntmux.echocli');
 
-        $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
-
-        $this->_nntp = (
-            $options['NNTP'] instanceof NNTP
-            ? $options['NNTP'] : new NNTP()
-        );
-        $this->_binaries = new Binaries(
-            ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI]
-        );
+        $this->_nntp = new NNTP();
+        $this->_binaries = new Binaries();
 
         $this->colorCli = new ColorCLI();
 
