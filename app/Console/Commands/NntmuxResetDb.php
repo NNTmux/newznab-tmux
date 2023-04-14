@@ -41,7 +41,7 @@ class NntmuxResetDb extends Command
     public function handle(): void
     {
         if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
-            $timestart = now();
+            $timestart = now()->toImmutable();
 
             DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 
@@ -60,8 +60,6 @@ class NntmuxResetDb extends Command
                 'tv_info',
                 'release_nfos',
                 'release_comments',
-                'sharing',
-                'sharing_sites',
                 'users_releases',
                 'user_movies',
                 'user_series',
