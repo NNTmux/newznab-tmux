@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1fb7986a747c028c210e6d325325d0fe",
+    "content-hash": "19f3ae32824551ad6567dd36fdc46784",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -18188,5 +18188,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
