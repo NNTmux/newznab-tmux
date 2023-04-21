@@ -67,7 +67,7 @@ class NntmuxOptimizeTables extends Command
             if ($tableCheck[0]->Msg_text !== 'Ok') {
             $this->error('Table '.$table.' is corrupted. Please repair it.');
             $this->info('Optimizing table: '.$table);
-            \DB::statement('OPTIMIZE TABLE '.$table);
+            \DB::select('OPTIMIZE TABLE '.$table);
         } else {
             $this->info('Table '.$table.' is ok. Optimization is not needed.');
         }
