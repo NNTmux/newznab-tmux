@@ -63,8 +63,8 @@ class NntmuxOptimizeTables extends Command
     private function tableCheck($table): void
     {
         $this->info('Checking table: '.$table);
-        $tableCheck = \DB::statement('CHECK TABLE '.$table);
-        if ($tableCheck === 'error') {
+        $tableCheck = \DB::select('CHECK TABLE '.$table);
+            if ($tableCheck[0]->Msg_text !== 'Ok') {
             $this->error('Table '.$table.' is corrupted. Please repair it.');
             $this->info('Optimizing table: '.$table);
             \DB::statement('OPTIMIZE TABLE '.$table);
