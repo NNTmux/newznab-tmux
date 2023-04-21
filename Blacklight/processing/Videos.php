@@ -257,17 +257,17 @@ abstract class Videos
         if (! empty($title)) {
             if ($source > 0) {
                 $query = Video::query()
-                ->whereRaw("REPLACE(title,'\'','') = ?", $title)
-                ->orWhereRaw("REPLACE(title,':','') = ?", $title)
-                ->where('type', '=', $type)
-                ->where('source', '=', $source)
-                ->first();
+                    ->whereRaw("REPLACE(title,'\'','') = ?", $title)
+                    ->orWhereRaw("REPLACE(title,':','') = ?", $title)
+                    ->where('type', '=', $type)
+                    ->where('source', '=', $source)
+                    ->first();
             } else {
                 $query = Video::query()
-                ->whereRaw("REPLACE(title,'\'','') = ?", $title)
-                ->orWhereRaw("REPLACE(title,':','') = ?", $title)
-                ->where('type', '=', $type)
-                ->first();
+                    ->whereRaw("REPLACE(title,'\'','') = ?", $title)
+                    ->orWhereRaw("REPLACE(title,':','') = ?", $title)
+                    ->where('type', '=', $type)
+                    ->first();
             }
             if (! empty($query)) {
                 $result = $query->toArray();

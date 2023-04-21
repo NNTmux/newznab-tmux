@@ -268,9 +268,9 @@ class Books
                     Release::query()->where('nzbstatus', '=', NZB::NZB_ADDED)
                         ->whereNull('bookinfo_id')
                         ->whereIn('categories_id', [$iValue])
-                    ->orderByDesc('postdate')
-                    ->limit($this->bookqty)
-                    ->get(['searchname', 'id', 'categories_id']), $iValue
+                        ->orderByDesc('postdate')
+                        ->limit($this->bookqty)
+                        ->get(['searchname', 'id', 'categories_id']), $iValue
                 );
             }
         }

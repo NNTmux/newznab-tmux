@@ -118,10 +118,10 @@ class AniDB
             $query->where('at.title', 'like', '%'.$animeTitle.'%');
         }
         $query->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
-                ->from('anidb_titles as at')
-                ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
-                ->groupBy('at.anidbid')
-                ->orderByDesc('at.anidbid');
+            ->from('anidb_titles as at')
+            ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
+            ->groupBy('at.anidbid')
+            ->orderByDesc('at.anidbid');
 
         return $query->paginate(config('nntmux.items_per_page'));
     }

@@ -164,34 +164,34 @@ class NntmuxPopulateSearchIndexes extends Command
 
         DB::statement('SET SESSION group_concat_max_len=16384;');
        Release::query()
-            ->orderByDesc('id')
-            ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
-            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', 'releases.postdate'])
-            ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
-            ->groupBy('id')
-            ->chunk($max, function ($releases) use ($bar, $data) {
-                foreach ($releases as $r) {
-                    $searchName = str_replace(['.', '-'], ' ', $r->searchname);
-                    $data['body'][] = [
-                        'index' => [
-                            '_index' => 'releases',
-                            '_id' => $r->id,
-                        ],
-                    ];
-                    $data['body'][] = [
-                        'id' => $r->id,
-                        'name' => $r->name,
-                        'searchname' => $r->searchname,
-                        'plainsearchname' => $searchName,
-                        'fromname' => $r->fromname,
-                        'categories_id' => $r->categories_id,
-                        'filename' => $r->filename,
-                        'postdate' => $r->postdate,
-                    ];
-                    $bar->advance();
-                }
-                \Elasticsearch::bulk($data);
-            });
+           ->orderByDesc('id')
+           ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
+           ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', 'releases.postdate'])
+           ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
+           ->groupBy('id')
+           ->chunk($max, function ($releases) use ($bar, $data) {
+               foreach ($releases as $r) {
+                   $searchName = str_replace(['.', '-'], ' ', $r->searchname);
+                   $data['body'][] = [
+                       'index' => [
+                           '_index' => 'releases',
+                           '_id' => $r->id,
+                       ],
+                   ];
+                   $data['body'][] = [
+                       'id' => $r->id,
+                       'name' => $r->name,
+                       'searchname' => $r->searchname,
+                       'plainsearchname' => $searchName,
+                       'fromname' => $r->fromname,
+                       'categories_id' => $r->categories_id,
+                       'filename' => $r->filename,
+                       'postdate' => $r->postdate,
+                   ];
+                   $bar->advance();
+               }
+               \Elasticsearch::bulk($data);
+           });
         $bar->finish();
         $this->newLine();
         $this->info('Done');

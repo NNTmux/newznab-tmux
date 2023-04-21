@@ -427,23 +427,23 @@ class Release extends Model
         }
 
         $releases = self::query()
-           ->where('nzbstatus', '=', NZB::NZB_ADDED)
-           ->select(
-               [
-                   'releases.id',
-                   'releases.name',
-                   'releases.searchname',
-                   'releases.size',
-                   'releases.guid',
-                   'releases.totalpart',
-                   'releases.postdate',
-                   'releases.adddate',
-                   'releases.grabs',
-                   'cp.title as parent_category',
-                   'c.title as sub_category',
-                   DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
-               ]
-           )
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->select(
+                [
+                    'releases.id',
+                    'releases.name',
+                    'releases.searchname',
+                    'releases.size',
+                    'releases.guid',
+                    'releases.totalpart',
+                    'releases.postdate',
+                    'releases.adddate',
+                    'releases.grabs',
+                    'cp.title as parent_category',
+                    'c.title as sub_category',
+                    DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
+                ]
+            )
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->orderByDesc('releases.postdate')
