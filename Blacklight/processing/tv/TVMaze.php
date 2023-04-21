@@ -141,7 +141,7 @@ class TVMaze extends TV
                         }
 
                         // Check if we have the episode for this video ID
-                        $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
+                        $episode = $this->getBySeasonEp($videoId, (int) $seasonNo, (int) $episodeNo, $release['airdate']);
 
                         if ($episode === false) {
                             // Send the request for the episode to TVMaze
