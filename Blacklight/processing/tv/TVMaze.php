@@ -147,8 +147,8 @@ class TVMaze extends TV
                             // Send the request for the episode to TVMaze
                             $tvMazeEpisode = $this->getEpisodeInfo(
                                 $tvMazeId,
-                                $seasonNo,
-                                $episodeNo,
+                                (int) $seasonNo,
+                                (int) $episodeNo,
                                 $release['airdate']
                             );
 
