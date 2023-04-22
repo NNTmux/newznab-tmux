@@ -114,6 +114,8 @@ class NNTP extends \Net_NNTP_Client
         $this->_tmux = new Tmux();
         $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
         $this->colorCli = new ColorCLI();
+        $this->_currentPort = config('nntmux_nntp.port');
+        $this->_currentServer = config('nntmux_nntp.server');
         $this->_primaryNntpConnections = config('nntmux_nntp.main_nntp_connections');
         $this->_alternateNntpConnections = config('nntmux_nntp.alternate_nntp_connections');
     }
@@ -150,8 +152,6 @@ class NNTP extends \Net_NNTP_Client
         $primaryConnections = $this->_tmux->getUSPConnections('primary', $primaryUSP);
         $alternateConnections = $this->_tmux->getUSPConnections('alternate', $alternateUSP);
         if ($this->_isConnected() && (($alternate && $this->_currentServer === config('nntmux_nntp.alternate_server') && ($this->_primaryNntpConnections < $alternateConnections['alternate']['active'])) || (! $alternate && $this->_currentServer === config('nntmux_nntp.server') && ($this->_primaryNntpConnections < $primaryConnections['primary']['active'])))) {
-            dump('true');
-
             return true;
         }
 
@@ -939,7 +939,7 @@ class NNTP extends \Net_NNTP_Client
      * of their _getTextResponse function since it is incompatible at decoding
      * headers when XFeature GZip compression is enabled server side.
      *
-     * @return self|string Our overridden function when compression is enabled.
+     * @return \Blacklight\NNTP|array|string Our overridden function when compression is enabled.
      *                     parent  Parent function when no compression.
      */
     public function _getTextResponse(): NNTP|array|string
