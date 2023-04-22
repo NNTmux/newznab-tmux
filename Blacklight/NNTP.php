@@ -105,10 +105,6 @@ class NNTP extends \Net_NNTP_Client
 
     /**
      * Default constructor.
-     *
-     * @param  array  $options  Class instances and echo to CLI bool.
-     *
-     * @throws \Exception
      */
     public function __construct()
     {
@@ -524,7 +520,7 @@ class NNTP extends \Net_NNTP_Client
         $body = '';
 
         $aConnected = false;
-        $nntp = ($alternate ? new self(['Echo' => $this->_echo]) : null);
+        $nntp = ($alternate ? new self() : null);
 
         // Check if the msgIds are in an array.
         if (\is_array($identifiers)) {
