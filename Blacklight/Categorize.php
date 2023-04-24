@@ -235,7 +235,7 @@ class Categorize
 
     public function isUHDTV(): bool
     {
-        if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon|NF|AMZN).*(TrollUHD|NTb|VLAD|DEFLATE|POFUDUK)/i', $this->releaseName)) {
+        if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon|NF|AMZN).*(TrollUHD|NTb|VLAD|DEFLATE|POFUDUK|CMRG)/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_UHD;
 
             return true;
