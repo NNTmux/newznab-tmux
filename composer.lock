@@ -6750,16 +6750,16 @@
         },
         {
             "name": "php-http/discovery",
-            "version": "1.15.3",
+            "version": "1.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/discovery.git",
-                "reference": "3ccd28dd9fb34b52db946abea1b538568e34eae8"
+                "reference": "bd810d15957cf165230e65d9e1a130793265e3b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/discovery/zipball/3ccd28dd9fb34b52db946abea1b538568e34eae8",
-                "reference": "3ccd28dd9fb34b52db946abea1b538568e34eae8",
+                "url": "https://api.github.com/repos/php-http/discovery/zipball/bd810d15957cf165230e65d9e1a130793265e3b7",
+                "reference": "bd810d15957cf165230e65d9e1a130793265e3b7",
                 "shasum": ""
             },
             "require": {
@@ -6767,7 +6767,8 @@
                 "php": "^7.1 || ^8.0"
             },
             "conflict": {
-                "nyholm/psr7": "<1.0"
+                "nyholm/psr7": "<1.0",
+                "zendframework/zend-diactoros": "*"
             },
             "provide": {
                 "php-http/async-client-implementation": "*",
@@ -6792,7 +6793,10 @@
             "autoload": {
                 "psr-4": {
                     "Http\\Discovery\\": "src/"
-                }
+                },
+                "exclude-from-classmap": [
+                    "src/Composer/Plugin.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -6818,9 +6822,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-http/discovery/issues",
-                "source": "https://github.com/php-http/discovery/tree/1.15.3"
+                "source": "https://github.com/php-http/discovery/tree/1.17.0"
             },
-            "time": "2023-03-31T14:40:37+00:00"
+            "time": "2023-04-26T15:39:13+00:00"
         },
         {
             "name": "php-http/guzzle7-adapter",
@@ -8259,16 +8263,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.11.15",
+            "version": "v0.11.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "5350ce0ec8ecf2c5b5cf554cd2496f97b444af85"
+                "reference": "151b145906804eea8e5d71fea23bfb470c904bfb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/5350ce0ec8ecf2c5b5cf554cd2496f97b444af85",
-                "reference": "5350ce0ec8ecf2c5b5cf554cd2496f97b444af85",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/151b145906804eea8e5d71fea23bfb470c904bfb",
+                "reference": "151b145906804eea8e5d71fea23bfb470c904bfb",
                 "shasum": ""
             },
             "require": {
@@ -8329,9 +8333,9 @@
             ],
             "support": {
                 "issues": "https://github.com/bobthecow/psysh/issues",
-                "source": "https://github.com/bobthecow/psysh/tree/v0.11.15"
+                "source": "https://github.com/bobthecow/psysh/tree/v0.11.16"
             },
-            "time": "2023-04-07T21:57:09+00:00"
+            "time": "2023-04-26T12:53:57+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -9455,16 +9459,16 @@
         },
         {
             "name": "spatie/laravel-package-tools",
-            "version": "1.14.3",
+            "version": "1.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-package-tools.git",
-                "reference": "42737fa494578e539eeba59c27a6e23ea8ddda4d"
+                "reference": "efab1844b8826443135201c4443690f032c3d533"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/42737fa494578e539eeba59c27a6e23ea8ddda4d",
-                "reference": "42737fa494578e539eeba59c27a6e23ea8ddda4d",
+                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/efab1844b8826443135201c4443690f032c3d533",
+                "reference": "efab1844b8826443135201c4443690f032c3d533",
                 "shasum": ""
             },
             "require": {
@@ -9503,7 +9507,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-package-tools/issues",
-                "source": "https://github.com/spatie/laravel-package-tools/tree/1.14.3"
+                "source": "https://github.com/spatie/laravel-package-tools/tree/1.15.0"
             },
             "funding": [
                 {
@@ -9511,7 +9515,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-04-25T14:17:59+00:00"
+            "time": "2023-04-27T08:09:01+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -17636,16 +17640,16 @@
         },
         {
             "name": "spatie/ignition",
-            "version": "1.5.0",
+            "version": "1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ignition.git",
-                "reference": "4db9c9626e4d7745efbe0b512157326190b41b65"
+                "reference": "fbcfcabc44e506e40c4d72fd4ddf465e272a600e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ignition/zipball/4db9c9626e4d7745efbe0b512157326190b41b65",
-                "reference": "4db9c9626e4d7745efbe0b512157326190b41b65",
+                "url": "https://api.github.com/repos/spatie/ignition/zipball/fbcfcabc44e506e40c4d72fd4ddf465e272a600e",
+                "reference": "fbcfcabc44e506e40c4d72fd4ddf465e272a600e",
                 "shasum": ""
             },
             "require": {
@@ -17676,7 +17680,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.4.x-dev"
+                    "dev-main": "1.5.x-dev"
                 }
             },
             "autoload": {
@@ -17715,7 +17719,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-04-12T09:07:50+00:00"
+            "time": "2023-04-27T08:40:07+00:00"
         },
         {
             "name": "spatie/laravel-ignition",
