@@ -962,20 +962,20 @@ class NameFixer
                         Release::query()
                             ->where('id', $release->releases_id)
                             ->update(
-                            [
-                                'videos_id' => 0,
-                                'tv_episodes_id' => 0,
-                                'imdbid' => null,
-                                'musicinfo_id' => null,
-                                'consoleinfo_id' => null,
-                                'bookinfo_id' => null,
-                                'anidbid' => null,
-                                'predb_id' => $preId,
-                                'searchname' => $newTitle,
-                                'categories_id' => $determinedCategory['categories_id'],
-                                'iscategorized' => 1,
-                            ]
-                        );
+                                [
+                                    'videos_id' => 0,
+                                    'tv_episodes_id' => 0,
+                                    'imdbid' => null,
+                                    'musicinfo_id' => null,
+                                    'consoleinfo_id' => null,
+                                    'bookinfo_id' => null,
+                                    'anidbid' => null,
+                                    'predb_id' => $preId,
+                                    'searchname' => $newTitle,
+                                    'categories_id' => $determinedCategory['categories_id'],
+                                    'iscategorized' => 1,
+                                ]
+                            );
 
                         if (config('nntmux.elasticsearch_enabled') === true) {
                             $this->elasticsearch->updateRelease($release->_releases_id);
