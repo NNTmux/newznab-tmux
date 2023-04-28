@@ -110,14 +110,15 @@ class Games
     }
 
     /**
-     * @return array|false
+     * @param string $title
+     * @return false
      */
-    public function getGamesInfoByName(string $title): bool|array
+    public function getGamesInfoByName(string $title): bool
     {
         $bestMatch = false;
 
         if (empty($title)) {
-            return $bestMatch;
+            return false;
         }
 
         $results = GamesInfo::search($title)->get();
@@ -132,7 +133,7 @@ class Games
                 }
                 similar_text(strtolower($result['title']), strtolower($title), $percent);
                 // If similar_text reports an exact match set best match and break out
-                if ($percent === 100) {
+                if ((int) $percent === 100) {
                     $bestMatch = $result;
                     break;
                 }
