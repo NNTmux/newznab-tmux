@@ -110,7 +110,6 @@ class Games
     }
 
     /**
-     * @param string $title
      * @return false
      */
     public function getGamesInfoByName(string $title): bool
