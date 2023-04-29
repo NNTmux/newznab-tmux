@@ -109,7 +109,6 @@ class Games
             ->first();
     }
 
-    
     public function getGamesInfoByName(string $title)
     {
         $bestMatch = false;
