@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "150938f2ba612649819b3d52365400d6",
+    "content-hash": "d929ff1b85ff9e7d8b5c8ca237439a38",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -14308,16 +14308,16 @@
         },
         {
             "name": "driftingly/rector-laravel",
-            "version": "0.17.0",
+            "version": "0.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/driftingly/rector-laravel.git",
-                "reference": "5eb5c21eb74cd11413ae2cd8022365edf18e0f7d"
+                "reference": "2bbe2cf0e24e2fad43aaaafac64821c633e09d08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/5eb5c21eb74cd11413ae2cd8022365edf18e0f7d",
-                "reference": "5eb5c21eb74cd11413ae2cd8022365edf18e0f7d",
+                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/2bbe2cf0e24e2fad43aaaafac64821c633e09d08",
+                "reference": "2bbe2cf0e24e2fad43aaaafac64821c633e09d08",
                 "shasum": ""
             },
             "require": {
@@ -14336,9 +14336,9 @@
             "description": "Rector upgrades rules for Laravel Framework",
             "support": {
                 "issues": "https://github.com/driftingly/rector-laravel/issues",
-                "source": "https://github.com/driftingly/rector-laravel/tree/0.17.0"
+                "source": "https://github.com/driftingly/rector-laravel/tree/0.19.0"
             },
-            "time": "2023-03-17T00:08:57+00:00"
+            "time": "2023-04-27T04:59:22+00:00"
         },
         {
             "name": "ergebnis/composer-normalize",
