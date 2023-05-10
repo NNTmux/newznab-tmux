@@ -5135,16 +5135,16 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "3.7.0",
+            "version": "3.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "e8f563ea0ec8d5060be14c5fec195b21af8fcbb2"
+                "reference": "09a40dbc3249cda09c0df97a6de7af8b1622227e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/e8f563ea0ec8d5060be14c5fec195b21af8fcbb2",
-                "reference": "e8f563ea0ec8d5060be14c5fec195b21af8fcbb2",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/09a40dbc3249cda09c0df97a6de7af8b1622227e",
+                "reference": "09a40dbc3249cda09c0df97a6de7af8b1622227e",
                 "shasum": ""
             },
             "require": {
@@ -5195,7 +5195,7 @@
             ],
             "support": {
                 "issues": "https://github.com/marcreichel/igdb-laravel/issues",
-                "source": "https://github.com/marcreichel/igdb-laravel/tree/3.7.0"
+                "source": "https://github.com/marcreichel/igdb-laravel/tree/3.8.0"
             },
             "funding": [
                 {
@@ -5203,7 +5203,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-15T12:44:33+00:00"
+            "time": "2023-05-03T10:27:03+00:00"
         },
         {
             "name": "maxmind-db/reader",
