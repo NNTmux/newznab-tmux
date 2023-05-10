@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\ShowLinkRequestFormForgotPasswordRequest;
 use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\Settings;
 use App\Models\User;
 use DariusIII\Token\Facades\Token;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\Request;
 
 class ForgotPasswordController extends Controller
 {
@@ -38,7 +38,7 @@ class ForgotPasswordController extends Controller
     /**
      * @throws \Exception
      */
-    public function showLinkRequestForm(ShowLinkRequestFormForgotPasswordRequest $request): void
+    public function showLinkRequestForm(Request $request): void
     {
         $sent = '';
         $email = $request->input('email') ?? '';
@@ -47,6 +47,9 @@ class ForgotPasswordController extends Controller
             app('smarty.view')->assign('error', 'Missing parameter(email and/or apikey to send password reset');
         } else {
             if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
+                $this->validate($request, [
+                    'g-recaptcha-response' => 'required|captcha',
+                ]);
             }
             //
             // Check users exists and send an email
