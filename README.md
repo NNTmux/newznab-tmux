@@ -73,7 +73,7 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
 
 ### Support
 
- Support is given on irc.synirc.net #tmux channel.
+ Support is given on discord: https://discord.gg/GjgGSzkrjh
 
 ### Licenses
 
