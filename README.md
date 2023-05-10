@@ -67,58 +67,9 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
 
 ## Docker
 
-Run the docker init command
-```bash
-./cli/docker init
-```
+ NNTmux uses Laravel Sail to manage docker container. To start docker container, edit your .env and then run:
 
-Copy .env.example -> .env, configure .env, mandatory fields:
-- DB_*
-- MANTICORESEARCH_HOST=manticore
-- MANTICORESEARCH_PORT=9306
-- NNTP_*
-- ADMIN_*
-- APP_TZ
-- APP_KEY=base64:wbvPP9pBOwifnwu84BeKAVzmwM4TLvcVFowLcPAi6nA= # or generate one!!!
-- REDIS_HOST=redis
-- REDIS_PASSWORD=null
-- REDIS_PORT=6379
-
-Copy docker-compose.override.yml.dist to docker-compose.override.yml and remove any services that you don't want to run locally. Make any other adjustments to suit your needs.
-
-Copy over localized configuration from docker/php-overrides.ini to docker/php-overrides.local.ini and any other adjustments you'd like to make.
-
-Copy your composer's auth.json file (can probably be found in ~/.composer/auth.json) to docker/composer-auth.json.
-
-Run the installation script
-```bash
-docker-compose run --rm web docker/install.sh
-```
-
-For routing, you can use a proxy container like [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy). The default configuration is to route the indexer to nntmux.local. You'll also need to add the following to your `/etc/hosts` file:
-```
-127.0.0.1  nntmux.local
-```
-
-Now, you can start the web container:
-```bash
-docker-compose up -d web
-
-# Tail the logs starting with the most recent 15 lines. Look for errors and resolve any issues.
-docker-compose logs --tail=15 --follow web
-```
-
-Open http://nntmux.local and sign in as the admin user with the credentials configured in the .env file. Configure site and tmux settings.
-
-Start the tmux container:
-```
-docker-compose up -d tmux
-
-# Attach to tmux
-./cli/docker tmux-attach
-```
-
-There are other commands available in cli/docker (i.e. to stop the tmux session -- you should do this before stopping the tmux container!).
+ ```./sail up -d```
 
 ### Support
 
