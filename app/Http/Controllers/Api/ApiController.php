@@ -91,7 +91,7 @@ class ApiController extends BasePageController
                 }
             }
 
-            if ($res->hasRole('Disabled')) {
+            if ($res !== null && $res->hasRole('Disabled')) {
                 Utility::showApiError(101);
             }
 
