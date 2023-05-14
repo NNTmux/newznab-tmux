@@ -658,7 +658,7 @@ class Movie
                         $ret['title'] = $art['name'];
                     }
                     if ($this->echooutput) {
-                        PHP_EOL.$this->colorCli->alternateOver('Fanart Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                        $this->colorCli->climate()->info('Fanart found '.$ret['title']);
                     }
 
                     return $ret;
@@ -763,7 +763,7 @@ class Movie
                 $ret['backdrop'] = '';
             }
             if ($this->echooutput) {
-                PHP_EOL.$this->colorCli->primaryOver('TMDb Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                $this->colorCli->climate()->info('TMDb found '.$ret['title']);
             }
 
             return $ret;
@@ -799,7 +799,7 @@ class Movie
                         ];
 
                         if ($this->echooutput) {
-                            PHP_EOL.$this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($title).PHP_EOL;
+                            $this->colorCli->climate()->info('IMDb found '.$title);
                         }
 
                         return $ret;
@@ -861,7 +861,7 @@ class Movie
                         }
 
                         if ($this->echooutput) {
-                            PHP_EOL.$this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                            $this->colorCli->climate()->info('Trakt found '.$ret['title']);
                         }
 
                         return $ret;
@@ -910,7 +910,7 @@ class Movie
                         ];
 
                         if ($this->echooutput) {
-                            PHP_EOL.$this->colorCli->alternateOver('OMDbAPI Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
+                            $this->colorCli->climate()->info('OMDbAPI Found '.$ret['title']);
                         }
 
                         return $ret;
@@ -985,7 +985,7 @@ class Movie
         if ($imdbId !== false) {
             $this->service = $service;
             if ($this->echooutput && $this->service !== '') {
-                PHP_EOL.$this->colorCli->primary($this->service.' found IMDBid: tt'.$imdbId, true);
+                $this->colorCli->climate()->info($this->service.' found IMDBid: tt'.$imdbId);
             }
 
             $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
