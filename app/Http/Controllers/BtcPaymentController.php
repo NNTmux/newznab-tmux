@@ -10,9 +10,11 @@ use Spatie\Permission\Models\Role;
 class BtcPaymentController extends BasePageController
 {
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
      * @throws \Exception
      */
-    public function show(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function show(Request $request)
     {
         $this->setPreferences();
         $gateway_id = config('settings.mycelium_gateway_id');
