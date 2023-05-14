@@ -47,7 +47,6 @@ class ApiController extends BasePageController
                     break;
                 case 's':
                 case 'search':
-                    $function = 's';
                     break;
                 case 'c':
                 case 'caps':
@@ -68,10 +67,10 @@ class ApiController extends BasePageController
                     $function = 'n';
                     break;
                 default:
-                    Utility::showApiError(202, 'No such function ('.$request->input('t').')');
+                    return Utility::showApiError(202, 'No such function ('.$request->input('t').')');
             }
         } else {
-            Utility::showApiError(200, 'Missing parameter (t)');
+            return Utility::showApiError(200, 'Missing parameter (t)');
         }
 
         $uid = $apiKey = $oldestGrabTime = $thisOldestTime = '';
@@ -82,17 +81,17 @@ class ApiController extends BasePageController
 
         if ($function !== 'c' && $function !== 'r') {
             if ($request->missing('apikey') || ($request->has('apikey') && empty($request->input('apikey')))) {
-                Utility::showApiError(200, 'Missing parameter (apikey)');
+                return Utility::showApiError(200, 'Missing parameter (apikey)');
             } else {
                 $apiKey = $request->input('apikey');
                 $res = User::getByRssToken($apiKey);
                 if ($res === null) {
-                    Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
+                    return Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
                 }
             }
 
-            if ($res !== null && $res->hasRole('Disabled')) {
-                Utility::showApiError(101);
+            if ($res->hasRole('Disabled')) {
+                return Utility::showApiError(101);
             }
 
             $uid = $res->id;
@@ -111,7 +110,7 @@ class ApiController extends BasePageController
             $thisRequests = UserRequest::getApiRequests($uid);
             $grabs = UserDownload::getDownloadRequests($uid);
             if ($thisRequests > $maxRequests) {
-                Utility::showApiError(500, 'Request limit reached ('.$thisRequests.'/'.$maxRequests.')');
+                return Utility::showApiError(500, 'Request limit reached ('.$thisRequests.'/'.$maxRequests.')');
             }
         }
 
@@ -276,13 +275,12 @@ class ApiController extends BasePageController
                     return redirect(url('/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
                 }
 
-                Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
-                break;
+                return Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
 
                 // Get individual NZB details.
             case 'd':
                 if ($request->missing('id')) {
-                    Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
+                    return Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
                 }
 
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
@@ -294,7 +292,7 @@ class ApiController extends BasePageController
                 // Get an NFO file for an individual release.
             case 'n':
                 if ($request->missing('id')) {
-                    Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
+                    return Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
                 }
 
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
@@ -311,10 +309,10 @@ class ApiController extends BasePageController
 
                         echo nl2br(Utility::cp437toUTF($data['nfo']));
                     } else {
-                        Utility::showApiError(300, 'Release does not have an NFO file associated.');
+                        return Utility::showApiError(300, 'Release does not have an NFO file associated.');
                     }
                 } else {
-                    Utility::showApiError(300, 'Release does not exist.');
+                    return Utility::showApiError(300, 'Release does not exist.');
                 }
                 break;
 
@@ -328,7 +326,7 @@ class ApiController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function output($data, array $params, bool $xml, int $offset, string $type = ''): void
+    public function output($data, array $params, bool $xml, int $offset, string $type = '')
     {
         $this->type = $type;
         $options = [
@@ -350,7 +348,7 @@ class ApiController extends BasePageController
             header('Content-type: application/json');
         }
         if ($response === false) {
-            Utility::showApiError(201);
+            return Utility::showApiError(201);
         } else {
             header('Content-Length: '.\strlen($response));
             echo $response;
@@ -398,18 +396,17 @@ class ApiController extends BasePageController
     }
 
     /**
-     * Verify maxage parameter.
-     *
-     * @return int $maxAge The maximum age of the release
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Foundation\Application|\Illuminate\Http\Response|int
      */
-    public function maxAge(Request $request): int
+    public function maxAge(Request $request)
     {
         $maxAge = -1;
         if ($request->has('maxage')) {
             if (! $request->filled('maxage')) {
-                Utility::showApiError(201, 'Incorrect parameter (maxage must not be empty)');
+                return Utility::showApiError(201, 'Incorrect parameter (maxage must not be empty)');
             } elseif (! is_numeric($request->input('maxage'))) {
-                Utility::showApiError(201, 'Incorrect parameter (maxage must be numeric)');
+                return Utility::showApiError(201, 'Incorrect parameter (maxage must be numeric)');
             } else {
                 $maxAge = (int) $request->input('maxage');
             }
@@ -484,10 +481,10 @@ class ApiController extends BasePageController
     /**
      * Check if a parameter is empty.
      */
-    public function verifyEmptyParameter(Request $request, string $parameter): void
+    public function verifyEmptyParameter(Request $request, string $parameter)
     {
         if ($request->has($parameter) && $request->isNotFilled($parameter)) {
-            Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
+            return Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
         }
     }
 
