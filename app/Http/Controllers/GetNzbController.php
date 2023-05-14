@@ -18,7 +18,7 @@ class GetNzbController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function getNzb(Request $request): \STS\ZipStream\ZipStream|StreamedResponse|JsonResponse
+    public function getNzb(Request $request)
     {
         $this->setPreferences();
 
@@ -28,34 +28,34 @@ class GetNzbController extends BasePageController
             $maxDownloads = $this->userdata->role->downloadrequests;
             $rssToken = $this->userdata->api_token;
             if ($this->userdata->hasRole('Disabled')) {
-                Utility::showApiError(101);
+                return Utility::showApiError(101);
             }
         } else {
             if ($request->missing('r')) {
-                Utility::showApiError(200);
+                return Utility::showApiError(200);
             }
 
             $res = User::getByRssToken($request->input('r'));
             if (! $res) {
-                Utility::showApiError(100);
+                return Utility::showApiError(100);
             }
 
             $uid = $res['id'];
             $rssToken = $res['api_token'];
             $maxDownloads = $res->role->downloadrequests;
             if ($res->hasRole('Disabled')) {
-                Utility::showApiError(101);
+                return Utility::showApiError(101);
             }
         }
 
         // Check download limit on user role.
         $requests = UserDownload::getDownloadRequests($uid);
         if ($requests > $maxDownloads) {
-            Utility::showApiError(501);
+            return Utility::showApiError(501);
         }
 
         if (! $request->input('id')) {
-            Utility::showApiError(200, 'Parameter id is required');
+            return Utility::showApiError(200, 'Parameter id is required');
         }
 
         // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
@@ -65,7 +65,7 @@ class GetNzbController extends BasePageController
         if ($request->has('zip') && $request->input('zip') === '1') {
             $guids = explode(',', $request->input('id'));
             if (isset($requests['num']) && ($requests['num'] + \count($guids) > $maxDownloads)) {
-                Utility::showApiError(501);
+                return Utility::showApiError(501);
             }
 
             $zip = getStreamingZip($guids);
@@ -89,7 +89,7 @@ class GetNzbController extends BasePageController
         $nzbPath = (new NZB())->getNZBPath($request->input('id'));
 
         if (! File::exists($nzbPath)) {
-            Utility::showApiError(300, 'NZB file not found!');
+            return Utility::showApiError(300, 'NZB file not found!');
         }
 
         $relData = Release::getByGuid($request->input('id'));
@@ -101,7 +101,7 @@ class GetNzbController extends BasePageController
                 UsersRelease::delCartByUserAndRelease($request->input('id'), $uid);
             }
         } else {
-            Utility::showApiError(300, 'Release not found!');
+            return Utility::showApiError(300, 'Release not found!');
         }
 
         $cleanName = str_replace([',', ' ', '/'], '_', $relData['searchname']);
