@@ -8,10 +8,8 @@ use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use Blacklight\NZB;
 use Blacklight\utility\Utility;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetNzbController extends BasePageController
 {
