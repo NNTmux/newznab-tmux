@@ -95,7 +95,7 @@ class ApiController extends BasePageController
                 Utility::showApiError(101);
             }
 
-            $uid = $res['id'];
+            $uid = $res->id;
             $catExclusions = User::getCategoryExclusionForApi($request);
             $maxRequests = $res->role->apirequests;
             $maxDownloads = $res->role->downloadrequests;
