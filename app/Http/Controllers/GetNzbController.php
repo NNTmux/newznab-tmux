@@ -62,7 +62,7 @@ class GetNzbController extends BasePageController
         // User requested a zip of guid,guid,guid releases.
         if ($request->has('zip') && $request->input('zip') === '1') {
             $guids = explode(',', $request->input('id'));
-            if (isset($requests['num']) && ($requests['num'] + \count($guids) > $maxDownloads)) {
+            if (isset($requests->num) && ($requests->num + \count($guids) > $maxDownloads)) {
                 return Utility::showApiError(501);
             }
 
