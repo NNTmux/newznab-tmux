@@ -297,10 +297,10 @@ class ApiController extends BasePageController
 
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
-                $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
                 if ($rel->isNotEmpty()) {
-                    if ($data->isNotEmpty()) {
+                    $data = ReleaseNfo::getReleaseNfo($rel->id);
+                    if (! empty($data)) {
                         if ($request->has('o') && $request->input('o') === 'file') {
                             return response()->streamDownload(function () use ($data) {
                                 echo $data['nfo'];

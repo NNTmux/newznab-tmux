@@ -11,9 +11,11 @@ use Illuminate\Support\Arr;
 class ConsoleController extends BasePageController
 {
     /**
+     * @return void
+     *
      * @throws \Exception
      */
-    public function show(Request $request, string $id = ''): \Illuminate\Http\JsonResponse
+    public function show(Request $request, string $id = '')
     {
         $this->setPreferences();
         if ($id === 'WiiVare') {
