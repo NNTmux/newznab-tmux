@@ -147,7 +147,7 @@ class NZBExport
 
                         continue;
                     }
-                // If not, decompress it and create a file to store it in.
+                    // If not, decompress it and create a file to store it in.
                 } else {
                     $nzbContents = Utility::unzipGzipFile($nzbFile);
                     if (! $nzbContents) {

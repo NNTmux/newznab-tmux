@@ -325,7 +325,7 @@ class IRCClient
                         return false;
                     }
                 }
-            //ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
+                //ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
             } elseif (preg_match('/^ERROR\s*:/', $this->_buffer)) {
                 echo $this->_buffer.PHP_EOL;
 
@@ -365,7 +365,7 @@ class IRCClient
                     $this->_pong($hits[1]);
                 }
 
-            // Check for a channel message.
+                // Check for a channel message.
             } elseif (preg_match(
                 '/^:(?P<nickname>.+?)\!.+?\s+PRIVMSG\s+(?P<channel>#.+?)\s+:\s*(?P<message>.+?)\s*$/',
                 $this->_stripControlCharacters($this->_buffer),

@@ -322,7 +322,7 @@ class Binaries
             // We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
             $leaveOver = $this->messageBuffer;
 
-        // If this is not a new group, go from our newest to the servers newest.
+            // If this is not a new group, go from our newest to the servers newest.
         } else {
             // Set our oldest wanted to our newest local article.
             $first = $groupMySQL['last_record'];

@@ -225,7 +225,7 @@ class NNTP extends \Net_NNTP_Client
                 if ($userName === '') {
                     $authenticated = true;
 
-                // Try to authenticate to usenet.
+                    // Try to authenticate to usenet.
                 } else {
                     $ret2 = $this->authenticate($userName, $password);
 
@@ -550,7 +550,7 @@ class NNTP extends \Net_NNTP_Client
                         $messageSize = \strlen($message);
                     }
 
-                // If there is an error try the alternate provider or return the PEAR error.
+                    // If there is an error try the alternate provider or return the PEAR error.
                 } elseif ($alternate) {
                     if (! $aConnected) {
                         // Check if the current connected server is the alternate or not.
@@ -584,7 +584,7 @@ class NNTP extends \Net_NNTP_Client
                 }
             }
 
-        // If it's a string check if it's a valid message-ID.
+            // If it's a string check if it's a valid message-ID.
         } elseif (\is_string($identifiers) || is_numeric($identifiers)) {
             $body = $this->_getMessage($groupName, $identifiers);
             if ($alternate && self::isError($body)) {
@@ -593,7 +593,7 @@ class NNTP extends \Net_NNTP_Client
                 $aConnected = true;
             }
 
-        // Else return an error.
+            // Else return an error.
         } else {
             $message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: '.gettype($identifiers);
 
@@ -675,7 +675,7 @@ class NNTP extends \Net_NNTP_Client
                         }
                     }
 
-                // Now we have the header, so get the body from the rest of the lines.
+                    // Now we have the header, so get the body from the rest of the lines.
                 } else {
                     $body .= $line;
                 }
@@ -799,7 +799,7 @@ class NNTP extends \Net_NNTP_Client
         if ($yEnc) {
             $bin = $compress ? gzdeflate($body, 4) : $body;
             $body = PhpYenc::encode($bin, $subject);
-        // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
+            // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
         } else {
             $body = $this->_splitLines($body, $compress);
         }
