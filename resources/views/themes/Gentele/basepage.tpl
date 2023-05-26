@@ -29,7 +29,7 @@
                         </div>
                         <div class="profile_info">
                             <span>Welcome,</span>
-                            <h2>{{Auth::user()->username}}</h2>
+                            <h2 class="text-break">{{Auth::user()->username}}</h2>
                         </div>
                     </div>
                 {/if}
