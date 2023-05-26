@@ -212,10 +212,6 @@ class AdminUserController extends BasePageController
         $this->adminrender();
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function destroy(Request $request): RedirectResponse
     {
         if ($request->has('id')) {
@@ -233,10 +229,6 @@ class AdminUserController extends BasePageController
         return redirect()->to($request->server('HTTP_REFERER'));
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function resendVerification(Request $request): RedirectResponse
     {
         if ($request->has('id')) {
@@ -251,10 +243,6 @@ class AdminUserController extends BasePageController
         return redirect()->back()->with('error', 'User is invalid');
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function verify(Request $request): RedirectResponse
     {
         if ($request->has('id')) {

@@ -31,8 +31,8 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -88,8 +88,6 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
     public function destroy($id): RedirectResponse

@@ -7,7 +7,6 @@ use App\Models\MovieInfo;
 use App\Models\Release;
 use Blacklight\Movie;
 use Blacklight\utility\Utility;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminMovieController extends BasePageController
@@ -32,8 +31,8 @@ class AdminMovieController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|void
+     *
      * @throws \Exception
      */
     public function create(Request $request)
@@ -79,8 +78,8 @@ class AdminMovieController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|void
+     *
      * @throws \Exception
      */
     public function edit(Request $request)

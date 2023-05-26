@@ -233,10 +233,6 @@ class AdminRoleController extends BasePageController
         $this->adminrender();
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function destroy(Request $request): \Illuminate\Http\RedirectResponse
     {
         if ($request->has('id')) {

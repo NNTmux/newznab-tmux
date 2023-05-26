@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use Blacklight\Regexes;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminCategoryRegexesController extends BasePageController
@@ -38,8 +37,8 @@ class AdminCategoryRegexesController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|void
+     *
      * @throws \Exception
      */
     public function edit(Request $request)
