@@ -98,7 +98,7 @@
                                 {elseif $userdata.consoleview != "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}>{$subcat.title}</a>
+                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {/if}
