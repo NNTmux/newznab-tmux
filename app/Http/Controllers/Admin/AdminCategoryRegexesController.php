@@ -38,11 +38,11 @@ class AdminCategoryRegexesController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
      * @throws \Exception
      */
-    public function edit(Request $request): RedirectResponse
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'category_regexes']);

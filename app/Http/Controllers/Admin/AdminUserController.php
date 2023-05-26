@@ -212,7 +212,11 @@ class AdminUserController extends BasePageController
         $this->adminrender();
     }
 
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Request $request): RedirectResponse
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
@@ -230,7 +234,8 @@ class AdminUserController extends BasePageController
     }
 
     /**
-     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function resendVerification(Request $request): RedirectResponse
     {
@@ -246,6 +251,10 @@ class AdminUserController extends BasePageController
         return redirect()->back()->with('error', 'User is invalid');
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function verify(Request $request): RedirectResponse
     {
         if ($request->has('id')) {

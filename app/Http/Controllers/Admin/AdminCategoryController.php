@@ -27,9 +27,11 @@ class AdminCategoryController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
      * @throws \Exception
      */
-    public function edit(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
 

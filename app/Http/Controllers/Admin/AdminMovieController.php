@@ -32,11 +32,11 @@ class AdminMovieController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
      * @throws \Exception
      */
-    public function create(Request $request): RedirectResponse
+    public function create(Request $request)
     {
         if (! \defined('STDOUT')) {
             \define('STDOUT', fopen('php://stdout', 'wb'));
@@ -79,9 +79,11 @@ class AdminMovieController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
      * @throws \Exception
      */
-    public function edit(Request $request): \Illuminate\Routing\Redirector|RedirectResponse
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
 

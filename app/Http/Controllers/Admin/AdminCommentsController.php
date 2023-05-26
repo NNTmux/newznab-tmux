@@ -24,7 +24,11 @@ class AdminCommentsController extends BasePageController
         $this->adminrender();
     }
 
-    public function destroy(int $id): \Illuminate\Http\RedirectResponse
+    /**
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(int $id)
     {
         if ($id) {
             ReleaseComment::deleteComment($id);

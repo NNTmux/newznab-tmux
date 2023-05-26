@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useBootstrap();
+        Paginator::useBootstrapFive();
         $smarty = app('smarty.view');
         view()->share('smarty', $smarty);
     }

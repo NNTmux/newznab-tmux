@@ -233,7 +233,11 @@ class AdminRoleController extends BasePageController
         $this->adminrender();
     }
 
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Request $request): \Illuminate\Http\RedirectResponse
     {
         if ($request->has('id')) {
             Role::query()->where('id', $request->input('id'))->delete();

@@ -31,9 +31,11 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
-    public function edit(Request $request): RedirectResponse
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Release Edit';
@@ -86,6 +88,8 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
     public function destroy($id): RedirectResponse
