@@ -15,8 +15,8 @@ use Illuminate\Support\Carbon;
 class RssController extends BasePageController
 {
     /**
-     * @return JsonResponse|void
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse|void
      * @throws \Throwable
      */
     public function myMoviesRss(Request $request)
@@ -40,13 +40,13 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse|void
      * @throws \Throwable
      */
     public function myShowsRss(Request $request)
     {
-        $rss = new RSS(['Settings' => $this->settings]);
+        $rss = new RSS();
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -61,13 +61,13 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse|void
      * @throws \Throwable
      */
     public function fullFeedRss(Request $request)
     {
-        $rss = new RSS(['Settings' => $this->settings]);
+        $rss = new RSS();
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -88,12 +88,13 @@ class RssController extends BasePageController
     }
 
     /**
+     * @return void
      * @throws \Exception
      */
     public function showRssDesc(): void
     {
         $this->setPreferences();
-        $rss = new RSS(['Settings' => $this->settings]);
+        $rss = new RSS();
 
         $title = 'Rss Info';
         $meta_title = 'Rss Nzb Info';
@@ -132,12 +133,14 @@ class RssController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse|array
      * @throws \Throwable
      */
     public function cartRss(Request $request): JsonResponse|array
     {
         $this->setPreferences();
-        $rss = new RSS(['Settings' => $this->settings]);
+        $rss = new RSS();
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -159,12 +162,14 @@ class RssController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse|array
      * @throws \Throwable
      */
     public function categoryFeedRss(Request $request): JsonResponse|array
     {
         $this->setPreferences();
-        $rss = new RSS(['Settings' => $this->settings]);
+        $rss = new RSS();
         $offset = 0;
         if ($request->missing('id')) {
             return response()->json(['error' => 'Category ID is missing'], '403');
@@ -190,6 +195,8 @@ class RssController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return array|\Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
     private function userCheck(Request $request): JsonResponse|array

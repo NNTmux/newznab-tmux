@@ -4,12 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Disable2faPasswordSecurityRequest;
 use App\Models\PasswordSecurity;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class PasswordSecurityController extends Controller
 {
-    public function show2faForm(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     */
+    public function show2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
     {
         $user = $request->user();
 
@@ -30,11 +38,13 @@ class PasswordSecurityController extends Controller
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException
      * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
      * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
      */
-    public function generate2faSecret(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function generate2faSecret(Request $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -51,11 +61,13 @@ class PasswordSecurityController extends Controller
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException
      * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
      * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
      */
-    public function enable2fa(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function enable2fa(Request $request): RedirectResponse
     {
         $user = $request->user();
         $secret = $request->input('verify-code');
@@ -70,7 +82,7 @@ class PasswordSecurityController extends Controller
         return redirect()->to('2fa')->with('error', 'Invalid Verification Code, Please try again.');
     }
 
-    public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if (! (Hash::check($request->get('current-password'), $request->user()->password))) {
             // The passwords matches

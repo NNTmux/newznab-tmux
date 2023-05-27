@@ -11,18 +11,19 @@ use Illuminate\Support\Arr;
 class ConsoleController extends BasePageController
 {
     /**
+     * @param \Illuminate\Http\Request $request
+     * @param string $id
      * @return void
-     *
      * @throws \Exception
      */
-    public function show(Request $request, string $id = '')
+    public function show(Request $request, string $id = ''): void
     {
         $this->setPreferences();
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
         }
-        $console = new Console(['Settings' => $this->settings]);
-        $gen = new Genres(['Settings' => $this->settings]);
+        $console = new Console();
+        $gen = new Genres();
 
         $concats = Category::getChildren(Category::GAME_ROOT);
         $ctmp = [];

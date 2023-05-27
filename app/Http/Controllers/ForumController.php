@@ -65,11 +65,12 @@ class ForumController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
-     *
+     * @param $id
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Exception
      */
-    public function getPosts($id, Request $request): RedirectResponse
+    public function getPosts($id, Request $request)
     {
         $this->setPreferences();
 
@@ -104,7 +105,11 @@ class ForumController extends BasePageController
         $this->pagerender();
     }
 
-    public function deleteTopic(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function deleteTopic(Request $request): RedirectResponse
     {
         $id = $request->input('id') + 0;
 

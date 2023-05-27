@@ -12,8 +12,8 @@ use Illuminate\Http\Request;
 class MyMoviesController extends BasePageController
 {
     /**
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|void
-     *
      * @throws \Exception
      */
     public function show(Request $request)

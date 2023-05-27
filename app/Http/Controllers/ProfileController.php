@@ -9,6 +9,9 @@ use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
 use Blacklight\utility\Utility;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -19,9 +22,11 @@ use Jrean\UserVerification\Facades\UserVerification;
 class ProfileController extends BasePageController
 {
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return void
      * @throws \Throwable
      */
-    public function show(Request $request)
+    public function show(Request $request): void
     {
         $this->setPreferences();
 
@@ -100,9 +105,9 @@ class ProfileController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|void
-     *
-     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
+     * @throws \Exception
      */
     public function edit(Request $request)
     {
@@ -265,9 +270,11 @@ class ProfileController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function destroy(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Routing\Redirector|\Illuminate\View\View|RedirectResponse
+    public function destroy(Request $request): Application|View|Factory|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $this->setPreferences();
         $userId = $request->input('id');

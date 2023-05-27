@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use App\Models\UsersRelease;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,9 +29,11 @@ class CartController extends BasePageController
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function store(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $this->setPreferences();
         $guids = explode(',', $request->input('id'));
@@ -52,9 +55,11 @@ class CartController extends BasePageController
     }
 
     /**
+     * @param array|string $id
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function destroy(array|string $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function destroy(array|string $id): RedirectResponse
     {
         $this->setPreferences();
         $ids = null;
