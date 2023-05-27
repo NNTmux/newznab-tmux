@@ -11,9 +11,6 @@ use Illuminate\Support\Arr;
 class ConsoleController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $id
-     * @return void
      * @throws \Exception
      */
     public function show(Request $request, string $id = ''): void

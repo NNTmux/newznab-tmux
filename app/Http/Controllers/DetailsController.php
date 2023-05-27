@@ -26,9 +26,8 @@ use Illuminate\Http\Request;
 class DetailsController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $guid
      * @return \Illuminate\Http\RedirectResponse|void
+     *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function show(Request $request, string $guid)

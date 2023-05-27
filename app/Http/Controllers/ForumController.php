@@ -65,9 +65,8 @@ class ForumController extends BasePageController
     }
 
     /**
-     * @param $id
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     *
      * @throws \Exception
      */
     public function getPosts($id, Request $request)
@@ -105,10 +104,6 @@ class ForumController extends BasePageController
         $this->pagerender();
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function deleteTopic(Request $request): RedirectResponse
     {
         $id = $request->input('id') + 0;

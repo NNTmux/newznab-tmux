@@ -15,8 +15,8 @@ use Illuminate\Support\Carbon;
 class RssController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse|void
+     *
      * @throws \Throwable
      */
     public function myMoviesRss(Request $request)
@@ -40,8 +40,8 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse|void
+     *
      * @throws \Throwable
      */
     public function myShowsRss(Request $request)
@@ -61,8 +61,8 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse|void
+     *
      * @throws \Throwable
      */
     public function fullFeedRss(Request $request)
@@ -88,7 +88,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return void
      * @throws \Exception
      */
     public function showRssDesc(): void
@@ -133,8 +132,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse|array
      * @throws \Throwable
      */
     public function cartRss(Request $request): JsonResponse|array
@@ -162,8 +159,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse|array
      * @throws \Throwable
      */
     public function categoryFeedRss(Request $request): JsonResponse|array
@@ -195,8 +190,6 @@ class RssController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return array|\Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
     private function userCheck(Request $request): JsonResponse|array

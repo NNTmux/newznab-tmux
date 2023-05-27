@@ -8,8 +8,8 @@ use App\Jobs\SendContactUsEmail;
 class ContactUsController extends BasePageController
 {
     /**
-     * @param \App\Http\Requests\ContactContactURequest $request
      * @return null
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function contact(ContactContactURequest $request)
@@ -45,8 +45,8 @@ class ContactUsController extends BasePageController
     }
 
     /**
-     * @param string $msg
      * @return void
+     *
      * @throws \Exception
      */
     public function showContactForm(string $msg = '')

@@ -11,10 +11,6 @@ use Illuminate\Http\Response;
 
 class FailedReleasesController extends BasePageController
 {
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Foundation\Application|\Illuminate\Http\Response
-     */
     public function failed(Request $request): Application|Response|\Illuminate\Contracts\Foundation\Application|ResponseFactory
     {
         if ($request->missing('api_token')) {

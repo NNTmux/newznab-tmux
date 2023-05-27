@@ -10,9 +10,6 @@ use Illuminate\Http\Request;
 class NfoController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $id
-     * @return void
      * @throws \Exception
      */
     public function showNfo(Request $request, string $id = ''): void

@@ -125,7 +125,6 @@ class MovieController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse|void
      */
     public function showTrailer(Request $request)
