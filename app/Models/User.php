@@ -368,9 +368,18 @@ class User extends Authenticatable
     }
 
     /**
+     * @param $start
+     * @param $offset
+     * @param $orderBy
+     * @param string|null $userName
+     * @param string|null $email
+     * @param string|null $host
+     * @param string|null $role
+     * @param bool $apiRequests
+     * @return \Illuminate\Database\Eloquent\Collection
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false): Collection
+    public static function getRange($start, $offset, $orderBy, ?string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false): Collection
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
