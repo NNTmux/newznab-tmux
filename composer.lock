@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f7b5f0b3b8e73288770ff4c15e1a630b",
+    "content-hash": "d59039b62cc644052ba8b8a620039f51",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3775,16 +3775,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.12.0",
+            "version": "v10.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "9e6dcff23ab1d4b522bef56074c31625cf077576"
+                "reference": "7322723585103082758d74917db62980684845cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/9e6dcff23ab1d4b522bef56074c31625cf077576",
-                "reference": "9e6dcff23ab1d4b522bef56074c31625cf077576",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/7322723585103082758d74917db62980684845cb",
+                "reference": "7322723585103082758d74917db62980684845cb",
                 "shasum": ""
             },
             "require": {
@@ -3971,20 +3971,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-05-23T18:04:16+00:00"
+            "time": "2023-05-30T14:46:25+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.16.0",
+            "version": "v5.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "4f762b1bd47b51f0557da84873a208410de9eece"
+                "reference": "ddd6a49063ba3bdfdf5f8ce885d27a8368ad03c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/4f762b1bd47b51f0557da84873a208410de9eece",
-                "reference": "4f762b1bd47b51f0557da84873a208410de9eece",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/ddd6a49063ba3bdfdf5f8ce885d27a8368ad03c4",
+                "reference": "ddd6a49063ba3bdfdf5f8ce885d27a8368ad03c4",
                 "shasum": ""
             },
             "require": {
@@ -4047,9 +4047,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.16.0"
+                "source": "https://github.com/laravel/horizon/tree/v5.16.1"
             },
-            "time": "2023-05-18T14:11:32+00:00"
+            "time": "2023-05-29T15:03:42+00:00"
         },
         {
             "name": "laravel/scout",
@@ -4186,16 +4186,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v4.14.3",
+            "version": "v4.14.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "d3de7650d846badfa067e2bc777392228a97df16"
+                "reference": "12cf59ce767e2984979a57c83891263be0e4c66a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/d3de7650d846badfa067e2bc777392228a97df16",
-                "reference": "d3de7650d846badfa067e2bc777392228a97df16",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/12cf59ce767e2984979a57c83891263be0e4c66a",
+                "reference": "12cf59ce767e2984979a57c83891263be0e4c66a",
                 "shasum": ""
             },
             "require": {
@@ -4251,9 +4251,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/telescope/issues",
-                "source": "https://github.com/laravel/telescope/tree/v4.14.3"
+                "source": "https://github.com/laravel/telescope/tree/v4.14.4"
             },
-            "time": "2023-05-19T18:34:30+00:00"
+            "time": "2023-05-29T15:04:52+00:00"
         },
         {
             "name": "laravel/tinker",
