@@ -811,11 +811,11 @@ class NameFixer
         }
 
         if ($show === 2) {
-            $this->colorCLI->overWritePrimary(
+            $this->colorCLI->climate()->info(
                 'Renamed Releases: ['.
                 number_format($this->fixed).
                 '] '.
-                $this->colorCLI->percentString($this->checked, $this->_totalReleases)
+                (new ConsoleTools())->percentString($this->checked, $this->_totalReleases)
             );
         }
     }
