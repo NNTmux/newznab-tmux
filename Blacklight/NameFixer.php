@@ -516,14 +516,7 @@ class NameFixer
 
             $this->colorCLI->climate()->info(number_format($total).' releases to process.');
             $Nfo = new Nfo();
-            $nzbContents = new NZBContents(
-                [
-                    'Echo' => $this->echoOutput,
-                    'NNTP' => $nntp,
-                    'Nfo' => $Nfo,
-                    'PostProcess' => new PostProcess(['Nfo' => $Nfo]),
-                ]
-            );
+            $nzbContents = new NZBContents();
 
             foreach ($releases as $release) {
                 if ($nzbContents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, $nameStatus, $show)) {
@@ -864,24 +857,24 @@ class NameFixer
                     echo PHP_EOL;
 
                     $this->colorCLI->headerOver('New name:  ').
-                        $this->colorCLI->climate()->info(substr($newName, 0, 299)).
+                        $this->colorCLI->info(substr($newName, 0, 299)).
                         $this->colorCLI->headerOver('Old name:  ').
-                        $this->colorCLI->climate()->info($release->searchname).
+                        $this->colorCLI->info($release->searchname).
                         $this->colorCLI->headerOver('Use name:  ').
-                        $this->colorCLI->climate()->info($release->name).
+                        $this->colorCLI->info($release->name).
                         $this->colorCLI->headerOver('New cat:   ').
-                        $this->colorCLI->climate()->info($newCatName).
+                        $this->colorCLI->info($newCatName).
                         $this->colorCLI->headerOver('Old cat:   ').
-                        $this->colorCLI->climate()->info($oldCatName).
+                        $this->colorCLI->info($oldCatName).
                         $this->colorCLI->headerOver('Group:     ').
-                        $this->colorCLI->climate()->info($groupName).
+                        $this->colorCLI->info($groupName).
                         $this->colorCLI->headerOver('Method:    ').
-                        $this->colorCLI->climate()->info($type.$method).
+                        $this->colorCLI->info($type.$method).
                         $this->colorCLI->headerOver('Releases ID: ').
-                        $this->colorCLI->climate()->info($release->releases_id);
+                        $this->colorCLI->info($release->releases_id);
                     if (! empty($release->filename)) {
                         $this->colorCLI->headerOver('Filename:  ').
-                            $this->colorCLI->climate()->info($release->filename);
+                            $this->colorCLI->info($release->filename);
                     }
 
                     if ($type !== 'PAR2, ') {
@@ -1022,13 +1015,13 @@ class NameFixer
         $colorCLI = new ColorCLI();
         echo PHP_EOL;
 
-        $colorCLI->climate()->info('New name:     ').$colorCLI->primaryOver($data['new_name']).
-            $colorCLI->climate()->info('Old name:     ').$colorCLI->primaryOver($data['old_name']).
-            $colorCLI->climate()->info('New category: ').$colorCLI->primaryOver($data['new_category']).
-            $colorCLI->climate()->info('Old category: ').$colorCLI->primaryOver($data['old_category']).
-            $colorCLI->climate()->info('Group:        ').$colorCLI->primaryOver($data['group']).
-            $colorCLI->climate()->info('Releases ID:   ').$colorCLI->primaryOver($data['releases_id']).
-            $colorCLI->climate()->info('Method:       ').$colorCLI->primaryOver($data['method']);
+        $colorCLI->info('New name:     ').$colorCLI->primaryOver($data['new_name']).
+            $colorCLI->info('Old name:     ').$colorCLI->primaryOver($data['old_name']).
+            $colorCLI->info('New category: ').$colorCLI->primaryOver($data['new_category']).
+            $colorCLI->info('Old category: ').$colorCLI->primaryOver($data['old_category']).
+            $colorCLI->info('Group:        ').$colorCLI->primaryOver($data['group']).
+            $colorCLI->info('Releases ID:   ').$colorCLI->primaryOver($data['releases_id']).
+            $colorCLI->info('Method:       ').$colorCLI->primaryOver($data['method']);
     }
 
     /**
