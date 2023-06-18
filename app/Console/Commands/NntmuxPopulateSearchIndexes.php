@@ -65,7 +65,7 @@ class NntmuxPopulateSearchIndexes extends Command
         $data = [];
         $total = Release::count();
         if (! $total) {
-            $this->warn('Could not get database information for releases table.');
+            $this->warn('Releases table is empty. Nothing to do.');
             exit();
         }
         $max = $this->option('count');
@@ -113,7 +113,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
         $total = Predb::count();
         if (! $total) {
-            $this->warn('Could not get database information for predb table.');
+            $this->warn('PreDB table is empty. Nothing to do.');
             exit();
         }
         $max = $this->option('count');
