@@ -346,15 +346,15 @@ class TMDB extends TV
         'firstaired' => 'string',
         'summary' => 'string',
     ])]
- protected function formatEpisodeInfo($episode): array
- {
-     return [
-         'title' => (string) $episode['name'],
-         'series' => (int) $episode['season_number'],
-         'episode' => (int) $episode['episode_number'],
-         'se_complete' => 'S'.sprintf('%02d', $episode['season_number']).'E'.sprintf('%02d', $episode['episode_number']),
-         'firstaired' => (string) $episode['air_date'],
-         'summary' => (string) $episode['overview'],
-     ];
- }
+    protected function formatEpisodeInfo($episode): array
+    {
+        return [
+            'title' => (string) $episode['name'],
+            'series' => (int) $episode['season_number'],
+            'episode' => (int) $episode['episode_number'],
+            'se_complete' => 'S'.sprintf('%02d', $episode['season_number']).'E'.sprintf('%02d', $episode['episode_number']),
+            'firstaired' => (string) $episode['air_date'],
+            'summary' => (string) $episode['overview'],
+        ];
+    }
 }

@@ -384,19 +384,19 @@ class TVDB extends TV
         ];
     }
 
- /**
-  * Assigns API episode response values to a formatted array for insertion
-  * Returns the formatted array.
-  */
- protected function formatEpisodeInfo($episode): array
- {
-     return [
-         'title' => (string) $episode->name,
-         'series' => (int) $episode->seasonNumber,
-         'episode' => (int) $episode->number,
-         'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
-         'firstaired' => $episode->aired,
-         'summary' => (string) $episode->overview,
-     ];
- }
+    /**
+     * Assigns API episode response values to a formatted array for insertion
+     * Returns the formatted array.
+     */
+    protected function formatEpisodeInfo($episode): array
+    {
+        return [
+            'title' => (string) $episode->name,
+            'series' => (int) $episode->seasonNumber,
+            'episode' => (int) $episode->number,
+            'se_complete' => 'S'.sprintf('%02d', $episode->seasonNumber).'E'.sprintf('%02d', $episode->number),
+            'firstaired' => $episode->aired,
+            'summary' => (string) $episode->overview,
+        ];
+    }
 }
