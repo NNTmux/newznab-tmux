@@ -52,6 +52,7 @@ class TVDB extends TV
 
         // Check if we can get the time for API status
         // If we can't then we set local to true
+        $this->token = '';
         try {
             $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
         } catch (UnauthorizedException $error) {
