@@ -45,7 +45,6 @@ class ProcessAdditional
      */
     public const maxCompressedFilesToCheck = 10;
 
-    protected bool $_echoDebug;
 
     protected $_releases;
 
@@ -586,12 +585,9 @@ class ProcessAdditional
     }
 
     /**
-     * Deletes files and folders recursively.
-     *
-     * @param  string  $path  Path to a folder or file.
-     * @param  string[]  $ignoredFolders  array with paths to folders to ignore.
-     *
-     * @void
+     * @param  string  $path
+     * @param  array  $ignoredFolders
+     * @return void
      */
     protected function _recursivePathDelete(string $path, array $ignoredFolders = []): void
     {
@@ -887,7 +883,7 @@ class ProcessAdditional
             // Get a summary of the compressed file.
             $dataSummary = $this->_archiveInfo->getSummary(true);
         } catch (\Exception $exception) {
-            //Log the exception and continue to next item
+            // Log the exception and continue to next item
             if (config('app.debug') === true) {
                 Log::warning($exception->getTraceAsString());
             }
@@ -947,7 +943,8 @@ class ProcessAdditional
                 if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
-                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
+                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
                 break;
