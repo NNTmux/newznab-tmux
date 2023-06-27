@@ -578,14 +578,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  string  $userName
-     * @param  string  $password
-     * @param  string  $email
-     * @param  int  $role
-     * @param  string|null  $notes
-     * @param  string  $host
-     * @param  int  $invites
-     * @param  int  $invitedBy
      * @return false|int|mixed
      */
     public static function add(string $userName, string $password, string $email, int $role, string|null $notes = '', string $host = '', int $invites = Invitation::DEFAULT_INVITES, int $invitedBy = 0)
