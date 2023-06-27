@@ -45,7 +45,6 @@ class ProcessAdditional
      */
     public const maxCompressedFilesToCheck = 10;
 
-
     protected $_releases;
 
     /**
@@ -584,11 +583,6 @@ class ProcessAdditional
         }
     }
 
-    /**
-     * @param  string  $path
-     * @param  array  $ignoredFolders
-     * @return void
-     */
     protected function _recursivePathDelete(string $path, array $ignoredFolders = []): void
     {
         if (File::isDirectory($path)) {
