@@ -1360,27 +1360,23 @@ class ProcessAdditional
                 // Try to create a file with it.
                 File::put($this->tmpPath.'samplepicture.jpg', $jpgBinary);
 
-                // Try to resize and move it.
-                $this->_foundJPGSample = (
-                    $this->_releaseImage->saveImage(
-                        $this->_release->guid.'_thumb',
-                        $this->tmpPath.'samplepicture.jpg',
-                        $this->_releaseImage->jpgSavePath,
-                        650,
-                        650
-                    ) === 1
-                );
+                // Check if image exif data is jpeg
+                if (exif_imagetype($this->tmpPath.'samplepicture.jpg') === IMAGETYPE_JPEG) {
+                    // Try to resize and move it.
+                    $this->_foundJPGSample = ($this->_releaseImage->saveImage($this->_release->guid.'_thumb',
+                            $this->tmpPath.'samplepicture.jpg', $this->_releaseImage->jpgSavePath, 650, 650) === 1);
 
-                if ($this->_foundJPGSample) {
-                    // Update the DB to say we got it.
-                    Release::query()->where('id', $this->_release->id)->update(['jpgstatus' => 1]);
+                    if ($this->_foundJPGSample) {
+                        // Update the DB to say we got it.
+                        Release::query()->where('id', $this->_release->id)->update(['jpgstatus' => 1]);
 
-                    if ($this->_echoCLI) {
-                        $this->_echo('j', 'primaryOver');
+                        if ($this->_echoCLI) {
+                            $this->_echo('j', 'primaryOver');
+                        }
                     }
-                }
 
-                File::delete($this->tmpPath.'samplepicture.jpg');
+                    File::delete($this->tmpPath.'samplepicture.jpg');
+                }
             } elseif ($this->_echoCLI) {
                 $this->_echo('f', 'warningOver');
             }
