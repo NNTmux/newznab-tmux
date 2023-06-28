@@ -1,4 +1,4 @@
-name: Label opened issues
+name: Label reopened issues
 on:
   issues:
     types:
