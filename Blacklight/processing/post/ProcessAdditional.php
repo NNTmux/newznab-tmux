@@ -1364,7 +1364,7 @@ class ProcessAdditional
                 if (exif_imagetype($this->tmpPath.'samplepicture.jpg') === IMAGETYPE_JPEG) {
                     // Try to resize and move it.
                     $this->_foundJPGSample = ($this->_releaseImage->saveImage($this->_release->guid.'_thumb',
-                            $this->tmpPath.'samplepicture.jpg', $this->_releaseImage->jpgSavePath, 650, 650) === 1);
+                        $this->tmpPath.'samplepicture.jpg', $this->_releaseImage->jpgSavePath, 650, 650) === 1);
 
                     if ($this->_foundJPGSample) {
                         // Update the DB to say we got it.
