@@ -246,7 +246,7 @@ class User extends Authenticatable
         self::find($id)->delete();
     }
 
-    public static function getCount(string|null $role = null, string|null $username = '', string|null $host = '', string|null $email = ''): int
+    public static function getCount(string $role = null, ?string $username = '', ?string $host = '', ?string $email = ''): int
     {
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
@@ -580,7 +580,7 @@ class User extends Authenticatable
     /**
      * @return false|int|mixed
      */
-    public static function add(string $userName, string $password, string $email, int $role, string|null $notes = '', string $host = '', int $invites = Invitation::DEFAULT_INVITES, int $invitedBy = 0)
+    public static function add(string $userName, string $password, string $email, int $role, ?string $notes = '', string $host = '', int $invites = Invitation::DEFAULT_INVITES, int $invitedBy = 0)
     {
         $password = self::hashPassword($password);
         if (! $password) {

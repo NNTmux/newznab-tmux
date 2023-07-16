@@ -272,7 +272,7 @@ class Contents
             ->get();
     }
 
-    public function data_getIndex(): Content|null
+    public function data_getIndex(): ?Content
     {
         return Content::query()->where(
             [
