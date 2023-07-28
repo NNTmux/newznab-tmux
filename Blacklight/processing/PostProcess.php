@@ -48,10 +48,20 @@ class PostProcess
 
     private Nfo $Nfo;
 
-    public function __construct()
+    /**
+     * @param  array  $options  Class instances / Echo to cli.
+     *
+     * @throws \Exception
+     */
+    public function __construct(array $options = [])
     {
-        // Various.
-        $this->echooutput = config('nntmux.echocli');
+        $defaults = [
+            'Echo' => false,
+            'Settings' => null,
+        ];
+        $options += $defaults;
+
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
         // Class instances.
         $this->_par2Info = new Par2Info();
