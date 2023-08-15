@@ -28,9 +28,6 @@ class ManticoreSearch
 
     public Search $search;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     private ColorCLI $cli;
 
     /**

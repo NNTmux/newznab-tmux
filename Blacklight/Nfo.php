@@ -56,9 +56,6 @@ class Nfo
 
     public const NFO_FOUND = 1; // Release has an NFO.
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**

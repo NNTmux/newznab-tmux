@@ -474,6 +474,7 @@ class NNTP extends \Net_NNTP_Client
             $data[$key] = $headerArray;
             $iterator = 0;
         }
+
         // Return the array of headers.
         return $data;
     }
@@ -568,6 +569,7 @@ class NNTP extends \Net_NNTP_Client
                             if ($body !== '') {
                                 return $body;
                             }
+
                             // Return the error.
                             return $newBody;
                         }

@@ -268,8 +268,6 @@ if (! function_exists('is_it_json')) {
 }
 
 /**
- * @return \STS\ZipStream\ZipStream
- *
  * @throws \Exception
  */
 function getStreamingZip(array $guids = []): STS\ZipStream\ZipStream

@@ -19,9 +19,6 @@ class Tmux
 
     public $tmux_session;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**

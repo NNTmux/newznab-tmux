@@ -42,9 +42,6 @@ class ReleaseRemover
      */
     protected string $query;
 
-    /**
-     * @var \Blacklight\Releases
-     */
     protected Releases $releases;
 
     /**
@@ -52,19 +49,10 @@ class ReleaseRemover
      */
     protected array $result;
 
-    /**
-     * @var \Blacklight\NZB
-     */
     private NZB $nzb;
 
-    /**
-     * @var \Blacklight\ReleaseImage
-     */
     private ReleaseImage $releaseImage;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     public function __construct()

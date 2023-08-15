@@ -42,9 +42,6 @@ class ReleaseImage
      */
     public string $vidSavePath;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**

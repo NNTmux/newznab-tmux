@@ -55,9 +55,6 @@ class IRCScraper extends IRCClient
      */
     protected mixed $_titleIgnoreRegex;
 
-    /**
-     * @var \Blacklight\ManticoreSearch
-     */
     protected manticoreSearch $manticoreSearch;
 
     private ElasticSearchSiteSearch $elasticsearch;

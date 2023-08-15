@@ -8,8 +8,6 @@ use App\Jobs\SendContactUsEmail;
 class ContactUsController extends BasePageController
 {
     /**
-     * @return null
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function contact(ContactContactURequest $request)

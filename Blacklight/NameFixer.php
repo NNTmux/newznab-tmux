@@ -101,9 +101,6 @@ class NameFixer
 
     protected string $fullall;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     public ColorCLI $colorCLI;
 
     /**
@@ -118,9 +115,6 @@ class NameFixer
      */
     public mixed $manticore;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     private ElasticSearchSiteSearch $elasticsearch;
@@ -474,7 +468,6 @@ class NameFixer
      * @param    $time 1: 24 hours, 2: no time limit
      * @param    $echo 1: change the name, anything else: preview of what could have been changed.
      * @param    $cats 1: other categories, 2: all categories
-     * @param  \Blacklight\NNTP  $nntp
      *
      * @throws \Exception
      */

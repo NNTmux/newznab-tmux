@@ -294,7 +294,6 @@ class Music
     }
 
     /**
-     * @param  null  $amazdata
      * @return int|mixed
      *
      * @throws \Exception

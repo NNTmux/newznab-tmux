@@ -225,9 +225,6 @@ class UsenetGroup extends Model
         return $res === null ? 0 : $res->count(['id']);
     }
 
-    /**
-     * @param  null  $active
-     */
     public static function getGroupsRange(string $groupname = '', $active = null): LengthAwarePaginator
     {
         $groups = self::query()->groupBy('id')->orderBy('name');

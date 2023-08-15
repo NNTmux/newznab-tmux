@@ -84,6 +84,7 @@ class Utility
                 $options['capath'] = config('nntmux_ssl.ssl_capath');
             }
         }
+
         // If we set the transport to tls and the server falls back to ssl,
         // the context options would be for tls and would not apply to ssl,
         // so set both tls and ssl context in case the server does not support tls.

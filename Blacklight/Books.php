@@ -50,9 +50,6 @@ class Books
 
     public array $failCache;
 
-    /**
-     * @var \Blacklight\ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     /**
@@ -395,7 +392,6 @@ class Books
     }
 
     /**
-     * @param  null  $amazdata
      * @return false|int|string
      *
      * @throws \Exception
