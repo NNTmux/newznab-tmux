@@ -346,7 +346,7 @@ class Forking
         );
 
         $count = 0;
-        if ($data[0]->name) {
+        if (! empty($data) && isset($data[0]->name)) {
             $this->safeBackfillGroup = $data[0]->name;
 
             $count = ($data[0]->our_first - $data[0]->their_first);
@@ -361,7 +361,7 @@ class Forking
 
             $queues = [];
             for ($i = 0; $i <= $getEach - 1; $i++) {
-                $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxMessages - $maxMessages, $data[0]->our_first - $i * $maxMessages - 1, $i + 1);
+                $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $this->safeBackfillGroup, $data[0]->our_first - $i * $maxMessages - $maxMessages, $data[0]->our_first - $i * $maxMessages - 1, $i + 1);
             }
 
             $pool = Pool::create()->concurrency($threads)->timeout(config('nntmux.multiprocessing_max_child_time'));
@@ -372,7 +372,7 @@ class Forking
                     return $this->_executeCommand($this->dnr_path.$queue.'"');
                 }, 2000000)->then(function ($output) use ($data) {
                     echo $output;
-                    $this->colorCli->primary('Backfilled group '.$data[0]->name);
+                    $this->colorCli->primary('Backfilled group '.$this->safeBackfillGroup);
                 })->catch(function (\Throwable $exception) {
                     echo $exception->getMessage();
                 })->catch(static function (SerializableException $serializableException) {
@@ -380,6 +380,10 @@ class Forking
                 });
             }
             $pool->wait();
+        } else {
+            if (config('nntmux.echocli')) {
+                $this->colorCli->primary('No backfill needed for group '.$this->safeBackfillGroup);
+            }
         }
     }
 
