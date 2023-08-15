@@ -370,7 +370,7 @@ class Forking
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
                     return $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 2000000)->then(function ($output) use ($data) {
+                }, 2000000)->then(function ($output) {
                     echo $output;
                     $this->colorCli->primary('Backfilled group '.$this->safeBackfillGroup);
                 })->catch(function (\Throwable $exception) {
