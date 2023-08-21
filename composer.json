@@ -119,7 +119,7 @@
         "beyondcode/laravel-dump-server": "^1.9",
         "captainhook/captainhook": "^5.1",
         "captainhook/plugin-composer": "^5.1",
-        "driftingly/rector-laravel": "^0.21.0",
+        "driftingly/rector-laravel": "^0.24.0",
         "ergebnis/composer-normalize": "^2.30",
         "friendsofphp/php-cs-fixer": "^3.21",
         "jubeki/laravel-code-style": "^2.0",
