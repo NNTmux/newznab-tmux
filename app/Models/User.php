@@ -150,7 +150,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
-    use Notifiable, UserVerification, HasRoles, InviteTrait;
+    use HasRoles, InviteTrait, Notifiable, UserVerification;
 
     public const ERR_SIGNUP_BADUNAME = -1;
 
