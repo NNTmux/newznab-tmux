@@ -15,6 +15,9 @@ return (new \Jubeki\LaravelCodeStyle\Config())
             ->in(base_path('tests'))
             ->in(base_path('Blacklight'))
             ->in(base_path('misc'))
+            ->notName('IRCClient.php')
+            ->notName('NNTP.php')
+            ->notName('*.blade.php')
     )
     ->setRules([
     ]);
