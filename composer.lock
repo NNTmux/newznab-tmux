@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d94c628289bf6dc1f3142e878f2098e",
+    "content-hash": "f34a8b1b9a701b90970686dadb2968d3",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -5182,16 +5182,16 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "3.8.1",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "385feec1299e6ef5160ed8fae495cc8dbb1624c0"
+                "reference": "5b9ebd853ccfeb31628453e9c46470b5499cd94b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/385feec1299e6ef5160ed8fae495cc8dbb1624c0",
-                "reference": "385feec1299e6ef5160ed8fae495cc8dbb1624c0",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/5b9ebd853ccfeb31628453e9c46470b5499cd94b",
+                "reference": "5b9ebd853ccfeb31628453e9c46470b5499cd94b",
                 "shasum": ""
             },
             "require": {
@@ -5199,7 +5199,7 @@
                 "guzzlehttp/guzzle": "~6.0|~7.0",
                 "laravel/framework": "^8.40.0|^9.0|^10.0",
                 "nesbot/carbon": "^2.53.1",
-                "php": "^8.0.2"
+                "php": "^8.1"
             },
             "require-dev": {
                 "nunomaduro/collision": "^5.3|^6.1",
@@ -5242,7 +5242,7 @@
             ],
             "support": {
                 "issues": "https://github.com/marcreichel/igdb-laravel/issues",
-                "source": "https://github.com/marcreichel/igdb-laravel/tree/3.8.1"
+                "source": "https://github.com/marcreichel/igdb-laravel/tree/4.0.0"
             },
             "funding": [
                 {
@@ -5250,7 +5250,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-05-19T14:50:29+00:00"
+            "time": "2023-09-03T20:58:53+00:00"
         },
         {
             "name": "maxmind-db/reader",
