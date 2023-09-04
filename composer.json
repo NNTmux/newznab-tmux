@@ -81,7 +81,7 @@
         "league/climate": "^3.8",
         "mailerlite/laravel-elasticsearch": "^11.0",
         "manticoresoftware/manticoresearch-php": "^3.0",
-        "marcreichel/igdb-laravel": "^3.8",
+        "marcreichel/igdb-laravel": "^4.0",
         "mhor/php-mediainfo": "^5.5",
         "monicahq/laravel-cloudflare": "^3.5",
         "monolog/monolog": "^3.4",
