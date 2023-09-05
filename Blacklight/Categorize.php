@@ -284,7 +284,7 @@ class Categorize
 
     public function isMovie(): bool
     {
-        if (preg_match('/[._ -]AVC|[._ -]|[BH][DR]RIP|Bluray|BD[._ -]?(25|50)?|\bBR\b|Camrip|[._ -]\d{4}[._ -].+(720p|1080p|Cam|HDTS)|DIVX|[._ -]DVD[._ -]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|[._ -](DTS|TVrip)[._ -]/i', $this->releaseName) && ! preg_match('/auto(cad|desk)|divx[._ -]plus|[._ -]exe$|[._ -](jav|XXX)[._ -]|SWE6RUS|\wXXX(1080p|720p|DVD)|Xilisoft/i', $this->releaseName)) {
+        if (preg_match('/[._ -]AVC|[BH][DR]RIP|(Bluray|Blu-Ray)|BD[._ -]?(25|50)?|\bBR\b|Camrip|[._ -]\d{4}[._ -].+(720p|1080p|Cam|HDTS|2160p)|DIVX|[._ -]DVD[._ -]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|[._ -](DTS|TVrip|webrip|WEBDL|WEB-DL)[._ -]|\b(2160)p\b.*\b(Netflix|Amazon|NF|AMZN|Disney)\b/i', $this->releaseName) && ! preg_match('/s\d{1,3}[._ -]?[ed]\d{1,3}|auto(cad|desk)|divx[._ -]plus|[._ -]exe$|[._ -](jav|XXX)[._ -]|SWE6RUS|\wXXX(1080p|720p|DVD)|Xilisoft|\.S[0-9]\d{1,3}\./i', $this->releaseName)) {
             return match (true) {
                 $this->categorizeForeign && $this->isMovieForeign(), $this->isMovieDVD(), $this->isMovieX265(), $this->isMovieUHD(), $this->catWebDL && $this->isMovieWEBDL(), $this->isMovieSD(), $this->isMovie3D(), $this->isMovieBluRay(), $this->isMovieHD(), $this->isMovieOther() => true,
                 default => false,
