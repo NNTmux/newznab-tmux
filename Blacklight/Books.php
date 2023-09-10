@@ -102,7 +102,7 @@ class Books
         return BookInfo::search($searchWords)->first();
     }
 
-    public function getBookRange($page, $cat, $start, $num, $orderby, array $excludedcats = []): array
+    public function getBookRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
     {
         $browseby = $this->getBrowseBy();
         $catsrch = '';
@@ -110,10 +110,10 @@ class Books
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
-        if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+        if (\count($excludedCats) > 0) {
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
-        $order = $this->getBookOrder($orderby);
+        $order = $this->getBookOrder($orderBy);
         $booksql = sprintf(
             "
 				SELECT SQL_CALC_FOUND_ROWS boo.id,
@@ -136,9 +136,9 @@ class Books
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $bookscache = Cache::get(md5($booksql.$page));
-        if ($bookscache !== null) {
-            $books = $bookscache;
+        $booksCache = Cache::get(md5($booksql.$page));
+        if ($booksCache !== null) {
+            $books = $booksCache;
         } else {
             $data = DB::select($booksql);
             $books = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
@@ -169,8 +169,8 @@ class Books
 			%s
 			GROUP BY boo.id
 			ORDER BY %s %s',
-            (\is_array($bookIDs) ? implode(',', $bookIDs) : -1),
-            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            \is_array($bookIDs) && ! empty($bookIDs) ? implode(',', $bookIDs) : -1,
+            \is_array($releaseIDs) && ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1,
             $catsrch,
             $order[0],
             $order[1]
@@ -188,9 +188,9 @@ class Books
         return $return;
     }
 
-    public function getBookOrder($orderby): array
+    public function getBookOrder($orderBy): array
     {
-        $order = $orderby === '' ? 'r.postdate' : $orderby;
+        $order = $orderBy === '' ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
         $orderfield = match ($orderArr[0]) {
             'title' => 'boo.title',
