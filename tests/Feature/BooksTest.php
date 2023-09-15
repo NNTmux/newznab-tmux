@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 
-class BooksTest extends TestCase
+final class BooksTest extends TestCase
 {
     /**
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
