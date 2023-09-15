@@ -4,4 +4,4 @@
 //     require('tinymce/plugins/wordcount')
 //   ES2015:
 //     import 'tinymce/plugins/wordcount'
-require('./plugin.js');
+import './plugin.js';

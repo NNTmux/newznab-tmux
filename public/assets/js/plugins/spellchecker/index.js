@@ -4,4 +4,4 @@
 //     require('tinymce/plugins/spellchecker')
 //   ES2015:
 //     import 'tinymce/plugins/spellchecker'
-require('./plugin.js');
+import './plugin.js';

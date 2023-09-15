@@ -4,4 +4,4 @@
 //     require('tinymce/plugins/visualblocks')
 //   ES2015:
 //     import 'tinymce/plugins/visualblocks'
-require('./plugin.js');
+import './plugin.js';

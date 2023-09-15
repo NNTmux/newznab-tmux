@@ -4,4 +4,4 @@
 //     require('tinymce/plugins/searchreplace')
 //   ES2015:
 //     import 'tinymce/plugins/searchreplace'
-require('./plugin.js');
+import './plugin.js';

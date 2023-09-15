@@ -4,4 +4,4 @@
 //     require('tinymce/plugins/quickbars')
 //   ES2015:
 //     import 'tinymce/plugins/quickbars'
-require('./plugin.js');
+import './plugin.js';

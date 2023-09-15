@@ -4,4 +4,4 @@
 //     require('tinymce/plugins/textpattern')
 //   ES2015:
 //     import 'tinymce/plugins/textpattern'
-require('./plugin.js');
+import './plugin.js';

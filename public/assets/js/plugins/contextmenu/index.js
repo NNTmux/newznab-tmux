@@ -4,4 +4,4 @@
 //     require('tinymce/plugins/contextmenu')
 //   ES2015:
 //     import 'tinymce/plugins/contextmenu'
-require('./plugin.js');
+import './plugin.js';
