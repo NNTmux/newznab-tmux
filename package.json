@@ -1,15 +1,10 @@
 {
     "private": true,
     "scripts": {
-        "dev": "npm run development",
-        "development": "mix",
-        "watch": "mix watch",
-        "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
-        "prod": "npm run production",
-        "production": "mix --production",
         "format": "prettier --write 'resources/**/*.{css,js,vue}'",
-        "package-update": "ncu -u -x pnotify,tinymce"
+        "package-update": "ncu -u -x pnotify,tinymce",
+        "dev": "vite",
+        "build": "vite build"
     },
     "devDependencies": {
         "axios": "^1.4.0",
