@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 
-class SettingsTest extends TestCase
+final class SettingsTest extends TestCase
 {
     public function testSettingValue(): void
     {

@@ -129,7 +129,7 @@
         "nunomaduro/collision": "^7.0",
         "nunomaduro/larastan": "^2.6",
         "php-coveralls/php-coveralls": "^2.0",
-        "phpunit/phpunit": "^8.0 || ^9.0 || ^10.0",
+        "phpunit/phpunit": "^10.0",
         "rector/rector": "^0.18.0"
     },
     "suggest": {

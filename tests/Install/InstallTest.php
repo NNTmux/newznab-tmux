@@ -18,7 +18,7 @@ require_once \dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 /**
  * Class InstallTest.
  */
-class InstallTest extends \PHPUnit\Framework\TestCase
+final class InstallTest extends \PHPUnit\Framework\TestCase
 {
     public function testFullInstall(): void
     {
