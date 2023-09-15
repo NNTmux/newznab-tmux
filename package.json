@@ -15,12 +15,14 @@
         "axios": "^1.4.0",
         "cross-env": "^7.0.3",
         "jquery": "3.7.0",
-        "laravel-mix": "^6.0.49",
         "lodash": "^4.17.21",
         "popper.js": "^1.16.1",
         "prettier": "^2.8.8",
         "resolve-url-loader": "^5.0.0",
-        "vue": "^3.3.4"
+        "vue": "^3.3.4",
+        "vite": "^3.0.2",
+        "laravel-vite-plugin": "^0.6.0",
+        "@vitejs/plugin-vue": "^3.0.1"
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
