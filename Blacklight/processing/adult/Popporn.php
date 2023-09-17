@@ -63,7 +63,7 @@ class Popporn extends AdultMovies
     {
         if ($ret = $this->_html->find('div[id=box-art], a[rel=box-art]', 1)) {
             $this->_res['boxcover'] = trim($ret->href);
-            if (false !== stripos(trim($ret->href), '_aa')) {
+            if (stripos(trim($ret->href), '_aa') !== false) {
                 $this->_res['backcover'] = str_ireplace('_aa', '_bb', trim($ret->href));
             } else {
                 $this->_res['backcover'] = str_ireplace('.jpg', '_b.jpg', trim($ret->href));

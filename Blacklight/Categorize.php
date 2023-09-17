@@ -373,7 +373,7 @@ class Categorize
 
     public function isMovieUHD(): bool
     {
-        if (! preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName) && false !== stripos($this->releaseName, '2160p')) {
+        if (! preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName) && stripos($this->releaseName, '2160p') !== false) {
             $this->tmpCat = Category::MOVIE_UHD;
 
             return true;

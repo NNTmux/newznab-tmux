@@ -919,7 +919,7 @@ class Forking
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(1800);
         $process->run(function ($type, $buffer) {
-            if (Process::ERR === $type) {
+            if ($type === Process::ERR) {
                 echo $buffer;
             }
         });
