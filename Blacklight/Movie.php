@@ -1184,7 +1184,7 @@ class Movie
     }
 
     /**
-     * @return mixed|false
+    * @return false|mixed
      */
     protected function localIMDBSearch()
     {
@@ -1197,9 +1197,30 @@ class Movie
             $end = Carbon::createFromFormat('Y', $this->currentYear)->addYears(2)->year;
             $check->whereBetween('year', [$start, $end]);
         }
-        $IMDBCheck = $check->first(['imdbid']);
-
-        return $IMDBCheck === null ? false : $IMDBCheck->imdbid;
+        $IMDBCheck = $check->get(['imdbid']);
+        foreach ($IMDBCheck as $check) {
+            // match the title and year of the movie as close as possible.
+            if ($this->currentYear !== '') {
+                $IMDBCheck = MovieInfo::query()
+                    ->where('imdbid', $check['imdbid'])
+                    ->where('title', 'like', '%'.$this->currentTitle.'%')
+                    ->whereBetween('year', [$start, $end])
+                    ->first(['imdbid', 'title']);
+            } else {
+                $IMDBCheck = MovieInfo::query()
+                    ->where('imdbid', $check['imdbid'])
+                    ->where('title', 'like', '%'.$this->currentTitle.'%')
+                    ->first(['imdbid', 'title']);
+            }
+            // If we found a match, check if percentage is high enough. If so, return the IMDB id.
+            if ($IMDBCheck !== null) {
+                similar_text($this->currentTitle, $IMDBCheck['title'], $percent);
+                if ($percent >= self::MATCH_PERCENT) {
+                    return $IMDBCheck['imdbid'];
+                }
+            }
+        }
+        return false;
     }
 
     /**
