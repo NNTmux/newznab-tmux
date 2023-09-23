@@ -1184,7 +1184,7 @@ class Movie
     }
 
     /**
-    * @return false|mixed
+     * @return false|mixed
      */
     protected function localIMDBSearch()
     {
@@ -1220,6 +1220,7 @@ class Movie
                 }
             }
         }
+
         return false;
     }
 
