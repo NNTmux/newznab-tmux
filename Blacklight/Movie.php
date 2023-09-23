@@ -1193,8 +1193,8 @@ class Movie
             ->where('title', 'like', '%'.$this->currentTitle.'%');
 
         if ($this->currentYear !== '') {
-            $start = Carbon::parse($this->currentYear)->subYears(2)->year;
-            $end = Carbon::parse($this->currentYear)->addYears(2)->year;
+            $start = Carbon::createFromFormat('Y', $this->currentYear)->subYears(2)->year;
+            $end = Carbon::createFromFormat('Y', $this->currentYear)->addYears(2)->year;
             $check->whereBetween('year', [$start, $end]);
         }
         $IMDBCheck = $check->first(['imdbid']);
