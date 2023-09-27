@@ -77,7 +77,6 @@
         "laravel/telescope": "^4.16",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
-        "laravelcollective/html": "^6.4",
         "league/climate": "^3.8",
         "mailerlite/laravel-elasticsearch": "^11.0",
         "manticoresoftware/manticoresearch-php": "^3.0",
@@ -112,7 +111,8 @@
         "vlucas/phpdotenv": "^5.5",
         "voku/simple_html_dom": "^4.8",
         "yab/laravel-scout-mysql-driver": "^5.1",
-        "ytake/laravel-smarty": "^7.0"
+        "ytake/laravel-smarty": "^7.0",
+        "spatie/laravel-html": "^3.2"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.13",
