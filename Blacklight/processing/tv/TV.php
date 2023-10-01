@@ -424,7 +424,7 @@ abstract class TV extends Videos
         // For names that don't start with the title.
         if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $hits)) {
             $showName = $hits['name'];
-        } elseif (preg_match('/^(?P<name>[\w+][\s\w\'.-]*?)'.$following. '/i', $relname, $hits)) {
+        } elseif (preg_match('/^(?P<name>[\w+][\s\w\'.-]*?)'.$following.'/i', $relname, $hits)) {
             // For names that start with the title.
             $showName = $hits['name'];
         }
