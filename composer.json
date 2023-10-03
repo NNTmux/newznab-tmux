@@ -103,6 +103,7 @@
         "spatie/laravel-directory-cleanup": "^1.9",
         "spatie/laravel-fractal": "^6.0",
         "spatie/laravel-ignition": "^2.3",
+        "spatie/laravel-image-optimizer": "^1.7",
         "spatie/laravel-permission": "^5.11",
         "sspat/es-query-sanitizer": "^1.0",
         "stechstudio/laravel-zipstream": "^4.13",
