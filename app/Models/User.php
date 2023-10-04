@@ -628,38 +628,16 @@ class User extends Authenticatable
         if (! empty($allowed)) {
             foreach ($cats as $cat) {
                 if (! \in_array($cat, $allowed, false)) {
-                    switch ($cat) {
-                        case 'view console':
-                            $ret[] = 1000;
-
-                            continue 2;
-                        case 'view movies':
-                            $ret[] = 2000;
-
-                            continue 2;
-                        case 'view audio':
-                            $ret[] = 3000;
-
-                            continue 2;
-                        case 'view pc':
-                            $ret[] = 4000;
-
-                            continue 2;
-                        case 'view tv':
-                            $ret[] = 5000;
-
-                            continue 2;
-                        case 'view adult':
-                            $ret[] = 6000;
-
-                            continue 2;
-                        case 'view books':
-                            $ret[] = 7000;
-
-                            continue 2;
-                        case 'view other':
-                            $ret[] = 1;
-                    }
+                    $ret[] = match ($cat) {
+                        'view console' => 1000,
+                        'view movies' => 2000,
+                        'view audio' => 3000,
+                        'view pc' => 4000,
+                        'view tv' => 5000,
+                        'view adult' => 6000,
+                        'view books' => 7000,
+                        'view other' => 1,
+                    };
                 }
             }
         }
