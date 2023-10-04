@@ -8,6 +8,7 @@ use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
 use Intervention\Image\Facades\Image;
+use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 /**
  * Resize/save/delete images to disk.
@@ -120,6 +121,8 @@ class ReleaseImage
 
                 if ($saveThumb) {
                     $cover->save($imgSavePath.$imgName.'_thumb.jpg');
+                    //Optimize the thumbnail.
+                    ImageOptimizer::optimize($imgSavePath.$imgName.'_thumb.jpg');
                 }
             }
         }
@@ -127,6 +130,8 @@ class ReleaseImage
         $coverPath = $imgSavePath.$imgName.'.jpg';
         try {
             $cover->save($coverPath);
+            //Optimize the image.
+            ImageOptimizer::optimize($coverPath);
         } catch (NotWritableException $e) {
             return 0;
         }
