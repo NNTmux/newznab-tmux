@@ -76,6 +76,7 @@
         "laravel/scout": "^9.0",
         "laravel/telescope": "^4.16",
         "laravel/tinker": "^2.8",
+        "laravel/sanctum": "^3.2",
         "laravel/ui": "^4.2",
         "laravelcollective/html": "^6.4",
         "league/climate": "^3.8",
@@ -162,7 +163,6 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "vendor/laravel/framework/src/Illuminate/Support/helpers.php",
             "app/Extensions/helper/helpers.php"
         ]
     },
@@ -177,20 +177,19 @@
             "captainhook/plugin-composer": true,
             "treeware/plant": true,
             "ergebnis/composer-normalize": true,
+            "pestphp/pest-plugin": true,
             "php-http/discovery": true
         },
         "discard-changes": true,
         "optimize-autoloader": true,
-        "preferred-install": {
-            "*": "dist"
-        },
+        "preferred-install": "dist",
         "process-timeout": 3600,
         "sort-packages": true
     },
     "scripts": {
         "post-update-cmd": [
             "@php artisan ide-helper:generate --ansi",
-            "@php artisan vendor:publish --tag=laravel-assets --ansi"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
