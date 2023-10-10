@@ -3,7 +3,9 @@
 namespace Blacklight;
 
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Blacklight\ManticoreSearch;
 
 /**
  * Handles removing of various unwanted releases.
@@ -80,7 +82,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    public function removeByCriteria(array $arguments)
+    public function removeByCriteria(array $arguments): bool|string
     {
         $this->delete = true;
         $this->ignoreUserCheck = false;
@@ -132,12 +134,12 @@ class ReleaseRemover
      * @param  int|string  $time  Time in hours (to select old releases) or 'full' for no time limit.
      * @param  string  $type  Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
      *                        passwordurl, sample, scr, short, size, ''] ('' runs against all types)
-     * @param  string|int  $blacklistID
+     * @param  int|string  $blacklistID
      * @return string|bool
      *
      * @throws \Exception
      */
-    public function removeCrap(bool $delete, $time, string $type = '', $blacklistID = '')
+    public function removeCrap(bool $delete, int|string $time, string $type = '', int|string $blacklistID = ''): bool|string
     {
         $timeStart = now();
         $this->delete = $delete;
@@ -254,7 +256,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeGibberish()
+    protected function removeGibberish(): bool|string
     {
         $this->method = 'Gibberish';
         $this->query = sprintf(
@@ -284,7 +286,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeHashed()
+    protected function removeHashed(): bool|string
     {
         $this->method = 'Hashed';
         $this->query = sprintf(
@@ -315,7 +317,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeShort()
+    protected function removeShort(): bool|string
     {
         $this->method = 'Short';
         $this->query = sprintf(
@@ -345,7 +347,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeExecutable()
+    protected function removeExecutable(): bool|string
     {
         $this->method = 'Executable';
 
@@ -377,7 +379,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeInstallBin()
+    protected function removeInstallBin(): bool|string
     {
         $this->method = 'Install.bin';
 
@@ -404,7 +406,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removePasswordURL()
+    protected function removePasswordURL(): bool|string
     {
         $this->method = 'Password.url';
 
@@ -431,7 +433,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removePassworded()
+    protected function removePassworded(): bool|string
     {
         $this->method = 'Passworded';
 
@@ -481,7 +483,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeSize()
+    protected function removeSize(): bool|string
     {
         $this->method = 'Size';
         $this->query = sprintf(
@@ -518,7 +520,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeHuge()
+    protected function removeHuge(): bool|string
     {
         $this->method = 'Huge';
         $this->query = sprintf(
@@ -543,7 +545,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeSingleNZB()
+    protected function removeSingleNZB(): bool|string
     {
         $this->method = '.nzb';
         $this->query = sprintf(
@@ -570,7 +572,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeSample()
+    protected function removeSample(): bool|string
     {
         $this->method = 'Sample';
 
@@ -614,7 +616,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeSCR()
+    protected function removeSCR(): bool|string
     {
         $this->method = '.scr';
 
@@ -740,19 +742,27 @@ class ReleaseRemover
                 );
 
                 if ($opTypeName === 'Subject') {
-                    $join = 'INNER JOIN releases_se rse ON rse.id = r.id';
+                    if (config('nntmux.elasticsearch_enabled') === true) {
+                        $searchResult = (new ElasticSearchSiteSearch())->indexSearch($regexMatch, 100);
+                    } else {
+                        $searchResult = (new ManticoreSearch())->searchIndexes('releases_rt', $regexMatch, ['name,searchname']);
+                        if (! empty($searchResult)) {
+                            $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+                        }
+                    }
+
                 } else {
-                    $join = '';
+                    $searchResult = '';
                 }
 
                 $this->query = sprintf(
                     '
 							SELECT r.guid, r.searchname, r.id
 							FROM releases r %s %s %s %s',
-                    $join,
                     $regexSQL,
                     $groupID,
-                    $this->crapTime
+                    $this->crapTime,
+                    $searchResult !== '' ? ' AND r.id IN ('.implode(',', $searchResult).')' : ''
                 );
 
                 if ($this->checkSelectQuery() === false) {
@@ -869,7 +879,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeWMV()
+    protected function removeWMV(): bool|string
     {
         $this->method = 'WMV_ALL';
         $this->query = "
@@ -895,7 +905,7 @@ class ReleaseRemover
      *
      * @throws \Exception
      */
-    protected function removeCodecPoster()
+    protected function removeCodecPoster(): bool|string
     {
         $categories = sprintf(
             'r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)',
@@ -1005,7 +1015,7 @@ class ReleaseRemover
      * @param  string  $argument  User argument.
      * @return string|false
      */
-    protected function formatCriteriaQuery(string $argument)
+    protected function formatCriteriaQuery(string $argument): bool|string
     {
         // Check if the user wants to ignore the check.
         if ($argument === 'ignore') {
@@ -1224,12 +1234,9 @@ class ReleaseRemover
     }
 
     /**
-     * Echo the error and return false if on CLI.
-     * Return the error if on browser.
-     *
-     * @return bool|string
+      * @return false
      */
-    protected function returnError()
+    protected function returnError(): bool
     {
         if ($this->echoCLI && $this->error !== '') {
             $this->colorCLI->error($this->error, true);
@@ -1241,7 +1248,7 @@ class ReleaseRemover
     /**
      * @return array|string|string[]
      */
-    protected function extractSrchFromRegx(string $dbRegex = '')
+    protected function extractSrchFromRegx(string $dbRegex = ''): array|string
     {
         $regexMatch = '';
 
