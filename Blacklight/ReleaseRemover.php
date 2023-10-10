@@ -741,9 +741,9 @@ class ReleaseRemover
 							SELECT r.guid, r.searchname, r.id
 							FROM releases r %s %s %s %s',
                     $regexSQL,
+                    $searchResult !== '' ? ' WHERE r.id IN ('.implode(',', $searchResult).')' : '',
                     $groupID,
                     $this->crapTime,
-                    $searchResult !== '' ? ' AND r.id IN ('.implode(',', $searchResult).')' : ''
                 );
 
                 if ($this->checkSelectQuery() === false) {
