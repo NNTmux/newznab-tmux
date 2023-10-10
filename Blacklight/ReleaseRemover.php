@@ -5,7 +5,6 @@ namespace Blacklight;
 use App\Models\Category;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Blacklight\ManticoreSearch;
 
 /**
  * Handles removing of various unwanted releases.
@@ -78,7 +77,6 @@ class ReleaseRemover
      *                            columnName is a column name from the releases table.
      *                            modifiers are : equals,like,bigger,smaller
      *                            content is what to change the column content to
-     * @return string|bool
      *
      * @throws \Exception
      */
@@ -134,8 +132,6 @@ class ReleaseRemover
      * @param  int|string  $time  Time in hours (to select old releases) or 'full' for no time limit.
      * @param  string  $type  Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
      *                        passwordurl, sample, scr, short, size, ''] ('' runs against all types)
-     * @param  int|string  $blacklistID
-     * @return string|bool
      *
      * @throws \Exception
      */
@@ -252,7 +248,6 @@ class ReleaseRemover
     /**
      * Remove releases with 15 or more letters or numbers, nothing else.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -282,7 +277,6 @@ class ReleaseRemover
     /**
      * Remove releases with 25 or more letters/numbers, probably hashed.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -313,7 +307,6 @@ class ReleaseRemover
     /**
      * Remove releases with 5 or less letters/numbers.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -343,7 +336,6 @@ class ReleaseRemover
     /**
      * Remove releases with an exe file not in other misc or pc apps/games.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -375,7 +367,6 @@ class ReleaseRemover
     /**
      * Remove releases with an install.bin file.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -402,7 +393,6 @@ class ReleaseRemover
     /**
      * Remove releases with an password.url file.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -429,7 +419,6 @@ class ReleaseRemover
     /**
      * Remove releases with password in the search name.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -479,7 +468,6 @@ class ReleaseRemover
     /**
      * Remove releases smaller than 2MB with 1 part not in MP3/books/misc section.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -516,7 +504,6 @@ class ReleaseRemover
     /**
      * Remove releases bigger than 200MB with just a single file.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -541,7 +528,6 @@ class ReleaseRemover
     /**
      * Remove releases that are just a single nzb file.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -568,7 +554,6 @@ class ReleaseRemover
     /**
      * Remove releases with more than 1 part, less than 40MB, sample in name. TV/Movie sections.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -612,7 +597,6 @@ class ReleaseRemover
     /**
      * Remove releases with a scr file in the filename/subject.
      *
-     * @return bool|string
      *
      * @throws \Exception
      */
@@ -875,7 +859,6 @@ class ReleaseRemover
      * Remove releases that contain .wmv file, aka that spam poster.
      * Thanks to dizant from nZEDb forums for the sql query.
      *
-     * @return string|bool
      *
      * @throws \Exception
      */
@@ -901,7 +884,6 @@ class ReleaseRemover
      * Remove releases that contain .wmv files and Codec\Setup.exe files, aka that spam poster.
      * Thanks to dizant from nZEDb forums for parts of the sql query.
      *
-     * @return string|bool
      *
      * @throws \Exception
      */
@@ -1234,7 +1216,7 @@ class ReleaseRemover
     }
 
     /**
-      * @return false
+     * @return false
      */
     protected function returnError(): bool
     {
