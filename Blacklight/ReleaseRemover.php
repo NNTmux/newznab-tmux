@@ -660,7 +660,7 @@ class ReleaseRemover
 
                 switch ((int) $regex->msgcol) {
                     case Binaries::BLACKLIST_FIELD_SUBJECT:
-                        $regexSQL = sprintf('WHERE (r.name REGEXP %s OR r.searchname REGEXP %2$s)', $dbRegex);
+                        $regexSQL = sprintf('WHERE r.searchname REGEXP %s', $dbRegex);
                         $opTypeName = 'Subject';
                         break;
                     case Binaries::BLACKLIST_FIELD_FROM:
