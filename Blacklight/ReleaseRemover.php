@@ -657,7 +657,7 @@ class ReleaseRemover
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
                     if ($regexMatch !== '') {
-                        $ftMatch = str_replace('|', ' ', str_replace('"', '', $regexMatch));
+                        $ftMatch = "'".str_replace('|', ' ', str_replace('"', '', $regexMatch))."'";
                     }
                 }
 
