@@ -656,14 +656,11 @@ class ReleaseRemover
 
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
-                    if ($regexMatch !== '') {
-                        $ftMatch = "'".str_replace('|', ' ', str_replace('"', '', $regexMatch))."'";
-                    }
                 }
 
                 switch ((int) $regex->msgcol) {
                     case Binaries::BLACKLIST_FIELD_SUBJECT:
-                        $regexSQL = sprintf('WHERE (r.name REGEXP %s OR r.searchname REGEXP %2$s)', $ftMatch, $dbRegex);
+                        $regexSQL = sprintf('WHERE %s (r.name REGEXP %s OR r.searchname REGEXP %2$s)', $ftMatch, $dbRegex);
                         $opTypeName = 'Subject';
                         break;
                     case Binaries::BLACKLIST_FIELD_FROM:
