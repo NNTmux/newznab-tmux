@@ -109,7 +109,7 @@ class Utility
         )
         ) {
             $fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
-            $fileSpec = file_exists(storage_path('covers').$fileSpec) ? $fileSpec :
+            $fileSpec = file_exists(storage_path('covers/').$fileSpec) ? $fileSpec :
                 sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
         }
 
