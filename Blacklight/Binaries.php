@@ -168,7 +168,6 @@ class Binaries
      */
     protected array $headersNotInserted;
 
-
     public function __construct()
     {
         $this->startUpdate = now();
