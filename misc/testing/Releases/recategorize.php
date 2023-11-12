@@ -51,14 +51,13 @@ function reCategorize($argv): void
 function categorizeRelease($argv, $echoOutput = false): int
 {
     $update = true;
-    $otherCats = implode(',', Category::OTHERS_GROUP);
     $query = Release::query()->select(['id', 'searchname', 'fromname', 'groups_id', 'categories_id']);
     if (isset($argv[1]) && is_numeric($argv[1])) {
         $query->where('groups_id', $argv[1]);
     } elseif (isset($argv[1]) && preg_match('/\([\d, ]+\)/', $argv[1])) {
         $query->whereIn('groups_id', $argv[1]);
     } elseif (isset($argv[1]) && $argv[1] === 'misc') {
-        $query->whereIn('categories_id', [$otherCats]);
+        $query->whereIn('categories_id', Category::OTHERS_GROUP);
     }
     if (isset($argv[2]) && $argv[2] === 'test') {
         $update = false;
