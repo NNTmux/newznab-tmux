@@ -168,13 +168,7 @@ class Binaries
      */
     protected array $headersNotInserted;
 
-    /**
-     * Constructor.
-     *
-     * @param  array  $options  Class instances / echo to CLI?
-     *
-     * @throws \Exception
-     */
+
     public function __construct()
     {
         $this->startUpdate = now();
@@ -322,7 +316,7 @@ class Binaries
             // We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
             $leaveOver = $this->messageBuffer;
 
-            // If this is not a new group, go from our newest to the servers newest.
+        // If this is not a new group, go from our newest to the servers newest.
         } else {
             // Set our oldest wanted to our newest local article.
             $first = $groupMySQL['last_record'];
@@ -487,8 +481,8 @@ class Binaries
      * @param  array  $groupMySQL  The group info from mysql.
      * @param  int  $first  The oldest wanted header.
      * @param  int  $last  The newest wanted header.
-     * @param  string  $type  Is this partrepair or update or backfill?
-     * @param  array|null  $missingParts  If we are running in partrepair, the list of missing article numbers.
+     * @param  string  $type  Is this part repair or update or backfill?
+     * @param  array|null  $missingParts  If we are running in part repair, the list of missing article numbers.
      * @return array Empty on failure.
      *
      * @throws \Exception
@@ -865,8 +859,8 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) {
-            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery(rtrim($partsQuery, ','))) {
+        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) || $this->runQuery($binariesQuery)) {
+            if (\strlen($partsQuery) === \strlen($partsCheck) || $this->runQuery(rtrim($partsQuery, ','))) {
                 DB::commit();
             } else {
                 if ($this->addToPartRepair) {
@@ -964,7 +958,7 @@ class Binaries
      */
     public function partRepair(array $groupArr): void
     {
-        // Get all parts in partrepair table.
+        // Get all parts in part repair table.
         $missingParts = [];
         try {
             $missingParts = DB::select(sprintf('
@@ -1191,7 +1185,7 @@ class Binaries
         $oldArticle = $articleTime = null;
 
         while (true) {
-            // Article exists outside of available range, this shouldn't happen
+            // Article exists outside available range, this shouldn't happen
             if ($wantedArticle <= $data['first'] || $wantedArticle >= $data['last']) {
                 break;
             }
@@ -1252,7 +1246,7 @@ class Binaries
      * @param  array  $numbers  The article numbers of the missing headers.
      * @param  int  $groupID  The ID of this groups.
      */
-    private function addMissingParts(array $numbers, int $groupID): string
+    private function addMissingParts(array $numbers, int $groupID): void
     {
         $insertStr = 'INSERT INTO missed_parts (numberid, groups_id) VALUES ';
         foreach ($numbers as $number) {
@@ -1260,8 +1254,6 @@ class Binaries
         }
 
         DB::insert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
-
-        return $this->_pdo->lastInsertId();
     }
 
     /**
@@ -1339,7 +1331,7 @@ class Binaries
             }
         }
 
-        // Check if the field is black listed.
+        // Check if the field is blacklisted.
 
         if (! $blackListed && $this->blackList[$groupName]) {
             foreach ($this->blackList[$groupName] as $blackList) {
@@ -1360,7 +1352,7 @@ class Binaries
      * @param  bool  $activeOnly  Only display active blacklists ?
      * @param  int|string  $opType  Optional, get white or black lists (use Binaries constants).
      * @param  string  $groupName  Optional, group.
-     * @param  bool  $groupRegex  Optional Join groups / binaryblacklist using regexp for equals.
+     * @param  bool  $groupRegex  Optional Join groups / binary blacklist using regexp for equals.
      */
     public function getBlacklist(bool $activeOnly = true, int|string $opType = -1, string $groupName = '', bool $groupRegex = false): array
     {
@@ -1390,7 +1382,9 @@ class Binaries
     }
 
     /**
-     * @return \App\Models\BinaryBlacklist|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     * Return a blacklist by ID.
+     *
+     * @param  int  $id  The ID of the blacklist.
      */
     public function getBlacklistByID(int $id)
     {
