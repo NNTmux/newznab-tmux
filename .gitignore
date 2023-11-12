@@ -19,6 +19,7 @@ test.php
 
 /.idea/
 /vendor/*
+/storage/covers/*
 /storage/nzb/*
 /resources/tmp/*
 !/resources/tmp/unrar/
