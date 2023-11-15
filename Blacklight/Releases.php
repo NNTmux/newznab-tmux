@@ -987,7 +987,7 @@ class Releases extends Release
             NZB::NZB_ADDED,
             $this->showPasswords(),
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %s ', $imDbId) : '',
+            ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = \'%s\' ', $imDbId) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
