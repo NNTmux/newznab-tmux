@@ -704,12 +704,13 @@ class Binaries
             // Set up the info for inserting into parts/binaries/collections tables.
             if (! isset($articles[$this->header['matches'][1]])) {
                 // Attempt to find the file count. If it is not found, set it to 0.
-                if (! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $this->header['matches'][1], $fileCount)) {
-                    $fileCount[1] = $fileCount[3] = 0;
+                $fileCount = $this->getFileCount($this->header['matches'][1]);
+                if ($fileCount[1] === 0 && $fileCount[3] === 0) {
+                    $fileCount = $this->getFileCount($this->header['matches'][0]);
                 }
 
                 $collMatch = $this->_collectionsCleaning->collectionsCleaner(
-                    $this->header['matches'][1]
+                    $this->header['matches'][1], $this->groupMySQL['name']
                 );
 
                 // Used to group articles together when forming the release.
@@ -760,6 +761,9 @@ class Binaries
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
                     $random = random_bytes(16);
+                    $number = random_int(3, 9999999);
+                    $special = Str::random(5);
+                    $string = htmlspecialchars(str_shuffle('trusin_ @'.$number.$special), ENT_QUOTES);
 
                     $collectionID = false;
 
@@ -1485,5 +1489,14 @@ class Binaries
         }
 
         return false;
+    }
+
+    private function getFileCount($subject): array
+    {
+        if (! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $subject, $fileCount)) {
+            $fileCount[1] = $fileCount[3] = 0;
+        }
+
+        return $fileCount;
     }
 }
