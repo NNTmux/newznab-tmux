@@ -141,7 +141,7 @@ class TVMaze extends TV
                         }
 
                         // Check if we have the episode for this video ID
-                        $episode = $this->getBySeasonEp($videoId, (int) $seasonNo, (int) $episodeNo, $release['airdate']);
+                        $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
                         if ($episode === false) {
                             // Send the request for the episode to TVMaze
@@ -307,7 +307,7 @@ class TVMaze extends TV
         return $hasCover;
     }
 
-    protected function getEpisodeInfo(int $tvMazeId, int $season, int $episode, string $airDate = '', int $videoId = 0): array|bool
+    protected function getEpisodeInfo(int|string $tvMazeId, int|string $season, int|string $episode, string $airDate = '', int $videoId = 0): array|bool
     {
         $return = $response = false;
 

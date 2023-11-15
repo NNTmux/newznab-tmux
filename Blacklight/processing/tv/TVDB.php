@@ -169,7 +169,7 @@ class TVDB extends TV
                     }
 
                     // Check if we have the episode for this video ID
-                    $episode = $this->getBySeasonEp($videoId, (int) $seasonNo, (int) $episodeNo, $release['airdate']);
+                    $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
                     if ($episode === false && $lookupSetting) {
                         // Send the request for the episode to TVDB
@@ -301,7 +301,7 @@ class TVDB extends TV
      * @throws \CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
-    protected function getEpisodeInfo(int $tvDbId, int $season, int $episode, int $videoId = 0): bool|array
+    protected function getEpisodeInfo(int|string $tvDbId, int|string $season, int|string $episode, int $videoId = 0): bool|array
     {
         $return = $response = false;
 

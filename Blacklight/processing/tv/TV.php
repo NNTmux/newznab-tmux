@@ -95,7 +95,7 @@ abstract class TV extends Videos
      *
      * @return array|false False on failure, an array of information fields otherwise.
      */
-    abstract protected function getEpisodeInfo(int $siteId, int $series, int $episode): array|bool;
+    abstract protected function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool;
 
     /**
      * Retrieve poster image for TV episode from site using its API.
@@ -339,7 +339,7 @@ abstract class TV extends Videos
      *
      * @return int|false
      */
-    public function getBySeasonEp(int $id, int $series, int $episode, string $airdate = ''): bool|int
+    public function getBySeasonEp(int|string $id, int|string $series, int|string $episode, string $airdate = ''): bool|int
     {
         if ($series > 0 && $episode > 0) {
             $queryString = sprintf('tve.series = %d AND tve.episode = %d', $series, $episode);

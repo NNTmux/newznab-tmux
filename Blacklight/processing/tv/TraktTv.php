@@ -185,7 +185,7 @@ class TraktTv extends TV
     /**
      * @throws GuzzleException
      */
-    public function getEpisodeInfo(int $siteId, int $series, int $episode): array|bool
+    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool
     {
         $return = false;
 

@@ -283,7 +283,7 @@ class TMDB extends TV
      *
      * @return array|false
      */
-    protected function getEpisodeInfo(int $tmdbid, int $season, int $episode, string $airdate = '', int $videoId = 0): bool|array
+    protected function getEpisodeInfo(int|string $tmdbid, int|string $season, int|string $episode, string $airdate = '', int $videoId = 0): bool|array
     {
         $return = false;
 
