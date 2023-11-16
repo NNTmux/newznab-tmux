@@ -309,7 +309,7 @@ class Regexes
         if ($this->_regexCache[$groupName]['regex'] !== null) {
             return;
         }
-        $this->_regexCache[$groupName]['regex'] = DB::raw($sql);
+        $this->_regexCache[$groupName]['regex'] = DB::select($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql), $this->_regexCache[$groupName]['regex'], $expiresAt);
     }
