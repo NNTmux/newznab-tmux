@@ -301,7 +301,7 @@ class Regexes
         $sql = sprintf(
             'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
             ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
-            $this->tableName,
+            escapeString($this->tableName),
             $groupName
         );
 
