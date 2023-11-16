@@ -299,9 +299,9 @@ class Regexes
     {
         // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
         $sql = sprintf(
-            'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
+            'SELECT r.id, r.regex %s FROM %s r WHERE \'%s\' REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
             ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
-            escapeString($this->tableName),
+            $this->tableName,
             $groupName
         );
 
