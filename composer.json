@@ -105,7 +105,7 @@
         "spatie/laravel-fractal": "^6.0",
         "spatie/laravel-ignition": "^2.3",
         "spatie/laravel-image-optimizer": "^1.7",
-        "spatie/laravel-permission": "^5.11",
+        "spatie/laravel-permission": "^6.1",
         "sspat/es-query-sanitizer": "^1.0",
         "stechstudio/laravel-zipstream": "^4.13",
         "symfony/http-client": "^6.0",
