@@ -834,7 +834,7 @@ class ProcessReleases
             $releases = Release::query()
                 ->select(['id', 'guid'])
                 ->where('passwordstatus', '=', Releases::PASSWD_RAR)
-                ->whereIn('id', function ($query) {
+                ->orWhereIn('id', function ($query) {
                     $query->select('releases_id')
                         ->from('release_files')
                         ->where('passworded', '=', Releases::PASSWD_RAR);
