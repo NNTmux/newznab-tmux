@@ -831,7 +831,14 @@ class ProcessReleases
 
         // Passworded releases.
         if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
-            $releases = Release::query()->join('release_files', 'release_files.releases_id', '=', 'releases.id')->select(['id', 'guid'])->where('release_files.passworded', '=', Releases::PASSWD_RAR)->orWhere('passwordstatus', '=', Releases::PASSWD_RAR)->get();
+            $releases = Release::query()
+                ->select(['id', 'guid'])
+                ->where('passwordstatus', '=', Releases::PASSWD_RAR)
+                ->whereIn('id', function ($query) {
+                    $query->select('releases_id')
+                        ->from('release_files')
+                        ->where('passworded', '=', Releases::PASSWD_RAR);
+                })->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $passwordDeleted++;
