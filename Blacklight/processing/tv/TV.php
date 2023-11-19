@@ -213,7 +213,7 @@ abstract class TV extends Videos
                     'tmdb' => $show['tmdb'],
                 ]);
                 // Insert the supplementary show info
-                TvInfo::query()->insert([
+                TvInfo::query()->insertOrIgnore([
                     'videos_id' => $videoId,
                     'summary' => $show['summary'],
                     'publisher' => $show['publisher'],
@@ -237,7 +237,7 @@ abstract class TV extends Videos
         $episodeId = $this->getBySeasonEp($videoId, $episode['series'], $episode['episode'], $episode['firstaired']);
 
         if ($episodeId === false) {
-            $episodeId = TvEpisode::query()->insert(
+            $episodeId = TvEpisode::query()->insertOrIgnore(
                 [
                     'videos_id' => $videoId,
                     'series' => $episode['series'],
