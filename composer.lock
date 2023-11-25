@@ -8884,12 +8884,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/gearer.git",
-                "reference": "3b2b20ed89529900950ed8486a026ff79811a6ba"
+                "reference": "ef687cecd2163681b6b1d7e7dca8b2f5ed5c463d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/gearer/zipball/3b2b20ed89529900950ed8486a026ff79811a6ba",
-                "reference": "3b2b20ed89529900950ed8486a026ff79811a6ba",
+                "url": "https://api.github.com/repos/DariusIII/gearer/zipball/ef687cecd2163681b6b1d7e7dca8b2f5ed5c463d",
+                "reference": "ef687cecd2163681b6b1d7e7dca8b2f5ed5c463d",
                 "shasum": ""
             },
             "require": {
@@ -8948,7 +8948,7 @@
             "support": {
                 "source": "https://github.com/DariusIII/gearer/tree/master"
             },
-            "time": "2023-11-25T15:00:47+00:00"
+            "time": "2023-11-25T15:22:59+00:00"
         },
         {
             "name": "seld/cli-prompt",
@@ -18592,7 +18592,8 @@
     "stability-flags": {
         "anhskohbo/no-captcha": 20,
         "b3rs3rk/steamfront": 20,
-        "joshpinkney/tv-maze-php-api": 20
+        "joshpinkney/tv-maze-php-api": 20,
+        "revlenuwe/gearer": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
