@@ -30,7 +30,7 @@ class BtcPaymentController extends BasePageController
                 $addYears = $request->input('addyears');
                 $data = ['user_id' => $this->userdata->id, 'username' => $this->userdata->username, 'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
                 $keychain_id = random_int(0, 19);
-                $callback_data = json_encode($data);
+                $callback_data = $data;
 
                 $order = Gearer::createOrder($price, $keychain_id, $callback_data);
 
