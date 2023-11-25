@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Gearer;
+use Blacklight\libraries\Geary;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
@@ -17,6 +17,8 @@ class BtcPaymentController extends BasePageController
     public function show(Request $request)
     {
         $this->setPreferences();
+        $gateway_id = config('settings.mycelium_gateway_id');
+        $gateway_secret = config('settings.mycelium_gateway_secret');
 
         $action = $request->input('action') ?? 'view';
         $donation = Role::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
@@ -30,9 +32,10 @@ class BtcPaymentController extends BasePageController
                 $addYears = $request->input('addyears');
                 $data = ['user_id' => $this->userdata->id, 'username' => $this->userdata->username, 'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
                 $keychain_id = random_int(0, 19);
-                $callback_data = $data;
+                $callback_data = json_encode($data);
 
-                $order = Gearer::createOrder($price, $keychain_id, $callback_data);
+                $geary = new Geary($gateway_id, $gateway_secret);
+                $order = $geary->create_order($price, $keychain_id, $callback_data);
 
                 if ($order->payment_id) {
                     // Redirect to a payment gateway
@@ -62,17 +65,22 @@ class BtcPaymentController extends BasePageController
      */
     public function callback(): void
     {
-        $order = Gearer::handleOrderStatusCallback();
+        $gateway_id = config('settings.mycelium_gateway_id');
+        $gateway_secret = config('settings.mycelium_gateway_secret');
+
+        $geary = new Geary($gateway_id, $gateway_secret);
+        $order = $geary->check_order_callback();
 
         // Order status was received
         if ($order !== false) {
-            $newRole = $order['role'];
-            $amount = $order['price'];
-            $addYear = $order['addyears'];
+            $callback_data = json_decode($order['callback_data'], true);
+            $newRole = $callback_data['role'];
+            $amount = $callback_data['price'];
+            $addYear = $callback_data['addyears'];
             // If order was paid in full (2) or overpaid (4)
             if ((int) $order['status'] === 2 || (int) $order['status'] === 4) {
-                User::updateUserRole($order['user_id'], $newRole);
-                User::updateUserRoleChangeDate($order['user_id'], null, $addYear);
+                User::updateUserRole($callback_data['user_id'], $newRole);
+                User::updateUserRoleChangeDate($callback_data['user_id'], null, $addYear);
             }
         }
     }
