@@ -71,7 +71,7 @@
         "jrean/laravel-user-verification": "^11.0",
         "junaidnasir/larainvite": "^5.0",
         "kevinlebrun/colors.php": "^1.0",
-        "laravel/framework": "^10.32",
+        "laravel/framework": "^10.34",
         "laravel/horizon": "^5.21",
         "laravel/sanctum": "^3.3",
         "laravel/scout": "^9.0",
