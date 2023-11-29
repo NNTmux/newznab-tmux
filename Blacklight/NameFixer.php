@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
  */
 class NameFixer
 {
-    public const PREDB_REGEX = '/([\w\(\)]+[\s\._-]([\w\p{L}\+\(\)]+[\s\._-])+[\w\(\)]+-\w+)/';
+    public const PREDB_REGEX = '/([\w\(\) -]+[\s\._-]([\w\p{L}\+\(\)]+[\s\._-])+[\w\(\)]+-\w+)/';
 
     // Constants for name fixing status
     public const PROC_NFO_NONE = 0;
