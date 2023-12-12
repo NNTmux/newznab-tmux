@@ -487,7 +487,7 @@ class Binaries
      * @throws \Exception
      * @throws \Throwable
      */
-    public function scan(array $groupMySQL, int $first, int $last, string $type = 'update', array $missingParts = null): array
+    public function scan(array $groupMySQL, int $first, int $last, string $type = 'update', ?array $missingParts = null): array
     {
         // Start time of scan method and of fetching headers.
         $this->startLoop = now();

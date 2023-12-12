@@ -170,7 +170,7 @@ class AniDB
         return false;
     }
 
-    private function processAPIResponseElement(\SimpleXMLElement $element, string $property = null, bool $children = false): string
+    private function processAPIResponseElement(\SimpleXMLElement $element, ?string $property = null, bool $children = false): string
     {
         $property = $property ?? 'name';
         $temp = '';
