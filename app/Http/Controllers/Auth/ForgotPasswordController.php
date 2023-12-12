@@ -44,7 +44,7 @@ class ForgotPasswordController extends Controller
         $email = $request->input('email') ?? '';
         $rssToken = $request->input('apikey') ?? '';
         if (empty($email) && empty($rssToken)) {
-            app('smarty.view')->assign('error', 'Missing parameter(email and/or apikey to send password reset');
+            app('smarty.view')->assign('error', 'Missing parameter (email and/or apikey) to send password reset');
         } else {
             if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
                 $this->validate($request, [
