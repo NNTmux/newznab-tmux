@@ -3,11 +3,9 @@
 namespace Blacklight;
 
 use Illuminate\Support\Facades\File;
-use Intervention\Image\Exception\ImageException;
-use Intervention\Image\Exception\NotFoundException;
-use Intervention\Image\Exception\NotReadableException;
-use Intervention\Image\Exception\NotWritableException;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\Exceptions\NotWritableException;
+use Intervention\Image\ImageManager;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 /**
@@ -58,11 +56,12 @@ class ReleaseImage
         $this->vidSavePath = storage_path('covers/video/');
     }
 
-    protected function fetchImage(string $imgLoc): \Intervention\Image\Image|bool
+    protected function fetchImage(string $imgLoc): bool|\Intervention\Image\Interfaces\ImageInterface
     {
         try {
-            $img = Image::make($imgLoc);
-        } catch (NotFoundException $e) {
+            $manager = new ImageManager(Driver::class);
+            $img = $manager->read(file_get_contents($imgLoc));
+        } catch (\Exception $e) {
             if ($e->getCode() === 404) {
                 $this->colorCli->notice('Data not available on server');
             } elseif ($e->getCode() === 503) {
@@ -72,17 +71,8 @@ class ReleaseImage
             }
 
             $img = false;
-        } catch (NotReadableException $e) {
+        } catch (\Error $e) {
             $this->colorCli->climate()->info($e->getMessage());
-
-            $img = false;
-        } catch (ImageException $e) {
-            $this->colorCli->climate()->error('Image error: '.$e->getMessage());
-
-            $img = false;
-        } catch (\ImagickException $e) {
-            $this->colorCli->climate()->error('Image error: '.$e->getMessage());
-
             $img = false;
         }
 
@@ -120,7 +110,7 @@ class ReleaseImage
                 $cover->resize($new_width, $new_height);
 
                 if ($saveThumb) {
-                    $cover->save($imgSavePath.$imgName.'_thumb.jpg');
+                    $cover->toJpeg(100)->save($imgSavePath.$imgName.'_thumb.jpg');
                     //Optimize the thumbnail.
                     ImageOptimizer::optimize($imgSavePath.$imgName.'_thumb.jpg');
                 }
@@ -129,7 +119,7 @@ class ReleaseImage
         // Store it on the hard drive.
         $coverPath = $imgSavePath.$imgName.'.jpg';
         try {
-            $cover->save($coverPath);
+            $cover->toJpeg(100)->save($coverPath);
             //Optimize the image.
             ImageOptimizer::optimize($coverPath);
         } catch (NotWritableException $e) {
