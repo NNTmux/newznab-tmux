@@ -3149,16 +3149,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "f17fe7bb54ec18d75588f527052069a6e9b5d720"
+                "reference": "ac9734129478be387c1914f1c2856d623341128c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/f17fe7bb54ec18d75588f527052069a6e9b5d720",
-                "reference": "f17fe7bb54ec18d75588f527052069a6e9b5d720",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/ac9734129478be387c1914f1c2856d623341128c",
+                "reference": "ac9734129478be387c1914f1c2856d623341128c",
                 "shasum": ""
             },
             "require": {
@@ -3200,7 +3200,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.0.1"
+                "source": "https://github.com/Intervention/image/tree/3.0.2"
             },
             "funding": [
                 {
@@ -3212,7 +3212,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-09T10:10:43+00:00"
+            "time": "2023-12-14T13:17:13+00:00"
         },
         {
             "name": "james-heinrich/getid3",
@@ -9325,27 +9325,27 @@
         },
         {
             "name": "spatie/async",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "59985e70e94b8afb1ef1d65de73e8f80cddb4146"
+                "reference": "c270e692f6eabafb4312e1ecd44e062032785635"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/59985e70e94b8afb1ef1d65de73e8f80cddb4146",
-                "reference": "59985e70e94b8afb1ef1d65de73e8f80cddb4146",
+                "url": "https://api.github.com/repos/spatie/async/zipball/c270e692f6eabafb4312e1ecd44e062032785635",
+                "reference": "c270e692f6eabafb4312e1ecd44e062032785635",
                 "shasum": ""
             },
             "require": {
                 "laravel/serializable-closure": "^1.0",
                 "php": "^7.4|^8.0",
-                "symfony/process": "^3.3 || ^4.0 || ^5.0 || ^6.0"
+                "symfony/process": "^3.3 || ^4.0 || ^5.0 || ^6.0 || ^7.0"
             },
             "require-dev": {
                 "larapack/dd": "^1.1",
-                "phpunit/phpunit": "^7.5 || ^8.5.21 || ^9.0",
-                "symfony/stopwatch": "^4.0 || ^5.0 || ^6.0"
+                "phpunit/phpunit": "^7.5 || ^8.5.21 || ^9.0 || ^10.0",
+                "symfony/stopwatch": "^4.0 || ^5.0 || ^6.0 || ^7.0"
             },
             "suggest": {
                 "ext-pcntl": "Required to use async processes",
@@ -9380,7 +9380,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/async/issues",
-                "source": "https://github.com/spatie/async/tree/1.6.0"
+                "source": "https://github.com/spatie/async/tree/1.6.1"
             },
             "funding": [
                 {
@@ -9388,7 +9388,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-08-25T16:07:30+00:00"
+            "time": "2023-12-14T13:21:46+00:00"
         },
         {
             "name": "spatie/backtrace",
@@ -15120,22 +15120,22 @@
         },
         {
             "name": "ergebnis/composer-normalize",
-            "version": "2.41.0",
+            "version": "2.41.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/composer-normalize.git",
-                "reference": "2b5fd81283fa3ad21eeed5b3816d4a49968f4679"
+                "reference": "01eb2d9b8623828ec2264f54d7782a25558d27b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/2b5fd81283fa3ad21eeed5b3816d4a49968f4679",
-                "reference": "2b5fd81283fa3ad21eeed5b3816d4a49968f4679",
+                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/01eb2d9b8623828ec2264f54d7782a25558d27b2",
+                "reference": "01eb2d9b8623828ec2264f54d7782a25558d27b2",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^2.0.0",
                 "ergebnis/json": "^1.1.0",
-                "ergebnis/json-normalizer": "^4.4.0",
+                "ergebnis/json-normalizer": "^4.4.1",
                 "ergebnis/json-printer": "^3.4.0",
                 "ext-json": "*",
                 "justinrainbow/json-schema": "^5.2.12",
@@ -15194,7 +15194,7 @@
                 "security": "https://github.com/ergebnis/composer-normalize/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/composer-normalize"
             },
-            "time": "2023-12-13T09:48:58+00:00"
+            "time": "2023-12-14T09:37:52+00:00"
         },
         {
             "name": "ergebnis/json",
@@ -15263,16 +15263,16 @@
         },
         {
             "name": "ergebnis/json-normalizer",
-            "version": "4.4.0",
+            "version": "4.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/json-normalizer.git",
-                "reference": "67fd0d513e5c79456b42ef5654ff29b5d4ce8256"
+                "reference": "d28f36af9763ee6bc4e2a2390c0348963df7881b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/json-normalizer/zipball/67fd0d513e5c79456b42ef5654ff29b5d4ce8256",
-                "reference": "67fd0d513e5c79456b42ef5654ff29b5d4ce8256",
+                "url": "https://api.github.com/repos/ergebnis/json-normalizer/zipball/d28f36af9763ee6bc4e2a2390c0348963df7881b",
+                "reference": "d28f36af9763ee6bc4e2a2390c0348963df7881b",
                 "shasum": ""
             },
             "require": {
@@ -15292,7 +15292,7 @@
                 "ergebnis/phpunit-slow-test-detector": "^2.7.0",
                 "fakerphp/faker": "^1.23.0",
                 "infection/infection": "~0.27.9",
-                "phpunit/phpunit": "^10.5.2",
+                "phpunit/phpunit": "^10.5.3",
                 "psalm/plugin-phpunit": "~0.18.4",
                 "rector/rector": "~0.18.12",
                 "roave/backward-compatibility-check": "^8.4.0",
@@ -15331,7 +15331,7 @@
                 "security": "https://github.com/ergebnis/json-normalizer/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/json-normalizer"
             },
-            "time": "2023-12-13T09:35:38+00:00"
+            "time": "2023-12-14T09:30:24+00:00"
         },
         {
             "name": "ergebnis/json-pointer",
