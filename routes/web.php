@@ -375,4 +375,5 @@ Route::post('2faVerify', function () {
     return redirect()->to(URL()->previous());
 })->name('2faVerify')->middleware('2fa');
 
-Route::btcPayWebhook();
+Route::post('btcpay/webhook', [BtcPaymentController::class, 'btcPayCallback']);
+Route::get('btcpay/webhook', [BtcPaymentController::class, 'btcPayCallback']);

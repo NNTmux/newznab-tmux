@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Blacklight\libraries\Geary;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController
@@ -83,5 +84,27 @@ class BtcPaymentController extends BasePageController
                 User::updateUserRoleChangeDate($callback_data['user_id'], null, $addYear);
             }
         }
+    }
+
+    public function btcPayCallback(Request $request): Response
+    {
+        if ($request->headers->get('btcpay-sig') !== config('nntmux.btcpay_webhook_secret')) {
+            return response('Unauthorized', 401);
+        }
+        $payload = json_decode($request->getContent(), true);
+        if (! empty($payload)) {
+            // We have received a payment for an invoice and user should be upgraded to a paid plan based on order
+            if ($payload['type'] === 'InvoiceReceivedPayment') {
+                preg_match('/(?P<role>\w+(\+\+)?)[ ](?P<addYears>\d+)/i', $payload['metadata']['itemDesc'], $matches);
+                $user = User::query()->where('email', '=', $payload['metadata']['buyerEmail'])->first();
+                if ($user) {
+                    User::updateUserRole($user->id, $matches['role']);
+                    User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
+                }
+            }
+            return response('OK', 200);
+        }
+
+        return response('OK', 200);
     }
 }

@@ -4,13 +4,11 @@ namespace App\Providers;
 
 use App\Events\UserAccessedApi;
 use App\Events\UserLoggedIn;
-use App\Listeners\BtcPayWebhookListener;
 use App\Listeners\UpdateUserAccessedApi;
 use App\Listeners\UpdateUserLoggedIn;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Petzsch\LaravelBtcpay\Events\BtcpayWebhookReceived;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -30,10 +28,6 @@ class EventServiceProvider extends ServiceProvider
 
         UserAccessedApi::class => [
             UpdateUserAccessedApi::class,
-        ],
-
-        BtcpayWebhookReceived::class => [
-            BtcPayWebhookListener::class,
         ],
     ];
 

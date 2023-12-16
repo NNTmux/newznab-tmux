@@ -21,6 +21,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'failed',
         'admin/*',
-        'laravel_btcpay/*',
+        'btcpay/*',
     ];
 }

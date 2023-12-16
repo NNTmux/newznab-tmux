@@ -17,4 +17,5 @@ return [
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'elasticsearch_enabled' => env('ELASTICSEARCH_ENABLED', false),
+    'btcpay_webhook_secret' => env('BTCPAY_SECRET'),
 ];
