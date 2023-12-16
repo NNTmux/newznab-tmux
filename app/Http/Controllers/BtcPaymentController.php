@@ -97,9 +97,10 @@ class BtcPaymentController extends BasePageController
                 if ($user) {
                     User::updateUserRole($user->id, $matches['role']);
                     User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
-                    Log::info('User upgraded to ' . $matches['role'] . ' for BTCPay webhook: ' . $payload['metadata']['buyerEmail']);
+                    Log::info('User upgraded to '.$matches['role'].' for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
                 } else {
-                    Log::error('User not found for BTCPay webhook: ' . $payload['metadata']['buyerEmail']);
+                    Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+
                     return response('Not Found', 404);
                 }
             }
