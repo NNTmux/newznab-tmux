@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d3c7fdba6367788630b0ab603ce98914",
+    "content-hash": "4a0fb21059fdb63daac4c55491eb3317",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -328,6 +328,60 @@
                 }
             ],
             "time": "2023-01-15T23:15:59+00:00"
+        },
+        {
+            "name": "btcpayserver/btcpayserver-greenfield-php",
+            "version": "v2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/btcpayserver/btcpayserver-greenfield-php.git",
+                "reference": "9a01503ce9f395bdbb9326fd380650c8faf449f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/btcpayserver/btcpayserver-greenfield-php/zipball/9a01503ce9f395bdbb9326fd380650c8faf449f6",
+                "reference": "9a01503ce9f395bdbb9326fd380650c8faf449f6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-bcmath": "*",
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpunit/phpunit": "^9.5",
+                "vimeo/psalm": "^4.8",
+                "vlucas/phpdotenv": "^5.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BTCPayServer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wouter Samaey",
+                    "email": "wouter.samaey@storefront.be"
+                },
+                {
+                    "name": "Andreas Tasch",
+                    "email": "andy.tasch@gmail.com"
+                }
+            ],
+            "description": "BTCPay Server Greenfield API PHP client library.",
+            "support": {
+                "issues": "https://github.com/btcpayserver/btcpayserver-greenfield-php/issues",
+                "source": "https://github.com/btcpayserver/btcpayserver-greenfield-php/tree/v2.3.0"
+            },
+            "time": "2023-03-28T10:08:01+00:00"
         },
         {
             "name": "cache/adapter-common",
@@ -6978,6 +7032,103 @@
                 "source": "https://github.com/pear/XML_Util"
             },
             "time": "2020-04-19T15:08:27+00:00"
+        },
+        {
+            "name": "petzsch/laravel-btcpay",
+            "version": "v6.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/petzsch/laravel-btcpay.git",
+                "reference": "8ec012319244a66286d6eebb15cece4f0a633341"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/petzsch/laravel-btcpay/zipball/8ec012319244a66286d6eebb15cece4f0a633341",
+                "reference": "8ec012319244a66286d6eebb15cece4f0a633341",
+                "shasum": ""
+            },
+            "require": {
+                "btcpayserver/btcpayserver-greenfield-php": "^2.0",
+                "ext-json": "*",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=9.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Petzsch\\LaravelBtcpay\\LaravelBtcpayServiceProvider"
+                    ],
+                    "aliases": {
+                        "LaravelBtcpay": "Petzsch\\LaravelBtcpay\\LaravelBtcpayFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Petzsch\\LaravelBtcpay\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vaibhavraj Roham",
+                    "email": "vaibhavraj@vrajroham.me",
+                    "homepage": "https://vrajroham.me",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Alex Stewart",
+                    "email": "iamalexstewart@gmail.com",
+                    "homepage": "https://github.com/alexstewartja",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Markus Petzsch",
+                    "email": "markus@petzsch.eu",
+                    "homepage": "https://www.petzsch.eu",
+                    "role": "Developer"
+                }
+            ],
+            "description": "BtcPay wrapper for laravel",
+            "homepage": "https://github.com/petzsch/laravel-btcpay",
+            "keywords": [
+                "btc",
+                "btcpay",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/petzsch/laravel-btcpay/issues",
+                "source": "https://github.com/petzsch/laravel-btcpay/tree/v6.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://bit.ly/asja_paypal_lara_bitpay",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.buymeacoffee.com/asja",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/alexstewartja",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/vrajroham",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/vrajroham",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2022-11-18T13:04:57+00:00"
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",

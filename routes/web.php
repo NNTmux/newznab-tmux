@@ -374,3 +374,5 @@ Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('ad
 Route::post('2faVerify', function () {
     return redirect()->to(URL()->previous());
 })->name('2faVerify')->middleware('2fa');
+
+Route::btcPayWebhook();

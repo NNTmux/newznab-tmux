@@ -321,15 +321,19 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
-    public static function updateUserRole(int $uid, int $role): bool
+    public static function updateUserRole(int $uid, int|string $role): bool
     {
-        $roleQuery = Role::query()->where('id', $role)->first();
+        if (is_int($role)) {
+            $roleQuery = Role::query()->where('id', $role)->first();
+        } else {
+            $roleQuery = Role::query()->where('name', $role)->first();
+        }
         $roleName = $roleQuery->name;
 
         $user = self::find($uid);
         $user->syncRoles([$roleName]);
 
-        return self::find($uid)->update(['roles_id' => $role]);
+        return self::find($uid)->update(['roles_id' => $roleQuery->id]);
     }
 
     public static function updateUserRoleChangeDate(int $uid, $date = '', int $addYear = 0): void
