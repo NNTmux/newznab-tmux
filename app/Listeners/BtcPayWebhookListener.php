@@ -4,8 +4,6 @@ namespace App\Listeners;
 
 use App\Models\User;
 use BTCPayServer\Client\Invoice;
-use BTCPayServer\Exception\BTCPayException;
-use Illuminate\Support\Facades\Log;
 use Petzsch\LaravelBtcpay\Events\BtcpayWebhookReceived;
 
 class BtcPayWebhookListener
