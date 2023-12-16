@@ -5,9 +5,6 @@ namespace App\Listeners;
 use App\Models\User;
 use BTCPayServer\Client\Invoice;
 use BTCPayServer\Exception\BTCPayException;
-use BTCPayServer\Result\InvoicePayment;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Petzsch\LaravelBtcpay\Constants\BtcPayConstants;
 use Petzsch\LaravelBtcpay\Events\BtcpayWebhookReceived;
@@ -34,12 +31,12 @@ class BtcPayWebhookListener
             try {
                 $invoice = LaravelBtcpay::getInvoice($payload['data']['id']);
                 $invoice_status = $invoice->getStatus();
-                if ($invoice_status === 'Settled' ) {
+                if ($invoice_status === 'Settled') {
                     preg_match('/(?P<role>\w+(\+\+)?)[ ](?P<addYears>\d+)/i', $invoice->getData()['metadata']['itemDesc'], $matches);
                     $user = User::query()->where('email', '=', $invoice->getData()['metadata']['buyerEmail'])->first();
                     if ($user) {
                         User::updateUserRole($user->id, $matches['role']);
-                        User::updateUserRoleChangeDate($user->id,null, $matches['addYears']);
+                        User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
                     }
                 }
             } catch (BTCPayException $e) {
