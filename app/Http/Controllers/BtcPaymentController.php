@@ -102,6 +102,7 @@ class BtcPaymentController extends BasePageController
                     User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
                 }
             }
+
             return response('OK', 200);
         }
 
