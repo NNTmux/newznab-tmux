@@ -7738,16 +7738,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.24.4",
+            "version": "1.24.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "6bd0c26f3786cd9b7c359675cb789e35a8e07496"
+                "reference": "fedf211ff14ec8381c9bf5714e33a7a552dd1acc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/6bd0c26f3786cd9b7c359675cb789e35a8e07496",
-                "reference": "6bd0c26f3786cd9b7c359675cb789e35a8e07496",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/fedf211ff14ec8381c9bf5714e33a7a552dd1acc",
+                "reference": "fedf211ff14ec8381c9bf5714e33a7a552dd1acc",
                 "shasum": ""
             },
             "require": {
@@ -7779,9 +7779,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.4"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.5"
             },
-            "time": "2023-11-26T18:29:22+00:00"
+            "time": "2023-12-16T09:33:33+00:00"
         },
         {
             "name": "pragmarx/google2fa",
@@ -10039,16 +10039,16 @@
         },
         {
             "name": "spatie/laravel-ignition",
-            "version": "2.3.1",
+            "version": "2.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-ignition.git",
-                "reference": "bf21cd15aa47fa4ec5d73bbc932005c70261efc8"
+                "reference": "4800661a195e15783477d99f7f8f669a49793996"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/bf21cd15aa47fa4ec5d73bbc932005c70261efc8",
-                "reference": "bf21cd15aa47fa4ec5d73bbc932005c70261efc8",
+                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/4800661a195e15783477d99f7f8f669a49793996",
+                "reference": "4800661a195e15783477d99f7f8f669a49793996",
                 "shasum": ""
             },
             "require": {
@@ -10127,7 +10127,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-09T12:55:26+00:00"
+            "time": "2023-12-15T13:44:49+00:00"
         },
         {
             "name": "spatie/laravel-image-optimizer",
@@ -14600,16 +14600,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.19.0",
+            "version": "5.19.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "6109b0f8d31728368cfcfb7bd09db1f4a2f0cba3"
+                "reference": "93ef43a6934fdcaea7d20c983ec2ac05c103ab02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/6109b0f8d31728368cfcfb7bd09db1f4a2f0cba3",
-                "reference": "6109b0f8d31728368cfcfb7bd09db1f4a2f0cba3",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/93ef43a6934fdcaea7d20c983ec2ac05c103ab02",
+                "reference": "93ef43a6934fdcaea7d20c983ec2ac05c103ab02",
                 "shasum": ""
             },
             "require": {
@@ -14672,7 +14672,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.19.0"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.19.1"
             },
             "funding": [
                 {
@@ -14680,7 +14680,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-01T14:34:56+00:00"
+            "time": "2023-12-15T09:20:36+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
