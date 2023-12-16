@@ -3203,16 +3203,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "3.0.2",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "ac9734129478be387c1914f1c2856d623341128c"
+                "reference": "3de73efee5b1f96355f4d3ff4103411527a7cfb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/ac9734129478be387c1914f1c2856d623341128c",
-                "reference": "ac9734129478be387c1914f1c2856d623341128c",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/3de73efee5b1f96355f4d3ff4103411527a7cfb6",
+                "reference": "3de73efee5b1f96355f4d3ff4103411527a7cfb6",
                 "shasum": ""
             },
             "require": {
@@ -3254,7 +3254,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.0.2"
+                "source": "https://github.com/Intervention/image/tree/3.1.0"
             },
             "funding": [
                 {
@@ -3266,7 +3266,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-14T13:17:13+00:00"
+            "time": "2023-12-16T14:21:10+00:00"
         },
         {
             "name": "james-heinrich/getid3",
@@ -9605,21 +9605,21 @@
         },
         {
             "name": "spatie/db-dumper",
-            "version": "3.4.0",
+            "version": "3.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/db-dumper.git",
-                "reference": "bbd5ae0f331d47e6534eb307e256c11a65c8e24a"
+                "reference": "06d88c596ffa877e5da0bc887b7498765a916cd2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/db-dumper/zipball/bbd5ae0f331d47e6534eb307e256c11a65c8e24a",
-                "reference": "bbd5ae0f331d47e6534eb307e256c11a65c8e24a",
+                "url": "https://api.github.com/repos/spatie/db-dumper/zipball/06d88c596ffa877e5da0bc887b7498765a916cd2",
+                "reference": "06d88c596ffa877e5da0bc887b7498765a916cd2",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.0",
-                "symfony/process": "^5.0|^6.0"
+                "symfony/process": "^5.0|^6.0|^7.0"
             },
             "require-dev": {
                 "pestphp/pest": "^1.22"
@@ -9652,7 +9652,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/db-dumper/tree/3.4.0"
+                "source": "https://github.com/spatie/db-dumper/tree/3.4.1"
             },
             "funding": [
                 {
@@ -9664,7 +9664,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-06-27T08:34:52+00:00"
+            "time": "2023-12-16T14:02:23+00:00"
         },
         {
             "name": "spatie/flare-client-php",
