@@ -88,9 +88,6 @@ class BtcPaymentController extends BasePageController
 
     public function btcPayCallback(Request $request): Response
     {
-        if ($request->headers->get('btcpay-sig') !== hash_hmac('sha256', $request->getContent(), config('nntmux.btcpay_webhook_secret'))) {
-            return response('Unauthorized', 401);
-        }
         $payload = json_decode($request->getContent(), true);
         if (! empty($payload)) {
             // We have received a payment for an invoice and user should be upgraded to a paid plan based on order
@@ -100,6 +97,10 @@ class BtcPaymentController extends BasePageController
                 if ($user) {
                     User::updateUserRole($user->id, $matches['role']);
                     User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
+                    Log::info('User upgraded to ' . $matches['role'] . ' for BTCPay webhook: ' . $payload['metadata']['buyerEmail']);
+                } else {
+                    Log::error('User not found for BTCPay webhook: ' . $payload['metadata']['buyerEmail']);
+                    return response('Not Found', 404);
                 }
             }
 
