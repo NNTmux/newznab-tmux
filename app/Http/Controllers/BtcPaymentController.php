@@ -88,7 +88,7 @@ class BtcPaymentController extends BasePageController
 
     public function btcPayCallback(Request $request): Response
     {
-        if ($request->headers->get('btcpay-sig') !== config('nntmux.btcpay_webhook_secret')) {
+        if ($request->headers->get('btcpay-sig') !== hash_hmac('sha256', $request->getContent(), config('nntmux.btcpay_webhook_secret'))) {
             return response('Unauthorized', 401);
         }
         $payload = json_decode($request->getContent(), true);
