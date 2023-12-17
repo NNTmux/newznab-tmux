@@ -71,7 +71,6 @@ use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
 use App\Models\User;
 
-
 Auth::routes();
 
 Route::get('/', [ContentController::class, 'show']);
