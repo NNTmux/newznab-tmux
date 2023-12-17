@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Jobs\RemoveInactiveAccounts;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Spatie\WebhookClient\Models\WebhookCall;
 
 class Kernel extends ConsoleKernel
 {
@@ -34,6 +35,9 @@ class Kernel extends ConsoleKernel
         if (config('nntmux.purge_inactive_users') === true) {
             $schedule->job(new RemoveInactiveAccounts())->daily();
         }
+        $schedule->command('model:prune', [
+            '--model' => [WebhookCall::class],
+        ])->daily();
     }
 
     /**

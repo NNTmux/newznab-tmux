@@ -108,6 +108,7 @@
         "spatie/laravel-ignition": "^2.3",
         "spatie/laravel-image-optimizer": "^1.7",
         "spatie/laravel-permission": "^6.1",
+        "spatie/laravel-webhook-client": "^3.2",
         "sspat/es-query-sanitizer": "^1.0",
         "stechstudio/laravel-zipstream": "^4.13",
         "symfony/http-client": "^6.0",

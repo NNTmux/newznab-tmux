@@ -21,6 +21,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'failed',
         'admin/*',
-        'btcpay/*',
+        'btcpay/webhook/*',
     ];
 }
