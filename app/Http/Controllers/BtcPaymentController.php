@@ -113,8 +113,9 @@ class BtcPaymentController extends BasePageController
 
     public static function verify_webhook($data, $hmac_header): bool
     {
-        # Calculate HMAC
+        // Calculate HMAC
         $calculated_hmac = base64_encode(hash_hmac('sha256', $data, config('nntmux.btcpay_webhook_secret'), true));
+
         return hash_equals($hmac_header, $calculated_hmac);
     }
 }

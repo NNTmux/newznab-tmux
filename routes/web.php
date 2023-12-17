@@ -377,13 +377,13 @@ Route::post('2faVerify', function () {
 })->name('2faVerify')->middleware('2fa');
 
 Route::post('btcpay/webhook', function (Illuminate\Http\Request $request) {
-    # Extract the signature header
+    // Extract the signature header
     $hmac_header = $_SERVER['btcpay-sig'];
 
-    # Get the raw body
+    // Get the raw body
     $data = file_get_contents('php://input');
 
-    # Compare HMACs
+    // Compare HMACs
     $verified = BtcPaymentController::verify_webhook($data, $hmac_header);
     if ($verified) {
         $payload = json_decode($request->getContent(), true);
@@ -411,13 +411,13 @@ Route::post('btcpay/webhook', function (Illuminate\Http\Request $request) {
     }
 });
 Route::get('btcpay/webhook', function (Illuminate\Http\Request $request) {
-    # Extract the signature header
+    // Extract the signature header
     $hmac_header = $_SERVER['btcpay-sig'];
 
-    # Get the raw body
+    // Get the raw body
     $data = file_get_contents('php://input');
 
-    # Compare HMACs
+    // Compare HMACs
     $verified = BtcPaymentController::verify_webhook($data, $hmac_header);
     if ($verified) {
         $payload = json_decode($request->getContent(), true);
