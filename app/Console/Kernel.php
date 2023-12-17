@@ -35,9 +35,6 @@ class Kernel extends ConsoleKernel
         if (config('nntmux.purge_inactive_users') === true) {
             $schedule->job(new RemoveInactiveAccounts())->daily();
         }
-        $schedule->command('model:prune', [
-            '--model' => [WebhookCall::class],
-        ])->daily();
     }
 
     /**
