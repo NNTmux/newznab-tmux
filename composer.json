@@ -110,7 +110,7 @@
         "sspat/es-query-sanitizer": "^1.0",
         "stechstudio/laravel-zipstream": "^4.13",
         "symfony/http-client": "^7.0",
-        "symfony/postmark-mailer": "^6.0",
+        "symfony/postmark-mailer": "^7.0",
         "symfony/process": "^6.0",
         "vlucas/phpdotenv": "^5.6",
         "voku/simple_html_dom": "^4.8",
