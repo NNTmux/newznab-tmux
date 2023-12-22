@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "55186ba0a14e5a8c884ff4862d2329a0",
+    "content-hash": "56a64999f6eb3f77047ea5a4a3324243",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -754,23 +754,23 @@
         },
         {
             "name": "clue/stream-filter",
-            "version": "v1.6.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/stream-filter.git",
-                "reference": "d6169430c7731d8509da7aecd0af756a5747b78e"
+                "reference": "049509fef80032cb3f051595029ab75b49a3c2f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/stream-filter/zipball/d6169430c7731d8509da7aecd0af756a5747b78e",
-                "reference": "d6169430c7731d8509da7aecd0af756a5747b78e",
+                "url": "https://api.github.com/repos/clue/stream-filter/zipball/049509fef80032cb3f051595029ab75b49a3c2f7",
+                "reference": "049509fef80032cb3f051595029ab75b49a3c2f7",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.36"
+                "phpunit/phpunit": "^9.6 || ^5.7 || ^4.8.36"
             },
             "type": "library",
             "autoload": {
@@ -792,7 +792,7 @@
                 }
             ],
             "description": "A simple and modern approach to stream filtering in PHP",
-            "homepage": "https://github.com/clue/php-stream-filter",
+            "homepage": "https://github.com/clue/stream-filter",
             "keywords": [
                 "bucket brigade",
                 "callback",
@@ -804,7 +804,7 @@
             ],
             "support": {
                 "issues": "https://github.com/clue/stream-filter/issues",
-                "source": "https://github.com/clue/stream-filter/tree/v1.6.0"
+                "source": "https://github.com/clue/stream-filter/tree/v1.7.0"
             },
             "funding": [
                 {
@@ -816,7 +816,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-02-21T13:15:14+00:00"
+            "time": "2023-12-20T15:40:13+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -3736,16 +3736,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.38.0",
+            "version": "v10.38.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "531732a17e4d0fa4fc4fb987a72abbdb93537d3a"
+                "reference": "43da808391da3540d44a8dfeb4e46da4ad8f5723"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/531732a17e4d0fa4fc4fb987a72abbdb93537d3a",
-                "reference": "531732a17e4d0fa4fc4fb987a72abbdb93537d3a",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/43da808391da3540d44a8dfeb4e46da4ad8f5723",
+                "reference": "43da808391da3540d44a8dfeb4e46da4ad8f5723",
                 "shasum": ""
             },
             "require": {
@@ -3791,6 +3791,8 @@
                 "voku/portable-ascii": "^2.0"
             },
             "conflict": {
+                "carbonphp/carbon-doctrine-types": ">=3.0",
+                "doctrine/dbal": ">=4.0",
                 "tightenco/collect": "<5.5.33"
             },
             "provide": {
@@ -3902,6 +3904,7 @@
                 "files": [
                     "src/Illuminate/Collections/helpers.php",
                     "src/Illuminate/Events/functions.php",
+                    "src/Illuminate/Filesystem/functions.php",
                     "src/Illuminate/Foundation/helpers.php",
                     "src/Illuminate/Support/helpers.php"
                 ],
@@ -3934,7 +3937,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-12-19T14:59:00+00:00"
+            "time": "2023-12-22T14:39:10+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -5162,16 +5165,16 @@
         },
         {
             "name": "livewire/livewire",
-            "version": "v3.3.2",
+            "version": "v3.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "cfda4d16fdd63052cff3030f066deeb2b6f97c9b"
+                "reference": "6dd3bec8c711cd792742be4620057637e261e6f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/cfda4d16fdd63052cff3030f066deeb2b6f97c9b",
-                "reference": "cfda4d16fdd63052cff3030f066deeb2b6f97c9b",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/6dd3bec8c711cd792742be4620057637e261e6f7",
+                "reference": "6dd3bec8c711cd792742be4620057637e261e6f7",
                 "shasum": ""
             },
             "require": {
@@ -5224,7 +5227,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v3.3.2"
+                "source": "https://github.com/livewire/livewire/tree/v3.3.3"
             },
             "funding": [
                 {
@@ -5232,7 +5235,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-19T18:02:00+00:00"
+            "time": "2023-12-20T05:34:05+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -9081,16 +9084,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "4.2.0",
+            "version": "4.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "d858b32e0f9733f41dab847a0dc8c8198ba17d8b"
+                "reference": "7e71a72baa2c7439507d868487bb36226a8a4e0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/d858b32e0f9733f41dab847a0dc8c8198ba17d8b",
-                "reference": "d858b32e0f9733f41dab847a0dc8c8198ba17d8b",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/7e71a72baa2c7439507d868487bb36226a8a4e0c",
+                "reference": "7e71a72baa2c7439507d868487bb36226a8a4e0c",
                 "shasum": ""
             },
             "require": {
@@ -9154,7 +9157,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/4.2.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/4.3.0"
             },
             "funding": [
                 {
@@ -9166,7 +9169,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-12-19T16:43:17+00:00"
+            "time": "2023-12-21T16:39:28+00:00"
         },
         {
             "name": "sentry/sentry-laravel",
@@ -10039,16 +10042,16 @@
         },
         {
             "name": "spatie/laravel-ignition",
-            "version": "2.3.2",
+            "version": "2.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-ignition.git",
-                "reference": "4800661a195e15783477d99f7f8f669a49793996"
+                "reference": "66499cd3c858642ded56dafb8fa0352057ca20dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/4800661a195e15783477d99f7f8f669a49793996",
-                "reference": "4800661a195e15783477d99f7f8f669a49793996",
+                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/66499cd3c858642ded56dafb8fa0352057ca20dd",
+                "reference": "66499cd3c858642ded56dafb8fa0352057ca20dd",
                 "shasum": ""
             },
             "require": {
@@ -10127,7 +10130,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-15T13:44:49+00:00"
+            "time": "2023-12-21T09:43:05+00:00"
         },
         {
             "name": "spatie/laravel-image-optimizer",
@@ -16755,23 +16758,23 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "10.1.10",
+            "version": "10.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "599109c8ca6bae97b23482d557d2874c25a65e59"
+                "reference": "78c3b7625965c2513ee96569a4dbb62601784145"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/599109c8ca6bae97b23482d557d2874c25a65e59",
-                "reference": "599109c8ca6bae97b23482d557d2874c25a65e59",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/78c3b7625965c2513ee96569a4dbb62601784145",
+                "reference": "78c3b7625965c2513ee96569a4dbb62601784145",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
-                "nikic/php-parser": "^4.15",
+                "nikic/php-parser": "^4.18 || ^5.0",
                 "php": ">=8.1",
                 "phpunit/php-file-iterator": "^4.0",
                 "phpunit/php-text-template": "^3.0",
@@ -16821,7 +16824,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/10.1.10"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/10.1.11"
             },
             "funding": [
                 {
@@ -16829,7 +16832,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-11T06:28:43+00:00"
+            "time": "2023-12-21T15:38:30+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -17177,16 +17180,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.18.12",
+            "version": "0.18.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "ed8d5352a3faa69e4a5e315896abffd4bc29c828"
+                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/ed8d5352a3faa69e4a5e315896abffd4bc29c828",
-                "reference": "ed8d5352a3faa69e4a5e315896abffd4bc29c828",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f8011a76d36aa4f839f60f3b4f97707d97176618",
+                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618",
                 "shasum": ""
             },
             "require": {
@@ -17221,7 +17224,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.18.12"
+                "source": "https://github.com/rectorphp/rector/tree/0.18.13"
             },
             "funding": [
                 {
@@ -17229,7 +17232,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-04T08:47:30+00:00"
+            "time": "2023-12-20T16:08:01+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -17477,20 +17480,20 @@
         },
         {
             "name": "sebastian/complexity",
-            "version": "3.1.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/complexity.git",
-                "reference": "68cfb347a44871f01e33ab0ef8215966432f6957"
+                "reference": "68ff824baeae169ec9f2137158ee529584553799"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/68cfb347a44871f01e33ab0ef8215966432f6957",
-                "reference": "68cfb347a44871f01e33ab0ef8215966432f6957",
+                "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/68ff824baeae169ec9f2137158ee529584553799",
+                "reference": "68ff824baeae169ec9f2137158ee529584553799",
                 "shasum": ""
             },
             "require": {
-                "nikic/php-parser": "^4.10",
+                "nikic/php-parser": "^4.18 || ^5.0",
                 "php": ">=8.1"
             },
             "require-dev": {
@@ -17499,7 +17502,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "3.1-dev"
+                    "dev-main": "3.2-dev"
                 }
             },
             "autoload": {
@@ -17523,7 +17526,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/complexity/issues",
                 "security": "https://github.com/sebastianbergmann/complexity/security/policy",
-                "source": "https://github.com/sebastianbergmann/complexity/tree/3.1.0"
+                "source": "https://github.com/sebastianbergmann/complexity/tree/3.2.0"
             },
             "funding": [
                 {
@@ -17531,20 +17534,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-09-28T11:50:59+00:00"
+            "time": "2023-12-21T08:37:17+00:00"
         },
         {
             "name": "sebastian/diff",
-            "version": "5.0.3",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "912dc2fbe3e3c1e7873313cc801b100b6c68c87b"
+                "reference": "fbf413a49e54f6b9b17e12d900ac7f6101591b7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/912dc2fbe3e3c1e7873313cc801b100b6c68c87b",
-                "reference": "912dc2fbe3e3c1e7873313cc801b100b6c68c87b",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/fbf413a49e54f6b9b17e12d900ac7f6101591b7f",
+                "reference": "fbf413a49e54f6b9b17e12d900ac7f6101591b7f",
                 "shasum": ""
             },
             "require": {
@@ -17557,7 +17560,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "5.0-dev"
+                    "dev-main": "5.1-dev"
                 }
             },
             "autoload": {
@@ -17590,7 +17593,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/diff/issues",
                 "security": "https://github.com/sebastianbergmann/diff/security/policy",
-                "source": "https://github.com/sebastianbergmann/diff/tree/5.0.3"
+                "source": "https://github.com/sebastianbergmann/diff/tree/5.1.0"
             },
             "funding": [
                 {
@@ -17598,7 +17601,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-05-01T07:48:21+00:00"
+            "time": "2023-12-22T10:55:06+00:00"
         },
         {
             "name": "sebastian/environment",
@@ -17806,20 +17809,20 @@
         },
         {
             "name": "sebastian/lines-of-code",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/lines-of-code.git",
-                "reference": "649e40d279e243d985aa8fb6e74dd5bb28dc185d"
+                "reference": "856e7f6a75a84e339195d48c556f23be2ebf75d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/649e40d279e243d985aa8fb6e74dd5bb28dc185d",
-                "reference": "649e40d279e243d985aa8fb6e74dd5bb28dc185d",
+                "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/856e7f6a75a84e339195d48c556f23be2ebf75d0",
+                "reference": "856e7f6a75a84e339195d48c556f23be2ebf75d0",
                 "shasum": ""
             },
             "require": {
-                "nikic/php-parser": "^4.10",
+                "nikic/php-parser": "^4.18 || ^5.0",
                 "php": ">=8.1"
             },
             "require-dev": {
@@ -17852,7 +17855,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/lines-of-code/issues",
                 "security": "https://github.com/sebastianbergmann/lines-of-code/security/policy",
-                "source": "https://github.com/sebastianbergmann/lines-of-code/tree/2.0.1"
+                "source": "https://github.com/sebastianbergmann/lines-of-code/tree/2.0.2"
             },
             "funding": [
                 {
@@ -17860,7 +17863,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-08-31T09:25:50+00:00"
+            "time": "2023-12-21T08:38:20+00:00"
         },
         {
             "name": "sebastian/object-enumerator",
@@ -18698,5 +18701,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
