@@ -8,6 +8,7 @@ use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use MarcReichel\IGDBLaravel\Models\Company;
@@ -620,7 +621,7 @@ class Console
      *
      * @throws \Exception
      */
-    public function fetchIGDBProperties($gameInfo, $gamePlatform)
+    public function fetchIGDBProperties($gameInfo, $gamePlatform): bool|array|\StdClass
     {
         $bestMatch = false;
 
@@ -682,7 +683,7 @@ class Console
                             }
                         }
 
-                        $game = [
+                        return [
                             'title' => $game->name,
                             'asin' => $game->id,
                             'review' => $game->summary ?? '',
@@ -696,8 +697,6 @@ class Console
                             'consolegenreid' => $genreKey ?? '',
                             'salesrank' => '',
                         ];
-
-                        return $game;
                     }
 
                     $this->colorCli->notice('IGDB returned no valid results');
@@ -712,6 +711,10 @@ class Console
                 if ($e->getCode() === 429) {
                     $this->igdbSleep = now()->endOfMonth();
                 }
+            } catch (\Exception $e) {
+                $this->colorCli->error('Error fetching IGDB properties: '.$e->getMessage());
+
+                return false;
             }
         }
 
