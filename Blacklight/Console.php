@@ -8,7 +8,6 @@ use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use MarcReichel\IGDBLaravel\Models\Company;
@@ -81,7 +80,7 @@ class Console
     public $failCache;
 
     /**
-     * @var \Blacklight\ColorCLI
+     * @var ColorCLI
      */
     protected $colorCli;
 
@@ -617,8 +616,6 @@ class Console
     }
 
     /**
-     * @return array|bool|\StdClass
-     *
      * @throws \Exception
      */
     public function fetchIGDBProperties($gameInfo, $gamePlatform): bool|array|\StdClass

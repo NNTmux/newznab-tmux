@@ -23,7 +23,7 @@ class AniDB
     public $echooutput;
 
     /**
-     * @var \Blacklight\db\populate\AniDB
+     * @var PaDb
      */
     public $padb;
 
@@ -43,7 +43,7 @@ class AniDB
     private $status;
 
     /**
-     * @var \Blacklight\ColorCLI
+     * @var ColorCLI
      */
     protected $colorCli;
 

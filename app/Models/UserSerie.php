@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $categories List of categories for user tv shows
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\User $user
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCategories($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCreatedAt($value)
@@ -94,7 +94,7 @@ class UserSerie extends Model
      * Get tv show information for a user.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getShow($userId, $videoId)
     {

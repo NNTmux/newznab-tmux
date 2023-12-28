@@ -119,7 +119,7 @@ class UsenetGroup extends Model
      * Get all properties of a single group by its ID.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getGroupByID($id)
     {
@@ -170,7 +170,7 @@ class UsenetGroup extends Model
      * Get all group columns by Name.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getByName($grp)
     {

@@ -16,7 +16,7 @@ class SendAccountChangedEmail implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var \App\Models\User
+     * @var User
      */
     private $user;
 

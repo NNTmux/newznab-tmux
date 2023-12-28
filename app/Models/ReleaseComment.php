@@ -27,8 +27,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $siteid
  * @property int|null $sourceid
  * @property mixed $nzb_guid
- * @property-read \App\Models\Release $release
- * @property-read \App\Models\User $user
+ * @property-read Release $release
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCreatedAt($value)
@@ -81,7 +81,7 @@ class ReleaseComment extends Model
      * Get a comment by id.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getCommentById($id)
     {

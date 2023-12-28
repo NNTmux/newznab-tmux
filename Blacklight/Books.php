@@ -77,7 +77,7 @@ class Books
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public function getBookInfo($id)
     {

@@ -88,7 +88,7 @@ class Forumpost extends Model
      * Get parent of the forum post.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getParent($parent)
     {
@@ -122,7 +122,7 @@ class Forumpost extends Model
      * Get post from forum.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getPost($id)
     {

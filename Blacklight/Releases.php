@@ -182,7 +182,7 @@ class Releases extends Release
     }
 
     /**
-     * @return \App\Models\Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
+     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
      */
     public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '')
     {

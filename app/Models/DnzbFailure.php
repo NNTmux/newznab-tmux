@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $release_id
  * @property int $users_id
  * @property int $failed
- * @property-read \App\Models\Release $release
- * @property-read \App\Models\User $user
+ * @property-read Release $release
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereFailed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereReleaseId($value)

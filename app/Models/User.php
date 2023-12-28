@@ -73,14 +73,14 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $style
  * @property string|null $rolechangedate When does the role expire
  * @property string|null $remember_token
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failedRelease
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Invitation[] $invitation
+ * @property-read Collection|\App\Models\ReleaseComment[] $comment
+ * @property-read Collection|\App\Models\UserDownload[] $download
+ * @property-read Collection|\App\Models\DnzbFailure[] $failedRelease
+ * @property-read Collection|\App\Models\Invitation[] $invitation
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $release
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserRequest[] $request
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserSerie[] $series
+ * @property-read Collection|\App\Models\UsersRelease[] $release
+ * @property-read Collection|\App\Models\UserRequest[] $request
+ * @property-read Collection|\App\Models\UserSerie[] $series
  *
  * @method static Builder|\App\Models\User whereApiaccess($value)
  * @method static Builder|\App\Models\User whereBookview($value)
@@ -132,12 +132,12 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $email_verified_at
  * @property int $verified
  * @property string|null $verification_token
- * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationPending
- * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationSuccess
- * @property-read \Illuminate\Database\Eloquent\Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitations
- * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions
- * @property-read \Spatie\Permission\Models\Role $role
- * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
+ * @property-read Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationPending
+ * @property-read Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationSuccess
+ * @property-read Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitations
+ * @property-read Collection|\Spatie\Permission\Models\Permission[] $permissions
+ * @property-read Role $role
+ * @property-read Collection|\Spatie\Permission\Models\Role[] $roles
  *
  * @method static Builder|\App\Models\User newModelQuery()
  * @method static Builder|\App\Models\User newQuery()
@@ -661,7 +661,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return Collection|\Illuminate\Support\Collection|static[]
      */
     public static function getTopGrabbers()
     {
@@ -669,7 +669,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return Collection|\Illuminate\Support\Collection|static[]
      */
     public static function getUsersByMonth()
     {

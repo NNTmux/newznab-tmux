@@ -12,7 +12,7 @@ class WelcomeEmail extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @var \App\Models\User
+     * @var User
      */
     private $user;
 

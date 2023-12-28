@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
 class RssController extends BasePageController
 {
     /**
-     * @return \Illuminate\Http\JsonResponse|void
+     * @return JsonResponse|void
      *
      * @throws \Throwable
      */
@@ -40,7 +40,7 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|void
+     * @return JsonResponse|void
      *
      * @throws \Throwable
      */
@@ -61,7 +61,7 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|void
+     * @return JsonResponse|void
      *
      * @throws \Throwable
      */

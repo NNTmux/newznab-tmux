@@ -297,9 +297,9 @@ class TVDB extends TV
     }
 
     /**
-     * @throws \CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException
-     * @throws \CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @throws ParseException
+     * @throws UnauthorizedException
+     * @throws ExceptionInterface
      */
     protected function getEpisodeInfo(int|string $tvDbId, int|string $season, int|string $episode, int $videoId = 0): bool|array
     {

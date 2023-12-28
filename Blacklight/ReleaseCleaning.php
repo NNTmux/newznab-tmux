@@ -78,7 +78,7 @@ class ReleaseCleaning
     public $subject = '';
 
     /**
-     * @var \Blacklight\Regexes
+     * @var Regexes
      */
     protected $_regexes;
 

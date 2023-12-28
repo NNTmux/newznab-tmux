@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class ForumController extends BasePageController
 {
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return RedirectResponse|void
      *
      * @throws \Exception
      */

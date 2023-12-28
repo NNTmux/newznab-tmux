@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $episode_title Title of the episode (en, x-jat)
  * @property string $airdate
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbInfo[] $info
- * @property-read \App\Models\AnidbTitle $title
+ * @property-read AnidbTitle $title
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereAirdate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereAnidbid($value)

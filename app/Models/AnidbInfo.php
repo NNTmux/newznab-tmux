@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * App\Models\AnidbInfo.
  *
- * @property-read \App\Models\AnidbEpisode $episode
- * @property-read \App\Models\AnidbTitle $title
+ * @property-read AnidbEpisode $episode
+ * @property-read AnidbTitle $title
  *
  * @mixin \Eloquent
  *

@@ -70,7 +70,7 @@ class Music
     public $failCache;
 
     /**
-     * @var \Blacklight\ColorCLI
+     * @var ColorCLI
      */
     protected $colorCli;
 

@@ -214,7 +214,7 @@ class Contents
     }
 
     /**
-     * @return \App\Models\Content[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
+     * @return Content[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
      */
     public function data_get(): array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
     {

@@ -10,12 +10,12 @@ use Illuminate\Http\Request;
 class AnimeController extends BasePageController
 {
     /**
-     * @var \Blacklight\AniDB
+     * @var AniDB
      */
     protected $aniDb;
 
     /**
-     * @var \Blacklight\Releases
+     * @var Releases
      */
     protected $releases;
 

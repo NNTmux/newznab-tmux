@@ -23,7 +23,7 @@ use Laravel\Scout\Searchable;
  * @property bool $cover
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\Genre|null $genre
+ * @property-read Genre|null $genre
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereArtist($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereAsin($value)

@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\File;
 class NZBImport
 {
     /**
-     * @var \Blacklight\Binaries
+     * @var Binaries
      */
     protected $binaries;
 
     /**
-     * @var \Blacklight\ReleaseCleaning
+     * @var ReleaseCleaning
      */
     protected $releaseCleaner;
 
@@ -35,7 +35,7 @@ class NZBImport
     protected $crossPostt;
 
     /**
-     * @var \Blacklight\Categorize
+     * @var Categorize
      */
     protected $category;
 
@@ -73,7 +73,7 @@ class NZBImport
     public $echoCLI;
 
     /**
-     * @var \Blacklight\NZB
+     * @var NZB
      */
     public $nzb;
 
@@ -83,7 +83,7 @@ class NZBImport
     protected $nzbGuid;
 
     /**
-     * @var \Blacklight\ColorCLI
+     * @var ColorCLI
      */
     protected $colorCli;
 

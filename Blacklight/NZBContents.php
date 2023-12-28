@@ -16,22 +16,22 @@ use Blacklight\utility\Utility;
 class NZBContents
 {
     /**
-     * @var \Blacklight\NNTP
+     * @var NNTP
      */
     protected $nntp;
 
     /**
-     * @var \Blacklight\Nfo
+     * @var Nfo
      */
     protected $nfo;
 
     /**
-     * @var \Blacklight\processing\PostProcess
+     * @var PostProcess
      */
     protected $pp;
 
     /**
-     * @var \Blacklight\NZB
+     * @var NZB
      */
     protected $nzb;
 

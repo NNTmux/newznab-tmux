@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $hosthash
  * @property string $request
  * @property string $timestamp
- * @property-read \App\Models\User $user
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereHosthash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereId($value)

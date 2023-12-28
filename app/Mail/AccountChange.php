@@ -12,7 +12,7 @@ class AccountChange extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @var \App\Models\User
+     * @var User
      */
     public $user;
 

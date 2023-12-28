@@ -69,19 +69,19 @@ use Illuminate\Support\Facades\DB;
  * @property bool $proc_hash16k Has the release been hash16k
  *                              processed
  * @property mixed|null $nzb_guid
- * @property-read \App\Models\Category                                                    $category
+ * @property-read Category                                                    $category
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[]   $comment
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[]     $download
- * @property-read \App\Models\TvEpisode                                                   $episode
+ * @property-read TvEpisode                                                   $episode
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[]      $failed
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseFile[]      $file
- * @property-read \App\Models\UsenetGroup                                                 $group
- * @property-read \App\Models\ReleaseNfo                                                  $nfo
- * @property-read \App\Models\Predb                                                       $predb
+ * @property-read UsenetGroup                                                 $group
+ * @property-read ReleaseNfo                                                  $nfo
+ * @property-read Predb                                                       $predb
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseExtraFull[] $releaseExtra
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleasesGroups[]   $releaseGroup
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[]     $userRelease
- * @property-read \App\Models\Video                                                       $video
+ * @property-read Video                                                       $video
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAdddate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAnidbid($value)
@@ -321,7 +321,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getCatByRelId($id)
     {
@@ -416,7 +416,7 @@ class Release extends Model
      * Used for admin page release-list.
      *
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @return LengthAwarePaginator|mixed
      */
     public static function getReleasesRange()
     {
@@ -518,7 +518,7 @@ class Release extends Model
     }
 
     /**
-     * @return \App\Models\Release|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
+     * @return Release|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
      */
     public static function getAlternate(string $guid, int $userid)
     {

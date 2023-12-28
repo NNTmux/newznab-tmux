@@ -103,7 +103,7 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return RedirectResponse|void
      *
      * @throws \Exception
      */

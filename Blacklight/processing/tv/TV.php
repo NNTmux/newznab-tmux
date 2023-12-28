@@ -125,7 +125,7 @@ abstract class TV extends Videos
     abstract protected function formatEpisodeInfo($episode): array;
 
     /**
-     * @return \App\Models\Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|int
+     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|int
      */
     public function getTvReleases(string $groupID = '', string $guidChar = '', int $lookupSetting = 1, int $status = 0): array|\Illuminate\Database\Eloquent\Collection|int|\Illuminate\Support\Collection
     {
@@ -316,7 +316,7 @@ abstract class TV extends Videos
     }
 
     /**
-     * @return \App\Models\Video|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
+     * @return Video|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
      */
     public function getSiteByID(string $column, int $id): \Illuminate\Database\Eloquent\Model|bool|\Illuminate\Database\Eloquent\Builder|Video
     {

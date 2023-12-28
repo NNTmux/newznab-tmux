@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property bool $passworded
- * @property-read \App\Models\Release $release
+ * @property-read Release $release
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereIshashed($value)

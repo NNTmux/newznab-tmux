@@ -18,7 +18,7 @@ class SendPasswordForgottenEmail implements ShouldQueue
     private $resetLink;
 
     /**
-     * @var \App\Models\User
+     * @var User
      */
     private $user;
 

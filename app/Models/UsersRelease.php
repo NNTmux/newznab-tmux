@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $releases_id FK to releases.id
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\Release $release
- * @property-read \App\Models\User $user
+ * @property-read Release $release
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereId($value)

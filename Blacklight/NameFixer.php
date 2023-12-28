@@ -104,14 +104,14 @@ class NameFixer
     public ColorCLI $colorCLI;
 
     /**
-     * @var \Blacklight\Categorize
+     * @var Categorize
      */
     public mixed $category;
 
     public Utility $text;
 
     /**
-     * @var \Blacklight\ManticoreSearch
+     * @var ManticoreSearch
      */
     public mixed $manticore;
 
@@ -553,7 +553,7 @@ class NameFixer
                 NZB::NZB_ADDED
             );
             $cats = 2;
-        // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
+            // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
         } else {
             $query = sprintf(
                 '
@@ -616,7 +616,7 @@ class NameFixer
                 NZB::NZB_ADDED
             );
             $cats = 2;
-        // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
+            // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
         } else {
             $query = sprintf(
                 "
@@ -682,7 +682,7 @@ class NameFixer
                 NZB::NZB_ADDED
             );
             $cats = 2;
-        // Otherwise check only releases we haven't renamed and checked their par2 hash_16K before in Misc categories
+            // Otherwise check only releases we haven't renamed and checked their par2 hash_16K before in Misc categories
         } else {
             $query = sprintf(
                 '

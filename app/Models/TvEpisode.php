@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $firstaired Date of original airing/release.
  * @property string $summary Description/summary of the episode.
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
- * @property-read \App\Models\Video $video
+ * @property-read Video $video
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereEpisode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereFirstaired($value)

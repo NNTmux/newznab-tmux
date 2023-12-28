@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  * @property int $minsizetoformrelease
  * @property int $maxsizetoformrelease
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $children
- * @property-read \App\Models\Category|null $parent
+ * @property-read Category|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $releases
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDescription($value)

@@ -226,7 +226,7 @@ class Predb extends Model
      * Return a single PRE for a release.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getOne($preID)
     {

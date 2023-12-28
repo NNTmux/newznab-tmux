@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int $videos_id FK to videos.id of the parent title.
  * @property string $title AKA of the video.
- * @property-read \App\Models\Video $video
+ * @property-read Video $video
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoAlias whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\VideoAlias whereVideosId($value)

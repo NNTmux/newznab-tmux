@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $users_id
  * @property string|null $created_at
  * @property string|null $updated_at
- * @property-read \App\Models\User $user
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereGuid($value)
@@ -58,7 +58,7 @@ class Invitation extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getInvite($inviteToken)
     {

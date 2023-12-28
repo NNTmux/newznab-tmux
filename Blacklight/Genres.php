@@ -141,7 +141,7 @@ class Genres
     }
 
     /**
-     * @return \App\Models\Genre|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     * @return Genre|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
     public function getById($id)
     {

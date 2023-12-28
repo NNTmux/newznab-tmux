@@ -55,7 +55,7 @@ if (! function_exists('makeFieldLinks')) {
     /**
      * @return string
      *
-     * @throws \Exception
+     * @throws Exception
      */
     function makeFieldLinks($data, $field, $type)
     {
@@ -139,7 +139,7 @@ if (! function_exists('getUserBrowseOrdering')) {
 
 if (! function_exists('createGUID')) {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function createGUID(): string
     {
@@ -268,7 +268,7 @@ if (! function_exists('is_it_json')) {
 }
 
 /**
- * @throws \Exception
+ * @throws Exception
  */
 function getStreamingZip(array $guids = []): STS\ZipStream\ZipStream
 {

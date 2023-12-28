@@ -82,7 +82,7 @@ class Video extends Model
      * Get info from tables for the provided ID.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return Model|null|static
      */
     public static function getByVideoID($id)
     {

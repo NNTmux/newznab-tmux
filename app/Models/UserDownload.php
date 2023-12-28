@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $hosthash
  * @property string $timestamp
  * @property int $releases_id FK to releases.id
- * @property-read \App\Models\Release $release
- * @property-read \App\Models\User $user
+ * @property-read Release $release
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereHosthash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereId($value)
