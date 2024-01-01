@@ -3149,16 +3149,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "dcedead709149720ceb1977f2e061167d79ae171"
+                "reference": "3f96a8f752f4db17cde0a152891bc332ea9aa28d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/dcedead709149720ceb1977f2e061167d79ae171",
-                "reference": "dcedead709149720ceb1977f2e061167d79ae171",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/3f96a8f752f4db17cde0a152891bc332ea9aa28d",
+                "reference": "3f96a8f752f4db17cde0a152891bc332ea9aa28d",
                 "shasum": ""
             },
             "require": {
@@ -3200,7 +3200,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.2.0"
+                "source": "https://github.com/Intervention/image/tree/3.2.1"
             },
             "funding": [
                 {
@@ -3212,7 +3212,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-23T16:36:10+00:00"
+            "time": "2023-12-30T20:10:28+00:00"
         },
         {
             "name": "james-heinrich/getid3",
@@ -18700,5 +18700,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
