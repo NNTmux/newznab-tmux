@@ -6,6 +6,7 @@ use App\Models\User;
 use Blacklight\libraries\Geary;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController
@@ -88,24 +89,35 @@ class BtcPaymentController extends BasePageController
 
     public function btcPayCallback(Request $request): Response
     {
+        $hashCheck = 'sha256='.hash_hmac('sha256', $request->getContent(), config('nntmux.btcpay_webhook_secret'));
+        if ($hashCheck !== $request->header('btcpay-sig')) {
+            Log::error('BTCPay webhook hash check failed: '.$request->header('btcpay-sig'));
+
+            return response('Not Found', 404);
+        }
         $payload = json_decode($request->getContent(), true);
-        if (! empty($payload)) {
-            // We have received a payment for an invoice and user should be upgraded to a paid plan based on order
-            if ($payload['type'] === 'InvoiceReceivedPayment') {
-                preg_match('/(?P<role>\w+(\+\+)?)[ ](?P<addYears>\d+)/i', $payload['metadata']['itemDesc'], $matches);
-                $user = User::query()->where('email', '=', $payload['metadata']['buyerEmail'])->first();
-                if ($user) {
-                    User::updateUserRole($user->id, $matches['role']);
-                    User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
-                    Log::info('User upgraded to '.$matches['role'].' for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
-                } else {
-                    Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+        // We have received a payment for an invoice and user should be upgraded to a paid plan based on order
+        if ($payload['type'] === 'InvoiceReceivedPayment' || $payload['type'] === 'InvoicePaymentSettled') {
+            preg_match('/(?P<role>\w+(\s\+\+)?)[\s](?P<addYears>\d+)/i', $payload['metadata']['itemDesc'], $matches);
+            if (empty($matches)) {
+                Log::error('Could not parse BTCPay webhook: '.$payload['metadata']['itemDesc']);
+                preg_match('/(?P<role>\w+(\s\+\+)?)[\s](?P<addYears>\d+)/i', $payload['metadata']['itemCode'], $matches);
+                if (empty($matches)) {
+                    Log::error('Could not parse BTCPay webhook: '.$payload['metadata']['itemDesc']);
 
                     return response('Not Found', 404);
                 }
             }
+            $user = User::query()->where('email', '=', $payload['metadata']['buyerEmail'])->first();
+            if ($user) {
+                User::updateUserRole($user->id, $matches['role']);
+                User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
+                Log::info('User upgraded to '.$matches['role'].' for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+            } else {
+                Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
 
-            return response('OK', 200);
+                return response('Not Found', 404);
+            }
         }
 
         return response('OK', 200);
