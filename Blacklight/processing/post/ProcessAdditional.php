@@ -931,16 +931,28 @@ class ProcessAdditional
                 }
                 break;
             case ArchiveInfo::TYPE_SZIP:
-            case ArchiveInfo::TYPE_ZIP:
                 if ($this->_echoCLI) {
                     $this->_echo('7z', 'primaryOver');
+                }
+
+                if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
+                    $fileName = $this->tmpPath.uniqid('', true).'.7z';
+                    File::put($fileName, $compressedData);
+                    // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
+                    runCmd($this->_killString.$this->_7zipPath.'" x -tzip "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    File::delete($fileName);
+                }
+                break;
+            case ArchiveInfo::TYPE_ZIP:
+                if ($this->_echoCLI) {
+                    $this->_echo('z', 'primaryOver');
                 }
 
                 if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
                     // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
-                    runCmd($this->_killString.$this->_7zipPath.'" x -tzip "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
                 break;
