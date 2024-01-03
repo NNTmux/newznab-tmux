@@ -403,6 +403,7 @@ Route::post('btcpay/webhook', function (Illuminate\Http\Request $request) {
             Log::info('User upgraded to '.$matches['role'].' for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
         } else {
             Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+
             return response('Not Found', 404);
         }
     }
