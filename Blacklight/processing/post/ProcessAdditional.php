@@ -939,7 +939,7 @@ class ProcessAdditional
                     $fileName = $this->tmpPath.uniqid('', true).'.7z';
                     File::put($fileName, $compressedData);
                     // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
-                    runCmd($this->_killString.$this->_7zipPath.'" x -tzip "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
                 break;
@@ -952,7 +952,7 @@ class ProcessAdditional
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
                     // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
-                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    runCmd($this->_killString.$this->_7zipPath.'" x -tzip "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
                 break;
