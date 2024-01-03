@@ -291,18 +291,19 @@ class ProcessAdditional
 
         // Pass the binary extractors to ArchiveInfo.
         $clients = [];
-        if (Settings::settingValue('apps..unrarpath') !== '') {
+        if (!empty(Settings::settingValue('apps..unrarpath'))) {
             $this->_unrarPath = Settings::settingValue('apps..unrarpath');
             $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
         }
-        if (Settings::settingValue('apps..zippath') !== '') {
+        if (!empty(Settings::settingValue('apps..zippath'))) {
             $this->_7zipPath = Settings::settingValue('apps..zippath');
+            $clients += [ArchiveInfo::TYPE_SZIP => $this->_7zipPath];
             $clients += [ArchiveInfo::TYPE_ZIP => $this->_7zipPath];
         }
         $this->_archiveInfo->setExternalClients($clients);
 
         $this->_killString = '"';
-        if (Settings::settingValue('apps..timeoutpath') !== '' && (int) Settings::settingValue('..timeoutseconds') > 0) {
+        if (!empty(Settings::settingValue('apps..timeoutpath')) && (int) Settings::settingValue('..timeoutseconds') > 0) {
             $this->_killString = (
                 '"'.Settings::settingValue('apps..timeoutpath').
                 '" --foreground --signal=KILL '.
@@ -929,16 +930,17 @@ class ProcessAdditional
                     File::delete($fileName);
                 }
                 break;
+            case ArchiveInfo::TYPE_SZIP:
             case ArchiveInfo::TYPE_ZIP:
                 if ($this->_echoCLI) {
-                    $this->_echo('z', 'primaryOver');
+                    $this->_echo('7z', 'primaryOver');
                 }
 
                 if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
                     // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
-                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    runCmd($this->_killString.$this->_7zipPath.'" x -tzip "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
                 break;
