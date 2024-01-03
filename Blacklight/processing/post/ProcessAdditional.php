@@ -291,11 +291,11 @@ class ProcessAdditional
 
         // Pass the binary extractors to ArchiveInfo.
         $clients = [];
-        if (!empty(Settings::settingValue('apps..unrarpath'))) {
+        if (! empty(Settings::settingValue('apps..unrarpath'))) {
             $this->_unrarPath = Settings::settingValue('apps..unrarpath');
             $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
         }
-        if (!empty(Settings::settingValue('apps..zippath'))) {
+        if (! empty(Settings::settingValue('apps..zippath'))) {
             $this->_7zipPath = Settings::settingValue('apps..zippath');
             $clients += [ArchiveInfo::TYPE_SZIP => $this->_7zipPath];
             $clients += [ArchiveInfo::TYPE_ZIP => $this->_7zipPath];
@@ -303,7 +303,7 @@ class ProcessAdditional
         $this->_archiveInfo->setExternalClients($clients);
 
         $this->_killString = '"';
-        if (!empty(Settings::settingValue('apps..timeoutpath')) && (int) Settings::settingValue('..timeoutseconds') > 0) {
+        if (! empty(Settings::settingValue('apps..timeoutpath')) && (int) Settings::settingValue('..timeoutseconds') > 0) {
             $this->_killString = (
                 '"'.Settings::settingValue('apps..timeoutpath').
                 '" --foreground --signal=KILL '.
