@@ -40,7 +40,7 @@ if (! function_exists('getRawHtml')) {
                 Log::error($e->getMessage());
             }
             $response = false;
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }

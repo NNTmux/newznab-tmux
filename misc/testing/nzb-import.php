@@ -48,12 +48,12 @@ if (! Str::endsWith($path, '/')) {
     $path .= '/';
 }
 
-$files = new \RegexIterator(
-    new \RecursiveIteratorIterator(
-        new \RecursiveDirectoryIterator($argv[1])
+$files = new RegexIterator(
+    new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($argv[1])
     ),
     '/^.+\.nzb(\.gz)?$/i',
-    \RecursiveRegexIterator::GET_MATCH
+    RecursiveRegexIterator::GET_MATCH
 );
 
 $i = 1;

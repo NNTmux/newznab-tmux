@@ -35,8 +35,8 @@ $couldbe = ($argv[1] === 'true') ? 'could be ' : '';
 $colorCli->header('Getting List of nzbs to check against db.');
 $colorCli->header("Checked / {$couldbe}moved\n");
 
-$dirItr = new \RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'));
-$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
+$dirItr = new RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'));
+$itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);
 
 foreach ($itr as $filePath) {
     $guid = stristr($filePath->getFilename(), '.nzb.gz', true);

@@ -87,7 +87,7 @@ function categorizeRelease($argv, $echoOutput = false): int
                             'xxxinfo_id' => 0,
                             'categories_id' => $catId['categories_id'],
                         ]);
-                        \Blacklight\NameFixer::echoChangedReleaseName([
+                        Blacklight\NameFixer::echoChangedReleaseName([
                             'new_name' => $result->searchname,
                             'old_name' => $result->searchname,
                             'new_category' => $catId['categories_id'],

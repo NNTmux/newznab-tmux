@@ -12,7 +12,7 @@ $movie = new Movie(['Echo' => true]);
 $colorCli = new ColorCLI();
 
 $movies = $pdo->query('SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC');
-if ($movies instanceof \Traversable) {
+if ($movies instanceof Traversable) {
     $count = $movies->rowCount();
     if ($count > 0) {
         $colorCli->header('Updating movie info for '.number_format($count).' movies.');

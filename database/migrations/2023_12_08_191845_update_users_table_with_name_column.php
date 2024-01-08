@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('name')->nullable()->after('username');
         });
-        \App\Models\User::query()->update(['name' => \DB::raw('username')]);
+        App\Models\User::query()->update(['name' => DB::raw('username')]);
     }
 
     /**

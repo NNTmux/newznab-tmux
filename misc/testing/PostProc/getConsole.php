@@ -21,7 +21,7 @@ $res = $pdo->query(
         Category::GAME_OTHER
     )
 );
-if ($res instanceof \Traversable) {
+if ($res instanceof Traversable) {
     $colorCli->header('Updating console info for '.number_format($res->rowCount()).' releases.');
 
     foreach ($res as $arr) {

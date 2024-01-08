@@ -29,13 +29,13 @@ if (! empty($argv[1]) && isset($argv[2], $argv[3]) && is_numeric($argv[2]) && is
                 echo 'Invalid argument(s) used'.PHP_EOL;
 
                 return false;
-            } catch (\CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException $error) {
+            } catch (CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException $error) {
                 if (str_starts_with($error->getMessage(), 'Could not decode JSON data') || str_starts_with($error->getMessage(), 'Incorrect data structure')) {
                     return false;
                 }
-            } catch (\CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException $error) {
+            } catch (CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException $error) {
                 return false;
-            } catch (\CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException $error) {
+            } catch (CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException $error) {
                 if (str_starts_with($error->getMessage(), 'Unauthorized')) {
                     return false;
                 }

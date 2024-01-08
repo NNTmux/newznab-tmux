@@ -14,7 +14,7 @@ $consoleTools = new ConsoleTools();
 
 $newLevel = $argv[1];
 $sourcePath = $argv[2];
-$objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($sourcePath));
+$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($sourcePath));
 
 $filestoprocess = [];
 $iFilesProcessed = $iFilesCounted = 0;

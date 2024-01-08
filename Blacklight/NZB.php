@@ -259,9 +259,6 @@ class NZB
      * file extensions, file sizes, file completion, group names, # of parts).
      *
      * @param  string  $nzb  The NZB contents in a string.
-     * @param  array  $options
-     *                          'no-file-key'    => True - use numeric array key; False - Use filename as array key.
-     *                          'strip-count'    => True - Strip file/part count from file name to make the array key; False - Leave file name as is.
      * @return array $result Empty if not an NZB or the contents of the NZB.
      */
     public function nzbFileList(string $nzb, array $options = []): array

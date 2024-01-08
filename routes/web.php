@@ -69,7 +69,6 @@ use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
-use App\Models\User;
 
 Auth::routes();
 

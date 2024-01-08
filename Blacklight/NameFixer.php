@@ -977,16 +977,6 @@ class NameFixer
     /**
      * Echo an updated release name to CLI.
      *
-     * @param  array  $data
-     *                       [
-     *                       'new_name'     => (string) The new release search name.
-     *                       'old_name'     => (string) The old release search name.
-     *                       'new_category' => (string) The new category name or ID for the release.
-     *                       'old_category' => (string) The old category name or ID for the release.
-     *                       'group'        => (string) The group name or ID of the release.
-     *                       'release_id'   => (int)    The ID of the release.
-     *                       'method'       => (string) The method used to rename the release.
-     *                       ]
      *
      * @static
      *
