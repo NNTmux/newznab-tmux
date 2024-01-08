@@ -3092,20 +3092,20 @@
         },
         {
             "name": "intervention/gif",
-            "version": "3.0.0",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/gif.git",
-                "reference": "cfececc760862f075a52acf747031bad08c8301b"
+                "reference": "521010e0cf1f5cde9df54b8adcd7496ab5f1504f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/gif/zipball/cfececc760862f075a52acf747031bad08c8301b",
-                "reference": "cfececc760862f075a52acf747031bad08c8301b",
+                "url": "https://api.github.com/repos/Intervention/gif/zipball/521010e0cf1f5cde9df54b8adcd7496ab5f1504f",
+                "reference": "521010e0cf1f5cde9df54b8adcd7496ab5f1504f",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.0"
+                "php": "^8.1"
             },
             "require-dev": {
                 "phpstan/phpstan": "^1",
@@ -3138,27 +3138,27 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/gif/issues",
-                "source": "https://github.com/Intervention/gif/tree/3.0.0"
+                "source": "https://github.com/Intervention/gif/tree/4.0.0"
             },
-            "time": "2023-11-27T18:54:30+00:00"
+            "time": "2024-01-06T16:35:57+00:00"
         },
         {
             "name": "intervention/image",
-            "version": "3.2.1",
+            "version": "3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "3f96a8f752f4db17cde0a152891bc332ea9aa28d"
+                "reference": "71bb0e3449bbbfdf47a0d0f2860af7e5e90428e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/3f96a8f752f4db17cde0a152891bc332ea9aa28d",
-                "reference": "3f96a8f752f4db17cde0a152891bc332ea9aa28d",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/71bb0e3449bbbfdf47a0d0f2860af7e5e90428e6",
+                "reference": "71bb0e3449bbbfdf47a0d0f2860af7e5e90428e6",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
-                "intervention/gif": "^3",
+                "intervention/gif": "^4",
                 "php": "^8.1"
             },
             "require-dev": {
@@ -3195,7 +3195,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.2.1"
+                "source": "https://github.com/Intervention/image/tree/3.2.2"
             },
             "funding": [
                 {
@@ -3207,7 +3207,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-30T20:10:28+00:00"
+            "time": "2024-01-07T09:11:20+00:00"
         },
         {
             "name": "james-heinrich/getid3",
@@ -18695,5 +18695,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
