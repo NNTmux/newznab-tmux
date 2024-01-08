@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use App\Models\User;
 use Blacklight\libraries\Geary;
 use Illuminate\Http\Request;
@@ -87,6 +88,9 @@ class BtcPaymentController extends BasePageController
         }
     }
 
+    /**
+     * BtcPay callback.
+     */
     public function btcPayCallback(Request $request): Response
     {
         $hashCheck = 'sha256='.hash_hmac('sha256', $request->getContent(), config('nntmux.btcpay_webhook_secret'));
@@ -110,9 +114,31 @@ class BtcPaymentController extends BasePageController
             }
             $user = User::query()->where('email', '=', $payload['metadata']['buyerEmail'])->first();
             if ($user) {
-                User::updateUserRole($user->id, $matches['role']);
-                User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
-                Log::info('User upgraded to '.$matches['role'].' for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+                $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->first();
+                if (! empty($checkOrder)) {
+                    Log::error('Duplicate BTCPay webhook: '.$payload['webhookId']);
+
+                    return response('Not Found', 404);
+                } else {
+                    Payment::create([
+                        'email' => $payload['metadata']['buyerEmail'],
+                        'username' => $user->username,
+                        'item_description' => $payload['metadata']['itemDesc'],
+                        'order_id' => $payload['metadata']['orderId'],
+                        'payment_id' => $payload['payment']['id'],
+                        'payment_status' => $payload['payment']['status'],
+                        'invoice_amount' => $payload['metadata']['invoice_amount'],
+                        'payment_method' => $payload['paymentMethod'],
+                        'payment_value' => $payload['payment']['value'],
+                        'webhook_id' => $payload['webhookId'],
+                        'invoice_id' => $payload['invoiceId'],
+                    ]);
+                    User::updateUserRole($user->id, $matches['role']);
+                    User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
+                    Log::info('User: '.$user->username.' upgraded to '.$matches['role'].' for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+
+                    return response('OK', 200);
+                }
             } else {
                 Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
 
