@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "55186ba0a14e5a8c884ff4862d2329a0",
+    "content-hash": "b3cae85b9b8de6c819664b1647ff3a29",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -15083,20 +15083,21 @@
         },
         {
             "name": "driftingly/rector-laravel",
-            "version": "0.26.2",
+            "version": "0.29.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/driftingly/rector-laravel.git",
-                "reference": "cf6d0a7c8e2dc33b6e2bb8ccb4638f44a5c09671"
+                "reference": "524f7ae302aa52e343d10630969cb1e36774d6d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/cf6d0a7c8e2dc33b6e2bb8ccb4638f44a5c09671",
-                "reference": "cf6d0a7c8e2dc33b6e2bb8ccb4638f44a5c09671",
+                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/524f7ae302aa52e343d10630969cb1e36774d6d2",
+                "reference": "524f7ae302aa52e343d10630969cb1e36774d6d2",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2 || ^8.0"
+                "php": "^7.2 || ^8.0",
+                "rector/rector": "^0.18.5"
             },
             "type": "rector-extension",
             "autoload": {
@@ -15111,9 +15112,9 @@
             "description": "Rector upgrades rules for Laravel Framework",
             "support": {
                 "issues": "https://github.com/driftingly/rector-laravel/issues",
-                "source": "https://github.com/driftingly/rector-laravel/tree/0.26.2"
+                "source": "https://github.com/driftingly/rector-laravel/tree/0.29.0"
             },
-            "time": "2023-10-11T21:42:53+00:00"
+            "time": "2024-01-04T21:45:25+00:00"
         },
         {
             "name": "ergebnis/composer-normalize",
@@ -18696,5 +18697,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
