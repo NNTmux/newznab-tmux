@@ -276,7 +276,7 @@ class AniDB
 
     private function updateRelease($anidbId, $relId): void
     {
-        Release::update(['anidbid' => $anidbId])->where('id', $relId);
+        Release::query()->where('id', $relId)->update(['anidbid' => $anidbId]);
     }
 
     /**
