@@ -65,6 +65,7 @@ class Categorize
         $this->groupId = $groupId;
         $this->poster = $poster;
         $this->groupName = UsenetGroup::whereId($this->groupId)->value('name');
+        $this->tmpCat = Category::OTHER_MISC;
 
         return match (true) {
             $this->isMisc(), $this->byGroupName($this->groupName), $this->isPC(), $this->isXxx(), $this->isTV(), $this->isMovie(), $this->isConsole(), $this->isBook(), $this->isMusic() => [
