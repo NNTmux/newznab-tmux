@@ -51,15 +51,9 @@ class AniDB
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo' => false,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echooutput = config('nntmux.echocli');
         $this->colorCli = new ColorCLI();
 
         $anidbupdint = Settings::settingValue('APIs.AniDB.max_update_frequency');
@@ -154,7 +148,7 @@ class AniDB
             if (isset($AniDBAPIXML->ratings->permanent)) {
                 $AniDBAPIArray['rating'] = $AniDBAPIXML->ratings->permanent;
             } else {
-                $AniDBAPIArray['rating'] = $AniDBAPIXML->ratings->temporary ?? $AniDBAPIArray['rating'] = '';
+                $AniDBAPIArray['rating'] = $AniDBAPIXML->ratings->temporary ?? '';
             }
 
             $AniDBAPIArray += [
@@ -178,7 +172,7 @@ class AniDB
         if (count($element) !== 0) {
             $result = $children === true ? $element->children() : $element;
             foreach ($result as $entry) {
-                $temp .= (string) $entry->$property.', ';
+                $temp .= $entry->$property.', ';
             }
         }
 
@@ -295,7 +289,7 @@ class AniDB
             //we must mark the last update time or risk ban
             $this->setLastUpdated();
 
-            if ($animeTitles instanceof \Traversable) {
+            if ($animeTitles) {
                 $count = $animeTitles->count();
                 if ($this->echooutput) {
                     $this->colorCli->header(
