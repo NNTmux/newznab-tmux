@@ -50,7 +50,7 @@ class RecategorizeReleases extends Command
         } elseif ($this->option('categories')) {
             $countQuery->whereIn('categories_id', explode(',', $this->option('categories')));
         } elseif ($this->option('test')) {
-
+            $countQuery->where('iscategorized', 0);
         } else {
             $this->error('You must specify at least one option. See: --help');
             exit();
