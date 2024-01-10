@@ -25,8 +25,6 @@ class AniDB
 
     public PaDb $padb;
 
-    public \PDO $pdo;
-
     /**
      * @var int number of AniDB releases to process
      */
