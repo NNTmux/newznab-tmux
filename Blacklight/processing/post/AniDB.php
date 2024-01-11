@@ -31,9 +31,9 @@ class AniDB
     private int $aniqty;
 
     /**
-     * @var int The status of the release being processed
+     * @var int|null The status of the release being processed
      */
-    private int $status;
+    private int|null $status;
 
     protected ColorCLI $colorCli;
 
@@ -49,7 +49,7 @@ class AniDB
         $quantity = (int) Settings::settingValue('..maxanidbprocessed');
         $this->aniqty = $quantity ?? 100;
 
-        $this->status = 'NULL';
+        $this->status = null;
     }
 
     /**
