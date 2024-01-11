@@ -33,7 +33,7 @@ class AniDB
     /**
      * @var int|null The status of the release being processed
      */
-    private int|null $status;
+    private ?int $status;
 
     protected ColorCLI $colorCli;
 
