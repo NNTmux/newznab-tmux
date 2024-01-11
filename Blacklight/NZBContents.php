@@ -15,29 +15,14 @@ use Blacklight\utility\Utility;
  */
 class NZBContents
 {
-    /**
-     * @var NNTP
-     */
     protected NNTP $nntp;
 
-    /**
-     * @var Nfo
-     */
     protected Nfo $nfo;
 
-    /**
-     * @var PostProcess
-     */
     protected PostProcess $pp;
 
-    /**
-     * @var NZB
-     */
     protected NZB $nzb;
 
-    /**
-     * @var bool
-     */
     protected bool $lookuppar2;
 
     /**
@@ -45,9 +30,6 @@ class NZBContents
      */
     protected mixed $echooutput;
 
-    /**
-     * @var bool
-     */
     protected bool $alternateNNTP;
 
     public function __construct()
@@ -173,9 +155,6 @@ class NZBContents
         return false;
     }
 
-    /**
-     * @return bool|\SimpleXMLElement
-     */
     public function LoadNZB($guid): \SimpleXMLElement|bool
     {
         // Fetch the NZB location using the GUID.
