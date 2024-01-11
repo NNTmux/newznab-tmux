@@ -18,37 +18,37 @@ class NZBContents
     /**
      * @var NNTP
      */
-    protected $nntp;
+    protected NNTP $nntp;
 
     /**
      * @var Nfo
      */
-    protected $nfo;
+    protected Nfo $nfo;
 
     /**
      * @var PostProcess
      */
-    protected $pp;
+    protected PostProcess $pp;
 
     /**
      * @var NZB
      */
-    protected $nzb;
+    protected NZB $nzb;
 
     /**
      * @var bool
      */
-    protected $lookuppar2;
+    protected bool $lookuppar2;
 
     /**
      * @var bool
      */
-    protected $echooutput;
+    protected mixed $echooutput;
 
     /**
      * @var bool
      */
-    protected $alternateNNTP;
+    protected bool $alternateNNTP;
 
     public function __construct()
     {
@@ -70,7 +70,7 @@ class NZBContents
      *
      * @throws \Exception
      */
-    public function getNfoFromNZB($guid, $relID, $groupID, $groupName)
+    public function getNfoFromNZB($guid, $relID, $groupID, $groupName): mixed
     {
         $fetchedBinary = false;
 
@@ -115,7 +115,7 @@ class NZBContents
      *
      * @throws \Exception
      */
-    public function parseNZB($guid, $relID, $groupID, bool $nfoCheck = false)
+    public function parseNZB($guid, $relID, $groupID, bool $nfoCheck = false): bool|array
     {
         $nzbFile = $this->LoadNZB($guid);
         if ($nzbFile !== false) {
@@ -176,7 +176,7 @@ class NZBContents
     /**
      * @return bool|\SimpleXMLElement
      */
-    public function LoadNZB($guid)
+    public function LoadNZB($guid): \SimpleXMLElement|bool
     {
         // Fetch the NZB location using the GUID.
         $nzbPath = $this->nzb->NZBPath($guid);
@@ -211,7 +211,7 @@ class NZBContents
     }
 
     /**
-     * Attempts to get the releasename from a par2 file.
+     * Attempts to get the release name from a par2 file.
      *
      *
      * @throws \Exception
