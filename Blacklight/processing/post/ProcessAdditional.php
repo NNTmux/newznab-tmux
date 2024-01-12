@@ -613,10 +613,11 @@ class ProcessAdditional
         $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.'/';
         if (! File::isDirectory($this->tmpPath)) {
             if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
-                $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
-                $this->_deleteRelease();
-
-                return false;
+                // We will try to create the main temp folder again, just in case there was a file lock or filesystem issue.
+                if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
+                    $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
+                    return false;
+                }
             }
         }
 
