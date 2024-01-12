@@ -219,8 +219,16 @@ class ManticoreSearch
                     $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
                 }
             } elseif (! empty($searchString)) {
-                $searchColumns = ! empty($column) ? '@'.implode('', $column) : '';
-                $query->search('@@relaxed'.$searchColumns.' '.self::escapeString($searchString));
+                // If $column is an array and has more than one item, implode it and wrap in parentheses.
+                if (! empty($column) && \count($column) > 1) {
+                    $searchColumns = '@('.implode(',', $column).')';
+                } elseif (! empty($column) && \count($column) == 1) { // If $column is an array and has only one item, use as is.
+                    $searchColumns = '@'.$column[0];
+                } else {
+                    $searchColumns = ''; // Careful, this will search all columns.
+                }
+
+                $query->search('@@relaxed '.$searchColumns.' '.self::escapeString($searchString));
             } else {
                 return [];
             }
