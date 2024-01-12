@@ -616,6 +616,7 @@ class ProcessAdditional
                 // We will try to create the main temp folder again, just in case there was a file lock or filesystem issue.
                 if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                     $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
+
                     return false;
                 }
             }
