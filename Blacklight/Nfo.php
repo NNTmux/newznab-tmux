@@ -73,7 +73,7 @@ class Nfo
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
         $this->colorCli = new ColorCLI();
 
-        $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
+        $this->tmpPath = config('nntmux.tmp_unrar_path');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {
             $this->tmpPath .= '/';
         }

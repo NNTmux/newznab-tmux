@@ -18,4 +18,6 @@ return [
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'elasticsearch_enabled' => env('ELASTICSEARCH_ENABLED', false),
     'btcpay_webhook_secret' => env('BTCPAY_SECRET'),
+    'tmp_unrar_path' => env('TEMP_UNRAR_PATH', storage_path('tmp/unrar/')),
+    'tmp_unzip_path' => env('TEMP_UNZIP_PATH', storage_path('tmp/unzip/')),
 ];

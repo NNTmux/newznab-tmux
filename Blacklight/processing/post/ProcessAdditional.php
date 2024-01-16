@@ -408,7 +408,7 @@ class ProcessAdditional
     protected function _setMainTempPath(&$guidChar, string &$groupID = ''): void
     {
         // Set up the temporary files folder location.
-        $this->_mainTmpPath = (string) Settings::settingValue('..tmpunrarpath');
+        $this->_mainTmpPath = config('nntmux.tmp_unrar_path');
 
         // Check if it ends with a dir separator.
         if (! preg_match('/[\/\\\\]$/', $this->_mainTmpPath)) {

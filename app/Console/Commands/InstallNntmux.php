@@ -61,7 +61,7 @@ class InstallNntmux extends Command
             $paths = $this->updatePaths();
             if ($paths !== false) {
                 $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
-                $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $paths['unrar_path']]);
+                $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => config('nntmux.tmp_path')]);
                 $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
                 if ($sql1 === null || $sql2 === null || $sql3 === null) {
                     $error = true;
