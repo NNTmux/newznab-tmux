@@ -465,9 +465,9 @@ class NameFixer
     /**
      * Attempts to fix release names using the Par2 File.
      *
-     * @param    $time 1: 24 hours, 2: no time limit
-     * @param    $echo 1: change the name, anything else: preview of what could have been changed.
-     * @param    $cats 1: other categories, 2: all categories
+     * @param  $time  1: 24 hours, 2: no time limit
+     * @param  $echo  1: change the name, anything else: preview of what could have been changed.
+     * @param  $cats  1: other categories, 2: all categories
      *
      * @throws \Exception
      */

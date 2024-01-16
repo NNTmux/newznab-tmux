@@ -133,7 +133,7 @@ class Forumpost extends Model
      * Get browse range for forum.
      *
      *
-     * @param $start
+     * @param  $start
      */
     public static function getBrowseRange(): LengthAwarePaginator
     {

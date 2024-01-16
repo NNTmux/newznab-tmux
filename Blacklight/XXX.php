@@ -292,7 +292,7 @@ class XXX
     /**
      * Get Genre id's Of the title.
      *
-     * @param $arr - Array or String
+     * @param  $arr  - Array or String
      * @return string - If array .. 1,2,3,4 if string .. 1
      */
     protected function getGenreID($arr): string
