@@ -919,16 +919,7 @@ class Categorize
 
     public function isAudiobook(): bool
     {
-        if ($this->categorizeForeign && stripos($this->releaseName, 'Audiobook') !== false) {
-            $this->tmpCat = Category::MUSIC_FOREIGN;
-
-            return true;
-        }
-
-        if (str_contains($this->groupName, 'audiobook')) {
-            if ($this->categorizeForeign && $this->isMusicForeign()) {
-                return false;
-            }
+        if (preg_match('/(Audiobook|Audio.?Book)|Audio.?Book/i', $this->releaseName)) {
             $this->tmpCat = Category::MUSIC_AUDIOBOOK;
 
             return true;
