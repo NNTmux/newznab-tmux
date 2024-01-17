@@ -919,7 +919,7 @@ class Categorize
 
     public function isAudiobook(): bool
     {
-        if (preg_match('/(Audiobook|Audio.?Book)|Audio.?Book/i', $this->releaseName)) {
+        if (preg_match('/(Audiobook|Audio.?Book)/i', $this->releaseName)) {
             $this->tmpCat = Category::MUSIC_AUDIOBOOK;
 
             return true;
