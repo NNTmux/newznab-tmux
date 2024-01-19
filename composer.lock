@@ -14590,16 +14590,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.19.2",
+            "version": "5.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "604bfc55fa40d6fe8c0275ca707ee80920b3b3f1"
+                "reference": "cebfe57cbb25f0646129c621b51029ebb06ad748"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/604bfc55fa40d6fe8c0275ca707ee80920b3b3f1",
-                "reference": "604bfc55fa40d6fe8c0275ca707ee80920b3b3f1",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/cebfe57cbb25f0646129c621b51029ebb06ad748",
+                "reference": "cebfe57cbb25f0646129c621b51029ebb06ad748",
                 "shasum": ""
             },
             "require": {
@@ -14610,7 +14610,7 @@
                 "php": ">=8.0",
                 "sebastianfeldmann/camino": "^0.9.2",
                 "sebastianfeldmann/cli": "^3.3",
-                "sebastianfeldmann/git": "^3.9",
+                "sebastianfeldmann/git": "^3.10",
                 "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
                 "symfony/filesystem": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
                 "symfony/process": "^2.7 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0"
@@ -14662,7 +14662,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.19.2"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.20.0"
             },
             "funding": [
                 {
@@ -14670,7 +14670,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-18T14:06:12+00:00"
+            "time": "2024-01-19T19:25:09+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -17067,16 +17067,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.7",
+            "version": "10.5.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "e5c5b397a95cb0db013270a985726fcae93e61b8"
+                "reference": "08f4fa74d5fbfff1ef22abffee47aaedcaea227e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e5c5b397a95cb0db013270a985726fcae93e61b8",
-                "reference": "e5c5b397a95cb0db013270a985726fcae93e61b8",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/08f4fa74d5fbfff1ef22abffee47aaedcaea227e",
+                "reference": "08f4fa74d5fbfff1ef22abffee47aaedcaea227e",
                 "shasum": ""
             },
             "require": {
@@ -17148,7 +17148,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.7"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.8"
             },
             "funding": [
                 {
@@ -17164,7 +17164,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-01-14T16:40:30+00:00"
+            "time": "2024-01-19T07:07:27+00:00"
         },
         {
             "name": "rector/rector",
