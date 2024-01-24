@@ -10,7 +10,7 @@ nginx runs on port 80 and is mapped to port 80 on the host machine too. If you'r
 
 Mailpit is used as a fake mailserver which catches all e-mails in one inbox. You can acess this via [this link](http://localhost:8025). Mailpit's SMTP server runs on port `1025`.
 
->This project currently uses PHP 8.2 and MariaDB 10.x
+>This project currently uses PHP 8.3 and MariaDB 10.x
 
 ## Prerequisites
 
