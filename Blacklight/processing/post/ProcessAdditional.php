@@ -1440,10 +1440,9 @@ class ProcessAdditional
             $this->_releaseHasPassword = false;
         }
 
-        // If we failed to get anything from the RAR/ZIPs, decrement the passwordstatus, if the rar/zip has no password.
+        // If we failed to get anything from the RAR/ZIPs update the release with what we have, if the rar/zip has no password.
         if (! $this->_releaseHasPassword && $this->_NZBHasCompressedFile && $releaseFilesCount === 0) {
             $release = Release::query()->where('id', $this->_release->id);
-            $release->decrement('passwordstatus');
             $release->update(
                 $updateRows
             );
