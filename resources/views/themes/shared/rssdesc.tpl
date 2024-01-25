@@ -38,10 +38,10 @@
 	<h3>General</h3>
 	<ul style="text-align: left;">
 		<li>
-			Full site feed<br/>
-			<a href="{{url("/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}")}}>{{url("/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}")}}</a>
+            <a href="{{url("/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}")}}">Full site</a> feed </br>
+            <a href="{{url("/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}")}}">{{url("/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}")}}</a>
             <br>You can define limit and num parameters, which will decide how much items to show and what offset to use (default values: limit 100 and offset 0).
-		</li>
+        </li>
 		<li>
 			<a href="{{url("/cart/index")}}">My cart</a> feed<br/>
 			<a href="{{url("/rss/cart?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}">{{url("/rss/cart?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}</a>
