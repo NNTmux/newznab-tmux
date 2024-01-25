@@ -1089,8 +1089,8 @@ class Movie
                     $imdbSearch = new TitleSearch($this->config);
                     foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
                         try {
-                            if (! empty($imdbTitle->orig_title())) {
-                                similar_text($imdbTitle->orig_title(), $this->currentTitle, $percent);
+                            if (! empty($imdbTitle->title())) {
+                                similar_text($imdbTitle->title(), $this->currentTitle, $percent);
                                 if ($percent >= self::MATCH_PERCENT) {
                                     similar_text($this->currentYear, $imdbTitle->year(), $percent);
                                     if ($percent >= self::YEAR_MATCH_PERCENT) {
