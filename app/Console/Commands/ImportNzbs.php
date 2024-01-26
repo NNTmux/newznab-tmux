@@ -48,14 +48,30 @@ class ImportNzbs extends Command
             } else {
                 $deleteFailedNZB = false;
             }
-            $folder = $this->option('folder');
-            $files = File::allFiles($folder);
-            $NZBImport = new NZBImport();
+            $importFolder = $this->option('folder');
+            $folders = File::directories($importFolder);
+            if (empty($folders)) {
+                $this->info('Importing NZB files from '.$importFolder);
+                $files = File::allFiles($importFolder);
+                $NZBImport = new NZBImport();
 
-            try {
-                $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB);
-            } catch (FileNotFoundException $e) {
-                $this->error($e->getMessage());
+                try {
+                    $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB);
+                } catch (FileNotFoundException $e) {
+                    $this->error($e->getMessage());
+                }
+            } else {
+                foreach ($folders as $folder) {
+                    $this->info('Importing NZB files from '.$folder);
+                    $files = File::allFiles($folder);
+                    $NZBImport = new NZBImport();
+
+                    try {
+                        $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB);
+                    } catch (FileNotFoundException $e) {
+                        $this->error($e->getMessage());
+                    }
+                }
             }
         } else {
             $this->error('Folder path must not be empty');
