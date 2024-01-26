@@ -64,7 +64,7 @@ class Categorize
         $this->releaseName = $releaseName;
         $this->groupId = $groupId;
         $this->poster = $poster;
-        $this->groupName = UsenetGroup::whereId($this->groupId)->value('name');
+        $this->groupName = UsenetGroup::whereId($this->groupId)->value('name') ?? '';
         $this->tmpCat = Category::OTHER_MISC;
 
         return match (true) {
