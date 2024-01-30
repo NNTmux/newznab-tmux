@@ -809,7 +809,7 @@ class ProcessAdditional
                     $this->_triedCompressedMids[] = $segment;
                 } elseif (\in_array($segment, $this->_triedCompressedMids, false)) {
                     // We already downloaded this file.
-                    continue;
+                    continue 2;
                 }
                 $mID[] = $segment;
             }
