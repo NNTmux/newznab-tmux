@@ -130,7 +130,7 @@ class NZBImport
 
                 // Try to insert the NZB details into the DB.
                 try {
-                    $inserted = $this->scanNZBFile($nzbXML, ($useNzbName ? str_ireplace('.nzb', '', basename($nzbFile)) : false));
+                    $inserted = $this->scanNZBFile($nzbXML, ($useNzbName === true ? str_ireplace('.nzb', '', basename($nzbFile)) : false));
                 } catch (\Exception $e) {
                     $this->echoOut('ERROR: Problem inserting: '.$nzbFile);
                     $inserted = false;
@@ -196,7 +196,7 @@ class NZBImport
     /**
      * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, bool $useNzbName = false): bool
+    protected function scanNZBFile(&$nzbXML, $useNzbName = false): bool
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
