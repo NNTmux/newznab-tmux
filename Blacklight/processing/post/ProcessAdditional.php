@@ -443,14 +443,7 @@ class ProcessAdditional
     protected function _clearMainTmpPath(): void
     {
         if ($this->_mainTmpPath !== '') {
-            $this->_recursivePathDelete(
-                $this->_mainTmpPath,
-                // These are folders we don't want to delete.
-                [
-                    // This is the actual temp folder.
-                    $this->_mainTmpPath,
-                ]
-            );
+            $this->_recursivePathDelete($this->_mainTmpPath);
         }
     }
 
@@ -584,17 +577,16 @@ class ProcessAdditional
         }
     }
 
-    protected function _recursivePathDelete(string $path, array $ignoredFolders = []): void
+    protected function _recursivePathDelete(string $path): void
     {
         if (File::isDirectory($path)) {
-            if (\in_array($path, $ignoredFolders, false)) {
-                return;
-            }
             foreach (File::allFiles($path) as $file) {
-                $this->_recursivePathDelete($file, $ignoredFolders);
+                File::delete($file);
             }
-
-            File::deleteDirectory($path);
+            // Don't delete the main temp folder.
+            if ($path !== $this->_mainTmpPath) {
+                File::deleteDirectory($path);
+            }
         } elseif (File::isFile($path)) {
             File::delete($path);
         }
@@ -781,7 +773,7 @@ class ProcessAdditional
         }
 
         $failed = $downloaded = 0;
-        // Loop through the files, attempt to find if password-ed and files. Starting with what not to process.
+        // Loop through the files, attempt to find if passworded and files. Starting with what not to process.
         foreach ($this->_nzbContents as $nzbFile) {
             if ($downloaded >= $this->_maximumRarSegments) {
                 break;
@@ -808,7 +800,7 @@ class ProcessAdditional
             // Get message-id's for the rar file.
             $segCount = (\count($nzbFile['segments']) - 1);
             $mID = [];
-            for ($i = 0; $i < $this->_maximumRarSegments; $i++) {
+            foreach (range(0, $this->_maximumRarSegments - 1) as $i) {
                 if ($i > $segCount) {
                     break;
                 }
@@ -817,7 +809,7 @@ class ProcessAdditional
                     $this->_triedCompressedMids[] = $segment;
                 } elseif (\in_array($segment, $this->_triedCompressedMids, false)) {
                     // We already downloaded this file.
-                    continue 2;
+                    continue;
                 }
                 $mID[] = $segment;
             }
