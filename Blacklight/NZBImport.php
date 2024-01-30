@@ -8,6 +8,7 @@ use App\Models\UsenetGroup;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 /**
  * Class NZBImport.
@@ -17,75 +18,75 @@ class NZBImport
     /**
      * @var Binaries
      */
-    protected $binaries;
+    protected Binaries $binaries;
 
     /**
      * @var ReleaseCleaning
      */
-    protected $releaseCleaner;
+    protected ReleaseCleaning $releaseCleaner;
 
     /**
      * @var bool|\stdClass
      */
-    protected $site;
+    protected \stdClass|bool $site;
 
     /**
      * @var int
      */
-    protected $crossPostt;
+    protected mixed $crossPostt;
 
     /**
      * @var Categorize
      */
-    protected $category;
+    protected Categorize $category;
 
     /**
      * List of all the group names/ids in the DB.
      *
      * @var array
      */
-    protected $allGroups;
+    protected array $allGroups;
 
     /**
      * Was this run from the browser?
      *
      * @var bool
      */
-    protected $browser;
+    protected bool $browser;
 
     /**
      * Return value for browser.
      *
      * @var string
      */
-    protected $retVal;
+    protected string $retVal;
 
     /**
      * Guid of the current releases.
      *
      * @var string
      */
-    protected $relGuid;
+    protected string $relGuid;
 
     /**
      * @var bool
      */
-    public $echoCLI;
+    public mixed $echoCLI;
 
     /**
      * @var NZB
      */
-    public $nzb;
+    public NZB $nzb;
 
     /**
      * @var string the MD5 hash of the first segment Message-ID of the NZB
      */
-    protected $nzbGuid;
+    protected string $nzbGuid;
 
     /**
      * @var ColorCLI
      */
-    protected $colorCli;
+    protected ColorCLI $colorCli;
 
     public function __construct()
     {
@@ -99,12 +100,15 @@ class NZBImport
         $this->retVal = '';
     }
 
-    /**
-     * @return bool|string
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    public function beginImport($filesToProcess, $useNzbName = false, $delete = true, $deleteFailed = true)
+   /**
+    * @param $filesToProcess
+    * @param bool $useNzbName
+    * @param bool $delete
+    * @param bool $deleteFailed
+    * @return bool|string
+    * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+    */
+    public function beginImport($filesToProcess, bool $useNzbName = false, bool $delete = true, bool $deleteFailed = true): bool|string
     {
         // Get all the groups in the DB.
         if (! $this->getAllGroups()) {
@@ -125,7 +129,7 @@ class NZBImport
             // Check if the file is really there.
             if (File::isFile($nzbFile)) {
                 // Get the contents of the NZB file as a string.
-                if (strtolower(substr($nzbFile, -7)) === '.nzb.gz') {
+                if (Str::endsWith($nzbFile, '.nzb.gz')) {
                     $nzbString = Utility::unzipGzipFile($nzbFile);
                 } else {
                     $nzbString = File::get($nzbFile);
@@ -135,20 +139,20 @@ class NZBImport
                     $this->echoOut('ERROR: Unable to read: '.$nzbFile);
 
                     if ($deleteFailed) {
-                        @unlink($nzbFile);
+                        File::delete($nzbFile);
                     }
                     $nzbsSkipped++;
 
                     continue;
                 }
 
-                // Load it as a XML object.
+                // Load it as an XML object.
                 $nzbXML = @simplexml_load_string($nzbString);
                 if ($nzbXML === false || strtolower($nzbXML->getName()) !== 'nzb') {
                     $this->echoOut('ERROR: Unable to load NZB XML data: '.$nzbFile);
 
                     if ($deleteFailed) {
-                        @unlink($nzbFile);
+                        File::delete($nzbFile);
                     }
                     $nzbsSkipped++;
 
@@ -174,7 +178,7 @@ class NZBImport
                         Release::query()->where('guid', $this->relGuid)->delete();
 
                         if ($deleteFailed) {
-                            @unlink($nzbFile);
+                            File::delete($nzbFile);
                         }
                         $nzbsSkipped++;
                     } else {
@@ -182,7 +186,7 @@ class NZBImport
 
                         if ($delete) {
                             // Remove the nzb file.
-                            @unlink($nzbFile);
+                            File::delete($nzbFile);
                         }
 
                         $nzbsImported++;
@@ -190,7 +194,7 @@ class NZBImport
                 } else {
                     $this->echoOut('ERROR: Failed to insert NZB!');
                     if ($deleteFailed) {
-                        @unlink($nzbFile);
+                        File::delete($nzbFile);
                     }
                     $nzbsSkipped++;
                 }
@@ -216,11 +220,12 @@ class NZBImport
     }
 
     /**
-     * @return bool
-     *
-     * @throws \Exception
+    * @param $nzbXML
+    * @param bool $useNzbName
+    * @return bool
+    * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, $useNzbName = false)
+    protected function scanNZBFile(&$nzbXML, bool $useNzbName = false): bool
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
@@ -340,7 +345,7 @@ class NZBImport
      *
      * @throws \Exception
      */
-    protected function insertNZB($nzbDetails)
+    protected function insertNZB($nzbDetails): bool
     {
         // Make up a GUID for the release.
         $this->relGuid = createGUID();
@@ -409,7 +414,7 @@ class NZBImport
     /**
      * Get all groups in the DB.
      */
-    protected function getAllGroups()
+    protected function getAllGroups(): bool
     {
         $this->allGroups = [];
         $groups = UsenetGroup::query()->get(['id', 'name']);
@@ -446,6 +451,10 @@ class NZBImport
      */
     protected function updateNzbGuid(): void
     {
-        Release::query()->where('guid', $this->relGuid)->update(['nzb_guid' => sodium_hex2bin($this->nzbGuid)]);
+        try {
+            Release::query()->where('guid', $this->relGuid)->update(['nzb_guid' => sodium_hex2bin($this->nzbGuid)]);
+        } catch (\SodiumException $e) {
+            $this->echoOut('ERROR: Problem updating nzb_guid for: '.$this->relGuid);
+        }
     }
 }
