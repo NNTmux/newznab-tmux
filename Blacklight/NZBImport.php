@@ -15,19 +15,10 @@ use Illuminate\Support\Str;
  */
 class NZBImport
 {
-    /**
-     * @var Binaries
-     */
     protected Binaries $binaries;
 
-    /**
-     * @var ReleaseCleaning
-     */
     protected ReleaseCleaning $releaseCleaner;
 
-    /**
-     * @var bool|\stdClass
-     */
     protected \stdClass|bool $site;
 
     /**
@@ -35,36 +26,25 @@ class NZBImport
      */
     protected mixed $crossPostt;
 
-    /**
-     * @var Categorize
-     */
     protected Categorize $category;
 
     /**
      * List of all the group names/ids in the DB.
-     *
-     * @var array
      */
     protected array $allGroups;
 
     /**
      * Was this run from the browser?
-     *
-     * @var bool
      */
     protected bool $browser;
 
     /**
      * Return value for browser.
-     *
-     * @var string
      */
     protected string $retVal;
 
     /**
      * Guid of the current releases.
-     *
-     * @var string
      */
     protected string $relGuid;
 
@@ -73,9 +53,6 @@ class NZBImport
      */
     public mixed $echoCLI;
 
-    /**
-     * @var NZB
-     */
     public NZB $nzb;
 
     /**
@@ -83,9 +60,6 @@ class NZBImport
      */
     protected string $nzbGuid;
 
-    /**
-     * @var ColorCLI
-     */
     protected ColorCLI $colorCli;
 
     public function __construct()
@@ -100,15 +74,10 @@ class NZBImport
         $this->retVal = '';
     }
 
-   /**
-    * @param $filesToProcess
-    * @param bool $useNzbName
-    * @param bool $delete
-    * @param bool $deleteFailed
-    * @return bool|string
-    * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-    */
-    public function beginImport($filesToProcess, bool $useNzbName = false, bool $delete = true, bool $deleteFailed = true): bool|string
+    /**
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function beginImport($filesToProcess, bool $useNzbName = false, bool $delete = false, bool $deleteFailed = false): bool|string
     {
         // Get all the groups in the DB.
         if (! $this->getAllGroups()) {
@@ -160,7 +129,12 @@ class NZBImport
                 }
 
                 // Try to insert the NZB details into the DB.
-                $inserted = $this->scanNZBFile($nzbXML, ($useNzbName ? str_ireplace('.nzb', '', basename($nzbFile)) : false));
+                try {
+                    $inserted = $this->scanNZBFile($nzbXML, ($useNzbName ? str_ireplace('.nzb', '', basename($nzbFile)) : false));
+                } catch (\Exception $e) {
+                    $this->echoOut('ERROR: Problem inserting: '.$nzbFile);
+                    $inserted = false;
+                }
 
                 if ($inserted) {
                     // Try to copy the NZB to the NZB folder.
@@ -220,10 +194,7 @@ class NZBImport
     }
 
     /**
-    * @param $nzbXML
-    * @param bool $useNzbName
-    * @return bool
-    * @throws \Exception
+     * @throws \Exception
      */
     protected function scanNZBFile(&$nzbXML, bool $useNzbName = false): bool
     {
