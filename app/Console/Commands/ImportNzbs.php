@@ -34,17 +34,17 @@ class ImportNzbs extends Command
     {
         if ($this->option('folder')) {
             if ($this->option('filename')) {
-                $useNzbName = $this->option('filename');
+                $useNzbName = true;
             } else {
                 $useNzbName = false;
             }
             if ($this->option('delete')) {
-                $deleteNZB = $this->option('delete');
+                $deleteNZB = true;
             } else {
                 $deleteNZB = false;
             }
             if ($this->option('delete-failed')) {
-                $deleteFailedNZB = $this->option('delete-failed');
+                $deleteFailedNZB = true;
             } else {
                 $deleteFailedNZB = false;
             }
