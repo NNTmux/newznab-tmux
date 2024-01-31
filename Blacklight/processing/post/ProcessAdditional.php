@@ -856,7 +856,7 @@ class ProcessAdditional
     protected function _processCompressedData(string &$compressedData): bool
     {
         $this->_compressedFilesChecked++;
-        // Give the data to archive info so it can check if it's a rar.
+        // Give the data to archive info, so it can check if it's a rar.
         if (! $this->_archiveInfo->setData($compressedData, true)) {
             if (config('app.debug') === true) {
                 $this->_debug('Data is probably not RAR or ZIP.');
@@ -1063,9 +1063,7 @@ class ProcessAdditional
                     }
 
                     // Check for "codec spam"
-                    if (preg_match('/alt\.binaries\.movies($|\.divx$)/', $this->_releaseGroupName) &&
-                        preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe$/i', $file['name'])
-                    ) {
+                    if (preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe$/i', $file['name'])) {
                         if (config('app.debug') === true) {
                             $this->_debug('Codec spam found, setting release to potentially passworded.');
                         }
