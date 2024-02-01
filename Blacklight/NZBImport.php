@@ -129,8 +129,9 @@ class NZBImport
                 }
 
                 // Try to insert the NZB details into the DB.
+                $nzbFileName = $useNzbName === true ? str_ireplace('.nzb', '', basename($nzbFile)) : '';
                 try {
-                    $inserted = $this->scanNZBFile($nzbXML, ($useNzbName === true ? str_ireplace('.nzb', '', basename($nzbFile)) : false));
+                    $inserted = $this->scanNZBFile($nzbXML, $nzbFileName);
                 } catch (\Exception $e) {
                     $this->echoOut('ERROR: Problem inserting: '.$nzbFile);
                     $inserted = false;
@@ -196,7 +197,7 @@ class NZBImport
     /**
      * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, $useNzbName = false): bool
+    protected function scanNZBFile(&$nzbXML, $nzbFileName = ''): bool
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
@@ -299,7 +300,7 @@ class NZBImport
         return $this->insertNZB(
             [
                 'subject' => $firstName,
-                'useFName' => $useNzbName,
+                'useFName' => $nzbFileName,
                 'postDate' => empty($postDate) ? now()->format('Y-m-d H:i:s') : $postDate,
                 'from' => empty($posterName) ? '' : $posterName,
                 'groups_id' => $groupID,
@@ -327,8 +328,8 @@ class NZBImport
         $subject = mb_convert_encoding(trim(preg_replace('/yEnc.*$/i', 'yEnc', $partLess)), 'UTF-8', mb_list_encodings());
 
         $renamed = 0;
-        if ($nzbDetails['useFName']) {
-            // If the user wants to use the file name.. use it.
+        if ($nzbDetails['useFName'] !== '') {
+            // If we are using the filename as the subject. We don't need to clean it.
             $cleanName = $nzbDetails['useFName'];
             $renamed = 1;
         } else {
