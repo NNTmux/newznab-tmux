@@ -101,7 +101,7 @@ class BtcPaymentController extends BasePageController
         }
         $payload = json_decode($request->getContent(), true);
         // We have received a payment for an invoice and user should be upgraded to a paid plan based on order
-        if ($payload['type'] === 'InvoicePaymentSettled') {
+        if ($payload['type'] === 'InvoiceSettled') {
             preg_match('/(?P<role>\w+(\s\+\+)?)[\s](?P<addYears>\d+)/i', $payload['metadata']['itemDesc'], $matches);
             if (empty($matches)) {
                 Log::error('Could not parse BTCPay webhook: '.$payload['metadata']['itemDesc']);
