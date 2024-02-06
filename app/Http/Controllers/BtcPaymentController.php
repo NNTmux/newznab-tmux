@@ -107,7 +107,7 @@ class BtcPaymentController extends BasePageController
                 Log::error('Could not parse BTCPay webhook: '.$payload['metadata']['itemDesc']);
                 preg_match('/(?P<role>\w+(\s\+\+)?)[\s](?P<addYears>\d+)/i', $payload['metadata']['itemCode'], $matches);
                 if (empty($matches)) {
-                    Log::error('Could not parse BTCPay webhook: '.$payload['metadata']['itemDesc']);
+                    Log::error('Could not parse BTCPay webhook: '.$payload['metadata']['itemCode']);
 
                     return response('Not Found', 404);
                 }
