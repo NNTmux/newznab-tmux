@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class ApiV2Controller extends BasePageController
 {
@@ -187,6 +188,9 @@ class ApiV2Controller extends BasePageController
         }
         $releases = new Releases();
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
+        if ($user === null) {
+            return response()->json(['error' => 'Invalid API Token'], 403);
+        }
         $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $this->api->verifyEmptyParameter($request, 'id');
@@ -261,6 +265,9 @@ class ApiV2Controller extends BasePageController
             return response()->json(['error' => 'Missing parameter (api_token)'], 403);
         }
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
+        if ($user === null) {
+            return response()->json(['error' => 'Invalid API Token'], 403);
+        }
         event(new UserAccessedApi($user));
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
@@ -273,16 +280,22 @@ class ApiV2Controller extends BasePageController
 
     public function details(Request $request): JsonResponse
     {
+        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
+            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        }
         if ($request->missing('id')) {
             return response()->json(['error' => 'Missing parameter (guid is required for single release details)'], 400);
         }
 
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
-        $userData = User::query()->where('api_token', $request->input('api_token'))->first();
-        event(new UserAccessedApi($userData));
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
+        if ($user === null) {
+            return response()->json(['error' => 'Invalid API Token'], 403);
+        }
+        event(new UserAccessedApi($user));
         $relData = Release::getByGuid($request->input('id'));
 
-        $relData = fractal($relData, new DetailsTransformer($userData));
+        $relData = fractal($relData, new DetailsTransformer($user));
 
         return response()->json($relData);
     }

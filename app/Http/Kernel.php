@@ -19,6 +19,7 @@ class Kernel extends HttpKernel
         Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \Monicahq\Cloudflare\Http\Middleware\TrustProxies::class,
+        Middleware\ForceJsonOnAPI::class,
     ];
 
     /**
