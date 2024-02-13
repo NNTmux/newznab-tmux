@@ -64,6 +64,9 @@ class ApiV2Controller extends BasePageController
      */
     public function movie(Request $request): JsonResponse
     {
+        if ($request->missing('api_token') || ($request->has('api_token') && $request->isNotFilled('api_token'))) {
+            return response()->json(['error' => 'Missing parameter (apikey)'], 403);
+        }
         $releases = new Releases();
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
@@ -72,9 +75,9 @@ class ApiV2Controller extends BasePageController
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         event(new UserAccessedApi($user));
 
-        $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
-        $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
-        $traktId = $request->has('traktid') && ! empty($request->input('traktid')) ? $request->input('traktid') : -1;
+        $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? $request->input('imdbid') : -1;
+        $tmdbId = $request->has('tmdbid') && $request->filled('tmdbid') ? $request->input('tmdbid') : -1;
+        $traktId = $request->has('traktid') && $request->filled('traktid') ? $request->input('traktid') : -1;
 
         $relData = $releases->moviesSearch(
             $imdbId,
@@ -114,6 +117,9 @@ class ApiV2Controller extends BasePageController
      */
     public function apiSearch(Request $request): JsonResponse
     {
+        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
+            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        }
         $releases = new Releases();
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $offset = $this->api->offset($request);
@@ -176,6 +182,9 @@ class ApiV2Controller extends BasePageController
      */
     public function tv(Request $request): JsonResponse
     {
+        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
+            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        }
         $releases = new Releases();
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $catExclusions = User::getCategoryExclusionForApi($request);
@@ -248,6 +257,9 @@ class ApiV2Controller extends BasePageController
 
     public function getNzb(Request $request): \Illuminate\Foundation\Application|JsonResponse|\Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
+        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
+            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        }
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         event(new UserAccessedApi($user));
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
@@ -262,7 +274,7 @@ class ApiV2Controller extends BasePageController
     public function details(Request $request): JsonResponse
     {
         if ($request->missing('id')) {
-            return response()->json(['data' => 'Missing parameter (guid is required for single release details)'], 400);
+            return response()->json(['error' => 'Missing parameter (guid is required for single release details)'], 400);
         }
 
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
