@@ -14,7 +14,6 @@ use App\Transformers\ApiTransformer;
 use App\Transformers\CategoryTransformer;
 use App\Transformers\DetailsTransformer;
 use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -246,7 +245,6 @@ class ApiV2Controller extends BasePageController
 
         return response()->json($response);
     }
-
 
     public function getNzb(Request $request): \Illuminate\Foundation\Application|JsonResponse|\Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
