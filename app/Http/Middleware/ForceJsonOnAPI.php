@@ -17,8 +17,8 @@ class ForceJsonOnAPI
     public function handle(Request $request, Closure $next): Response
     {
         // Force Json accept type on api routes
-        if ($request->is('api/*') && !Str::contains($request->header('accept'), ['/json', '+json'])) {
-            $request->headers->set('accept', 'application/json,' . $request->header('accept'));
+        if ($request->is('api/*') && ! Str::contains($request->header('accept'), ['/json', '+json'])) {
+            $request->headers->set('accept', 'application/json,'.$request->header('accept'));
         }
 
         return $next($request);
