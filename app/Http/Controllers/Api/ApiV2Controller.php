@@ -196,13 +196,13 @@ class ApiV2Controller extends BasePageController
         event(new UserAccessedApi($user));
 
         $siteIdArr = [
-            'id' => $request->input('vid') ?? '0',
-            'tvdb' => $request->input('tvdbid') ?? '0',
-            'trakt' => $request->input('traktid') ?? '0',
-            'tvrage' => $request->input('rid') ?? '0',
-            'tvmaze' => $request->input('tvmazeid') ?? '0',
-            'imdb' => $request->input('imdbid') ?? '0',
-            'tmdb' => $request->input('tmdbid') ?? '0',
+            'id' => $request->input('vid') ?? null,
+            'tvdb' => $request->input('tvdbid') ?? null,
+            'trakt' => $request->input('traktid') ?? null,
+            'tvrage' => $request->input('rid') ?? null,
+            'tvmaze' => $request->input('tvmazeid') ?? null,
+            'imdb' => $request->input('imdbid') ?? null,
+            'tmdb' => $request->input('tmdbid') ?? null,
         ];
 
         // Process season only queries or Season and Episode/Airdate queries
@@ -247,10 +247,8 @@ class ApiV2Controller extends BasePageController
         return response()->json($response);
     }
 
-    /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
-     */
-    public function getNzb(Request $request): RedirectResponse
+
+    public function getNzb(Request $request): \Illuminate\Foundation\Application|JsonResponse|\Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         event(new UserAccessedApi($user));
@@ -260,13 +258,13 @@ class ApiV2Controller extends BasePageController
             return redirect('/getnzb?r='.$request->input('api_token').'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
         }
 
-        Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
+        return response()->json(['data' => 'No such item (the guid you provided has no release in our database)'], 404);
     }
 
     public function details(Request $request): JsonResponse
     {
         if ($request->missing('id')) {
-            Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
+            return response()->json(['data' => 'Missing parameter (guid is required for single release details)'], 400);
         }
 
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
