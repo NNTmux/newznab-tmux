@@ -1102,12 +1102,12 @@ class ProcessAdditional
             // Get all the compressed files in the temp folder.
             $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1)($|[^a-z0-9])/i');
 
-            if ($files !== false) {
+            if (! empty($files)) {
                 foreach ($files as $file) {
                     // Check if the file exists.
                     if (File::isFile($file[0])) {
                         $rarData = @File::get($file[0]);
-                        if ($rarData !== false) {
+                        if (! empty($rarData)) {
                             $this->_processCompressedData($rarData);
                             $foundCompressedFile = true;
                         }
@@ -1128,7 +1128,7 @@ class ProcessAdditional
 
         // Get all the remaining files in the temp dir.
         $files = $this->_getTempDirectoryContents();
-        if ($files !== false) {
+        if (! empty($files)) {
             foreach ($files as $file) {
                 $file = $file->getPathname();
 
@@ -1448,36 +1448,37 @@ class ProcessAdditional
     }
 
     /**
-     * @return bool|string|\Symfony\Component\Finder\SplFileInfo[]
+     * Get the contents of a directory.
+     *
+     * @param  string  $pattern
+     * @param  string  $path
+     *
+     * @return array
      */
-    protected function _getTempDirectoryContents(string $pattern = '', string $path = ''): array|bool|string
+    protected function _getTempDirectoryContents(string $pattern = '', string $path = ''): array
     {
-        if ($path === '') {
-            $path = $this->tmpPath;
-        }
+        $path = $path ?: $this->tmpPath;
 
-        $files = File::allFiles($path);
         try {
-            if ($pattern !== '') {
-                $allFiles = '';
-                foreach ($files as $file) {
-                    if (preg_match($pattern, $file->getRelativePathname())) {
-                        $allFiles .= $file->getRealPath();
-                    }
-                }
-
-                return $allFiles;
-            }
-
-            return $files;
+            $files = File::allFiles($path);
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
                 Log::error($e->getTraceAsString());
-                $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
             }
-
-            return false;
+            throw new \RuntimeException('ERROR: Could not open temp dir: '.$e->getMessage());
         }
+
+        if ($pattern !== '') {
+            $filteredFiles = [];
+            foreach ($files as $file) {
+                if (preg_match($pattern, $file->getRelativePathname())) {
+                    $filteredFiles[] = $file->getRelativePathname();
+                }
+            }
+            return $filteredFiles;
+        }
+
+        return $files;
     }
 
     /**
