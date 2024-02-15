@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Mhor\MediaInfo\MediaInfo;
 
 class ProcessAdditional
@@ -411,15 +412,15 @@ class ProcessAdditional
         $this->_mainTmpPath = config('nntmux.tmp_unrar_path');
 
         // Check if it ends with a dir separator.
-        if (! preg_match('/[\/\\\\]$/', $this->_mainTmpPath)) {
+        if (! Str::endsWith($this->_mainTmpPath, '/') && ! Str::endsWith($this->_mainTmpPath, '\\')) {
             $this->_mainTmpPath .= '/';
         }
 
-        // If we are doing per group, use the groupID has a inner path, so other scripts don't delete the files we are working on.
+        // If we are doing per group, use the groupID has an inner path, so other scripts don't delete the files we are working on.
         if ($groupID !== '') {
-            $this->_mainTmpPath .= ($groupID.'/');
+            $this->_mainTmpPath .= $groupID.'/';
         } elseif ($guidChar !== '') {
-            $this->_mainTmpPath .= ($guidChar.'/');
+            $this->_mainTmpPath .= $guidChar.'/';
         }
 
         if (! File::isDirectory($this->_mainTmpPath)) {
@@ -1458,10 +1459,10 @@ class ProcessAdditional
         $files = File::allFiles($path);
         try {
             if ($pattern !== '') {
-                $allFiles = [];
+                $allFiles = '';
                 foreach ($files as $file) {
                     if (preg_match($pattern, $file->getRelativePathname())) {
-                        $allFiles .= $file;
+                        $allFiles .= $file->getRealPath();
                     }
                 }
 

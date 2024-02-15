@@ -1752,35 +1752,6 @@ function init_EasyPieChart() {
         $('.js_update').on('click', function () {
             a.update(200 * Math.random() - 100);
         });
-        var b = $.fn.popover.Constructor.prototype.leave;
-        ($.fn.popover.Constructor.prototype.leave = function (a) {
-            var d,
-                e,
-                c =
-                    a instanceof this.constructor
-                        ? a
-                        : $(a.currentTarget)
-                              [this.type](this.getDelegateOptions())
-                              .data('bs.' + this.type);
-            b.call(this, a),
-                a.currentTarget &&
-                    ((d = $(a.currentTarget).siblings('.popover')),
-                    (e = c.timeout),
-                    d.one('mouseenter', function () {
-                        clearTimeout(e),
-                            d.one('mouseleave', function () {
-                                $.fn.popover.Constructor.prototype.leave.call(c, c);
-                            });
-                    }));
-        }),
-            $('body').popover({
-                selector: '[data-popover]',
-                trigger: 'click hover',
-                delay: {
-                    show: 50,
-                    hide: 400,
-                },
-            });
     }
 }
 
@@ -5254,35 +5225,6 @@ $('.bulk_action input').on('ifChecked', function () {
         $(window).load(function () {
             NProgress.done();
         }));
-var originalLeave = $.fn.popover.Constructor.prototype.leave;
-($.fn.popover.Constructor.prototype.leave = function (a) {
-    var c,
-        d,
-        b =
-            a instanceof this.constructor
-                ? a
-                : $(a.currentTarget)
-                      [this.type](this.getDelegateOptions())
-                      .data('bs.' + this.type);
-    originalLeave.call(this, a),
-        a.currentTarget &&
-            ((c = $(a.currentTarget).siblings('.popover')),
-            (d = b.timeout),
-            c.one('mouseenter', function () {
-                clearTimeout(d),
-                    c.one('mouseleave', function () {
-                        $.fn.popover.Constructor.prototype.leave.call(b, b);
-                    });
-            }));
-}),
-    $('body').popover({
-        selector: '[data-popover]',
-        trigger: 'click hover',
-        delay: {
-            show: 50,
-            hide: 400,
-        },
-    }),
     $(document).ready(function () {
         init_sparklines(),
             init_flot_chart(),
