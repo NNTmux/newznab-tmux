@@ -1449,11 +1449,6 @@ class ProcessAdditional
 
     /**
      * Get the contents of a directory.
-     *
-     * @param  string  $pattern
-     * @param  string  $path
-     *
-     * @return array
      */
     protected function _getTempDirectoryContents(string $pattern = '', string $path = ''): array
     {
@@ -1475,6 +1470,7 @@ class ProcessAdditional
                     $filteredFiles[] = $file->getRelativePathname();
                 }
             }
+
             return $filteredFiles;
         }
 
