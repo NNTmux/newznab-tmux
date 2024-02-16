@@ -25,19 +25,17 @@
 	{$site->adbrowse}
 	{if $serieslist|@count > 0}
 		<table class="data table table-striped responsive-utilities jambo-table icons" id="browsetable">
-			<div class="col-md-12 float-right">
-			    {{Form::open(['class' => 'form float-right', 'style' => 'margin-top:-35px;'])}}
-                    {{Form::open(['name' => 'showsearch', 'class' => 'navbar-form', 'method' => 'get'])}}
-						<div class="input-group">
-							<input class="form-inline" style="width: 150px;"
-								   id="title appendedInputButton"
-								   type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}"{else}{/if}"
-								   placeholder="Search here"/>
-                            {{Form::button('Go', ['class' => 'btn btn-success', 'type' => 'submit'])}}
-						</div>
-					{{Form::close()}}
-				{{Form::close()}}
-			</div>
+			<div class="col-md-12 float-right" style="margin-top:-35px;">
+                {{Form::open(['name' => 'showsearch', 'class' => 'form navbar-form float-right', 'method' => 'get'])}}
+                    <div class="input-group">
+                        <input class="form-inline" style="width: 150px;"
+                            id="title appendedInputButton"
+                            type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}"{else}{/if}"
+                            placeholder="Search here"/>
+                        {{Form::button('Go', ['class' => 'btn btn-success', 'type' => 'submit'])}}
+                    </div>
+                {{Form::close()}}
+            </div>
 			{foreach $serieslist as $sletter => $series}
 				<tr>
 					<td colspan="10">
