@@ -505,21 +505,39 @@ jQuery(function ($) {
     // headermenu.tpl
     $('#headsearch')
         .focus(function () {
-            if (this.value == 'Search...') this.value = '';
+            if (this.value === 'Search...') this.value = '';
             else this.select();
         })
         .blur(function () {
-            if (this.value == '') this.value = 'Search...';
+            if (this.value === '') this.value = 'Search...';
         });
     $('#headsearch_form').submit(function () {
         $('#headsearch_go').trigger('click');
         return false;
     });
-    $('#headsearch_go').click(function () {
-        if ($('#headsearch').val() && $('#headsearch').val() != 'Search...') {
-            let sText = $('#headsearch').val();
-            let sCat = $('#headcat').val() != -1 ? '&t=' + $('#headcat').val() : '';
-            document.location = base_url + '/search?id=' + sText + sCat;
+        document.getElementById('headsearch_go').addEventListener('click', function () {
+        let searchInput = document.getElementById('headsearch');
+        let categoryInput = document.getElementById('headcat');
+        if (searchInput.value && searchInput.value != 'Search...') {
+            let sText = searchInput.value;
+            let sCat = categoryInput.value !== '-1' ? '&t=' + categoryInput.value : 't=-1';
+            window.location.href = base_url + '/search?' + sCat + '&search=' + sText;
+        } else {
+            PNotify.defaults.icons = 'fontawesome5';
+            PNotify.alert({
+                title: 'You need to enter a search term!',
+                type: 'error',
+                icon: 'fa fa-info fa-3x',
+                Animate: {
+                    animate: true,
+                    in_class: 'bounceInLeft',
+                    out_class: 'bounceOutRight',
+                },
+                desktop: {
+                    desktop: true,
+                    fallback: true,
+                },
+            });
         }
     });
 
