@@ -157,10 +157,12 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge bg-info">{$result->comments}
 																			Comment{if $result->comments != 1}s{/if}</span></a>
-                                                                    <a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs text-muted"
-																			title="Send to my Download Basket"><i
-																				class="fa fa-shopping-basket"></i>
-                                                                        </span></a>
+                                                                    <a href="#"><i
+                                                                            id="guid{$result->guid}"
+                                                                            class="icon_cart text-muted fa fa-shopping-basket"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top" title
+                                                                            data-original-title="Send to my download basket"></i></a>
 																</div>
 															</td>
 														</tr>

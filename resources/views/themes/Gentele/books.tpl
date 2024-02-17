@@ -140,10 +140,12 @@
 																			class="fa fa-comment-o"></i><span
 																			class="badge bg-info"> {$result->comments}
 																		Comment{if $result->comments != 1}s{/if}</span></a>
-                                                                <a href="{{url("/cart/add?id={$result->guid}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs icon text-muted"
-																	  data-bs-toggle="tooltip" data-bs-placement="top"
-																	  data-original-title="Send to my download basket"><i
-                                                                            class="fa fa-shopping-basket"></i></span></a>
+                                                                <a href="#"><i
+                                                                        id="guid{$result->guid}"
+                                                                        class="icon_cart text-muted fa fa-shopping-basket"
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top" title
+                                                                        data-original-title="Send to my download basket"></i></a>
 																{if !empty($result->failed)}
 																	<span class="btn btn-light btn-xs"
 																		  title="This release has failed to download for some users">

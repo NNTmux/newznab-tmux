@@ -239,9 +239,12 @@
 											<a class="btn btn-light btn-sm btn-success btn-transparent"
 											   href="{{url("/getnzb?id={$release.guid}")}}"><i
 														class="fa fa-cloud-download"></i> Download</a>
-                                            <a class="btn btn-success btn-sm btn-info btn-transparent"
-                                                href="{{url("/cart/add?id={$release.guid}")}}" target="_blank">
-                                                        <i class="fa fa-shopping-basket guid"></i> Add to Cart</a>
+                                            <a href="#"><i
+                                                    id="guid{$result->guid}"
+                                                    class="icon_cart text-muted fa fa-shopping-basket"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title
+                                                    data-original-title="Send to my download basket"></i></a>
 										</div>
 									</div>
 									<div class="col-md-9 small-gutter-left">

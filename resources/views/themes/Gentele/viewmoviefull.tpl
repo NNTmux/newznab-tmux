@@ -156,11 +156,12 @@
 																class="fa fa-comments-o text-muted"
 																data-bs-toggle="tooltip" data-bs-placement="top" title
 																data-original-title="Comments"></i></a>
-                                                    <a href="{{url("/cart/add?id={$mguid[$m@index]}")}}" target="_blank"><i
-																class="text-muted fa fa-shopping-basket"
-																data-bs-toggle="tooltip"
-																data-bs-placement="top" title
-																data-original-title="Send to my download basket"></i></a>
+                                                    <a href="#"><i
+                                                            id="guid{$mguid[$m@index]}"
+                                                            class="icon_cart text-muted fa fa-shopping-basket"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top" title
+                                                            data-original-title="Send to my download basket"></i></a>
 												</td>
 											</tr>
 										{/foreach}

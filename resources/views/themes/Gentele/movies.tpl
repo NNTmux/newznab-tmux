@@ -159,10 +159,12 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-                                                                    <a href="{{url("/cart/add?id={$mguid[$m@index]}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs text-muted"
-																		  data-bs-toggle="tooltip" data-bs-placement="top" title
-																		  data-original-title="Send to my download basket"><i
-                                                                                class="fa fa-shopping-basket"></i></span></a>
+                                                                    <a href="#"><i
+                                                                            id="guid{$mguid[$m@index]}"
+                                                                            class="icon_cart text-muted fa fa-shopping-basket"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top" title
+                                                                            data-original-title="Send to my download basket"></i></a>
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
@@ -285,10 +287,12 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge bg-info"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-                                                                    <a href="{{url("/cart/add?id={$mguid[$m@index]}")}}" target="_blank"><span class="btn btn-hover btn-light btn-xs text-muted"
-																		  data-bs-toggle="tooltip" data-bs-placement="top" title
-																		  data-original-title="Send to my download basket"><i
-                                                                                class="fa fa-shopping-basket"></i></span></a>
+                                                                    <a href="#"><i
+                                                                            id="guid{$mguid[$m@index]}"
+                                                                            class="icon_cart text-muted fa fa-shopping-basket"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top" title
+                                                                            data-original-title="Send to my download basket"></i></a>
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
