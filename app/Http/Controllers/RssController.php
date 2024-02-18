@@ -136,7 +136,6 @@ class RssController extends BasePageController
      */
     public function cartRss(Request $request): JsonResponse|array
     {
-        $this->setPreferences();
         $rss = new RSS();
         $offset = 0;
         $user = $this->userCheck($request);
