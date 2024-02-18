@@ -116,7 +116,8 @@ class BasePageController extends Controller
     /**
      * Show 404 page.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param  null  $message
+     * @return \Illuminate\View\View
      */
     public function show404($message = null): View
     {
@@ -156,12 +157,6 @@ class BasePageController extends Controller
 
         $this->smarty->assign('userdata', $this->userdata);
         $this->smarty->assign('loggedin', 'true');
-
-        if ($this->userdata->nzbvortex_api_key !== '' && $this->userdata->nzbvortex_server_url !== '') {
-            $this->smarty->assign('weHasVortex', true);
-        } else {
-            $this->smarty->assign('weHasVortex', false);
-        }
 
         if ($this->userdata->hasRole('Admin')) {
             $this->smarty->assign('isadmin', 'true');

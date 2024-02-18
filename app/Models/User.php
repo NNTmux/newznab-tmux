@@ -198,6 +198,8 @@ class User extends Authenticatable
      */
     protected $guarded = [];
 
+    protected function getDefaultGuardName() : string{ return 'web'; }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'roles_id');

@@ -67,6 +67,7 @@ class RssController extends BasePageController
      */
     public function fullFeedRss(Request $request)
     {
+        $this->setPreferences();
         $rss = new RSS();
         $offset = 0;
         $user = $this->userCheck($request);
@@ -92,6 +93,7 @@ class RssController extends BasePageController
      */
     public function showRssDesc(): void
     {
+        $this->setPreferences();
         $rss = new RSS();
 
         $title = 'Rss Info';
