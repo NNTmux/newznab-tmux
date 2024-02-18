@@ -935,6 +935,7 @@ class ProcessAdditional
             default:
                 return false;
         }
+
         return $this->_processCompressedFileList();
     }
 
