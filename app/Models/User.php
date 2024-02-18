@@ -198,7 +198,10 @@ class User extends Authenticatable
      */
     protected $guarded = [];
 
-    protected function getDefaultGuardName() : string{ return 'web'; }
+    protected function getDefaultGuardName(): string
+    {
+        return 'web';
+    }
 
     public function role(): BelongsTo
     {
