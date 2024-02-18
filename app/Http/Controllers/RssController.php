@@ -92,7 +92,6 @@ class RssController extends BasePageController
      */
     public function showRssDesc(): void
     {
-        $this->setPreferences();
         $rss = new RSS();
 
         $title = 'Rss Info';
@@ -162,7 +161,6 @@ class RssController extends BasePageController
      */
     public function categoryFeedRss(Request $request): JsonResponse|array
     {
-        $this->setPreferences();
         $rss = new RSS();
         $offset = 0;
         if ($request->missing('id')) {
