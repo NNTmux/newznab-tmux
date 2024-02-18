@@ -74,11 +74,6 @@ class ProcessAdditional
     protected int $_maxNestedLevels;
 
     /**
-     * @var string|null
-     */
-    protected mixed $_7zipPath;
-
-    /**
      * @var null|string
      */
     protected mixed $_unrarPath;
@@ -286,8 +281,6 @@ class ProcessAdditional
         $this->_maxNestedLevels = (int) Settings::settingValue('..maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('..maxnestedlevels');
         $this->_extractUsingRarInfo = (int) Settings::settingValue('..extractusingrarinfo') !== 0;
         $this->_fetchLastFiles = (int) Settings::settingValue('archive.fetch.end') !== 0;
-
-        $this->_7zipPath = false;
         $this->_unrarPath = false;
 
         // Pass the binary extractors to ArchiveInfo.
@@ -296,11 +289,7 @@ class ProcessAdditional
             $this->_unrarPath = Settings::settingValue('apps..unrarpath');
             $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
         }
-        if (! empty(Settings::settingValue('apps..zippath'))) {
-            $this->_7zipPath = Settings::settingValue('apps..zippath');
-            $clients += [ArchiveInfo::TYPE_SZIP => $this->_7zipPath];
-            $clients += [ArchiveInfo::TYPE_ZIP => $this->_7zipPath];
-        }
+
         $this->_archiveInfo->setExternalClients($clients);
 
         $this->_killString = '"';
@@ -931,36 +920,21 @@ class ProcessAdditional
                     File::delete($fileName);
                 }
                 break;
-            case ArchiveInfo::TYPE_SZIP:
-                if ($this->_echoCLI) {
-                    $this->_echo('7z', 'primaryOver');
-                }
-
-                if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
-                    $fileName = $this->tmpPath.uniqid('', true).'.7z';
-                    File::put($fileName, $compressedData);
-                    // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
-                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
-                    File::delete($fileName);
-                }
-                break;
             case ArchiveInfo::TYPE_ZIP:
                 if ($this->_echoCLI) {
                     $this->_echo('z', 'primaryOver');
                 }
-
-                if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
+                if (! $this->_extractUsingRarInfo) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
-                    // Pass the -p flag to the 7zip command to make sure it doesn't get stuck in password prompt
-                    runCmd($this->_killString.$this->_7zipPath.'" x -tzip "'.$fileName.'" -p -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    // Use the unzip command instead of 7zip
+                    runCmd('unzip -o "'.$fileName.'" -d "'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
                 break;
             default:
                 return false;
         }
-
         return $this->_processCompressedFileList();
     }
 
