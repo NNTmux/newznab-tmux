@@ -790,7 +790,9 @@ a:focus {
 .nav.side-menu > li.active > a {
     text-shadow: rgba(0, 0, 0, 0.25) 0 -1px 0;
     background: linear-gradient(#334556, #2c4257), #2a3f54;
-    box-shadow: rgba(0, 0, 0, 0.25) 0 1px 0, inset rgba(255, 255, 255, 0.16) 0 1px 0;
+    box-shadow:
+        rgba(0, 0, 0, 0.25) 0 1px 0,
+        inset rgba(255, 255, 255, 0.16) 0 1px 0;
 }
 
 .navbar-brand,
@@ -2753,7 +2755,9 @@ textarea:focus {
     border: 1px solid #cccccc;
     border-bottom-color: #b3b3b3;
     border-radius: 4px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* *********  /form textarea  **************************** */
@@ -4034,7 +4038,10 @@ form:after {
 }
 
 .login_content h1 {
-    font: normal 25px Helvetica, Arial, sans-serif;
+    font:
+        normal 25px Helvetica,
+        Arial,
+        sans-serif;
     letter-spacing: -0.05em;
     line-height: 20px;
     margin: 10px 0 30px;
@@ -4091,9 +4098,15 @@ form:after {
 .login_content form input[type='email'],
 .login_content form input[type='password'] {
     border-radius: 3px;
-    -ms-box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
-    -o-box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
-    box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
+    -ms-box-shadow:
+        0 1px 0 #fff,
+        0 -2px 5px rgba(0, 0, 0, 0.08) inset;
+    -o-box-shadow:
+        0 1px 0 #fff,
+        0 -2px 5px rgba(0, 0, 0, 0.08) inset;
+    box-shadow:
+        0 1px 0 #fff,
+        0 -2px 5px rgba(0, 0, 0, 0.08) inset;
     border: 1px solid #c8c8c8;
     color: #777;
     margin: 0 0 20px;
@@ -4183,7 +4196,9 @@ header {
 }
 
 #nprogress .peg {
-    box-shadow: 0 0 10px #1abb9c, 0 0 5px #1abb9c;
+    box-shadow:
+        0 0 10px #1abb9c,
+        0 0 5px #1abb9c;
 }
 
 #nprogress .spinner-icon {

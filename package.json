@@ -20,7 +20,8 @@
         "popper.js": "^1.16.1",
         "prettier": "^3.2.5",
         "resolve-url-loader": "^5.0.0",
-        "vue": "^3.4.19"
+        "vue": "^3.4.19",
+        "webpack-cli": "^5.1.4"
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",

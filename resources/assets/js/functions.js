@@ -515,7 +515,7 @@ jQuery(function ($) {
         $('#headsearch_go').trigger('click');
         return false;
     });
-        document.getElementById('headsearch_go').addEventListener('click', function () {
+    document.getElementById('headsearch_go').addEventListener('click', function () {
         let searchInput = document.getElementById('headsearch');
         let categoryInput = document.getElementById('headcat');
         if (searchInput.value && searchInput.value != 'Search...') {
