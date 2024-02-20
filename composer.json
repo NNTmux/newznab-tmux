@@ -155,6 +155,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/gearer"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/html"
         }
     ],
     "minimum-stability": "dev",
