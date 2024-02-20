@@ -18,7 +18,7 @@ class SendAccountChangedEmail implements ShouldQueue
     /**
      * @var User
      */
-    private $user;
+    private User $user;
 
     /**
      * Create a new job instance.
