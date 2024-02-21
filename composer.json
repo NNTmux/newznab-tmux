@@ -47,7 +47,7 @@
         "b3rs3rk/steamfront": "dev-master",
         "bacon/bacon-qr-code": "^2.0",
         "bhuvidya/laravel-countries": "^10.0",
-        "brick/math": "^0.11",
+        "brick/math": "^0.12",
         "caneara/triggers": "^1.0",
         "canihavesomecoffee/thetvdbapi": "^2.0",
         "dariusiii/php-itunes-api": "^1.0",
