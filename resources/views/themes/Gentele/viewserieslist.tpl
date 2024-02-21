@@ -8,6 +8,7 @@
 			</ol>
 		</div>
 	</div>
+<div>
 	<p>
 		<b>Jump to</b>:
 		&nbsp;[ {if $seriesletter == '0-9'}<b><u>{/if}<a
@@ -17,6 +18,7 @@
 		href="{{url("/series/{$range}")}}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
 		{/foreach}]
 	</p>
+</div>
 	<div class="btn-group">
 		<a class="btn btn-success" href="{{route('myshows')}}" title="List my watched shows">My shows</a>
 		<a class="btn btn-success" href="{{url("/myshows/browse")}}" title="browse your shows">Find all my
@@ -25,7 +27,7 @@
 	{$site->adbrowse}
 	{if $serieslist|@count > 0}
 		<table class="data table table-striped responsive-utilities jambo-table icons" id="browsetable">
-			<div class="col-md-12 float-right" style="margin-top:-35px;">
+			<div class="col-md-4 float-right" style="margin-top:35px;">
                 {{Form::open(['name' => 'showsearch', 'class' => 'form navbar-form float-right', 'method' => 'get'])}}
                     <div class="input-group">
                         <input class="form-inline" style="width: 150px;"
