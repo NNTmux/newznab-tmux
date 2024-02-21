@@ -546,9 +546,9 @@ jQuery(function ($) {
         if ($('#search').val())
             document.location =
                 base_url +
-                '/search?id=' +
+                '/search?search=' +
                 $('#search').val() +
-                ($('#search_cat').val() != -1 ? '&t=' + $('#search_cat').val() : '');
+                ($('#search_cat').val() != -1 ? '&t=' + $('#search_cat').val() : '&t=-1');
         return false;
     });
 
