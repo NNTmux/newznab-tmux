@@ -15,9 +15,6 @@ class SendAccountChangedEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var User
-     */
     private User $user;
 
     /**
