@@ -3044,16 +3044,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v8.1.0",
+            "version": "v8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "7d4b65fe18693d791dace6a8eb88d18fdc5bbbff"
+                "reference": "c622579ac6a232d41ecd95d1cab20975da1b25d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/7d4b65fe18693d791dace6a8eb88d18fdc5bbbff",
-                "reference": "7d4b65fe18693d791dace6a8eb88d18fdc5bbbff",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/c622579ac6a232d41ecd95d1cab20975da1b25d1",
+                "reference": "c622579ac6a232d41ecd95d1cab20975da1b25d1",
                 "shasum": ""
             },
             "require": {
@@ -3086,9 +3086,9 @@
             "description": "Library for retrieving film and tv information from IMDb",
             "support": {
                 "issues": "https://github.com/tboothman/imdbphp/issues",
-                "source": "https://github.com/tboothman/imdbphp/tree/v8.1.0"
+                "source": "https://github.com/tboothman/imdbphp/tree/v8.2.0"
             },
-            "time": "2023-03-14T23:52:55+00:00"
+            "time": "2024-02-25T10:22:15+00:00"
         },
         {
             "name": "intervention/gif",
@@ -16989,16 +16989,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.10",
+            "version": "10.5.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "50b8e314b6d0dd06521dc31d1abffa73f25f850c"
+                "reference": "0d968f6323deb3dbfeba5bfd4929b9415eb7a9a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/50b8e314b6d0dd06521dc31d1abffa73f25f850c",
-                "reference": "50b8e314b6d0dd06521dc31d1abffa73f25f850c",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0d968f6323deb3dbfeba5bfd4929b9415eb7a9a4",
+                "reference": "0d968f6323deb3dbfeba5bfd4929b9415eb7a9a4",
                 "shasum": ""
             },
             "require": {
@@ -17070,7 +17070,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.10"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.11"
             },
             "funding": [
                 {
@@ -17086,7 +17086,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-04T09:07:51+00:00"
+            "time": "2024-02-25T14:05:00+00:00"
         },
         {
             "name": "rector/rector",
