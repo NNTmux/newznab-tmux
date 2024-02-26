@@ -85,12 +85,12 @@ class ReleaseImage
      * @param  string  $imgName  What to name the new image.
      * @param  string  $imgLoc  URL or location on the disk the original image is in.
      * @param  string  $imgSavePath  Folder to save the new image in.
-     * @param  string  $imgMaxWidth  Max width to resize image to.   (OPTIONAL)
-     * @param  string  $imgMaxHeight  Max height to resize image to.  (OPTIONAL)
+     * @param  int  $imgMaxWidth  Max width to resize image to.   (OPTIONAL)
+     * @param  int  $imgMaxHeight  Max height to resize image to.  (OPTIONAL)
      * @param  bool  $saveThumb  Save a thumbnail of this image? (OPTIONAL)
      * @return int 1 on success, 0 on failure Used on site to check if there is an image.
      */
-    public function saveImage(string $imgName, string $imgLoc, string $imgSavePath, string $imgMaxWidth = '', string $imgMaxHeight = '', bool $saveThumb = false): int
+    public function saveImage(string $imgName, string $imgLoc, string $imgSavePath, int $imgMaxWidth = 0, int $imgMaxHeight = 0, bool $saveThumb = false): int
     {
         $cover = $this->fetchImage($imgLoc);
 
@@ -99,20 +99,22 @@ class ReleaseImage
         }
 
         // Check if we need to resize it.
-        if ($imgMaxWidth !== '' && $imgMaxHeight !== '') {
+        if ($imgMaxWidth !== 0 && $imgMaxHeight !== 0) {
             $width = $cover->width();
             $height = $cover->height();
-            $ratio = min($imgMaxHeight / $height, $imgMaxWidth / $width);
-            // New dimensions
-            $new_width = $ratio * $width;
-            $new_height = $ratio * $height;
-            if ($new_width < $width && $new_width > 10 && $new_height > 10) {
-                $cover->resize($new_width, $new_height);
+            if ($width !== 0 || $height !== 0) {
+                $ratio = min($imgMaxHeight / $height, $imgMaxWidth / $width);
+                // New dimensions
+                $new_width = $ratio * $width;
+                $new_height = $ratio * $height;
+                if ($new_width < $width && $new_width > 10 && $new_height > 10) {
+                    $cover->resize($new_width, $new_height);
 
-                if ($saveThumb) {
-                    $cover->toJpeg(100)->save($imgSavePath.$imgName.'_thumb.jpg');
-                    //Optimize the thumbnail.
-                    ImageOptimizer::optimize($imgSavePath.$imgName.'_thumb.jpg');
+                    if ($saveThumb) {
+                        $cover->toJpeg(100)->save($imgSavePath.$imgName.'_thumb.jpg');
+                        //Optimize the thumbnail.
+                        ImageOptimizer::optimize($imgSavePath.$imgName.'_thumb.jpg');
+                    }
                 }
             }
         }
