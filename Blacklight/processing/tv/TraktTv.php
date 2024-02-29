@@ -218,12 +218,12 @@ class TraktTv extends TV
 
         if ($this->posterUrl !== '') {
             // Try to get the Poster
-            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
+            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
         }
 
         // Couldn't get poster, try fan art instead
         if ($hasCover !== 1 && $this->fanartUrl !== '') {
-            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath, '', '');
+            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath);
         }
 
         // Mark it retrieved if we saved an image

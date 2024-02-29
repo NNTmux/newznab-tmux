@@ -287,7 +287,7 @@ class TVDB extends TV
         $ri = new ReleaseImage();
 
         // Try to get the Poster
-        $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '', false);
+        $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
         // Mark it retrieved if we saved an image
         if ($hasCover === 1) {
             $this->setCoverFound($videoId);
