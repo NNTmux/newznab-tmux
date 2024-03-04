@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f29ac614c17e0baf894de44649f54c48",
+    "content-hash": "3c1a67d08a196e986d8b3e2fd7498551",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2403,25 +2403,25 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "10.0.2",
+            "version": "11.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikebronner/laravel-caffeine.git",
-                "reference": "f3b6c997ad038fe30d682da5d62ff596bb8403e5"
+                "reference": "0d03494417cda0e4258f13c45275974dbf30717b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikebronner/laravel-caffeine/zipball/f3b6c997ad038fe30d682da5d62ff596bb8403e5",
-                "reference": "f3b6c997ad038fe30d682da5d62ff596bb8403e5",
+                "url": "https://api.github.com/repos/mikebronner/laravel-caffeine/zipball/0d03494417cda0e4258f13c45275974dbf30717b",
+                "reference": "0d03494417cda0e4258f13c45275974dbf30717b",
                 "shasum": ""
             },
             "require": {
-                "illuminate/routing": "^10.0",
-                "illuminate/support": "^10.0",
+                "illuminate/routing": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
                 "jenssegers/model": "^1.5"
             },
             "require-dev": {
-                "orchestra/testbench": "^8.0",
+                "orchestra/testbench": "^8.0|^9.0",
                 "orchestra/testbench-browser-kit": "^8.0",
                 "orchestra/testbench-dusk": "^8.0",
                 "phpmd/phpmd": "^2.13",
@@ -2453,7 +2453,7 @@
             "description": "Keeping Your Laravel Forms Awake",
             "support": {
                 "issues": "https://github.com/mikebronner/laravel-caffeine/issues",
-                "source": "https://github.com/mikebronner/laravel-caffeine/tree/10.0.2"
+                "source": "https://github.com/mikebronner/laravel-caffeine/tree/11.0.0"
             },
             "funding": [
                 {
@@ -2461,7 +2461,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-03T17:10:07+00:00"
+            "time": "2024-03-03T17:43:07+00:00"
         },
         {
             "name": "geoip2/geoip2",
