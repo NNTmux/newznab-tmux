@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "981e1a94dd490aa6835312d892b3e83a",
+    "content-hash": "6d453af9dbf5578d08aea755c9f8051f",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2465,28 +2465,28 @@
         },
         {
             "name": "geoip2/geoip2",
-            "version": "v2.13.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:maxmind/GeoIP2-php.git",
-                "reference": "6a41d8fbd6b90052bc34dff3b4252d0f88067b23"
+                "reference": "1a802ce9356cdd1c6b681c030fd9563750e11e6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxmind/GeoIP2-php/zipball/6a41d8fbd6b90052bc34dff3b4252d0f88067b23",
-                "reference": "6a41d8fbd6b90052bc34dff3b4252d0f88067b23",
+                "url": "https://api.github.com/repos/maxmind/GeoIP2-php/zipball/1a802ce9356cdd1c6b681c030fd9563750e11e6a",
+                "reference": "1a802ce9356cdd1c6b681c030fd9563750e11e6a",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "maxmind-db/reader": "~1.8",
+                "maxmind-db/reader": "^1.11.1",
                 "maxmind/web-service-common": "~0.8",
-                "php": ">=7.2"
+                "php": ">=8.1"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "3.*",
                 "phpstan/phpstan": "*",
-                "phpunit/phpunit": "^8.0 || ^9.0",
+                "phpunit/phpunit": "^10.0",
                 "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
@@ -2515,7 +2515,7 @@
                 "geolocation",
                 "maxmind"
             ],
-            "time": "2022-08-05T20:32:58+00:00"
+            "time": "2023-12-04T17:16:34+00:00"
         },
         {
             "name": "google/recaptcha",
@@ -4241,43 +4241,47 @@
         },
         {
             "name": "laravel/scout",
-            "version": "v9.8.1",
+            "version": "v10.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "38595717b396ce733d432b82e3225fa4e0d6c8ef"
+                "reference": "f2e20b0eb3355b555038581b52aec4bfe814c700"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/38595717b396ce733d432b82e3225fa4e0d6c8ef",
-                "reference": "38595717b396ce733d432b82e3225fa4e0d6c8ef",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/f2e20b0eb3355b555038581b52aec4bfe814c700",
+                "reference": "f2e20b0eb3355b555038581b52aec4bfe814c700",
                 "shasum": ""
             },
             "require": {
-                "illuminate/bus": "^8.0|^9.0|^10.0",
-                "illuminate/contracts": "^8.0|^9.0|^10.0",
-                "illuminate/database": "^8.0|^9.0|^10.0",
-                "illuminate/http": "^8.0|^9.0|^10.0",
-                "illuminate/pagination": "^8.0|^9.0|^10.0",
-                "illuminate/queue": "^8.0|^9.0|^10.0",
-                "illuminate/support": "^8.0|^9.0|^10.0",
-                "php": "^7.3|^8.0"
+                "illuminate/bus": "^9.0|^10.0|^11.0",
+                "illuminate/contracts": "^9.0|^10.0|^11.0",
+                "illuminate/database": "^9.0|^10.0|^11.0",
+                "illuminate/http": "^9.0|^10.0|^11.0",
+                "illuminate/pagination": "^9.0|^10.0|^11.0",
+                "illuminate/queue": "^9.0|^10.0|^11.0",
+                "illuminate/support": "^9.0|^10.0|^11.0",
+                "php": "^8.0"
             },
             "require-dev": {
-                "meilisearch/meilisearch-php": "^0.19",
+                "algolia/algoliasearch-client-php": "^3.2",
+                "meilisearch/meilisearch-php": "^1.0",
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^6.17|^7.0|^8.0",
+                "orchestra/testbench": "^7.31|^8.11|^9.0",
                 "php-http/guzzle7-adapter": "^1.0",
-                "phpunit/phpunit": "^9.3"
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^9.3|^10.4",
+                "typesense/typesense-php": "^4.9"
             },
             "suggest": {
                 "algolia/algoliasearch-client-php": "Required to use the Algolia engine (^3.2).",
-                "meilisearch/meilisearch-php": "Required to use the MeiliSearch engine (^0.23)."
+                "meilisearch/meilisearch-php": "Required to use the Meilisearch engine (^1.0).",
+                "typesense/typesense-php": "Required to use the Typesense engine (^4.9)."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "9.x-dev"
+                    "dev-master": "10.x-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -4310,7 +4314,7 @@
                 "issues": "https://github.com/laravel/scout/issues",
                 "source": "https://github.com/laravel/scout"
             },
-            "time": "2023-02-14T16:53:14+00:00"
+            "time": "2024-02-13T17:22:36+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -14218,24 +14222,24 @@
         },
         {
             "name": "ytake/laravel-smarty",
-            "version": "7.0.1",
+            "version": "8.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ytake/Laravel.Smarty.git",
-                "reference": "babd07251e422d2404878451632494827adfa1fd"
+                "reference": "488461d2e698a9fd279920698ed2ddac6d59456a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/babd07251e422d2404878451632494827adfa1fd",
-                "reference": "babd07251e422d2404878451632494827adfa1fd",
+                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/488461d2e698a9fd279920698ed2ddac6d59456a",
+                "reference": "488461d2e698a9fd279920698ed2ddac6d59456a",
                 "shasum": ""
             },
             "require": {
-                "illuminate/config": "^10.0",
-                "illuminate/console": "^10.0",
-                "illuminate/events": "^10.0",
-                "illuminate/support": "^10.0",
-                "illuminate/view": "^10.0",
+                "illuminate/config": "^10.0|^11.0",
+                "illuminate/console": "^10.0|^11.0",
+                "illuminate/events": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "illuminate/view": "^10.0|^11.0",
                 "php": "^8.1",
                 "smarty/smarty": "^4.3"
             },
@@ -14245,13 +14249,13 @@
                 "phploc/phploc": "*",
                 "phpmd/phpmd": "^2.13",
                 "phpstan/phpstan": "^1.9",
-                "phpunit/phpunit": "^9.5.10",
+                "phpunit/phpunit": "^9.5.10|^10.5",
                 "predis/predis": "^2.1",
                 "sebastian/phpcpd": "*",
                 "slevomat/coding-standard": "^8.8",
                 "squizlabs/php_codesniffer": "^3.7",
-                "symfony/console": "^6.0",
-                "symfony/framework-bundle": "^6.0"
+                "symfony/console": "^6.0|^7.0",
+                "symfony/framework-bundle": "^6.0|^7.0"
             },
             "suggest": {
                 "ext-memcached": "memcached Template Cache Driver",
@@ -14292,7 +14296,7 @@
             ],
             "support": {
                 "issues": "https://github.com/ytake/Laravel.Smarty/issues",
-                "source": "https://github.com/ytake/Laravel.Smarty/tree/7.0.1"
+                "source": "https://github.com/ytake/Laravel.Smarty/tree/8.0.0"
             },
             "funding": [
                 {
@@ -14300,7 +14304,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-08-09T09:06:35+00:00"
+            "time": "2024-03-04T13:00:35+00:00"
         }
     ],
     "packages-dev": [
