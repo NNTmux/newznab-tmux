@@ -117,7 +117,7 @@
         "ytake/laravel-smarty": "^7.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.15",
+        "barryvdh/laravel-ide-helper": "^3.0",
         "beyondcode/laravel-dump-server": "^1.9",
         "captainhook/captainhook": "^5.1",
         "captainhook/plugin-composer": "^5.1",
