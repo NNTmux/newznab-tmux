@@ -8,8 +8,6 @@ class AEBN extends AdultMovies
 {
     /**
      * Keyword to search.
-     *
-     * @var string
      */
     public string $searchTerm = '';
 
@@ -32,9 +30,6 @@ class AEBN extends AdultMovies
      */
     protected $_response;
 
-    /**
-     * @var string
-     */
     protected string $_trailerUrl = '';
 
     /**

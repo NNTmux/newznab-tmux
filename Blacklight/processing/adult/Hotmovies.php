@@ -16,22 +16,16 @@ class Hotmovies extends AdultMovies
 
     /**
      * Keyword Search.
-     *
-     * @var string
      */
     protected string $searchTerm = '';
 
     /**
      * Define a cookie location.
-     *
-     * @var string
      */
     public string $cookie = '';
 
     /**
      * If a direct link is set parse it instead of search for it.
-     *
-     * @var string
      */
     protected string $directLink = '';
 
@@ -42,22 +36,16 @@ class Hotmovies extends AdultMovies
 
     /**
      * Sets the link to get in curl.
-     *
-     * @var string
      */
     protected string $_getLink = '';
 
     /**
      * POST parameters used with curl.
-     *
-     * @var array
      */
     protected array $_postParams = [];
 
     /**
      * Results return from some methods.
-     *
-     * @var array
      */
     protected array $_res = [];
 
