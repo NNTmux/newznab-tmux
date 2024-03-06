@@ -32,9 +32,9 @@ class FanartTV
     }
 
     /**
-     * Getting movie pictures.
+    * @param string $id
+    * @return bool|array
      *
-     * @return array|false
      */
     public function getMovieFanArt(string $id): bool|array
     {
@@ -46,11 +46,10 @@ class FanartTV
     }
 
     /**
-     * Getting tv show pictures.
-     *
-     * @return array|false
+    * @param string $id
+    * @return bool|array
      */
-    public function getTVFanart(string $id): bool|array
+    public function getTVFanArt(string $id): bool|array
     {
         if ($this->apiKey !== '') {
             return $this->_getUrl('tv/'.$id);
@@ -60,9 +59,8 @@ class FanartTV
     }
 
     /**
-     * The function making all the work using curl to call.
-     *
-     * @return false|array
+    * @param string $path
+    * @return bool|array
      */
     private function _getUrl(string $path): bool|array
     {

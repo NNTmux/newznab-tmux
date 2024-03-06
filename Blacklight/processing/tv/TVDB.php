@@ -145,7 +145,7 @@ class TVDB extends TV
                     if (! empty($tvdbShow['poster'])) { // Use TVDB poster if available
                         $this->getPoster($videoId);
                     } else { // Check Fanart.tv for poster
-                        $poster = $this->fanart->getTVFanart($tvDbId);
+                        $poster = $this->fanart->getTVFanArt($tvDbId);
                         if ($poster) {
                             $this->posterUrl = collect($poster['tvposter'])->sortByDesc('likes')[0]['url'];
                             $this->getPoster($videoId);
