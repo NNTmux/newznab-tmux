@@ -21,12 +21,12 @@ class FanartTV
     /**
      * @var string
      */
-    private $apiKey;
+    private string $apiKey;
 
     /**
      * @var string
      */
-    private $server;
+    private string $server;
 
     /**
      * The constructor setting the config variables.
@@ -34,7 +34,7 @@ class FanartTV
     public function __construct($apiKey)
     {
         $this->apiKey = $apiKey;
-        $this->server = 'https://webservice.fanart.tv/v3';
+        $this->server = 'https://webservice.fanart.tv/';
     }
 
     /**
@@ -45,12 +45,7 @@ class FanartTV
     public function getMovieFanArt(string $id): bool|array
     {
         if ($this->apiKey !== '') {
-            $fanArt = $this->_getUrl('movies/'.$id);
-            if ($fanArt !== false) {
-                return $fanArt;
-            }
-
-            return false;
+            return $this->_getUrl('movie/'.$id);
         }
 
         return false;
@@ -64,12 +59,7 @@ class FanartTV
     public function getTVFanart(string $id): bool|array
     {
         if ($this->apiKey !== '') {
-            $fanArt = $this->_getUrl('tv/'.$id);
-            if ($fanArt !== false) {
-                return $fanArt;
-            }
-
-            return false;
+            return $this->_getUrl('tv/'.$id);
         }
 
         return false;
