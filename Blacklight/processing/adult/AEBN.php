@@ -11,7 +11,7 @@ class AEBN extends AdultMovies
      *
      * @var string
      */
-    public $searchTerm = '';
+    public string $searchTerm = '';
 
     /**
      * Url Constants used within this class.
@@ -35,7 +35,7 @@ class AEBN extends AdultMovies
     /**
      * @var string
      */
-    protected $_trailerUrl = '';
+    protected string $_trailerUrl = '';
 
     /**
      * Returned results in all methods except search/geturl.
@@ -59,7 +59,7 @@ class AEBN extends AdultMovies
     protected string $_title = '';
 
     /**
-     * Gets Trailer URL .. will be processed in XXX insertswf.
+     * Gets Trailer URL . will be processed in XXX insertswf.
      */
     protected function trailers(): mixed
     {
@@ -80,7 +80,7 @@ class AEBN extends AdultMovies
         $ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1);
         if ($ret !== false) {
             $ret = trim($ret->src);
-            if (strpos($ret, '//') === 0) {
+            if (str_starts_with($ret, '//')) {
                 $ret = 'https:'.$ret;
             }
             $this->_res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
@@ -122,7 +122,7 @@ class AEBN extends AdultMovies
             $ret = $this->_html->findOne('div.detailsLink');
             if (! $ret instanceof SimpleHtmlDomNodeBlank) {
                 foreach ($ret->find('span') as $star) {
-                    if (strpos($star->plaintext, '/More/') !== false && strpos($star->plaintext, '/Stars/') !== false) {
+                    if (str_contains($star->plaintext, '/More/') && str_contains($star->plaintext, '/Stars/')) {
                         $this->_res['cast'][] = trim($star->plaintext);
                     }
                 }

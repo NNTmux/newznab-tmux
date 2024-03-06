@@ -8,7 +8,7 @@ namespace Blacklight\processing\adult;
 class ADE extends AdultMovies
 {
     /**
-     * If a direct link is given parse it rather then search.
+     * If a direct link is given parse it rather than search.
      */
     protected string $directLink = '';
 
@@ -35,25 +35,21 @@ class ADE extends AdultMovies
     /** Trailing urls */
     protected string $_dvdQuery = '/dvd/search?q=';
 
-    protected $_scenes = '/scenes';
+    protected string $_scenes = '/scenes';
 
-    protected $_boxCover = '/boxcover';
+    protected string $_boxCover = '/boxcover';
 
-    protected $_backCover = '/backcover';
+    protected string $_backCover = '/backcover';
 
-    protected $_reviews = '/reviews';
+    protected string $_reviews = '/reviews';
 
-    protected $_trailers = '/trailers';
-
-    protected $_url;
+    protected string $_trailers = '/trailers';
 
     protected $_response;
 
     protected $_res = [];
 
     protected $_tmpResponse;
-
-    protected $_ch;
 
     /**
      * Gets Trailer Movies.

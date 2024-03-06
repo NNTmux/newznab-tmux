@@ -60,7 +60,7 @@ class ADM extends AdultMovies
     /**
      * Get Box Cover Images.
      *
-     * @return array - boxcover,backcover
+     * @return array - box cover,back cover
      */
     protected function covers(): array
     {
@@ -159,7 +159,7 @@ class ADM extends AdultMovies
     }
 
     /**
-     * Searches for match against searchterm.
+     * Searches for match against search term.
      *
      * @return bool - true if search = 100%
      */

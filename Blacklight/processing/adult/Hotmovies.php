@@ -19,21 +19,21 @@ class Hotmovies extends AdultMovies
      *
      * @var string
      */
-    protected $searchTerm = '';
+    protected string $searchTerm = '';
 
     /**
      * Define a cookie location.
      *
      * @var string
      */
-    public $cookie = '';
+    public string $cookie = '';
 
     /**
      * If a direct link is set parse it instead of search for it.
      *
      * @var string
      */
-    protected $directLink = '';
+    protected string $directLink = '';
 
     /**
      * Sets the direct url in the getAll method.
@@ -45,21 +45,21 @@ class Hotmovies extends AdultMovies
      *
      * @var string
      */
-    protected $_getLink = '';
+    protected string $_getLink = '';
 
     /**
      * POST parameters used with curl.
      *
      * @var array
      */
-    protected $_postParams = [];
+    protected array $_postParams = [];
 
     /**
      * Results return from some methods.
      *
      * @var array
      */
-    protected $_res = [];
+    protected array $_res = [];
 
     /**
      * Raw Html from Curl.
@@ -71,7 +71,7 @@ class Hotmovies extends AdultMovies
      */
     protected string $_title = '';
 
-    protected function trailers(): mixed
+    protected function trailers(): false
     {
         // TODO: Implement trailers() method.
 
@@ -109,7 +109,7 @@ class Hotmovies extends AdultMovies
                 if (stripos($e, 'Studio:') !== false) {
                     $studio = true;
                 }
-                if (strpos($e, 'Director:') !== false) {
+                if (str_contains($e, 'Director:')) {
                     $director = true;
                     $e = null;
                 }
@@ -176,7 +176,7 @@ class Hotmovies extends AdultMovies
     /**
      * Get Box Cover Images.
      */
-    protected function covers(): mixed
+    protected function covers(): array|false
     {
         if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
             $this->_res['boxcover'] = trim($ret->src);
@@ -217,11 +217,10 @@ class Hotmovies extends AdultMovies
                             unset($this->_response);
                             if ($this->_getLink !== false) {
                                 $this->_response = getRawHtml($this->_getLink, $this->cookie);
-                                $this->_html->loadHtml($this->_response);
                             } else {
                                 $this->_response = getRawHtml($this->_directUrl, $this->cookie);
-                                $this->_html->loadHtml($this->_response);
                             }
+                            $this->_html->loadHtml($this->_response);
 
                             return true;
                         }

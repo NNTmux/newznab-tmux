@@ -28,7 +28,7 @@ class Popporn extends AdultMovies
     private const TRAILINGSEARCH = '/search&q=';
 
     /**
-     * Sets the directurl for the return results array.
+     * Sets the direct url for the return results array.
      */
     protected string $_directUrl = '';
 
@@ -48,7 +48,7 @@ class Popporn extends AdultMovies
     protected string $_title = '';
 
     /**
-     * Add this to popurl to get results.
+     * Add this to pop url to get results.
      */
     protected string $_trailUrl = '';
 
@@ -57,7 +57,7 @@ class Popporn extends AdultMovies
     /**
      * Get Box Cover Images.
      *
-     * @return array - boxcover,backcover
+     * @return array - box cover,back cover
      */
     protected function covers(): array
     {
@@ -80,7 +80,7 @@ class Popporn extends AdultMovies
         return $this->_res;
     }
 
-    protected function synopsis(): mixed
+    protected function synopsis(): array
     {
         if ($ret = $this->_html->find('div[id=product-info] ,h3[class=highlight]', 1)) {
             if ($ret->next_sibling()->plaintext) {
@@ -99,7 +99,7 @@ class Popporn extends AdultMovies
         return $this->_res;
     }
 
-    protected function trailers(): mixed
+    protected function trailers(): array
     {
         if ($ret = $this->_html->findOne('input#thickbox-trailer-link')) {
             $ret->value = trim($ret->value);
@@ -122,7 +122,7 @@ class Popporn extends AdultMovies
         return $this->_res;
     }
 
-    protected function productInfo(bool $extras = false): mixed
+    protected function productInfo(bool $extras = false): array
     {
         $country = false;
         if ($ret = $this->_html->findOne('div#lside')) {
@@ -225,7 +225,7 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * Searches for match against searchterm.
+     * Searches for match against search term.
      *
      * @return bool , true if search >= 90%
      */
