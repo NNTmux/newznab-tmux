@@ -2468,7 +2468,7 @@
             "version": "v3.0.0",
             "source": {
                 "type": "git",
-                "url": "git@github.com:maxmind/GeoIP2-php.git",
+                "url": "https://github.com/maxmind/GeoIP2-php.git",
                 "reference": "1a802ce9356cdd1c6b681c030fd9563750e11e6a"
             },
             "dist": {
@@ -2515,6 +2515,10 @@
                 "geolocation",
                 "maxmind"
             ],
+            "support": {
+                "issues": "https://github.com/maxmind/GeoIP2-php/issues",
+                "source": "https://github.com/maxmind/GeoIP2-php/tree/v3.0.0"
+            },
             "time": "2023-12-04T17:16:34+00:00"
         },
         {
@@ -6263,16 +6267,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.0.1",
+            "version": "v5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "2218c2252c874a4624ab2f613d86ac32d227bc69"
+                "reference": "139676794dc1e9231bf7bcd123cfc0c99182cb13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/2218c2252c874a4624ab2f613d86ac32d227bc69",
-                "reference": "2218c2252c874a4624ab2f613d86ac32d227bc69",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/139676794dc1e9231bf7bcd123cfc0c99182cb13",
+                "reference": "139676794dc1e9231bf7bcd123cfc0c99182cb13",
                 "shasum": ""
             },
             "require": {
@@ -6315,9 +6319,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.0.1"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.0.2"
             },
-            "time": "2024-02-21T19:24:10+00:00"
+            "time": "2024-03-05T20:51:40+00:00"
         },
         {
             "name": "nunomaduro/termwind",
@@ -14521,16 +14525,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.21.2",
+            "version": "5.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "f0911f6b5bb9fe0f144a40fe1e156772dcfbdf90"
+                "reference": "dbd4dd6ae6ae9a05c014a01f50417aee8a7520cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/f0911f6b5bb9fe0f144a40fe1e156772dcfbdf90",
-                "reference": "f0911f6b5bb9fe0f144a40fe1e156772dcfbdf90",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/dbd4dd6ae6ae9a05c014a01f50417aee8a7520cd",
+                "reference": "dbd4dd6ae6ae9a05c014a01f50417aee8a7520cd",
                 "shasum": ""
             },
             "require": {
@@ -14593,7 +14597,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.21.2"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.22.1"
             },
             "funding": [
                 {
@@ -14601,7 +14605,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-23T13:10:10+00:00"
+            "time": "2024-03-06T13:08:46+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
