@@ -31,11 +31,6 @@ class FanartTV
         $this->server = 'https://webservice.fanart.tv/';
     }
 
-    /**
-    * @param string $id
-    * @return bool|array
-     *
-     */
     public function getMovieFanArt(string $id): bool|array
     {
         if ($this->apiKey !== '') {
@@ -45,10 +40,6 @@ class FanartTV
         return false;
     }
 
-    /**
-    * @param string $id
-    * @return bool|array
-     */
     public function getTVFanArt(string $id): bool|array
     {
         if ($this->apiKey !== '') {
@@ -58,10 +49,6 @@ class FanartTV
         return false;
     }
 
-    /**
-    * @param string $path
-    * @return bool|array
-     */
     private function _getUrl(string $path): bool|array
     {
         $url = $this->server.'/'.$path.'?api_key='.$this->apiKey;
