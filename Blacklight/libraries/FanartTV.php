@@ -18,14 +18,8 @@ namespace Blacklight\libraries;
 
 class FanartTV
 {
-    /**
-     * @var string
-     */
     private string $apiKey;
 
-    /**
-     * @var string
-     */
     private string $server;
 
     /**
