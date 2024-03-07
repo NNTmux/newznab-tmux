@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Triggers\Trigger;
 
-class CreateReleasesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -95,4 +95,4 @@ processed');
     {
         Schema::drop('releases');
     }
-}
+};

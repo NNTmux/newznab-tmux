@@ -7,7 +7,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddVerificationToUserTable extends Migration
+return new class extends Migration
 {
     /**
      * Determine the user table name.
@@ -40,4 +40,4 @@ class AddVerificationToUserTable extends Migration
             $table->dropColumn('verification_token');
         });
     }
-}
+};

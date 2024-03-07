@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class AddStoredProcedures extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -55,4 +55,4 @@ class AddStoredProcedures extends Migration
     {
         DB::statement('DROP PROCEDURE loop_cbpm;');
     }
-}
+};

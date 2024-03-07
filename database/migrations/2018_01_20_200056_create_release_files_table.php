@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Triggers\Trigger;
 
-class CreateReleaseFilesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -42,4 +42,4 @@ class CreateReleaseFilesTable extends Migration
     {
         Schema::drop('release_files');
     }
-}
+};

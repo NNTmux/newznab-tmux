@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Triggers\Trigger;
 
-class CreatePredbTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -50,4 +50,4 @@ class CreatePredbTable extends Migration
     {
         Schema::drop('predb');
     }
-}
+};

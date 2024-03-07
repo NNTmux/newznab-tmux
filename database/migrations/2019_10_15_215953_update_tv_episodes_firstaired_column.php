@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateTvEpisodesFirstairedColumn extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -25,4 +25,4 @@ class UpdateTvEpisodesFirstairedColumn extends Migration
             $table->date('firstaired')->comment('Date of original airing/release.')->change();
         });
     }
-}
+};
