@@ -69,7 +69,7 @@ return [
     'force_compile' => env('SMARTY_FORCE_COMPILE', false),
 
     // smarty cache driver "file", "memcached", "redis"
-    'cache_driver' => env('SMARTY_CACHE_DRIVER', 'file'),
+    'cache_driver' => env('SMARTY_CACHE_STORE', 'file'),
 
     // memcached servers
     'memcached' => [
