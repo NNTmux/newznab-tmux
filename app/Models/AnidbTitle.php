@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -52,12 +53,12 @@ class AnidbTitle extends Model
      */
     protected $guarded = [];
 
-    public function episode()
+    public function episode(): HasMany
     {
         return $this->hasMany(AnidbEpisode::class, 'anidbid');
     }
 
-    public function info()
+    public function info(): HasMany
     {
         return $this->hasMany(AnidbInfo::class, 'anidbid');
     }

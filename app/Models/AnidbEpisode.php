@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -54,12 +56,12 @@ class AnidbEpisode extends Model
      */
     protected $guarded = [];
 
-    public function title()
+    public function title(): BelongsTo
     {
         return $this->belongsTo(AnidbTitle::class, 'anidbid');
     }
 
-    public function info()
+    public function info(): HasMany
     {
         return $this->hasMany(AnidbInfo::class, 'anidbid');
     }

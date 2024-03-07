@@ -30,7 +30,7 @@ class ImportNzbs extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->option('folder')) {
             if ($this->option('filename')) {

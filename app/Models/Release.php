@@ -180,7 +180,7 @@ class Release extends Model
         return $this->hasMany(UsersRelease::class, 'releases_id');
     }
 
-    public function file()
+    public function file(): HasMany
     {
         return $this->hasMany(ReleaseFile::class, 'releases_id');
     }
