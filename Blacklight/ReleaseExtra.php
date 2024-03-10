@@ -32,9 +32,10 @@ class ReleaseExtra
     }
 
     /**
+     * @param $id
      * @return array|false
      */
-    public function getVideo($id)
+    public function getVideo($id): false|array
     {
         $result = VideoData::query()->where('releases_id', $id)->first();
 
@@ -46,9 +47,10 @@ class ReleaseExtra
     }
 
     /**
+     * @param $id
      * @return array|false
      */
-    public function getAudio($id)
+    public function getAudio($id): false|array
     {
         $result = AudioData::query()->where('releases_id', $id)->orderBy('audioid')->get();
 
@@ -65,22 +67,6 @@ class ReleaseExtra
     public function getSubs($id)
     {
         return ReleaseSubtitle::query()->where('releases_id', $id)->select([DB::raw("GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs")])->orderBy('subsid')->first();
-    }
-
-    public function getBriefByGuid(string $guid): array
-    {
-        return DB::select(sprintf("SELECT containerformat, videocodec, videoduration, videoaspect,
-                        CONCAT(video_data.videowidth,'x',video_data.videoheight,' @',format(videoframerate,0),'fps') AS size,
-                        GROUP_CONCAT(DISTINCT audio_data.audiolanguage SEPARATOR ', ') AS audio,
-                        GROUP_CONCAT(DISTINCT audio_data.audioformat,' (',SUBSTRING(audio_data.audiochannels,1,1),' ch)' SEPARATOR ', ') AS audioformat,
-                        GROUP_CONCAT(DISTINCT audio_data.audioformat,' (',SUBSTRING(audio_data.audiochannels,1,1),' ch)' SEPARATOR ', ') AS audioformat,
-                        GROUP_CONCAT(DISTINCT release_subtitles.subslanguage SEPARATOR ', ') AS subs
-                        FROM video_data
-                        LEFT OUTER JOIN release_subtitles ON video_data.releases_id = release_subtitles.releases_id
-                        LEFT OUTER JOIN audio_data ON video_data.releases_id = audio_data.releases_id
-                        INNER JOIN releases r ON r.id = video_data.releases_id
-                        WHERE r.guid = %s
-                        GROUP BY r.id LIMIT 1", escapeString($guid)));
     }
 
     /**
@@ -106,7 +92,7 @@ class ReleaseExtra
         $audios = $arrXml->getAudios();
         $videos = $arrXml->getVideos();
         $subtitles = $arrXml->getSubtitles();
-        if (! empty($general)) {
+        if ($general !== null) {
             if (! empty($general->get('unique_id')) && (int) $general->get('unique_id')->getShortName() !== 1) {
                 $uniqueId = $general->get('unique_id')->getShortName();
                 $this->addUID($releaseID, $uniqueId);
@@ -277,7 +263,7 @@ class ReleaseExtra
 
     private function addAudio($releaseID, $audioID, $audioFormat, $audioMode, $audioBitRateMode, $audioBitRate, $audioChannels, $audioSampleRate, $audioLibrary, $audioLanguage, $audioTitle): void
     {
-        $ckid = AudioData::query()->where('releases_id', $releaseID)->first(['releases_id']);
+        $ckid = AudioData::query()->where('releases_id', $releaseID)->where('audioid', '=', $audioID)->first(['releases_id']);
         if ($ckid === null) {
             AudioData::insertOrIgnore([
                 'releases_id' => $releaseID,
@@ -297,7 +283,7 @@ class ReleaseExtra
 
     private function addSubs($releaseID, $subsID, $subsLanguage): void
     {
-        $ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->first(['releases_id']);
+        $ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->where('subsid', '=', $subsID)->first(['releases_id']);
         $subs = '';
         if (! empty($subsLanguage)) {
             if (! empty($subsLanguage[1])) {
