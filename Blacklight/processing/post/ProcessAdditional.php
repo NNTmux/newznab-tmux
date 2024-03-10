@@ -1854,12 +1854,6 @@ class ProcessAdditional
             try {
                 $xmlArray = $this->mediaInfo->getInfo($fileLocation, true);
 
-                // Check if we got it.
-
-                if ($xmlArray === null) {
-                    return false;
-                }
-
                 // Insert it into the DB.
                 $this->_releaseExtra->addFull($this->_release->id, $xmlArray);
                 $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
