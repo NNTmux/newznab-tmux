@@ -20,7 +20,7 @@
         "popper.js": "^1.16.1",
         "prettier": "^3.2.5",
         "resolve-url-loader": "^5.0.0",
-        "vue": "^3.4.19",
+        "vue": "^3.4.21",
         "webpack-cli": "^5.1.4"
     },
     "dependencies": {
@@ -29,7 +29,7 @@
         "@popperjs/core": "^2.11.8",
         "animate.css": "^4.1.1",
         "autosize": "^6.0.1",
-        "bootstrap": "^5.3.2",
+        "bootstrap": "^5.3.3",
         "bootstrap-datepicker": "^1.10.0",
         "bootstrap-hover-dropdown": "^2.2.1",
         "bootstrap-progressbar": "^0.9.0",
@@ -41,7 +41,7 @@
         "jquery-migrate": "3.4.1",
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
-        "npm": "^10.4.0",
+        "npm": "^10.5.0",
         "npm-check-updates": "^16.14.15",
         "pace-js": "^1.2.4",
         "pnotify": "4.0.1",
