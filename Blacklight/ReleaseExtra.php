@@ -31,10 +31,6 @@ class ReleaseExtra
         return VideoData::query()->where('releases_id', $id)->first();
     }
 
-    /**
-     * @param $id
-     * @return array|false
-     */
     public function getVideo($id): false|array
     {
         $result = VideoData::query()->where('releases_id', $id)->first();
@@ -46,10 +42,6 @@ class ReleaseExtra
         return false;
     }
 
-    /**
-     * @param $id
-     * @return array|false
-     */
     public function getAudio($id): false|array
     {
         $result = AudioData::query()->where('releases_id', $id)->orderBy('audioid')->get();
