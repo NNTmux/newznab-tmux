@@ -5720,16 +5720,16 @@
         },
         {
             "name": "monicahq/laravel-cloudflare",
-            "version": "3.6.0",
+            "version": "3.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/monicahq/laravel-cloudflare.git",
-                "reference": "e01f2d3963f83f5228f0cf487b625b6bfa48515f"
+                "reference": "4e760aa222f5eed94833112d669d310c1ec7b137"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/monicahq/laravel-cloudflare/zipball/e01f2d3963f83f5228f0cf487b625b6bfa48515f",
-                "reference": "e01f2d3963f83f5228f0cf487b625b6bfa48515f",
+                "url": "https://api.github.com/repos/monicahq/laravel-cloudflare/zipball/4e760aa222f5eed94833112d669d310c1ec7b137",
+                "reference": "4e760aa222f5eed94833112d669d310c1ec7b137",
                 "shasum": ""
             },
             "require": {
@@ -5791,7 +5791,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-01T23:16:09+00:00"
+            "time": "2024-03-10T17:30:42+00:00"
         },
         {
             "name": "monolog/monolog",
