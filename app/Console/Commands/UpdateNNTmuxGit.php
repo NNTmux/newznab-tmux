@@ -34,11 +34,15 @@ class UpdateNNTmuxGit extends Command
     {
         $wasRunning = false;
 
-        if ((new Tmux())->isRunning() === true) {
+        if ((new Tmux())->isRunning()) {
             $wasRunning = true;
             $this->call('tmux-ui:stop', ['--kill' => true]);
         }
-        $this->output->writeln('<comment>Getting changes from Github</comment>');
+        $this->info('Stashing local changes before pulling from Github');
+        $processGitStash = Process::run('git stash');
+        echo $processGitStash->output();
+        echo $processGitStash->errorOutput();
+        $this->info('Getting changes from Github');
         $process = Process::run('git pull');
         echo $process->output();
         echo $process->errorOutput();
