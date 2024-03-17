@@ -53,15 +53,21 @@ class TVDB extends TV
         // Check if we can get the time for API status
         // If we can't then we set local to true
         $this->token = '';
-        try {
-            $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
-        } catch (UnauthorizedException $error) {
-            $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
+        // Check if we have the tvdb api key and user pin
+        if (config('tvdb.api_key') === null || config('tvdb.user_pin') === null) {
+            $this->colorCli->warning('TVDB API key or user pin not set. Running in local mode only!', true);
             $this->local = true;
-        }
+        } else {
+            try {
+                $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
+            } catch (UnauthorizedException $error) {
+                $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
+                $this->local = true;
+            }
 
-        if ($this->token !== '') {
-            $this->client->setToken($this->token);
+            if ($this->token !== '') {
+                $this->client->setToken($this->token);
+            }
         }
 
         $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
@@ -95,8 +101,8 @@ class TVDB extends TV
                 if (\in_array($release['cleanname'], $this->titleCache, false)) {
                     if ($this->echooutput) {
                         $this->colorCli->headerOver('Title: ').
-                                    $this->colorCli->warningOver($release['cleanname']).
-                                    $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
+                        $this->colorCli->warningOver($release['cleanname']).
+                        $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
                     }
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
 
@@ -305,34 +311,36 @@ class TVDB extends TV
     {
         $return = $response = false;
 
-        if ($videoId > 0) {
-            try {
-                $response = $this->client->series()->allEpisodes($tvDbId);
-            } catch (ResourceNotFoundException $error) {
-                return false;
-            }
-        } else {
-            try {
-                foreach ($this->client->series()->episodes($tvDbId) as $episodeBaseRecord) {
-                    if ($episodeBaseRecord->seasonNumber === $season && $episodeBaseRecord->number === $episode) {
-                        $response = $episodeBaseRecord;
-                    }
+        if (! $this->local) {
+            if ($videoId > 0) {
+                try {
+                    $response = $this->client->series()->allEpisodes($tvDbId);
+                } catch (ResourceNotFoundException $error) {
+                    return false;
                 }
-            } catch (ResourceNotFoundException $error) {
-                return false;
+            } else {
+                try {
+                    foreach ($this->client->series()->episodes($tvDbId) as $episodeBaseRecord) {
+                        if ($episodeBaseRecord->seasonNumber === $season && $episodeBaseRecord->number === $episode) {
+                            $response = $episodeBaseRecord;
+                        }
+                    }
+                } catch (ResourceNotFoundException $error) {
+                    return false;
+                }
             }
-        }
 
-        sleep(1);
+            sleep(1);
 
-        if (\is_object($response)) {
-            if ($this->checkRequiredAttr($response, 'tvdbE')) {
-                $return = $this->formatEpisodeInfo($response);
-            }
-        } elseif ($videoId > 0 && \is_array($response)) {
-            foreach ($response as $singleEpisode) {
-                if ($this->checkRequiredAttr($singleEpisode, 'tvdbE')) {
-                    $this->addEpisode($videoId, $this->formatEpisodeInfo($singleEpisode));
+            if (\is_object($response)) {
+                if ($this->checkRequiredAttr($response, 'tvdbE')) {
+                    $return = $this->formatEpisodeInfo($response);
+                }
+            } elseif ($videoId > 0 && \is_array($response)) {
+                foreach ($response as $singleEpisode) {
+                    if ($this->checkRequiredAttr($singleEpisode, 'tvdbE')) {
+                        $this->addEpisode($videoId, $this->formatEpisodeInfo($singleEpisode));
+                    }
                 }
             }
         }
