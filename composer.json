@@ -75,7 +75,7 @@
         "laravel/pulse": "^1.0@beta",
         "laravel/sanctum": "^3.3",
         "laravel/scout": "^10.0",
-        "laravel/telescope": "^4.17",
+        "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.4",
         "laravelcollective/html": "^6.4",
