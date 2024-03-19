@@ -43,6 +43,7 @@ class NntmuxResetDb extends Command
         // Allow database reset only if app environment is local
         if (app()->environment() !== 'local') {
             $this->error('This command can only be run in local environment');
+
             return;
         }
         if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
