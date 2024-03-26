@@ -45,6 +45,6 @@
         "npm-check-updates": "^16.14.15",
         "pace-js": "^1.2.4",
         "pnotify": "4.0.1",
-        "tinymce": "5.10.9"
+        "tinymce": "7.0.0"
     }
 }
