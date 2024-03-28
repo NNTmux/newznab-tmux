@@ -244,11 +244,11 @@ if (! function_exists('realDuration')) {
      * @return string
      */
     function realDuration($milliseconds)
-{
-    $time = round($milliseconds / 1000);
+    {
+        $time = round($milliseconds / 1000);
 
-    return sprintf('%02dh:%02dm:%02ds', floor($time / 3600), floor($time / 60 % 60), $time % 60);
-}
+        return sprintf('%02dh:%02dm:%02ds', floor($time / 3600), floor($time / 60 % 60), $time % 60);
+    }
 }
 
 if (! function_exists('is_it_json')) {
