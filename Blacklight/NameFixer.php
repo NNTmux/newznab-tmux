@@ -153,7 +153,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rel.id AS releases_id, rel.fromname, rel.nzb_password
+					SELECT rel.id AS releases_id, rel.fromname
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
@@ -165,7 +165,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rel.id AS releases_id, rel.fromname, rel.nzb_password
+					SELECT rel.id AS releases_id, rel.fromname
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
@@ -190,7 +190,7 @@ class NameFixer
                 $releaseRow = Release::fromQuery(
                     sprintf(
                         '
-							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname, rel.nzb_password,
+							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
@@ -234,7 +234,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -247,7 +247,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -296,7 +296,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.nzb_password,
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -309,7 +309,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.nzb_password,
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -357,7 +357,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -369,7 +369,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -416,7 +416,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -428,7 +428,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -488,7 +488,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname, rel.nzb_password
+					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
 					FROM releases rel
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
@@ -538,7 +538,7 @@ class NameFixer
             $query = sprintf(
                 '
 				SELECT
-					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id, rel.nzb_password,
+					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					ru.unique_id AS uid
 				FROM releases rel
@@ -555,7 +555,7 @@ class NameFixer
                 '
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.nzb_password,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					ru.unique_id AS uid
 				FROM releases rel
 				LEFT JOIN media_infos ru ON ru.releases_id = rel.id
@@ -602,7 +602,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.nzb_password, rel.id AS releases_id, rf.movie_name as movie_name
+				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.movie_name as movie_name
 				FROM releases rel
 				INNER JOIN media_infos rf ON rf.releases_id = rel.id
                 WHERE rel.nzbstatus = %d
@@ -614,7 +614,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.nzb_password, rel.id AS releases_id, rf.movie_name as movie_name, rf.file_name as file_name
+				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.movie_name as movie_name, rf.file_name as file_name
 				FROM releases rel
 				INNER JOIN media_infos rf ON rf.releases_id = rel.id
 				WHERE rel.nzbstatus = %d
@@ -664,7 +664,7 @@ class NameFixer
                 '
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.nzb_password,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					IFNULL(ph.hash, \'\') AS hash
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
@@ -680,7 +680,7 @@ class NameFixer
                 '
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.nzb_password,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					IFNULL(ph.hash, \'\') AS hash
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
@@ -922,7 +922,6 @@ class NameFixer
                             'predb_id' => $preId,
                             'searchname' => $newTitle,
                             'categories_id' => $determinedCategory['categories_id'],
-                            'nzb_password' => $release->nzb_password,
                         ];
 
                         if ($status !== '') {
@@ -956,7 +955,6 @@ class NameFixer
                                     'searchname' => $newTitle,
                                     'categories_id' => $determinedCategory['categories_id'],
                                     'iscategorized' => 1,
-                                    'nzb_password' => $release->nzb_password,
                                 ]
                             );
 
