@@ -1855,7 +1855,7 @@ class ProcessAdditional
                 $xmlArray = $this->mediaInfo->getInfo($fileLocation, true);
 
                 // Insert it into the DB.
-                $this->_releaseExtra->addFull($this->_release->id, $xmlArray);
+                \App\Models\MediaInfo::addData($this->_release->id, $xmlArray);
                 $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
 
                 if ($this->_echoCLI) {

@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
  */
 class NameFixer
 {
-    public const PREDB_REGEX = '/([\w() -]+[\s._,&+-]([!\w,.+()]+[\s._-])+[\w()]+-\w+)/';
+    public const PREDB_REGEX = '/([\w\(\) \-–]+[\s\._,&+\'-–]([\!\w&\',@#.\+\(\)]+[\s\._–-])+[\w\(\)]+(.?-)\w+)/ui';
 
     // Constants for name fixing status
     public const PROC_NFO_NONE = 0;
@@ -153,7 +153,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rel.id AS releases_id, rel.fromname
+					SELECT rel.id AS releases_id, rel.fromname, rel.nzb_password
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
@@ -165,7 +165,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rel.id AS releases_id, rel.fromname
+					SELECT rel.id AS releases_id, rel.fromname, rel.nzb_password
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
@@ -190,7 +190,7 @@ class NameFixer
                 $releaseRow = Release::fromQuery(
                     sprintf(
                         '
-							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
+							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname, rel.nzb_password,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
@@ -234,7 +234,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -247,7 +247,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -296,7 +296,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -309,7 +309,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -357,7 +357,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -369,7 +369,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -416,7 +416,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -428,7 +428,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.nzb_password,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -488,7 +488,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
+					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname, rel.nzb_password
 					FROM releases rel
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
@@ -525,10 +525,6 @@ class NameFixer
     }
 
     /**
-     * Attempts to fix release names using the mediainfo xml Unique_ID.
-     *
-     *
-     *
      * @throws \Exception
      */
     public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show): void
@@ -542,11 +538,11 @@ class NameFixer
             $query = sprintf(
                 '
 				SELECT
-					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
+					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id, rel.nzb_password,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					ru.uniqueid AS uid
+					ru.unique_id AS uid
 				FROM releases rel
-				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
+				LEFT JOIN media_infos ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
 				AND rel.predb_id = 0',
@@ -559,10 +555,10 @@ class NameFixer
                 '
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					ru.uniqueid AS uid
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.nzb_password,
+					ru.unique_id AS uid
 				FROM releases rel
-				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
+				LEFT JOIN media_infos ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
 				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
@@ -605,34 +601,30 @@ class NameFixer
         // Re-check all releases we haven't matched to a PreDB
         if ($cats === 3) {
             $query = sprintf(
-                "
-				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
+                '
+				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.nzb_password, rel.id AS releases_id, rf.movie_name as movie_name
 				FROM releases rel
-				INNER JOIN releaseextrafull rf ON rf.releases_id = rel.id
-				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
-                AND rf.mediainfo REGEXP '\<Movie_name\>'
-                AND rel.nzbstatus = %d
-                AND rel.predb_id = 0",
+				INNER JOIN media_infos rf ON rf.releases_id = rel.id
+                WHERE rel.nzbstatus = %d
+                AND rel.predb_id = 0',
                 NZB::NZB_ADDED
             );
             $cats = 2;
             // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
         } else {
             $query = sprintf(
-                "
-				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
+                '
+				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.nzb_password, rel.id AS releases_id, rf.movie_name as movie_name, rf.file_name as file_name
 				FROM releases rel
-				INNER JOIN releaseextrafull rf ON rf.releases_id = rel.id
-				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
-				AND rf.mediainfo REGEXP '\<Movie_name\>'
-				AND rel.nzbstatus = %d
+				INNER JOIN media_infos rf ON rf.releases_id = rel.id
+				WHERE rel.nzbstatus = %d
                 AND rel.isrenamed = %d
-                AND rel.predb_id = 0",
+                AND rel.predb_id = 0',
                 NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE
             );
             if ($cats === 2) {
-                $query .= PHP_EOL.sprintf('AND rel.categories_id IN (%s)', [Category::OTHER_MISC, Category::OTHER_HASHED]);
+                $query .= PHP_EOL.'AND rel.categories_id IN ('.Category::OTHER_MISC.','.Category::OTHER_HASHED.')';
             }
         }
 
@@ -672,7 +664,7 @@ class NameFixer
                 '
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.nzb_password,
 					IFNULL(ph.hash, \'\') AS hash
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
@@ -688,7 +680,7 @@ class NameFixer
                 '
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.nzb_password,
 					IFNULL(ph.hash, \'\') AS hash
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
@@ -817,6 +809,10 @@ class NameFixer
         if (\is_array($release)) {
             $release = (object) $release;
         }
+        // If $release does not have a releases_id, we should add it.
+        if (! isset($release->releases_id)) {
+            $release->releases_id = $release->id;
+        }
         if ($this->relid !== $release->releases_id) {
             $newName = (new ReleaseCleaning())->fixerCleaner($name);
             if (strtolower($newName) !== strtolower($release->searchname)) {
@@ -926,6 +922,7 @@ class NameFixer
                             'predb_id' => $preId,
                             'searchname' => $newTitle,
                             'categories_id' => $determinedCategory['categories_id'],
+                            'nzb_password' => $release->nzb_password,
                         ];
 
                         if ($status !== '') {
@@ -959,6 +956,7 @@ class NameFixer
                                     'searchname' => $newTitle,
                                     'categories_id' => $determinedCategory['categories_id'],
                                     'iscategorized' => 1,
+                                    'nzb_password' => $release->nzb_password,
                                 ]
                             );
 
@@ -1838,10 +1836,10 @@ class NameFixer
                 case preg_match('/^(.+?(x264|XviD)\-TVP)\\\\/i', $release->textstring, $result):
                     $this->updateRelease($release, $result['1'], 'fileCheck: TVP', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/^(\\\\|\/)?(.+(\\\\|\/))*(.+?S\d{1,3}[.-_ ]?[ED]\d{1,3}.+)\.(.+)$/i', $release->textstring, $result):
+                case preg_match('/^(\\\\|\/)?(.+(\\\\|\/))*(.+?S\d{1,3}[.-_ ]?[ED]\d{1,3}.+)\.(.+)$/iu', $release->textstring, $result):
                     $this->updateRelease($release, $result['4'], 'fileCheck: Generic TV', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/^(\\\\|\/)?(.+(\\\\|\/))*(.+?([\.\-_ ]\d{4}[\.\-_ ].+?(BDRip|bluray|DVDRip|XVID)).+)\.(.+)$/i', $release->textstring, $result):
+                case preg_match('/^(\\\\|\/)?(.+(\\\\|\/))*(.+?([\.\-_ ]\d{4}[\.\-_ ].+?(BDRip|bluray|DVDRip|XVID)).+)\.(.+)$/iu', $release->textstring, $result):
                     $this->updateRelease($release, $result['4'], 'fileCheck: Generic movie 1', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^([a-z0-9\.\-_]+(19|20)\d\d[a-z0-9\.\-_]+[\.\-_ ](720p|1080p|BDRip|bluray|DVDRip|x264|XviD)[a-z0-9\.\-_]+)\.[a-z]{2,}$/i', $release->textstring, $result):
@@ -1930,9 +1928,9 @@ class NameFixer
                 '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
-				LEFT JOIN release_unique ru ON ru.releases_id = r.id
+				LEFT JOIN media_infos ru ON ru.releases_id = r.id
 				WHERE ru.releases_id IS NOT NULL
-				AND ru.uniqueid = %s
+				AND ru.unique_id = %s
 				AND ru.releases_id != %d
 				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = %s)',
                 escapeString($release->uid),
@@ -1975,14 +1973,13 @@ class NameFixer
 
         $newName = '';
         if (! $this->done && $this->relid !== (int) $release->releases_id) {
-            if (preg_match('/<Movie_name>(.+)<\/Movie_name>/i', $release->mediainfo, $hit)) {
-                $media = $hit[1];
-                if (preg_match(self::PREDB_REGEX, $media, $hit)) {
+            if (! empty($release->movie_name)) {
+                if (preg_match(self::PREDB_REGEX, $release->movie_name, $hit)) {
                     $newName = $hit[1];
-                } elseif (preg_match('/(.+)[\,](\sRMZ\.cr)?$/i', $media, $hit)) {
+                } elseif (preg_match('/(.+),(\sRMZ\.cr)?$/i', $release->movie_name, $hit)) {
                     $newName = $hit[1];
                 } else {
-                    $newName = $media;
+                    $newName = $release->movie_name;
                 }
             }
 

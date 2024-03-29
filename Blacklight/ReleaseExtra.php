@@ -3,9 +3,7 @@
 namespace Blacklight;
 
 use App\Models\AudioData;
-use App\Models\ReleaseExtraFull;
 use App\Models\ReleaseSubtitle;
-use App\Models\ReleaseUnique;
 use App\Models\VideoData;
 use Illuminate\Support\Facades\DB;
 use Mhor\MediaInfo\Container\MediaInfoContainer;
@@ -54,7 +52,7 @@ class ReleaseExtra
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function getSubs($id)
     {
@@ -85,17 +83,8 @@ class ReleaseExtra
         $videos = $arrXml->getVideos();
         $subtitles = $arrXml->getSubtitles();
         if ($general !== null) {
-            if (! empty($general->get('unique_id')) && (int) $general->get('unique_id')->getShortName() !== 1) {
-                $uniqueId = $general->get('unique_id')->getShortName();
-                $this->addUID($releaseID, $uniqueId);
-            }
-
             if ($general->get('format') !== null) {
                 $containerFormat = $general->get('format')->getFullName();
-            }
-
-            if ($general->get('overall_bit_rate') !== null) {
-                $overallBitRate = $general->get('overall_bit_rate')->getFullName();
             }
 
             $videoDuration = $videoFormat = $videoCodec = $videoWidth = $videoHeight = $videoAspect = $videoFrameRate = $videoLibrary = $videoBitRate = '';
@@ -104,6 +93,10 @@ class ReleaseExtra
                 foreach ($videos as $video) {
                     if ($video->get('duration') !== null) {
                         $videoDuration = $video->get('duration')->getMilliseconds();
+                    }
+
+                    if ($video->get('bit_rate') !== null) {
+                        $overallBitRate = $video->get('bit_rate');
                     }
 
                     if ($video->get('format') !== null) {
@@ -290,47 +283,6 @@ class ReleaseExtra
                 'subsid' => $subsID,
                 'subslanguage' => $subs,
             ]);
-        }
-    }
-
-    public function addUID(int $releaseID, string $uniqueId): void
-    {
-        $dupecheck = ReleaseUnique::query()->where('releases_id', $releaseID)->orWhere([
-            'releases_id' => $releaseID,
-            'uniqueid' => $uniqueId,
-        ])->first(['releases_id']);
-        if ($dupecheck === null) {
-            ReleaseUnique::insertOrIgnore([
-                'releases_id' => $releaseID,
-                'uniqueid' => $uniqueId,
-            ]);
-        }
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
-     */
-    public function getFull($id)
-    {
-        return ReleaseExtraFull::query()->where('releases_id', $id)->first();
-    }
-
-    /***
-     * @param $id
-     *
-     * @return mixed
-     */
-    public function deleteFull($id)
-    {
-        return ReleaseExtraFull::query()->where('releases_id', $id)->delete();
-    }
-
-    public function addFull($id, MediaInfoContainer $xmlArray): void
-    {
-        $ckid = ReleaseExtraFull::query()->where('releases_id', $id)->first();
-        if ($ckid === null) {
-            $xml = $xmlArray->__toXML()->asXML();
-            ReleaseExtraFull::insertOrIgnore(['releases_id' => $id, 'mediainfo' => $xml]);
         }
     }
 }
