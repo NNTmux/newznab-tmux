@@ -1598,7 +1598,7 @@ class NameFixer
             if (preg_match('/(idiomas|lang|language|langue|sprache).*?\b(?P<lang>Brazilian|Chinese|Croatian|Danish|DE|Deutsch|Dutch|Estonian|ES|English|Englisch|Finnish|Flemish|Francais|French|FR|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)\b/i', $release->textstring, $result)) {
                 switch ($result['lang']) {
                     case 'DE':
-                        $result['lang'] = 'DUTCH';
+                        $result['lang'] = 'GERMAN';
                         break;
                     case 'Englisch':
                         $result['lang'] = 'ENGLISH';
