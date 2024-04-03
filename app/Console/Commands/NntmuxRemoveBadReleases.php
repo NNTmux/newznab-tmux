@@ -53,16 +53,16 @@ class NntmuxRemoveBadReleases extends Command
             File::delete($nzbPath);
             (new ReleaseImage)->delete($badRelease->guid);
             if (config('nntmux.elasticsearch_enabled') === true) {
-                    $params = [
-                        'index' => 'releases',
-                        'id' => $badRelease->id,
-                    ];
+                $params = [
+                    'index' => 'releases',
+                    'id' => $badRelease->id,
+                ];
 
-                    try {
-                        Elasticsearch::delete($params);
-                    } catch (Missing404Exception $e) {
-                        //we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
-                    }
+                try {
+                    Elasticsearch::delete($params);
+                } catch (Missing404Exception $e) {
+                    //we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
+                }
             } else {
                 $identifiers = [
                     'id' => $badRelease->id,
