@@ -65,7 +65,7 @@ class NntmuxRemoveBadReleases extends Command
                 }
             } else {
                 $identifiers = [
-                    'id' => $badRelease->id,
+                    'i' => $badRelease->id,
                 ];
                 // Delete from sphinx.
                 (new ManticoreSearch())->deleteRelease($identifiers);
