@@ -68,7 +68,7 @@
 </a>
 <!-- Submenu content -->
 <div id='submenu2' class="collapse sidebar-submenu">
-    <a href="{{route('forum')}}" class="list-group-item list-group-item-action bg-dark text-white">
+    <a href="{{url('forum')}}" class="list-group-item list-group-item-action bg-dark text-white">
         <span class="fa fa-forumbee"></span>
         <span class="menu-collapsed">Forum</span>
     </a>
