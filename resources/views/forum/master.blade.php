@@ -43,7 +43,7 @@
     <nav class="v-navbar bg-white shadow py-4">
         <div class="container mx-auto px-4 md:flex md:items-center md:gap-4">
             <div class="flex justify-between items-center">
-                <a class="text-lg" href="{{ url(config('app.url')) }}">{{config('app.name')}} Home &nbsp;</a>
+                <a class="text-lg" href="{{ url('/') }}">{{config('app.name')}} Home &nbsp;</a>
                 <a class="text-lg" href="{{ url(config('forum.web.router.prefix')) }}">{{config('app.name')}} Forum</a>
                 <button class="navbar-toggler block md:hidden border rounded-md px-2 py-1" type="button" :class="{ collapsed: isCollapsed }" @click="isCollapsed = ! isCollapsed">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="navbar-toggler-icon w-6 h-6">
