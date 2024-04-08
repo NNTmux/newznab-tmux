@@ -4913,16 +4913,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.26.0",
+            "version": "3.27.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "072735c56cc0da00e10716dd90d5a7f7b40b36be"
+                "reference": "4729745b1ab737908c7d055148c9a6b3e959832f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/072735c56cc0da00e10716dd90d5a7f7b40b36be",
-                "reference": "072735c56cc0da00e10716dd90d5a7f7b40b36be",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/4729745b1ab737908c7d055148c9a6b3e959832f",
+                "reference": "4729745b1ab737908c7d055148c9a6b3e959832f",
                 "shasum": ""
             },
             "require": {
@@ -4987,7 +4987,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.26.0"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.27.0"
             },
             "funding": [
                 {
@@ -4999,7 +4999,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-25T11:49:53+00:00"
+            "time": "2024-04-07T19:17:50+00:00"
         },
         {
             "name": "league/flysystem-local",
@@ -5342,30 +5342,30 @@
         },
         {
             "name": "mailerlite/laravel-elasticsearch",
-            "version": "11.0.0",
+            "version": "11.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mailerlite/laravel-elasticsearch.git",
-                "reference": "cfa7cbfd4d1289a7760d4b8db0aea0fcc0dcbc2e"
+                "reference": "5f755bc3c69dcc1ff122f627f16c084cfdf3a716"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mailerlite/laravel-elasticsearch/zipball/cfa7cbfd4d1289a7760d4b8db0aea0fcc0dcbc2e",
-                "reference": "cfa7cbfd4d1289a7760d4b8db0aea0fcc0dcbc2e",
+                "url": "https://api.github.com/repos/mailerlite/laravel-elasticsearch/zipball/5f755bc3c69dcc1ff122f627f16c084cfdf3a716",
+                "reference": "5f755bc3c69dcc1ff122f627f16c084cfdf3a716",
                 "shasum": ""
             },
             "require": {
                 "elasticsearch/elasticsearch": "^7.11",
                 "ext-json": "*",
                 "guzzlehttp/psr7": "^1.7|^2.0",
-                "illuminate/contracts": "^7.0|^8.0|^9.0|^10.0",
-                "illuminate/support": "^7.0|^8.0|^9.0|^10.0",
+                "illuminate/contracts": "^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0",
                 "php": "^7.3|^8.0",
-                "psr/http-message": "^1.0"
+                "psr/http-message": "^1.0|^2.0"
             },
             "require-dev": {
                 "mockery/mockery": "^1.4.3",
-                "orchestra/testbench": "^6.5|^7.0|^8.0",
+                "orchestra/testbench": "^6.5|^7.0|^8.0|^9.0",
                 "phpunit/phpunit": "^9.4"
             },
             "suggest": {
@@ -5407,7 +5407,7 @@
             ],
             "support": {
                 "issues": "https://github.com/mailerlite/laravel-elasticsearch/issues",
-                "source": "https://github.com/mailerlite/laravel-elasticsearch/tree/11.0.0"
+                "source": "https://github.com/mailerlite/laravel-elasticsearch/tree/11.1.0"
             },
             "funding": [
                 {
@@ -5415,7 +5415,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-06-13T10:06:35+00:00"
+            "time": "2024-04-05T13:42:28+00:00"
         },
         {
             "name": "manticoresoftware/manticoresearch-php",
