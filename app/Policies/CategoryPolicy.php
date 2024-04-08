@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use TeamTeaTime\Forum\Models\Category;
 
 class CategoryPolicy extends \TeamTeaTime\Forum\Policies\CategoryPolicy

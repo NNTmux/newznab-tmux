@@ -2,8 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\User;
-
 class ForumPolicy extends \TeamTeaTime\Forum\Policies\ForumPolicy
 {
     /**
