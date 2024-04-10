@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             // Add increments to the thread and post counts on the categories table
@@ -24,7 +24,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             $table->dropColumn(['thread_count', 'post_count']);

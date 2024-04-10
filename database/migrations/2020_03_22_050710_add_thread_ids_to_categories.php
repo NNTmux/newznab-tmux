@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             $table->integer('newest_thread_id')->after('accepts_threads')->unsigned()->nullable();
@@ -24,7 +24,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             $table->dropColumn('newest_thread_id');
