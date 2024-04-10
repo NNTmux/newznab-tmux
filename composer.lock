@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ab151a8fea6ff561d73c3e3c25e6cc8",
+    "content-hash": "01624044ef88773d39b2631f4d9375f5",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -1078,65 +1078,6 @@
                 "source": "https://github.com/DariusIII/tmdb-laravel/tree/v6.0.2"
             },
             "time": "2023-11-29T11:33:57+00:00"
-        },
-        {
-            "name": "dariusiii/token",
-            "version": "v5.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/laravel-token.git",
-                "reference": "713cdffe185e4dab26d6a79ae4663cc8329df18b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel-token/zipball/713cdffe185e4dab26d6a79ae4663cc8329df18b",
-                "reference": "713cdffe185e4dab26d6a79ae4663cc8329df18b",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^8.0|^9.0|^10.0",
-                "php": ">=8.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "DariusIII\\Token\\TokenServiceProvider"
-                    ],
-                    "aliases": {
-                        "Token": "DariusIII\\Token\\Facades\\Token"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "DariusIII\\Token\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "MustafaKhaled",
-                    "email": "MustafaKhaled.dev@gmail.com"
-                }
-            ],
-            "description": "Unique Token Generator For Laravel",
-            "keywords": [
-                "PHP token",
-                "generate",
-                "laravel",
-                "laravel token",
-                "token",
-                "token generator",
-                "unique token"
-            ],
-            "support": {
-                "source": "https://github.com/DariusIII/laravel-token/tree/v5.0.0"
-            },
-            "time": "2023-02-16T17:40:32+00:00"
         },
         {
             "name": "dasprid/enum",

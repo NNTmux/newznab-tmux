@@ -53,7 +53,6 @@
         "dariusiii/php-itunes-api": "^1.0",
         "dariusiii/rarinfo": "^2.7",
         "dariusiii/tmdb-laravel": "^6.0",
-        "dariusiii/token": "^5.0",
         "dborsatto/php-giantbomb": "^2.2",
         "divineomega/php-cli-progress-bar": "^2.1",
         "doctrine/dbal": "^3.8",

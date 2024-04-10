@@ -528,7 +528,7 @@ class User extends Authenticatable
      */
     public static function generatePassword(int $length = 15): string
     {
-        return Token::random($length, true);
+        return Str::password($length);
     }
 
     /**
