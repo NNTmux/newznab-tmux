@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\Settings;
 use App\Models\User;
-use DariusIII\Token\Facades\Token;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
