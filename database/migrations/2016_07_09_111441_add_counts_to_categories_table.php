@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddCountsToCategoriesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -30,4 +30,4 @@ class AddCountsToCategoriesTable extends Migration
             $table->dropColumn(['thread_count', 'post_count']);
         });
     }
-}
+};
