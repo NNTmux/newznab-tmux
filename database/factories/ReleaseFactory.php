@@ -20,7 +20,7 @@ class ReleaseFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name,
+            'name' => $this->faker->name(),
             'searchname' => $this->faker->unique()->name(),
             'fromname' => $this->faker->unique()->safeEmail(),
             'postdate' => $this->faker->date(),
