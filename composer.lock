@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39be4b667147f4d95dcd993742a5b646",
+    "content-hash": "210f8a507b0871873559f4d39fbe9c26",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3345,16 +3345,16 @@
         },
         {
             "name": "junaidnasir/larainvite",
-            "version": "v5.0.1",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/larainvite.git",
-                "reference": "dfdffee96f668b51b98dfc7dc4fd686aa4989a48"
+                "url": "https://github.com/junaidnasir/larainvite.git",
+                "reference": "695d62c7ca840e46dba33cc56658ed6122784c0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/larainvite/zipball/dfdffee96f668b51b98dfc7dc4fd686aa4989a48",
-                "reference": "dfdffee96f668b51b98dfc7dc4fd686aa4989a48",
+                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/695d62c7ca840e46dba33cc56658ed6122784c0f",
+                "reference": "695d62c7ca840e46dba33cc56658ed6122784c0f",
                 "shasum": ""
             },
             "require": {
@@ -3382,11 +3382,7 @@
                     "Junaidnasir\\Larainvite\\": "src"
                 }
             },
-            "autoload-dev": {
-                "classmap": [
-                    "tests/TestCase.php"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -3399,14 +3395,15 @@
             "description": "Laravel Invitation package, existing users can invite others by email",
             "homepage": "https://github.com/junaidnasir/larainvite",
             "keywords": [
+                "Invite",
                 "invitations",
-                "invite",
                 "laravel"
             ],
             "support": {
-                "source": "https://github.com/DariusIII/larainvite/tree/v5.0.1"
+                "issues": "https://github.com/junaidnasir/larainvite/issues",
+                "source": "https://github.com/junaidnasir/larainvite/tree/v6.0.0"
             },
-            "time": "2023-02-16T15:34:58+00:00"
+            "time": "2023-04-08T15:21:12+00:00"
         },
         {
             "name": "kalnoy/nestedset",
