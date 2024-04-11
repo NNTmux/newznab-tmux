@@ -329,6 +329,76 @@ CREATE TABLE `firewall` (
   UNIQUE KEY `firewall_ip_address_unique` (`ip_address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `forum_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `forum_categories` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `accepts_threads` tinyint(1) NOT NULL DEFAULT 0,
+  `newest_thread_id` int(10) unsigned DEFAULT NULL,
+  `latest_active_thread_id` int(10) unsigned DEFAULT NULL,
+  `thread_count` int(11) NOT NULL DEFAULT 0,
+  `post_count` int(11) NOT NULL DEFAULT 0,
+  `is_private` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `_lft` int(10) unsigned NOT NULL DEFAULT 0,
+  `_rgt` int(10) unsigned NOT NULL DEFAULT 0,
+  `parent_id` int(10) unsigned DEFAULT NULL,
+  `color` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `forum_categories__lft__rgt_parent_id_index` (`_lft`,`_rgt`,`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `forum_posts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `forum_posts` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `thread_id` int(10) unsigned NOT NULL,
+  `author_id` bigint(20) unsigned NOT NULL,
+  `content` text NOT NULL,
+  `post_id` int(10) unsigned DEFAULT NULL,
+  `sequence` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `forum_posts_thread_id_index` (`thread_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `forum_threads`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `forum_threads` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `category_id` int(10) unsigned NOT NULL,
+  `author_id` bigint(20) unsigned NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `pinned` tinyint(1) DEFAULT 0,
+  `locked` tinyint(1) DEFAULT 0,
+  `first_post_id` int(10) unsigned DEFAULT NULL,
+  `last_post_id` int(10) unsigned DEFAULT NULL,
+  `reply_count` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `forum_threads_category_id_index` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `forum_threads_read`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `forum_threads_read` (
+  `thread_id` int(10) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `forumpost`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1680,3 +1750,21 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (92,'2024_01_12_193
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (93,'2024_01_12_194256_add_back_timestamps_column_to__predb_crcs_table',2);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (94,'2024_02_13_234425_add_indexes_to_movieinfo_table',3);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (95,'2024_02_25_162628_add_id_column_to_steam_apps_table',4);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (96,'2014_05_19_151759_create_forum_table_categories',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (97,'2014_05_19_152425_create_forum_table_threads',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (98,'2014_05_19_152611_create_forum_table_posts',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (99,'2015_04_14_180344_create_forum_table_threads_read',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (100,'2015_07_22_181406_update_forum_table_categories',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (101,'2015_07_22_181409_update_forum_table_threads',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (102,'2015_07_22_181417_update_forum_table_posts',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (103,'2016_05_24_114302_add_defaults_to_forum_table_threads_columns',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (104,'2016_07_09_111441_add_counts_to_categories_table',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (105,'2016_07_09_122706_add_counts_to_threads_table',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (106,'2016_07_10_134700_add_sequence_to_posts_table',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (107,'2018_11_04_211718_update_categories_table',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (108,'2019_09_07_210904_update_forum_category_booleans',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (109,'2019_09_07_230148_add_color_to_categories',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (110,'2020_03_22_050710_add_thread_ids_to_categories',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (111,'2020_03_22_055827_add_post_id_to_threads',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (112,'2020_12_02_233754_add_first_post_id_to_threads',5);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (113,'2021_07_31_094750_add_fk_indices',5);
