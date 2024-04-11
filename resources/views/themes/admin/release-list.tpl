@@ -24,8 +24,8 @@
 					<td class="less">{$release->category_name}</td>
 					<td class="less right">{$release->size|filesize}</td>
 					<td class="less mid"><a href="release-files?id={$release->guid}">{$release->totalpart}</a></td>
-					<td class="less">{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}</td>
-					<td class="less">{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->adddate, config('app.timezone')), 'Y-m-d h:i:s')}}</td>
+					<td class="less">{$result->postdate}</td>
+					<td class="less">{$result->adddate}</td>
 					<td class="less mid">{$release->grabs}</td>
 					<td><a href="{{url("/admin/release-delete/{$release->guid}")}}">delete</a></td>
 				</tr>

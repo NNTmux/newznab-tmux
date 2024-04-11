@@ -152,7 +152,7 @@
 											</td>
 											<td><span class="badge bg-info">{$result->category_name}</span>
 											</td>
-											<td>{Illuminate\Support\Carbon::parse({{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}})->diffForHumans()}</td>
+											<td>{$result->postdate|timeago}</td>
 											<td>{$result->size|filesize}</td>
                                             <td style="width:auto;text-align:center;white-space:nowrap;">
                                                 <a title="View file list" href="{{url("/filelist/{$result.guid}")}}">{$result->totalpart}</a>

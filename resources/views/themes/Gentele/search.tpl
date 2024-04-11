@@ -315,8 +315,8 @@
 										<a title="Browse {$result->category_name}"
 										   href="{{url("/browse/{$result->parent_category}/{$result->sub_category}")}}"> {$result->category_name}</a>
 									</td>
-									<td class="posted" title="{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}">
-                                        {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+									<td class="posted" title="{$result->postdate}">
+                                        {$result->postdate|timeago}
 									</td>
 									<td class="size">
 										{$result->size|filesize}

@@ -83,7 +83,7 @@
 			<tr>
 				<td><label for="postdate">Posted Date:</label></td>
 				<td>
-					<input id="postdate" class="long" name="postdate" value="{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result.postdate, config('app.timezone')), 'Y-m-d h:i:s')}}"/>
+					<input id="postdate" class="long" name="postdate" value="{$result.postdate}"/>
 				</td>
 			</tr>
 			<tr>

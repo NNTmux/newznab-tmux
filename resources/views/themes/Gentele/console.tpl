@@ -110,7 +110,7 @@
 																		   id="chksingle"/>
 																</label>
 																<span class="badge bg-info">{$result->size|filesize}</span>
-																<span class="badge bg-info">Posted {{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}|timeago}
+																<span class="badge bg-info">Posted {$result->postdate|timeago}
 																	ago</span>
 																{if isset($isadmin)}
 																<a

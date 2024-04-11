@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "01624044ef88773d39b2631f4d9375f5",
+    "content-hash": "39be4b667147f4d95dcd993742a5b646",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -588,52 +588,6 @@
                 "source": "https://github.com/php-cache/void-adapter/tree/1.2.0"
             },
             "time": "2022-01-15T15:47:19+00:00"
-        },
-        {
-            "name": "caneara/triggers",
-            "version": "v1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/caneara/triggers.git",
-                "reference": "87ca303f766790f619663eb0be2ae29ddf1d7cad"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/caneara/triggers/zipball/87ca303f766790f619663eb0be2ae29ddf1d7cad",
-                "reference": "87ca303f766790f619663eb0be2ae29ddf1d7cad",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^6.0",
-                "phpunit/phpunit": "^9.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Triggers\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A package to add database trigger support to Laravel",
-            "homepage": "https://github.com/mattkingshott/triggers",
-            "keywords": [
-                "database",
-                "laravel",
-                "php",
-                "triggers"
-            ],
-            "support": {
-                "issues": "https://github.com/caneara/triggers/issues",
-                "source": "https://github.com/caneara/triggers/tree/v1.0.1"
-            },
-            "abandoned": true,
-            "time": "2022-09-20T07:05:30+00:00"
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
@@ -3175,131 +3129,6 @@
                 }
             ],
             "time": "2024-03-22T07:12:19+00:00"
-        },
-        {
-            "name": "james-heinrich/getid3",
-            "version": "v1.9.23",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JamesHeinrich/getID3.git",
-                "reference": "06c7482532ff2b3f9111b011d880ca6699c8542b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/06c7482532ff2b3f9111b011d880ca6699c8542b",
-                "reference": "06c7482532ff2b3f9111b011d880ca6699c8542b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "php-parallel-lint/php-parallel-lint": "^1.0"
-            },
-            "suggest": {
-                "ext-SimpleXML": "SimpleXML extension is required to analyze RIFF/WAV/BWF audio files (also requires `ext-libxml`).",
-                "ext-com_dotnet": "COM extension is required when loading files larger than 2GB on Windows.",
-                "ext-ctype": "ctype extension is required when loading files larger than 2GB on 32-bit PHP (also on 64-bit PHP on Windows) or executing `getid3_lib::CopyTagsToComments`.",
-                "ext-dba": "DBA extension is required to use the DBA database as a cache storage.",
-                "ext-exif": "EXIF extension is required for graphic modules.",
-                "ext-iconv": "iconv extension is required to work with different character sets (when `ext-mbstring` is not available).",
-                "ext-json": "JSON extension is required to analyze Apple Quicktime videos.",
-                "ext-libxml": "libxml extension is required to analyze RIFF/WAV/BWF audio files.",
-                "ext-mbstring": "mbstring extension is required to work with different character sets.",
-                "ext-mysql": "MySQL extension is required to use the MySQL database as a cache storage (deprecated in PHP 5.5, removed in PHP >= 7.0, use `ext-mysqli` instead).",
-                "ext-mysqli": "MySQLi extension is required to use the MySQL database as a cache storage.",
-                "ext-rar": "RAR extension is required for RAR archive module.",
-                "ext-sqlite3": "SQLite3 extension is required to use the SQLite3 database as a cache storage.",
-                "ext-xml": "XML extension is required for graphic modules to analyze the XML metadata.",
-                "ext-zlib": "Zlib extension is required for archive modules and compressed metadata."
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.9.x-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "getid3/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-1.0-or-later",
-                "LGPL-3.0-only",
-                "MPL-2.0"
-            ],
-            "description": "PHP script that extracts useful information from popular multimedia file formats",
-            "homepage": "https://www.getid3.org/",
-            "keywords": [
-                "codecs",
-                "php",
-                "tags"
-            ],
-            "support": {
-                "issues": "https://github.com/JamesHeinrich/getID3/issues",
-                "source": "https://github.com/JamesHeinrich/getID3/tree/v1.9.23"
-            },
-            "time": "2023-10-19T13:18:49+00:00"
-        },
-        {
-            "name": "jamesmills/laravel-timezone",
-            "version": "1.13.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jamesmills/laravel-timezone.git",
-                "reference": "014f51cfff5985424dfd791d0dffe438dc28b29b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jamesmills/laravel-timezone/zipball/014f51cfff5985424dfd791d0dffe438dc28b29b",
-                "reference": "014f51cfff5985424dfd791d0dffe438dc28b29b",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "5.6.*|5.7.*|5.8.*|^6|^7|^8|^9|^10.0",
-                "nesbot/carbon": "^1.0|^2.0",
-                "php": ">=7.4",
-                "torann/geoip": "^3.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.12|^3.14"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "JamesMills\\LaravelTimezone\\LaravelTimezoneServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "JamesMills\\LaravelTimezone\\": "src/",
-                    "JamesMills\\LaravelTimezone\\Database\\Seeds\\": "database/seeds/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "James Mills",
-                    "email": "james@jamesmills.co.uk"
-                }
-            ],
-            "description": "Timezone storage and retrieval for Laravel",
-            "keywords": [
-                "laravel",
-                "timezone"
-            ],
-            "support": {
-                "issues": "https://github.com/jamesmills/laravel-timezone/issues",
-                "source": "https://github.com/jamesmills/laravel-timezone/tree/1.13.0"
-            },
-            "time": "2023-02-17T11:07:53+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -13929,86 +13758,6 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.2.7"
             },
             "time": "2023-12-08T13:03:43+00:00"
-        },
-        {
-            "name": "torann/geoip",
-            "version": "3.0.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Torann/laravel-geoip.git",
-                "reference": "a0600618e2ea145e018361498ff4cadf773dbe5b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Torann/laravel-geoip/zipball/a0600618e2ea145e018361498ff4cadf773dbe5b",
-                "reference": "a0600618e2ea145e018361498ff4cadf773dbe5b",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/cache": "^8.0|^9.0|^10.0|^11.0",
-                "illuminate/console": "^8.0|^9.0|^10.0|^11.0",
-                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
-                "php": "^8.0|^8.1|^8.2|^8.3"
-            },
-            "require-dev": {
-                "geoip2/geoip2": "~2.1|~3.0",
-                "mockery/mockery": "^1.3",
-                "phpstan/phpstan": "^0.12.14|^1.9",
-                "phpunit/phpunit": "^8.0|^9.0|^10.0|^11.0",
-                "squizlabs/php_codesniffer": "^3.5",
-                "vlucas/phpdotenv": "^5.0"
-            },
-            "suggest": {
-                "geoip2/geoip2": "Required to use the MaxMind database or web service with GeoIP (~2.1).",
-                "monolog/monolog": "Allows for storing location not found errors to the log"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                },
-                "laravel": {
-                    "providers": [
-                        "Torann\\GeoIP\\GeoIPServiceProvider"
-                    ],
-                    "aliases": {
-                        "GeoIP": "Torann\\GeoIP\\Facades\\GeoIP"
-                    }
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
-                "psr-4": {
-                    "Torann\\GeoIP\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Daniel Stainback",
-                    "email": "torann@gmail.com"
-                }
-            ],
-            "description": "Support for multiple GeoIP services.",
-            "keywords": [
-                "IP API",
-                "geoip",
-                "geolocation",
-                "infoDB",
-                "laravel",
-                "location",
-                "maxmind"
-            ],
-            "support": {
-                "issues": "https://github.com/Torann/laravel-geoip/issues",
-                "source": "https://github.com/Torann/laravel-geoip/tree/3.0.7"
-            },
-            "time": "2024-03-22T18:39:18+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

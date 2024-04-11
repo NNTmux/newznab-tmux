@@ -199,7 +199,7 @@
                                                 <span class="badge bg-info">{$result->category_name}</span>
                                             </td>
                                             <td width="40"
-                                                title="{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate, config('app.timezone')), 'Y-m-d h:i:s')}}">{{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($result->postdate), 'Y-m-d h:i:s')}}|timeago}</td>
+                                                title="{$result->postdate}">{$result->postdate|timeago}</td>
                                             <td>
                                                 {$result->size|filesize}
                                             </td>
