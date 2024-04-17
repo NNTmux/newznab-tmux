@@ -3794,16 +3794,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.24.1",
+            "version": "v5.24.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "df27ad9c125c1eb8c8c8b2cb50f38a2a28288da9"
+                "reference": "6667681e5462e080d73d3f75de70e63e38afe2d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/df27ad9c125c1eb8c8c8b2cb50f38a2a28288da9",
-                "reference": "df27ad9c125c1eb8c8c8b2cb50f38a2a28288da9",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/6667681e5462e080d73d3f75de70e63e38afe2d1",
+                "reference": "6667681e5462e080d73d3f75de70e63e38afe2d1",
                 "shasum": ""
             },
             "require": {
@@ -3867,9 +3867,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.24.1"
+                "source": "https://github.com/laravel/horizon/tree/v5.24.2"
             },
-            "time": "2024-04-15T15:17:16+00:00"
+            "time": "2024-04-17T08:18:07+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -4221,16 +4221,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v5.0.2",
+            "version": "v5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "a13cef8a3b8ea04848fe008ad6d920c3a242ffb9"
+                "reference": "e45a4ceca928082529fd6d43474eb1ba0fab7ae9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/a13cef8a3b8ea04848fe008ad6d920c3a242ffb9",
-                "reference": "a13cef8a3b8ea04848fe008ad6d920c3a242ffb9",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/e45a4ceca928082529fd6d43474eb1ba0fab7ae9",
+                "reference": "e45a4ceca928082529fd6d43474eb1ba0fab7ae9",
                 "shasum": ""
             },
             "require": {
@@ -4284,9 +4284,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/telescope/issues",
-                "source": "https://github.com/laravel/telescope/tree/v5.0.2"
+                "source": "https://github.com/laravel/telescope/tree/v5.0.3"
             },
-            "time": "2024-04-15T15:17:26+00:00"
+            "time": "2024-04-17T08:18:48+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -15355,16 +15355,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.53.0",
+            "version": "v3.54.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "69a19093a9ded8d1baac62ed6c009b8bc148d008"
+                "reference": "2aecbc8640d7906c38777b3dcab6f4ca79004d08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/69a19093a9ded8d1baac62ed6c009b8bc148d008",
-                "reference": "69a19093a9ded8d1baac62ed6c009b8bc148d008",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/2aecbc8640d7906c38777b3dcab6f4ca79004d08",
+                "reference": "2aecbc8640d7906c38777b3dcab6f4ca79004d08",
                 "shasum": ""
             },
             "require": {
@@ -15436,7 +15436,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.53.0"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.54.0"
             },
             "funding": [
                 {
@@ -15444,7 +15444,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-04-08T15:03:00+00:00"
+            "time": "2024-04-17T08:12:13+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -15634,16 +15634,16 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v2.9.4",
+            "version": "v2.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "3e7b1217c0021c29727a6df078830d4ef908f3bf"
+                "reference": "101f1a4470f87326f4d3995411d28679d8800abe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/3e7b1217c0021c29727a6df078830d4ef908f3bf",
-                "reference": "3e7b1217c0021c29727a6df078830d4ef908f3bf",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/101f1a4470f87326f4d3995411d28679d8800abe",
+                "reference": "101f1a4470f87326f4d3995411d28679d8800abe",
                 "shasum": ""
             },
             "require": {
@@ -15712,7 +15712,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v2.9.4"
+                "source": "https://github.com/larastan/larastan/tree/v2.9.5"
             },
             "funding": [
                 {
@@ -15732,7 +15732,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-04-14T14:47:58+00:00"
+            "time": "2024-04-16T19:13:34+00:00"
         },
         {
             "name": "laravel/pint",
@@ -16831,16 +16831,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.18",
+            "version": "10.5.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "835df1709ac6c968ba34bf23f3c30e5d5a266de8"
+                "reference": "c726f0de022368f6ed103e452a765d3304a996a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/835df1709ac6c968ba34bf23f3c30e5d5a266de8",
-                "reference": "835df1709ac6c968ba34bf23f3c30e5d5a266de8",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c726f0de022368f6ed103e452a765d3304a996a4",
+                "reference": "c726f0de022368f6ed103e452a765d3304a996a4",
                 "shasum": ""
             },
             "require": {
@@ -16912,7 +16912,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.18"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.19"
             },
             "funding": [
                 {
@@ -16928,7 +16928,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-04-14T07:05:31+00:00"
+            "time": "2024-04-17T14:06:18+00:00"
         },
         {
             "name": "rector/rector",
