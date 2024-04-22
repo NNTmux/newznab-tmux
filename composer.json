@@ -45,7 +45,7 @@
         "aharen/omdbapi": "^2.1",
         "anhskohbo/no-captcha": "dev-master",
         "b3rs3rk/steamfront": "dev-master",
-        "bacon/bacon-qr-code": "^2.0",
+        "bacon/bacon-qr-code": "^3.0",
         "bhuvidya/laravel-countries": "^10.0",
         "brick/math": "^0.11",
         "canihavesomecoffee/thetvdbapi": "^2.0",
