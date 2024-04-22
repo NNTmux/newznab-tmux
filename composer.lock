@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b6f109f0da22887c8b9631f222348c1b",
+    "content-hash": "669dbe46ec1b82bd7cf8cf2749862587",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3345,26 +3345,26 @@
         },
         {
             "name": "junaidnasir/larainvite",
-            "version": "v6.0.0",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/junaidnasir/larainvite.git",
-                "reference": "695d62c7ca840e46dba33cc56658ed6122784c0f"
+                "reference": "c4b178c22ced18e7469fad7c81a69de91ddc2dbb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/695d62c7ca840e46dba33cc56658ed6122784c0f",
-                "reference": "695d62c7ca840e46dba33cc56658ed6122784c0f",
+                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/c4b178c22ced18e7469fad7c81a69de91ddc2dbb",
+                "reference": "c4b178c22ced18e7469fad7c81a69de91ddc2dbb",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/events": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/support": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0",
+                "illuminate/database": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/events": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                 "php": ">=5.5.9"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.2|^7.0|^8.0|^9.0"
+                "phpunit/phpunit": "^5.2|^7.0|^8.0|^9.0|^10.5"
             },
             "type": "library",
             "extra": {
@@ -3401,9 +3401,9 @@
             ],
             "support": {
                 "issues": "https://github.com/junaidnasir/larainvite/issues",
-                "source": "https://github.com/junaidnasir/larainvite/tree/v6.0.0"
+                "source": "https://github.com/junaidnasir/larainvite/tree/v7.0.0"
             },
-            "time": "2023-04-08T15:21:12+00:00"
+            "time": "2024-04-18T11:07:27+00:00"
         },
         {
             "name": "kalnoy/nestedset",
