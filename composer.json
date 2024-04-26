@@ -51,7 +51,7 @@
         "canihavesomecoffee/thetvdbapi": "^2.0",
         "dariusiii/php-itunes-api": "^1.0",
         "dariusiii/rarinfo": "^2.7",
-        "dariusiii/tmdb-laravel": "^6.0",
+        "dariusiii/tmdb-laravel": "^7.0",
         "dborsatto/php-giantbomb": "^2.2",
         "divineomega/php-cli-progress-bar": "^2.1",
         "fakerphp/faker": "^1.12",

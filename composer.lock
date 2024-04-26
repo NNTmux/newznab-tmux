@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "669dbe46ec1b82bd7cf8cf2749862587",
+    "content-hash": "4ff7322e0a03db11a2f9000ff7f8f96b",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -959,32 +959,32 @@
         },
         {
             "name": "dariusiii/tmdb-laravel",
-            "version": "v6.0.2",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/tmdb-laravel.git",
-                "reference": "f5e871d22a6a44ee7f69f768420003c666d01ba1"
+                "reference": "330822f162d5742c44d568a78393280c630b3ceb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/f5e871d22a6a44ee7f69f768420003c666d01ba1",
-                "reference": "f5e871d22a6a44ee7f69f768420003c666d01ba1",
+                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/330822f162d5742c44d568a78393280c630b3ceb",
+                "reference": "330822f162d5742c44d568a78393280c630b3ceb",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^7.2",
-                "illuminate/support": "^8.0|^9.0|^10.0",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
                 "nyholm/psr7": "^1.3",
                 "php": ">=8.0",
                 "php-tmdb/api": "^4.0"
             },
             "require-dev": {
                 "doctrine/cache": "^1.8",
-                "illuminate/events": "^8.0|^9.0|^10.0",
+                "illuminate/events": "^8.0|^9.0|^10.0|^11.0",
                 "monolog/monolog": "^3.0",
-                "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0|^11.0",
                 "psr/event-dispatcher": "^1.0",
-                "symfony/event-dispatcher": "^6.0"
+                "symfony/event-dispatcher": "^6.0|^7.0"
             },
             "suggest": {
                 "doctrine/cache": "Required if you want to make use of caching features.",
@@ -1029,9 +1029,9 @@
                 "wrapper"
             ],
             "support": {
-                "source": "https://github.com/DariusIII/tmdb-laravel/tree/v6.0.2"
+                "source": "https://github.com/DariusIII/tmdb-laravel/tree/v7.0.0"
             },
-            "time": "2023-11-29T11:33:57+00:00"
+            "time": "2024-04-25T20:50:30+00:00"
         },
         {
             "name": "dasprid/enum",
