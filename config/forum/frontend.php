@@ -4,10 +4,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Enable/disable
+    | Enable/disable feature
     |--------------------------------------------------------------------------
     |
-    | Set to false if you want to effectively disable the frontend.
+    | Whether or not to enable the frontend feature.
     |
     */
 
@@ -15,17 +15,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Preset
+    |--------------------------------------------------------------------------
+    |
+    | The frontend preset to use. Must be installed with the
+    | forum:preset-install command.
+    |
+    */
+
+    'preset' => 'livewire-tailwind',
+
+    /*
+    |--------------------------------------------------------------------------
     | Router
     |--------------------------------------------------------------------------
     |
-    | Web router config.
+    | Router config for the frontend routes.
     |
     */
 
     'router' => [
         'prefix' => '/forum',
         'as' => 'forum.',
-        'namespace' => '\TeamTeaTime\Forum\Http\Controllers\Web',
         'middleware' => ['web'],
         'auth_middleware' => ['auth'],
     ],
@@ -35,7 +46,7 @@ return [
     | Route Prefixes
     |--------------------------------------------------------------------------
     |
-    | Prefixes to use for each model.
+    | Prefixes to use for each model in frontend routes.
     |
     */
 
@@ -61,11 +72,11 @@ return [
     | Utility Class
     |--------------------------------------------------------------------------
     |
-    | Here we specify the class to use for various web utility methods.
+    | Here we specify the class to use for various frontend utility methods.
     | This is automatically aliased to 'Forum' for ease of use in views.
     |
     */
 
-    'utility_class' => TeamTeaTime\Forum\Support\Web\Forum::class,
+    'utility_class' => TeamTeaTime\Forum\Support\Frontend\Forum::class,
 
 ];
