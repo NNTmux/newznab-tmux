@@ -46,7 +46,7 @@
         "anhskohbo/no-captcha": "dev-master",
         "b3rs3rk/steamfront": "dev-master",
         "bacon/bacon-qr-code": "^3.0",
-        "bhuvidya/laravel-countries": "^10.0",
+        "bhuvidya/laravel-countries": "dev-master",
         "brick/math": "^0.11",
         "canihavesomecoffee/thetvdbapi": "^2.0",
         "dariusiii/php-itunes-api": "^1.0",
@@ -62,13 +62,13 @@
         "imdbphp/imdbphp": "^8.1",
         "intervention/image": "^3.3",
         "joshpinkney/tv-maze-php-api": "dev-master",
-        "jrean/laravel-user-verification": "^11.0",
+        "jrean/laravel-user-verification": "^12.0",
         "junaidnasir/larainvite": "^7.0",
         "kevinlebrun/colors.php": "^1.0",
-        "laravel/framework": "^10.45",
+        "laravel/framework": "^11.5",
         "laravel/horizon": "^5.23",
         "laravel/pulse": "^1.0@beta",
-        "laravel/sanctum": "^3.3",
+        "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.0",
         "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.8",
@@ -92,7 +92,7 @@
         "predis/predis": "^2.2",
         "propaganistas/laravel-disposable-email": "^2.2",
         "ramsey/uuid": "^4.7",
-        "riari/laravel-forum": "^5.6",
+        "riari/laravel-forum": "^6.0",
         "sentry/sentry-laravel": "^4.2",
         "smarty/smarty": "^4.3",
         "spatie/async": "^1.6",
@@ -106,14 +106,14 @@
         "stechstudio/laravel-zipstream": "^4.13",
         "symfony/http-client": "^7.0",
         "symfony/postmark-mailer": "^7.0",
-        "symfony/process": "^6.0",
+        "symfony/process": "^7.0",
         "vlucas/phpdotenv": "^5.6",
         "voku/simple_html_dom": "^4.8",
         "ytake/laravel-smarty": "^8.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",
-        "beyondcode/laravel-dump-server": "^1.9",
+        "beyondcode/laravel-dump-server": "^2.0",
         "captainhook/captainhook": "^5.1",
         "captainhook/plugin-composer": "^5.1",
         "driftingly/rector-laravel": "^0.29",
@@ -124,7 +124,7 @@
         "laravel/pint": "^1.6",
         "laravel/sail": "^1.21",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^7.0",
+        "nunomaduro/collision": "^8.0",
         "php-coveralls/php-coveralls": "^2.0",
         "phpunit/phpunit": "^10.1",
         "rector/rector": "^0.18.13"
@@ -146,6 +146,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/html"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/laravel-user-verification"
         }
     ],
     "minimum-stability": "dev",
