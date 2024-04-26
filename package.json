@@ -11,7 +11,8 @@
         "production": "mix --production",
         "format": "prettier --write 'resources/**/*.{css,js,vue}'",
         "package-update": "ncu -u -x pnotify,tinymce",
-        "build": "vite build"
+        "build": "vite build",
+        "vitedev": "vite"
     },
     "devDependencies": {
         "axios": "^1.6.8",
