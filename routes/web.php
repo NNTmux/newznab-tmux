@@ -204,7 +204,6 @@ Route::middleware('isVerified')->group(function () {
 
     Route::post('filelist/{guid}', [FileListController::class, 'show']);
 
-
     Route::get('series/{id?}', [SeriesController::class, 'index'])->name('series');
 
     Route::post('series/{id?}', [SeriesController::class, 'index'])->name('series');

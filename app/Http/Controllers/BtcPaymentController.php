@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController
 {
