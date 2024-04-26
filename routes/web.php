@@ -204,13 +204,6 @@ Route::middleware('isVerified')->group(function () {
 
     Route::post('filelist/{guid}', [FileListController::class, 'show']);
 
-    Route::get('btc_payment', [BtcPaymentController::class, 'show'])->name('btc_payment');
-
-    Route::post('btc_payment', [BtcPaymentController::class, 'show'])->name('btc_payment');
-
-    Route::get('btc_payment_callback', [BtcPaymentController::class, 'callback'])->name('btc_payment_callback');
-
-    Route::post('btc_payment_callback', [BtcPaymentController::class, 'callback'])->name('btc_payment_callback');
 
     Route::get('series/{id?}', [SeriesController::class, 'index'])->name('series');
 

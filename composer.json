@@ -92,7 +92,6 @@
         "predis/predis": "^2.2",
         "propaganistas/laravel-disposable-email": "^2.2",
         "ramsey/uuid": "^4.7",
-        "revlenuwe/gearer": "dev-master",
         "riari/laravel-forum": "^5.6",
         "sentry/sentry-laravel": "^4.2",
         "smarty/smarty": "^4.3",
@@ -143,10 +142,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/gearer"
         },
         {
             "type": "vcs",

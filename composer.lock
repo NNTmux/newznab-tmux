@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ff7322e0a03db11a2f9000ff7f8f96b",
+    "content-hash": "c6f8193aa197a06890d90185df6215ab",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -8810,78 +8810,6 @@
                 }
             ],
             "time": "2023-11-16T16:16:50+00:00"
-        },
-        {
-            "name": "revlenuwe/gearer",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/gearer.git",
-                "reference": "ef687cecd2163681b6b1d7e7dca8b2f5ed5c463d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/gearer/zipball/ef687cecd2163681b6b1d7e7dca8b2f5ed5c463d",
-                "reference": "ef687cecd2163681b6b1d7e7dca8b2f5ed5c463d",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^7.2",
-                "illuminate/support": "^10.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^8.0",
-                "phpunit/phpunit": "^9.3"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Revlenuwe\\Gearer\\GearerServiceProvider"
-                    ],
-                    "aliases": {
-                        "Gearer": "Revlenuwe\\Gearer\\Facades\\Gearer"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Revlenuwe\\Gearer\\": "src"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Revlenuwe\\Gearer\\Tests\\": "tests"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "vendor/bin/phpunit"
-                ],
-                "test-coverage": [
-                    "vendor/bin/phpunit --coverage-html coverage"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "MyceliumGear gateway payment processing",
-            "keywords": [
-                "bitcoin",
-                "gear",
-                "gearer",
-                "laravel",
-                "laravel gateway",
-                "laravel payment",
-                "mycelium",
-                "revlenuwe"
-            ],
-            "support": {
-                "source": "https://github.com/DariusIII/gearer/tree/master"
-            },
-            "time": "2023-11-25T15:22:59+00:00"
         },
         {
             "name": "riari/laravel-forum",
@@ -18420,8 +18348,7 @@
         "anhskohbo/no-captcha": 20,
         "b3rs3rk/steamfront": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "laravel/pulse": 10,
-        "revlenuwe/gearer": 20
+        "laravel/pulse": 10
     },
     "prefer-stable": true,
     "prefer-lowest": false,
