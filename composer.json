@@ -82,7 +82,7 @@
         "monicahq/laravel-cloudflare": "^3.5",
         "monolog/monolog": "^3.5",
         "mtownsend/xml-to-array": "^2.0",
-        "nesbot/carbon": "^2.71",
+        "nesbot/carbon": "^3.3",
         "opis/closure": "^3.6",
         "pear/net_nntp": "^1.6.0",
         "php-ffmpeg/php-ffmpeg": "^1.2",

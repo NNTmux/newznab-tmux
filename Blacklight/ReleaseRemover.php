@@ -119,7 +119,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             $this->colorCLI->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            $this->colorCLI->header(now()->diffInSeconds($timeStart).' seconds', true);
+            $this->colorCLI->header(now()->diffInSeconds($timeStart, true).' seconds', true);
         }
 
         return true;
@@ -239,7 +239,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             $this->colorCLI->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            $this->colorCLI->header(now()->diffInSeconds($timeStart).' seconds', true);
+            $this->colorCLI->header(now()->diffInSeconds($timeStart, true).' seconds', true);
         }
 
         return true;
