@@ -14,7 +14,34 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectUsersTo('/');
+
+        $middleware->validateCsrfTokens(except: [
+            'failed',
+            'admin/*',
+            'btcpay/webhook',
+        ]);
+
+        $middleware->append([
+            \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
+            \Monicahq\Cloudflare\Http\Middleware\TrustProxies::class,
+            \App\Http\Middleware\ForceJsonOnAPI::class,
+        ]);
+
+        $middleware->web(\Illuminate\Session\Middleware\AuthenticateSession::class);
+
+        $middleware->throttleApi('60,1');
+
+        $middleware->alias([
+            '2fa' => \App\Http\Middleware\Google2FAMiddleware::class,
+            'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'clearance' => \App\Http\Middleware\ClearanceMiddleware::class,
+            'isVerified' => \Jrean\UserVerification\Middleware\IsVerified::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
