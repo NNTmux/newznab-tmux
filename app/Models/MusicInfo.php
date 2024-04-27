@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 
@@ -71,7 +72,7 @@ class MusicInfo extends Model
      */
     protected $guarded = [];
 
-    public function genre()
+    public function genre(): BelongsTo
     {
         return $this->belongsTo(Genre::class, 'genres_id');
     }
