@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10739567a859ba1f69e3fd9b1e562e36",
+    "content-hash": "ddb956a243bf17fa54db0477940ad4c1",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2872,16 +2872,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "3.6.1",
+            "version": "3.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "33cbb217a00926149d96ed9e794100d8f8b53263"
+                "reference": "8e00dd330ff8ef944492037c5dd17da00b85daa6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/33cbb217a00926149d96ed9e794100d8f8b53263",
-                "reference": "33cbb217a00926149d96ed9e794100d8f8b53263",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/8e00dd330ff8ef944492037c5dd17da00b85daa6",
+                "reference": "8e00dd330ff8ef944492037c5dd17da00b85daa6",
                 "shasum": ""
             },
             "require": {
@@ -2928,7 +2928,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.6.1"
+                "source": "https://github.com/Intervention/image/tree/3.6.2"
             },
             "funding": [
                 {
@@ -2940,7 +2940,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-04-23T14:17:12+00:00"
+            "time": "2024-04-26T15:29:43+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -3737,38 +3737,37 @@
         },
         {
             "name": "laravel/pulse",
-            "version": "v1.0.0-beta16",
+            "version": "dev-validation-errors",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pulse.git",
-                "reference": "bd05ae7bfb9a6671c91f7eb25e742ee2497df0df"
+                "reference": "461d8247cc11b2e9a0c65fd22bd19fee70413646"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pulse/zipball/bd05ae7bfb9a6671c91f7eb25e742ee2497df0df",
-                "reference": "bd05ae7bfb9a6671c91f7eb25e742ee2497df0df",
+                "url": "https://api.github.com/repos/laravel/pulse/zipball/461d8247cc11b2e9a0c65fd22bd19fee70413646",
+                "reference": "461d8247cc11b2e9a0c65fd22bd19fee70413646",
                 "shasum": ""
             },
             "require": {
                 "doctrine/sql-formatter": "^1.1",
                 "guzzlehttp/promises": "^1.0|^2.0",
-                "illuminate/auth": "^10.48.4|^11.0.8",
-                "illuminate/cache": "^10.48.4|^11.0.8",
-                "illuminate/config": "^10.48.4|^11.0.8",
-                "illuminate/console": "^10.48.4|^11.0.8",
-                "illuminate/contracts": "^10.48.4|^11.0.8",
-                "illuminate/database": "^10.48.4|^11.0.8",
-                "illuminate/events": "^10.48.4|^11.0.8",
-                "illuminate/http": "^10.48.4|^11.0.8",
-                "illuminate/queue": "^10.48.4|^11.0.8",
-                "illuminate/redis": "^10.48.4|^11.0.8",
-                "illuminate/routing": "^10.48.4|^11.0.8",
-                "illuminate/support": "^10.48.4|^11.0.8",
-                "illuminate/view": "^10.48.4|^11.0.8",
+                "illuminate/auth": "^10.34|^11.0",
+                "illuminate/cache": "^10.34|^11.0",
+                "illuminate/config": "^10.34|^11.0",
+                "illuminate/console": "^10.34|^11.0",
+                "illuminate/contracts": "^10.34|^11.0",
+                "illuminate/database": "^10.34|^11.0",
+                "illuminate/events": "^10.34|^11.0",
+                "illuminate/http": "^10.34|^11.0",
+                "illuminate/queue": "^10.34|^11.0",
+                "illuminate/redis": "^10.34|^11.0",
+                "illuminate/routing": "^10.34|^11.0",
+                "illuminate/support": "^10.34|^11.0",
+                "illuminate/view": "^10.34|^11.0",
                 "livewire/livewire": "^3.2",
                 "nesbot/carbon": "^2.67|^3.0",
-                "php": "^8.1",
-                "symfony/console": "^6.0|^7.0"
+                "php": "^8.1"
             },
             "conflict": {
                 "nunomaduro/collision": "<7.7.0"
@@ -3776,7 +3775,7 @@
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.7",
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^8.23.1|^9.0",
+                "orchestra/testbench": "^8.16|^9.0",
                 "pestphp/pest": "^2.0",
                 "pestphp/pest-plugin-laravel": "^2.2",
                 "phpstan/phpstan": "^1.11",
@@ -3820,7 +3819,7 @@
                 "issues": "https://github.com/laravel/pulse/issues",
                 "source": "https://github.com/laravel/pulse"
             },
-            "time": "2024-03-24T15:02:27+00:00"
+            "time": "2024-02-24T22:25:35+00:00"
         },
         {
             "name": "laravel/sanctum",
@@ -18224,7 +18223,7 @@
         "b3rs3rk/steamfront": 20,
         "bhuvidya/laravel-countries": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "laravel/pulse": 10
+        "laravel/pulse": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
