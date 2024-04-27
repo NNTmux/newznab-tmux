@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Release;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ReleaseFactory extends Factory

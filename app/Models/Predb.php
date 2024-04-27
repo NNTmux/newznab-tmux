@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Scout\Searchable;
