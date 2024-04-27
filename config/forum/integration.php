@@ -16,8 +16,8 @@ return [
         'forum' => App\Policies\ForumPolicy::class,
         'model' => [
             TeamTeaTime\Forum\Models\Category::class => \App\Policies\CategoryPolicy::class,
-            TeamTeaTime\Forum\Models\Thread::class => TeamTeaTime\Forum\Policies\ThreadPolicy::class,
-            TeamTeaTime\Forum\Models\Post::class => TeamTeaTime\Forum\Policies\PostPolicy::class,
+            TeamTeaTime\Forum\Models\Thread::class =>\TeamTeaTime\Forum\Policies\ThreadPolicy::class,
+            TeamTeaTime\Forum\Models\Post::class => \TeamTeaTime\Forum\Policies\PostPolicy::class,
         ],
     ],
 
