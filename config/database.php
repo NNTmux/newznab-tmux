@@ -67,13 +67,32 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Migration Repository Table
+    |--------------------------------------------------------------------------
+    |
+    | This table keeps track of all the migrations that have already run for
+    | your application. Using this information, we can determine which of
+    | the migrations on disk haven't actually been run on the database.
+    |
+    */
+
     'migrations' => [
-        'table' => [
-            'table' => 'migrations',
-            'update_date_on_publish' => false, // disable to preserve original behavior for existing applications
-        ],
-        'update_date_on_publish' => false, // disable to preserve original behavior for existing applications
+        'table' => 'migrations',
+        'update_date_on_publish' => true,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redis Databases
+    |--------------------------------------------------------------------------
+    |
+    | Redis is an open source, fast, and advanced key-value store that also
+    | provides a richer body of commands than a typical key-value system
+    | such as Memcached. You may define your connection settings here.
+    |
+    */
 
     'redis' => [
         'client' => env('REDIS_CLIENT', 'phpredis'),
