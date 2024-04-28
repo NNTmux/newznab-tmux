@@ -12,7 +12,7 @@ class CreateForumTableCategories extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('forum_categories')) {
+        if (! Schema::hasTable('forum_categories')) {
             Schema::create('forum_categories', function (Blueprint $table) {
                 $table->increments('id');
                 $table->integer('parent_category')->unsigned();

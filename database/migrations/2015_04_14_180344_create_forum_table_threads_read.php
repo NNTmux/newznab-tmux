@@ -12,7 +12,7 @@ class CreateForumTableThreadsRead extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('forum_threads_read')) {
+        if (! Schema::hasTable('forum_threads_read')) {
             Schema::create('forum_threads_read', function (Blueprint $table) {
                 $table->integer('thread_id')->unsigned();
                 $table->foreignIdFor(config('forum.integration.user_model'), 'user_id');

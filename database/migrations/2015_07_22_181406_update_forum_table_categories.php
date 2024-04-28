@@ -13,10 +13,10 @@ class UpdateForumTableCategories extends Migration
     public function up()
     {
         Schema::table('forum_categories', function (Blueprint $table) {
-            if (!Schema::hasColumn('forum_categories', 'category_id')) {
+            if (! Schema::hasColumn('forum_categories', 'category_id')) {
                 $table->renameColumn('parent_category', 'category_id');
             }
-            if (!Schema::hasColumn('forum_categories', 'description')) {
+            if (! Schema::hasColumn('forum_categories', 'description')) {
                 $table->renameColumn('subtitle', 'description');
             }
         });
