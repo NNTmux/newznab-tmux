@@ -1125,7 +1125,7 @@ class NameFixer
                         $this->colorCLI->climate()->info('Renamed Releases: ['.number_format($counted).'] '.(new ConsoleTools())->percentString(++$counter, $total));
                     }
                 }
-                $this->colorCLI->climate()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart).' seconds'.'.');
+                $this->colorCLI->climate()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds'.'.');
             } else {
                 $this->colorCLI->climate()->info('Nothing to do.');
             }

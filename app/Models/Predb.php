@@ -7,6 +7,7 @@ use Blacklight\ConsoleTools;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Scout\Searchable;
@@ -89,12 +90,12 @@ class Predb extends Model
      */
     protected $guarded = [];
 
-    public function hash()
+    public function hash(): HasMany
     {
         return $this->hasMany(PredbHash::class, 'predb_id');
     }
 
-    public function release()
+    public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'predb_id');
     }

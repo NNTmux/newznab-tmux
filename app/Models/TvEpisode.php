@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -51,7 +52,7 @@ class TvEpisode extends Model
      */
     public $timestamps = false;
 
-    public function video()
+    public function video(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'videos_id');
     }

@@ -363,7 +363,7 @@ class User extends Authenticatable
 
         foreach ($period as $value) {
             $users = self::query()->whereDate('rolechangedate', '=', $value)->get();
-            $days = $now->diffInDays($value);
+            $days = $now->diffInDays($value, true);
             foreach ($users as $user) {
                 SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails');
             }

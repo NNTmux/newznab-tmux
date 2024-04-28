@@ -48,7 +48,7 @@ try {
         }
     }
 
-    $colorCli->header('Running time: '.now()->diffInSeconds($start).' seconds');
+    $colorCli->header('Running time: '.now()->diffInSeconds($start, true).' seconds');
 } catch (ErrorException $e) {
     echo $e->getMessage();
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\Genre.
@@ -41,7 +42,7 @@ class Genre extends Model
      */
     protected $guarded = [];
 
-    public function music()
+    public function music(): HasMany
     {
         return $this->hasMany(MusicInfo::class, 'genres_id');
     }

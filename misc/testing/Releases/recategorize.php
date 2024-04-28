@@ -39,7 +39,7 @@ function reCategorize($argv): void
     }
     $timeStart = now();
     $chgCount = categorizeRelease($argv, true);
-    $time = now()->diffInSeconds($timeStart);
+    $time = now()->diffInSeconds($timeStart, true);
     if (! isset($argv[2])) {
         $colorCli->header('Finished re-categorizing '.number_format($chgCount).' releases in '.$time.' seconds, using the searchname.').PHP_EOL;
     } else {
