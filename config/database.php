@@ -46,6 +46,25 @@ return [
             'unix_socket' => '',
             'charset' => 'utf8',
         ],
+
+        'mariadb' => [
+            'driver' => 'mariadb',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'nntmux'),
+            'username' => env('DB_USERNAME', 'nntmux'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'strict' => false,
+            'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+            ]) : [],
+        ],
     ],
 
     'migrations' => [
