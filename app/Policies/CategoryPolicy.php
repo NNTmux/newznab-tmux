@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use Illuminate\Foundation\Auth\User;
 use TeamTeaTime\Forum\Models\Category;
 
 class CategoryPolicy extends \TeamTeaTime\Forum\Policies\CategoryPolicy
@@ -60,6 +61,11 @@ class CategoryPolicy extends \TeamTeaTime\Forum\Policies\CategoryPolicy
     }
 
     public function delete($user, Category $category): bool
+    {
+        return $user->hasRole('Admin');
+    }
+    
+    public function edit(User $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
