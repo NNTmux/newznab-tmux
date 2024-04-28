@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('media_infos', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('releases_id')->unsigned();
-            $table->string('movie_name')->nullable();
-            $table->string('file_name')->nullable();
-            $table->string('unique_id')->nullable();
-            $table->timestamps();
-        });
+        // Check if table exists
+        if (! Schema::hasTable('media_infos')) {
+            Schema::create('media_infos', function (Blueprint $table) {
+                $table->id();
+                $table->bigInteger('releases_id')->unsigned();
+                $table->string('movie_name')->nullable();
+                $table->string('file_name')->nullable();
+                $table->string('unique_id')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
