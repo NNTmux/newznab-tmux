@@ -4,8 +4,14 @@ on: [push]
 
 jobs:
   tests:
-    name: Run tests
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ 8.2, 8.3 ]
+
+    name: PHP ${{ matrix.php }}
     services:
       mysql:
         image: mariadb:10
@@ -23,8 +29,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, bcmath, soap, intl, gd, exif, iconv
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
 
       - name: Copy env file
@@ -32,11 +38,10 @@ jobs:
           cp .env.test .env
 
       - name: Run composer install
-        run: composer install -n --prefer-dist
+        run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Prepare Laravel Application
-        run:
-          php artisan key:generate
+      - name: Generate app key
+        run: php artisan key:generate
 
       - name: Run tests
-        run: php artisan test
+        run: vendor/bin/phpunit
