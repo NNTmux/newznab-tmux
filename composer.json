@@ -47,7 +47,7 @@
         "b3rs3rk/steamfront": "dev-master",
         "bacon/bacon-qr-code": "^3.0",
         "bhuvidya/laravel-countries": "dev-master",
-        "brick/math": "^0.11",
+        "brick/math": "^0.12",
         "canihavesomecoffee/thetvdbapi": "^2.0",
         "dariusiii/php-itunes-api": "^1.0",
         "dariusiii/rarinfo": "^2.7",
