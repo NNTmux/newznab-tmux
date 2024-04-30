@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "30fc64a79535944218f58ad4c9ffc888",
+    "content-hash": "6c0c348935eae65b980d8653bac24578",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -219,7 +219,7 @@
         },
         {
             "name": "bhuvidya/laravel-countries",
-            "version": "dev-master",
+            "version": "v11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bhuvidya/laravel-countries.git",
@@ -236,7 +236,6 @@
                 "illuminate/support": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                 "php": ">=7.0.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -18369,7 +18368,6 @@
     "stability-flags": {
         "anhskohbo/no-captcha": 20,
         "b3rs3rk/steamfront": 20,
-        "bhuvidya/laravel-countries": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "laravel/pulse": 20
     },
