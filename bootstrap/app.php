@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'failed',
             'admin/*',
             'btcpay/webhook',
+            'logout',
         ]);
 
         $middleware->append([
