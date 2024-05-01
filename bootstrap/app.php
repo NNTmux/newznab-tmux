@@ -25,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin/*',
             'btcpay/webhook',
             'logout',
+            'register',
+            'login',
         ]);
 
         $middleware->append([
