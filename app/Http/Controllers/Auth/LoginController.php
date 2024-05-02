@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Models\Settings;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,11 +49,7 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    /**
-     * @throws \Illuminate\Auth\AuthenticationException
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function login(LoginLoginRequest $request): RedirectResponse
+    public function login(LoginLoginRequest $request): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|Application|RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'username' => ['required'],
@@ -69,7 +66,7 @@ class LoginController extends Controller
             $this->fireLockoutEvent($request);
             $request->session()->flash('message', 'You have failed to login too many times.Try again in '.$this->decayMinutes().' minutes.');
 
-            return $this->showLoginForm();
+            return redirect('login');
         }
 
         if ($validator->passes()) {
@@ -80,7 +77,7 @@ class LoginController extends Controller
                 if (! $user->isVerified() || $user->isPendingVerification()) {
                     $request->session()->flash('message', 'You have not verified your email address!');
 
-                    return $this->showLoginForm();
+                    return redirect('login');
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
@@ -100,13 +97,13 @@ class LoginController extends Controller
                 $request->session()->flash('message', 'Username or email used do not match our records!');
             }
 
-            return $this->showLoginForm();
+            return redirect('login');
         }
 
         $this->incrementLoginAttempts($request);
         $request->session()->flash('message', implode('', Arr::collapse($validator->errors()->toArray())));
 
-        return $this->showLoginForm();
+        return redirect('login');
     }
 
     public function showLoginForm()
