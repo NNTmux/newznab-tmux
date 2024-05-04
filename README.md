@@ -32,8 +32,7 @@ System Administration know-how. NNTmux is not plug-n-play software. Installation
 
 ### Hardware
 
-	32GB RAM, 4 cores(8 threads) and 80GB disk space minimum.
-
+	64GB RAM, 8 cores(16 threads) and 320GB disk space minimum.
 If you wish to use more than 5 threads an eight core CPU is beneficial.
 
 The overall speed of NNTmux is largely governed by performance of the database. As many of the database tables should be held within system RAM as possible. See Database Section below.
