@@ -39,7 +39,7 @@ The overall speed of NNTmux is largely governed by performance of the database. 
 
 ### Software
 
-	PHP 8.1+ (and various modules)
+	PHP 8.2+ (and various modules)
 	MariaDB 10+ or MySQL 8+ (Postgres is not supported)
 The installation guides have more detailed software requirements.
 
