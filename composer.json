@@ -123,7 +123,6 @@
         "friendsofphp/php-cs-fixer": "^3.53",
         "jubeki/laravel-code-style": "^2.0",
         "larastan/larastan": "^2.8",
-        "laravel/breeze": "^2.0",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
