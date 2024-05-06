@@ -241,6 +241,8 @@ class TVDB extends TV
         } catch (ResourceNotFoundException $e) {
             $response = false;
             $this->colorCli->climate()->error('Show not found on TVDB');
+        } catch (UnauthorizedException $e) {
+            $this->colorCli->climate()->error('Not authorized to access TVDB');
         }
 
         sleep(1);
