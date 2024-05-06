@@ -7478,16 +7478,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.28.0",
+            "version": "1.29.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "cd06d6b1a1b3c75b0b83f97577869fd85a3cd4fb"
+                "reference": "536889f2b340489d328f5ffb7b02bb6b183ddedc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/cd06d6b1a1b3c75b0b83f97577869fd85a3cd4fb",
-                "reference": "cd06d6b1a1b3c75b0b83f97577869fd85a3cd4fb",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/536889f2b340489d328f5ffb7b02bb6b183ddedc",
+                "reference": "536889f2b340489d328f5ffb7b02bb6b183ddedc",
                 "shasum": ""
             },
             "require": {
@@ -7519,9 +7519,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.28.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.29.0"
             },
-            "time": "2024-04-03T18:51:33+00:00"
+            "time": "2024-05-06T12:04:23+00:00"
         },
         {
             "name": "pragmarx/google2fa",
@@ -9465,16 +9465,16 @@
         },
         {
             "name": "spatie/image-optimizer",
-            "version": "1.7.3",
+            "version": "1.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image-optimizer.git",
-                "reference": "d4f0d09c44700c78d1718cd40da404b1c800b935"
+                "reference": "ed39c7bfce7a2ecf676174a2d4286ab3a1c4f4f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image-optimizer/zipball/d4f0d09c44700c78d1718cd40da404b1c800b935",
-                "reference": "d4f0d09c44700c78d1718cd40da404b1c800b935",
+                "url": "https://api.github.com/repos/spatie/image-optimizer/zipball/ed39c7bfce7a2ecf676174a2d4286ab3a1c4f4f7",
+                "reference": "ed39c7bfce7a2ecf676174a2d4286ab3a1c4f4f7",
                 "shasum": ""
             },
             "require": {
@@ -9514,9 +9514,9 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/image-optimizer/issues",
-                "source": "https://github.com/spatie/image-optimizer/tree/1.7.3"
+                "source": "https://github.com/spatie/image-optimizer/tree/1.7.4"
             },
-            "time": "2024-05-03T14:05:33+00:00"
+            "time": "2024-05-06T09:12:30+00:00"
         },
         {
             "name": "spatie/laravel-backup",
@@ -15237,16 +15237,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.54.0",
+            "version": "v3.55.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "2aecbc8640d7906c38777b3dcab6f4ca79004d08"
+                "reference": "c9eeacb559bfa0bcc7f778cfb7b42715c83d2c7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/2aecbc8640d7906c38777b3dcab6f4ca79004d08",
-                "reference": "2aecbc8640d7906c38777b3dcab6f4ca79004d08",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/c9eeacb559bfa0bcc7f778cfb7b42715c83d2c7e",
+                "reference": "c9eeacb559bfa0bcc7f778cfb7b42715c83d2c7e",
                 "shasum": ""
             },
             "require": {
@@ -15318,7 +15318,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.54.0"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.55.0"
             },
             "funding": [
                 {
@@ -15326,7 +15326,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-04-17T08:12:13+00:00"
+            "time": "2024-05-06T00:10:15+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
