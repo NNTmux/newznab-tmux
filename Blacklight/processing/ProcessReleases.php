@@ -22,7 +22,6 @@ use Blacklight\Releases;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use JetBrains\PhpStorm\ArrayShape;
 
 class ProcessReleases
 {

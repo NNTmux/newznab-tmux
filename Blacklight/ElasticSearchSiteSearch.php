@@ -5,7 +5,6 @@ namespace Blacklight;
 use App\Models\Release;
 use Elasticsearch;
 use Elasticsearch\Common\Exceptions\ElasticsearchException;
-use Elasticsearch\Elasticsearch\ClientBuilder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 

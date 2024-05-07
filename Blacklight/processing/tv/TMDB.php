@@ -3,7 +3,6 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
-use JetBrains\PhpStorm\ArrayShape;
 use Tmdb\Client;
 use Tmdb\Exception\TmdbApiException;
 use Tmdb\Helper\ImageHelper;
