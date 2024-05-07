@@ -9,6 +9,7 @@ use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\File;
 
 $dir = resource_path().'/movednzbs/';
 $colorCli = new ColorCLI();

@@ -53,6 +53,8 @@ class AEBN extends AdultMovies
      */
     protected string $_title = '';
 
+    private $cookie;
+
     /**
      * Gets Trailer URL . will be processed in XXX insertswf.
      */

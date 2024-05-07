@@ -352,7 +352,6 @@ class NZB
                 $result[$i]['groups'][] = (string) $g;
             }
 
-            unset($result[$i]['segments']['@attributes']);
             if ($options['no-file-key']) {
                 $i++;
             }

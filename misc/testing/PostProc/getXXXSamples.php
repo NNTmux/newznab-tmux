@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use App\Models\Category;
 use Blacklight\ColorCLI;
 use Blacklight\ReleaseImage;
+use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $colorCli = new ColorCLI();

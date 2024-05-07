@@ -381,7 +381,6 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    #[ArrayShape(['added' => 'int', 'dupes' => 'int'])]
     public function createReleases(int|string $groupID): array
     {
         $startTime = now()->toImmutable();

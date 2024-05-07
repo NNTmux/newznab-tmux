@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use Elasticsearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
@@ -365,7 +366,7 @@ class Releases extends Release
                 ];
 
                 try {
-                    \Elasticsearch::delete($params);
+                    Elasticsearch::delete($params);
                 } catch (Missing404Exception $e) {
                     //we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
                 }

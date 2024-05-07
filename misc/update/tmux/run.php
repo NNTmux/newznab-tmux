@@ -6,6 +6,7 @@ use App\Models\Collection;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\DB;
 
 $tmuxPath = base_path().'/misc/update/tmux/';
 $import = Settings::settingValue('site.tmux.import') ?? 0;

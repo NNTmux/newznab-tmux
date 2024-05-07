@@ -3,6 +3,7 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NZBImport;
+use Illuminate\Support\Str;
 
 $n = PHP_EOL;
 

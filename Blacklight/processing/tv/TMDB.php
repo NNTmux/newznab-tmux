@@ -338,14 +338,6 @@ class TMDB extends TV
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    #[ArrayShape([
-        'title' => 'string',
-        'series' => 'int',
-        'episode' => 'int',
-        'se_complete' => 'string',
-        'firstaired' => 'string',
-        'summary' => 'string',
-    ])]
     protected function formatEpisodeInfo($episode): array
     {
         return [
