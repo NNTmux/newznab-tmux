@@ -1053,16 +1053,6 @@ CREATE TABLE `release_unique` (
   CONSTRAINT `FK_ru_releases` FOREIGN KEY (`releases_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `releaseextrafull`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `releaseextrafull` (
-  `releases_id` int(10) unsigned NOT NULL COMMENT 'FK to releases.id',
-  `mediainfo` text DEFAULT NULL,
-  PRIMARY KEY (`releases_id`),
-  CONSTRAINT `FK_ref_releases` FOREIGN KEY (`releases_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `releases`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1694,7 +1684,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (36,'2018_01_20_200
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (37,'2018_01_20_200018_create_releases_groups_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (38,'2018_01_20_200030_create_release_regexes_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (39,'2018_01_20_200038_create_release_unique_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (40,'2018_01_20_200046_create_releaseextrafull_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (41,'2018_01_20_200056_create_release_files_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (42,'2018_01_20_200104_create_release_nfos_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (43,'2018_01_20_200124_create_release_subtitles_table',1);

@@ -924,14 +924,12 @@ class Releases extends Release
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				g.name AS group_name,
-				rn.releases_id AS nfoid,
-				re.releases_id AS reid
+				rn.releases_id AS nfoid
 			FROM releases r
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
 			%s",
             $whereSql
         );

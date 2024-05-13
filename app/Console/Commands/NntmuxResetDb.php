@@ -75,7 +75,6 @@ class NntmuxResetDb extends Command
                 'audio_data',
                 'release_subtitles',
                 'video_data',
-                'releaseextrafull',
                 'releases',
                 'anidb_titles',
                 'anidb_info',

@@ -42,13 +42,12 @@ switch (true) {
 						IFNULL(ru.uniqueid, '') AS uid,
 						IFNULL(ph.hash, 0) AS hash,
 					    IFNULL(rf.crc32, '') AS crc,
-					    IFNULL(re.mediainfo, '') AS mediainfo
 					FROM releases r
 					LEFT JOIN release_nfos rn ON rn.releases_id = r.id
 					LEFT JOIN release_files rf ON rf.releases_id = r.id
 					LEFT JOIN release_unique ru ON ru.releases_id = r.id
 					LEFT JOIN par_hashes ph ON ph.releases_id = r.id
-					LEFT JOIN releaseextrafull re ON re.releases_id = r.id
+
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
@@ -60,10 +59,6 @@ switch (true) {
 						(
 							r.nfostatus = %d
 							AND r.proc_nfo = %d
-						)
-						OR (
-						    r.name REGEXP '[a-z0-9]{32,64}'
-				            AND re.mediainfo REGEXP '\<Movie_name\>'
 						)
 						OR r.proc_files = %d
 						OR r.proc_uid = %d

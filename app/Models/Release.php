@@ -200,11 +200,6 @@ class Release extends Model
         return $this->hasMany(DnzbFailure::class, 'release_id');
     }
 
-    public function releaseExtra(): HasMany
-    {
-        return $this->hasMany(ReleaseExtraFull::class, 'releases_id');
-    }
-
     public function nfo(): HasOne
     {
         return $this->hasOne(ReleaseNfo::class, 'releases_id');
