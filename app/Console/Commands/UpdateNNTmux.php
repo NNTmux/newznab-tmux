@@ -59,13 +59,14 @@ class UpdateNNTmux extends Command
                     $this->error('Db updating failed!!');
                 }
             }
-            // Install npm packages
-            Process::run('npm install')->output();
-            // Run npm build
-            Process::run('npm run build')->output();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
+
+        // Install npm packages
+        Process::run('npm install')->output();
+        // Run npm build
+        Process::run('npm run build')->output();
 
         $cleared = (new Smarty())->setCompileDir(config('ytake-laravel-smarty.compile_path'))->clearCompiledTemplate();
         if ($cleared) {
