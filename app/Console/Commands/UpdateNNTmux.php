@@ -64,9 +64,13 @@ class UpdateNNTmux extends Command
         }
 
         // Install npm packages
-        Process::run('npm install')->output();
+        $process = Process::timeout(360)->run('npm install');
+        echo $process->output();
+        echo $process->errorOutput();
         // Run npm build
-        Process::run('npm run build')->output();
+        $process = Process::timeout(360)->run('npm run build');
+        echo $process->output();
+        echo $process->errorOutput();
 
         $cleared = (new Smarty())->setCompileDir(config('ytake-laravel-smarty.compile_path'))->clearCompiledTemplate();
         if ($cleared) {
