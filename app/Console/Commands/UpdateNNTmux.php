@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Process;
 use Ytake\LaravelSmarty\Smarty;
 
 class UpdateNNTmux extends Command
@@ -57,6 +58,10 @@ class UpdateNNTmux extends Command
                 if ($fail) {
                     $this->error('Db updating failed!!');
                 }
+                // Install npm packages
+                Process::run('npm install')->output();
+                // Run npm build
+                Process::run('npm run build')->output();
             }
         } catch (\Exception $e) {
             $this->error($e->getMessage());
