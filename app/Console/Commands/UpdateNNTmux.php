@@ -58,11 +58,11 @@ class UpdateNNTmux extends Command
                 if ($fail) {
                     $this->error('Db updating failed!!');
                 }
-                // Install npm packages
-                Process::run('npm install')->output();
-                // Run npm build
-                Process::run('npm run build')->output();
             }
+            // Install npm packages
+            Process::run('npm install')->output();
+            // Run npm build
+            Process::run('npm run build')->output();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
