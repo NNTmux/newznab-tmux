@@ -9,8 +9,8 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Blacklight\db\populate\AniDB as PaDb;
 use Blacklight\NZB;
+use Blacklight\PopulateAniDB as PaDb;
 
 class AniDB
 {
