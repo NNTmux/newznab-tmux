@@ -67,7 +67,7 @@
         "kevinlebrun/colors.php": "^1.0",
         "laravel/framework": "^11.6",
         "laravel/horizon": "^5.24",
-        "laravel/pulse": "dev-validation-errors",
+        "laravel/pulse": "^1.1.0",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.8",
         "laravel/telescope": "^5.0",
