@@ -1587,53 +1587,6 @@ CREATE TABLE `xxxinfo` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_xxxinfo_title` (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `loop_cbpm` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb3 */ ;
-/*!50003 SET character_set_results = utf8mb3 */ ;
-/*!50003 SET collation_connection  = utf8mb3_unicode_ci */ ;
-DELIMITER ;;
-CREATE DEFINER=`darius`@`%` PROCEDURE `loop_cbpm`(IN method CHAR(10))
-    COMMENT 'Performs tasks on All CBPM tables one by one -- REPAIR/ANALYZE/OPTIMIZE or DROP/TRUNCATE'
-main: BEGIN
-    DECLARE done INT DEFAULT 0;
-    DECLARE tname VARCHAR(255) DEFAULT "";
-    DECLARE regstr VARCHAR(255) CHARSET utf8 COLLATE utf8_general_ci DEFAULT "";
-
-    DECLARE cur1 CURSOR FOR
-      SELECT TABLE_NAME
-      FROM information_schema.TABLES
-      WHERE
-        TABLE_SCHEMA = (SELECT DATABASE())
-        AND TABLE_NAME REGEXP regstr
-      ORDER BY TABLE_NAME ASC;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    IF method NOT IN ("repair", "analyze", "optimize", "drop", "truncate")
-    THEN LEAVE main; END IF;
-
-    IF method = "drop" THEN SET regstr = "^(collections|binaries|parts|missed_parts)_[0-9]+$";
-    ELSE SET regstr = "^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$";
-    END IF;
-
-    OPEN cur1;
-    cbpm_loop: LOOP FETCH cur1
-    INTO tname;
-      IF done
-      THEN LEAVE cbpm_loop; END IF;
-      SET @SQL := CONCAT(method, " TABLE ", tname);
-      PREPARE _stmt FROM @SQL;
-      EXECUTE _stmt;
-      DEALLOCATE PREPARE _stmt;
-    END LOOP;
-    CLOSE cur1;
-  END ;;
-DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
@@ -1700,7 +1653,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (53,'2018_01_20_200
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (54,'2018_01_20_200353_create_videos_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (55,'2018_01_20_200403_create_videos_aliases_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (56,'2018_01_20_200417_create_xxxinfo_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (57,'2018_01_22_220858_add_stored_procedures',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (58,'2018_04_24_132758_create_cache_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (59,'2018_08_08_100000_create_telescope_entries_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (60,'2018_09_13_070520_add_verification_to_user_table',1);
