@@ -31,7 +31,7 @@ class UpdateNNTmuxDB extends Command
     public function handle(): void
     {
         // also prevent web access.
-        $this->output->writeln('<info>Updating database</info>');
+        $this->info('Updating database');
         if (config('app.env') !== 'production') {
             $this->call('migrate');
         } else {
