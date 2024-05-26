@@ -32,6 +32,6 @@ class SendContactUsEmail implements ShouldQueue
 
     public function handle(): void
     {
-        Mail::to($this->mailTo)->send(new ContactUs($this->email, $this->mailBody));
+        Mail::to($this->mailTo)->send(new ContactUs($this->mailTo, $this->email, $this->mailBody));
     }
 }
