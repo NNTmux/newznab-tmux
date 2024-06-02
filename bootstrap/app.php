@@ -27,6 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'logout',
             'register',
             'login',
+            'cart',
+            'cart/*',
         ]);
 
         $middleware->append([
