@@ -270,7 +270,7 @@ class Tmux
 
     public function relativeTime($_time): string
     {
-        return Carbon::createFromTimestamp($_time)->ago();
+        return Carbon::createFromTimestamp($_time, date_default_timezone_get())->ago();
     }
 
     public function command_exist($cmd): bool

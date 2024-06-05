@@ -273,7 +273,7 @@ class PopulateAniDB
      */
     private function populateMainTable(): void
     {
-        $lastUpdate = Carbon::createFromTimestamp($this->lastUpdate);
+        $lastUpdate = Carbon::createFromTimestamp($this->lastUpdate, date_default_timezone_get());
         $current = now();
 
         if ($current->diff($lastUpdate)->format('%d') > $this->updateInterval) {

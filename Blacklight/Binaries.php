@@ -296,7 +296,7 @@ class Binaries
         // Generate postdate for first record, for those that upgraded.
         if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] !== 0) {
             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
-            UsenetGroup::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
+            UsenetGroup::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'], date_default_timezone_get())]);
         }
 
         // Get first article we want aka the oldest.
@@ -418,7 +418,8 @@ class Binaries
                                 [
                                     'first_record' => $scanSummary['firstArticleNumber'],
                                     'first_record_postdate' => Carbon::createFromTimestamp(
-                                        $groupMySQL['first_record_postdate']
+                                        $groupMySQL['first_record_postdate'],
+                                        date_default_timezone_get()
                                     ),
                                 ]
                             );
@@ -434,7 +435,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
-                                'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate']),
+                                'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate'], date_default_timezone_get()),
                                 'last_updated' => now(),
                             ]
                         );
@@ -1236,7 +1237,7 @@ class Binaries
         if ($this->_echoCLI) {
             $this->colorCli->primary(
                 PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
-                ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime), true).'days.'
+                ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime, date_default_timezone_get())->diffInDays(Carbon::createFromTimestamp($articleTime), true).'days.'
             );
         }
 
