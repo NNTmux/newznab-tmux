@@ -75,6 +75,7 @@
         "laravel/ui": "^4.5",
         "laravelcollective/html": "^6.4",
         "league/climate": "^3.8",
+        "leventcz/laravel-top": "^1.1",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.6",
         "mailerlite/laravel-elasticsearch": "^11.1",

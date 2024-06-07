@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "21c2d369b4279021cb3a6ae150b6c92b",
+    "content-hash": "1101fb93759c3f11550e0edf30081ef2",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -4813,6 +4813,75 @@
             "time": "2024-01-28T23:22:08+00:00"
         },
         {
+            "name": "leventcz/laravel-top",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/leventcz/laravel-top.git",
+                "reference": "63733427a478fdfaa32c1959487932e39c069e5f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/leventcz/laravel-top/zipball/63733427a478fdfaa32c1959487932e39c069e5f",
+                "reference": "63733427a478fdfaa32c1959487932e39c069e5f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcntl": "*",
+                "laravel/framework": "^10.0|^11.0",
+                "php": "^8.2.0",
+                "react/event-loop": "^1.5"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.15",
+                "mockery/mockery": "^1.6",
+                "pestphp/pest": "^2.34",
+                "phpstan/phpstan": "^1.10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Leventcz\\Top\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "Top": "Leventcz\\Top\\Facades\\Top"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Leventcz\\Top\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Levent Corapsiz",
+                    "email": "l.corapsiz@gmail.com"
+                }
+            ],
+            "description": "Real-time monitoring straight from the command line for Laravel applications.",
+            "homepage": "https://github.com/leventcz/laravel-top",
+            "keywords": [
+                "Metrics",
+                "apm",
+                "cli",
+                "command-line-tool",
+                "laravel",
+                "php",
+                "realtime-monitoring"
+            ],
+            "support": {
+                "issues": "https://github.com/leventcz/laravel-top/issues",
+                "source": "https://github.com/leventcz/laravel-top/tree/v1.1.0"
+            },
+            "time": "2024-05-27T03:17:13+00:00"
+        },
+        {
             "name": "livewire/livewire",
             "version": "v3.5.0",
             "source": {
@@ -8615,6 +8684,78 @@
                 }
             ],
             "time": "2024-04-27T21:32:50+00:00"
+        },
+        {
+            "name": "react/event-loop",
+            "version": "v1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/reactphp/event-loop.git",
+                "reference": "bbe0bd8c51ffc05ee43f1729087ed3bdf7d53354"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/bbe0bd8c51ffc05ee43f1729087ed3bdf7d53354",
+                "reference": "bbe0bd8c51ffc05ee43f1729087ed3bdf7d53354",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.6 || ^5.7 || ^4.8.36"
+            },
+            "suggest": {
+                "ext-pcntl": "For signal handling support when using the StreamSelectLoop"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "React\\EventLoop\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@clue.engineering",
+                    "homepage": "https://clue.engineering/"
+                },
+                {
+                    "name": "Cees-Jan Kiewiet",
+                    "email": "reactphp@ceesjankiewiet.nl",
+                    "homepage": "https://wyrihaximus.net/"
+                },
+                {
+                    "name": "Jan Sorgalla",
+                    "email": "jsorgalla@gmail.com",
+                    "homepage": "https://sorgalla.com/"
+                },
+                {
+                    "name": "Chris Boden",
+                    "email": "cboden@gmail.com",
+                    "homepage": "https://cboden.dev/"
+                }
+            ],
+            "description": "ReactPHP's core reactor event loop that libraries can use for evented I/O.",
+            "keywords": [
+                "asynchronous",
+                "event-loop"
+            ],
+            "support": {
+                "issues": "https://github.com/reactphp/event-loop/issues",
+                "source": "https://github.com/reactphp/event-loop/tree/v1.5.0"
+            },
+            "funding": [
+                {
+                    "url": "https://opencollective.com/reactphp",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2023-11-13T13:48:05+00:00"
         },
         {
             "name": "react/promise",
@@ -17174,78 +17315,6 @@
                 }
             ],
             "time": "2023-11-29T12:41:06+00:00"
-        },
-        {
-            "name": "react/event-loop",
-            "version": "v1.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/event-loop.git",
-                "reference": "bbe0bd8c51ffc05ee43f1729087ed3bdf7d53354"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/bbe0bd8c51ffc05ee43f1729087ed3bdf7d53354",
-                "reference": "bbe0bd8c51ffc05ee43f1729087ed3bdf7d53354",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9.6 || ^5.7 || ^4.8.36"
-            },
-            "suggest": {
-                "ext-pcntl": "For signal handling support when using the StreamSelectLoop"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "React\\EventLoop\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christian Lück",
-                    "email": "christian@clue.engineering",
-                    "homepage": "https://clue.engineering/"
-                },
-                {
-                    "name": "Cees-Jan Kiewiet",
-                    "email": "reactphp@ceesjankiewiet.nl",
-                    "homepage": "https://wyrihaximus.net/"
-                },
-                {
-                    "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com",
-                    "homepage": "https://sorgalla.com/"
-                },
-                {
-                    "name": "Chris Boden",
-                    "email": "cboden@gmail.com",
-                    "homepage": "https://cboden.dev/"
-                }
-            ],
-            "description": "ReactPHP's core reactor event loop that libraries can use for evented I/O.",
-            "keywords": [
-                "asynchronous",
-                "event-loop"
-            ],
-            "support": {
-                "issues": "https://github.com/reactphp/event-loop/issues",
-                "source": "https://github.com/reactphp/event-loop/tree/v1.5.0"
-            },
-            "funding": [
-                {
-                    "url": "https://opencollective.com/reactphp",
-                    "type": "open_collective"
-                }
-            ],
-            "time": "2023-11-13T13:48:05+00:00"
         },
         {
             "name": "react/socket",
