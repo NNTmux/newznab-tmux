@@ -2,7 +2,11 @@
 
 **Author:** [Fossil01](https://github.com/Fossil01)
 
-The development environment contains the: App, MariaDB, Redis, Manticore and Mailpit containers. The app container is where nginx and PHP-FPM run and has a bind mount to the root directory of this project. Supervisord is used to run it all in the background. Manticore can be switched out for Elasticsearch by commenting/uncommenting the corresponding lines in `docker-compose.yml`. Elasticsearch has security disabled by default.
+### Caution: This setup is intended solely for development use. For production deployments, it is recommended to construct your own Docker containers.
+
+This development environment is composed of several key containers: App, MariaDB, Redis, Manticore, and Mailpit. The App container hosts nginx and PHP-FPM, and includes a bind mount that links to the root directory of this project. Supervisord is utilized to manage these services in the background.
+
+For search capabilities, Manticore is the default setup, but you can easily switch to Elasticsearch by modifying the corresponding lines in the docker-compose.yml file. Note that Elasticsearch is configured with security features disabled by default.
 
 This container also houses several tools to run the indexing backend: tmux, ffmpeg, mediainfo, unrar etc. It also has MariaDB & Postgres clients, NodeJS & Yarn.
 
@@ -10,7 +14,7 @@ nginx runs on port 80 and is mapped to port 80 on the host machine too. If you'r
 
 Mailpit is used as a fake mailserver which catches all e-mails in one inbox. You can acess this via [this link](http://localhost:8025). Mailpit's SMTP server runs on port `1025`.
 
->This project currently uses PHP 8.3 and MariaDB 10.x
+> This project currently uses PHP 8.3 and MariaDB 11.x
 
 ## Prerequisites
 
