@@ -16,9 +16,7 @@ class ReleaseExtra
     /**
      * ReleaseExtra constructor.
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * @return \Illuminate\Database\Eloquent\Model|null|static

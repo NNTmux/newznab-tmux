@@ -10,6 +10,7 @@ use Blacklight\processing\PostProcess;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
+use getID3;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -162,20 +163,15 @@ class Nfo
                 }
             }
 
-            // If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
-            $check = (new \getID3())->analyze($tmpPath);
-            @File::delete($tmpPath);
-            if (isset($check['error'])) {
-                // Check if it's a par2.
-                $par2info = new Par2Info();
-                $par2info->setData($possibleNFO);
-                if ($par2info->error) {
-                    // Check if it's an SFV.
-                    $sfv = new SfvInfo();
-                    $sfv->setData($possibleNFO);
-                    if ($sfv->error) {
-                        return true;
-                    }
+            // Check if it's a par2.
+            $par2info = new Par2Info();
+            $par2info->setData($possibleNFO);
+            if ($par2info->error) {
+                // Check if it's an SFV.
+                $sfv = new SfvInfo();
+                $sfv->setData($possibleNFO);
+                if ($sfv->error) {
+                    return true;
                 }
             }
         }

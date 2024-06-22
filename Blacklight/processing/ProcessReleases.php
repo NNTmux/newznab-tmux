@@ -22,7 +22,6 @@ use Blacklight\Releases;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use JetBrains\PhpStorm\ArrayShape;
 
 class ProcessReleases
 {
@@ -236,7 +235,7 @@ class ProcessReleases
             }
             $count = $countQuery->count('id');
 
-            $totalTime = now()->diffInSeconds($startTime);
+            $totalTime = now()->diffInSeconds($startTime, true);
 
             $this->colorCLI->primary(
                 ($count ?? 0).' collections were found to be complete. Time: '.
@@ -282,7 +281,7 @@ class ProcessReleases
                     $checked.' collections set to filecheck = 3(size calculated)',
                     true
                 );
-                $totalTime = now()->diffInSeconds($startTime);
+                $totalTime = now()->diffInSeconds($startTime, true);
                 $this->colorCLI->primary($totalTime.Str::plural(' second', $totalTime), true);
             }
         }, 10);
@@ -366,7 +365,7 @@ class ProcessReleases
                         }
                     }
 
-                    $totalTime = now()->diffInSeconds($startTime);
+                    $totalTime = now()->diffInSeconds($startTime, true);
 
                     if ($this->echoCLI) {
                         $this->colorCLI->primary('Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).' collections: '.PHP_EOL.$minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.' with less files than site/group settings in: '.$totalTime.Str::plural(' second', $totalTime), true);
@@ -381,7 +380,6 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    #[ArrayShape(['added' => 'int', 'dupes' => 'int'])]
     public function createReleases(int|string $groupID): array
     {
         $startTime = now()->toImmutable();
@@ -535,7 +533,7 @@ class ProcessReleases
             }
         }
 
-        $totalTime = now()->diffInSeconds($startTime);
+        $totalTime = now()->diffInSeconds($startTime, true);
 
         if ($this->echoCLI) {
             $this->colorCLI->primary(
@@ -587,7 +585,7 @@ class ProcessReleases
             }
         }
 
-        $totalTime = now()->diffInSeconds($startTime);
+        $totalTime = now()->diffInSeconds($startTime, true);
 
         if ($this->echoCLI) {
             $this->colorCLI->primary(
@@ -625,7 +623,7 @@ class ProcessReleases
             $groupID
         );
 
-        $totalTime = now()->diffInSeconds($startTime);
+        $totalTime = now()->diffInSeconds($startTime, true);
 
         if ($this->echoCLI) {
             $this->colorCLI->primary($totalTime.Str::plural(' second', $totalTime));
@@ -682,7 +680,7 @@ class ProcessReleases
             }
             $firstQuery = $fourthQuery = now();
 
-            $totalTime = $firstQuery->diffInSeconds($startTime);
+            $totalTime = $firstQuery->diffInSeconds($startTime, true);
 
             if ($this->echoCLI) {
                 $this->colorCLI->primary(
@@ -729,8 +727,8 @@ class ProcessReleases
             }
             $deletedCount += $deleted;
 
-            $colDelTime = now()->diffInSeconds($fourthQuery);
-            $totalTime = $fourthQuery->diffInSeconds($startTime);
+            $colDelTime = now()->diffInSeconds($fourthQuery, true);
+            $totalTime = $fourthQuery->diffInSeconds($startTime, true);
 
             if ($this->echoCLI) {
                 $this->colorCLI->primary('Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime), true);

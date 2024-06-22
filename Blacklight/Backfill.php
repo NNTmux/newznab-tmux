@@ -103,7 +103,7 @@ class Backfill
                 $counter++;
             }
 
-            $dMessage = 'Backfilling completed in '.now()->diffInSeconds($allTime).' seconds.';
+            $dMessage = 'Backfilling completed in '.now()->diffInSeconds($allTime, true).' seconds.';
 
             if ($this->_echoCLI) {
                 $this->colorCli->primary($dMessage);

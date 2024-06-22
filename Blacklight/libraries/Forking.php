@@ -323,7 +323,7 @@ class Forking
         if ($backfill_days === 1) {
             $backfilldays = 'g.backfill_target';
         } elseif ($backfill_days === 2) {
-            $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate')));
+            $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate')), true);
         }
 
         $data = DB::select(

@@ -36,7 +36,7 @@ class UpdateNNTmuxComposer extends Command
 
     protected function composer(): void
     {
-        $this->output->writeln('<comment>Running composer install process...</comment>');
+        $this->info('Running composer install process...');
         $process = Process::timeout(360)->run('composer install');
         echo $process->output();
         echo $process->errorOutput();

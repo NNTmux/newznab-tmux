@@ -65,7 +65,7 @@ class SearchController extends BasePageController
             foreach ($releases->getBrowseOrdering() as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    url('/search?id='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType));
+                    url('/search?search='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType));
             }
 
             $rslt = $releases->search(

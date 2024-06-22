@@ -100,7 +100,7 @@ class ReleaseFile extends Model
             if ($createdTime === 0) {
                 $adjustedCreatedTime = now()->format('Y-m-d H:i:s');
             } else {
-                $adjustedCreatedTime = Carbon::createFromTimestamp($createdTime)->format('Y-m-d H:i:s');
+                $adjustedCreatedTime = Carbon::createFromTimestamp($createdTime, date_default_timezone_get())->format('Y-m-d H:i:s');
             }
         } else {
             $adjustedCreatedTime = $createdTime;

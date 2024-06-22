@@ -46,8 +46,8 @@ class NntmuxResetDb extends Command
 
             return;
         }
-        if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
-            $timestart = now()->toImmutable();
+        if ($this->confirm('This command removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
+            $timestart = now();
 
             DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 
@@ -61,6 +61,10 @@ class NntmuxResetDb extends Command
             $this->info('Reseting all groups completed.');
 
             $arr = [
+                'binaries',
+                'collections',
+                'parts',
+                'missed_parts',
                 'videos',
                 'tv_episodes',
                 'tv_info',
@@ -75,7 +79,6 @@ class NntmuxResetDb extends Command
                 'audio_data',
                 'release_subtitles',
                 'video_data',
-                'releaseextrafull',
                 'releases',
                 'anidb_titles',
                 'anidb_info',
@@ -87,9 +90,6 @@ class NntmuxResetDb extends Command
                 $this->info('Truncating '.$value.' completed.');
             }
             unset($value);
-            $this->info('Truncating binaries, collections, missed_parts and parts tables...');
-            DB::statement("CALL loop_cbpm('truncate')");
-            $this->info('Truncating completed.');
 
             if (config('nntmux.elasticsearch_enabled') === true) {
                 if (\Elasticsearch::indices()->exists(['index' => 'releases'])) {

@@ -190,7 +190,7 @@ class NameFixer
                 $releaseRow = Release::fromQuery(
                     sprintf(
                         '
-							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname
+							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
@@ -234,7 +234,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -1125,7 +1125,7 @@ class NameFixer
                         $this->colorCLI->climate()->info('Renamed Releases: ['.number_format($counted).'] '.(new ConsoleTools())->percentString(++$counter, $total));
                     }
                 }
-                $this->colorCLI->climate()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart).' seconds'.'.');
+                $this->colorCLI->climate()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds'.'.');
             } else {
                 $this->colorCLI->climate()->info('Nothing to do.');
             }
@@ -1598,7 +1598,7 @@ class NameFixer
             if (preg_match('/(idiomas|lang|language|langue|sprache).*?\b(?P<lang>Brazilian|Chinese|Croatian|Danish|DE|Deutsch|Dutch|Estonian|ES|English|Englisch|Finnish|Flemish|Francais|French|FR|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)\b/i', $release->textstring, $result)) {
                 switch ($result['lang']) {
                     case 'DE':
-                        $result['lang'] = 'DUTCH';
+                        $result['lang'] = 'GERMAN';
                         break;
                     case 'Englisch':
                         $result['lang'] = 'ENGLISH';

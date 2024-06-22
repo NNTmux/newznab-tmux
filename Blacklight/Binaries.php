@@ -227,7 +227,7 @@ class Binaries
                 $counter++;
             }
 
-            $endTime = now()->diffInSeconds($allTime);
+            $endTime = now()->diffInSeconds($allTime, true);
             $this->log(
                 'Updating completed in '.$endTime.Str::plural(' second', $endTime),
                 __FUNCTION__,
@@ -296,7 +296,7 @@ class Binaries
         // Generate postdate for first record, for those that upgraded.
         if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] !== 0) {
             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
-            UsenetGroup::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
+            UsenetGroup::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'], date_default_timezone_get())]);
         }
 
         // Get first article we want aka the oldest.
@@ -418,7 +418,8 @@ class Binaries
                                 [
                                     'first_record' => $scanSummary['firstArticleNumber'],
                                     'first_record_postdate' => Carbon::createFromTimestamp(
-                                        $groupMySQL['first_record_postdate']
+                                        $groupMySQL['first_record_postdate'],
+                                        date_default_timezone_get()
                                     ),
                                 ]
                             );
@@ -434,7 +435,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
-                                'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate']),
+                                'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate'], date_default_timezone_get()),
                                 'last_updated' => now(),
                             ]
                         );
@@ -458,7 +459,7 @@ class Binaries
             }
 
             if ($this->_echoCLI) {
-                $endGroup = now()->diffInSeconds($startGroup);
+                $endGroup = now()->diffInSeconds($startGroup, true);
                 $this->colorCli->primary(
                     PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
                     $endGroup.Str::plural(' second', $endGroup)
@@ -547,7 +548,7 @@ class Binaries
         $this->startCleaning = now();
 
         // End of the getting data from usenet.
-        $this->timeHeaders = $this->startCleaning->diffInSeconds($this->startLoop);
+        $this->timeHeaders = $this->startCleaning->diffInSeconds($this->startLoop, true);
 
         // Check if we got headers.
         $msgCount = \count($headers);
@@ -636,7 +637,7 @@ class Binaries
         $this->startPR = now();
 
         // End of inserting.
-        $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate);
+        $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate, true);
 
         if ($partRepair && \count($headersRepaired) > 0) {
             $this->removeRepairedParts($headersRepaired, $this->groupMySQL['id']);
@@ -853,7 +854,7 @@ class Binaries
         $this->startUpdate = now();
 
         // End of processing headers.
-        $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning);
+        $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning, true);
         $binariesQuery = $binariesCheck = 'INSERT INTO binaries (id, partsize, currentparts) VALUES ';
         foreach ($binariesUpdate as $binaryID => $binary) {
             $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
@@ -944,9 +945,9 @@ class Binaries
             $this->colorCli->primaryOver(' to process collections, ').
             $this->colorCli->alternateOver($this->timeInsert.'s').
             $this->colorCli->primaryOver(' to insert binaries/parts, ').
-            $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startPR).'s').
+            $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startPR, true).'s').
             $this->colorCli->primaryOver(' for part repair, ').
-            $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startLoop).'s').
+            $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startLoop, true).'s').
             $this->colorCli->primary(' total.');
         }
     }
@@ -1236,7 +1237,7 @@ class Binaries
         if ($this->_echoCLI) {
             $this->colorCli->primary(
                 PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
-                ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
+                ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime, date_default_timezone_get())->diffInDays(Carbon::createFromTimestamp($articleTime), true).'days.'
             );
         }
 

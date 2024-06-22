@@ -765,9 +765,9 @@ class Console
                     } else {
                         if ($this->echooutput) {
                             $this->colorCli->headerOver('Found Local: ').
-                                $this->colorCli->primary("{$gameCheck['title']} - {$gameCheck['platform']}");
+                                $this->colorCli->primary("{$gameInfo['title']} - {$gameInfo['platform']}");
                         }
-                        $gameId = $gameCheck['id'];
+                        $gameId = $gameCheck['id'] ?? -2;
                     }
                 } elseif ($this->echooutput) {
                     echo '.';

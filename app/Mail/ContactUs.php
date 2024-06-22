@@ -10,15 +10,18 @@ class ContactUs extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $mailFrom;
+    public string $mailFrom;
 
-    public $mailBody;
+    public string $mailBody;
+
+    public string $mailTo;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($mailFrom, $mailBody)
+    public function __construct($mailTo, $mailFrom, $mailBody)
     {
+        $this->mailTo = $mailTo;
         $this->mailFrom = $mailFrom;
         $this->mailBody = $mailBody;
     }
@@ -31,6 +34,6 @@ class ContactUs extends Mailable
      */
     public function build(): static
     {
-        return $this->from($this->mailFrom)->subject('Contact form submitted')->replyTo($this->mailFrom)->view('emails.contactUs')->with(['mailBody' => $this->mailBody]);
+        return $this->from($this->mailTo)->subject('Contact form submitted')->replyTo($this->mailFrom)->view('emails.contactUs')->with(['mailBody' => $this->mailBody]);
     }
 }

@@ -49,26 +49,7 @@ class TVDB extends TV
         parent::__construct();
         $this->client = new TheTVDbAPI();
         $this->local = false;
-
-        // Check if we can get the time for API status
-        // If we can't then we set local to true
-        $this->token = '';
-        // Check if we have the tvdb api key and user pin
-        if (config('tvdb.api_key') === null || config('tvdb.user_pin') === null) {
-            $this->colorCli->warning('TVDB API key or user pin not set. Running in local mode only!', true);
-            $this->local = true;
-        } else {
-            try {
-                $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
-            } catch (UnauthorizedException $error) {
-                $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
-                $this->local = true;
-            }
-
-            if ($this->token !== '') {
-                $this->client->setToken($this->token);
-            }
-        }
+        $this->authorizeTvdb();
 
         $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
         if ($this->fanartapikey !== null) {
@@ -241,6 +222,12 @@ class TVDB extends TV
         } catch (ResourceNotFoundException $e) {
             $response = false;
             $this->colorCli->climate()->error('Show not found on TVDB');
+        } catch (UnauthorizedException $e) {
+            try {
+                $this->authorizeTvdb();
+            } catch (UnauthorizedException $error) {
+                $this->colorCli->climate()->error('Not authorized to access TVDB');
+            }
         }
 
         sleep(1);
@@ -317,6 +304,13 @@ class TVDB extends TV
                     $response = $this->client->series()->allEpisodes($tvDbId);
                 } catch (ResourceNotFoundException $error) {
                     return false;
+                } catch (UnauthorizedException $error) {
+
+                    try {
+                        $this->authorizeTvdb();
+                    } catch (UnauthorizedException $error) {
+                        $this->colorCli->climate()->error('Not authorized to access TVDB');
+                    }
                 }
             } else {
                 try {
@@ -365,6 +359,13 @@ class TVDB extends TV
             $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->climate()->error('Poster image not found on TVDB');
+        } catch (UnauthorizedException $error) {
+
+            try {
+                $this->authorizeTvdb();
+            } catch (UnauthorizedException $error) {
+                $this->colorCli->climate()->error('Not authorized to access TVDB');
+            }
         }
 
         try {
@@ -372,6 +373,13 @@ class TVDB extends TV
             preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->climate()->error('Show ImdbId not found on TVDB');
+        } catch (UnauthorizedException $error) {
+
+            try {
+                $this->authorizeTvdb();
+            } catch (UnauthorizedException $error) {
+                $this->colorCli->climate()->error('Not authorized to access TVDB');
+            }
         }
 
         return [
@@ -407,5 +415,28 @@ class TVDB extends TV
             'firstaired' => $episode->aired,
             'summary' => (string) $episode->overview,
         ];
+    }
+
+    protected function authorizeTvdb(): void
+    {
+        // Check if we can get the time for API status
+        // If we can't then we set local to true
+        $this->token = '';
+        // Check if we have the tvdb api key and user pin
+        if (config('tvdb.api_key') === null || config('tvdb.user_pin') === null) {
+            $this->colorCli->warning('TVDB API key or user pin not set. Running in local mode only!', true);
+            $this->local = true;
+        } else {
+            try {
+                $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
+            } catch (UnauthorizedException $error) {
+                $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
+                $this->local = true;
+            }
+
+            if ($this->token !== '') {
+                $this->client->setToken($this->token);
+            }
+        }
     }
 }

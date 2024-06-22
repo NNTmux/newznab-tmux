@@ -374,13 +374,13 @@ class XXX
         $this->colorCli->info('Checking AEBN for movie info');
         $res = $mov->processSite($movie);
 
-        if ($res === false) {
+        /*if ($res === false) {
             $this->whichClass = 'pop';
             $mov = new Popporn();
             $mov->cookie = $this->cookie;
             $this->colorCli->info('Checking PopPorn for movie info');
             $res = $mov->processSite($movie);
-        }
+        }*/
 
         if ($res === false) {
             $this->whichClass = 'adm';

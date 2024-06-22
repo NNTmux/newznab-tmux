@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\db\populate\AniDB;
+use Blacklight\PopulateAniDB;
 use Illuminate\Console\Command;
 
 class NntmuxPopulateAniDB extends Command
@@ -30,11 +30,11 @@ class NntmuxPopulateAniDB extends Command
     public function handle(): void
     {
         if ($this->option('full')) {
-            (new AniDB(['Echo' => true]))->populateTable('full');
+            (new PopulateAniDB(['Echo' => true]))->populateTable('full');
         } elseif ($this->option('info') && is_numeric($this->option('anidbid'))) {
-            (new AniDB(['Echo' => true]))->populateTable('info', $this->option('anidbid'));
+            (new PopulateAniDB(['Echo' => true]))->populateTable('info', $this->option('anidbid'));
         } elseif ($this->option('info')) {
-            (new AniDB(['Echo' => true]))->populateTable('info');
+            (new PopulateAniDB(['Echo' => true]))->populateTable('info');
         }
         $this->info('AniDB tables populated with requested data');
     }

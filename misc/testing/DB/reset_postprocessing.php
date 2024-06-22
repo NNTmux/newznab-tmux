@@ -23,7 +23,6 @@ if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'tr
         DB::select('TRUNCATE TABLE musicinfo');
         DB::select('TRUNCATE TABLE bookinfo');
         DB::select('TRUNCATE TABLE release_nfos');
-        DB::select('TRUNCATE TABLE releaseextrafull');
         DB::select('TRUNCATE TABLE xxxinfo');
         DB::select('TRUNCATE TABLE videos');
         DB::select('TRUNCATE TABLE videos_aliases');

@@ -202,9 +202,7 @@ class TraktTv extends TV
         return $return;
     }
 
-    public function getMovieInfo(): void
-    {
-    }
+    public function getMovieInfo(): void {}
 
     /**
      * Retrieve poster image for TV episode from site using its API.

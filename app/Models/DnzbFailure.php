@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\DnzbFailure.
@@ -49,12 +50,12 @@ class DnzbFailure extends Model
      */
     protected $guarded = [];
 
-    public function release()
+    public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'release_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }

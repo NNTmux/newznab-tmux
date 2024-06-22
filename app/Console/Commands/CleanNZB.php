@@ -34,7 +34,7 @@ class CleanNZB extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         // Check if any options are false
         if (! $this->option('notindb') && ! $this->option('notondisk')) {

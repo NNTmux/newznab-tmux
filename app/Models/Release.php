@@ -180,7 +180,7 @@ class Release extends Model
         return $this->hasMany(UsersRelease::class, 'releases_id');
     }
 
-    public function file()
+    public function file(): HasMany
     {
         return $this->hasMany(ReleaseFile::class, 'releases_id');
     }
@@ -198,11 +198,6 @@ class Release extends Model
     public function failed(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'release_id');
-    }
-
-    public function releaseExtra(): HasMany
-    {
-        return $this->hasMany(ReleaseExtraFull::class, 'releases_id');
     }
 
     public function nfo(): HasOne

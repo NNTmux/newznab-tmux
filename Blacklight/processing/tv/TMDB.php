@@ -3,7 +3,6 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
-use JetBrains\PhpStorm\ArrayShape;
 use Tmdb\Client;
 use Tmdb\Exception\TmdbApiException;
 use Tmdb\Helper\ImageHelper;
@@ -338,14 +337,6 @@ class TMDB extends TV
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    #[ArrayShape([
-        'title' => 'string',
-        'series' => 'int',
-        'episode' => 'int',
-        'se_complete' => 'string',
-        'firstaired' => 'string',
-        'summary' => 'string',
-    ])]
     protected function formatEpisodeInfo($episode): array
     {
         return [

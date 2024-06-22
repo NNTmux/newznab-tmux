@@ -55,7 +55,6 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\DetailsController;
 use App\Http\Controllers\FailedReleasesController;
 use App\Http\Controllers\FileListController;
-use App\Http\Controllers\ForumController;
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\GetNzbController;
 use App\Http\Controllers\MovieController;
@@ -177,22 +176,6 @@ Route::middleware('isVerified')->group(function () {
     Route::get('contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
     Route::post('contact-us', [ContactUsController::class, 'contact'])->name('contact-us');
 
-    Route::get('forum', [ForumController::class, 'forum'])->name('forum');
-
-    Route::post('forum', [ForumController::class, 'forum'])->name('forum');
-
-    Route::get('forumpost/{id}', [ForumController::class, 'getPosts'])->name('forumpost');
-
-    Route::post('forumpost/{id}', [ForumController::class, 'getPosts'])->name('forumpost');
-
-    Route::get('topic_delete', [ForumController::class, 'deleteTopic'])->name('topic_delete');
-
-    Route::post('topic_delete', [ForumController::class, 'deleteTopic'])->name('topic_delete');
-
-    Route::get('post_edit', [ForumController::class, 'edit'])->name('post_edit');
-
-    Route::post('post_edit', [ForumController::class, 'edit'])->name('post_edit');
-
     Route::get('profileedit', [ProfileController::class, 'edit'])->name('profileedit');
 
     Route::post('profileedit', [ProfileController::class, 'edit'])->name('profileedit');
@@ -221,14 +204,6 @@ Route::middleware('isVerified')->group(function () {
 
     Route::post('filelist/{guid}', [FileListController::class, 'show']);
 
-    Route::get('btc_payment', [BtcPaymentController::class, 'show'])->name('btc_payment');
-
-    Route::post('btc_payment', [BtcPaymentController::class, 'show'])->name('btc_payment');
-
-    Route::get('btc_payment_callback', [BtcPaymentController::class, 'callback'])->name('btc_payment_callback');
-
-    Route::post('btc_payment_callback', [BtcPaymentController::class, 'callback'])->name('btc_payment_callback');
-
     Route::get('series/{id?}', [SeriesController::class, 'index'])->name('series');
 
     Route::post('series/{id?}', [SeriesController::class, 'index'])->name('series');
@@ -242,10 +217,6 @@ Route::middleware('isVerified')->group(function () {
     Route::post('2fa', [PasswordSecurityController::class, 'enable2fa'])->name('enable2fa');
     Route::post('disable2fa', [PasswordSecurityController::class, 'disable2fa'])->name('disable2fa');
 });
-
-Route::get('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware('role:Admin');
-
-Route::post('forum-delete/{id}', [ForumController::class, 'destroy'])->middleware('role:Admin');
 
 Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::get('index', [AdminPageController::class, 'index']);

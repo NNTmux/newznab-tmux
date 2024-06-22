@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use App\Models\Release;
+use Elasticsearch;
 use Elasticsearch\Common\Exceptions\ElasticsearchException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -156,7 +157,7 @@ class ElasticSearchSiteSearch
             'id' => $parameters['id'],
         ];
 
-        \Elasticsearch::index($data);
+        Elasticsearch::index($data);
     }
 
     public function updateRelease(int $id): void
@@ -187,7 +188,7 @@ class ElasticSearchSiteSearch
                 'id' => $new->id,
             ];
 
-            \Elasticsearch::update($data);
+            Elasticsearch::update($data);
         }
     }
 
@@ -208,7 +209,7 @@ class ElasticSearchSiteSearch
         ];
 
         try {
-            $primaryResults = \Elasticsearch::search($search);
+            $primaryResults = Elasticsearch::search($search);
 
             $results = [];
             foreach ($primaryResults['hits']['hits'] as $primaryResult) {
@@ -234,7 +235,7 @@ class ElasticSearchSiteSearch
             'id' => $parameters['id'],
         ];
 
-        \Elasticsearch::index($data);
+        Elasticsearch::index($data);
     }
 
     public function updatePreDb(array $parameters): void
@@ -254,12 +255,12 @@ class ElasticSearchSiteSearch
             'id' => $parameters['id'],
         ];
 
-        \Elasticsearch::update($data);
+        Elasticsearch::update($data);
     }
 
     protected function search(array $search, bool $fullResults = false): array
     {
-        $results = \Elasticsearch::search($search);
+        $results = Elasticsearch::search($search);
 
         $searchResult = [];
         while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
@@ -275,7 +276,7 @@ class ElasticSearchSiteSearch
             $scroll_id = $results['_scroll_id'];
 
             // Execute a Scroll request and repeat
-            $results = \Elasticsearch::scroll([
+            $results = Elasticsearch::scroll([
                 'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
                 'scroll' => '30s',        // and the same timeout window
             ]

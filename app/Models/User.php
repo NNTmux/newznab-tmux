@@ -6,7 +6,6 @@ use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Jobs\SendInviteEmail;
 use Carbon\CarbonImmutable;
-use DariusIII\Token\Facades\Token;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -364,7 +363,7 @@ class User extends Authenticatable
 
         foreach ($period as $value) {
             $users = self::query()->whereDate('rolechangedate', '=', $value)->get();
-            $days = $now->diffInDays($value);
+            $days = $now->diffInDays($value, true);
             foreach ($users as $user) {
                 SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails');
             }
@@ -528,7 +527,7 @@ class User extends Authenticatable
      */
     public static function generatePassword(int $length = 15): string
     {
-        return Token::random($length, true);
+        return Str::password($length);
     }
 
     /**

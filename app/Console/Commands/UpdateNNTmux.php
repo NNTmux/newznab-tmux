@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Process;
 use Ytake\LaravelSmarty\Smarty;
 
 class UpdateNNTmux extends Command
@@ -61,6 +62,19 @@ class UpdateNNTmux extends Command
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
+
+        // Install npm packages
+        $this->info('Installing npm packages...');
+        $process = Process::timeout(360)->run('npm install');
+        echo $process->output();
+        echo $process->errorOutput();
+        $this->info('Npm packages installed successfully!');
+        // Run npm build
+        $this->info('Building assets...');
+        $process = Process::timeout(360)->run('npm run build');
+        echo $process->output();
+        echo $process->errorOutput();
+        $this->info('Assets built successfully!');
 
         $cleared = (new Smarty())->setCompileDir(config('ytake-laravel-smarty.compile_path'))->clearCompiledTemplate();
         if ($cleared) {

@@ -452,7 +452,7 @@ class Music
 
                 // Sleep to not flood amazon.
                 $sleeptime = $this->sleeptime / 1000;
-                $diff = now()->diffInSeconds($startTime);
+                $diff = now()->diffInSeconds($startTime, true);
                 if ($sleeptime - $diff > 0 && $usedAmazon === true) {
                     sleep($sleeptime - $diff);
                 }

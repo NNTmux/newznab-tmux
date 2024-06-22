@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\ReleaseNfo.
@@ -39,7 +40,7 @@ class ReleaseNfo extends Model
      */
     protected $guarded = [];
 
-    public function release()
+    public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }

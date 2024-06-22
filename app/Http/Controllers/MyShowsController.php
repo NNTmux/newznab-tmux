@@ -137,16 +137,16 @@ class MyShowsController extends BasePageController
 
                 $shows = UserSerie::getShows($this->userdata->id);
                 $results = [];
+                $catArr = [];
                 foreach ($shows as $showk => $show) {
                     $showcats = explode('|', $show['categories']);
                     if (\is_array($showcats) && ! empty($showcats)) {
-                        $catarr = [];
                         foreach ($showcats as $scat) {
                             if (! empty($scat)) {
-                                $catarr[] = $categories[$scat];
+                                $catArr[] = $categories[$scat];
                             }
                         }
-                        $show['categoryNames'] = implode(', ', $catarr);
+                        $show['categoryNames'] = implode(', ', $catArr);
                     } else {
                         $show['categoryNames'] = '';
                     }

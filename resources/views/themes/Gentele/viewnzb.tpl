@@ -533,12 +533,12 @@
 														</tr>
 														<tr>
 															<th width="140">Posted</th>
-															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($release.postdate, config('app.timezone')), 'F j, Y H:i:s')}}
+															<td>{$release.postdate}
 															</td>
 														</tr>
 														<tr>
 															<th width="140">Added</th>
-															<td>{{Timezone::convertToLocal(Illuminate\Support\Carbon::parse($release.adddate, config('app.timezone')), 'F j, Y H:i:s')}}
+															<td>{$release.adddate}
 															</td>
 														</tr>
 														{if isset($isadmin)}

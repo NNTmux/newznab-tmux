@@ -217,7 +217,7 @@ class NZBImport
                 $posterName = (string) $file->attributes()->poster;
             }
             if ($postDate === false) {
-                $postDate = Carbon::createFromTimestamp((string) $file->attributes()->date)->format('Y-m-d H:i:s');
+                $postDate = Carbon::createFromTimestamp((string) $file->attributes()->date, date_default_timezone_get())->format('Y-m-d H:i:s');
             }
 
             // Make a fake message array to use to check the blacklist.
