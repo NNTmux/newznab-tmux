@@ -23,9 +23,7 @@ class Genres
 
     public const STATUS_DISABLED = 1;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * @return array|mixed

@@ -20,9 +20,7 @@ class Contents
     /**
      * Contents constructor.
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * @return array|false

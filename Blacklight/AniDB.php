@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\DB;
  */
 class AniDB
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Updates stored AniDB entries in the database.
