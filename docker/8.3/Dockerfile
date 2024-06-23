@@ -51,7 +51,7 @@ RUN ARCH="$(dpkg --print-architecture)" && \
         SZIP_URL="https://www.7-zip.org/a/7z$SEVENZIP_VERSION-linux-x64.tar.xz"; \
     fi && \
     if [ "$ARCH" = "arm64" ]; then \
-        SZIP_URL="https://www.7-zip.org/a/7z2407-linux-arm64.tar.xz"; \
+        SZIP_URL="https://www.7-zip.org/a/7z$SEVENZIP_VERSION-linux-arm64.tar.xz"; \
     fi && \
     wget "$SZIP_URL" -O /tmp/7z.tar.xz && \
     tar -xf /tmp/7z.tar.xz -C /tmp/ && \
