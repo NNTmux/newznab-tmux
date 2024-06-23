@@ -636,6 +636,7 @@ class Releases extends Release
                 $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
         }
+
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -645,7 +646,7 @@ class Releases extends Release
 					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
 				FROM videos v
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s
+				WHERE %s %s %s %s
 				GROUP BY v.id
 				LIMIT 1",
                 implode(' OR ', $siteSQL),
@@ -654,30 +655,33 @@ class Releases extends Release
                 ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
             $show = self::fromQuery($showQry);
-            if (! empty($show[0]) && $show->isNotEmpty()) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airDate)) && $show[0]->episodes !== '') {
+
+            if ($show->isNotEmpty()) {
+                //dd($show);
+                if (! empty($episode) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
-                } elseif ((int) $show[0]->video > 0) {
+                } elseif (! empty($series) && empty($episode)) {
+                    // If $series is set but episode is not, return Season Packs and Episodes
+                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+                } elseif ($show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
-                    // If $series is set but episode is not, return Season Packs only
-                    if (! empty($series) && empty($episode)) {
-                        $showSql .= ' AND r.tv_episodes_id = 0';
-                    }
-                } else {
-                    // If we were passed Episode Info and no match was found, do not run the query
-                    return [];
                 }
             } else {
                 // If we were passed Site ID Info and no match was found, do not run the query
                 return [];
             }
         }
+
         // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
         if (! empty($name) && $showSql === '') {
             if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
                 if (! empty($episode) && ! str_contains($episode, '/')) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
+                }
+                // If season is not empty but episode is, add a wildcard to the search
+                if (empty($episode)) {
+                    $name .= '*';
                 }
             } elseif (! empty($airDate)) {
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airDate));
@@ -790,17 +794,14 @@ class Releases extends Release
             );
             $show = self::fromQuery($showQry);
             if ($show->isNotEmpty()) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airDate)) && $show[0]->episodes !== '') {
+                //dd($show);
+                if (! empty($episode) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
-                } elseif ((int) $show[0]->video > 0) {
+                } elseif (! empty($series) && empty($episode)) {
+                    // If $series is set but episode is not, return Season Packs and Episodes
+                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+                } elseif ($show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
-                    // If $series is set but episode is not, return Season Packs only
-                    if (! empty($series) && empty($episode)) {
-                        $showSql .= ' AND r.tv_episodes_id = 0';
-                    }
-                } else {
-                    // If we were passed Episode Info and no match was found, do not run the query
-                    return [];
                 }
             } else {
                 // If we were passed Site ID Info and no match was found, do not run the query
@@ -813,6 +814,10 @@ class Releases extends Release
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
                 if (! empty($episode) && ! str_contains($episode, '/')) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
+                }
+                // If season is not empty but episode is, add a wildcard to the search
+                if (empty($episode)) {
+                    $name .= '*';
                 }
             } elseif (! empty($airDate)) {
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airDate));
