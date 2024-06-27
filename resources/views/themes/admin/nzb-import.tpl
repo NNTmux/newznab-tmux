@@ -63,7 +63,7 @@
 				<tr>
 					<td style="width:100px;"><label for="uploadedfiles[]">File:</label></td>
 					<td>
-						<input name="uploadedfiles[]" type="file" class="multi accept-nzb"/>
+						<input name="uploadedfiles[]" type="file" class="multi accept-nzb" multiple/>
 						<div class="hint">Select one or more .nzb files.</div>
 					</td>
 				</tr>

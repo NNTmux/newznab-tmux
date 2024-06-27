@@ -62,7 +62,7 @@ class NZBImport
 
     protected ColorCLI $colorCli;
 
-    public function __construct()
+    public function __construct(array $options = [])
     {
         $this->echoCLI = config('nntmux.echocli');
         $this->binaries = new Binaries();
@@ -71,7 +71,10 @@ class NZBImport
         $this->releaseCleaner = new ReleaseCleaning();
         $this->colorCli = new ColorCLI();
         $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
-        $this->browser = $this->retVal = '';
+
+        // Set properties from options
+        $this->browser = isset($options['Browser']) ? $options['Browser'] : '';
+        $this->retVal = '';
     }
 
     /**
