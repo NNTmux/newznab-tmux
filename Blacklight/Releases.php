@@ -646,7 +646,7 @@ class Releases extends Release
 					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
 				FROM videos v
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE %s %s %s %s
+				WHERE (%s) %s %s %s
 				GROUP BY v.id
 				LIMIT 1",
                 implode(' OR ', $siteSQL),
@@ -654,16 +654,20 @@ class Releases extends Release
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
+
             $show = self::fromQuery($showQry);
 
             if ($show->isNotEmpty()) {
-                if (! empty($episode) && $show[0]->episodes !== '') {
+                if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
+                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+                } elseif (! empty($episode) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif (! empty($series) && empty($episode)) {
                     // If $series is set but episode is not, return Season Packs and Episodes
                     $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                } elseif ($show[0]->video > 0) {
-                    $showSql = 'AND r.videos_id = '.$show[0]->video;
+                }
+                if ($show[0]->video > 0) {
+                    $showSql .= ' AND r.videos_id = '.$show[0]->video;
                 }
             } else {
                 // If we were passed Site ID Info and no match was found, do not run the query
@@ -774,6 +778,7 @@ class Releases extends Release
                 $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
         }
+
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -791,15 +796,19 @@ class Releases extends Release
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
+
             $show = self::fromQuery($showQry);
             if ($show->isNotEmpty()) {
-                if (! empty($episode) && $show[0]->episodes !== '') {
+                if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
+                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+                } elseif (! empty($episode) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif (! empty($series) && empty($episode)) {
                     // If $series is set but episode is not, return Season Packs and Episodes
                     $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                } elseif ($show[0]->video > 0) {
-                    $showSql = 'AND r.videos_id = '.$show[0]->video;
+                }
+                if ($show[0]->video > 0) {
+                    $showSql .= ' AND r.videos_id = '.$show[0]->video;
                 }
             } else {
                 // If we were passed Site ID Info and no match was found, do not run the query
