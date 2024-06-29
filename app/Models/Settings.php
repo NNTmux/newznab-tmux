@@ -141,7 +141,7 @@ class Settings extends Model
     /**
      * Load all settings into a collection.
      */
-    public static function loadSettings()
+    public static function loadSettings(): void
     {
         self::$settingsCollection = self::all()->keyBy(function ($item) {
             return "{$item->section}.{$item->subsection}.{$item->name}";
@@ -154,7 +154,7 @@ class Settings extends Model
      * @param  string  $setting  The setting key in the format 'section.subsection.name'.
      * @return mixed The value of the specified setting.
      */
-    public static function settingValue($setting)
+    public static function settingValue(string $setting): mixed
     {
         // Ensure settings are loaded
         if (self::$settingsCollection === null) {
@@ -171,13 +171,13 @@ class Settings extends Model
             $key = "{$section}.{$subsection}.{$name}";
 
             return self::$settingsCollection->get($key)->value ?? null;
-        } else {
-            // Handle invalid setting format
-            throw new \InvalidArgumentException('Invalid setting format. Expected format: section.subsection.name');
         }
+
+        // Handle invalid setting format
+        throw new \InvalidArgumentException('Invalid setting format. Expected format: section.subsection.name');
     }
 
-    public static function settingsUpdate(array $data = [])
+    public static function settingsUpdate(array $data = []): void
     {
         foreach ($data as $key => $value) {
             self::query()->where('setting', $key)->update(['value' => \is_array($value) ? implode(', ', $value) : $value]);
