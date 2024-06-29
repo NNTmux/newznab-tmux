@@ -3065,12 +3065,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "e53aed7774dba83528fc5a4c282c14a0e1e137da"
+                "reference": "ac3856fbd402253bcbe0782ad62885f96caabe1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/e53aed7774dba83528fc5a4c282c14a0e1e137da",
-                "reference": "e53aed7774dba83528fc5a4c282c14a0e1e137da",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/ac3856fbd402253bcbe0782ad62885f96caabe1b",
+                "reference": "ac3856fbd402253bcbe0782ad62885f96caabe1b",
                 "shasum": ""
             },
             "default-branch": true,
@@ -3091,9 +3091,9 @@
             ],
             "description": "TVMaze-API-Wrapper",
             "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/master"
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/1.0.3"
             },
-            "time": "2023-10-06T17:23:02+00:00"
+            "time": "2024-06-29T17:57:18+00:00"
         },
         {
             "name": "jrean/laravel-user-verification",
