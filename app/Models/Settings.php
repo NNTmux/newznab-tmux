@@ -23,7 +23,6 @@ namespace App\Models;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Settings - model for settings table.
@@ -113,7 +112,6 @@ class Settings extends Model
      * @var array
      */
     protected $guarded = [];
-
 
     /**
      * Return a tree-like array of all or selected settings.
