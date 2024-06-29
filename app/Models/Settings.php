@@ -21,7 +21,6 @@
 
 namespace App\Models;
 
-use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -80,11 +79,6 @@ class Settings extends Model
     public const ERR_SABCOMPLETEPATH = -12;
 
     /**
-     * @var Command
-     */
-    protected $console;
-
-    /**
      * @var array
      */
     protected $primaryKey = ['section', 'subsection', 'name'];
@@ -112,6 +106,8 @@ class Settings extends Model
      * @var array
      */
     protected $guarded = [];
+
+    protected static $settingsCollection;
 
     /**
      * Return a tree-like array of all or selected settings.
@@ -143,20 +139,42 @@ class Settings extends Model
     }
 
     /**
-     * @return mixed
+     * Load all settings into a collection.
+     */
+    public static function loadSettings()
+    {
+        self::$settingsCollection = self::all()->keyBy(function ($item) {
+            return "{$item->section}.{$item->subsection}.{$item->name}";
+        });
+    }
+
+    /**
+     * Retrieves the value of a specified setting.
+     *
+     * @param  string  $setting  The setting key in the format 'section.subsection.name'.
+     * @return mixed The value of the specified setting.
      */
     public static function settingValue($setting)
     {
-        preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $hit);
-        $result = self::query()->where(
-            [
-                'section' => $hit[1] ?? '',
-                'subsection' => $hit[2] ?? '',
-                'name' => $hit[3] ?? '',
-            ]
-        )->value('value');
+        // Ensure settings are loaded
+        if (self::$settingsCollection === null) {
+            self::loadSettings();
+        }
 
-        return $result;
+        // Validate and parse the setting string
+        if (preg_match('/^(\w*)\.(\w*)\.(\w+)$/i', $setting, $matches)) {
+            $section = $matches[1] ?? '';
+            $subsection = $matches[2] ?? '';
+            $name = $matches[3];
+
+            // Retrieve the setting value from the collection
+            $key = "{$section}.{$subsection}.{$name}";
+
+            return self::$settingsCollection->get($key)->value ?? null;
+        } else {
+            // Handle invalid setting format
+            throw new \InvalidArgumentException('Invalid setting format. Expected format: section.subsection.name');
+        }
     }
 
     public static function settingsUpdate(array $data = [])
