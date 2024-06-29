@@ -61,7 +61,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "imdbphp/imdbphp": "^8.2",
         "intervention/image": "^3.7",
-        "joshpinkney/tv-maze-php-api": "dev-master",
+        "dariusiii/tv-maze-php-api": "^2.0.0",
         "jrean/laravel-user-verification": "^12.0",
         "junaidnasir/larainvite": "^7.0",
         "kevinlebrun/colors.php": "^1.0",
@@ -141,10 +141,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/Net_NNTP"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper"
         },
         {
             "type": "vcs",

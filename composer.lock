@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8cd07f8b5e1423d391af1cefecdce4b",
+    "content-hash": "eba6bb161a2d700bedc46c7503a17e49",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -1037,6 +1037,45 @@
                 "source": "https://github.com/DariusIII/tmdb-laravel/tree/v7.0.0"
             },
             "time": "2024-04-25T20:50:30+00:00"
+        },
+        {
+            "name": "dariusiii/tv-maze-php-api",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
+                "reference": "52df9a39e98274518bda0bbff2b385b173e8e0df"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/52df9a39e98274518bda0bbff2b385b173e8e0df",
+                "reference": "52df9a39e98274518bda0bbff2b385b173e8e0df",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DariusIII\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Pinkney",
+                    "email": "Joshpinkney@gmail.com"
+                },
+                {
+                    "name": "DariusIII"
+                }
+            ],
+            "description": "TVMaze-API-Wrapper",
+            "support": {
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.0"
+            },
+            "time": "2024-06-29T18:41:25+00:00"
         },
         {
             "name": "dasprid/enum",
@@ -3058,42 +3097,6 @@
                 "source": "https://github.com/jenssegers/model/tree/v1.5.2"
             },
             "time": "2024-04-03T13:39:07+00:00"
-        },
-        {
-            "name": "joshpinkney/tv-maze-php-api",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "ac3856fbd402253bcbe0782ad62885f96caabe1b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/ac3856fbd402253bcbe0782ad62885f96caabe1b",
-                "reference": "ac3856fbd402253bcbe0782ad62885f96caabe1b",
-                "shasum": ""
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "JPinkney\\": ""
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Josh Pinkney",
-                    "email": "Joshpinkney@gmail.com"
-                }
-            ],
-            "description": "TVMaze-API-Wrapper",
-            "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/1.0.3"
-            },
-            "time": "2024-06-29T17:57:18+00:00"
         },
         {
             "name": "jrean/laravel-user-verification",
@@ -19044,8 +19047,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "anhskohbo/no-captcha": 20,
-        "b3rs3rk/steamfront": 20,
-        "joshpinkney/tv-maze-php-api": 20
+        "b3rs3rk/steamfront": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
