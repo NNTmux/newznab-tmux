@@ -114,26 +114,6 @@ class Settings extends Model
      */
     protected $guarded = [];
 
-    private $dbVersion;
-
-    /**
-     * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
-     *
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        $override = self::query()->where('name', $key)->first();
-
-        // If there's an override and no mutator has been explicitly defined on
-        // the model then use the override value
-        if ($override && ! $this->hasGetMutator($key)) {
-            return $override->value;
-        }
-
-        // If the attribute is not overridden the use the usual __get() magic method
-        return parent::__get($key);
-    }
 
     /**
      * Return a tree-like array of all or selected settings.
@@ -157,7 +137,7 @@ class Settings extends Model
             }
         } else {
             throw new \RuntimeException(
-                'NO results from Settings table! Check your table has been created and populated.'
+                'No results from Settings table! Check your table has been created and populated.'
             );
         }
 
@@ -179,42 +159,6 @@ class Settings extends Model
         )->value('value');
 
         return $result;
-    }
-
-    /**
-     * Returns the stored Db version string.
-     */
-    public function getDbVersion(): string
-    {
-        return $this->dbVersion;
-    }
-
-    /**
-     * @param  string  $requiredVersion  The minimum version to compare against
-     * @return bool|null TRUE if Db version is greater than or eaqual to $requiredVersion,
-     *                   false if not, and null if the version isn't available to check against.
-     */
-    public function isDbVersionAtLeast(string $requiredVersion): ?bool
-    {
-        $this->fetchDbVersion();
-        if (empty($this->dbVersion)) {
-            return null;
-        }
-
-        return version_compare($requiredVersion, $this->dbVersion, '<=');
-    }
-
-    /**
-     * Performs the fetch from the Db server and stores the resulting Major.Minor.Version number.
-     */
-    private function fetchDbVersion()
-    {
-        $result = DB::select('SELECT VERSION() AS version');
-
-        if (! empty($result)) {
-            $dummy = explode('-', $result[0]->version, 2);
-            $this->dbVersion = $dummy[0];
-        }
     }
 
     public static function settingsUpdate(array $data = [])
