@@ -3,7 +3,7 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ReleaseImage;
-use JPinkney\TVMaze\TVMaze as Client;
+use DariusIII\TVMaze\TVMaze as Client;
 
 /**
  * Class TVMaze.
