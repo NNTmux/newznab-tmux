@@ -110,6 +110,25 @@ class Settings extends Model
     protected static $settingsCollection;
 
     /**
+     * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
+     *
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        $override = self::query()->where('name', $key)->first();
+
+        // If there's an override and no mutator has been explicitly defined on
+        // the model then use the override value
+        if ($override && ! $this->hasGetMutator($key)) {
+            return $override->value;
+        }
+
+        // If the attribute is not overridden the use the usual __get() magic method
+        return parent::__get($key);
+    }
+
+    /**
      * Return a tree-like array of all or selected settings.
      *
      * @param  bool  $excludeUnsectioned  If rows with empty 'section' field should be excluded.
