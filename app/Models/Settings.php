@@ -158,42 +158,20 @@ class Settings extends Model
     }
 
     /**
-     * Load all settings into a collection.
+     * @return mixed
      */
-    public static function loadSettings(): void
+    public static function settingValue($setting)
     {
-        self::$settingsCollection = self::all()->keyBy(function ($item) {
-            return "{$item->section}.{$item->subsection}.{$item->name}";
-        });
-    }
+        preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $hit);
+        $result = self::query()->where(
+            [
+                'section' => $hit[1] ?? '',
+                'subsection' => $hit[2] ?? '',
+                'name' => $hit[3] ?? '',
+            ]
+        )->value('value');
 
-    /**
-     * Retrieves the value of a specified setting.
-     *
-     * @param  string  $setting  The setting key in the format 'section.subsection.name'.
-     * @return mixed The value of the specified setting.
-     */
-    public static function settingValue(string $setting): mixed
-    {
-        // Ensure settings are loaded
-        if (self::$settingsCollection === null) {
-            self::loadSettings();
-        }
-
-        // Validate and parse the setting string
-        if (preg_match('/^(\w*)\.(\w*)\.(\w+)$/i', $setting, $matches)) {
-            $section = $matches[1] ?? '';
-            $subsection = $matches[2] ?? '';
-            $name = $matches[3];
-
-            // Retrieve the setting value from the collection
-            $key = "{$section}.{$subsection}.{$name}";
-
-            return self::$settingsCollection->get($key)->value ?? null;
-        }
-
-        // Handle invalid setting format
-        throw new \InvalidArgumentException('Invalid setting format. Expected format: section.subsection.name');
+        return $result;
     }
 
     public static function settingsUpdate(array $data = []): void
