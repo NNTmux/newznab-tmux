@@ -2918,16 +2918,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "3.7.1",
+            "version": "3.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "137bdb356aacc01409d22aee3f0904497616cf3c"
+                "reference": "5451ff9f909c2fc836722e5ed6831b9f9a6db68c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/137bdb356aacc01409d22aee3f0904497616cf3c",
-                "reference": "137bdb356aacc01409d22aee3f0904497616cf3c",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/5451ff9f909c2fc836722e5ed6831b9f9a6db68c",
+                "reference": "5451ff9f909c2fc836722e5ed6831b9f9a6db68c",
                 "shasum": ""
             },
             "require": {
@@ -2974,7 +2974,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.7.1"
+                "source": "https://github.com/Intervention/image/tree/3.7.2"
             },
             "funding": [
                 {
@@ -2986,7 +2986,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-06-29T07:51:20+00:00"
+            "time": "2024-07-05T13:35:01+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -14451,16 +14451,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.23.1",
+            "version": "5.23.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "dcadeb2961ab851fa4c70291abd02d1f43b1bc45"
+                "reference": "c9deaefc098dde7f7093b44482b099195442e70d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/dcadeb2961ab851fa4c70291abd02d1f43b1bc45",
-                "reference": "dcadeb2961ab851fa4c70291abd02d1f43b1bc45",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/c9deaefc098dde7f7093b44482b099195442e70d",
+                "reference": "c9deaefc098dde7f7093b44482b099195442e70d",
                 "shasum": ""
             },
             "require": {
@@ -14523,7 +14523,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.23.1"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.23.3"
             },
             "funding": [
                 {
@@ -14531,7 +14531,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-06-18T22:19:22+00:00"
+            "time": "2024-07-07T19:12:59+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -15796,20 +15796,20 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "v5.2.13",
+            "version": "5.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jsonrainbow/json-schema.git",
-                "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793"
+                "reference": "feb2ca6dd1cebdaf1ed60a4c8de2e53ce11c4fd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/fbbe7e5d79f618997bc3332a6f49246036c45793",
-                "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/feb2ca6dd1cebdaf1ed60a4c8de2e53ce11c4fd8",
+                "reference": "feb2ca6dd1cebdaf1ed60a4c8de2e53ce11c4fd8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=7.1"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "~2.2.20||~2.15.1",
@@ -15820,11 +15820,6 @@
                 "bin/validate-json"
             ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.0.x-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "JsonSchema\\": "src/JsonSchema/"
@@ -15860,22 +15855,22 @@
             ],
             "support": {
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
-                "source": "https://github.com/jsonrainbow/json-schema/tree/v5.2.13"
+                "source": "https://github.com/jsonrainbow/json-schema/tree/5.3.0"
             },
-            "time": "2023-09-26T02:20:38+00:00"
+            "time": "2024-07-06T21:00:26+00:00"
         },
         {
             "name": "larastan/larastan",
-            "version": "v2.9.7",
+            "version": "v2.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "5c805f636095cc2e0b659e3954775cf8f1dad1bb"
+                "reference": "340badd89b0eb5bddbc503a4829c08cf9a2819d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/5c805f636095cc2e0b659e3954775cf8f1dad1bb",
-                "reference": "5c805f636095cc2e0b659e3954775cf8f1dad1bb",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/340badd89b0eb5bddbc503a4829c08cf9a2819d7",
+                "reference": "340badd89b0eb5bddbc503a4829c08cf9a2819d7",
                 "shasum": ""
             },
             "require": {
@@ -15889,7 +15884,7 @@
                 "illuminate/support": "^9.52.16 || ^10.28.0 || ^11.0",
                 "php": "^8.0.2",
                 "phpmyadmin/sql-parser": "^5.9.0",
-                "phpstan/phpstan": "^1.11.1"
+                "phpstan/phpstan": "^1.11.2"
             },
             "require-dev": {
                 "doctrine/coding-standard": "^12.0",
@@ -15944,7 +15939,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v2.9.7"
+                "source": "https://github.com/larastan/larastan/tree/v2.9.8"
             },
             "funding": [
                 {
@@ -15964,7 +15959,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-05-27T18:33:26+00:00"
+            "time": "2024-07-06T17:46:02+00:00"
         },
         {
             "name": "laravel/pint",
@@ -16686,16 +16681,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.11.6",
+            "version": "1.11.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "6ac78f1165346c83b4a753f7e4186d969c6ad0ee"
+                "reference": "52d2bbfdcae7f895915629e4694e9497d0f8e28d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6ac78f1165346c83b4a753f7e4186d969c6ad0ee",
-                "reference": "6ac78f1165346c83b4a753f7e4186d969c6ad0ee",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/52d2bbfdcae7f895915629e4694e9497d0f8e28d",
+                "reference": "52d2bbfdcae7f895915629e4694e9497d0f8e28d",
                 "shasum": ""
             },
             "require": {
@@ -16740,7 +16735,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-01T15:33:06+00:00"
+            "time": "2024-07-06T11:17:41+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
