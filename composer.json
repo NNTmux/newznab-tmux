@@ -99,7 +99,7 @@
         "sentry/sentry-laravel": "^4.6",
         "smarty/smarty": "^4.3",
         "spatie/async": "^1.6",
-        "spatie/laravel-backup": "^8.8",
+        "spatie/laravel-backup": "^9.0",
         "spatie/laravel-directory-cleanup": "^1.10",
         "spatie/laravel-fractal": "^6.2",
         "spatie/laravel-ignition": "^2.8",
