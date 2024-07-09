@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3fa3c61ab8f19992ab17256838489768",
+    "content-hash": "b813f356ed5e532fa76dfe97ab52ee24",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -9730,19 +9730,20 @@
         },
         {
             "name": "spatie/laravel-backup",
-            "version": "8.8.1",
+            "version": "9.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-backup.git",
-                "reference": "a9c2d2f726f4c60c2dc5d7c0c8380f72492638c2"
+                "reference": "83ad4a47ea292afbdc41484d6572c5504d247883"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/a9c2d2f726f4c60c2dc5d7c0c8380f72492638c2",
-                "reference": "a9c2d2f726f4c60c2dc5d7c0c8380f72492638c2",
+                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/83ad4a47ea292afbdc41484d6572c5504d247883",
+                "reference": "83ad4a47ea292afbdc41484d6572c5504d247883",
                 "shasum": ""
             },
             "require": {
+                "ext-pcntl": "*",
                 "ext-zip": "^1.14.0",
                 "illuminate/console": "^10.10.0|^11.0",
                 "illuminate/contracts": "^10.10.0|^11.0",
@@ -9751,7 +9752,7 @@
                 "illuminate/notifications": "^10.10.0|^11.0",
                 "illuminate/support": "^10.10.0|^11.0",
                 "league/flysystem": "^3.0",
-                "php": "^8.1",
+                "php": "^8.2",
                 "spatie/db-dumper": "^3.0",
                 "spatie/laravel-package-tools": "^1.6.2",
                 "spatie/laravel-signal-aware-command": "^1.2|^2.0",
@@ -9761,7 +9762,6 @@
             },
             "require-dev": {
                 "composer-runtime-api": "^2.0",
-                "ext-pcntl": "*",
                 "larastan/larastan": "^2.7.0",
                 "laravel/slack-notification-channel": "^2.5|^3.0",
                 "league/flysystem-aws-s3-v3": "^2.0|^3.0",
@@ -9770,7 +9770,8 @@
                 "pestphp/pest": "^1.20|^2.0",
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan-deprecation-rules": "^1.0",
-                "phpstan/phpstan-phpunit": "^1.1"
+                "phpstan/phpstan-phpunit": "^1.1",
+                "rector/rector": "^1.1"
             },
             "suggest": {
                 "laravel/slack-notification-channel": "Required for sending notifications via Slack"
@@ -9813,7 +9814,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-backup/issues",
-                "source": "https://github.com/spatie/laravel-backup/tree/8.8.1"
+                "source": "https://github.com/spatie/laravel-backup/tree/9.0.2"
             },
             "funding": [
                 {
@@ -9825,7 +9826,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2024-06-04T11:31:33+00:00"
+            "time": "2024-07-04T07:07:36+00:00"
         },
         {
             "name": "spatie/laravel-directory-cleanup",
