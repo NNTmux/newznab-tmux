@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b813f356ed5e532fa76dfe97ab52ee24",
+    "content-hash": "4e43606be6b1c08f0a689c22435237f7",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -9324,69 +9324,6 @@
             "time": "2024-04-24T13:22:11+00:00"
         },
         {
-            "name": "spatie/db-dumper",
-            "version": "3.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/db-dumper.git",
-                "reference": "faca5056830bccea04eadf07e8074669cb9e905e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/db-dumper/zipball/faca5056830bccea04eadf07e8074669cb9e905e",
-                "reference": "faca5056830bccea04eadf07e8074669cb9e905e",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.0",
-                "symfony/process": "^5.0|^6.0|^7.0"
-            },
-            "require-dev": {
-                "pestphp/pest": "^1.22"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\DbDumper\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Dump databases",
-            "homepage": "https://github.com/spatie/db-dumper",
-            "keywords": [
-                "database",
-                "db-dumper",
-                "dump",
-                "mysqldump",
-                "spatie"
-            ],
-            "support": {
-                "source": "https://github.com/spatie/db-dumper/tree/3.6.0"
-            },
-            "funding": [
-                {
-                    "url": "https://spatie.be/open-source/support-us",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2024-04-24T14:54:13+00:00"
-        },
-        {
             "name": "spatie/error-solutions",
             "version": "1.0.5",
             "source": {
@@ -9727,106 +9664,6 @@
                 "source": "https://github.com/spatie/image-optimizer/tree/1.7.5"
             },
             "time": "2024-05-16T08:48:33+00:00"
-        },
-        {
-            "name": "spatie/laravel-backup",
-            "version": "9.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-backup.git",
-                "reference": "83ad4a47ea292afbdc41484d6572c5504d247883"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/83ad4a47ea292afbdc41484d6572c5504d247883",
-                "reference": "83ad4a47ea292afbdc41484d6572c5504d247883",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pcntl": "*",
-                "ext-zip": "^1.14.0",
-                "illuminate/console": "^10.10.0|^11.0",
-                "illuminate/contracts": "^10.10.0|^11.0",
-                "illuminate/events": "^10.10.0|^11.0",
-                "illuminate/filesystem": "^10.10.0|^11.0",
-                "illuminate/notifications": "^10.10.0|^11.0",
-                "illuminate/support": "^10.10.0|^11.0",
-                "league/flysystem": "^3.0",
-                "php": "^8.2",
-                "spatie/db-dumper": "^3.0",
-                "spatie/laravel-package-tools": "^1.6.2",
-                "spatie/laravel-signal-aware-command": "^1.2|^2.0",
-                "spatie/temporary-directory": "^2.0",
-                "symfony/console": "^6.0|^7.0",
-                "symfony/finder": "^6.0|^7.0"
-            },
-            "require-dev": {
-                "composer-runtime-api": "^2.0",
-                "larastan/larastan": "^2.7.0",
-                "laravel/slack-notification-channel": "^2.5|^3.0",
-                "league/flysystem-aws-s3-v3": "^2.0|^3.0",
-                "mockery/mockery": "^1.4",
-                "orchestra/testbench": "^8.0|^9.0",
-                "pestphp/pest": "^1.20|^2.0",
-                "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan-deprecation-rules": "^1.0",
-                "phpstan/phpstan-phpunit": "^1.1",
-                "rector/rector": "^1.1"
-            },
-            "suggest": {
-                "laravel/slack-notification-channel": "Required for sending notifications via Slack"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Spatie\\Backup\\BackupServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/Helpers/functions.php"
-                ],
-                "psr-4": {
-                    "Spatie\\Backup\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A Laravel package to backup your application",
-            "homepage": "https://github.com/spatie/laravel-backup",
-            "keywords": [
-                "backup",
-                "database",
-                "laravel-backup",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/laravel-backup/issues",
-                "source": "https://github.com/spatie/laravel-backup/tree/9.0.2"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/sponsors/spatie",
-                    "type": "github"
-                },
-                {
-                    "url": "https://spatie.be/open-source/support-us",
-                    "type": "other"
-                }
-            ],
-            "time": "2024-07-04T07:07:36+00:00"
         },
         {
             "name": "spatie/laravel-directory-cleanup",
@@ -10282,81 +10119,6 @@
                 }
             ],
             "time": "2024-06-22T23:04:52+00:00"
-        },
-        {
-            "name": "spatie/laravel-signal-aware-command",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-signal-aware-command.git",
-                "reference": "49a5e671c3a3fd992187a777d01385fc6a84759d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-signal-aware-command/zipball/49a5e671c3a3fd992187a777d01385fc6a84759d",
-                "reference": "49a5e671c3a3fd992187a777d01385fc6a84759d",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "^11.0",
-                "php": "^8.2",
-                "spatie/laravel-package-tools": "^1.4.3",
-                "symfony/console": "^7.0"
-            },
-            "require-dev": {
-                "brianium/paratest": "^6.2|^7.0",
-                "ext-pcntl": "*",
-                "nunomaduro/collision": "^5.3|^6.0|^7.0|^8.0",
-                "orchestra/testbench": "^9.0",
-                "pestphp/pest-plugin-laravel": "^1.3|^2.0",
-                "phpunit/phpunit": "^9.5|^10|^11",
-                "spatie/laravel-ray": "^1.17"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Spatie\\SignalAwareCommand\\SignalAwareCommandServiceProvider"
-                    ],
-                    "aliases": {
-                        "Signal": "Spatie\\SignalAwareCommand\\Facades\\Signal"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\SignalAwareCommand\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Handle signals in artisan commands",
-            "homepage": "https://github.com/spatie/laravel-signal-aware-command",
-            "keywords": [
-                "laravel",
-                "laravel-signal-aware-command",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/laravel-signal-aware-command/issues",
-                "source": "https://github.com/spatie/laravel-signal-aware-command/tree/2.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2024-02-05T13:37:25+00:00"
         },
         {
             "name": "spatie/temporary-directory",
@@ -17063,16 +16825,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.2.6",
+            "version": "11.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "1dc0fedac703199e8704de085e47dd46bac0dde4"
+                "reference": "15c7e69dec4a8f246840859e6b430bd2abeb5039"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1dc0fedac703199e8704de085e47dd46bac0dde4",
-                "reference": "1dc0fedac703199e8704de085e47dd46bac0dde4",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/15c7e69dec4a8f246840859e6b430bd2abeb5039",
+                "reference": "15c7e69dec4a8f246840859e6b430bd2abeb5039",
                 "shasum": ""
             },
             "require": {
@@ -17082,25 +16844,25 @@
                 "ext-mbstring": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "myclabs/deep-copy": "^1.10.1",
-                "phar-io/manifest": "^2.0.3",
-                "phar-io/version": "^3.0.2",
+                "myclabs/deep-copy": "^1.12.0",
+                "phar-io/manifest": "^2.0.4",
+                "phar-io/version": "^3.2.1",
                 "php": ">=8.2",
-                "phpunit/php-code-coverage": "^11.0",
-                "phpunit/php-file-iterator": "^5.0",
-                "phpunit/php-invoker": "^5.0",
-                "phpunit/php-text-template": "^4.0",
-                "phpunit/php-timer": "^7.0",
-                "sebastian/cli-parser": "^3.0",
-                "sebastian/code-unit": "^3.0",
-                "sebastian/comparator": "^6.0",
-                "sebastian/diff": "^6.0",
-                "sebastian/environment": "^7.0",
-                "sebastian/exporter": "^6.1.2",
-                "sebastian/global-state": "^7.0",
-                "sebastian/object-enumerator": "^6.0",
-                "sebastian/type": "^5.0",
-                "sebastian/version": "^5.0"
+                "phpunit/php-code-coverage": "^11.0.5",
+                "phpunit/php-file-iterator": "^5.0.1",
+                "phpunit/php-invoker": "^5.0.1",
+                "phpunit/php-text-template": "^4.0.1",
+                "phpunit/php-timer": "^7.0.1",
+                "sebastian/cli-parser": "^3.0.2",
+                "sebastian/code-unit": "^3.0.1",
+                "sebastian/comparator": "^6.0.1",
+                "sebastian/diff": "^6.0.2",
+                "sebastian/environment": "^7.2.0",
+                "sebastian/exporter": "^6.1.3",
+                "sebastian/global-state": "^7.0.2",
+                "sebastian/object-enumerator": "^6.0.1",
+                "sebastian/type": "^5.0.1",
+                "sebastian/version": "^5.0.1"
             },
             "suggest": {
                 "ext-soap": "To be able to generate mocks based on WSDL files"
@@ -17143,7 +16905,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.2.6"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.2.7"
             },
             "funding": [
                 {
@@ -17159,7 +16921,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-03T05:51:49+00:00"
+            "time": "2024-07-10T11:50:09+00:00"
         },
         {
             "name": "react/cache",
