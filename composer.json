@@ -144,10 +144,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/html"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/laravel-user-verification"
         }
     ],
     "minimum-stability": "dev",

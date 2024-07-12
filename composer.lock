@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e43606be6b1c08f0a689c22435237f7",
+    "content-hash": "55426d527a6c1b0904539234ba3525b3",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3100,28 +3100,29 @@
         },
         {
             "name": "jrean/laravel-user-verification",
-            "version": "v12.0.1",
+            "version": "v12.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DariusIII/laravel-user-verification.git",
-                "reference": "20fe85f26d386c3bf0a697262d5d9acf5718b9e9"
+                "url": "https://github.com/jrean/laravel-user-verification.git",
+                "reference": "114e67354f1ec6c7b350587a274d2759ab08b011"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel-user-verification/zipball/20fe85f26d386c3bf0a697262d5d9acf5718b9e9",
-                "reference": "20fe85f26d386c3bf0a697262d5d9acf5718b9e9",
+                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/114e67354f1ec6c7b350587a274d2759ab08b011",
+                "reference": "114e67354f1ec6c7b350587a274d2759ab08b011",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^6.0 | ^7.0 | ^8.0| ^9.0| ^10.0| ^11.0",
+                "illuminate/support": "^6.0 || ^7.0 || ^8.0|^9.0|^10.0|^11.0",
                 "php": ">=7.2.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.5",
-                "fzaninotto/faker": "^1.9",
+                "friendsofphp/php-cs-fixer": "^1.12|^3.5",
+                "fzaninotto/faker": "^1.9|^1.5",
                 "mockery/mockery": "^1.3",
-                "php-coveralls/php-coveralls": "^2.7",
-                "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0|^11.0"
+                "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0|^11.0",
+                "satooshi/php-coveralls": "^2.0|^1.0",
+                "sllh/php-cs-fixer-styleci-bridge": "^2.1"
             },
             "type": "library",
             "extra": {
@@ -3139,6 +3140,7 @@
                     "Jrean\\UserVerification\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -3158,9 +3160,10 @@
                 "user verification"
             ],
             "support": {
-                "source": "https://github.com/DariusIII/laravel-user-verification/tree/v12.0.1"
+                "issues": "https://github.com/jrean/laravel-user-verification/issues",
+                "source": "https://github.com/jrean/laravel-user-verification/tree/v12.0.0"
             },
-            "time": "2024-04-25T20:43:47+00:00"
+            "time": "2024-07-02T15:04:21+00:00"
         },
         {
             "name": "junaidnasir/larainvite",
@@ -9040,16 +9043,16 @@
         },
         {
             "name": "sentry/sentry-laravel",
-            "version": "4.6.1",
+            "version": "4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-laravel.git",
-                "reference": "7f5fd9f362e440c4c0c492f386b93095321f9101"
+                "reference": "44151798253145c1abc7fe7e38210b98f926d794"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/7f5fd9f362e440c4c0c492f386b93095321f9101",
-                "reference": "7f5fd9f362e440c4c0c492f386b93095321f9101",
+                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/44151798253145c1abc7fe7e38210b98f926d794",
+                "reference": "44151798253145c1abc7fe7e38210b98f926d794",
                 "shasum": ""
             },
             "require": {
@@ -9113,7 +9116,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-laravel/issues",
-                "source": "https://github.com/getsentry/sentry-laravel/tree/4.6.1"
+                "source": "https://github.com/getsentry/sentry-laravel/tree/4.7.0"
             },
             "funding": [
                 {
@@ -9125,7 +9128,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-06-18T15:06:09+00:00"
+            "time": "2024-07-10T21:55:04+00:00"
         },
         {
             "name": "smarty/smarty",
@@ -14000,16 +14003,16 @@
     "packages-dev": [
         {
             "name": "barryvdh/laravel-ide-helper",
-            "version": "v3.0.0",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-ide-helper.git",
-                "reference": "bc1d67f01ce8c77e3f97d48ba51fa1d81874f622"
+                "reference": "591e7d665fbab8a3b682e451641706341573eb80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/bc1d67f01ce8c77e3f97d48ba51fa1d81874f622",
-                "reference": "bc1d67f01ce8c77e3f97d48ba51fa1d81874f622",
+                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/591e7d665fbab8a3b682e451641706341573eb80",
+                "reference": "591e7d665fbab8a3b682e451641706341573eb80",
                 "shasum": ""
             },
             "require": {
@@ -14041,7 +14044,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.0-dev"
+                    "dev-master": "3.1-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -14078,7 +14081,7 @@
             ],
             "support": {
                 "issues": "https://github.com/barryvdh/laravel-ide-helper/issues",
-                "source": "https://github.com/barryvdh/laravel-ide-helper/tree/v3.0.0"
+                "source": "https://github.com/barryvdh/laravel-ide-helper/tree/v3.1.0"
             },
             "funding": [
                 {
@@ -14090,7 +14093,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-01T12:53:18+00:00"
+            "time": "2024-07-12T14:20:51+00:00"
         },
         {
             "name": "barryvdh/reflection-docblock",
@@ -14617,16 +14620,16 @@
         },
         {
             "name": "composer/semver",
-            "version": "3.4.0",
+            "version": "3.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/semver.git",
-                "reference": "35e8d0af4486141bc745f23a29cc2091eb624a32"
+                "reference": "c51258e759afdb17f1fd1fe83bc12baaef6309d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/semver/zipball/35e8d0af4486141bc745f23a29cc2091eb624a32",
-                "reference": "35e8d0af4486141bc745f23a29cc2091eb624a32",
+                "url": "https://api.github.com/repos/composer/semver/zipball/c51258e759afdb17f1fd1fe83bc12baaef6309d6",
+                "reference": "c51258e759afdb17f1fd1fe83bc12baaef6309d6",
                 "shasum": ""
             },
             "require": {
@@ -14678,7 +14681,7 @@
             "support": {
                 "irc": "ircs://irc.libera.chat:6697/composer",
                 "issues": "https://github.com/composer/semver/issues",
-                "source": "https://github.com/composer/semver/tree/3.4.0"
+                "source": "https://github.com/composer/semver/tree/3.4.2"
             },
             "funding": [
                 {
@@ -14694,7 +14697,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-31T09:50:34+00:00"
+            "time": "2024-07-12T11:35:52+00:00"
         },
         {
             "name": "composer/xdebug-handler",
