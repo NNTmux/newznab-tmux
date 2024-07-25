@@ -257,12 +257,11 @@ CREATE TABLE `content` (
   `metadescription` varchar(1000) NOT NULL,
   `metakeywords` varchar(1000) NOT NULL,
   `contenttype` int(11) NOT NULL,
-  `showinmenu` int(11) NOT NULL,
   `status` int(11) NOT NULL,
   `ordinal` int(11) DEFAULT NULL,
   `role` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `ix_showinmenu_status_contenttype_role` (`showinmenu`,`status`,`contenttype`,`role`)
+  KEY `ix_status_contenttype_role` (`status`,`contenttype`,`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `countries`;

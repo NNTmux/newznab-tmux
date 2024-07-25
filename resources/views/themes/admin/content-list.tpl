@@ -46,13 +46,6 @@
 						Admins
 					{/if}
 				</td>
-				<td style="width:50px;">
-					{if $content->showinmenu == "1"}
-						Yes
-					{else}
-						No
-					{/if}
-				</td>
 				<td title="{$content->body|escape:'htmlall'}">{$content->body|truncate:100|escape:'htmlall'}</td>
 				<td><a class="confirm_action"
 					   href="{{url("/admin/content-delete?id={$content->id}")}}">delete</a></td>

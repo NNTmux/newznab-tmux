@@ -96,24 +96,6 @@ class Contents
         return $arr;
     }
 
-    /**
-     * @return array|false
-     */
-    public function getForMenuByTypeAndRole($id, $role): bool|array
-    {
-        $arr = [];
-        $rows = $this->data_getForMenuByTypeAndRole($id, $role);
-        if ($rows === false) {
-            return false;
-        }
-
-        foreach ($rows as $row) {
-            $arr[] = $row;
-        }
-
-        return $arr;
-    }
-
     public function getIndex()
     {
         $row = $this->data_getIndex();
@@ -185,7 +167,6 @@ class Contents
                     'metadescription' => $content['metadescription'],
                     'metakeywords' => $content['metakeywords'],
                     'contenttype' => $content['contenttype'],
-                    'showinmenu' => $content['showinmenu'],
                     'status' => $content['status'],
                     'ordinal' => $content['ordinal'],
                 ]
@@ -204,7 +185,6 @@ class Contents
                     'metadescription' => $content['metadescription'],
                     'metakeywords' => $content['metakeywords'],
                     'contenttype' => $content['contenttype'],
-                    'showinmenu' => $content['showinmenu'],
                     'status' => $content['status'],
                     'ordinal' => $content['ordinal'],
                 ]
@@ -278,18 +258,5 @@ class Contents
                 'contenttype' => self::TYPEINDEX,
             ]
         )->first();
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
-     */
-    public function data_getForMenuByTypeAndRole($id, $role): \Illuminate\Database\Eloquent\Collection|static
-    {
-        $query = Content::query()->where('showinmenu', '=', 1)->where('contenttype', $id)->where('status', '=', 1);
-        if ($role !== User::ROLE_ADMIN) {
-            $query->where('role', $role)->orWhere('role', '=', 0);
-        }
-
-        return $query->get();
     }
 }

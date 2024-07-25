@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $metadescription
  * @property string $metakeywords
  * @property int $contenttype
- * @property int $showinmenu
  * @property int $status
  * @property int|null $ordinal
  * @property int $role
@@ -26,7 +25,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereMetakeywords($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereOrdinal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereRole($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereShowinmenu($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content whereUrl($value)

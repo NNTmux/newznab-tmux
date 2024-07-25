@@ -54,12 +54,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td><label for="showinmenu">Show In Menu:</label></td>
-				<td>
-					{html_radios id="showinmenu" name='showinmenu' values=$yesno_ids output=$yesno_names selected=$content->showinmenu separator='<br />'}
-				</td>
-			</tr>
-			<tr>
 				<td><label for="status">Status:</label></td>
 				<td>
 					{html_radios id="status" name='status' values=$status_ids output=$status_names selected=$content->status separator='<br />'}

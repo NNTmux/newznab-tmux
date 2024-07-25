@@ -50,7 +50,6 @@ class AdminContentController extends BasePageController
             'metadescription' => '',
             'metakeywords' => '',
             'contenttype' => '',
-            'showinmenu' => '',
             'status' => '',
             'ordinal' => '',
             'created_at' => '',
@@ -60,7 +59,6 @@ class AdminContentController extends BasePageController
         switch ($action) {
             case 'add':
                 $meta_title = 'Content Add';
-                $content['showinmenu'] = '1';
                 $content['status'] = '1';
                 $content['contenttype'] = '2';
                 break;
