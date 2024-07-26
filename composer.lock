@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c99667126167d3f1994005821c24f43e",
+    "content-hash": "bb7cfab1ec0fda801c551842f09535a5",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3409,16 +3409,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v11.17.0",
+            "version": "v11.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "42f505a0c8afc0743f73e70bec08e641e2870bd6"
+                "reference": "35901bbdfe3576f21197d4df4f4b72edbd0cf7a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/42f505a0c8afc0743f73e70bec08e641e2870bd6",
-                "reference": "42f505a0c8afc0743f73e70bec08e641e2870bd6",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/35901bbdfe3576f21197d4df4f4b72edbd0cf7a9",
+                "reference": "35901bbdfe3576f21197d4df4f4b72edbd0cf7a9",
                 "shasum": ""
             },
             "require": {
@@ -3611,7 +3611,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2024-07-23T16:33:27+00:00"
+            "time": "2024-07-26T06:20:43+00:00"
         },
         {
             "name": "laravel/horizon",
