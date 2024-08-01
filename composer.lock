@@ -7848,16 +7848,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.4.3",
+            "version": "2.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "11766a079e64698f04aa686176efd265a715c114"
+                "reference": "4da37844d0dfcf5f7a0a1ff0793fe2ce9bf8ea9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/11766a079e64698f04aa686176efd265a715c114",
-                "reference": "11766a079e64698f04aa686176efd265a715c114",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/4da37844d0dfcf5f7a0a1ff0793fe2ce9bf8ea9b",
+                "reference": "4da37844d0dfcf5f7a0a1ff0793fe2ce9bf8ea9b",
                 "shasum": ""
             },
             "require": {
@@ -7913,7 +7913,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.3"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.4"
             },
             "funding": [
                 {
@@ -7921,7 +7921,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-01T00:41:40+00:00"
+            "time": "2024-08-01T00:41:48+00:00"
         },
         {
             "name": "psr/cache",
@@ -9402,16 +9402,16 @@
         },
         {
             "name": "spatie/flare-client-php",
-            "version": "1.7.0",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/flare-client-php.git",
-                "reference": "097040ff51e660e0f6fc863684ac4b02c93fa234"
+                "reference": "180f8ca4c0d0d6fc51477bd8c53ce37ab5a96122"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/097040ff51e660e0f6fc863684ac4b02c93fa234",
-                "reference": "097040ff51e660e0f6fc863684ac4b02c93fa234",
+                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/180f8ca4c0d0d6fc51477bd8c53ce37ab5a96122",
+                "reference": "180f8ca4c0d0d6fc51477bd8c53ce37ab5a96122",
                 "shasum": ""
             },
             "require": {
@@ -9429,7 +9429,7 @@
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan-deprecation-rules": "^1.0",
                 "phpstan/phpstan-phpunit": "^1.0",
-                "spatie/phpunit-snapshot-assertions": "^4.0|^5.0"
+                "spatie/pest-plugin-snapshots": "^1.0|^2.0"
             },
             "type": "library",
             "extra": {
@@ -9459,7 +9459,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/flare-client-php/issues",
-                "source": "https://github.com/spatie/flare-client-php/tree/1.7.0"
+                "source": "https://github.com/spatie/flare-client-php/tree/1.8.0"
             },
             "funding": [
                 {
@@ -9467,7 +9467,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-06-12T14:39:14+00:00"
+            "time": "2024-08-01T08:27:26+00:00"
         },
         {
             "name": "spatie/fractalistic",
@@ -15351,16 +15351,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.60.0",
+            "version": "v3.61.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "e595e4e070d17c5d42ed8c4206f630fcc5f401a4"
+                "reference": "94a87189f55814e6cabca2d9a33b06de384a2ab8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/e595e4e070d17c5d42ed8c4206f630fcc5f401a4",
-                "reference": "e595e4e070d17c5d42ed8c4206f630fcc5f401a4",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/94a87189f55814e6cabca2d9a33b06de384a2ab8",
+                "reference": "94a87189f55814e6cabca2d9a33b06de384a2ab8",
                 "shasum": ""
             },
             "require": {
@@ -15442,7 +15442,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.60.0"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.61.1"
             },
             "funding": [
                 {
@@ -15450,7 +15450,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-25T09:26:51+00:00"
+            "time": "2024-07-31T14:33:15+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -15737,16 +15737,16 @@
         },
         {
             "name": "laravel/pint",
-            "version": "v1.17.0",
+            "version": "v1.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
-                "reference": "4dba80c1de4b81dc4c4fb10ea6f4781495eb29f5"
+                "reference": "b5b6f716db298671c1dfea5b1082ec2c0ae7064f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/4dba80c1de4b81dc4c4fb10ea6f4781495eb29f5",
-                "reference": "4dba80c1de4b81dc4c4fb10ea6f4781495eb29f5",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/b5b6f716db298671c1dfea5b1082ec2c0ae7064f",
+                "reference": "b5b6f716db298671c1dfea5b1082ec2c0ae7064f",
                 "shasum": ""
             },
             "require": {
@@ -15799,7 +15799,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-            "time": "2024-07-23T16:40:20+00:00"
+            "time": "2024-08-01T09:06:33+00:00"
         },
         {
             "name": "laravel/sail",
@@ -16455,16 +16455,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.11.8",
+            "version": "1.11.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec"
+                "reference": "e370bcddadaede0c1716338b262346f40d296f82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec",
-                "reference": "6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e370bcddadaede0c1716338b262346f40d296f82",
+                "reference": "e370bcddadaede0c1716338b262346f40d296f82",
                 "shasum": ""
             },
             "require": {
@@ -16509,7 +16509,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-24T07:01:22+00:00"
+            "time": "2024-08-01T16:25:18+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
