@@ -1040,16 +1040,16 @@
         },
         {
             "name": "dariusiii/tv-maze-php-api",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "aea605b8a4a1d29aae0332d886d02345e31f493f"
+                "reference": "70681fda34722f147751ae8e16d025f0d5faaa58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/aea605b8a4a1d29aae0332d886d02345e31f493f",
-                "reference": "aea605b8a4a1d29aae0332d886d02345e31f493f",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/70681fda34722f147751ae8e16d025f0d5faaa58",
+                "reference": "70681fda34722f147751ae8e16d025f0d5faaa58",
                 "shasum": ""
             },
             "type": "library",
@@ -1073,9 +1073,9 @@
             ],
             "description": "TVMaze-API-Wrapper",
             "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.1"
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.2"
             },
-            "time": "2024-08-05T18:41:31+00:00"
+            "time": "2024-08-06T18:18:57+00:00"
         },
         {
             "name": "dasprid/enum",
