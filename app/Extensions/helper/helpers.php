@@ -23,7 +23,7 @@ if (! function_exists('getRawHtml')) {
      */
     function getRawHtml($url, $cookie = false)
     {
-        $cookieJar = new CookieJar();
+        $cookieJar = new CookieJar;
         $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         if ($cookie !== false) {
             $cookie = $cookieJar->setCookie(SetCookie::fromString($cookie));
@@ -67,7 +67,7 @@ if (! function_exists('makeFieldLinks')) {
                 continue;
             }
             if ($type === 'xxx' && $field === 'genre') {
-                $ta = (new XXX())->getGenres(true, $ta);
+                $ta = (new XXX)->getGenres(true, $ta);
                 $ta = $ta['title'] ?? '';
             }
             if ($i > 7) {
@@ -272,7 +272,7 @@ if (! function_exists('is_it_json')) {
  */
 function getStreamingZip(array $guids = []): STS\ZipStream\ZipStream
 {
-    $nzb = new NZB();
+    $nzb = new NZB;
     $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
     foreach ($guids as $guid) {
         $nzbPath = $nzb->NZBPath($guid);

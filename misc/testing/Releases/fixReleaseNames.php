@@ -14,9 +14,9 @@ use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\NNTP;
 
-$nameFixer = new NameFixer();
-$colorCli = new ColorCLI();
-$nntp = new NNTP();
+$nameFixer = new NameFixer;
+$colorCli = new ColorCLI;
+$nntp = new NNTP;
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     $update = $argv[2] === 'true';

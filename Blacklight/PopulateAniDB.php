@@ -52,7 +52,7 @@ class PopulateAniDB
     public function __construct()
     {
         $this->echooutput = config('nntmux.echocli');
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $anidbupdint = Settings::settingValue('APIs.AniDB.max_update_frequency');
         $lastupdated = Settings::settingValue('APIs.AniDB.last_full_update');
@@ -430,7 +430,7 @@ class PopulateAniDB
         }
 
         if (! empty($picture) && ! file_exists($this->imgSavePath.$aniDbId.'.jpg')) {
-            (new ReleaseImage())->saveImage(
+            (new ReleaseImage)->saveImage(
                 $aniDbId,
                 'http://img7.anidb.net/pics/anime/'.$picture,
                 $this->imgSavePath

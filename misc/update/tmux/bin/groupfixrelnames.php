@@ -15,12 +15,12 @@ use Blacklight\NZBContents;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB;
 
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 if (! isset($argv[1])) {
     $colorCli->error('This script is not intended to be run manually, it is called from Multiprocessing.');
     exit();
 }
-$nameFixer = new NameFixer();
+$nameFixer = new NameFixer;
 [$type, $guidChar, $maxPerRun, $thread] = explode(' ', $argv[1]);
 
 switch (true) {
@@ -191,11 +191,11 @@ switch (true) {
             if ((int) $release->proc_par2 === NameFixer::PROC_PAR2_NONE) {
                 $colorCli->primaryOver('p');
                 if (! isset($nzbcontents)) {
-                    $nntp = new NNTP();
+                    $nntp = new NNTP;
                     if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
                         $colorCli->error('Unable to connect to usenet.');
                     }
-                    $Nfo = new Nfo();
+                    $Nfo = new Nfo;
                     $nzbcontents = new NZBContents([
                         'Echo' => true,
                         'NNTP' => $nntp,

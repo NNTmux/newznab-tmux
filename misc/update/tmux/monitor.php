@@ -13,15 +13,15 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
-$tMain = new Tmux();
-$colorCli = new ColorCLI();
+$tMain = new Tmux;
+$colorCli = new ColorCLI;
 try {
-    $tRun = new TmuxRun();
+    $tRun = new TmuxRun;
 } catch (Exception $e) {
     echo $e;
 }
 try {
-    $tOut = new TmuxOutput();
+    $tOut = new TmuxOutput;
 } catch (Exception $e) {
     echo $e;
 }
@@ -400,7 +400,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 function errorOnSQL()
 {
-    (new ColorCLI())->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL. Please diagnose and try running again.'.PHP_EOL);
+    (new ColorCLI)->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL. Please diagnose and try running again.'.PHP_EOL);
 }
 
 /**

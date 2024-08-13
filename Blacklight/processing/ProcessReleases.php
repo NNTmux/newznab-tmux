@@ -76,11 +76,11 @@ class ProcessReleases
     {
         $this->echoCLI = config('nntmux.echocli');
 
-        $this->colorCLI = new ColorCLI();
-        $this->nzb = new NZB();
-        $this->releaseCleaning = new ReleaseCleaning();
-        $this->releases = new Releases();
-        $this->releaseImage = new ReleaseImage();
+        $this->colorCLI = new ColorCLI;
+        $this->nzb = new NZB;
+        $this->releaseCleaning = new ReleaseCleaning;
+        $this->releases = new Releases;
+        $this->releaseImage = new ReleaseImage;
 
         $dummy = Settings::settingValue('..delaytime');
         $this->collectionDelayTime = ($dummy !== '' ? (int) $dummy : 2);
@@ -178,7 +178,7 @@ class ProcessReleases
      */
     public function categorizeRelease(string $type, $groupId): int
     {
-        $cat = new Categorize();
+        $cat = new Categorize;
         $categorized = $total = 0;
         $releasesQuery = Release::query()->where(['categories_id' => Category::OTHER_MISC, 'iscategorized' => 0]);
         if (! empty($groupId)) {
@@ -384,7 +384,7 @@ class ProcessReleases
     {
         $startTime = now()->toImmutable();
 
-        $categorize = new Categorize();
+        $categorize = new Categorize;
         $returnCount = $duplicate = 0;
 
         if ($this->echoCLI) {
@@ -809,7 +809,7 @@ class ProcessReleases
     public function deleteReleases(): void
     {
         $startTime = now()->toImmutable();
-        $genres = new Genres();
+        $genres = new Genres;
         $passwordDeleted = $duplicateDeleted = $retentionDeleted = $completionDeleted = $disabledCategoryDeleted = 0;
         $disabledGenreDeleted = $miscRetentionDeleted = $miscHashedDeleted = $categoryMinSizeDeleted = 0;
 

@@ -10,7 +10,7 @@ use Blacklight\Movie;
 use Illuminate\Support\Facades\DB;
 
 $movie = new Movie(['Echo' => true]);
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 $path2cover = storage_path('covers/movies/');
 

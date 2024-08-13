@@ -41,7 +41,7 @@ class TraktAPI
         }
         $this->requestHeaders = $headers;
 
-        $this->client = new Client();
+        $this->client = new Client;
     }
 
     /**

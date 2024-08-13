@@ -17,7 +17,7 @@ abstract class AdultMovies
      */
     public function __construct()
     {
-        $this->_html = new HtmlDomParser();
+        $this->_html = new HtmlDomParser;
     }
 
     /**

@@ -7,7 +7,7 @@ use Blacklight\NameFixer;
 
 if (empty($argv[1]) && ($argv[1] !== 'full' || ! is_numeric($argv[1]))) {
     exit(
-        (new ColorCLI())->error(
+        (new ColorCLI)->error(
             PHP_EOL
             .'This script tries to match release filenames to PreDB filenames.'.PHP_EOL
             .'To display the changes, use "show" as the second argument. The optional third argument will limit the amount of filenames to attempt to match.'.PHP_EOL.PHP_EOL
@@ -18,7 +18,7 @@ if (empty($argv[1]) && ($argv[1] !== 'full' || ! is_numeric($argv[1]))) {
 }
 
 try {
-    $nameFixer = new NameFixer();
+    $nameFixer = new NameFixer;
 } catch (Exception $e) {
     echo $e->getMessage();
 }

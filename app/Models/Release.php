@@ -261,9 +261,9 @@ class Release extends Model
             );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            (new ElasticSearchSiteSearch())->insertRelease($parameters);
+            (new ElasticSearchSiteSearch)->insertRelease($parameters);
         } else {
-            (new ManticoreSearch())->insertRelease($parameters);
+            (new ManticoreSearch)->insertRelease($parameters);
         }
 
         return $parameters['id'];
@@ -298,9 +298,9 @@ class Release extends Model
         );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            (new ElasticSearchSiteSearch())->updateRelease($id);
+            (new ElasticSearchSiteSearch)->updateRelease($id);
         } else {
-            (new ManticoreSearch())->updateRelease($id);
+            (new ManticoreSearch)->updateRelease($id);
         }
     }
 
@@ -528,9 +528,9 @@ class Release extends Model
 
         if (! empty($similar)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch())->indexSearch($similar[1], 10);
+                $searchResult = (new ElasticSearchSiteSearch)->indexSearch($similar[1], 10);
             } else {
-                $searchResult = (new ManticoreSearch())->searchIndexes('releases_rt', $similar[1]);
+                $searchResult = (new ManticoreSearch)->searchIndexes('releases_rt', $similar[1]);
                 if (! empty($searchResult)) {
                     $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                 }

@@ -5,7 +5,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use Blacklight\ColorCLI;
 use Tmdb\Laravel\Facades\Tmdb;
 
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
     // Test if your TMDB API configuration is working

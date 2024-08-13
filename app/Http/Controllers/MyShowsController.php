@@ -175,7 +175,7 @@ class MyShowsController extends BasePageController
 
         $shows = UserSerie::getShows($this->userdata->id);
 
-        $releases = new Releases();
+        $releases = new Releases;
 
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');

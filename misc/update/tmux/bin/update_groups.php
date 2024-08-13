@@ -11,11 +11,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 $start = now();
-$consoleTools = new ConsoleTools();
-$colorCli = new ColorCLI();
+$consoleTools = new ConsoleTools;
+$colorCli = new ColorCLI;
 
 // Create the connection here and pass
-$nntp = new NNTP();
+$nntp = new NNTP;
 if ($nntp->doConnect() !== true) {
     $colorCli->error('Unable to connect to usenet.');
     exit();

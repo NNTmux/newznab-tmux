@@ -15,7 +15,7 @@ class AdminBlacklistController extends BasePageController
     public function index(): void
     {
         $this->setAdminPrefs();
-        $binaries = new Binaries();
+        $binaries = new Binaries;
 
         $meta_title = $title = 'Binary Black/White List';
 

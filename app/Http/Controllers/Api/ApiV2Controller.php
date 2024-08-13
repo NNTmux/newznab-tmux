@@ -25,7 +25,7 @@ class ApiV2Controller extends BasePageController
 
     public function __construct()
     {
-        $this->api = new ApiController();
+        $this->api = new ApiController;
     }
 
     public function capabilities(): JsonResponse
@@ -53,7 +53,7 @@ class ApiV2Controller extends BasePageController
                 'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid, tmdbid, traktid'],
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
-            'categories' => fractal($category, new CategoryTransformer()),
+            'categories' => fractal($category, new CategoryTransformer),
         ];
 
         return response()->json($capabilities);
@@ -67,7 +67,7 @@ class ApiV2Controller extends BasePageController
         if ($request->missing('api_token') || ($request->has('api_token') && $request->isNotFilled('api_token'))) {
             return response()->json(['error' => 'Missing parameter (apikey)'], 403);
         }
-        $releases = new Releases();
+        $releases = new Releases;
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $this->api->maxAge($request);
@@ -120,7 +120,7 @@ class ApiV2Controller extends BasePageController
         if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
             return response()->json(['error' => 'Missing parameter (api_token)'], 403);
         }
-        $releases = new Releases();
+        $releases = new Releases;
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $offset = $this->api->offset($request);
         $catExclusions = User::getCategoryExclusionForApi($request);
@@ -185,7 +185,7 @@ class ApiV2Controller extends BasePageController
         if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
             return response()->json(['error' => 'Missing parameter (api_token)'], 403);
         }
-        $releases = new Releases();
+        $releases = new Releases;
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         if ($user === null) {
             return response()->json(['error' => 'Invalid API Token'], 403);

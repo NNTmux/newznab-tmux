@@ -27,7 +27,7 @@ class NntmuxPopulateSteamApps extends Command
     public function handle(): void
     {
         try {
-            (new Steam())->populateSteamAppsTable();
+            (new Steam)->populateSteamAppsTable();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             $this->error('There was an error populating the steam_apps table');

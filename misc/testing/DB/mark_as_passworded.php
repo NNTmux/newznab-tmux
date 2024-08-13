@@ -22,4 +22,4 @@ if ($passFiles->isNotEmpty()) {
         }
     }
 }
-(new ColorCLI())->info($count2.' releases marked as passworded');
+(new ColorCLI)->info($count2.' releases marked as passworded');

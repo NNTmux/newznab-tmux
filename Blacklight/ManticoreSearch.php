@@ -39,7 +39,7 @@ class ManticoreSearch
         $this->connection = ['host' => $this->config['host'], 'port' => $this->config['port']];
         $this->manticoresearch = new Client($this->connection);
         $this->search = new Search($this->manticoresearch);
-        $this->cli = new ColorCLI();
+        $this->cli = new ColorCLI;
     }
 
     /**

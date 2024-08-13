@@ -38,8 +38,8 @@ class Releases extends Release
     public function __construct()
     {
         parent::__construct();
-        $this->manticoreSearch = new ManticoreSearch();
-        $this->elasticSearch = new ElasticSearchSiteSearch();
+        $this->manticoreSearch = new ManticoreSearch;
+        $this->elasticSearch = new ElasticSearchSiteSearch;
     }
 
     /**
@@ -325,8 +325,8 @@ class Releases extends Release
     {
         $list = (array) $list;
 
-        $nzb = new NZB();
-        $releaseImage = new ReleaseImage();
+        $nzb = new NZB;
+        $releaseImage = new ReleaseImage;
 
         foreach ($list as $identifier) {
             $this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);

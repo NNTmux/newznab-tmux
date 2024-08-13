@@ -176,9 +176,9 @@ class Binaries
         $this->_echoCLI = config('nntmux.echocli');
 
         $this->_pdo = DB::connection()->getPdo();
-        $this->colorCli = new ColorCLI();
-        $this->_nntp = new NNTP();
-        $this->_collectionsCleaning = new CollectionsCleaning();
+        $this->colorCli = new ColorCLI;
+        $this->_nntp = new NNTP;
+        $this->_collectionsCleaning = new CollectionsCleaning;
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
             (int) Settings::settingValue('..maxmssgs') : 20000;

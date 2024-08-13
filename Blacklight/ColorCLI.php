@@ -16,7 +16,7 @@ class ColorCLI
      */
     public function __construct()
     {
-        $this->climate = new CLImate();
+        $this->climate = new CLImate;
     }
 
     public function debug(string $str, bool $newline = false): void

@@ -56,7 +56,7 @@ class BasePageController extends Controller
     {
         $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release');
         // Buffer settings/DB connection.
-        $this->settings = new Settings();
+        $this->settings = new Settings;
         $this->smarty = app('smarty.view');
 
         foreach (Arr::get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
@@ -177,7 +177,7 @@ class BasePageController extends Controller
             $role = $this->userdata->roles_id;
         }
 
-        $content = new Contents();
+        $content = new Contents;
         if ($this->userdata !== null) {
             $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }

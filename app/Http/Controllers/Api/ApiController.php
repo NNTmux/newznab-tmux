@@ -114,7 +114,7 @@ class ApiController extends BasePageController
             }
         }
 
-        $releases = new Releases();
+        $releases = new Releases;
 
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');

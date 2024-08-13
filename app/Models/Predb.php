@@ -108,11 +108,11 @@ class Predb extends Model
      */
     public static function checkPre(bool|int|string $dateLimit = false): void
     {
-        $consoleTools = new ConsoleTools();
+        $consoleTools = new ConsoleTools;
         $updated = 0;
 
         if (config('nntmux.echocli')) {
-            (new ColorCLI())->header('Querying DB for release search names not matched with PreDB titles.');
+            (new ColorCLI)->header('Querying DB for release search names not matched with PreDB titles.');
         }
 
         $query = self::query()
@@ -127,7 +127,7 @@ class Predb extends Model
 
         if ($res !== null) {
             $total = \count($res);
-            (new ColorCLI())->primary(number_format($total).' releases to match.');
+            (new ColorCLI)->primary(number_format($total).' releases to match.');
 
             foreach ($res as $row) {
                 Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
@@ -143,7 +143,7 @@ class Predb extends Model
             }
 
             if (config('nntmux.echocli')) {
-                (new ColorCLI())->header(
+                (new ColorCLI)->header(
                     'Matched '.number_format(($updated > 0) ? $updated : 0).' PreDB titles to release search names.'
                 );
             }
@@ -198,9 +198,9 @@ class Predb extends Model
         $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if (! empty($search)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $ids = (new ElasticSearchSiteSearch())->predbIndexSearch($search);
+                $ids = (new ElasticSearchSiteSearch)->predbIndexSearch($search);
             } else {
-                $manticore = new ManticoreSearch();
+                $manticore = new ManticoreSearch;
                 $ids = Arr::get($manticore->searchIndexes('predb_rt', $search, ['title']), 'id');
             }
             $sql->whereIn('predb.id', $ids);

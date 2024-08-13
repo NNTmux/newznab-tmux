@@ -6,7 +6,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use Blacklight\ColorCLI;
 use Blacklight\ReleaseRemover;
 
-$cli = new ColorCLI();
+$cli = new ColorCLI;
 
 $n = PHP_EOL;
 
@@ -66,5 +66,5 @@ if (isset($argv[3]) && $argv[3] === 'blacklist' && isset($argv[4])) {
     $blacklistID = $argv[4];
 }
 
-$RR = new ReleaseRemover();
+$RR = new ReleaseRemover;
 $RR->removeCrap($argv[1] === 'true' ? true : false, $argv[2], $argv[3] ?? '', isset($blacklistID) ? $argv[4] : '');

@@ -4,8 +4,8 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\processing\tv\TVMaze;
 
-$c = new Blacklight\ColorCLI();
-$tvmaze = new TVMaze();
+$c = new Blacklight\ColorCLI;
+$tvmaze = new TVMaze;
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
     // Test if your TVMaze API configuration is working

@@ -391,9 +391,9 @@ class UsenetGroup extends Model
 
         $res->get();
 
-        $releases = new Releases();
-        $nzb = new NZB();
-        $releaseImage = new ReleaseImage();
+        $releases = new Releases;
+        $nzb = new NZB;
+        $releaseImage = new ReleaseImage;
         foreach ($res as $row) {
             $releases->deleteSingle(
                 [
@@ -484,6 +484,6 @@ class UsenetGroup extends Model
     public static function disableIfNotExist(int $id): void
     {
         self::updateGroupStatus($id, 'active');
-        (new ColorCLI())->error('Group does not exist on server, disabling');
+        (new ColorCLI)->error('Group does not exist on server, disabling');
     }
 }

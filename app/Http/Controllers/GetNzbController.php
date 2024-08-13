@@ -84,7 +84,7 @@ class GetNzbController extends BasePageController
             return response()->json(['message' => 'Unable to create .zip file'], 404);
         }
 
-        $nzbPath = (new NZB())->getNZBPath($request->input('id'));
+        $nzbPath = (new NZB)->getNZBPath($request->input('id'));
 
         if (! File::exists($nzbPath)) {
             return Utility::showApiError(300, 'NZB file not found!');

@@ -47,7 +47,7 @@ class TVDB extends TV
     public function __construct()
     {
         parent::__construct();
-        $this->client = new TheTVDbAPI();
+        $this->client = new TheTVDbAPI;
         $this->local = false;
         $this->authorizeTvdb();
 
@@ -277,7 +277,7 @@ class TVDB extends TV
      */
     public function getPoster(int $videoId): int
     {
-        $ri = new ReleaseImage();
+        $ri = new ReleaseImage;
 
         // Try to get the Poster
         $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);

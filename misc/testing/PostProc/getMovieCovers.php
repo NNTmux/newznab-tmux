@@ -8,7 +8,7 @@ use Blacklight\ColorCLI;
 use Blacklight\Movie;
 
 $movie = new Movie(['Echo' => true]);
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 $movies = MovieInfo::query()->where('cover', '=', 0)->orderBy('year')->orderByDesc('id')->get(['imdbid']);
 $count = $movies->count();

@@ -78,7 +78,7 @@ class Music
     {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -153,7 +153,7 @@ class Music
 				%s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
-                (new Releases())->showPasswords(),
+                (new Releases)->showPasswords(),
                 $browseby,
                 $catsrch,
                 $exccatlist,
@@ -300,7 +300,7 @@ class Music
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
     {
-        $ri = new ReleaseImage();
+        $ri = new ReleaseImage;
 
         $mus = [];
         if ($amazdata !== null) {
@@ -612,7 +612,7 @@ class Music
     {
         $mus = true;
         // Load genres.
-        $defaultGenres = (new Genres())->loadGenres(Genres::MUSIC_TYPE);
+        $defaultGenres = (new Genres)->loadGenres(Genres::MUSIC_TYPE);
 
         try {
             $album = iTunes::load('album')->fetchOneByName($title);

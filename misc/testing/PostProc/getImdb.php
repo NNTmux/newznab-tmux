@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $movie = new Movie(['Echo' => true]);
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 $movies = $pdo->query('SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC');
 if ($movies instanceof Traversable) {

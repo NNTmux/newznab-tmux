@@ -46,11 +46,11 @@ class XXX
 
     public function __construct()
     {
-        $this->releaseImage = new ReleaseImage();
-        $this->colorCli = new ColorCLI();
+        $this->releaseImage = new ReleaseImage;
+        $this->colorCli = new ColorCLI;
 
         $this->movieQty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
-        $this->showPasswords = (new Releases())->showPasswords();
+        $this->showPasswords = (new Releases)->showPasswords();
         $this->echoOutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/xxx/');
         $this->cookie = resource_path('tmp/xxx.cookie');
@@ -369,7 +369,7 @@ class XXX
         $cover = $backdrop = 0;
         $xxxID = -2;
         $this->whichClass = 'aebn';
-        $mov = new AEBN();
+        $mov = new AEBN;
         $mov->cookie = $this->cookie;
         $this->colorCli->info('Checking AEBN for movie info');
         $res = $mov->processSite($movie);
@@ -384,7 +384,7 @@ class XXX
 
         if ($res === false) {
             $this->whichClass = 'adm';
-            $mov = new ADM();
+            $mov = new ADM;
             $mov->cookie = $this->cookie;
             $this->colorCli->info('Checking ADM for movie info');
             $res = $mov->processSite($movie);
@@ -392,14 +392,14 @@ class XXX
 
         if ($res === false) {
             $this->whichClass = 'ade';
-            $mov = new ADE();
+            $mov = new ADE;
             $this->colorCli->info('Checking ADE for movie info');
             $res = $mov->processSite($movie);
         }
 
         if ($res === false) {
             $this->whichClass = 'hotm';
-            $mov = new Hotmovies();
+            $mov = new Hotmovies;
             $mov->cookie = $this->cookie;
             $this->colorCli->info('Checking HotMovies for movie info');
             $res = $mov->processSite($movie);

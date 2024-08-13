@@ -16,7 +16,7 @@ class SeriesController extends BasePageController
     public function index(Request $request, string $id = ''): void
     {
         $this->setPreferences();
-        $releases = new Releases();
+        $releases = new Releases;
         $title = 'Series';
         $meta_title = 'View TV Series';
         $meta_keywords = 'view,series,tv,show,description,details';

@@ -4,8 +4,8 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\processing\tv\TVDB;
 
-$c = new Blacklight\ColorCLI();
-$tvDB = new TVDB();
+$c = new Blacklight\ColorCLI;
+$tvDB = new TVDB;
 
 if (! empty($argv[1]) && isset($argv[2], $argv[3]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
     // Test if your TvDB API key and configuration are working

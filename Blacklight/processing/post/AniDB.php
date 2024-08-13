@@ -43,8 +43,8 @@ class AniDB
     public function __construct()
     {
         $this->echooutput = config('nntmux.echocli');
-        $this->padb = new PaDb();
-        $this->colorCli = new ColorCLI();
+        $this->padb = new PaDb;
+        $this->colorCli = new ColorCLI;
 
         $quantity = (int) Settings::settingValue('..maxanidbprocessed');
         $this->aniqty = $quantity ?? 100;

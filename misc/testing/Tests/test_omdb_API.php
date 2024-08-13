@@ -6,7 +6,7 @@ use aharen\OMDbAPI;
 use Blacklight\ColorCLI;
 
 $omdb = new OMDbAPI(config('nntmux_api.omdb_api_key'));
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if (! empty($argv[1]) && ! empty($argv[2]) && ($argv[2] !== 'series' || $argv[2] !== 'movie')) {
     // Test if your OMDb API key and configuration are working

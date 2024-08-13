@@ -31,8 +31,8 @@ class NZBExport
     public function __construct()
     {
         $this->echoCLI = config('nntmux.echocli');
-        $this->releases = new Releases();
-        $this->nzb = new NZB();
+        $this->releases = new Releases;
+        $this->nzb = new NZB;
     }
 
     /**

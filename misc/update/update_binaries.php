@@ -9,10 +9,10 @@ use Blacklight\ColorCLI;
 use Blacklight\NNTP;
 
 $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 // Create the connection here and pass
-$nntp = new NNTP();
+$nntp = new NNTP;
 if ($nntp->doConnect() !== true) {
     $colorCli->error('Unable to connect to usenet.');
     exit();

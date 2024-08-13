@@ -10,8 +10,8 @@ if (! isset($argv[1]) || ! isset($argv[2])) {
     exit("ERROR: You must supply the level you want to reorganize it to, and the source directory  (You would use: 3 .../newznab/resources/nzb/ to move it to 3 levels deep)\n");
 }
 
-$nzb = new NZB();
-$consoleTools = new ConsoleTools();
+$nzb = new NZB;
+$consoleTools = new ConsoleTools;
 
 $newLevel = $argv[1];
 $sourcePath = $argv[2];

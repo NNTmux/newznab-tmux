@@ -76,7 +76,7 @@ class UpdateNNTmux extends Command
         echo $process->errorOutput();
         $this->info('Assets built successfully!');
 
-        $cleared = (new Smarty())->setCompileDir(config('ytake-laravel-smarty.compile_path'))->clearCompiledTemplate();
+        $cleared = (new Smarty)->setCompileDir(config('ytake-laravel-smarty.compile_path'))->clearCompiledTemplate();
         if ($cleared) {
             $this->output->writeln('<comment>The Smarty compiled template cache has been cleaned for you</comment>');
         } else {
@@ -107,7 +107,7 @@ class UpdateNNTmux extends Command
 
     private function stopTmux(): bool
     {
-        if ((new Tmux())->isRunning() === true) {
+        if ((new Tmux)->isRunning() === true) {
             $this->call('tmux-ui:stop', ['--kill' => true]);
 
             return true;

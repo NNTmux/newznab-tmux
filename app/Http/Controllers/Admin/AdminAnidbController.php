@@ -16,7 +16,7 @@ class AdminAnidbController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $AniDB = new AniDB();
+        $AniDB = new AniDB;
         $title = $meta_title = 'AniDB List';
 
         $aname = '';
@@ -43,7 +43,7 @@ class AdminAnidbController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $AniDB = new AniDB();
+        $AniDB = new AniDB;
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';

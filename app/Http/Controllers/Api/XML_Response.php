@@ -93,7 +93,7 @@ class XML_Response
         $this->offset = $options['Offset'];
         $this->type = $options['Type'];
 
-        $this->xml = new \XMLWriter();
+        $this->xml = new \XMLWriter;
         $this->xml->openMemory();
         $this->xml->setIndent(true);
     }

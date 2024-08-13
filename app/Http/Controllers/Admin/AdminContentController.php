@@ -16,7 +16,7 @@ class AdminContentController extends BasePageController
     public function index(): void
     {
         $this->setAdminPrefs();
-        $contentList = (new Contents())->getAll();
+        $contentList = (new Contents)->getAll();
         $this->smarty->assign('contentlist', $contentList);
 
         $meta_title = 'Content List';
@@ -36,7 +36,7 @@ class AdminContentController extends BasePageController
     public function create(Request $request)
     {
         $this->setAdminPrefs();
-        $contents = new Contents();
+        $contents = new Contents;
         $meta_title = 'Content Add';
 
         // Set the current action.
@@ -110,7 +110,7 @@ class AdminContentController extends BasePageController
     public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if ($request->has('id')) {
-            $contents = new Contents();
+            $contents = new Contents;
             $contents->delete($request->input('id'));
         }
 

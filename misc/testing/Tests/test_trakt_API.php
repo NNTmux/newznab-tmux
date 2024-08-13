@@ -4,8 +4,8 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\processing\tv\TraktTv;
 
-$c = new Blacklight\ColorCLI();
-$trakt = new TraktTv();
+$c = new Blacklight\ColorCLI;
+$trakt = new TraktTv;
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
     // Test if your Trakt API key and configuration are working

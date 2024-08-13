@@ -53,7 +53,7 @@ class ImportNzbs extends Command
             if (empty($folders)) {
                 $this->info('Importing NZB files from '.$importFolder);
                 $files = File::allFiles($importFolder);
-                $NZBImport = new NZBImport();
+                $NZBImport = new NZBImport;
 
                 try {
                     $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB);
@@ -64,7 +64,7 @@ class ImportNzbs extends Command
                 foreach ($folders as $folder) {
                     $this->info('Importing NZB files from '.$folder);
                     $files = File::allFiles($folder);
-                    $NZBImport = new NZBImport();
+                    $NZBImport = new NZBImport;
 
                     try {
                         $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB);

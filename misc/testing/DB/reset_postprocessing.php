@@ -7,8 +7,8 @@ use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
-$consoletools = new ConsoleTools();
-$colorCli = new ColorCLI();
+$consoletools = new ConsoleTools;
+$colorCli = new ColorCLI;
 $ran = false;
 
 if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'true') {

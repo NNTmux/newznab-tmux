@@ -14,7 +14,7 @@ $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $seq = Settings::settingValue('site.tmux.sequential') ?? 0;
 $delaytime = Settings::settingValue('..delaytime');
 $delaytime = $delaytime ? (int) $delaytime : 2;
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 Process::run('clear');
 

@@ -71,7 +71,7 @@ class AdminNzbController extends BasePageController
     public function export(Request $request): void
     {
         $this->setAdminPrefs();
-        $rel = new Releases();
+        $rel = new Releases;
 
         if ($this->isPostBack($request)) {
             $path = $request->input('folder');

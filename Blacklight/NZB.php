@@ -93,7 +93,7 @@ class NZB
             return false;
         }
 
-        $XMLWriter = new \XMLWriter();
+        $XMLWriter = new \XMLWriter;
         $XMLWriter->openMemory();
         $XMLWriter->setIndent(true);
         $XMLWriter->setIndentString('  ');

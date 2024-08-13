@@ -60,7 +60,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function manticoreReleases(): void
     {
-        $manticore = new ManticoreSearch();
+        $manticore = new ManticoreSearch;
         $manticore->truncateRTIndex(Arr::wrap('releases_rt'));
         $data = [];
         $total = Release::count();
@@ -107,7 +107,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function manticorePreDB(): void
     {
-        $manticore = new ManticoreSearch();
+        $manticore = new ManticoreSearch;
         $manticore->truncateRTIndex(['predb_rt']);
         $data = [];
 
@@ -149,7 +149,7 @@ class NntmuxPopulateSearchIndexes extends Command
     private function elasticReleases(): void
     {
         $data = ['body' => []];
-        $elastic = new ElasticSearchSiteSearch();
+        $elastic = new ElasticSearchSiteSearch;
         $total = Release::count();
         if (! $total) {
             $this->warn('Could not get database information for releases table.');
@@ -200,7 +200,7 @@ class NntmuxPopulateSearchIndexes extends Command
     private function elasticPreDB(): void
     {
         $data = ['body' => []];
-        $elastic = new ElasticSearchSiteSearch();
+        $elastic = new ElasticSearchSiteSearch;
         $total = Predb::count();
         if (! $total) {
             $this->warn('Could not get database information for predb table.');
@@ -250,7 +250,7 @@ class NntmuxPopulateSearchIndexes extends Command
     {
         $this->info('Optimizing release_rt & predb_rt indexes');
         try {
-            (new ManticoreSearch())->optimizeRTIndex();
+            (new ManticoreSearch)->optimizeRTIndex();
         } catch (\Exception $e) {
             echo $e->getMessage();
         }

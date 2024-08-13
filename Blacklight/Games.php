@@ -82,7 +82,7 @@ class Games
     {
         $this->echoOutput = config('nntmux.echocli');
 
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $this->publicKey = config('nntmux_api.giantbomb_api_key');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
@@ -195,7 +195,7 @@ class Games
 				%s %s %s %s
 				GROUP BY gi.id
 				ORDER BY %s %s %s",
-                (new Releases())->showPasswords(),
+                (new Releases)->showPasswords(),
                 $browseBy,
                 $catsrch,
                 $maxAge,
@@ -343,7 +343,7 @@ class Games
         //wait 10 seconds before proceeding (steam api limit)
         sleep(10);
         $gen = new Genres(['Settings' => null]);
-        $ri = new ReleaseImage();
+        $ri = new ReleaseImage;
 
         $game = [];
 

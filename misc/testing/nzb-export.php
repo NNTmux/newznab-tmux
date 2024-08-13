@@ -23,7 +23,7 @@ if (count($argv) !== 6) {
     );
 }
 
-$NE = new NZBExport();
+$NE = new NZBExport;
 $NE->beginExport(
     [
         // Path.

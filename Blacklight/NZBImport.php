@@ -65,11 +65,11 @@ class NZBImport
     public function __construct(array $options = [])
     {
         $this->echoCLI = config('nntmux.echocli');
-        $this->binaries = new Binaries();
-        $this->category = new Categorize();
-        $this->nzb = new NZB();
-        $this->releaseCleaner = new ReleaseCleaning();
-        $this->colorCli = new ColorCLI();
+        $this->binaries = new Binaries;
+        $this->category = new Categorize;
+        $this->nzb = new NZB;
+        $this->releaseCleaner = new ReleaseCleaning;
+        $this->colorCli = new ColorCLI;
         $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
 
         // Set properties from options

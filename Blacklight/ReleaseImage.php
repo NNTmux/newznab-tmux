@@ -48,7 +48,7 @@ class ReleaseImage
      */
     public function __construct()
     {
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
         $this->audSavePath = storage_path('covers/audiosample/');
         $this->imgSavePath = storage_path('covers/preview/');
         $this->jpgSavePath = storage_path('covers/sample/');

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\File;
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $covers = $updated = $deleted = 0;
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if ($argc === 1 || $argv[1] !== 'true') {
     $colorCli->error("\nThis script will check all images in covers/book and compare to db->bookinfo.\nTo run:\nphp $argv[0] true\n");

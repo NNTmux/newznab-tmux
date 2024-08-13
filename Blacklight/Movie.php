@@ -116,13 +116,13 @@ class Movie
     public function __construct()
     {
 
-        $this->releaseImage = new ReleaseImage();
-        $this->colorCli = new ColorCLI();
+        $this->releaseImage = new ReleaseImage;
+        $this->colorCli = new ColorCLI;
         $this->traktcheck = config('nntmux_api.trakttv_api_key');
         if ($this->traktcheck !== null) {
             $this->traktTv = new TraktTv(['Settings' => null]);
         }
-        $this->client = new Client();
+        $this->client = new Client;
         $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
         if ($this->fanartapikey !== null) {
             $this->fanart = new FanartTV($this->fanartapikey);
@@ -133,7 +133,7 @@ class Movie
         }
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
-        $this->config = new Config();
+        $this->config = new Config;
         $this->config->language = $this->lookuplanguage;
         $this->config->throwHttpExceptions = false;
         $cacheDir = storage_path('framework/cache/imdb_cache');
@@ -144,7 +144,7 @@ class Movie
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
-        $this->showPasswords = (new Releases())->showPasswords();
+        $this->showPasswords = (new Releases)->showPasswords();
 
         $this->echooutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/movies/');

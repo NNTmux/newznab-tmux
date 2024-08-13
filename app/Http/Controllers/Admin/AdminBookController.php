@@ -38,7 +38,7 @@ class AdminBookController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $book = new Books();
+        $book = new Books;
 
         $meta_title = $title = 'Book Edit';
 

@@ -58,10 +58,10 @@ class ReleaseRemover
 
     public function __construct()
     {
-        $this->colorCLI = new ColorCLI();
-        $this->releases = new Releases();
-        $this->nzb = new NZB();
-        $this->releaseImage = new ReleaseImage();
+        $this->colorCLI = new ColorCLI;
+        $this->releases = new Releases;
+        $this->nzb = new NZB;
+        $this->releaseImage = new ReleaseImage;
 
         $this->query = '';
         $this->error = '';
@@ -724,9 +724,9 @@ class ReleaseRemover
 
                 if ($opTypeName === 'Subject') {
                     if (config('nntmux.elasticsearch_enabled') === true) {
-                        $searchResult = (new ElasticSearchSiteSearch())->indexSearch($regexMatch, 100);
+                        $searchResult = (new ElasticSearchSiteSearch)->indexSearch($regexMatch, 100);
                     } else {
-                        $searchResult = (new ManticoreSearch())->searchIndexes('releases_rt', $regexMatch, ['name,searchname']);
+                        $searchResult = (new ManticoreSearch)->searchIndexes('releases_rt', $regexMatch, ['name,searchname']);
                         if (! empty($searchResult)) {
                             $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                         }

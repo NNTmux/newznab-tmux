@@ -27,8 +27,8 @@ class AnimeController extends BasePageController
     public function __construct()
     {
         parent::__construct();
-        $this->aniDb = new AniDB();
-        $this->releases = new Releases();
+        $this->aniDb = new AniDB;
+        $this->releases = new Releases;
     }
 
     /**

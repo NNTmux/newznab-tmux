@@ -27,7 +27,7 @@ class Tmux
     public function __construct()
     {
         $this->pdo = DB::connection()->getPdo();
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
     }
 
     /**

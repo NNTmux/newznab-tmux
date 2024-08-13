@@ -93,7 +93,7 @@ class AdminReleasesController extends BasePageController
     public function destroy($id): RedirectResponse
     {
         if ($id) {
-            $releases = new Releases();
+            $releases = new Releases;
             $releases->deleteMultiple($id);
         }
 

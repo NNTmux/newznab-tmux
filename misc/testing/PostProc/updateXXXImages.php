@@ -7,7 +7,7 @@ use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if ($argc === 1 || $argv[1] !== 'true') {
     $colorCli->error("\nThis script will check all images in covers/xxx and compare to db->xxxinfo.\nTo run:\nphp $argv[0] true\n");

@@ -51,8 +51,8 @@ if (\count($releases) === 0) {
     exit('No releases found in your database for group '.$argv[1].PHP_EOL);
 }
 
-$releaseCleaner = new ReleaseCleaning();
-$manticore = new ManticoreSearch();
+$releaseCleaner = new ReleaseCleaning;
+$manticore = new ManticoreSearch;
 
 foreach ($releases as $release) {
     echo '.';

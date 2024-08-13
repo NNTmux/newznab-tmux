@@ -6,7 +6,7 @@ use Blacklight\Backfill;
 use Blacklight\NNTP;
 
 // Create the connection here and pass
-$nntp = new NNTP();
+$nntp = new NNTP;
 
 if (isset($argv[1]) && $argv[1] === 'all' && ! isset($argv[2])) {
     $backfill = new Backfill(['NNTP' => $nntp]);
@@ -27,7 +27,7 @@ if (isset($argv[1]) && $argv[1] === 'all' && ! isset($argv[2])) {
     $backfill = new Backfill(['NNTP' => $nntp]);
     $backfill->safeBackfill($argv[2]);
 } else {
-    exit((new Blacklight\ColorCLI())->error('Wrong set of arguments.'
+    exit((new Blacklight\ColorCLI)->error('Wrong set of arguments.'
             .'php backfill.php safe 200000		 ...: Backfill an active group alphabetically, x articles, the script stops,'
             .'					 ...: if the group has reached reached 2012-06-24, the next group will backfill.'
             .'php backfill.php alph 200000 		 ...: Backfills all groups (sorted alphabetically) by number of articles'

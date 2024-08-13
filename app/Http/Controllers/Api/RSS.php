@@ -27,7 +27,7 @@ class RSS extends ApiController
     public function __construct()
     {
         parent::__construct();
-        $this->releases = new Releases();
+        $this->releases = new Releases;
     }
 
     /**

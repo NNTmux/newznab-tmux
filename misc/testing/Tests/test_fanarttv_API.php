@@ -6,7 +6,7 @@ use Blacklight\ColorCLI;
 use Blacklight\libraries\FanartTV;
 
 $fanart = new FanartTV(config('nntmux_api.fanarttv_api_key'));
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if (! empty($argv[1])) {
     // Test if you can fetch Fanart.TV images

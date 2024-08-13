@@ -75,7 +75,7 @@ if ($i > 1) {
     $useNzbName = ($argv[4] === 'true');
 
     // Create a new instance of NZBImport and send it the file locations.
-    $NZBImport = new NZBImport();
+    $NZBImport = new NZBImport;
 
     $NZBImport->beginImport($nzbFiles, $useNzbName, $deleteNZB, $deleteFailedNZB);
 } else {

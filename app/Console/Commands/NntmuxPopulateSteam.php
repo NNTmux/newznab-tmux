@@ -26,7 +26,7 @@ class NntmuxPopulateSteam extends Command
      */
     public function handle(): void
     {
-        $steam = new Steam();
+        $steam = new Steam;
 
         $steam->populateSteamAppsTable();
     }

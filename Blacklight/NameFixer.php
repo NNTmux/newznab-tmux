@@ -130,10 +130,10 @@ class NameFixer
         $this->fullall = '';
         $this->_fileName = '';
         $this->done = $this->matched = false;
-        $this->colorCLI = new ColorCLI();
-        $this->category = new Categorize();
-        $this->manticore = new ManticoreSearch();
-        $this->elasticsearch = new ElasticSearchSiteSearch();
+        $this->colorCLI = new ColorCLI;
+        $this->category = new Categorize;
+        $this->manticore = new ManticoreSearch;
+        $this->elasticsearch = new ElasticSearchSiteSearch;
     }
 
     /**
@@ -507,8 +507,8 @@ class NameFixer
             $this->_totalReleases = $total;
 
             $this->colorCLI->climate()->info(number_format($total).' releases to process.');
-            $Nfo = new Nfo();
-            $nzbContents = new NZBContents();
+            $Nfo = new Nfo;
+            $nzbContents = new NZBContents;
 
             foreach ($releases as $release) {
                 if ($nzbContents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, $nameStatus, $show)) {
@@ -792,7 +792,7 @@ class NameFixer
                 'Renamed Releases: ['.
                 number_format($this->fixed).
                 '] '.
-                (new ConsoleTools())->percentString($this->checked, $this->_totalReleases)
+                (new ConsoleTools)->percentString($this->checked, $this->_totalReleases)
             );
         }
     }
@@ -814,7 +814,7 @@ class NameFixer
             $release->releases_id = $release->id;
         }
         if ($this->relid !== $release->releases_id) {
-            $newName = (new ReleaseCleaning())->fixerCleaner($name);
+            $newName = (new ReleaseCleaning)->fixerCleaner($name);
             if (strtolower($newName) !== strtolower($release->searchname)) {
                 $this->matched = true;
                 $this->relid = (int) $release->releases_id;
@@ -990,7 +990,7 @@ class NameFixer
             'method' => '',
         ]
     ): void {
-        $colorCLI = new ColorCLI();
+        $colorCLI = new ColorCLI;
         echo PHP_EOL;
 
         $colorCLI->info('New name:     ').$colorCLI->primaryOver($data['new_name']).
@@ -1122,7 +1122,7 @@ class NameFixer
                         $counted++;
                     }
                     if ($show === 0) {
-                        $this->colorCLI->climate()->info('Renamed Releases: ['.number_format($counted).'] '.(new ConsoleTools())->percentString(++$counter, $total));
+                        $this->colorCLI->climate()->info('Renamed Releases: ['.number_format($counted).'] '.(new ConsoleTools)->percentString(++$counter, $total));
                     }
                 }
                 $this->colorCLI->climate()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds'.'.');
@@ -1294,7 +1294,7 @@ class NameFixer
                 $updated += $this->matchPredbHash($hits[0], $row, $echo, $nameStatus, $show);
             }
             if ($show === 2) {
-                $this->colorCLI->climate()->info('Renamed Releases: ['.number_format($updated).'] '.(new ConsoleTools())->percentString($checked++, $total));
+                $this->colorCLI->climate()->info('Renamed Releases: ['.number_format($updated).'] '.(new ConsoleTools)->percentString($checked++, $total));
             }
         }
         if ($echo === 1) {

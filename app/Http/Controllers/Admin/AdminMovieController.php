@@ -86,7 +86,7 @@ class AdminMovieController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $movie = new Movie();
+        $movie = new Movie;
         $meta_title = $title = 'Add Movie';
 
         // set the current action

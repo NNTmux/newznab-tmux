@@ -259,21 +259,21 @@ class ProcessAdditional
     {
         $this->_echoCLI = config('nntmux.echocli');
 
-        $this->_nntp = new NNTP();
+        $this->_nntp = new NNTP;
 
-        $this->_nzb = new NZB();
-        $this->_archiveInfo = new ArchiveInfo();
-        $this->_categorize = new Categorize();
-        $this->_nameFixer = new NameFixer();
-        $this->_releaseExtra = new ReleaseExtra();
-        $this->_releaseImage = new ReleaseImage();
-        $this->_par2Info = new Par2Info();
-        $this->_nfo = new Nfo();
-        $this->manticore = new ManticoreSearch();
-        $this->elasticsearch = new ElasticSearchSiteSearch();
+        $this->_nzb = new NZB;
+        $this->_archiveInfo = new ArchiveInfo;
+        $this->_categorize = new Categorize;
+        $this->_nameFixer = new NameFixer;
+        $this->_releaseExtra = new ReleaseExtra;
+        $this->_releaseImage = new ReleaseImage;
+        $this->_par2Info = new Par2Info;
+        $this->_nfo = new Nfo;
+        $this->manticore = new ManticoreSearch;
+        $this->elasticsearch = new ElasticSearchSiteSearch;
         $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
-        $this->mediaInfo = new MediaInfo();
+        $this->mediaInfo = new MediaInfo;
         $this->mediaInfo->setConfig('use_oldxml_mediainfo_output_format', true);
         $this->mediaInfo->setConfig('command', Settings::settingValue('apps..mediainfopath'));
 
@@ -894,14 +894,14 @@ class ProcessAdditional
                 if (preg_match(NameFixer::PREDB_REGEX, $rarFileName[0], $hit)) {
                     $preCheck = Predb::whereTitle($hit[0])->first();
                     $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                    (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($hit[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
+                    (new NameFixer)->updateRelease($this->_release, $preCheck->title ?? ucwords($hit[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
                 } elseif (! empty($dataSummary['archives']) && ! empty($dataSummary['archives'][$rarFileName[0]]['file_list'])) {
                     $archiveData = $dataSummary['archives'][$rarFileName[0]]['file_list'];
                     $archiveFileName = Arr::pluck($archiveData, 'name');
                     if (preg_match(NameFixer::PREDB_REGEX, $archiveFileName[0], $match2)) {
                         $preCheck = Predb::whereTitle($match2[0])->first();
                         $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                        (new NameFixer())->updateRelease($this->_release, $preCheck->title ?? ucwords($match2[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
+                        (new NameFixer)->updateRelease($this->_release, $preCheck->title ?? ucwords($match2[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
                     }
                 }
             }
@@ -1572,7 +1572,7 @@ class ProcessAdditional
                 if ($this->ffprobe->isValid($fileLocation)) {
                     try {
                         $audioSample = $this->ffmpeg->open($fileLocation);
-                        $format = new Vorbis();
+                        $format = new Vorbis;
                         $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
                         $audioSample->save($format, $this->tmpPath.$audioFileName);
                     } catch (\InvalidArgumentException $e) {
@@ -1774,7 +1774,7 @@ class ProcessAdditional
                         try {
                             $video = $this->ffmpeg->open($fileLocation);
                             $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($this->_ffMPEGDuration));
-                            $format = new Ogg();
+                            $format = new Ogg;
                             $format->setAudioCodec('libvorbis');
                             $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                             $videoSample->save($format, $fileName);
@@ -1793,7 +1793,7 @@ class ProcessAdditional
                 try {
                     $video = $this->ffmpeg->open($fileLocation);
                     $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
-                    $format = new Ogg();
+                    $format = new Ogg;
                     $format->setAudioCodec('libvorbis');
                     $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                     $videoSample->save($format, $fileName);
@@ -2085,7 +2085,7 @@ class ProcessAdditional
     protected function _echo(string $string, string $type): void
     {
         if ($this->_echoCLI) {
-            (new ColorCLI())->$type($string);
+            (new ColorCLI)->$type($string);
         }
     }
 

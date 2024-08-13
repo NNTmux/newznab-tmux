@@ -7,8 +7,8 @@ use Blacklight\ColorCLI;
 use Blacklight\XXX;
 use Illuminate\Support\Facades\DB;
 
-$movie = new XXX();
-$c = new ColorCLI();
+$movie = new XXX;
+$c = new ColorCLI;
 
 $movies = DB::select('SELECT title FROM xxxinfo WHERE cover = 0');
 

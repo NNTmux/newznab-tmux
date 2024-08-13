@@ -147,7 +147,7 @@ class MyMoviesController extends BasePageController
                     }
                 }
 
-                $ordering = (new Releases())->getBrowseOrdering();
+                $ordering = (new Releases)->getBrowseOrdering();
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 

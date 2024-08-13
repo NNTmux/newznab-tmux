@@ -54,9 +54,9 @@ class PostProcess
         $this->echooutput = config('nntmux.echocli');
 
         // Class instances.
-        $this->_par2Info = new Par2Info();
-        $this->nameFixer = new NameFixer();
-        $this->Nfo = new Nfo();
+        $this->_par2Info = new Par2Info;
+        $this->nameFixer = new NameFixer;
+        $this->Nfo = new Nfo;
 
         // Site settings.
         $this->addpar2 = (int) Settings::settingValue('..addpar2') !== 0;

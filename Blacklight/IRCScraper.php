@@ -130,8 +130,8 @@ class IRCScraper extends IRCClient
             $this->_titleIgnoreRegex = config('irc_settings.scrape_irc_title_ignore');
         }
 
-        $this->elasticsearch = new ElasticSearchSiteSearch();
-        $this->manticoreSearch = new ManticoreSearch();
+        $this->elasticsearch = new ElasticSearchSiteSearch;
+        $this->manticoreSearch = new ManticoreSearch;
 
         $this->_groupList = [];
         $this->_silent = $silent;
@@ -284,7 +284,7 @@ class IRCScraper extends IRCClient
     protected function _insertNewPre(): void
     {
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $indexData = (new ElasticSearchSiteSearch())->predbIndexSearch($this->_curPre['title']);
+            $indexData = (new ElasticSearchSiteSearch)->predbIndexSearch($this->_curPre['title']);
         } else {
             $indexData = $this->manticoreSearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
         }

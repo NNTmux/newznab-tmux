@@ -72,7 +72,7 @@ class Nfo
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $this->tmpPath = config('nntmux.tmp_unrar_path');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {
@@ -164,11 +164,11 @@ class Nfo
             }
 
             // Check if it's a par2.
-            $par2info = new Par2Info();
+            $par2info = new Par2Info;
             $par2info->setData($possibleNFO);
             if ($par2info->error) {
                 // Check if it's an SFV.
-                $sfv = new SfvInfo();
+                $sfv = new SfvInfo;
                 $sfv->setData($possibleNFO);
                 if ($sfv->error) {
                     return true;

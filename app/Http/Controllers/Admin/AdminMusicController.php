@@ -36,8 +36,8 @@ class AdminMusicController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $music = new Music();
-        $gen = new Genres();
+        $music = new Music;
+        $gen = new Genres;
 
         $meta_title = $title = 'Music Edit';
 

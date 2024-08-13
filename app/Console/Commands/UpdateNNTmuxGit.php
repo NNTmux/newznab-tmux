@@ -34,7 +34,7 @@ class UpdateNNTmuxGit extends Command
     {
         $wasRunning = false;
 
-        if ((new Tmux())->isRunning()) {
+        if ((new Tmux)->isRunning()) {
             $wasRunning = true;
             $this->call('tmux-ui:stop', ['--kill' => true]);
         }

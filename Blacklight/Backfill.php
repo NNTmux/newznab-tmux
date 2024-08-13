@@ -49,10 +49,10 @@ class Backfill
     {
         $this->_echoCLI = config('nntmux.echocli');
 
-        $this->_nntp = new NNTP();
-        $this->_binaries = new Binaries();
+        $this->_nntp = new NNTP;
+        $this->_binaries = new Binaries;
 
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
         $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2012-08-14';

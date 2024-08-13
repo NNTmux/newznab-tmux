@@ -49,7 +49,7 @@ class NntmuxRemoveBadReleases extends Command
         // Select releases with password status -2 and smaller and delete them. Also delete the files from the filesystem.
         $badReleases = Release::query()->where('passwordstatus', '<=', -2)->get();
         foreach ($badReleases as $badRelease) {
-            $nzbPath = (new NZB())->getNZBPath($badRelease->guid);
+            $nzbPath = (new NZB)->getNZBPath($badRelease->guid);
             File::delete($nzbPath);
             (new ReleaseImage)->delete($badRelease->guid);
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -68,7 +68,7 @@ class NntmuxRemoveBadReleases extends Command
                     'i' => $badRelease->id,
                 ];
                 // Delete from sphinx.
-                (new ManticoreSearch())->deleteRelease($identifiers);
+                (new ManticoreSearch)->deleteRelease($identifiers);
             }
             $badRelease->delete();
         }

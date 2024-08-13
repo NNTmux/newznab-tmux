@@ -29,5 +29,5 @@ Schedule::command('horizon:snapshot')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('cloudflare:reload')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
 if (config('nntmux.purge_inactive_users') === true) {
-    Schedule::job(new RemoveInactiveAccounts())->daily();
+    Schedule::job(new RemoveInactiveAccounts)->daily();
 }

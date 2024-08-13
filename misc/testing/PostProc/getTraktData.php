@@ -9,7 +9,7 @@ use Blacklight\Movie;
 use Blacklight\processing\tv\TraktTv;
 
 $movie = new Movie(['Echo' => true]);
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 $movies = MovieInfo::query()->where('imdbid', '<>', 0)->where('traktid', '=', 0)->get(['imdbid']);
 $count = $movies->count();

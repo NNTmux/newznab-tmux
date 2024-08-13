@@ -88,7 +88,7 @@ class Console
     {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -161,7 +161,7 @@ class Console
 					%s %s %s
 					GROUP BY con.id
 					ORDER BY %s %s %s",
-            (new Releases())->showPasswords(),
+            (new Releases)->showPasswords(),
             $browseBy,
             $catsrch,
             $exccatlist,
@@ -564,7 +564,7 @@ class Console
      */
     protected function _updateConsoleTable(array $con = [])
     {
-        $ri = new ReleaseImage();
+        $ri = new ReleaseImage;
 
         $check = ConsoleInfo::query()->where('asin', $con['asin'])->first();
 

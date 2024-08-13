@@ -35,7 +35,7 @@ class DetailsController extends BasePageController
         $this->setPreferences();
 
         if ($guid !== null) {
-            $releases = new Releases();
+            $releases = new Releases;
             $re = new ReleaseExtra;
             $data = Release::getByGuid($guid);
             $cpapi = $this->userdata->cp_api;
@@ -87,7 +87,7 @@ class DetailsController extends BasePageController
 
             $xxx = '';
             if ($data['xxxinfo_id'] !== '' && $data['xxxinfo_id'] !== 0) {
-                $x = new XXX();
+                $x = new XXX;
                 $xxx = $x->getXXXInfo($data['xxxinfo_id']);
 
                 if (isset($xxx['trailers'])) {
@@ -106,7 +106,7 @@ class DetailsController extends BasePageController
 
             $game = '';
             if ($data['gamesinfo_id'] !== '') {
-                $game = (new Games())->getGamesInfoById($data['gamesinfo_id']);
+                $game = (new Games)->getGamesInfoById($data['gamesinfo_id']);
             }
 
             $mus = '';
@@ -116,17 +116,17 @@ class DetailsController extends BasePageController
 
             $book = '';
             if ($data['bookinfo_id'] !== '') {
-                $book = (new Books())->getBookInfo($data['bookinfo_id']);
+                $book = (new Books)->getBookInfo($data['bookinfo_id']);
             }
 
             $con = '';
             if ($data['consoleinfo_id'] !== '') {
-                $con = (new Console())->getConsoleInfo($data['consoleinfo_id']);
+                $con = (new Console)->getConsoleInfo($data['consoleinfo_id']);
             }
 
             $AniDBAPIArray = '';
             if ($data['anidbid'] > 0) {
-                $AniDBAPIArray = (new AniDB())->getAnimeInfo($data['anidbid']);
+                $AniDBAPIArray = (new AniDB)->getAnimeInfo($data['anidbid']);
             }
 
             $pre = Predb::getForRelease($data['predb_id']);

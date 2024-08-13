@@ -39,7 +39,7 @@ class AdminConsoleController extends BasePageController
     {
         $this->setAdminPrefs();
         $console = new Console(['Settings' => null]);
-        $gen = new Genres();
+        $gen = new Genres;
         $meta_title = $title = 'Console Edit';
 
         // set the current action

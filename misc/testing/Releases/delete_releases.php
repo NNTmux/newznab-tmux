@@ -11,7 +11,7 @@ $n = PHP_EOL;
 // Include config.php
 
 // ColorCLI class.
-$cli = new ColorCLI();
+$cli = new ColorCLI;
 
 // Print arguments/usage.
 $totalArgs = count($argv);
@@ -52,6 +52,6 @@ if ($totalArgs < 2) {
     ));
 }
 
-$RR = new ReleaseRemover();
+$RR = new ReleaseRemover;
 // Remove argv[0] and send the array.
 $RR->removeByCriteria(array_slice($argv, 1, $totalArgs - 1));

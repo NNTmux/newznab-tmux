@@ -19,8 +19,8 @@ class ConsoleController extends BasePageController
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
         }
-        $console = new Console();
-        $gen = new Genres();
+        $console = new Console;
+        $gen = new Genres;
 
         $concats = Category::getChildren(Category::GAME_ROOT);
         $ctmp = [];

@@ -8,7 +8,7 @@ use Blacklight\Categorize;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
     $colorCli->error(
@@ -28,7 +28,7 @@ reCategorize($argv);
 
 function reCategorize($argv): void
 {
-    $colorCli = new ColorCLI();
+    $colorCli = new ColorCLI;
 
     if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]))) {
         $colorCli->header('Categorizing all releases in '.$argv[1].' using searchname. This can take a while, be patient.');
@@ -63,13 +63,13 @@ function categorizeRelease($argv, $echoOutput = false): int
         $update = false;
     }
     $total = $query->count();
-    $colorCli = new ColorCLI();
+    $colorCli = new ColorCLI;
     $colorCli->header('Categorizing ['.$total.'] releases. This can take a while, be patient.');
-    $consoleTools = new ConsoleTools();
+    $consoleTools = new ConsoleTools;
     $relCount = $chgCount = 0;
     if ($total > 0) {
         $query->chunk('100', function ($results) use ($update, $relCount, $chgCount) {
-            $cat = new Categorize();
+            $cat = new Categorize;
             foreach ($results as $result) {
                 $catId = $cat->determineCategory($result->groups_id, $result->searchname, $result->fromname);
                 if ((int) $result->categories_id !== (int) $catId['categories_id']) {

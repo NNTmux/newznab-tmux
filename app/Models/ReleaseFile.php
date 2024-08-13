@@ -125,9 +125,9 @@ class ReleaseFile extends Model
                 ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
             if (config('nntmux.elasticsearch_enabled') === true) {
-                (new ElasticSearchSiteSearch())->updateRelease($id);
+                (new ElasticSearchSiteSearch)->updateRelease($id);
             } else {
-                (new ManticoreSearch())->updateRelease($id);
+                (new ManticoreSearch)->updateRelease($id);
             }
         }
 

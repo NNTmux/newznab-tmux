@@ -259,7 +259,7 @@ class TMDB extends TV
      */
     public function getPoster(int $videoId): int
     {
-        $ri = new ReleaseImage();
+        $ri = new ReleaseImage;
 
         $hascover = 0;
 

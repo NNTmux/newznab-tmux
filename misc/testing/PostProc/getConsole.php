@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $console = new Console(['Echo' => true]);
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 $res = $pdo->query(
     sprintf(

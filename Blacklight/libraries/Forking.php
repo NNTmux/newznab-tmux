@@ -93,7 +93,7 @@ class Forking
     public function __construct()
     {
         SerializableClosure::removeSecurityProvider();
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
@@ -851,7 +851,7 @@ class Forking
     {
         $sharing = DB::select('SELECT enabled FROM sharing');
         if ($sharing > 0 && (int) $sharing[0]->enabled === 1) {
-            $nntp = new NNTP();
+            $nntp = new NNTP;
             if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
                 (new PostProcess(['ColorCLI' => $this->colorCli]))->processSharing($nntp);
             }

@@ -36,7 +36,7 @@ $bool = [
 
 if (! isset($argv[1], $argv[2]) || ! in_array($argv[1], $args, false) || ! in_array($argv[2], $bool, false)) {
     exit(
-        (new Blacklight\ColorCLI())->error(
+        (new Blacklight\ColorCLI)->error(
             "\nIncorrect arguments.\n"
             ."The second argument (true/false) determines wether to echo or not.\n\n"
             ."php postprocess.php all true         ...: Does all the types of post processing.\n"
@@ -60,7 +60,7 @@ if (! isset($argv[1], $argv[2]) || ! in_array($argv[1], $args, false) || ! in_ar
 
 $nntp = null;
 if ($args[$argv[1]] === true) {
-    $nntp = new NNTP();
+    $nntp = new NNTP;
     if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
         echo 'Unable to connect to usenet.'.PHP_EOL;
         exit;

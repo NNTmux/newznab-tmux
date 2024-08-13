@@ -13,7 +13,7 @@ class FileListController extends BasePageController
     public function show(string $guid): void
     {
         $this->setPreferences();
-        $nzb = new NZB();
+        $nzb = new NZB;
 
         if ($guid !== null) {
             $rel = Release::getByGuid($guid);

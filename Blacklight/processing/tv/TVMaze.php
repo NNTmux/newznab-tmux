@@ -33,7 +33,7 @@ class TVMaze extends TV
     public function __construct()
     {
         parent::__construct();
-        $this->client = new Client();
+        $this->client = new Client;
     }
 
     /**
@@ -290,7 +290,7 @@ class TVMaze extends TV
      */
     public function getPoster(int $videoId): int
     {
-        $ri = new ReleaseImage();
+        $ri = new ReleaseImage;
 
         $hasCover = 0;
 

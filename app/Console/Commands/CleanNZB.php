@@ -52,7 +52,7 @@ class CleanNZB extends Command
     private function GetNZBsWithNoDatabaseEntry($delete = false)
     {
         $this->info('Getting list of NZB files on disk to check if they exist in database');
-        $releases = new Release();
+        $releases = new Release;
         $checked = $deleted = 0;
         // Get the list of NZBs in the NZB folder
         $dirItr = new \RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'));
@@ -80,8 +80,8 @@ class CleanNZB extends Command
     private function GetReleasesWithNoNZBOnDisk($delete = false)
     {
         // Setup
-        $nzb = new NZB();
-        $rel = new Releases();
+        $nzb = new NZB;
+        $rel = new Releases;
         $checked = $deleted = 0;
 
         $this->info('Getting list of releases from database to check if they have a corresponding NZB on disk');
@@ -94,7 +94,7 @@ class CleanNZB extends Command
 
                 if (! $nzb->NZBPath($r->guid)) {
                     if ($delete) {
-                        $rel->deleteSingle(['g' => $r->guid, 'i' => $r->id], $nzb, new ReleaseImage());
+                        $rel->deleteSingle(['g' => $r->guid, 'i' => $r->id], $nzb, new ReleaseImage);
                     }
                     $deleted++;
                     $this->line("Deleted: $r->searchname -> $r->guid");

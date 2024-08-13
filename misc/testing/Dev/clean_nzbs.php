@@ -12,7 +12,7 @@ use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 $dir = resource_path().'/movednzbs/';
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if (! isset($argv[1]) || ! in_array($argv[1], ['true', 'move'])) {
     $colorCli->error("This script can remove all nzbs not found in the db and all releases with no nzbs found. It can also move invalid nzbs.\n\n"
@@ -25,9 +25,9 @@ if (! File::isDirectory($dir) && ! File::makeDirectory($dir)) {
     exit("ERROR: Could not create folder [$dir].".PHP_EOL);
 }
 
-$releases = new Releases();
-$nzb = new NZB();
-$releaseImage = new ReleaseImage();
+$releases = new Releases;
+$nzb = new NZB;
+$releaseImage = new ReleaseImage;
 
 $timestart = now()->toRfc2822String();
 $checked = $moved = 0;

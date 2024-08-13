@@ -46,7 +46,7 @@ class RssController extends BasePageController
      */
     public function myShowsRss(Request $request)
     {
-        $rss = new RSS();
+        $rss = new RSS;
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -68,7 +68,7 @@ class RssController extends BasePageController
     public function fullFeedRss(Request $request)
     {
         $this->setPreferences();
-        $rss = new RSS();
+        $rss = new RSS;
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -94,7 +94,7 @@ class RssController extends BasePageController
     public function showRssDesc(): void
     {
         $this->setPreferences();
-        $rss = new RSS();
+        $rss = new RSS;
 
         $title = 'Rss Info';
         $meta_title = 'Rss Nzb Info';
@@ -137,7 +137,7 @@ class RssController extends BasePageController
      */
     public function cartRss(Request $request): JsonResponse|array
     {
-        $rss = new RSS();
+        $rss = new RSS;
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -163,7 +163,7 @@ class RssController extends BasePageController
      */
     public function categoryFeedRss(Request $request): JsonResponse|array
     {
-        $rss = new RSS();
+        $rss = new RSS;
         $offset = 0;
         if ($request->missing('id')) {
             return response()->json(['error' => 'Category ID is missing'], '403');

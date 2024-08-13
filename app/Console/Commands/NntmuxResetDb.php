@@ -172,7 +172,7 @@ class NntmuxResetDb extends Command
 
                 $this->info('All done! ElasticSearch indexes are deleted and recreated.');
             } else {
-                (new ManticoreSearch())->truncateRTIndex(['releases_rt', 'predb_rt']);
+                (new ManticoreSearch)->truncateRTIndex(['releases_rt', 'predb_rt']);
             }
 
             $this->info('Deleting nzbfiles subfolders.');

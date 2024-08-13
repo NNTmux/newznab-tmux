@@ -46,7 +46,7 @@ class Steam
             ]
         );
 
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
     }
 
     /**
@@ -135,7 +135,7 @@ class Steam
      */
     public function populateSteamAppsTable(): void
     {
-        $bar = new ProgressBar();
+        $bar = new ProgressBar;
         $lastUpdate = Settings::settingValue('APIs.Steam.last_update');
         $this->lastUpdate = $lastUpdate > 0 ? $lastUpdate : 0;
         if ((time() - (int) $this->lastUpdate) > 86400) {

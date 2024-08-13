@@ -6,7 +6,7 @@ use Jrean\UserVerification\Facades\UserVerification;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 if (isset($argv[1]) && is_numeric($argv[1])) {
     $user = User::find($argv[1]);

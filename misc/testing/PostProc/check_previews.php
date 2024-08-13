@@ -14,15 +14,15 @@ use Blacklight\Releases;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
-$colorCli = new ColorCLI();
+$colorCli = new ColorCLI;
 
 $path2preview = storage_path('covers/preview');
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
-    $releases = new Releases();
-    $nzb = new NZB();
-    $releaseImage = new ReleaseImage();
-    $consoletools = new ConsoleTools();
+    $releases = new Releases;
+    $nzb = new NZB;
+    $releaseImage = new ReleaseImage;
+    $consoletools = new ConsoleTools;
     $couldbe = $argv[1] === 'true' ? $couldbe = 'were ' : 'could be ';
     $limit = $counterfixed = 0;
     if (isset($argv[2]) && is_numeric($argv[2])) {

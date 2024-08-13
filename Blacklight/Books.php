@@ -61,7 +61,7 @@ class Books
     {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->colorCli = new ColorCLI();
+        $this->colorCli = new ColorCLI;
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -127,7 +127,7 @@ class Books
 				%s %s %s
 				GROUP BY boo.id
 				ORDER BY %s %s %s",
-            (new Releases())->showPasswords(),
+            (new Releases)->showPasswords(),
             $browseby,
             $catsrch,
             $exccatlist,
@@ -398,7 +398,7 @@ class Books
      */
     public function updateBookInfo(string $bookInfo = '', $amazdata = null)
     {
-        $ri = new ReleaseImage();
+        $ri = new ReleaseImage;
 
         $bookId = -2;
 
