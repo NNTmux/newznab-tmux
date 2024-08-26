@@ -14218,16 +14218,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.23.3",
+            "version": "5.23.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "c9deaefc098dde7f7093b44482b099195442e70d"
+                "reference": "53cdd84c14dd50d229cf5ebef66b20a128ade613"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/c9deaefc098dde7f7093b44482b099195442e70d",
-                "reference": "c9deaefc098dde7f7093b44482b099195442e70d",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/53cdd84c14dd50d229cf5ebef66b20a128ade613",
+                "reference": "53cdd84c14dd50d229cf5ebef66b20a128ade613",
                 "shasum": ""
             },
             "require": {
@@ -14290,7 +14290,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.23.3"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.23.4"
             },
             "funding": [
                 {
@@ -14298,7 +14298,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-07T19:12:59+00:00"
+            "time": "2024-08-22T07:50:22+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
