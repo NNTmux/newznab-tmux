@@ -1086,9 +1086,9 @@ class Movie
 
                 // Check on IMDb first
                 if ($movieUpdated === false) {
-                    $imdbSearch = new TitleSearch($this->config);
-                    foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
-                        try {
+                    try {
+                        $imdbSearch = new TitleSearch($this->config);
+                        foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
                             if (! empty($imdbTitle->title())) {
                                 similar_text($imdbTitle->title(), $this->currentTitle, $percent);
                                 if ($percent >= self::MATCH_PERCENT) {
@@ -1102,10 +1102,10 @@ class Movie
                                     }
                                 }
                             }
-                        } catch (\ErrorException $e) {
-                            $this->colorCli->error('Error fetching data from imdb occured', true);
-                            Log::debug($e->getMessage());
                         }
+                    } catch (\ErrorException $e) {
+                        $this->colorCli->error('Error fetching data from imdb occurred', true);
+                        Log::debug($e->getMessage());
                     }
                 }
 
