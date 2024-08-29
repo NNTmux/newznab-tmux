@@ -373,8 +373,9 @@ class TVDB extends TV
             preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
             $this->colorCli->climate()->error('Show ImdbId not found on TVDB');
+        } catch (\Exception) {
+            $this->colorCli->climate()->error('Error on TVDB, aborting');
         } catch (UnauthorizedException $error) {
-
             try {
                 $this->authorizeTvdb();
             } catch (UnauthorizedException $error) {
