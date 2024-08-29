@@ -102,8 +102,6 @@ class GetNzbController extends BasePageController
             return Utility::showApiError(300, 'Release not found!');
         }
 
-        $cleanName = str_replace([',', ' ', '/'], '_', $relData['searchname']);
-
         $headers = [
             'Content-Type' => 'application/x-nzb',
             'Expires' => date('r', now()->addDays(365)->timestamp),
@@ -125,8 +123,10 @@ class GetNzbController extends BasePageController
         $headers += ['X-DNZB-RCode' => '200',
             'X-DNZB-RText' => 'OK, NZB content follows.', ];
 
+        $cleanName = str_replace([',', ' ', '/', '\\'], '_', $relData['searchname']);
+
         return response()->streamDownload(function () use ($nzbPath) {
-            readgzfile($nzbPath);
+            echo $nzbPath;
         }, $cleanName.'.nzb', $headers);
     }
 }
