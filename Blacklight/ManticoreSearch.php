@@ -208,7 +208,14 @@ class ManticoreSearch
         }
     }
 
-    public function searchIndexes(string $rt_index, string $searchString = '', array $column = [], array $searchArray = []): array
+    /**
+     * @param  string  $rt_index
+     * @param  string|null  $searchString
+     * @param  array  $column
+     * @param  array  $searchArray
+     * @return array
+     */
+    public function searchIndexes(string $rt_index, ?string $searchString, array $column = [], array $searchArray = []): array
     {
         $resultId = [];
         $resultData = [];
