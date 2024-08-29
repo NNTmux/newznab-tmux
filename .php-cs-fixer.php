@@ -4,6 +4,7 @@ require __DIR__.'/vendor/autoload.php';
 require __DIR__.'/bootstrap/app.php';
 
 return (new \Jubeki\LaravelCodeStyle\Config())
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder(
         PhpCsFixer\Finder::create()
             ->in(app_path())
