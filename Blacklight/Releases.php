@@ -1050,7 +1050,11 @@ class Releases extends Release
         $currRow = self::getCatByRelId($currentID);
         if ($currRow !== null) {
             $catRow = Category::find($currRow['categories_id']);
-            $parentCat = $catRow['root_categories_id'];
+            $parentCat = $catRow !== null ? $catRow['root_categories_id'] : null;
+
+            if ($parentCat === null) {
+                return $ret;
+            }
 
             $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, 'basic', [$parentCat]);
             if (! $results) {
