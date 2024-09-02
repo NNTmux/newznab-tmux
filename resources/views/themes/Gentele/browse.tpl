@@ -1,11 +1,16 @@
 <div class="header">
 	<div class="breadcrumb-wrapper">
 		<ul class="breadcrumb">
-			<li><a href="{{url("{$site->home_link}")}}">Home</a></li>&nbsp;
-			/
-			<a href="{{url("/{if preg_match('/^alt\.binaries|a\.b|dk\./i', $parentcat)}browse/group?g={else}browse/{/if}{if ($parentcat == 'music')}Audio{else}{$parentcat}{/if}")}}">{$parentcat}</a>
-			{if ($catname != '' && $catname != 'all')}/  <a
-				href="{{url("/browse/{$parentcat}/{$catname}")}}">{$catname}</a>{/if}
+			<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
+            {if $parentcat == ''}
+                <a href="{{url("/browse/$catname")}}">/Browse/{$catname}</a>
+                {else}
+                /
+                <a href="{{url("/{if preg_match('/^alt\.binaries|a\.b|dk\./i', $parentcat)}browse/group?g={else}browse/{/if}{if ($parentcat == 'music')}Audio{else}{$parentcat}{/if}")}}">{$parentcat}</a>
+                {if ($catname != '' && $catname != 'all')}/
+                    <a href="{{url("/browse/{$parentcat}/{$catname}")}}">{$catname}</a>
+                {/if}
+            {/if}
 		</ul>
 	</div>
 </div>
