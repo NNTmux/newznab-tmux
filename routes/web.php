@@ -69,277 +69,144 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
 
-Auth::routes();
+//Auth::routes();
 
-Route::get('/', [ContentController::class, 'show']);
+Route::match(['GET', 'POST'], '/', [ContentController::class, 'show'])->name('home');
 
-Route::get('register', [RegisterController::class, 'showRegistrationForm']);
-Route::post('register', [RegisterController::class, 'register'])->name('register');
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [RegisterController::class, 'register'])->name('register.post');
 
-Route::get('forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword');
-Route::post('forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword');
+Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword');
+Route::match(['GET', 'POST'], 'terms-and-conditions', [TermsController::class, 'terms'])->name('terms-and-conditions');
 
-Route::get('terms-and-conditions', [TermsController::class, 'terms']);
-
-Route::get('login', [LoginController::class, 'showLoginForm']);
-Route::post('login', [LoginController::class, 'login'])->name('login');
-Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('login', [LoginController::class, 'login'])->name('login.post');
+Route::match(['GET', 'POST'], 'logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('isVerified')->group(function () {
-    Route::get('resetpassword', [ResetPasswordController::class, 'reset']);
-    Route::post('resetpassword', [ResetPasswordController::class, 'reset']);
-
-    Route::get('profile', [ProfileController::class, 'show']);
+    Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
+    Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
 
     Route::prefix('browse')->group(function () {
-        Route::get('tags', [BrowseController::class, 'tags']);
-        Route::get('group', [BrowseController::class, 'group']);
-        Route::get('All', [BrowseController::class, 'index']);
-        Route::get('{parentCategory}/{id?}', [BrowseController::class, 'show'])->middleware('clearance');
+        Route::match(['GET', 'POST'], 'tags', [BrowseController::class, 'tags'])->name('tags');
+        Route::match(['GET', 'POST'], 'group', [BrowseController::class, 'group'])->name('group');
+        Route::match(['GET', 'POST'], 'All', [BrowseController::class, 'index'])->name('All');
+        Route::match(['GET', 'POST'], '{parentCategory}/{id?}', [BrowseController::class, 'show'])->middleware('clearance')->name('browse');
     });
 
     Route::prefix('cart')->group(function () {
-        Route::get('index', [CartController::class, 'index']);
-        Route::post('index', [CartController::class, 'index']);
-        Route::get('add', [CartController::class, 'store']);
-        Route::post('add', [CartController::class, 'store']);
-        Route::get('delete/{id}', [CartController::class, 'destroy']);
-        Route::post('delete/{id}', [CartController::class, 'destroy']);
+        Route::match(['GET', 'POST'], 'index', [CartController::class, 'index'])->name('cart.index');
+        Route::match(['GET', 'POST'], 'add', [CartController::class, 'store'])->name('cart.add');
+        Route::match(['GET', 'POST'], 'delete/{id}', [CartController::class, 'destroy'])->name('cart.delete');
     });
 
-    Route::get('details/{guid}', [DetailsController::class, 'show']);
-    Route::post('details/{guid}', [DetailsController::class, 'show']);
-
-    Route::get('getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
-    Route::post('getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
-
-    Route::get('rsshelp', [RssController::class, 'showRssDesc'])->name('rsshelp');
-    Route::post('rsshelp', [RssController::class, 'showRssDesc'])->name('rsshelp');
-
-    Route::get('profile', [ProfileController::class, 'show'])->name('profile');
-
-    Route::get('apihelp', [ApiHelpController::class, 'index'])->name('apihelp');
-    Route::get('apiv2help', [ApiHelpController::class, 'apiv2'])->name('apiv2help');
-
-    Route::get('browsegroup', [BrowseGroupController::class, 'show'])->name('browsegroup');
-
-    Route::get('content', [ContentController::class, 'show'])->name('content');
-
-    Route::post('content', [ContentController::class, 'show'])->name('content');
-
-    Route::get('failed', [FailedReleasesController::class, 'failed'])->name('failed');
-
-    Route::post('failed', [FailedReleasesController::class, 'failed'])->name('failed');
+    Route::match(['GET', 'POST'], 'details/{guid}', [DetailsController::class, 'show'])->name('details');
+    Route::match(['GET', 'POST'], 'getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
+    Route::match(['GET', 'POST'], 'rsshelp', [RssController::class, 'showRssDesc'])->name('rsshelp');
+    Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
+    Route::match(['GET', 'POST'], 'apihelp', [ApiHelpController::class, 'index'])->name('apihelp');
+    Route::match(['GET', 'POST'], 'apiv2help', [ApiHelpController::class, 'apiv2'])->name('apiv2help');
+    Route::match(['GET', 'POST'], 'browsegroup', [BrowseGroupController::class, 'show'])->name('browsegroup');
+    Route::match(['GET', 'POST'], 'content', [ContentController::class, 'show'])->name('content');
+    Route::match(['GET', 'POST'], 'failed', [FailedReleasesController::class, 'failed'])->name('failed');
 
     Route::middleware('clearance')->group(function () {
-        Route::get('Games', [GamesController::class, 'show'])->name('Games');
-        Route::post('Games', [GamesController::class, 'show'])->name('Games');
-
-        Route::get('Movies/{id?}', [MovieController::class, 'showMovies'])->name('Movies');
-
-        Route::get('movie', [MovieController::class, 'showMovies'])->name('movie');
-
-        Route::get('movietrailers', [MovieController::class, 'showTrailer'])->name('movietrailers');
-
-        Route::post('Movies/{id?}', [MovieController::class, 'showMovies'])->name('Movies');
-
-        Route::post('movie', [MovieController::class, 'showMovies'])->name('movie');
-
-        Route::post('movietrailers', [MovieController::class, 'showTrailer'])->name('movietrailers');
-
-        Route::get('Audio/{id?}', [MusicController::class, 'show'])->name('Audio');
-
-        Route::post('Audio/{id?}', [MusicController::class, 'show'])->name('Audio');
-
-        Route::get('Console/{id?}', [ConsoleController::class, 'show'])->name('Console');
-
-        Route::post('Console/{id?}', [ConsoleController::class, 'show'])->name('Console');
-
-        Route::get('XXX/{id?}', [AdultController::class, 'show'])->name('XXX');
-
-        Route::post('XXX/{id?}', [AdultController::class, 'show'])->name('XXX');
-
-        Route::get('anime', [AnimeController::class, 'showAnime'])->name('anime');
-        Route::post('anime', [AnimeController::class, 'showAnime'])->name('anime');
-
-        Route::get('animelist', [AnimeController::class, 'showList'])->name('animelist');
-        Route::post('animelist', [AnimeController::class, 'showList'])->name('animelist');
-
-        Route::get('Books/{id?}', [BooksController::class, 'index'])->name('Books');
-        Route::post('Books/{id?}', [BooksController::class, 'index'])->name('Books');
+        Route::match(['GET', 'POST'], 'Games', [GamesController::class, 'show'])->name('Games');
+        Route::match(['GET', 'POST'], 'Movies/{id?}', [MovieController::class, 'showMovies'])->name('Movies');
+        Route::match(['GET', 'POST'], 'movie', [MovieController::class, 'showMovies'])->name('movie');
+        Route::match(['GET', 'POST'], 'movietrailers', [MovieController::class, 'showTrailer'])->name('movietrailers');
+        Route::match(['GET', 'POST'], 'Audio/{id?}', [MusicController::class, 'show'])->name('Audio');
+        Route::match(['GET', 'POST'], 'Console/{id?}', [ConsoleController::class, 'show'])->name('Console');
+        Route::match(['GET', 'POST'], 'XXX/{id?}', [AdultController::class, 'show'])->name('XXX');
+        Route::match(['GET', 'POST'], 'anime', [AnimeController::class, 'showAnime'])->name('anime');
+        Route::match(['GET', 'POST'], 'animelist', [AnimeController::class, 'showList'])->name('animelist');
+        Route::match(['GET', 'POST'], 'Books/{id?}', [BooksController::class, 'index'])->name('Books');
     });
 
-    Route::get('nfo/{id?}', [NfoController::class, 'showNfo'])->name('nfo');
+    Route::match(['GET', 'POST'], 'nfo/{id?}', [NfoController::class, 'showNfo'])->name('nfo');
 
-    Route::post('nfo/{id?}', [NfoController::class, 'showNfo'])->name('nfo');
-
-    Route::get('contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
-    Route::post('contact-us', [ContactUsController::class, 'contact'])->name('contact-us');
-
-    Route::get('profileedit', [ProfileController::class, 'edit'])->name('profileedit');
-
-    Route::post('profileedit', [ProfileController::class, 'edit'])->name('profileedit');
-
-    Route::get('profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
-
-    Route::post('profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
-
-    Route::get('search', [SearchController::class, 'search'])->name('search');
-
-    Route::post('search', [SearchController::class, 'search'])->name('search');
-
-    Route::get('mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
-
-    Route::post('mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
-
-    Route::get('myshows', [MyShowsController::class, 'show'])->name('myshows');
-
-    Route::post('myshows', [MyShowsController::class, 'show'])->name('myshows');
-
-    Route::get('myshows/browse', [MyShowsController::class, 'browse']);
-
-    Route::post('myshows/browse', [MyShowsController::class, 'browse']);
-
-    Route::get('filelist/{guid}', [FileListController::class, 'show']);
-
-    Route::post('filelist/{guid}', [FileListController::class, 'show']);
-
-    Route::get('series/{id?}', [SeriesController::class, 'index'])->name('series');
-
-    Route::post('series/{id?}', [SeriesController::class, 'index'])->name('series');
-
-    Route::get('ajax_profile', [AjaxController::class, 'profile']);
-
-    Route::post('ajax_profile', [AjaxController::class, 'profile']);
-
-    Route::get('2fa', [PasswordSecurityController::class, 'show2faForm']);
+    Route::match(['GET', 'POST'], 'contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
+    Route::post('contact-us', [ContactUsController::class, 'contact']);
+    Route::match(['GET', 'POST'], 'profileedit', [ProfileController::class, 'edit'])->name('profileedit');
+    Route::match(['GET', 'POST'], 'profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
+    Route::match(['GET', 'POST'], 'search', [SearchController::class, 'search'])->name('search');
+    Route::match(['GET', 'POST'], 'mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
+    Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
+    Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');
+    Route::match(['GET', 'POST'], 'filelist/{guid}', [FileListController::class, 'show'])->name('filelist');
+    Route::match(['GET', 'POST'], 'series/{id?}', [SeriesController::class, 'index'])->name('series');
+    Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
+    Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
     Route::post('generate2faSecret', [PasswordSecurityController::class, 'generate2faSecret'])->name('generate2faSecret');
     Route::post('2fa', [PasswordSecurityController::class, 'enable2fa'])->name('enable2fa');
     Route::post('disable2fa', [PasswordSecurityController::class, 'disable2fa'])->name('disable2fa');
 });
 
 Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
-    Route::get('index', [AdminPageController::class, 'index']);
-    Route::get('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
-    Route::post('anidb-delete/{id}', [AdminAnidbController::class, 'destroy']);
-    Route::get('anidb-edit/{id}', [AdminAnidbController::class, 'edit']);
-    Route::post('anidb-edit/{id}', [AdminAnidbController::class, 'edit']);
-    Route::get('anidb-list', [AdminAnidbController::class, 'index']);
-    Route::post('anidb-list', [AdminAnidbController::class, 'index']);
-    Route::get('binaryblacklist-list', [AdminBlacklistController::class, 'index']);
-    Route::post('binaryblacklist-list', [AdminBlacklistController::class, 'index']);
-    Route::get('binaryblacklist-edit', [AdminBlacklistController::class, 'edit']);
-    Route::post('binaryblacklist-edit', [AdminBlacklistController::class, 'edit']);
-    Route::get('book-list', [AdminBookController::class, 'index']);
-    Route::post('book-list', [AdminBookController::class, 'index']);
-    Route::get('book-edit', [AdminBookController::class, 'edit']);
-    Route::post('book-edit', [AdminBookController::class, 'edit']);
-    Route::get('category-list', [AdminCategoryController::class, 'index']);
-    Route::post('category-list', [AdminCategoryController::class, 'index']);
-    Route::get('category-edit', [AdminCategoryController::class, 'edit']);
-    Route::post('category-edit', [AdminCategoryController::class, 'edit']);
-    Route::get('user-list', [AdminUserController::class, 'index']);
-    Route::post('user-list', [AdminUserController::class, 'index']);
-    Route::get('user-edit', [AdminUserController::class, 'edit']);
-    Route::post('user-edit', [AdminUserController::class, 'edit']);
-    Route::get('user-delete', [AdminUserController::class, 'destroy']);
-    Route::post('user-delete', [AdminUserController::class, 'destroy']);
-    Route::get('verify', [AdminUserController::class, 'verify']);
-    Route::post('verify', [AdminUserController::class, 'verify']);
-    Route::get('resendverification', [AdminUserController::class, 'resendVerification']);
-    Route::post('resendverification', [AdminUserController::class, 'resendVerification']);
-    Route::get('site-edit', [AdminSiteController::class, 'edit']);
-    Route::post('site-edit', [AdminSiteController::class, 'edit']);
-    Route::get('site-stats', [AdminSiteController::class, 'stats']);
-    Route::post('site-stats', [AdminSiteController::class, 'stats']);
-    Route::get('role-list', [AdminRoleController::class, 'index']);
-    Route::post('role-list', [AdminRoleController::class, 'index']);
-    Route::get('role-add', [AdminRoleController::class, 'create']);
-    Route::post('role-add', [AdminRoleController::class, 'create']);
-    Route::get('role-edit', [AdminRoleController::class, 'edit']);
-    Route::post('role-edit', [AdminRoleController::class, 'edit']);
-    Route::get('role-delete', [AdminRoleController::class, 'destroy']);
-    Route::post('role-delete', [AdminRoleController::class, 'destroy']);
-    Route::get('content-list', [AdminContentController::class, 'index']);
-    Route::post('content-list', [AdminContentController::class, 'index']);
-    Route::get('content-add', [AdminContentController::class, 'create']);
-    Route::post('content-add', [AdminContentController::class, 'create']);
-    Route::get('content-delete', [AdminContentController::class, 'destroy']);
-    Route::post('content-delete', [AdminContentController::class, 'destroy']);
-    Route::get('category_regexes-list', [AdminCategoryRegexesController::class, 'index']);
-    Route::post('category_regexes-list', [AdminCategoryRegexesController::class, 'index']);
-    Route::get('category_regexes-edit', [AdminCategoryRegexesController::class, 'edit']);
-    Route::post('category_regexes-edit', [AdminCategoryRegexesController::class, 'edit']);
-    Route::get('collection_regexes-list', [AdminCollectionRegexesController::class, 'index']);
-    Route::post('collection_regexes-list', [AdminCollectionRegexesController::class, 'index']);
-    Route::get('collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit']);
-    Route::post('collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit']);
-    Route::get('collection_regexes-test', [AdminCollectionRegexesController::class, 'testRegex']);
-    Route::post('collection_regexes-test', [AdminCollectionRegexesController::class, 'testRegex']);
-    Route::get('release_naming_regexes-list', [AdminReleaseNamingRegexesController::class, 'index']);
-    Route::post('release_naming_regexes-list', [AdminReleaseNamingRegexesController::class, 'index']);
-    Route::get('release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit']);
-    Route::post('release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit']);
-    Route::get('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex']);
-    Route::post('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex']);
-    Route::get('ajax', [AdminAjaxController::class, 'ajaxAction']);
-    Route::post('ajax', [AdminAjaxController::class, 'ajaxAction']);
-    Route::get('tmux-edit', [AdminTmuxController::class, 'edit']);
-    Route::post('tmux-edit', [AdminTmuxController::class, 'edit']);
-    Route::get('release-list', [AdminReleasesController::class, 'index']);
-    Route::post('release-list', [AdminReleasesController::class, 'index']);
-    Route::get('release-delete/{id}', [AdminReleasesController::class, 'destroy']);
-    Route::post('release-delete/{id}', [AdminReleasesController::class, 'destroy']);
-    Route::get('show-list', [AdminShowsController::class, 'index']);
-    Route::post('show-list', [AdminShowsController::class, 'index']);
-    Route::get('show-edit', [AdminShowsController::class, 'edit']);
-    Route::post('show-edit', [AdminShowsController::class, 'edit']);
-    Route::get('show-remove', [AdminShowsController::class, 'destroy']);
-    Route::post('show-remove', [AdminShowsController::class, 'destroy']);
-    Route::get('comments-list', [AdminCommentsController::class, 'index']);
-    Route::post('comments-list', [AdminCommentsController::class, 'index']);
-    Route::get('comments-delete/{id}', [AdminCommentsController::class, 'destroy']);
-    Route::post('comments-delete/{id}', [AdminCommentsController::class, 'destroy']);
-    Route::get('console-list', [ConsoleController::class, 'index']);
-    Route::post('console-list', [AdminConsoleController::class, 'index']);
-    Route::get('console-edit', [AdminConsoleController::class, 'edit']);
-    Route::post('console-edit', [AdminConsoleController::class, 'edit']);
-    Route::get('failrel-list', [AdminFailedReleasesController::class, 'index']);
-    Route::get('game-list', [AdminGameController::class, 'index']);
-    Route::post('game-list', [AdminGameController::class, 'index']);
-    Route::get('game-edit', [AdminGameController::class, 'edit']);
-    Route::post('game-edit', [AdminGameController::class, 'edit']);
-    Route::get('movie-list', [AdminMovieController::class, 'index']);
-    Route::post('movie-list', [AdminMovieController::class, 'index']);
-    Route::get('movie-edit', [AdminMovieController::class, 'edit']);
-    Route::post('movie-edit', [AdminMovieController::class, 'edit']);
-    Route::get('movie-add', [AdminMovieController::class, 'create']);
-    Route::post('movie-add', [AdminMovieController::class, 'create']);
-    Route::get('music-list', [AdminMusicController::class, 'index']);
-    Route::post('music-list', [AdminMusicController::class, 'index']);
-    Route::get('music-edit', [AdminMusicController::class, 'edit']);
-    Route::post('music-edit', [AdminMusicController::class, 'edit']);
-    Route::get('nzb-import', [AdminNzbController::class, 'import']);
-    Route::post('nzb-import', [AdminNzbController::class, 'import']);
-    Route::get('nzb-export', [AdminNzbController::class, 'export']);
-    Route::post('nzb-export', [AdminNzbController::class, 'export']);
-    Route::get('predb', [AdminPredbController::class, 'index']);
-    Route::post('predb', [AdminPredbController::class, 'index']);
-    Route::get('group-list', [AdminGroupController::class, 'index']);
-    Route::post('group-list', [AdminGroupController::class, 'index']);
-    Route::get('group-edit', [AdminGroupController::class, 'edit']);
-    Route::post('group-edit', [AdminGroupController::class, 'edit']);
-    Route::get('group-bulk', [AdminGroupController::class, 'createBulk']);
-    Route::post('group-bulk', [AdminGroupController::class, 'createBulk']);
-    Route::get('group-list-active', [AdminGroupController::class, 'active']);
-    Route::post('group-list-active', [AdminGroupController::class, 'active']);
-    Route::get('group-list-inactive', [AdminGroupController::class, 'inactive']);
-    Route::post('group-list-inactive', [AdminGroupController::class, 'inactive']);
+    Route::match(['GET', 'POST'], 'index', [AdminPageController::class, 'index'])->name('admin.index');
+    Route::match(['GET', 'POST'], 'anidb-delete/{id}', [AdminAnidbController::class, 'destroy'])->name('admin.anidb-delete');
+    Route::match(['GET', 'POST'], 'anidb-edit/{id}', [AdminAnidbController::class, 'edit'])->name('admin.anidb-edit');
+    Route::match(['GET', 'POST'], 'anidb-list', [AdminAnidbController::class, 'index'])->name('admin.anidb-list');
+    Route::match(['GET', 'POST'], 'binaryblacklist-list', [AdminBlacklistController::class, 'index'])->name('admin.binaryblacklist-list');
+    Route::match(['GET', 'POST'], 'binaryblacklist-edit', [AdminBlacklistController::class, 'edit'])->name('admin.binaryblacklist-edit');
+    Route::match(['GET', 'POST'], 'book-list', [AdminBookController::class, 'index'])->name('admin.book-list');
+    Route::match(['GET', 'POST'], 'book-edit', [AdminBookController::class, 'edit'])->name('admin.book-edit');
+    Route::match(['GET', 'POST'], 'category-list', [AdminCategoryController::class, 'index'])->name('admin.category-list');
+    Route::match(['GET', 'POST'], 'category-edit', [AdminCategoryController::class, 'edit'])->name('admin.category-edit');
+    Route::match(['GET', 'POST'], 'user-list', [AdminUserController::class, 'index'])->name('admin.user-list');
+    Route::match(['GET', 'POST'], 'user-edit', [AdminUserController::class, 'edit'])->name('admin.user-edit');
+    Route::match(['GET', 'POST'], 'user-delete', [AdminUserController::class, 'destroy'])->name('admin.user-delete');
+    Route::match(['GET', 'POST'], 'verify', [AdminUserController::class, 'verify'])->name('admin.verify');
+    Route::match(['GET', 'POST'], 'resendverification', [AdminUserController::class, 'resendVerification'])->name('admin.resend-verification');
+    Route::match(['GET', 'POST'], 'site-edit', [AdminSiteController::class, 'edit'])->name('admin.site-edit');
+    Route::match(['GET', 'POST'], 'site-stats', [AdminSiteController::class, 'stats'])->name('admin.site-stats');
+    Route::match(['GET', 'POST'], 'role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');
+    Route::match(['GET', 'POST'], 'role-add', [AdminRoleController::class, 'create'])->name('admin.role-add');
+    Route::match(['GET', 'POST'], 'role-edit', [AdminRoleController::class, 'edit'])->name('admin.role-edit');
+    Route::match(['GET', 'POST'], 'role-delete', [AdminRoleController::class, 'destroy'])->name('admin.role-delete');
+    Route::match(['GET', 'POST'], 'content-list', [AdminContentController::class, 'index'])->name('admin.content-list');
+    Route::match(['GET', 'POST'], 'content-add', [AdminContentController::class, 'create'])->name('admin.content-add');
+    Route::match(['GET', 'POST'], 'content-delete', [AdminContentController::class, 'destroy'])->name('admin.content-delete');
+    Route::match(['GET', 'POST'], 'category_regexes-list', [AdminCategoryRegexesController::class, 'index'])->name('admin.category-regexes-list');
+    Route::match(['GET', 'POST'], 'category_regexes-edit', [AdminCategoryRegexesController::class, 'edit'])->name('admin.category-regexes-edit');
+    Route::match(['GET', 'POST'], 'collection_regexes-list', [AdminCollectionRegexesController::class, 'index'])->name('admin.collection-regexes-list');
+    Route::match(['GET', 'POST'], 'collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit'])->name('admin.collection-regexes-edit');
+    Route::match(['GET', 'POST'], 'collection_regexes-test', [AdminCollectionRegexesController::class, 'testRegex'])->name('admin.collection-regexes-test');
+    Route::match(['GET', 'POST'], 'release_naming_regexes-list', [AdminReleaseNamingRegexesController::class, 'index'])->name('admin.release-naming-regexes-list');
+    Route::match(['GET', 'POST'], 'release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit'])->name('admin.release-naming-regexes-edit');
+    Route::match(['GET', 'POST'], 'release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex'])->name('admin.release-naming-regexes-test');
+    Route::match(['GET', 'POST'], 'ajax', [AdminAjaxController::class, 'ajaxAction'])->name('admin.ajax');
+    Route::match(['GET', 'POST'], 'tmux-edit', [AdminTmuxController::class, 'edit'])->name('admin.tmux-edit');
+    Route::match(['GET', 'POST'], 'release-list', [AdminReleasesController::class, 'index'])->name('admin.release-list');
+    Route::match(['GET', 'POST'], 'release-delete/{id}', [AdminReleasesController::class, 'destroy'])->name('admin.release-delete');
+    Route::match(['GET', 'POST'], 'show-list', [AdminShowsController::class, 'index'])->name('admin.show-list');
+    Route::match(['GET', 'POST'], 'show-edit', [AdminShowsController::class, 'edit'])->name('admin.show-edit');
+    Route::match(['GET', 'POST'], 'show-remove', [AdminShowsController::class, 'destroy'])->name('admin.show-remove');
+    Route::match(['GET', 'POST'], 'comments-list', [AdminCommentsController::class, 'index'])->name('admin.comments-list');
+    Route::match(['GET', 'POST'], 'comments-delete/{id}', [AdminCommentsController::class, 'destroy'])->name('admin.comments-delete');
+    Route::match(['GET', 'POST'], 'console-list', [AdminConsoleController::class, 'index'])->name('admin.console-list');
+    Route::match(['GET', 'POST'], 'console-edit', [AdminConsoleController::class, 'edit'])->name('admin.console-edit');
+    Route::match(['GET', 'POST'], 'failrel-list', [AdminFailedReleasesController::class, 'index'])->name('admin.failrel-list');
+    Route::match(['GET', 'POST'], 'game-list', [AdminGameController::class, 'index'])->name('admin.game-list');
+    Route::match(['GET', 'POST'], 'game-edit', [AdminGameController::class, 'edit'])->name('admin.game-edit');
+    Route::match(['GET', 'POST'], 'movie-list', [AdminMovieController::class, 'index'])->name('admin.movie-list');
+    Route::match(['GET', 'POST'], 'movie-edit', [AdminMovieController::class, 'edit'])->name('admin.movie-edit');
+    Route::match(['GET', 'POST'], 'movie-add', [AdminMovieController::class, 'create'])->name('admin.movie-add');
+    Route::match(['GET', 'POST'], 'music-list', [AdminMusicController::class, 'index'])->name('admin.music-list');
+    Route::match(['GET', 'POST'], 'music-edit', [AdminMusicController::class, 'edit'])->name('admin.music-edit');
+    Route::match(['GET', 'POST'], 'nzb-import', [AdminNzbController::class, 'import'])->name('admin.nzb-import');
+    Route::match(['GET', 'POST'], 'nzb-export', [AdminNzbController::class, 'export'])->name('admin.nzb-export');
+    Route::match(['GET', 'POST'], 'predb', [AdminPredbController::class, 'index'])->name('admin.predb');
+    Route::match(['GET', 'POST'], 'group-list', [AdminGroupController::class, 'index'])->name('admin.group-list');
+    Route::match(['GET', 'POST'], 'group-edit', [AdminGroupController::class, 'edit'])->name('admin.group-edit');
+    Route::match(['GET', 'POST'], 'group-bulk', [AdminGroupController::class, 'createBulk'])->name('admin.group-bulk');
+    Route::match(['GET', 'POST'], 'group-list-active', [AdminGroupController::class, 'active'])->name('admin.group-list-active');
+    Route::match(['GET', 'POST'], 'group-list-inactive', [AdminGroupController::class, 'inactive'])->name('admin.group-list-inactive');
+
 });
 
 Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {
-    Route::get('release-edit', [AdminReleasesController::class, 'edit']);
-    Route::post('release-edit', [AdminReleasesController::class, 'edit']);
+    Route::match(['GET', 'POST'], 'release-edit', [AdminReleasesController::class, 'edit'])->name('admin.release-edit');
 });
 
 Route::post('2faVerify', function () {
