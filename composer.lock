@@ -3619,16 +3619,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.28.0",
+            "version": "v5.28.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "642ed10341713ddadc99526c499f1f25d841bf6e"
+                "reference": "9d2c4eaeb11408384401f8a7d1b0ea4c76554f3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/642ed10341713ddadc99526c499f1f25d841bf6e",
-                "reference": "642ed10341713ddadc99526c499f1f25d841bf6e",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/9d2c4eaeb11408384401f8a7d1b0ea4c76554f3f",
+                "reference": "9d2c4eaeb11408384401f8a7d1b0ea4c76554f3f",
                 "shasum": ""
             },
             "require": {
@@ -3692,9 +3692,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.28.0"
+                "source": "https://github.com/laravel/horizon/tree/v5.28.1"
             },
-            "time": "2024-09-03T10:02:34+00:00"
+            "time": "2024-09-04T14:06:50+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -6342,24 +6342,24 @@
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v2.7.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "52a0d99e69f56b9ec27ace92ba56897fe6993105"
+                "reference": "df1e7fde177501eee2037dd159cf04f5f301a512"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/52a0d99e69f56b9ec27ace92ba56897fe6993105",
-                "reference": "52a0d99e69f56b9ec27ace92ba56897fe6993105",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/df1e7fde177501eee2037dd159cf04f5f301a512",
+                "reference": "df1e7fde177501eee2037dd159cf04f5f301a512",
                 "shasum": ""
             },
             "require": {
-                "php": "^7|^8"
+                "php": "^8"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6|^7|^8|^9",
-                "vimeo/psalm": "^1|^2|^3|^4"
+                "phpunit/phpunit": "^9",
+                "vimeo/psalm": "^4|^5"
             },
             "type": "library",
             "autoload": {
@@ -6405,7 +6405,7 @@
                 "issues": "https://github.com/paragonie/constant_time_encoding/issues",
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
-            "time": "2024-05-08T12:18:48+00:00"
+            "time": "2024-05-08T12:36:18+00:00"
         },
         {
             "name": "pear/archive_tar",
@@ -7597,24 +7597,24 @@
         },
         {
             "name": "pragmarx/google2fa",
-            "version": "v8.0.1",
+            "version": "v8.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/antonioribeiro/google2fa.git",
-                "reference": "80c3d801b31fe165f8fe99ea085e0a37834e1be3"
+                "reference": "825fb0614534fbaee742df30463297ac5ecf417e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/antonioribeiro/google2fa/zipball/80c3d801b31fe165f8fe99ea085e0a37834e1be3",
-                "reference": "80c3d801b31fe165f8fe99ea085e0a37834e1be3",
+                "url": "https://api.github.com/repos/antonioribeiro/google2fa/zipball/825fb0614534fbaee742df30463297ac5ecf417e",
+                "reference": "825fb0614534fbaee742df30463297ac5ecf417e",
                 "shasum": ""
             },
             "require": {
-                "paragonie/constant_time_encoding": "^1.0|^2.0",
+                "paragonie/constant_time_encoding": "^1.0|^2.0|^3.0",
                 "php": "^7.1|^8.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "^0.12.18",
+                "phpstan/phpstan": "^1.9",
                 "phpunit/phpunit": "^7.5.15|^8.5|^9.0"
             },
             "type": "library",
@@ -7643,9 +7643,9 @@
             ],
             "support": {
                 "issues": "https://github.com/antonioribeiro/google2fa/issues",
-                "source": "https://github.com/antonioribeiro/google2fa/tree/v8.0.1"
+                "source": "https://github.com/antonioribeiro/google2fa/tree/v8.0.2"
             },
-            "time": "2022-06-13T21:57:56+00:00"
+            "time": "2024-07-13T11:36:19+00:00"
         },
         {
             "name": "pragmarx/google2fa-laravel",
@@ -8839,16 +8839,16 @@
         },
         {
             "name": "riari/laravel-forum",
-            "version": "6.0.11",
+            "version": "6.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Team-Tea-Time/laravel-forum.git",
-                "reference": "87ba26fc7ff9c4c9c4b4265ab21e7741dd35d6aa"
+                "reference": "6bdff2b447a2927685870321b6b2aad1a4c0744e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Team-Tea-Time/laravel-forum/zipball/87ba26fc7ff9c4c9c4b4265ab21e7741dd35d6aa",
-                "reference": "87ba26fc7ff9c4c9c4b4265ab21e7741dd35d6aa",
+                "url": "https://api.github.com/repos/Team-Tea-Time/laravel-forum/zipball/6bdff2b447a2927685870321b6b2aad1a4c0744e",
+                "reference": "6bdff2b447a2927685870321b6b2aad1a4c0744e",
                 "shasum": ""
             },
             "require": {
@@ -8898,9 +8898,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Team-Tea-Time/laravel-forum/issues",
-                "source": "https://github.com/Team-Tea-Time/laravel-forum/tree/6.0.11"
+                "source": "https://github.com/Team-Tea-Time/laravel-forum/tree/6.0.12"
             },
-            "time": "2024-07-24T09:23:50+00:00"
+            "time": "2024-09-03T20:44:03+00:00"
         },
         {
             "name": "seld/cli-prompt",
@@ -15808,16 +15808,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.31.2",
+            "version": "v1.31.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "b4af38e1ab16fe7aa729eddf5b810229f42d2ad3"
+                "reference": "0a7e2891a85eba2d448a9ffc6fc5ce367e924bc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/b4af38e1ab16fe7aa729eddf5b810229f42d2ad3",
-                "reference": "b4af38e1ab16fe7aa729eddf5b810229f42d2ad3",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/0a7e2891a85eba2d448a9ffc6fc5ce367e924bc1",
+                "reference": "0a7e2891a85eba2d448a9ffc6fc5ce367e924bc1",
                 "shasum": ""
             },
             "require": {
@@ -15867,7 +15867,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2024-09-03T13:44:23+00:00"
+            "time": "2024-09-03T20:05:33+00:00"
         },
         {
             "name": "localheinz/diff",
@@ -16459,16 +16459,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.0",
+            "version": "1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "384af967d35b2162f69526c7276acadce534d0e1"
+                "reference": "d8ed7fffa66de1db0d2972267d8ed1d8fa0fe5a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/384af967d35b2162f69526c7276acadce534d0e1",
-                "reference": "384af967d35b2162f69526c7276acadce534d0e1",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d8ed7fffa66de1db0d2972267d8ed1d8fa0fe5a2",
+                "reference": "d8ed7fffa66de1db0d2972267d8ed1d8fa0fe5a2",
                 "shasum": ""
             },
             "require": {
@@ -16513,7 +16513,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-08-27T09:18:05+00:00"
+            "time": "2024-09-03T19:55:22+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -16840,16 +16840,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.3.2",
+            "version": "11.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8a4de85cc4a78c59dd31cc4ef454b0029f8440dc"
+                "reference": "8ed08766d9a2ed979a2f5fdbb95a0671523419c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8a4de85cc4a78c59dd31cc4ef454b0029f8440dc",
-                "reference": "8a4de85cc4a78c59dd31cc4ef454b0029f8440dc",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8ed08766d9a2ed979a2f5fdbb95a0671523419c1",
+                "reference": "8ed08766d9a2ed979a2f5fdbb95a0671523419c1",
                 "shasum": ""
             },
             "require": {
@@ -16920,7 +16920,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.3.2"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.3.3"
             },
             "funding": [
                 {
@@ -16936,7 +16936,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-03T12:00:26+00:00"
+            "time": "2024-09-04T13:34:52+00:00"
         },
         {
             "name": "react/cache",
