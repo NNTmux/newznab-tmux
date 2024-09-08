@@ -664,7 +664,6 @@ class User extends Authenticatable
         return self::getCategoryExclusionById($user->id);
     }
 
-
     /**
      * @throws \Exception
      */
