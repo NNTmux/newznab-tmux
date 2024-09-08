@@ -334,56 +334,6 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
-     */
-    public static function getTopDownloads()
-    {
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $releases = Cache::get(md5('topDownloads'));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $releases = self::query()
-            ->where('grabs', '>', 0)
-            ->select(['id', 'searchname', 'guid', 'adddate'])
-            ->selectRaw('SUM(grabs) as grabs')
-            ->groupBy('id', 'searchname', 'adddate')
-            ->havingRaw('SUM(grabs) > 0')
-            ->orderByDesc('grabs')
-            ->limit(10)
-            ->get();
-
-        Cache::put(md5('topDownloads'), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
-     */
-    public static function getTopComments()
-    {
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $releases = Cache::get(md5('topComments'));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $releases = self::query()
-            ->where('comments', '>', 0)
-            ->select(['id', 'guid', 'searchname'])
-            ->selectRaw('SUM(comments) AS comments')
-            ->groupBy('id', 'searchname', 'adddate')
-            ->havingRaw('SUM(comments) > 0')
-            ->orderByDesc('comments')
-            ->limit(10)
-            ->get();
-
-        Cache::put(md5('topComments'), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
      */
     public static function getReleases()

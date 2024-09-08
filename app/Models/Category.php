@@ -277,30 +277,7 @@ class Category extends Model
         return $this->belongsTo(RootCategory::class, 'root_categories_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
-     */
-    public static function getRecentlyAdded()
-    {
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $result = Cache::get(md5('RecentlyAdded'));
-        if ($result !== null) {
-            return $result;
-        }
 
-        $result = self::query()
-            ->with('parent')
-            ->where('r.adddate', '>', now()->subWeek())
-            ->select(['root_categories_id', DB::raw('COUNT(r.id) as count'), 'title'])
-            ->join('releases as r', 'r.categories_id', '=', 'categories.id')
-            ->groupBy('title')
-            ->orderByDesc('count')
-            ->get();
-
-        Cache::put(md5('RecentlyAdded'), $result, $expiresAt);
-
-        return $result;
-    }
 
     public static function getCategorySearch(array $cat = []): string
     {

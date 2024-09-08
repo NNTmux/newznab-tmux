@@ -6,6 +6,7 @@ use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Models\SiteStat;
 use App\Models\User;
 use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
@@ -184,23 +185,20 @@ class AdminSiteController extends BasePageController
 
         $meta_title = $title = 'Site Stats';
 
-        $topgrabs = User::getTopGrabbers();
-        $this->smarty->assign('topgrabs', $topgrabs);
+        $topGrabs = SiteStat::getTopGrabbers();
+        $this->smarty->assign('topgrabs', $topGrabs);
 
-        $topdownloads = Release::getTopDownloads();
-        $this->smarty->assign('topdownloads', $topdownloads);
+        $topDownloads = SiteStat::getTopDownloads();
+        $this->smarty->assign('topdownloads', $topDownloads);
 
-        $topcomments = Release::getTopComments();
-        $this->smarty->assign('topcomments', $topcomments);
-
-        $recent = Category::getRecentlyAdded();
+        $recent = SiteStat::getRecentlyAdded();
         $this->smarty->assign('recent', $recent);
 
-        $usersbymonth = User::getUsersByMonth();
-        $this->smarty->assign('usersbymonth', $usersbymonth);
+        $usersByMonth = SiteStat::getUsersByMonth();
+        $this->smarty->assign('usersbymonth', $usersByMonth);
 
-        $usersbyrole = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderByDesc('users_count')->get();
-        $this->smarty->assign('usersbyrole', $usersbyrole);
+        $usersByRole = SiteStat::usersByRole();
+        $this->smarty->assign('usersbyrole', $usersByRole);
         $this->smarty->assign('totusers', 0);
         $this->smarty->assign('totrusers', 0);
 
