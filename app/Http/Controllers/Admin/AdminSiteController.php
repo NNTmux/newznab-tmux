@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
+use App\Models\DownloadStat;
+use App\Models\GrabStat;
+use App\Models\ReleaseStat;
+use App\Models\RoleStat;
 use App\Models\Settings;
+use App\Models\SignupStat;
 use App\Models\SiteStat;
 use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
@@ -182,19 +187,19 @@ class AdminSiteController extends BasePageController
 
         $meta_title = $title = 'Site Stats';
 
-        $topGrabs = SiteStat::getTopGrabbers();
+        $topGrabs = GrabStat::getTopGrabbers();
         $this->smarty->assign('topgrabs', $topGrabs);
 
-        $topDownloads = SiteStat::getTopDownloads();
+        $topDownloads = DownloadStat::getTopDownloads();
         $this->smarty->assign('topdownloads', $topDownloads);
 
-        $recent = SiteStat::getRecentlyAdded();
+        $recent = ReleaseStat::getRecentlyAdded();
         $this->smarty->assign('recent', $recent);
 
-        $usersByMonth = SiteStat::getUsersByMonth();
+        $usersByMonth = SignupStat::getUsersByMonth();
         $this->smarty->assign('usersbymonth', $usersByMonth);
 
-        $usersByRole = SiteStat::usersByRole();
+        $usersByRole = RoleStat::getUsersByRole();
         $this->smarty->assign('usersbyrole', $usersByRole);
         $this->smarty->assign('totusers', 0);
         $this->smarty->assign('totrusers', 0);

@@ -33,10 +33,10 @@
 		</tr>
 
 		{foreach from=$usersbymonth item=result}
-			{assign var="totusers" value=$totusers+$result.num}
+			{assign var="totusers" value=$totusers+$result.signups}
 			<tr class="{cycle values=",alt"}">
-				<td width="75%">{$result.mth}</td>
-				<td>{$result.num}</td>
+				<td width="75%">{$result.month}</td>
+				<td>{$result.signups}</td>
 			</tr>
 		{/foreach}
 		<tr>
@@ -57,10 +57,10 @@
 		</tr>
 
 		{foreach from=$usersbyrole item=result}
-			{assign var="totrusers" value=$totrusers+$result.users_count}
+			{assign var="totrusers" value=$totrusers+$result.users}
 			<tr class="{cycle values=",alt"}">
-				<td width="75%">{$result.name}</td>
-				<td>{$result.users_count}</td>
+				<td width="75%">{$result.role}</td>
+				<td>{$result.users}</td>
 			</tr>
 		{/foreach}
 		<tr>
@@ -106,7 +106,7 @@
 
 		{foreach from=$recent item=result}
 			<tr class="{cycle values=",alt"}">
-                <td>{$result->parent->title} > {$result->title}</td>
+                <td>{$result.category} > {$result.category}</td>
 				<td>{$result.count}</td>
 			</tr>
 		{/foreach}
@@ -114,26 +114,4 @@
 	</table>
 
 	<br/><br/>
-
-	{if $topcomments|count > 0}
-		<h2>Top Comments</h2>
-		<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
-			<tr>
-				<th>Release</th>
-				<th>Comments</th>
-				<th>Days Ago</th>
-			</tr>
-
-			{foreach from=$topcomments item=result}
-				<tr class="{cycle values=",alt"}">
-					<td width="75%"><a
-								href="{{url("/details/{$result.guid}/#comments")}}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
-					</td>
-					<td>{$result.comments}</td>
-					<td>{$result.adddate|timeago}</td>
-				</tr>
-			{/foreach}
-
-		</table>
-	{/if}
 </div>
