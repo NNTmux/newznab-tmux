@@ -14,7 +14,7 @@ class RoleStat extends Model
 
     public static function insertUsersByRole(): void
     {
-        $roles =  Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderByDesc('users_count')->get();
+        $roles = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderByDesc('users_count')->get();
         foreach ($roles as $role) {
             self::updateOrCreate(['role' => $role->name, 'users' => $role->users_count]);
         }

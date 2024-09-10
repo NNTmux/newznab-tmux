@@ -13,7 +13,7 @@ class DownloadStat extends Model
 
     public static function insertTopDownloads(): void
     {
-        $releases =  Release::query()
+        $releases = Release::query()
             ->where('grabs', '>', 0)
             ->select(['id', 'searchname', 'guid', 'adddate'])
             ->selectRaw('SUM(grabs) as grabs')
