@@ -43,12 +43,18 @@ class Releases extends Release
     }
 
     /**
-     * Used for Browse results.
-     *
-     *
-     * @return Collection|mixed
+     * @param $page
+     * @param $cat
+     * @param $start
+     * @param $num
+     * @param $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @param  int|string  $groupName
+     * @param  int  $minSize
+     * @return mixed
      */
-    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0): mixed
+    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0)
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
@@ -92,19 +98,14 @@ class Releases extends Release
             ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
-        $releases = Cache::get(md5($qry.$page));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $sql = self::fromQuery($qry);
-        if (\count($sql) > 0) {
-            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
-            $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($qry.$page), $sql, $expiresAt);
-
-        return $sql;
+        return Cache::remember(md5($qry.$page), config('nntmux.cache_expiry_medium'), function () use ($qry, $cat, $maxAge, $excludedCats, $groupName) {
+            $sql = self::fromQuery($qry);
+            if (\count($sql) > 0) {
+                $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
+                $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
+                return $sql;
+            }
+        });
     }
 
     /**
@@ -256,9 +257,15 @@ class Releases extends Release
     }
 
     /**
-     * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
+     * @param $userShows
+     * @param $offset
+     * @param $limit
+     * @param $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @return mixed
      */
-    public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = [])
+    public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
@@ -285,15 +292,9 @@ class Releases extends Release
             $orderBy[1],
             ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $result = Cache::get(md5($sql));
-        if ($result !== null) {
-            return $result;
-        }
-        $result = self::fromQuery($sql);
-        Cache::put(md5($sql), $result, $expiresAt);
-
-        return $result;
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_long'), function () use ($sql) {
+            return self::fromQuery($sql);
+        });
     }
 
     public function getShowsCount($userShows, int $maxAge = -1, array $excludedCats = []): int
@@ -425,10 +426,21 @@ class Releases extends Release
     }
 
     /**
-     * Function for searching on the site (by subject, searchname or advanced).
-     *
-     *
-     * @return array|Collection|mixed
+     * @param  array  $searchArr
+     * @param $groupName
+     * @param $sizeFrom
+     * @param $sizeTo
+     * @param $daysNew
+     * @param $daysOld
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  array|string  $orderBy
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @param  string  $type
+     * @param  array  $cat
+     * @param  int  $minSize
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0): mixed
     {
@@ -527,25 +539,25 @@ class Releases extends Release
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+            $releases = self::fromQuery($sql);
+            if ($releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            }
             return $releases;
-        }
-        $releases = self::fromQuery($sql);
-        if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
+        });
     }
 
     /**
-     * Search function for API.
-     *
-     *
-     * @return Collection|mixed
+     * @param $searchName
+     * @param $groupName
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  int  $maxAge
+     * @param  array  $excludedCats
+     * @param  array  $cat
+     * @param  int  $minSize
+     * @return mixed
      */
     public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed
     {
@@ -600,32 +612,38 @@ class Releases extends Release
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-        if ($searchName !== -1 && ! empty($searchResult)) {
-            $releases = self::fromQuery($sql);
-        } elseif ($searchName !== -1 && empty($searchResult)) {
-            $releases = collect();
-        } elseif ($searchName === -1) {
-            $releases = self::fromQuery($sql);
-        } else {
-            $releases = collect();
-        }
-        if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
 
-        return $releases;
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql, $searchName, $searchResult) {
+            if ($searchName !== -1 && ! empty($searchResult)) {
+                $releases = self::fromQuery($sql);
+            } elseif ($searchName !== -1 && empty($searchResult)) {
+                $releases = collect();
+            } elseif ($searchName === -1) {
+                $releases = self::fromQuery($sql);
+            } else {
+                $releases = collect();
+            }
+            if ($releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            }
+
+            return $releases;
+        });
     }
 
     /**
-     * Search for TV shows via API.
-     *
-     * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
+     * @param  array  $siteIdArr
+     * @param  string  $series
+     * @param  string  $episode
+     * @param  string  $airDate
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  int  $minSize
+     * @param  array  $excludedCategories
+     * @return array|\Illuminate\Support\Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
@@ -747,27 +765,32 @@ class Releases extends Release
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
-        if (count($releases) !== 0 && $releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
 
-        return $releases;
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql, $name, $searchResult) {
+            $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
+            if (count($releases) !== 0 && $releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount(
+                    preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
+                );
+            }
+
+            return $releases;
+        });
     }
 
     /**
-     * Search TV Shows via APIv2.
-     *
-     *
-     * @return Collection|mixed
+     * @param  array  $siteIdArr
+     * @param  string  $series
+     * @param  string  $episode
+     * @param  string  $airDate
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  int  $minSize
+     * @param  array  $excludedCategories
+     * @return array|\Illuminate\Support\Collection|mixed
      */
     public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
@@ -881,27 +904,28 @@ class Releases extends Release
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $releases = self::fromQuery($sql);
-        if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
 
-        return $releases;
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+            $releases = self::fromQuery($sql);
+            if ($releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount(
+                    preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
+                );
+            }
+
+            return $releases;
+        });
     }
 
     /**
-     * Search anime releases.
-     *
-     *
-     * @return Collection|mixed
+     * @param $aniDbID
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  array  $excludedCategories
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
     {
@@ -953,25 +977,29 @@ class Releases extends Release
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $releases = self::fromQuery($sql);
-        if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
 
-        return $releases;
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+            $releases = self::fromQuery($sql);
+            if ($releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            }
+
+            return $releases;
+        });
     }
 
     /**
-     * Movies search through API and site.
-     *
-     *
-     * @return Collection|mixed
+     * @param  int  $imDbId
+     * @param  int  $tmDbId
+     * @param  int  $traktId
+     * @param  int  $offset
+     * @param  int  $limit
+     * @param  string  $name
+     * @param  array  $cat
+     * @param  int  $maxAge
+     * @param  int  $minSize
+     * @param  array  $excludedCategories
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
@@ -1029,18 +1057,14 @@ class Releases extends Release
             $offset
         );
 
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $releases = self::fromQuery($sql);
-        if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+            $releases = self::fromQuery($sql);
+            if ($releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            }
 
-        return $releases;
+            return $releases;
+        });
     }
 
     public function searchSimilar($currentID, $name, array $excludedCats = []): bool|array
@@ -1073,26 +1097,21 @@ class Releases extends Release
     }
 
     /**
-     * Get count of releases for pager.
-     *
-     *
-     * @param  string  $query  The query to get the count from.
+     * @param  string  $query
+     * @return mixed
      */
-    private function getPagerCount(string $query): int
+    private function getPagerCount(string $query)
     {
         $sql = sprintf(
             'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
             preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
             (int) config('nntmux.max_pager_results')
         );
-        $count = Cache::get(md5($sql));
-        if ($count !== null) {
-            return $count;
-        }
-        $count = self::fromQuery($sql);
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
-        Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
-        return $count[0]->count ?? 0;
+        return Cache::remember(md5($sql), config('nntmux.cache_expiry_short'), function () use ($sql) {
+            $count = self::fromQuery($sql);
+
+            return $count[0]->count ?? 0;
+        });
     }
 }
