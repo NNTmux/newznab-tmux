@@ -1021,7 +1021,7 @@ class Releases extends Release
     /**
      * @return mixed
      */
-    private function getPagerCount(string $query)
+    private function getPagerCount(string $query): mixed
     {
         $sql = sprintf(
             'SELECT COUNT(r.id) AS count FROM (%s) r',
