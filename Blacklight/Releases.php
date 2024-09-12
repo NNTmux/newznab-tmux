@@ -1024,9 +1024,8 @@ class Releases extends Release
     private function getPagerCount(string $query)
     {
         $sql = sprintf(
-            'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
-            preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
-            (int) config('nntmux.max_pager_results')
+            'SELECT COUNT(r.id) AS count FROM (%s) r',
+            preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query)
         );
 
         return Cache::remember(md5($sql), config('nntmux.cache_expiry_short'), function () use ($sql) {
