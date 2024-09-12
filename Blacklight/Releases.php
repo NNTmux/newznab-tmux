@@ -1018,9 +1018,6 @@ class Releases extends Release
         return $ret;
     }
 
-    /**
-     * @return mixed
-     */
     private function getPagerCount(string $query): mixed
     {
         $sql = sprintf(
