@@ -43,15 +43,6 @@ class Releases extends Release
     }
 
     /**
-     * @param $page
-     * @param $cat
-     * @param $start
-     * @param $num
-     * @param $orderBy
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @param  int|string  $groupName
-     * @param  int  $minSize
      * @return mixed
      */
     public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0)
@@ -103,6 +94,7 @@ class Releases extends Release
             if (\count($sql) > 0) {
                 $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
                 $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
+
                 return $sql;
             }
         });
@@ -256,15 +248,6 @@ class Releases extends Release
         return $temp_array;
     }
 
-    /**
-     * @param $userShows
-     * @param $offset
-     * @param $limit
-     * @param $orderBy
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @return mixed
-     */
     public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $orderBy = $this->getBrowseOrder($orderBy);
@@ -292,6 +275,7 @@ class Releases extends Release
             $orderBy[1],
             ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
+
         return Cache::remember(md5($sql), config('nntmux.cache_expiry_long'), function () use ($sql) {
             return self::fromQuery($sql);
         });
@@ -426,20 +410,6 @@ class Releases extends Release
     }
 
     /**
-     * @param  array  $searchArr
-     * @param $groupName
-     * @param $sizeFrom
-     * @param $sizeTo
-     * @param $daysNew
-     * @param $daysOld
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  array|string  $orderBy
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @param  string  $type
-     * @param  array  $cat
-     * @param  int  $minSize
      * @return \Illuminate\Support\Collection|mixed
      */
     public function search(array $searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, int $offset = 0, int $limit = 1000, array|string $orderBy = '', int $maxAge = -1, array $excludedCats = [], string $type = 'basic', array $cat = [-1], int $minSize = 0): mixed
@@ -539,26 +509,17 @@ class Releases extends Release
             $limit,
             $offset
         );
+
         return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
             $releases = self::fromQuery($sql);
             if ($releases->isNotEmpty()) {
                 $releases[0]->_totalrows = $this->getPagerCount($baseSql);
             }
+
             return $releases;
         });
     }
 
-    /**
-     * @param $searchName
-     * @param $groupName
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  int  $maxAge
-     * @param  array  $excludedCats
-     * @param  array  $cat
-     * @param  int  $minSize
-     * @return mixed
-     */
     public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed
     {
         if ($searchName !== -1) {
@@ -632,17 +593,6 @@ class Releases extends Release
     }
 
     /**
-     * @param  array  $siteIdArr
-     * @param  string  $series
-     * @param  string  $episode
-     * @param  string  $airDate
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  int  $minSize
-     * @param  array  $excludedCategories
      * @return array|\Illuminate\Support\Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
@@ -779,17 +729,6 @@ class Releases extends Release
     }
 
     /**
-     * @param  array  $siteIdArr
-     * @param  string  $series
-     * @param  string  $episode
-     * @param  string  $airDate
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  int  $minSize
-     * @param  array  $excludedCategories
      * @return array|\Illuminate\Support\Collection|mixed
      */
     public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
@@ -918,13 +857,6 @@ class Releases extends Release
     }
 
     /**
-     * @param $aniDbID
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  array  $excludedCategories
      * @return \Illuminate\Support\Collection|mixed
      */
     public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
@@ -989,16 +921,6 @@ class Releases extends Release
     }
 
     /**
-     * @param  int  $imDbId
-     * @param  int  $tmDbId
-     * @param  int  $traktId
-     * @param  int  $offset
-     * @param  int  $limit
-     * @param  string  $name
-     * @param  array  $cat
-     * @param  int  $maxAge
-     * @param  int  $minSize
-     * @param  array  $excludedCategories
      * @return \Illuminate\Support\Collection|mixed
      */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
@@ -1097,7 +1019,6 @@ class Releases extends Release
     }
 
     /**
-     * @param  string  $query
      * @return mixed
      */
     private function getPagerCount(string $query)
