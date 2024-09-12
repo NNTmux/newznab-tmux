@@ -9,7 +9,7 @@
  *
  * @author   Monte Ohrt <monte at ohrt dot com>
  *
- * @param  DateTime|int|string  $string date object, timestamp or string that can be converted using strtotime()
+ * @param  DateTime|int|string  $string  date object, timestamp or string that can be converted using strtotime()
  * @return int
  */
 function smarty_make_timestamp($string)

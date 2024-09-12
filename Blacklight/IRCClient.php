@@ -71,8 +71,6 @@ class IRCClient
 
     /**
      * Buffer contents.
-     *
-     * @var string
      */
     protected ?string $_buffer = null;
 
@@ -341,7 +339,7 @@ class IRCClient
      *
      * @param  string  $message  Optional disconnect message.
      */
-    public function quit(string $message = null): bool
+    public function quit(?string $message = null): bool
     {
         if ($this->_connected()) {
             $this->_writeSocket('QUIT'.($message === null ? '' : ' :'.$message));
@@ -418,9 +416,7 @@ class IRCClient
      * Implementation.
      * Extended classes will use this function to parse the messages in the channel using $this->_channelData.
      */
-    protected function processChannelMessages()
-    {
-    }
+    protected function processChannelMessages() {}
 
     /**
      * Join a channel.
@@ -530,7 +526,7 @@ class IRCClient
     /**
      * Write a single character to the socket.
      *
-     * @param  string (char)  $character A single character.
+     * @param  string (char)  $character  A single character.
      * @return int|bool Number of bytes written or false.
      */
     protected function _writeSocketChar($character)
