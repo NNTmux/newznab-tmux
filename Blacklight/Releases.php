@@ -89,7 +89,7 @@ class Releases extends Release
             ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
-        return Cache::remember(md5($qry.$page), config('nntmux.cache_expiry_medium'), function () use ($qry, $cat, $maxAge, $excludedCats, $groupName) {
+        return Cache::flexible(md5($qry.$page), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($qry, $cat, $maxAge, $excludedCats, $groupName) {
             $sql = self::fromQuery($qry);
             if (\count($sql) > 0) {
                 $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
@@ -276,7 +276,7 @@ class Releases extends Release
             ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_long'), function () use ($sql) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
             return self::fromQuery($sql);
         });
     }
@@ -510,7 +510,7 @@ class Releases extends Release
             $offset
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $baseSql) {
             $releases = self::fromQuery($sql);
             if ($releases->isNotEmpty()) {
                 $releases[0]->_totalrows = $this->getPagerCount($baseSql);
@@ -574,7 +574,7 @@ class Releases extends Release
             $offset
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql, $searchName, $searchResult) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $baseSql, $searchName, $searchResult) {
             if ($searchName !== -1 && ! empty($searchResult)) {
                 $releases = self::fromQuery($sql);
             } elseif ($searchName !== -1 && empty($searchResult)) {
@@ -716,7 +716,7 @@ class Releases extends Release
             $offset
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql, $name, $searchResult) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $baseSql, $name, $searchResult) {
             $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
             if (count($releases) !== 0 && $releases->isNotEmpty()) {
                 $releases[0]->_totalrows = $this->getPagerCount(
@@ -844,7 +844,7 @@ class Releases extends Release
             $offset
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $baseSql) {
             $releases = self::fromQuery($sql);
             if ($releases->isNotEmpty()) {
                 $releases[0]->_totalrows = $this->getPagerCount(
@@ -910,7 +910,7 @@ class Releases extends Release
             $offset
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $baseSql) {
             $releases = self::fromQuery($sql);
             if ($releases->isNotEmpty()) {
                 $releases[0]->_totalrows = $this->getPagerCount($baseSql);
@@ -979,7 +979,7 @@ class Releases extends Release
             $offset
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_medium'), function () use ($sql, $baseSql) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $baseSql) {
             $releases = self::fromQuery($sql);
             if ($releases->isNotEmpty()) {
                 $releases[0]->_totalrows = $this->getPagerCount($baseSql);
@@ -1025,7 +1025,7 @@ class Releases extends Release
             preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query)
         );
 
-        return Cache::remember(md5($sql), config('nntmux.cache_expiry_short'), function () use ($sql) {
+        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_short'), config('nntmux.cache_expiry_medium')], function () use ($sql) {
             $count = self::fromQuery($sql);
 
             return $count[0]->count ?? 0;
