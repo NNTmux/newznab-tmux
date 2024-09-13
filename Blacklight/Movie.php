@@ -87,7 +87,7 @@ class Movie
     /**
      * @var bool
      */
-    public $imdburl;
+    public bool $imdburl;
 
     public int $movieqty;
 
@@ -151,21 +151,23 @@ class Movie
         $this->service = '';
     }
 
-    /**
-     * @return Builder|Model|null|object
-     */
+
     public function getMovieInfo($imdbId)
     {
         return MovieInfo::query()->where('imdbid', $imdbId)->first();
     }
 
     /**
-     * Get movie releases with covers for movie browse page.
-     *
-     *
-     * @return array|mixed
+     * @param $page
+     * @param $cat
+     * @param $start
+     * @param $num
+     * @param $orderBy
+     * @param int $maxAge
+     * @param array $excludedCats
+     * @return mixed
      */
-    public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [])
+    public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
@@ -255,17 +257,16 @@ class Movie
             $order[0],
             $order[1]
         );
-        $return = Cache::get(md5($sql.$page));
-        if ($return !== null) {
-            return $return;
-        }
-        $return = Release::fromQuery($sql);
-        if (\count($return) > 0) {
-            $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
-        }
-        Cache::put(md5($sql.$page), $return, $expiresAt);
 
-        return $return;
+        return Cache::flexible(md5($sql.$page), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $movies) {
+            $return = Release::fromQuery($sql);
+            if (\count($return) > 0) {
+                $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
+            }
+            return $return;
+        });
+
+
     }
 
     /**
