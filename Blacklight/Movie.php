@@ -16,6 +16,8 @@ use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -82,7 +84,10 @@ class Movie
      */
     public mixed $omdbapikey;
 
-    public bool $imdburl;
+    /**
+     * @var bool
+     */
+    public $imdburl;
 
     public int $movieqty;
 
@@ -146,12 +151,21 @@ class Movie
         $this->service = '';
     }
 
+    /**
+     * @return Builder|Model|null|object
+     */
     public function getMovieInfo($imdbId)
     {
         return MovieInfo::query()->where('imdbid', $imdbId)->first();
     }
 
-    public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
+    /**
+     * Get movie releases with covers for movie browse page.
+     *
+     *
+     * @return array|mixed
+     */
+    public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
@@ -179,8 +193,8 @@ class Movie
                 (! empty($catsrch) ? $catsrch : ''),
                 (
                     $maxAge > 0
-                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                    : ''
+                        ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
+                        : ''
                 ),
                 \count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '',
                 $order[0],
@@ -241,16 +255,17 @@ class Movie
             $order[0],
             $order[1]
         );
-
-        return Cache::flexible(md5($sql.$page), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $movies) {
-            $return = Release::fromQuery($sql);
-            if (\count($return) > 0) {
-                $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
-            }
-
+        $return = Cache::get(md5($sql.$page));
+        if ($return !== null) {
             return $return;
-        });
+        }
+        $return = Release::fromQuery($sql);
+        if (\count($return) > 0) {
+            $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
+        }
+        Cache::put(md5($sql.$page), $return, $expiresAt);
 
+        return $return;
     }
 
     /**
@@ -598,13 +613,13 @@ class Movie
 
         if ($this->echooutput && $this->service !== '') {
             PHP_EOL.$this->colorCli->headerOver('Added/updated movie: ').
-                $this->colorCli->primary(
-                    $mov['title'].
-                    ' ('.
-                    $mov['year'].
-                    ') - '.
-                    $mov['imdbid']
-                );
+            $this->colorCli->primary(
+                $mov['title'].
+                ' ('.
+                $mov['year'].
+                ') - '.
+                $mov['imdbid']
+            );
         }
 
         return $movieID;

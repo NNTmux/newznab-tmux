@@ -163,7 +163,10 @@ class Games
         return $res ?? 0;
     }
 
-    public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): mixed
+    /**
+     * @throws \Exception
+     */
+    public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): array
     {
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
@@ -240,15 +243,17 @@ class Games
                 $order[0],
                 $order[1]
             );
-
-        return Cache::flexible($returnSql.$page, [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($returnSql, $games) {
-            $return = DB::select($returnSql);
-            if (\count($return) > 0) {
-                $return[0]->_totalcount = $games['total'][0]->total ?? 0;
-            }
-
+        $return = Cache::get(md5($returnSql.$page));
+        if ($return !== null) {
             return $return;
-        });
+        }
+        $return = DB::select($returnSql);
+        if (\count($return) > 0) {
+            $return[0]->_totalcount = $games['total'][0]->total ?? 0;
+        }
+        Cache::put(md5($returnSql.$page), $return, $expiresAt);
+
+        return $return;
     }
 
     public function getGamesOrder(array|string $orderBy): array
@@ -639,10 +644,10 @@ class Games
         if (! empty($gamesId)) {
             if ($this->echoOutput) {
                 $this->colorCli->header('Added/updated game: ').
-                    $this->colorCli->alternateOver('   Title:    ').
-                    $this->colorCli->primary($game['title']).
-                    $this->colorCli->alternateOver('   Source:   ').
-                    $this->colorCli->primary($this->_classUsed);
+                $this->colorCli->alternateOver('   Title:    ').
+                $this->colorCli->primary($game['title']).
+                $this->colorCli->alternateOver('   Source:   ').
+                $this->colorCli->primary($this->_classUsed);
             }
             if ($game['cover'] === 1) {
                 $game['cover'] = $ri->saveImage($gamesId, $game['coverurl'], $this->imgSavePath, 250, 250);
@@ -652,7 +657,7 @@ class Games
             }
         } elseif ($this->echoOutput) {
             $this->colorCli->headerOver('Nothing to update: ').
-                $this->colorCli->primary($game['title'].' (PC)');
+            $this->colorCli->primary($game['title'].' (PC)');
         }
 
         return ! empty($gamesId) ? $gamesId : false;
