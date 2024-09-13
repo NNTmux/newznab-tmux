@@ -16,6 +16,8 @@ use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -82,6 +84,9 @@ class Movie
      */
     public mixed $omdbapikey;
 
+    /**
+     * @var bool
+     */
     public bool $imdburl;
 
     public int $movieqty;
@@ -146,11 +151,22 @@ class Movie
         $this->service = '';
     }
 
+
     public function getMovieInfo($imdbId)
     {
         return MovieInfo::query()->where('imdbid', $imdbId)->first();
     }
 
+    /**
+     * @param $page
+     * @param $cat
+     * @param $start
+     * @param $num
+     * @param $orderBy
+     * @param int $maxAge
+     * @param array $excludedCats
+     * @return mixed
+     */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $catsrch = '';
@@ -247,9 +263,9 @@ class Movie
             if (\count($return) > 0) {
                 $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
             }
-
             return $return;
         });
+
 
     }
 
