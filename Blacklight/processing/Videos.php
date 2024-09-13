@@ -300,33 +300,25 @@ abstract class Videos
         }
     }
 
-    /**
-     * Retrieves all aliases for given VideoID or VideoID for a given alias.
-     *
-     *
-     * @return VideoAlias[]|bool|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
-     */
     public function getAliases(int $videoId, string $alias = ''): mixed
     {
-        $return = false;
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-
-        if ($videoId > 0 || $alias !== '') {
-            $aliasCache = Cache::get(md5($videoId.$alias));
-            if ($aliasCache !== null) {
-                $return = $aliasCache;
-            } else {
-                $sql = VideoAlias::query();
-                if ($videoId > 0) {
-                    $sql->where('videos_id', $videoId);
-                } elseif ($alias !== '') {
-                    $sql->where('title', $alias);
-                }
-                $return = $sql->get();
-                Cache::put(md5($videoId.$alias), $return, $expiresAt);
-            }
+        if ($videoId <= 0 && $alias === '') {
+            return false;
         }
 
-        return $return->isEmpty() ? false : $return;
+        $cacheKey = md5($videoId.$alias);
+
+        $sql = VideoAlias::query();
+        if ($videoId > 0) {
+            $sql->where('videos_id', $videoId);
+        } else {
+            $sql->where('title', $alias);
+        }
+
+        return Cache::flexible($cacheKey, [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
+            $result = $sql->get();
+
+            return $result->isEmpty() ? false : $result;
+        });
     }
 }
