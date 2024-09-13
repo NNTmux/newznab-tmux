@@ -163,10 +163,7 @@ class Games
         return $res ?? 0;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): array
+    public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): mixed
     {
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
@@ -243,17 +240,15 @@ class Games
                 $order[0],
                 $order[1]
             );
-        $return = Cache::get(md5($returnSql.$page));
-        if ($return !== null) {
-            return $return;
-        }
-        $return = DB::select($returnSql);
-        if (\count($return) > 0) {
-            $return[0]->_totalcount = $games['total'][0]->total ?? 0;
-        }
-        Cache::put(md5($returnSql.$page), $return, $expiresAt);
 
-        return $return;
+        return Cache::flexible($returnSql.$page, [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($returnSql, $games) {
+            $return = DB::select($returnSql);
+            if (\count($return) > 0) {
+                $return[0]->_totalcount = $games['total'][0]->total ?? 0;
+            }
+
+            return $return;
+        });
     }
 
     public function getGamesOrder(array|string $orderBy): array
