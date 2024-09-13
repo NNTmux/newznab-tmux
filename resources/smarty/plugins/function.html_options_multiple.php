@@ -31,8 +31,8 @@ require_once 'load_plugin_dependency.php';
  * @author Monte Ohrt <monte at ohrt dot com>
  * @author Ralf Strehle (minor optimization) <ralf dot strehle at yahoo dot de>
  *
- * @param  array  $params   parameters
- * @param  Smarty_Internal_Template  $template template object
+ * @param  array  $params  parameters
+ * @param  Smarty_Internal_Template  $template  template object
  * @return string
  *
  * @uses smarty_function_escape_special_chars()
