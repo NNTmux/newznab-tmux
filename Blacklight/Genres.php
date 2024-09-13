@@ -25,13 +25,21 @@ class Genres
 
     public function __construct() {}
 
-    public function getGenres(string $type = '', bool $activeOnly = false): mixed
+    /**
+     * @return array|mixed
+     */
+    public function getGenres(string $type = '', bool $activeOnly = false)
     {
         $sql = $this->getListQuery($type, $activeOnly);
+        $genres = Cache::get(md5($sql));
+        if ($genres !== null) {
+            return $genres;
+        }
+        $genres = DB::select($sql);
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        Cache::put(md5($sql), $genres, $expiresAt);
 
-        return Cache::flexible($sql, [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
-            return DB::select($sql);
-        });
+        return $genres;
     }
 
     public function loadGenres($type): array
@@ -148,8 +156,15 @@ class Genres
      */
     public function getDisabledIDs()
     {
-        return Cache::flexible('disabledCats', [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () {
-            return Genre::query()->where('disabled', '=', 1)->get(['id']);
-        });
+        $cats = Cache::get('disabledcats');
+        if ($cats !== null) {
+            $disabled = $cats;
+        } else {
+            $disabled = Genre::query()->where('disabled', '=', 1)->get(['id']);
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+            Cache::put('disabledcats', $disabled, $expiresAt);
+        }
+
+        return $disabled;
     }
 }

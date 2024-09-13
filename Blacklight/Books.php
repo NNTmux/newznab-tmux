@@ -102,7 +102,7 @@ class Books
         return BookInfo::search($searchWords)->first();
     }
 
-    public function getBookRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): mixed
+    public function getBookRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
     {
         $browseby = $this->getBrowseBy();
         $catsrch = '';
@@ -175,16 +175,17 @@ class Books
             $order[0],
             $order[1]
         );
-
-        return Cache::flexible($sql.$page, [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $books) {
-            $return = DB::select($sql);
-            if (\count($return) > 0) {
-                $return[0]->_totalcount = $books['total'][0]->total ?? 0;
-            }
-
+        $return = Cache::get(md5($sql.$page));
+        if ($return !== null) {
             return $return;
-        });
+        }
+        $return = DB::select($sql);
+        if (\count($return) > 0) {
+            $return[0]->_totalcount = $books['total'][0]->total ?? 0;
+        }
+        Cache::put(md5($sql.$page), $return, $expiresAt);
 
+        return $return;
     }
 
     public function getBookOrder($orderBy): array
