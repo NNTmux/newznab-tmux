@@ -7,7 +7,7 @@ function load_plugin_dependency($filename)
     global $smarty;
 
     if (! isset($smarty)) {
-        $smarty = new Smarty();
+        $smarty = new Smarty;
     }
 
     switch (true) {

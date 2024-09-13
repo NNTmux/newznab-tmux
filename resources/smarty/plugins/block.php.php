@@ -7,8 +7,8 @@
 /**
  * Smarty {php}{/php} block plugin.
  *
- * @param  string  $content contents of the block
- * @param  object  $template template object
+ * @param  string  $content  contents of the block
+ * @param  object  $template  template object
  * @param bool $ &$repeat repeat flag
  * @return string content re-formatted
  */

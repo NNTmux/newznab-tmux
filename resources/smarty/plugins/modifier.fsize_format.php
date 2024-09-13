@@ -47,10 +47,10 @@ function smarty_modifier_fsize_format($size, $format = '', $precision = 2, $dec_
         $sizes = array_reverse($sizes, true);
     }
     //~ get "human" filesize
-    foreach ($sizes    as    $unit => $bytes) {
+    foreach ($sizes as $unit => $bytes) {
         if ($size > $bytes || $unit == $format) {
             //~ return formatted size
-            return    number_format($size / $bytes, $precision, $dec_point, $thousands_sep).' '.$unit;
+            return number_format($size / $bytes, $precision, $dec_point, $thousands_sep).' '.$unit;
         } //~ end if
     } //~ end foreach
 } //~ end function
