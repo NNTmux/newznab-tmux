@@ -1,50 +1,55 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+    namespace App\Http\Controllers\Api;
 
-use App\Models\Category;
-use App\Models\Release;
-use App\Models\UserMovie;
-use App\Models\UserSerie;
-use Blacklight\NZB;
-use Blacklight\Releases;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-
-/**
- * Class RSS -- contains specific functions for RSS.
- */
-class RSS extends ApiController
-{
-    public Releases $releases;
+    use App\Models\Category;
+    use App\Models\Release;
+    use App\Models\UserMovie;
+    use App\Models\UserSerie;
+    use Blacklight\NZB;
+    use Blacklight\Releases;
+    use Illuminate\Database\Eloquent\Builder;
+    use Illuminate\Database\Eloquent\Collection;
+    use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Support\Facades\Cache;
+    use Illuminate\Support\Facades\DB;
 
     /**
-     * @throws \Exception
+     * Class RSS -- contains specific functions for RSS.
      */
-    public function __construct()
+    class RSS extends ApiController
     {
-        parent::__construct();
-        $this->releases = new Releases;
-    }
+        public Releases $releases;
 
-    public function getRss($cat, $videosId, $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0): mixed
-    {
-        $catSearch = $cartSearch = '';
-        $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
-        if (\count($cat)) {
-            if ((int) $cat[0] === -2) {
-                $cartSearch = sprintf(
-                    'INNER JOIN users_releases ON users_releases.users_id = %d AND users_releases.releases_id = r.id',
-                    $userID
-                );
-            } elseif ((int) $cat[0] !== -1) {
-                $catSearch = Category::getCategorySearch($cat);
-            }
+        /**
+         * @throws \Exception
+         */
+        public function __construct()
+        {
+            parent::__construct();
+            $this->releases = new Releases;
         }
-        $sql =
-            sprintf(
-                "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
+
+        /**
+         * @return Release[]|Collection|mixed
+         */
+        public function getRss($cat, $videosId, $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
+        {
+            $catSearch = $cartSearch = '';
+            $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
+            if (\count($cat)) {
+                if ((int) $cat[0] === -2) {
+                    $cartSearch = sprintf(
+                        'INNER JOIN users_releases ON users_releases.users_id = %d AND users_releases.releases_id = r.id',
+                        $userID
+                    );
+                } elseif ((int) $cat[0] !== -1) {
+                    $catSearch = Category::getCategorySearch($cat);
+                }
+            }
+            $sql =
+                sprintf(
+                    "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
 					m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors,
 					g.name AS group_name,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
@@ -71,25 +76,35 @@ class RSS extends ApiController
 				AND r.nzbstatus = %d
 				%s %s %s %s
 				ORDER BY postdate DESC %s",
-                $cartSearch,
-                $this->releases->showPasswords(),
-                NZB::NZB_ADDED,
-                $catSearch,
-                ($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
-                ($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
-                ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
-                $limit === -1 ? '' : ' LIMIT '.$limit.' OFFSET '.$offset
-            );
+                    $cartSearch,
+                    $this->releases->showPasswords(),
+                    NZB::NZB_ADDED,
+                    $catSearch,
+                    ($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
+                    ($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
+                    ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
+                    $limit === -1 ? '' : ' LIMIT '.$limit.' OFFSET '.$offset
+                );
 
-        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
-            return Release::fromQuery($sql);
-        });
-    }
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            $result = Cache::get(md5($sql));
+            if ($result !== null) {
+                return $result;
+            }
 
-    public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1): mixed
-    {
-        $sql = sprintf(
-            "
+            $result = Release::fromQuery($sql);
+            Cache::put(md5($sql), $result, $expiresAt);
+
+            return $result;
+        }
+
+        /**
+         * @return Builder|Collection
+         */
+        public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1)
+        {
+            $sql = sprintf(
+                "
 				SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					COALESCE(cp.id,0) AS parentid
@@ -104,36 +119,46 @@ class RSS extends ApiController
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-            $this->releases->uSQL(
-                UserSerie::fromQuery(
-                    sprintf(
-                        '
+                $this->releases->uSQL(
+                    UserSerie::fromQuery(
+                        sprintf(
+                            '
 							SELECT videos_id, categories
 							FROM user_series
 							WHERE users_id = %d',
-                        $userID
-                    )
+                            $userID
+                        )
+                    ),
+                    'videos_id'
                 ),
-                'videos_id'
-            ),
-            (\count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-            NZB::NZB_ADDED,
-            Category::TV_ROOT,
-            Category::TV_OTHER,
-            $this->releases->showPasswords(),
-            ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
-        );
+                (\count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
+                NZB::NZB_ADDED,
+                Category::TV_ROOT,
+                Category::TV_OTHER,
+                $this->releases->showPasswords(),
+                ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
+            );
 
-        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
-            return Release::fromQuery($sql);
-        });
-    }
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            $result = Cache::get(md5($sql));
+            if ($result !== null) {
+                return $result;
+            }
 
-    public function getMyMoviesRss(int $limit, int $userID = 0, array $excludedCats = []): mixed
-    {
-        $sql = sprintf(
-            "
+            $result = Release::fromQuery($sql);
+            Cache::put(md5($sql), $result, $expiresAt);
+
+            return $result;
+        }
+
+        /**
+         * @return Release[]|Collection|mixed
+         */
+        public function getMyMoviesRss(int $limit, int $userID = 0, array $excludedCats = [])
+        {
+            $sql = sprintf(
+                "
 				SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					COALESCE(cp.id,0) AS parentid
@@ -147,40 +172,48 @@ class RSS extends ApiController
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-            $this->releases->uSQL(
-                UserMovie::fromQuery(
-                    sprintf(
-                        '
+                $this->releases->uSQL(
+                    UserMovie::fromQuery(
+                        sprintf(
+                            '
 							SELECT imdbid, categories
 							FROM user_movies
 							WHERE users_id = %d',
-                        $userID
-                    )
+                            $userID
+                        )
+                    ),
+                    'imdbid'
                 ),
-                'imdbid'
-            ),
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            NZB::NZB_ADDED,
-            Category::MOVIE_ROOT,
-            Category::MOVIE_OTHER,
-            $this->releases->showPasswords(),
-            ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
-        );
+                (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                NZB::NZB_ADDED,
+                Category::MOVIE_ROOT,
+                Category::MOVIE_OTHER,
+                $this->releases->showPasswords(),
+                ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
+            );
 
-        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
-            return Release::fromQuery($sql);
-        });
-    }
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            $result = Cache::get(md5($sql));
+            if ($result !== null) {
+                return $result;
+            }
 
-    /**
-     * @return Model|\Illuminate\Database\Query\Builder|null
-     */
-    public function getFirstInstance($column, $table, $order)
-    {
-        return DB::table($table)
-            ->select([$column])
-            ->where($column, '>', 0)
-            ->orderBy($order)
-            ->first();
+            $result = Release::fromQuery($sql);
+
+            Cache::put(md5($sql), $result, $expiresAt);
+
+            return $result;
+        }
+
+        /**
+         * @return Model|\Illuminate\Database\Query\Builder|null
+         */
+        public function getFirstInstance($column, $table, $order)
+        {
+            return DB::table($table)
+                ->select([$column])
+                ->where($column, '>', 0)
+                ->orderBy($order)
+                ->first();
+        }
     }
-}
