@@ -111,9 +111,9 @@ class NNTP extends \Net_NNTP_Client
         parent::__construct();
 
         $this->_echo = config('nntmux.echocli');
-        $this->_tmux = new Tmux;
+        $this->_tmux = new Tmux();
         $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
-        $this->colorCli = new ColorCLI;
+        $this->colorCli = new ColorCLI();
         $this->_currentPort = config('nntmux_nntp.port');
         $this->_currentServer = config('nntmux_nntp.server');
         $this->_primaryNntpConnections = config('nntmux_nntp.main_nntp_connections');
@@ -521,7 +521,7 @@ class NNTP extends \Net_NNTP_Client
         $body = '';
 
         $aConnected = false;
-        $nntp = ($alternate ? new self : null);
+        $nntp = ($alternate ? new self() : null);
 
         // Check if the msgIds are in an array.
         if (\is_array($identifiers)) {
@@ -757,10 +757,10 @@ class NNTP extends \Net_NNTP_Client
      * @param  string  $subject  string  The subject.     ie.: $subject = 'Test article';
      * @param  \Exception|string  $body  string  The message.     ie.: $message = 'This is only a test, please disregard.';
      * @param  string  $from  string  The poster.      ie.: $from = '<anon@anon.com>';
-     * @param  $extra  string  Extra, separated by \r\n
-     *                ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
-     * @param  $yEnc  bool    Encode the message with yEnc?
-     * @param  $compress  bool    Compress the message with GZip?
+     * @param $extra    string  Extra, separated by \r\n
+     *                                           ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
+     * @param $yEnc     bool    Encode the message with yEnc?
+     * @param $compress bool    Compress the message with GZip?
      * @return mixed On success : (bool)   True.
      *               On failure : (object) PEAR_Error.
      *
@@ -942,7 +942,7 @@ class NNTP extends \Net_NNTP_Client
      * headers when XFeature GZip compression is enabled server side.
      *
      * @return \Blacklight\NNTP|array|string Our overridden function when compression is enabled.
-     *                                       parent  Parent function when no compression.
+     *                     parent  Parent function when no compression.
      */
     public function _getTextResponse(): NNTP|array|string
     {
@@ -1280,8 +1280,8 @@ class NNTP extends \Net_NNTP_Client
      * @param  int  $port  (optional) The port number to connect to, defaults to 119.
      * @param  int  $timeout  (optional) How many seconds to wait before giving up when connecting.
      * @param  int  $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
-     * @return mixed (bool) On success: True when posting allowed, otherwise false.
-     *                      (object) On failure: pear_error
+     * @return mixed (bool)   On success: True when posting allowed, otherwise false.
+     *               (object) On failure: pear_error
      */
     public function connect($host = null, $encryption = null, $port = null, $timeout = 15, $socketTimeout = 120)
     {

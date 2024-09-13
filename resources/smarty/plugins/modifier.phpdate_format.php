@@ -14,7 +14,7 @@ use Ytake\LaravelSmarty\Smarty;
  */
 // Fix by nZEDb
 if (! isset($smarty)) {
-    $smarty = new Smarty;
+    $smarty = new Smarty();
 }
 switch (true) {
     case is_string($smarty->getPluginsDir()) && is_dir($smarty->getPluginsDir()):
