@@ -132,10 +132,7 @@ class Console
         return ConsoleInfo::search($searchWords)->first() ?? false;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
+    public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): mixed
     {
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
@@ -211,18 +208,15 @@ class Console
             $order[0],
             $order[1]
         );
-        $return = Cache::get(md5($sql.$page));
-        if ($return !== null) {
-            return $return;
-        }
-        $return = DB::select($sql);
-        if (\count($return) > 0) {
-            $return[0]->_totalcount = $consoles['total'][0]->total ?? 0;
-        }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($sql.$page), $return, $expiresAt);
 
-        return $return;
+        return Cache::flexible($sql.$page, [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $consoles) {
+            $return = DB::select($sql);
+            if (\count($return) > 0) {
+                $return[0]->_totalcount = $consoles['total'][0]->total ?? 0;
+            }
+
+            return $return;
+        });
     }
 
     public function getConsoleOrder($orderBy): array
