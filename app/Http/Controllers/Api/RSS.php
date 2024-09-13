@@ -8,6 +8,8 @@ use App\Models\UserMovie;
 use App\Models\UserSerie;
 use Blacklight\NZB;
 use Blacklight\Releases;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +30,10 @@ class RSS extends ApiController
         $this->releases = new Releases;
     }
 
-    public function getRss($cat, $videosId, $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0): mixed
+    /**
+     * @return Release[]|Collection|mixed
+     */
+    public function getRss($cat, $videosId, $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
     {
         $catSearch = $cartSearch = '';
         $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
@@ -81,12 +86,22 @@ class RSS extends ApiController
                 $limit === -1 ? '' : ' LIMIT '.$limit.' OFFSET '.$offset
             );
 
-        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
-            return Release::fromQuery($sql);
-        });
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $result = Cache::get(md5($sql));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = Release::fromQuery($sql);
+        Cache::put(md5($sql), $result, $expiresAt);
+
+        return $result;
     }
 
-    public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1): mixed
+    /**
+     * @return Builder|Collection
+     */
+    public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1)
     {
         $sql = sprintf(
             "
@@ -125,12 +140,22 @@ class RSS extends ApiController
             ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
         );
 
-        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
-            return Release::fromQuery($sql);
-        });
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $result = Cache::get(md5($sql));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = Release::fromQuery($sql);
+        Cache::put(md5($sql), $result, $expiresAt);
+
+        return $result;
     }
 
-    public function getMyMoviesRss(int $limit, int $userID = 0, array $excludedCats = []): mixed
+    /**
+     * @return Release[]|Collection|mixed
+     */
+    public function getMyMoviesRss(int $limit, int $userID = 0, array $excludedCats = [])
     {
         $sql = sprintf(
             "
@@ -167,9 +192,17 @@ class RSS extends ApiController
             ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
         );
 
-        return Cache::flexible(md5($sql), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql) {
-            return Release::fromQuery($sql);
-        });
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $result = Cache::get(md5($sql));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = Release::fromQuery($sql);
+
+        Cache::put(md5($sql), $result, $expiresAt);
+
+        return $result;
     }
 
     /**

@@ -363,9 +363,16 @@ class Category extends Model
      */
     public static function getChildren($categoryId)
     {
-        return Cache::flexible(md5($categoryId), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($categoryId) {
-            return RootCategory::find($categoryId)->categories;
-        });
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $result = Cache::get(md5($categoryId));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = RootCategory::find($categoryId)->categories;
+        Cache::put(md5($categoryId), $result, $expiresAt);
+
+        return $result;
     }
 
     /**
@@ -399,9 +406,16 @@ class Category extends Model
     public static function getByIds($ids)
     {
         if (\count($ids) > 0) {
-            return Cache::flexible(md5(md5(implode(',', $ids))), [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($ids) {
-                return self::query()->whereIn('id', $ids)->get();
-            });
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+            $result = Cache::get(md5(implode(',', $ids)));
+            if ($result !== null) {
+                return $result;
+            }
+            $result = self::query()->whereIn('id', $ids)->get();
+
+            Cache::put(md5(md5(implode(',', $ids))), $result, $expiresAt);
+
+            return $result;
         }
 
         return false;
@@ -463,13 +477,21 @@ class Category extends Model
     }
 
     /**
-     * Get categories for the API.
+     * @return mixed
      */
     public static function getForApi()
     {
-        return Cache::flexible('ForApi', [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () {
-            return RootCategory::query()->select(['id', 'title'])->where('status', '=', self::STATUS_ACTIVE)->get();
-        });
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $result = Cache::get(md5('ForApi'));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = RootCategory::query()->select(['id', 'title'])->where('status', '=', self::STATUS_ACTIVE)->get();
+
+        Cache::put(md5('ForApi'), $result, $expiresAt);
+
+        return $result;
     }
 
     /**

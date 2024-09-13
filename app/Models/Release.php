@@ -333,44 +333,70 @@ class Release extends Model
         return self::whereAnidbid($anidbID)->update(['anidbid' => -1]);
     }
 
-    public static function getReleases(): mixed
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
+     */
+    public static function getReleases()
     {
-        return Cache::flexible('Releases', [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () {
-            return self::query()
-                ->where('nzbstatus', '=', NZB::NZB_ADDED)
-                ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
-                ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-                ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
-                ->get();
-        });
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $releases = Cache::get(md5('releases'));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = self::query()
+
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
+            ->get();
+
+        Cache::put(md5('releases'), $releases, $expiresAt);
+
+        return $releases;
     }
 
-    public static function getReleasesRange(): mixed
+    /**
+     * Used for admin page release-list.
+     *
+     *
+     * @return LengthAwarePaginator|mixed
+     */
+    public static function getReleasesRange()
     {
-        return Cache::flexible('releasesRange', [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () {
-            return self::query()
-                ->where('nzbstatus', '=', NZB::NZB_ADDED)
-                ->select(
-                    [
-                        'releases.id',
-                        'releases.name',
-                        'releases.searchname',
-                        'releases.size',
-                        'releases.guid',
-                        'releases.totalpart',
-                        'releases.postdate',
-                        'releases.adddate',
-                        'releases.grabs',
-                        'cp.title as parent_category',
-                        'c.title as sub_category',
-                        DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
-                    ]
-                )
-                ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-                ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
-                ->orderByDesc('releases.postdate')
-                ->paginate(config('nntmux.items_per_page'));
-        });
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $releases = Cache::get(md5('releasesRange'));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = self::query()
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->select(
+                [
+                    'releases.id',
+                    'releases.name',
+                    'releases.searchname',
+                    'releases.size',
+                    'releases.guid',
+                    'releases.totalpart',
+                    'releases.postdate',
+                    'releases.adddate',
+                    'releases.grabs',
+                    'cp.title as parent_category',
+                    'c.title as sub_category',
+                    DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
+                ]
+            )
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
+            ->orderByDesc('releases.postdate')
+            ->paginate(config('nntmux.items_per_page'));
+
+        Cache::put(md5('releasesRange'), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
