@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use App\Models\Settings;
 use App\Models\SteamApp;
 use b3rs3rk\steamfront\Main;
 use DivineOmega\CliProgressBar\ProgressBar;
@@ -96,8 +95,6 @@ class Steam
             return false;
         }
 
-        $this->populateSteamAppsTable();
-
         $results = SteamApp::search($searchTerm)->get();
 
         if ($results instanceof \Traversable) {
@@ -136,51 +133,27 @@ class Steam
     public function populateSteamAppsTable(): void
     {
         $bar = new ProgressBar;
-        $lastUpdate = Settings::settingValue('APIs.Steam.last_update');
-        $this->lastUpdate = $lastUpdate > 0 ? $lastUpdate : 0;
-        if ((time() - (int) $this->lastUpdate) > 86400) {
-            // Set time we updated steam_apps table
-            $this->setLastUpdated();
-            $fullAppArray = $this->steamFront->getFullAppList();
-            $inserted = $dupe = 0;
-            $this->colorCli->info('Populating steam apps table');
-            $appsArray = Arr::pluck($fullAppArray, 'apps');
-            $max = count($appsArray[0]);
-            $bar->setMaxProgress($max);
-            foreach ($appsArray as $appArray) {
-                foreach ($appArray as $app) {
-                    $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->first(['appid']);
-                    if ($dupeCheck === null) {
-                        SteamApp::query()->insert(['name' => $app['name'], 'appid' => $app['appid']]);
-                        $inserted++;
-                    } else {
-                        $dupe++;
-                    }
-                    $bar->advance()->display();
+        $fullAppArray = $this->steamFront->getFullAppList();
+        $inserted = $dupe = 0;
+        $this->colorCli->info('Populating steam apps table');
+        $appsArray = Arr::pluck($fullAppArray, 'apps');
+        $max = count($appsArray[0]);
+        $bar->setMaxProgress($max);
+        foreach ($appsArray as $appArray) {
+            foreach ($appArray as $app) {
+                $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->first(['appid']);
+                if ($dupeCheck === null) {
+                    SteamApp::query()->insert(['name' => $app['name'], 'appid' => $app['appid']]);
+                    $inserted++;
+                } else {
+                    $dupe++;
                 }
+                $bar->advance()->display();
             }
-
-            $bar->complete();
-
-            echo PHP_EOL.'Added '.$inserted.' new steam app(s), '.$dupe.' duplicates skipped'.PHP_EOL;
         }
-    }
 
-    /**
-     * Sets the database time for last full Steam update.
-     */
-    private function setLastUpdated(): void
-    {
-        Settings::query()->where(
-            [
-                ['section', '=', 'APIs'],
-                ['subsection', '=', 'Steam'],
-                ['name', '=', 'last_update'],
-            ]
-        )->update(
-            [
-                'value' => time(),
-            ]
-        );
+        $bar->complete();
+
+        \Laravel\Prompts\info('Added '.$inserted.' new steam app(s), '.$dupe.' duplicates skipped');
     }
 }

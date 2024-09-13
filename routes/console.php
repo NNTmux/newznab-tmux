@@ -29,6 +29,7 @@ Schedule::command('horizon:snapshot')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('cloudflare:reload')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
 Schedule::command('nntmux:collect-stats')->hourly();
+Schedule::command('nntmux:populate-steam-apps')->monthly();
 if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
 }
