@@ -71,6 +71,8 @@ class IRCClient
 
     /**
      * Buffer contents.
+     *
+     * @var string
      */
     protected ?string $_buffer = null;
 
@@ -87,12 +89,12 @@ class IRCClient
     protected array $_channelData = [];
 
     /**
-     * Nickname when we log in.
+     * Nick name when we log in.
      */
     protected string $_nickName;
 
     /**
-     * Username when we log in.
+     * User name when we log in.
      */
     protected string $_userName;
 
@@ -148,7 +150,11 @@ class IRCClient
      */
     public function setSocketTimeout(int $timeout)
     {
-        $this->_socket_timeout = $timeout;
+        if (! is_numeric($timeout)) {
+            echo 'ERROR: IRC socket timeout must be a number!'.PHP_EOL;
+        } else {
+            $this->_socket_timeout = $timeout;
+        }
     }
 
     /**
@@ -158,7 +164,11 @@ class IRCClient
      */
     public function setConnectionTimeout(int $timeout)
     {
-        $this->_remote_connection_timeout = $timeout;
+        if (! is_numeric($timeout)) {
+            echo 'ERROR: IRC connection timeout must be a number!'.PHP_EOL;
+        } else {
+            $this->_remote_connection_timeout = $timeout;
+        }
     }
 
     /**
@@ -166,7 +176,11 @@ class IRCClient
      */
     public function setConnectionRetries(int $retries)
     {
-        $this->_reconnectRetries = $retries;
+        if (! is_numeric($retries)) {
+            echo 'ERROR: IRC connection retries must be a number!'.PHP_EOL;
+        } else {
+            $this->_reconnectRetries = $retries;
+        }
     }
 
     /**
@@ -176,7 +190,11 @@ class IRCClient
      */
     public function setReConnectDelay(int $delay)
     {
-        $this->_reconnectDelay = $delay;
+        if (! is_numeric($delay)) {
+            echo 'ERROR: IRC reconnect delay must be a number!'.PHP_EOL;
+        } else {
+            $this->_reconnectDelay = $delay;
+        }
     }
 
     /**
@@ -193,8 +211,14 @@ class IRCClient
 
         $socket_string = $transport.'://'.$hostname.':'.$port;
         if ($socket_string !== $this->_remote_socket_string || ! $this->_connected()) {
-            if ($hostname === '') {
+            if (! \is_string($hostname) || $hostname === '') {
                 echo 'ERROR: IRC host name must not be empty!'.PHP_EOL;
+
+                return false;
+            }
+
+            if (! is_numeric($port)) {
+                echo 'ERROR: IRC port must be a number!'.PHP_EOL;
 
                 return false;
             }
@@ -254,7 +278,7 @@ class IRCClient
         $this->_realName = $realName;
         $this->_password = $password;
 
-        if (empty($password) && ! $this->_writeSocket('PASSWORD '.$password)) {
+        if (($password !== null && ! empty($password)) && ! $this->_writeSocket('PASSWORD '.$password)) {
             return false;
         }
 
@@ -312,7 +336,12 @@ class IRCClient
         return true;
     }
 
-    public function quit(?string $message = null): bool
+    /**
+     * Quit from IRC.
+     *
+     * @param  string  $message  Optional disconnect message.
+     */
+    public function quit(string $message = null): bool
     {
         if ($this->_connected()) {
             $this->_writeSocket('QUIT'.($message === null ? '' : ' :'.$message));
@@ -325,7 +354,7 @@ class IRCClient
     /**
      * Read the incoming buffer in a loop.
      */
-    public function readIncoming(): void
+    public function readIncoming()
     {
         while (true) {
             $this->_readSocket();
@@ -389,7 +418,9 @@ class IRCClient
      * Implementation.
      * Extended classes will use this function to parse the messages in the channel using $this->_channelData.
      */
-    protected function processChannelMessages() {}
+    protected function processChannelMessages()
+    {
+    }
 
     /**
      * Join a channel.
@@ -404,7 +435,7 @@ class IRCClient
      */
     protected function _pong(string $host)
     {
-        if (! $this->_writeSocket('PONG '.$host)) {
+        if ($this->_writeSocket('PONG '.$host) === false) {
             $this->_reconnect();
         }
 
@@ -417,7 +448,7 @@ class IRCClient
     /**
      * Send PING to a host.
      */
-    protected function _ping(string $host): void
+    protected function _ping(string $host)
     {
         $pong = $this->_writeSocket('PING '.$host);
 
@@ -435,13 +466,13 @@ class IRCClient
     /**
      * Attempt to reconnect to IRC.
      */
-    protected function _reconnect(): void
+    protected function _reconnect()
     {
         if (! $this->connect($this->_remote_host, $this->_remote_port, $this->_remote_tls)) {
             exit('FATAL: Could not reconnect to ('.$this->_remote_host.') after ('.$this->_reconnectRetries.') tries.'.PHP_EOL);
         }
 
-        if (! $this->_alreadyLoggedIn) {
+        if ($this->_alreadyLoggedIn === false) {
             if (! $this->login($this->_nickName, $this->_userName, $this->_realName, $this->_password)) {
                 exit('FATAL: Could not log in to ('.$this->_remote_host.')!'.PHP_EOL);
             }
@@ -453,7 +484,7 @@ class IRCClient
     /**
      * Read response from the IRC server.
      */
-    protected function _readSocket(): void
+    protected function _readSocket()
     {
         $buffer = '';
         do {
@@ -499,10 +530,10 @@ class IRCClient
     /**
      * Write a single character to the socket.
      *
-     * @param  string  $character(char)  $character  A single character.
+     * @param  string (char)  $character A single character.
      * @return int|bool Number of bytes written or false.
      */
-    protected function _writeSocketChar(string $character): bool|int
+    protected function _writeSocketChar($character)
     {
         return @fwrite($this->_socket, $character);
     }
@@ -510,7 +541,7 @@ class IRCClient
     /**
      * Initiate stream socket to IRC server.
      */
-    protected function _initiateStream(): void
+    protected function _initiateStream()
     {
         $this->_closeStream();
 
@@ -533,7 +564,7 @@ class IRCClient
     /**
      * Close the socket.
      */
-    protected function _closeStream(): void
+    protected function _closeStream()
     {
         if ($this->_socket !== null) {
             $this->_socket = null;

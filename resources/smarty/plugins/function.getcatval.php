@@ -24,8 +24,8 @@ use App\Models\Category;
  *
  * @usage {getcatval category=BOOKS_COMICS}
  *
- * @param  string  $params  Name of constant whose value to return.
- * @return Value of the specified Category constant.
+ *@param  string  $params Name of constant whose value to return.
+ *@return Value of the specified Category constant.
  */
 function smarty_function_getcatval($params)
 {
