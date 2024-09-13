@@ -522,6 +522,7 @@ class Releases extends Release
 
     public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed
     {
+        $searchResult = [];
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchApi($searchName, $limit);
