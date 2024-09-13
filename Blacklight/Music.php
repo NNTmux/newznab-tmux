@@ -201,15 +201,17 @@ class Music
             $order[0],
             $order[1]
         );
-
-        return Cache::flexible($sql.$page, [config('nntmux.cache_expiry_medium'), config('nntmux.cache_expiry_long')], function () use ($sql, $music) {
-            $return = DB::select($sql);
-            if (\count($return) > 0) {
-                $return[0]->_totalcount = $music['total'][0]->total ?? 0;
-            }
-
+        $return = Cache::get(md5($sql.$page));
+        if ($return !== null) {
             return $return;
-        });
+        }
+        $return = MusicInfo::fromQuery($sql);
+        if ($return->isNotEmpty()) {
+            $return[0]->_totalcount = $music['total'][0]->total ?? 0;
+        }
+        Cache::put(md5($sql.$page), $return, $expiresAt);
+
+        return $return;
     }
 
     public function getMusicOrder($orderBy): array
