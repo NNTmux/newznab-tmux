@@ -600,6 +600,7 @@ class Releases extends Release
     {
         $siteSQL = [];
         $showSql = '';
+        $searchResult = [];
         foreach ($siteIdArr as $column => $Id) {
             if ($Id > 0) {
                 $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
