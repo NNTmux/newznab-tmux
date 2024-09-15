@@ -161,6 +161,8 @@ class Category extends Model
 
     public const XXX_UHD = 6045;
 
+    public const XXX_VR = 6046;
+
     public const XXX_PACK = 6050;
 
     public const XXX_IMAGESET = 6060;

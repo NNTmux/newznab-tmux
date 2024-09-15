@@ -508,6 +508,7 @@ class Categorize
             case $this->isXxxSD():
             case $this->isXxxUHD():
             case $this->isXxxClipHD():
+            case $this->isXxxVr():
             case $this->catWebDL && $this->isXxxWEBDL():
             case $this->isXxx264():
             case $this->isXxxXvid():
@@ -593,6 +594,25 @@ class Categorize
         }
 
         return false;
+    }
+
+    public function isXxxVr(): bool
+    {
+        switch (true) {
+            case preg_match('/OnlyFans/i', $this->releaseName):
+                return false;
+            case preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(VR(180|360))+.*/i', $this->releaseName):
+            case preg_match('/^VR(Hush|\.?(Cosplay|Spy|Conk|Porn|Latina|Bangers|KM|Mansion|Intimacy|oomed))|^VirtualReal|iStripper|SLROriginals|VirtualPorn|XSinsVR|NaughtyAmericaVR|WetVR|VRStars|SexBabesVR|VR Porn|\[VR\][.\s]Pack|BIBIVR|VRCosplayX|CzechVRFetish|GearVR|Oculus|SexLikeReal|3584p|^.*VR[\. -_]+?/i', $this->releaseName):
+            case preg_match('/.+\.VR(180|360)\.(3584|3840|3072)p/i', $this->releaseName):
+            case preg_match('/^SLR.+(VR|LR_180|LR-180|3072p)/i', $this->releaseName):
+            case preg_match('/^SLR_SLR|^REQUEST\.SLR/i', $this->releaseName):
+            case preg_match('/180x180_3dh/i', $this->releaseName):
+                $this->tmpCat = Category::XXX_VR;
+
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isXxxImageset(): bool
