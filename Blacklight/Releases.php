@@ -1075,24 +1075,30 @@ class Releases extends Release
     /**
      * Get count of releases for pager.
      *
-     *
      * @param  string  $query  The query to get the count from.
      */
     private function getPagerCount(string $query): int
     {
-        $sql = sprintf(
-            'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
-            preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
-            (int) config('nntmux.max_pager_results')
-        );
+        $queryBuilder = DB::table(DB::raw('('.preg_replace(
+            '/SELECT.+?FROM\s+releases/is',
+            'SELECT r.id FROM releases',
+            $query
+        ).' LIMIT '.(int) config('nntmux.max_pager_results').') as z'))
+            ->selectRaw('COUNT(z.id) as count');
+
+        $sql = $queryBuilder->toSql();
         $count = Cache::get(md5($sql));
+
         if ($count !== null) {
             return $count;
         }
-        $count = self::fromQuery($sql);
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
-        Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
-        return $count[0]->count ?? 0;
+        $result = $queryBuilder->first();
+        $count = $result->count ?? 0;
+
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
+        Cache::put(md5($sql), $count, $expiresAt);
+
+        return $count;
     }
 }
