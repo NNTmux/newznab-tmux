@@ -195,6 +195,6 @@
             "@php artisan key:generate --ansi"
         ],
         "check-style": "php-cs-fixer fix --dry-run --diff",
-        "fix-style": "php-cs-fixer fix"
+        "fix-style": "pint"
     }
 }
