@@ -20,19 +20,18 @@ class AdminMovieController extends BasePageController
 
         if ($request->has('moviesearch')) {
             $lastSearch = $request->input('moviesearch');
-            $parr = MovieInfo::getAll($request->input('moviesearch'));
+            $movieList = MovieInfo::getAll($request->input('moviesearch'));
         } else {
             $lastSearch = '';
-            $parr = MovieInfo::getAll();
+            $movieList = MovieInfo::getAll();
         }
 
         $this->smarty->assign('lastSearch', $lastSearch);
 
-        $this->smarty->assign('results', $parr);
+        $this->smarty->assign('results', $movieList);
 
         $meta_title = $title = 'Movie List';
-
-        $movieList = Utility::getRange('movieinfo');
+        
         $this->smarty->assign('movielist', $movieList);
 
         $content = $this->smarty->fetch('movie-list.tpl');
