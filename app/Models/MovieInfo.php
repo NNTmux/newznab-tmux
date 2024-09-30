@@ -81,9 +81,9 @@ class MovieInfo extends Model
         if ($movie !== null) {
             return $movie;
         }
-        $sql = self::query()->leftJoin('releases', 'releases.imdbid', '=', 'movieinfo.imdbid')->orderByDesc('movieinfo.created_at');
+        $sql = self::query()->select('*');
         if (! empty($search)) {
-            $sql->whereLike('movieinfo.title', $search);
+            $sql->whereLike('title', $search);
         }
 
         $movie = $sql->paginate(config('nntmux.items_per_page'));
