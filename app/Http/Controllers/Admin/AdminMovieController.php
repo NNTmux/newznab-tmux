@@ -14,9 +14,21 @@ class AdminMovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index(Request $request): void
     {
         $this->setAdminPrefs();
+
+        if ($request->has('moviesearch')) {
+            $lastSearch = $request->input('moviesearch');
+            $parr = MovieInfo::getAll($request->input('moviesearch'));
+        } else {
+            $lastSearch = '';
+            $parr = MovieInfo::getAll();
+        }
+
+        $this->smarty->assign('lastSearch', $lastSearch);
+
+        $this->smarty->assign('results', $parr);
 
         $meta_title = $title = 'Movie List';
 

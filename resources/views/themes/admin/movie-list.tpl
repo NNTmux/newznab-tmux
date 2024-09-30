@@ -1,5 +1,18 @@
 <div class="card card-body">
 	<h1>{$title}</h1>
+    <form name="moviesearch" method="get" action="{{URL("/admin/movie-list")}}" id="custom-search-form"
+          class="form-inline form-horizontal col-4 col-lg-4 float-right">
+        {{csrf_field()}}
+        <div id="search" class="input-group col-12 col-lg-12">
+            <input type="text" class="form-inline" placeholder="Search movie list" id="moviesearch" name="moviesearch"
+                   value="{$lastSearch|escape:'html'}">
+            <span class="input-group-btn">
+			<button type="submit" value="Go" class="btn btn-success">
+				<i class="fab fa-searchengin"></i>
+			</button>
+		</span>
+        </div>
+    </form>
 
 	{if $movielist}
 		{$movielist->onEachSide(5)->links()}

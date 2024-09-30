@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * App\Models\MovieInfo.
@@ -72,4 +73,22 @@ class MovieInfo extends Model
      * @var array
      */
     protected $guarded = ['id'];
+
+    public static function getAll(string $search = ''): mixed
+    {
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $movie = Cache::get(md5($search));
+        if ($movie !== null) {
+            return $movie;
+        }
+        $sql = self::query()->leftJoin('releases', 'releases.imdbid', '=', 'movieinfo.imdbid')->orderByDesc('movieinfo.created_at');
+        if (! empty($search)) {
+            $sql->whereLike('movieinfo.title', $search);
+        }
+
+        $movie = $sql->paginate(config('nntmux.items_per_page'));
+        Cache::put(md5($search), $movie, $expiresAt);
+
+        return $movie;
+    }
 }
