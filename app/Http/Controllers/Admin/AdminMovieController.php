@@ -6,7 +6,6 @@ use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use Blacklight\Movie;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 
 class AdminMovieController extends BasePageController
@@ -31,7 +30,7 @@ class AdminMovieController extends BasePageController
         $this->smarty->assign('results', $movieList);
 
         $meta_title = $title = 'Movie List';
-        
+
         $this->smarty->assign('movielist', $movieList);
 
         $content = $this->smarty->fetch('movie-list.tpl');
