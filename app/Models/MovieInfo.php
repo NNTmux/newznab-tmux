@@ -83,7 +83,7 @@ class MovieInfo extends Model
         }
         $sql = self::query()->select('*');
         if (! empty($search)) {
-            $sql->whereLike('title', $search);
+            $sql->whereLike('title', '%'.$search.'%');
         }
 
         $movie = $sql->paginate(config('nntmux.items_per_page'));
