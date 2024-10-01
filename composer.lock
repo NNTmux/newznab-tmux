@@ -165,16 +165,16 @@
         },
         {
             "name": "bacon/bacon-qr-code",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Bacon/BaconQrCode.git",
-                "reference": "510de6eca6248d77d31b339d62437cc995e2fb41"
+                "reference": "f9cc1f52b5a463062251d666761178dbdb6b544f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Bacon/BaconQrCode/zipball/510de6eca6248d77d31b339d62437cc995e2fb41",
-                "reference": "510de6eca6248d77d31b339d62437cc995e2fb41",
+                "url": "https://api.github.com/repos/Bacon/BaconQrCode/zipball/f9cc1f52b5a463062251d666761178dbdb6b544f",
+                "reference": "f9cc1f52b5a463062251d666761178dbdb6b544f",
                 "shasum": ""
             },
             "require": {
@@ -213,9 +213,9 @@
             "homepage": "https://github.com/Bacon/BaconQrCode",
             "support": {
                 "issues": "https://github.com/Bacon/BaconQrCode/issues",
-                "source": "https://github.com/Bacon/BaconQrCode/tree/v3.0.0"
+                "source": "https://github.com/Bacon/BaconQrCode/tree/v3.0.1"
             },
-            "time": "2024-04-18T11:16:25+00:00"
+            "time": "2024-10-01T13:55:55+00:00"
         },
         {
             "name": "bhuvidya/laravel-countries",
@@ -3417,16 +3417,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v11.25.0",
+            "version": "v11.26.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "b487a9089c0b1c71ac63bb6bc44fb4b00dc6da2e"
+                "reference": "b8cb8998701d5b3cfe68539d3c3da1fc59ddd82b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/b487a9089c0b1c71ac63bb6bc44fb4b00dc6da2e",
-                "reference": "b487a9089c0b1c71ac63bb6bc44fb4b00dc6da2e",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/b8cb8998701d5b3cfe68539d3c3da1fc59ddd82b",
+                "reference": "b8cb8998701d5b3cfe68539d3c3da1fc59ddd82b",
                 "shasum": ""
             },
             "require": {
@@ -3445,7 +3445,7 @@
                 "fruitcake/php-cors": "^1.3",
                 "guzzlehttp/guzzle": "^7.8",
                 "guzzlehttp/uri-template": "^1.0",
-                "laravel/prompts": "^0.1.18|^0.2.0",
+                "laravel/prompts": "^0.1.18|^0.2.0|^0.3.0",
                 "laravel/serializable-closure": "^1.3",
                 "league/commonmark": "^2.2.1",
                 "league/flysystem": "^3.8.0",
@@ -3622,7 +3622,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2024-09-26T11:21:58+00:00"
+            "time": "2024-10-01T14:29:34+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -3705,21 +3705,21 @@
         },
         {
             "name": "laravel/prompts",
-            "version": "v0.1.25",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/prompts.git",
-                "reference": "7b4029a84c37cb2725fc7f011586e2997040bc95"
+                "reference": "ea57a2261093986721d4a5f4f9524d76f21f9fa0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/prompts/zipball/7b4029a84c37cb2725fc7f011586e2997040bc95",
-                "reference": "7b4029a84c37cb2725fc7f011586e2997040bc95",
+                "url": "https://api.github.com/repos/laravel/prompts/zipball/ea57a2261093986721d4a5f4f9524d76f21f9fa0",
+                "reference": "ea57a2261093986721d4a5f4f9524d76f21f9fa0",
                 "shasum": ""
             },
             "require": {
+                "composer-runtime-api": "^2.2",
                 "ext-mbstring": "*",
-                "illuminate/collections": "^10.0|^11.0",
                 "php": "^8.1",
                 "symfony/console": "^6.2|^7.0"
             },
@@ -3728,6 +3728,7 @@
                 "laravel/framework": ">=10.17.0 <10.25.0"
             },
             "require-dev": {
+                "illuminate/collections": "^10.0|^11.0",
                 "mockery/mockery": "^1.5",
                 "pestphp/pest": "^2.3",
                 "phpstan/phpstan": "^1.11",
@@ -3739,7 +3740,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "0.1.x-dev"
+                    "dev-main": "0.3.x-dev"
                 }
             },
             "autoload": {
@@ -3757,9 +3758,9 @@
             "description": "Add beautiful and user-friendly forms to your command-line applications.",
             "support": {
                 "issues": "https://github.com/laravel/prompts/issues",
-                "source": "https://github.com/laravel/prompts/tree/v0.1.25"
+                "source": "https://github.com/laravel/prompts/tree/v0.3.0"
             },
-            "time": "2024-08-12T22:06:33+00:00"
+            "time": "2024-09-30T14:27:51+00:00"
         },
         {
             "name": "laravel/pulse",
@@ -3850,16 +3851,16 @@
         },
         {
             "name": "laravel/sanctum",
-            "version": "v4.0.2",
+            "version": "v4.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sanctum.git",
-                "reference": "9cfc0ce80cabad5334efff73ec856339e8ec1ac1"
+                "reference": "54aea9d13743ae8a6cdd3c28dbef128a17adecab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sanctum/zipball/9cfc0ce80cabad5334efff73ec856339e8ec1ac1",
-                "reference": "9cfc0ce80cabad5334efff73ec856339e8ec1ac1",
+                "url": "https://api.github.com/repos/laravel/sanctum/zipball/54aea9d13743ae8a6cdd3c28dbef128a17adecab",
+                "reference": "54aea9d13743ae8a6cdd3c28dbef128a17adecab",
                 "shasum": ""
             },
             "require": {
@@ -3910,20 +3911,20 @@
                 "issues": "https://github.com/laravel/sanctum/issues",
                 "source": "https://github.com/laravel/sanctum"
             },
-            "time": "2024-04-10T19:39:58+00:00"
+            "time": "2024-09-27T14:55:41+00:00"
         },
         {
             "name": "laravel/scout",
-            "version": "v10.11.3",
+            "version": "v10.11.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "642b4750127b5242a089571c9314037a7453cc0a"
+                "reference": "f9cf4f79163e3c5f13f81369d4992d66e6700502"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/642b4750127b5242a089571c9314037a7453cc0a",
-                "reference": "642b4750127b5242a089571c9314037a7453cc0a",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/f9cf4f79163e3c5f13f81369d4992d66e6700502",
+                "reference": "f9cf4f79163e3c5f13f81369d4992d66e6700502",
                 "shasum": ""
             },
             "require": {
@@ -3988,7 +3989,7 @@
                 "issues": "https://github.com/laravel/scout/issues",
                 "source": "https://github.com/laravel/scout"
             },
-            "time": "2024-09-11T21:32:42+00:00"
+            "time": "2024-10-01T14:39:33+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -4902,16 +4903,16 @@
         },
         {
             "name": "livewire/livewire",
-            "version": "v3.5.8",
+            "version": "v3.5.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "ce1ce71b39a3492b98f7d2f2a4583f1b163fe6ae"
+                "reference": "d04a229058afa76116d0e39209943a8ea3a7f888"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/ce1ce71b39a3492b98f7d2f2a4583f1b163fe6ae",
-                "reference": "ce1ce71b39a3492b98f7d2f2a4583f1b163fe6ae",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/d04a229058afa76116d0e39209943a8ea3a7f888",
+                "reference": "d04a229058afa76116d0e39209943a8ea3a7f888",
                 "shasum": ""
             },
             "require": {
@@ -4919,7 +4920,7 @@
                 "illuminate/routing": "^10.0|^11.0",
                 "illuminate/support": "^10.0|^11.0",
                 "illuminate/validation": "^10.0|^11.0",
-                "laravel/prompts": "^0.1.24",
+                "laravel/prompts": "^0.1.24|^0.2|^0.3",
                 "league/mime-type-detection": "^1.9",
                 "php": "^8.1",
                 "symfony/console": "^6.0|^7.0",
@@ -4966,7 +4967,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v3.5.8"
+                "source": "https://github.com/livewire/livewire/tree/v3.5.9"
             },
             "funding": [
                 {
@@ -4974,7 +4975,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-09-20T19:41:19+00:00"
+            "time": "2024-10-01T12:40:06+00:00"
         },
         {
             "name": "livewire/volt",
@@ -7860,16 +7861,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.4.5",
+            "version": "2.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "87a717f696a5167111833dff659fddbccc638f9b"
+                "reference": "378e9d3b049b7b12e0b1e656c1d82c504173d8b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/87a717f696a5167111833dff659fddbccc638f9b",
-                "reference": "87a717f696a5167111833dff659fddbccc638f9b",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/378e9d3b049b7b12e0b1e656c1d82c504173d8b2",
+                "reference": "378e9d3b049b7b12e0b1e656c1d82c504173d8b2",
                 "shasum": ""
             },
             "require": {
@@ -7925,7 +7926,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.5"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.6"
             },
             "funding": [
                 {
@@ -7933,7 +7934,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-09-01T00:48:21+00:00"
+            "time": "2024-10-01T00:48:13+00:00"
         },
         {
             "name": "psr/cache",
@@ -14748,16 +14749,16 @@
         },
         {
             "name": "ergebnis/composer-normalize",
-            "version": "2.43.0",
+            "version": "2.44.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/composer-normalize.git",
-                "reference": "4b46330c84bb8f43fac79f5c5a05162fc7c80d75"
+                "reference": "bd0c446426bb837ae0cc9f97948167e658bd11d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/4b46330c84bb8f43fac79f5c5a05162fc7c80d75",
-                "reference": "4b46330c84bb8f43fac79f5c5a05162fc7c80d75",
+                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/bd0c446426bb837ae0cc9f97948167e658bd11d2",
+                "reference": "bd0c446426bb837ae0cc9f97948167e658bd11d2",
                 "shasum": ""
             },
             "require": {
@@ -14768,20 +14769,20 @@
                 "ext-json": "*",
                 "justinrainbow/json-schema": "^5.2.12",
                 "localheinz/diff": "^1.1.1",
-                "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
+                "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
             },
             "require-dev": {
                 "composer/composer": "^2.7.7",
-                "ergebnis/license": "^2.4.0",
-                "ergebnis/php-cs-fixer-config": "^6.30.1",
-                "ergebnis/phpunit-slow-test-detector": "^2.14.0",
+                "ergebnis/license": "^2.5.0",
+                "ergebnis/php-cs-fixer-config": "^6.37.0",
+                "ergebnis/phpunit-slow-test-detector": "^2.16.0",
                 "fakerphp/faker": "^1.23.1",
                 "infection/infection": "~0.26.6",
-                "phpunit/phpunit": "^9.6.19",
+                "phpunit/phpunit": "^9.6.20",
                 "psalm/plugin-phpunit": "~0.19.0",
-                "rector/rector": "^1.1.0",
-                "symfony/filesystem": "^5.4.40",
-                "vimeo/psalm": "^5.24.0"
+                "rector/rector": "^1.2.5",
+                "symfony/filesystem": "^5.4.41",
+                "vimeo/psalm": "^5.26.1"
             },
             "type": "composer-plugin",
             "extra": {
@@ -14821,7 +14822,7 @@
                 "security": "https://github.com/ergebnis/composer-normalize/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/composer-normalize"
             },
-            "time": "2024-06-16T13:22:18+00:00"
+            "time": "2024-09-30T21:56:22+00:00"
         },
         {
             "name": "ergebnis/json",
@@ -15745,16 +15746,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.33.0",
+            "version": "v1.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "d54af9d5745e3680d8a6463ffd9f314aa53eb2d1"
+                "reference": "511e9c95b0f3ee778dc9e11e242bcd2af8e002cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/d54af9d5745e3680d8a6463ffd9f314aa53eb2d1",
-                "reference": "d54af9d5745e3680d8a6463ffd9f314aa53eb2d1",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/511e9c95b0f3ee778dc9e11e242bcd2af8e002cd",
+                "reference": "511e9c95b0f3ee778dc9e11e242bcd2af8e002cd",
                 "shasum": ""
             },
             "require": {
@@ -15804,7 +15805,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2024-09-22T19:04:21+00:00"
+            "time": "2024-09-27T14:58:09+00:00"
         },
         {
             "name": "localheinz/diff",
