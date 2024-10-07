@@ -167,105 +167,93 @@ class Movie
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
-        $catsrch = '';
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
-        }
+        $categorySearch = $this->buildCategorySearch($cat);
         $order = $this->getMovieOrder($orderBy);
+        $cacheKey = md5(json_encode([$cat, $start, $num, $orderBy, $maxAge, $excludedCats, $page]));
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $moviesSql =
-            sprintf(
-                "
-					SELECT SQL_CALC_FOUND_ROWS
-						m.imdbid,
-						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-					FROM movieinfo m
-					LEFT JOIN releases r USING (imdbid)
-					WHERE r.nzbstatus = 1
-					AND m.title != ''
-					AND m.imdbid != '0000000'
-					AND r.passwordstatus %s
-					%s %s %s %s
-					GROUP BY m.imdbid
-					ORDER BY %s %s %s",
-                $this->showPasswords,
-                $this->getBrowseBy(),
-                (! empty($catsrch) ? $catsrch : ''),
-                (
-                    $maxAge > 0
-                        ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                        : ''
-                ),
-                \count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '',
-                $order[0],
-                $order[1],
-                $start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start
-            );
-        $movieCache = Cache::get(md5($moviesSql.$page));
-        if ($movieCache !== null) {
-            $movies = $movieCache;
-        } else {
-            $data = MovieInfo::fromQuery($moviesSql);
-            $movies = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
-            Cache::put(md5($moviesSql.$page), $movies, $expiresAt);
+
+        // Try to get from cache
+        $cachedMovies = Cache::get($cacheKey);
+        if ($cachedMovies) {
+            return $cachedMovies;
         }
-        $movieIDs = $releaseIDs = [];
-        if (! empty($movies['result'])) {
-            foreach ($movies['result'] as $movie => $id) {
-                $movieIDs[] = $id->imdbid;
-                $releaseIDs[] = $id->grp_release_id;
+
+        $moviesQuery = MovieInfo::query()
+            ->selectRaw('m.imdbid, GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_id')
+            ->join('releases as r', 'm.imdbid', '=', 'r.imdbid')
+            ->where('r.nzbstatus', 1)
+            ->where('m.title', '!=', '')
+            ->where('m.imdbid', '!=', '0000000')
+            ->when($maxAge > 0, fn ($query) => $query->whereRaw('r.postdate > NOW() - INTERVAL ? DAY', [$maxAge]))
+            ->when(! empty($excludedCats), fn ($query) => $query->whereNotIn('r.categories_id', $excludedCats))
+            ->when(! empty($categorySearch), fn ($query) => $query->whereRaw($categorySearch))
+            ->groupBy('m.imdbid')
+            ->orderBy($order[0], $order[1])
+            ->offset($start)
+            ->limit($num);
+
+        $movies = $moviesQuery->get();
+        $total = DB::select('SELECT FOUND_ROWS() AS total');
+
+        $movieIDs = $movies->pluck('imdbid')->toArray();
+        $releaseIDs = $movies->pluck('grp_release_id')->toArray();
+
+        if (! empty($movieIDs)) {
+            $moviesDetailQuery = Release::query()
+                ->selectRaw('
+                GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_id,
+                GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ",") AS grp_rarinnerfilecount,
+                GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ",") AS grp_haspreview,
+                GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_password,
+                GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_guid,
+                GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_nfoid,
+                GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_grpname,
+                GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR "#") AS grp_release_name,
+                GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_postdate,
+                GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_size,
+                GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_totalparts,
+                GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_comments,
+                GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_grabs,
+                GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_failed,
+                GROUP_CONCAT(CONCAT(cp.title, " > ", c.title) ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_catname,
+                m.*,
+                g.name AS group_name,
+                rn.releases_id AS nfoid
+            ')
+                ->leftJoin('usenet_groups as g', 'g.id', '=', 'r.groups_id')
+                ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+                ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+                ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+                ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
+                ->join('movieinfo as m', 'm.imdbid', '=', 'r.imdbid')
+                ->whereIn('m.imdbid', $movieIDs)
+                ->whereIn('r.id', $releaseIDs)
+                ->when(! empty($categorySearch), fn ($query) => $query->whereRaw($categorySearch))
+                ->groupBy('m.imdbid')
+                ->orderBy($order[0], $order[1])
+                ->get();
+
+            // Add total count to the first record if available
+            if ($moviesDetailQuery->count() > 0) {
+                $moviesDetailQuery[0]->_totalcount = $total[0]->total ?? 0;
             }
+
+            // Cache the result
+            Cache::put($cacheKey, $moviesDetailQuery, $expiresAt);
+
+            return $moviesDetailQuery;
         }
 
-        $sql = sprintf(
-            "
-			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
-			m.*,
-			g.name AS group_name,
-			rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
-			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
-			WHERE m.imdbid IN (%s)
-			AND r.id IN (%s) %s
-			GROUP BY m.imdbid
-			ORDER BY %s %s",
-            (\is_array($movieIDs) && ! empty($movieIDs) ? implode(',', $movieIDs) : -1),
-            (\is_array($releaseIDs) && ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
-            (! empty($catsrch) ? $catsrch : ''),
-            $order[0],
-            $order[1]
-        );
-        $return = Cache::get(md5($sql.$page));
-        if ($return !== null) {
-            return $return;
-        }
-        $return = Release::fromQuery($sql);
-        if (\count($return) > 0) {
-            $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
-        }
-        Cache::put(md5($sql.$page), $return, $expiresAt);
+        return collect();
+    }
 
-        return $return;
+    protected function buildCategorySearch($cat): string
+    {
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            return Category::getCategorySearch($cat);
+        }
+
+        return '';
     }
 
     /**

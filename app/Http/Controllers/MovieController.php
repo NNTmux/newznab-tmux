@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Blacklight\Movie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class MovieController extends BasePageController
 {
@@ -17,109 +16,72 @@ class MovieController extends BasePageController
         $this->setPreferences();
         $movie = new Movie(['Settings' => $this->settings]);
 
-        $moviecats = Category::getChildren(Category::MOVIE_ROOT);
-        $mtmp = [];
-        foreach ($moviecats as $mcat) {
-            $mtmp[] =
-                [
-                    'id' => $mcat->id,
-                    'title' => $mcat->title,
-                ];
-        }
+        $moviecats = Category::getChildren(Category::MOVIE_ROOT)->map(function ($mcat) {
+            return ['id' => $mcat->id, 'title' => $mcat->title];
+        });
 
-        $category = $request->has('imdb') ? -1 : ($request->has('t') ? $request->input('t') : Category::MOVIE_ROOT);
-        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
-            $cat = Category::query()
-                ->where(['title' => $id, 'root_categories_id' => Category::MOVIE_ROOT])
-                ->first(['id']);
-            $category = $cat !== null ? $cat['id'] : Category::MOVIE_ROOT;
+        $category = $request->has('imdb') ? -1 : ($request->input('t', Category::MOVIE_ROOT));
+        if ($id && $moviecats->pluck('title')->contains($id)) {
+            $cat = Category::where(['title' => $id, 'root_categories_id' => Category::MOVIE_ROOT])->first(['id']);
+            $category = $cat->id ?? Category::MOVIE_ROOT;
         }
 
         $this->smarty->assign('cpapi', $this->userdata->cp_api);
         $this->smarty->assign('cpurl', $this->userdata->cp_url);
 
-        $catarray = [];
-        if ((int) $category !== -1) {
-            $catarray[] = $category;
-        }
+        $catarray = $category !== -1 ? [$category] : [];
 
-        $this->smarty->assign('catlist', $mtmp);
+        $this->smarty->assign('catlist', $moviecats);
         $this->smarty->assign('category', $category);
         $this->smarty->assign('categorytitle', $id);
 
-        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
+        $page = $request->input('page', 1);
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
+        $orderby = $request->input('ob', '');
         $ordering = $movie->getMovieOrdering();
-        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+        if (! in_array($orderby, $ordering, false)) {
+            $orderby = '';
+        }
 
-        $movies = [];
         $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
-        foreach ($results as $result) {
+        $movies = $results->map(function ($result) {
             $result->genre = makeFieldLinks($result, 'genre', 'movies');
             $result->actors = makeFieldLinks($result, 'actors', 'movies');
             $result->director = makeFieldLinks($result, 'director', 'movies');
             $result->languages = explode(', ', $result->language);
 
-            $movies[] = $result;
-        }
+            return $result;
+        });
 
-        $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
-        $this->smarty->assign('title', $title);
-
-        $actors = ($request->has('actors') && ! empty($request->input('actors'))) ? stripslashes($request->input('actors')) : '';
-        $this->smarty->assign('actors', $actors);
-
-        $director = ($request->has('director') && ! empty($request->input('director'))) ? stripslashes($request->input('director')) : '';
-        $this->smarty->assign('director', $director);
-
-        $ratings = range(1, 9);
-        $rating = ($request->has('rating') && \in_array($request->input('rating'), $ratings, false)) ? $request->input('rating') : '';
-        $this->smarty->assign('ratings', $ratings);
-        $this->smarty->assign('rating', $rating);
-
-        $genres = $movie->getGenres();
-        $genre = ($request->has('genre') && \in_array($request->input('genre'), $genres, false)) ? $request->input('genre') : '';
-        $this->smarty->assign('genres', $genres);
-        $this->smarty->assign('genre', $genre);
-
+        $this->smarty->assign('title', stripslashes($request->input('title', '')));
+        $this->smarty->assign('actors', stripslashes($request->input('actors', '')));
+        $this->smarty->assign('director', stripslashes($request->input('director', '')));
+        $this->smarty->assign('ratings', range(1, 9));
+        $this->smarty->assign('rating', $request->input('rating', ''));
+        $this->smarty->assign('genres', $movie->getGenres());
+        $this->smarty->assign('genre', $request->input('genre', ''));
         $years = range(1903, now()->addYear()->year);
         rsort($years);
-        $year = ($request->has('year') && \in_array($request->input('year'), $years, false)) ? $request->input('year') : '';
         $this->smarty->assign('years', $years);
-        $this->smarty->assign('year', $year);
+        $this->smarty->assign('year', $request->input('year', ''));
 
-        if ((int) $category === -1) {
-            $this->smarty->assign('catname', 'All');
-        } else {
-            $cdata = Category::find($category);
-            if ($cdata !== null) {
-                $this->smarty->assign('catname', $cdata);
-            } else {
-                $this->smarty->assign('catname', 'All');
-            }
-        }
+        $catname = $category === -1 ? 'All' : Category::find($category) ?? 'All';
+        $this->smarty->assign('catname', $catname);
 
-        $this->smarty->assign(
-            [
-                'resultsadd' => $movies,
-                'results' => $results,
-                'covgroup' => 'movies',
-            ]
-        );
+        $this->smarty->assign([
+            'resultsadd' => $movies,
+            'results' => $results,
+            'covgroup' => 'movies',
+        ]);
 
         $meta_title = 'Browse Movies';
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Movies';
 
-        if ($request->has('imdb')) {
-            $content = $this->smarty->fetch('viewmoviefull.tpl');
-        } else {
-            $content = $this->smarty->fetch('movies.tpl');
-        }
-
+        $content = $request->has('imdb') ? $this->smarty->fetch('viewmoviefull.tpl') : $this->smarty->fetch('movies.tpl');
         $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
