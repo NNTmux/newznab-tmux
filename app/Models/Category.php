@@ -305,39 +305,38 @@ class Category extends Model
     }
 
     public static function getCategorySearch(array $cat = []): string
-{
-    $categories = [];
+    {
+        $categories = [];
 
-    // If multiple categories were sent in a single array position, slice and add them
-    if (strpos($cat[0], ',') !== false) {
-        $tmpcats = explode(',', $cat[0]);
-        // Reset the category to the first comma separated value in the string
-        $cat[0] = $tmpcats[0];
-        // Add the remaining categories in the string to the original array
-        foreach (array_slice($tmpcats, 1) as $tmpcat) {
-            $cat[] = $tmpcat;
+        // If multiple categories were sent in a single array position, slice and add them
+        if (strpos($cat[0], ',') !== false) {
+            $tmpcats = explode(',', $cat[0]);
+            // Reset the category to the first comma separated value in the string
+            $cat[0] = $tmpcats[0];
+            // Add the remaining categories in the string to the original array
+            foreach (array_slice($tmpcats, 1) as $tmpcat) {
+                $cat[] = $tmpcat;
+            }
         }
-    }
 
-    foreach ($cat as $category) {
-        if (is_numeric($category) && $category !== -1 && self::isParent($category)) {
-            $children = RootCategory::find($category)->categories->pluck('id')->toArray();
-            $categories = array_merge($categories, $children);
-        } elseif (is_numeric($category) && $category > 0) {
-            $categories[] = $category;
+        foreach ($cat as $category) {
+            if (is_numeric($category) && $category !== -1 && self::isParent($category)) {
+                $children = RootCategory::find($category)->categories->pluck('id')->toArray();
+                $categories = array_merge($categories, $children);
+            } elseif (is_numeric($category) && $category > 0) {
+                $categories[] = $category;
+            }
         }
+
+        $catCount = count($categories);
+        $catSearch = match ($catCount) {
+            0 => 'AND 1=1',
+            1 => $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '',
+            default => ' AND r.categories_id IN ('.implode(', ', $categories).') ',
+        };
+
+        return $catSearch;
     }
-
-    $catCount = count($categories);
-    $catSearch = match ($catCount) {
-        0 => 'AND 1=1',
-        1 => $categories[0] !== -1 ? ' AND r.categories_id = ' . $categories[0] : '',
-        default => ' AND r.categories_id IN (' . implode(', ', $categories) . ') ',
-    };
-
-
-    return $catSearch;
-}
 
     /**
      * Returns a concatenated list of other categories.
