@@ -165,9 +165,10 @@ class Movie
      *
      * @return array|mixed
      */
-    public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [])
+    public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $categorySearch = $this->buildCategorySearch($cat);
+
         $order = $this->getMovieOrder($orderBy);
         $cacheKey = md5(json_encode([$cat, $start, $num, $orderBy, $maxAge, $excludedCats, $page]));
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -179,15 +180,18 @@ class Movie
         }
 
         $moviesQuery = MovieInfo::query()
-            ->selectRaw('m.imdbid, GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_id')
-            ->join('releases as r', 'm.imdbid', '=', 'r.imdbid')
+            ->selectRaw('movieinfo.imdbid, GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ",") AS grp_release_id')
+            ->join('releases as r', 'movieinfo.imdbid', '=', 'r.imdbid')
             ->where('r.nzbstatus', 1)
-            ->where('m.title', '!=', '')
-            ->where('m.imdbid', '!=', '0000000')
+            ->where('movieinfo.title', '!=', '')
+            ->where('movieinfo.imdbid', '!=', '0000000')
             ->when($maxAge > 0, fn ($query) => $query->whereRaw('r.postdate > NOW() - INTERVAL ? DAY', [$maxAge]))
             ->when(! empty($excludedCats), fn ($query) => $query->whereNotIn('r.categories_id', $excludedCats))
-            ->when(! empty($categorySearch), fn ($query) => $query->whereRaw($categorySearch))
-            ->groupBy('m.imdbid')
+            ->when(!empty($categorySearch), fn ($query) => $query->whereRaw(
+            // Check if $categorySearch starts with AND or OR and clean it up
+                preg_match('/^\s*(AND|OR)\s+/i', $categorySearch) ? preg_replace('/^\s*(AND|OR)\s+/i', '', $categorySearch) : $categorySearch
+            ))
+            ->groupBy('movieinfo.imdbid')
             ->orderBy($order[0], $order[1])
             ->offset($start)
             ->limit($num);
@@ -239,7 +243,7 @@ class Movie
             }
 
             // Cache the result
-            Cache::put($cacheKey, $moviesDetailQuery, $expiresAt);
+            //Cache::put($cacheKey, $moviesDetailQuery, $expiresAt);
 
             return $moviesDetailQuery;
         }
@@ -257,20 +261,20 @@ class Movie
     }
 
     /**
-     * Get the order type the user requested on the movies page.
-     */
-    protected function getMovieOrder($orderBy): array
-    {
-        $orderArr = explode('_', (($orderBy === '') ? 'MAX(r.postdate)' : $orderBy));
-        $orderField = match ($orderArr[0]) {
-            'title' => 'm.title',
-            'year' => 'm.year',
-            'rating' => 'm.rating',
-            default => 'MAX(r.postdate)',
-        };
+ * Get the order type the user requested on the movies page.
+ */
+protected function getMovieOrder($orderBy): array
+{
+    $orderArr = explode('_', (($orderBy === '') ? 'MAX(r.postdate)' : $orderBy));
+    $orderField = match ($orderArr[0]) {
+        'title' => 'm.title',
+        'year' => 'm.year',
+        'rating' => 'm.rating',
+        default => DB::raw('MAX(r.postdate)'),
+    };
 
-        return [$orderField, isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
-    }
+    return [$orderField, isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
+}
 
     /**
      * Order types for movies page.
