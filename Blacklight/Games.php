@@ -171,7 +171,7 @@ class Games
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat, true);
         }
         if ($maxAge > 0) {
             $maxAge = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge);

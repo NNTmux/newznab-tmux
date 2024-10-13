@@ -187,10 +187,7 @@ class Movie
             ->where('movieinfo.imdbid', '!=', '0000000')
             ->when($maxAge > 0, fn ($query) => $query->whereRaw('r.postdate > NOW() - INTERVAL ? DAY', [$maxAge]))
             ->when(! empty($excludedCats), fn ($query) => $query->whereNotIn('r.categories_id', $excludedCats))
-            ->when(! empty($categorySearch), fn ($query) => $query->whereRaw(
-                // Check if $categorySearch starts with AND or OR and clean it up
-                preg_match('/^\s*(AND|OR)\s+/i', $categorySearch) ? preg_replace('/^\s*(AND|OR)\s+/i', '', $categorySearch) : $categorySearch
-            ))
+            ->when(! empty($categorySearch), fn ($query) => $query->whereRaw($categorySearch))
             ->groupBy('movieinfo.imdbid')
             ->orderBy($order[0], $order[1])
             ->offset($start)

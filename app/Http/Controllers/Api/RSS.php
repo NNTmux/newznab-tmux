@@ -44,7 +44,7 @@ class RSS extends ApiController
                     $userID
                 );
             } elseif ((int) $cat[0] !== -1) {
-                $catSearch = Category::getCategorySearch($cat);
+                $catSearch = Category::getCategorySearch($cat, true);
             }
         }
         $sql =
