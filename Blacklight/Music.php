@@ -130,7 +130,7 @@ class Music
         $browseby = $this->getBrowseBy();
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat, true);
+            $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
         if (\count($excludedCats) > 0) {

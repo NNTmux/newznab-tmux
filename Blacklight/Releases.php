@@ -82,7 +82,7 @@ class Releases extends Release
 			ORDER BY %8\$s %9\$s",
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            Category::getCategorySearch($cat, true),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
@@ -124,7 +124,7 @@ class Releases extends Release
             NZB::NZB_ADDED,
             $this->showPasswords(),
             ($groupName !== -1 ? sprintf(' AND g.name = %s', escapeString($groupName)) : ''),
-            Category::getCategorySearch($cat, true),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
         ));
@@ -474,7 +474,7 @@ class Releases extends Release
 
         $catQuery = '';
         if ($type === 'basic') {
-            $catQuery = Category::getCategorySearch($cat, true);
+            $catQuery = Category::getCategorySearch($cat);
         } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
@@ -560,7 +560,7 @@ class Releases extends Release
             }
         }
 
-        $catQuery = Category::getCategorySearch($cat, true);
+        $catQuery = Category::getCategorySearch($cat);
 
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s',
@@ -712,7 +712,7 @@ class Releases extends Release
             $this->showPasswords(),
             $showSql,
             (! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : '',
-            Category::getCategorySearch($cat, true),
+            Category::getCategorySearch($cat),
             $maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : '',
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '',
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
@@ -852,7 +852,7 @@ class Releases extends Release
             $this->showPasswords(),
             $showSql,
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            Category::getCategorySearch($cat, true),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
@@ -929,7 +929,7 @@ class Releases extends Release
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
-            Category::getCategorySearch($cat, true),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
         $baseSql = sprintf(
@@ -1002,7 +1002,7 @@ class Releases extends Release
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
-            Category::getCategorySearch($cat, true),
+            Category::getCategorySearch($cat),
             $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
         );

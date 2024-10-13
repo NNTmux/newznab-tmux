@@ -304,17 +304,18 @@ class Category extends Model
         return $result;
     }
 
-    public static function getCategorySearch(array $cat = [], bool $useRaw = false): array|string
+    public static function getCategorySearch(array $cat = []): string
     {
         $categories = [];
 
-        // If multiple categories were sent in a single array position, split them
-        if (isset($cat[0]) && str_contains($cat[0], ',')) {
-            $tempCategories = explode(',', $cat[0]);
-            // Reset the first category and add the remaining ones
-            $cat[0] = $tempCategories[0];
-            foreach (array_slice($tempCategories, 1) as $tempCategory) {
-                $cat[] = $tempCategory;
+        // If multiple categories were sent in a single array position, slice and add them
+        if (strpos($cat[0], ',') !== false) {
+            $tmpcats = explode(',', $cat[0]);
+            // Reset the category to the first comma separated value in the string
+            $cat[0] = $tmpcats[0];
+            // Add the remaining categories in the string to the original array
+            foreach (array_slice($tmpcats, 1) as $tmpcat) {
+                $cat[] = $tmpcat;
             }
         }
 
@@ -327,24 +328,14 @@ class Category extends Model
             }
         }
 
-        // Return based on whether it's for raw SQL or Laravel query builder
         $catCount = count($categories);
-
-        if ($useRaw) {
-            // Raw MySQL query string
-            return match ($catCount) {
-                0 => '1=1', // Always true condition
-                1 => $categories[0] !== -1 ? 'AND r.categories_id = '.$categories[0] : '1=1', // Single category case
-                default => 'AND r.categories_id IN ('.implode(', ', $categories).')', // Multiple categories
-            };
-        }
-
-        // Laravel Query Builder array
-        return match ($catCount) {
-            0 => ['1=1'], // Always true condition
-            1 => [$categories[0] !== -1 ? 'r.categories_id = ?' : '1=1', $categories[0]],
-            default => 'r.categories_id IN ('.implode(', ', $categories).')',
+        $catSearch = match ($catCount) {
+            0 => 'AND 1=1',
+            1 => $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '',
+            default => ' AND r.categories_id IN ('.implode(', ', $categories).') ',
         };
+
+        return $catSearch;
     }
 
     /**

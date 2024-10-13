@@ -73,7 +73,7 @@ class XXX
     {
         $catSrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catSrch = Category::getCategorySearch($cat, true);
+            $catSrch = Category::getCategorySearch($cat);
         }
         $order = $this->getXXXOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
