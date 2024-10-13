@@ -521,6 +521,8 @@ class XXX
                     Category::XXX_CLIPHD,
                     Category::XXX_CLIPSD,
                     Category::XXX_WEBDL,
+                    Category::XXX_UHD,
+                    Category::XXX_VR,
                 ]
             )
             ->limit($this->movieQty)
@@ -556,7 +558,6 @@ class XXX
                 }
                 Release::query()
                     ->where('id', $arr['id'])
-                    ->whereIn('categories_id', [Category::XXX_DVD, Category::XXX_WMV, Category::XXX_XVID, Category::XXX_X264, Category::XXX_SD, Category::XXX_CLIPHD, Category::XXX_CLIPSD, Category::XXX_WEBDL])
                     ->update(['xxxinfo_id' => $idcheck]);
             }
         } elseif ($this->echoOutput) {
