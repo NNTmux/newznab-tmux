@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-
 use Spatie\Csp\Directive;
 use Spatie\Csp\Policies\Basic;
 

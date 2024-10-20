@@ -37,7 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ForceJsonOnAPI::class,
         ]);
 
-        $middleware->web(\Illuminate\Session\Middleware\AuthenticateSession::class);
+        $middleware->web([
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Spatie\Csp\AddCspHeaders::class,
+        ]);
 
         $middleware->throttleApi('60,1');
 
