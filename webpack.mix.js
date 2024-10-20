@@ -61,7 +61,6 @@ mix
             'node_modules/jquery-colorbox/jquery.colorbox-min.js',
             'node_modules/pace-js/pace.min.js',
             'node_modules/icheck/icheck.min.js',
-            'node_modules/jquery-goup/dist/jquery.goup.min.js',
             'resources/assets/js/utils-admin.js',
             'resources/assets/js/custom.js',
             'resources/assets/js/functions.js'

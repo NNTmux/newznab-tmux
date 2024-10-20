@@ -93,19 +93,6 @@
 <!-- jQuery 3.3.0 -->
 {{Html::script("{{asset("/assets/js/all-js.js")}}")}}
 
-
-<script>
-    jQuery(document).ready(function () {
-        jQuery.goup({
-            containerColor: "#8bc5c5",
-            arrowColor: "#fdf8f8",
-            bottomOffset: 100,
-            goupSpeed: "normal",
-            title: "Scroll to top"
-        });
-    });
-</script>
-
 {{Form::open(['id' => 'frm-logout', 'route' => 'logout'])}}
 {{Form::close()}}
 
