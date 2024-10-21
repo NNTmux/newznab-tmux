@@ -1620,16 +1620,16 @@
         },
         {
             "name": "doctrine/sql-formatter",
-            "version": "1.5.0",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/sql-formatter.git",
-                "reference": "16ca9e39877369d664f06dacde468548298bdc40"
+                "reference": "b784cbde727cf806721451dde40eff4fec3bbe86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/sql-formatter/zipball/16ca9e39877369d664f06dacde468548298bdc40",
-                "reference": "16ca9e39877369d664f06dacde468548298bdc40",
+                "url": "https://api.github.com/repos/doctrine/sql-formatter/zipball/b784cbde727cf806721451dde40eff4fec3bbe86",
+                "reference": "b784cbde727cf806721451dde40eff4fec3bbe86",
                 "shasum": ""
             },
             "require": {
@@ -1670,9 +1670,9 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/sql-formatter/issues",
-                "source": "https://github.com/doctrine/sql-formatter/tree/1.5.0"
+                "source": "https://github.com/doctrine/sql-formatter/tree/1.5.1"
             },
-            "time": "2024-09-11T07:29:40+00:00"
+            "time": "2024-10-21T18:21:57+00:00"
         },
         {
             "name": "dragonmantank/cron-expression",
