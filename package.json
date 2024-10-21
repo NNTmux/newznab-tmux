@@ -1,6 +1,6 @@
 {
     "private": true,
-    "type": "commonjs",
+    "type": "module",
     "scripts": {
         "dev": "npm run development",
         "development": "mix",
