@@ -806,36 +806,6 @@ function isValidEmailAddress(emailAddress) {
     return pattern.test(emailAddress);
 }
 
-function mymovie_del(imdbID, btn) {
-    $.ajax({
-        url: base_url + '/ajax_mymovies?rand=' + $.now(),
-        data: { del: imdbID },
-        dataType: 'html',
-        success: function (data) {
-            $(btn).hide();
-            $(btn).prev('a').show();
-        },
-        error: function (xhr, err, e) {},
-    });
-
-    return false;
-}
-
-function mymovie_add(imdbID, btn) {
-    $(btn).hide();
-    $(btn).next('a').show();
-
-    $.ajax({
-        url: base_url + '/ajax_mymovies?rand=' + $.now(),
-        data: { add: imdbID },
-        dataType: 'html',
-        success: function (data) {},
-        error: function (xhr, err, e) {},
-    });
-
-    return false;
-}
-
 function getNzbGetQueue() {
     $.ajax({
         url: 'queuedata?type=nzbget&id=' + $.now(),
