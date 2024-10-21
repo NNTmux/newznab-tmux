@@ -39,7 +39,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web([
             \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \Spatie\Csp\AddCspHeaders::class,
         ]);
 
         $middleware->throttleApi('60,1');
