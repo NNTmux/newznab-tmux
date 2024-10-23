@@ -168,6 +168,10 @@ class Games
      */
     public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): array
     {
+
+        $page = max(1, $page);
+        $start = max(1, $start);
+
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {

@@ -50,6 +50,9 @@ class Releases extends Release
      */
     public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0): mixed
     {
+        $page = max(1, $page);
+        $start = max(1, $start);
+
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(

@@ -71,6 +71,9 @@ class XXX
      */
     public function getXXXRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = []): array
     {
+        $page = max(1, $page);
+        $start = max(1, $start);
+
         $catSrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
             $catSrch = Category::getCategorySearch($cat);

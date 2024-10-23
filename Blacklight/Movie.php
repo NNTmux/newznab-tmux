@@ -167,6 +167,9 @@ class Movie
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
+        $page = max(1, $page);
+        $start = max(1, $start);
+
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);

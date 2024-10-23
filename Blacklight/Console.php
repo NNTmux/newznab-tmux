@@ -137,6 +137,9 @@ class Console
      */
     public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
     {
+        $page = max(1, $page);
+        $start = max(1, $start);
+
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
