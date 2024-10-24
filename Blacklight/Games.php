@@ -170,7 +170,7 @@ class Games
     {
 
         $page = max(1, $page);
-        $start = max(1, $start);
+        $start = max(0, $start);
 
         $browseBy = $this->getBrowseBy();
         $catsrch = '';

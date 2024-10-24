@@ -105,7 +105,7 @@ class Books
     public function getBookRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
     {
         $page = max(1, $page);
-        $start = max(1, $start);
+        $start = max(0, $start);
 
         $browseby = $this->getBrowseBy();
         $catsrch = '';
