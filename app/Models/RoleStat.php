@@ -16,7 +16,12 @@ class RoleStat extends Model
     {
         $roles = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderByDesc('users_count')->get();
         foreach ($roles as $role) {
-            self::updateOrCreate(['role' => $role->name, 'users' => $role->users_count]);
+            // Check if we already have the information and if we do just update the count
+            if (self::query()->where('role', $role->name)->exists()) {
+                self::query()->where('role', $role->name)->update(['users' => $role->users_count]);
+                continue;
+            }
+            self::query()->create(['role' => $role->name, 'users' => $role->users_count]);
         }
     }
 
