@@ -19,6 +19,7 @@ class RoleStat extends Model
             // Check if we already have the information and if we do just update the count
             if (self::query()->where('role', $role->name)->exists()) {
                 self::query()->where('role', $role->name)->update(['users' => $role->users_count]);
+
                 continue;
             }
             self::query()->create(['role' => $role->name, 'users' => $role->users_count]);
