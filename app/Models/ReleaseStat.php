@@ -20,10 +20,13 @@ class ReleaseStat extends Model
             'categories.id')->groupBy('title')->orderByDesc('count')->get();
 
         foreach ($categories as $category) {
-            self::updateOrCreate([
-                'category' => $category->title,
-                'count' => $category->count,
-            ]);
+            // Check if we already have the information and if we do just update the count
+            if (self::query()->where('category', $category->title)->exists()) {
+                self::query()->where('category', $category->title)->update(['count' => $category->count]);
+
+                continue;
+            }
+            self::query()->create(['category' => $category->title, 'count' => $category->count]);
         }
     }
 
