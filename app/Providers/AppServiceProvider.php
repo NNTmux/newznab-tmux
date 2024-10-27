@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use PragmaRX\Google2FALaravel\Listeners\LoginViaRemember;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewPulse', function (User $user) {
             return $user->hasRole('Admin');
         });
+        Event::listen(Login::class, LoginViaRemember::class);
     }
 
     /**
