@@ -285,17 +285,15 @@ class ProcessAdditional
 
         // Pass the binary extractors to ArchiveInfo.
         $clients = [];
-        if (! empty(Settings::settingValue('apps..unrarpath'))) {
-            $this->_unrarPath = Settings::settingValue('apps..unrarpath');
-            $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
-        }
+        $this->_unrarPath = config('nntmux_settings.unrar_path');
+        $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
 
         $this->_archiveInfo->setExternalClients($clients);
 
         $this->_killString = '"';
-        if (! empty(Settings::settingValue('apps..timeoutpath')) && (int) Settings::settingValue('..timeoutseconds') > 0) {
+        if (config('nntmux_settings.timeout_path') && (int) Settings::settingValue('..timeoutseconds') > 0) {
             $this->_killString = (
-                '"'.Settings::settingValue('apps..timeoutpath').
+                '"'.config('nntmux_settings.timeout_path').
                 '" --foreground --signal=KILL '.
                 Settings::settingValue('..timeoutseconds').' "'
             );
@@ -327,13 +325,13 @@ class ProcessAdditional
         $this->_minSize = (Settings::settingValue('..minsizetopostprocess') !== '') ? (int) Settings::settingValue('..minsizetopostprocess') : 100;
 
         // Use the alternate NNTP provider for downloading Message-ID's ?
-        $this->_alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
+        $this->_alternateNNTP = config('nntmux_nntp.use_alternate_nntp_server');
 
         $this->_ffMPEGDuration = Settings::settingValue('..ffmpeg_duration') !== '' ? (int) Settings::settingValue('..ffmpeg_duration') : 5;
 
-        $this->_addPAR2Files = (int) Settings::settingValue('..addpar2') !== 0;
+        $this->_addPAR2Files = config('nntmux:settings.add_par2');
 
-        if (! Settings::settingValue('apps..ffmpegpath')) {
+        if (! config('nntmux_settings.ffmpeg_path')) {
             $this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
         } else {
             $this->_processAudioSample = (int) Settings::settingValue('..saveaudiopreview') !== 0;
@@ -342,11 +340,11 @@ class ProcessAdditional
         }
 
         $this->_processJPGSample = (int) Settings::settingValue('..processjpg') !== 0;
-        $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') !== '';
+        $this->_processMediaInfo = config('nntmux_settings.mediainfo_path');
         $this->_processAudioInfo = $this->_processMediaInfo;
-        $this->_processPasswords = ! empty(Settings::settingValue('..checkpasswordedrar')) && ! empty(Settings::settingValue('apps..unrarpath'));
+        $this->_processPasswords = config('nntmux_settings.check_passworded_rars') === true && ! empty(config('nntmux_settings.unrar_path'));
 
-        $this->_audioSavePath = storage_path('covers/audiosample/');
+        $this->_audioSavePath = config('nntmux_settings.covers_path').'/audiosample/';
 
         $this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
         $this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';

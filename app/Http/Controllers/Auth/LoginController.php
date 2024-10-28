@@ -81,7 +81,7 @@ class LoginController extends Controller
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                    $userIp = (int) Settings::settingValue('..storeuserips') === 1 ? ($request->ip() ?? $request->getClientIp()) : '';
+                    $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
                     event(new UserLoggedIn($user, $userIp));
 
                     Auth::logoutOtherDevices($request->input('password'));
@@ -108,7 +108,7 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
-        $theme = Settings::settingValue('site.main.style');
+        $theme = 'Gentele';
 
         $meta_title = 'Login';
         $meta_keywords = 'Login';

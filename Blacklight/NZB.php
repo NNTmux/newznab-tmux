@@ -65,7 +65,7 @@ class NZB
     {
         $nzbSplitLevel = (int) Settings::settingValue('..nzbsplitlevel');
         $this->nzbSplitLevel = $nzbSplitLevel ?? 1;
-        $this->siteNzbPath = (string) Settings::settingValue('..nzbpath');
+        $this->siteNzbPath = config('nntmux_settings.path_to_nzbs');
         if (! Str::endsWith($this->siteNzbPath, '/')) {
             $this->siteNzbPath .= '/';
         }

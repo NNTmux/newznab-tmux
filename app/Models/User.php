@@ -595,7 +595,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
+        $storeips = config('nntmux:settings.store_user_ip') === true ? $host : '';
 
         $user = self::create(
             [

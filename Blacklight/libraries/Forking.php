@@ -187,10 +187,6 @@ class Forking
                 $this->postProcessNfo();
                 break;
 
-            case 'postProcess_sha':
-                $this->processSharing();
-                break;
-
             case 'postProcess_tv':
                 $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
                 $this->postProcessTv();
@@ -839,27 +835,6 @@ class Forking
         }
 
         $this->postProcess($this->work, $this->maxProcesses);
-    }
-
-    /**
-     * Process sharing.
-     *
-     *
-     * @throws \Exception
-     */
-    private function processSharing(): bool
-    {
-        $sharing = DB::select('SELECT enabled FROM sharing');
-        if ($sharing > 0 && (int) $sharing[0]->enabled === 1) {
-            $nntp = new NNTP;
-            if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
-                (new PostProcess(['ColorCLI' => $this->colorCli]))->processSharing($nntp);
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     /**

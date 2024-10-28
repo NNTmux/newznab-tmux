@@ -41,7 +41,7 @@ class NZBContents
         $this->pp = new PostProcess;
         $this->nzb = new NZB;
         $this->lookuppar2 = (int) Settings::settingValue('..lookuppar2') === 1;
-        $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
+        $this->alternateNNTP = config('nntmux_nntp.use_alternate_nntp_server');
     }
 
     /**

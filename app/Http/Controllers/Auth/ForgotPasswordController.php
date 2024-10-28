@@ -73,7 +73,7 @@ class ForgotPasswordController extends Controller
             }
         }
 
-        $theme = Settings::settingValue('site.main.style');
+        $theme = 'Gentele';
 
         $title = 'Forgotten Password';
         $meta_title = 'Forgotten Password';

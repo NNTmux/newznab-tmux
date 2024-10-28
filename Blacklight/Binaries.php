@@ -182,7 +182,7 @@ class Binaries
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
             (int) Settings::settingValue('..maxmssgs') : 20000;
-        $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
+        $this->_compressedHeaders = config('nntmux_nntp.compressed_headers');
         $this->_partRepair = (int) Settings::settingValue('..partrepair') === 1;
         $this->_newGroupScanByDays = (int) Settings::settingValue('..newgroupscanmethod') === 1;
         $this->_newGroupMessagesToScan = Settings::settingValue('..newgroupmsgstoscan') !== '' ? (int) Settings::settingValue('..newgroupmsgstoscan') : 50000;

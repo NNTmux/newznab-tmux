@@ -55,7 +55,7 @@ class CleanNZB extends Command
         $releases = new Release;
         $checked = $deleted = 0;
         // Get the list of NZBs in the NZB folder
-        $dirItr = new \RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'));
+        $dirItr = new \RecursiveDirectoryIterator(config('nntmux_settings.path_to_nzbs'));
         $itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
 
         // Checking filename GUIDs against the releases table

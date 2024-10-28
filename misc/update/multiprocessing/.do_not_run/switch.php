@@ -421,7 +421,7 @@ function charCheck(string $char): bool
 function &nntp(): NNTP
 {
     $nntp = new NNTP();
-    if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(false, true) : $nntp->doConnect()) !== true) {
+    if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect(false, true) : $nntp->doConnect()) !== true) {
         exit('ERROR: Unable to connect to usenet.'.PHP_EOL);
     }
 

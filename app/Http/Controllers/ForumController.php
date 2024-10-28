@@ -48,7 +48,7 @@ class ForumController extends BasePageController
 
         $results = Forumpost::getBrowseRange();
 
-        $this->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
+        $this->smarty->assign('privateprofiles', config('nntmux_settings.private_profiles'));
 
         $this->smarty->assign('results', $results);
 
@@ -89,7 +89,7 @@ class ForumController extends BasePageController
         $meta_description = 'View forum post';
 
         $this->smarty->assign('results', $results);
-        $this->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
+        $this->smarty->assign('privateprofiles', config('nntmux_settings.private_profiles'));
 
         $content = $this->smarty->fetch('forumpost.tpl');
 

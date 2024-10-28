@@ -192,7 +192,8 @@ switch (true) {
                 $colorCli->primaryOver('p');
                 if (! isset($nzbcontents)) {
                     $nntp = new NNTP;
-                    if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+                    $compressedHeaders = config('nntmux_nntp.compressed_headers');
+                    if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect()) !== true) {
                         $colorCli->error('Unable to connect to usenet.');
                     }
                     $Nfo = new Nfo;

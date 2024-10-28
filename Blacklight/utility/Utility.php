@@ -127,7 +127,7 @@ class Utility
      */
     public static function fileInfo(string $path): string
     {
-        $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
+        $magicPath = config('nntmux_settings.magic_file_path');
         if ($magicPath !== null && Process::run('which file')->successful()) {
             $magicSwitch = " -m $magicPath";
             $output = runCmd('file'.$magicSwitch.' -b "'.$path.'"');

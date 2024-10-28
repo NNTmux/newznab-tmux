@@ -59,8 +59,8 @@ class PostProcess
         $this->Nfo = new Nfo;
 
         // Site settings.
-        $this->addpar2 = (int) Settings::settingValue('..addpar2') !== 0;
-        $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
+        $this->addpar2 = config('nntmux:settings.add_par2');
+        $this->alternateNNTP = config('nntmux_nntp.use_alternate_nntp_server');
     }
 
     /**
