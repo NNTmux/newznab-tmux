@@ -124,7 +124,7 @@ class Tmux
 
     public function getMonitorSettings(): string
     {
-        $settstr = 'SELECT value FROM settings WHERE setting =';
+        $settstr = 'SELECT value FROM settings WHERE name =';
 
         $sql = sprintf(
             "SELECT
@@ -132,17 +132,13 @@ class Tmux
 					(%1\$s 'binaries') AS binaries_run,
 					(%1\$s 'backfill') AS backfill,
 					(%1\$s 'backfill_qty') AS backfill_qty,
-					(%1\$s 'import') AS import,
 					(%1\$s 'nzbs') AS nzbs,
 					(%1\$s 'post') AS post,
 					(%1\$s 'releases') AS releases_run,
-					(%1\$s 'releases_threaded') AS releases_threaded,
 					(%1\$s 'fix_names') AS fix_names,
 					(%1\$s 'seq_timer') AS seq_timer,
 					(%1\$s 'bins_timer') AS bins_timer,
 					(%1\$s 'back_timer') AS back_timer,
-					(%1\$s 'import_count') AS import_count,
-					(%1\$s 'import_timer') AS import_timer,
 					(%1\$s 'rel_timer') AS rel_timer,
 					(%1\$s 'fix_timer') AS fix_timer,
 					(%1\$s 'post_timer') AS post_timer,
@@ -152,7 +148,6 @@ class Tmux
 					(%1\$s 'fix_crap') AS fix_crap,
 					(%1\$s 'fix_crap_opt') AS fix_crap_opt,
 					(%1\$s 'tv_timer') AS tv_timer,
-					(%1\$s 'update_tv') AS update_tv,
 					(%1\$s 'post_kill_timer') AS post_kill_timer,
 					(%1\$s 'monitor_path') AS monitor_path,
 					(%1\$s 'monitor_path_a') AS monitor_path_a,
@@ -170,8 +165,6 @@ class Tmux
 					(%1\$s 'colors_exc') AS colors_exc,
 					(%1\$s 'showquery') AS show_query,
 					(%1\$s 'running') AS is_running,
-					(%1\$s 'run_sharing') AS run_sharing,
-					(%1\$s 'sharing_timer') AS sharing_timer,
 					(%1\$s 'lookupbooks') AS processbooks,
 					(%1\$s 'lookupmusic') AS processmusic,
 					(%1\$s 'lookupgames') AS processgames,
@@ -182,8 +175,6 @@ class Tmux
 					(%1\$s 'lookupnfo') AS processnfo,
 					(%1\$s 'lookuppar2') AS processpar2,
 					(%1\$s 'nzbthreads') AS nzbthreads,
-					(%1\$s 'tmpunrarpath') AS tmpunrar,
-					(%1\$s 'compressedheaders') AS compressed,
 					(%1\$s 'maxsizetopostprocess') AS maxsize_pp,
 					(%1\$s 'minsizetopostprocess') AS minsize_pp",
             $settstr
@@ -223,7 +214,7 @@ class Tmux
     {
         $path = storage_path('logs');
         $getDate = now()->format('Y_m_d');
-        $logs = Settings::settingValue('site.tmux.write_logs') ?? 0;
+        $logs = Settings::settingValue('write_logs') ?? 0;
         if ($logs === 1) {
             return "2>&1 | tee -a $path/$pane-$getDate.log";
         }
@@ -260,7 +251,7 @@ class Tmux
      */
     public function rand_bool($loop, int $chance = 60): bool
     {
-        $usecache = Settings::settingValue('site.tmux.usecache') ?? 0;
+        $usecache = Settings::settingValue('usecache') ?? 0;
         if ($loop === 1 || $usecache === 0) {
             return false;
         }
@@ -393,7 +384,7 @@ class Tmux
      */
     public function isRunning(): bool
     {
-        $running = Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->first(['value']);
+        $running = Settings::query()->where(['name' => 'running'])->first(['value']);
         if ($running === null) {
             throw new \RuntimeException('Tmux\\\'s running flag was not found in the database.'.PHP_EOL.'Please check the tables are correctly setup.'.PHP_EOL);
         }
@@ -407,8 +398,8 @@ class Tmux
     public function stopIfRunning(): bool
     {
         if ($this->isRunning()) {
-            Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 0]);
-            $sleep = Settings::settingValue('site.tmux.monitor_delay');
+            Settings::query()->where(['name' => 'running'])->update(['value' => 0]);
+            $sleep = Settings::settingValue('monitor_delay');
             $this->colorCli->header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
             sleep($sleep);
 

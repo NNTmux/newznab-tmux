@@ -55,9 +55,9 @@ class Backfill
         $this->colorCli = new ColorCLI;
 
         $this->_compressedHeaders = config('nntmux_nntp.compressed_headers');
-        $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2012-08-14';
-        $this->_safePartRepair = (int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill';
-        $this->_disableBackfillGroup = (int) Settings::settingValue('..disablebackfillgroup') === 1;
+        $this->_safeBackFillDate = Settings::settingValue('safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2012-08-14';
+        $this->_safePartRepair = (int) Settings::settingValue('safepartrepair') === 1 ? 'update' : 'backfill';
+        $this->_disableBackfillGroup = (int) Settings::settingValue('disablebackfillgroup') === 1;
     }
 
     /**

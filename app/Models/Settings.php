@@ -157,21 +157,14 @@ class Settings extends Model
         return $tree;
     }
 
-    /**
-     * @return mixed
-     */
-    public static function settingValue($setting)
+
+    public static function settingValue($setting): mixed
     {
-        preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $hit);
-        $result = self::query()->where(
+        return self::query()->where(
             [
-                'section' => $hit[1] ?? '',
-                'subsection' => $hit[2] ?? '',
-                'name' => $hit[3] ?? '',
+                'name' => $setting,
             ]
         )->value('value');
-
-        return $result;
     }
 
     public static function settingsUpdate(array $data = []): void

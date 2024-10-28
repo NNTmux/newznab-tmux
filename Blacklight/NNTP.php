@@ -112,7 +112,7 @@ class NNTP extends \Net_NNTP_Client
 
         $this->_echo = config('nntmux.echocli');
         $this->_tmux = new Tmux;
-        $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
+        $this->_nntpRetries = Settings::settingValue('nntpretries') !== '' ? (int) Settings::settingValue('nntpretries') : 0 + 1;
         $this->colorCli = new ColorCLI;
         $this->_currentPort = config('nntmux_nntp.port');
         $this->_currentServer = config('nntmux_nntp.server');

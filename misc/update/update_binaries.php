@@ -8,7 +8,7 @@ use Blacklight\Binaries;
 use Blacklight\ColorCLI;
 use Blacklight\NNTP;
 
-$maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
+$maxHeaders = (int) Settings::settingValue('max_headers_iteration') ?: 1000000;
 $colorCli = new ColorCLI;
 
 // Create the connection here and pass

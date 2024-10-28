@@ -29,7 +29,7 @@ class TmuxUIStart extends Command
     public function handle(): void
     {
         $tmux = new Tmux;
-        $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
+        $tmux_session = Settings::settingValue('tmux_session') ?? 0;
 
         // Set running value to on.
         $tmux->startRunning();

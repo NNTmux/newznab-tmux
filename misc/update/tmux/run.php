@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 $tmuxPath = base_path().'/misc/update/tmux/';
-$import = Settings::settingValue('site.tmux.import') ?? 0;
-$tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
-$seq = Settings::settingValue('site.tmux.sequential') ?? 0;
-$delaytime = Settings::settingValue('..delaytime');
+$tmux_session = Settings::settingValue('tmux_session') ?? 0;
+$seq = Settings::settingValue('sequential') ?? 0;
+$delaytime = Settings::settingValue('delaytime');
 $delaytime = $delaytime ? (int) $delaytime : 2;
 $colorCli = new ColorCLI;
 
@@ -45,18 +44,18 @@ unset($value);
 
 function start_apps($tmux_session): void
 {
-    $htop = Settings::settingValue('site.tmux.htop');
-    $vnstat = Settings::settingValue('site.tmux.vnstat');
-    $vnstat_args = Settings::settingValue('site.tmux.vnstat_args');
-    $tcptrack = Settings::settingValue('site.tmux.tcptrack');
-    $tcptrack_args = Settings::settingValue('site.tmux.tcptrack_args');
-    $nmon = Settings::settingValue('site.tmux.nmon');
-    $bwmng = Settings::settingValue('site.tmux.bwmng');
-    $mytop = Settings::settingValue('site.tmux.mytop');
-    $redis = Settings::settingValue('site.tmux.redis');
-    $showprocesslist = Settings::settingValue('site.tmux.showprocesslist');
-    $processupdate = Settings::settingValue('site.tmux.processupdate');
-    $console_bash = Settings::settingValue('site.tmux.console');
+    $htop = Settings::settingValue('htop');
+    $vnstat = Settings::settingValue('vnstat');
+    $vnstat_args = Settings::settingValue('vnstat_args');
+    $tcptrack = Settings::settingValue('tcptrack');
+    $tcptrack_args = Settings::settingValue('tcptrack_args');
+    $nmon = Settings::settingValue('nmon');
+    $bwmng = Settings::settingValue('bwmng');
+    $mytop = Settings::settingValue('mytop');
+    $redis = Settings::settingValue('redis');
+    $showprocesslist = Settings::settingValue('showprocesslist');
+    $processupdate = Settings::settingValue('processupdate');
+    $console_bash = Settings::settingValue('console');
 
     if ((int) $htop === 1 && command_exist('htop')) {
         Process::run("tmux new-window -t $tmux_session -n htop 'printf \"\033]2;htop\033\" && htop'");

@@ -29,7 +29,7 @@ switch ($options[1]) {
     // $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
     case 'backfill':
         if (in_array((int) $options[3], [1, 2], false)) {
-            $value = (int) Settings::settingValue('site.tmux.backfill_qty');
+            $value = (int) Settings::settingValue('backfill_qty');
             if ($value !== null) {
                 try {
                     $nntp = nntp();
@@ -109,7 +109,7 @@ switch ($options[1]) {
         }
         try {
             $binaries = new Binaries(['NNTP' => $nntp, 'Groups' => null]);
-            $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill'));
+            $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('safepartrepair') === 1 ? 'update' : 'backfill'));
         } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
@@ -309,7 +309,7 @@ switch ($options[1]) {
                 echo $e->getMessage();
             }
             try {
-                (new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
+                (new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptvrage'));
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
@@ -331,7 +331,7 @@ switch ($options[1]) {
 
             if ($options[1] === 'pp_nfo') {
                 try {
-                    (new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
+                    (new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptvrage'));
                 } catch (Throwable $e) {
                     echo $e->getMessage();
                 }
@@ -386,7 +386,7 @@ switch ($options[1]) {
  */
 function processReleases(ProcessReleases $releases, $groupID): void
 {
-    $releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int) Settings::settingValue('..maxnzbsprocessed') : 1000);
+    $releaseCreationLimit = (Settings::settingValue('maxnzbsprocessed') !== '' ? (int) Settings::settingValue('maxnzbsprocessed') : 1000);
     $releases->processIncompleteCollections($groupID);
     $releases->processCollectionSizes($groupID);
     $releases->deleteUnwantedCollections($groupID);

@@ -90,13 +90,13 @@ class Console
 
         $this->colorCli = new ColorCLI;
 
-        $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
-        $this->privkey = Settings::settingValue('APIs..amazonprivkey');
-        $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
-        $this->gameqty = (Settings::settingValue('..maxgamesprocessed') !== '') ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
-        $this->sleeptime = (Settings::settingValue('..amazonsleep') !== '') ? (int) Settings::settingValue('..amazonsleep') : 1000;
-        $this->imgSavePath = storage_path('covers/console/');
-        $this->renamed = (int) Settings::settingValue('..lookupgames') === 2;
+        $this->pubkey = Settings::settingValue('amazonpubkey');
+        $this->privkey = Settings::settingValue('amazonprivkey');
+        $this->asstag = Settings::settingValue('amazonassociatetag');
+        $this->gameqty = (Settings::settingValue('maxgamesprocessed') !== '') ? (int) Settings::settingValue('maxgamesprocessed') : 150;
+        $this->sleeptime = (Settings::settingValue('amazonsleep') !== '') ? (int) Settings::settingValue('amazonsleep') : 1000;
+        $this->imgSavePath = config('nntmux_settings.covers_path').'/console/';
+        $this->renamed = (int) Settings::settingValue('lookupgames') === 2;
 
         $this->failCache = [];
     }

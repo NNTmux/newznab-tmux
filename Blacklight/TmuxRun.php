@@ -27,8 +27,7 @@ class TmuxRun extends Tmux
     public function __construct()
     {
         parent::__construct();
-        $dateFormat = Settings::settingValue('shell.date.format');
-        $this->_dateFormat = $dateFormat ?? '%Y-%m-%d %T';
+        $this->_dateFormat = '%Y-%m-%d %T';
     }
 
     /**

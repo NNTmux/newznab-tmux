@@ -70,7 +70,7 @@ class MyMoviesController extends BasePageController
                 $categories = [];
                 foreach ($tmpcats as $c) {
                     // If MOVIE WEB-DL categorization is disabled, don't include it as an option
-                    if ((int) $c['id'] === Category::MOVIE_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+                    if ((int) $c['id'] === Category::MOVIE_WEBDL && (int) Settings::settingValue('catwebdl') === 0) {
                         continue;
                     }
                     $categories[$c['id']] = $c['title'];

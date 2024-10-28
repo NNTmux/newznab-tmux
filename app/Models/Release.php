@@ -309,7 +309,7 @@ class Release extends Model
      */
     public static function updateGrab(string $guid): void
     {
-        $updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
+        $updateGrabs = ((int) Settings::settingValue('grabstatus') !== 0);
         if ($updateGrabs) {
             self::whereGuid($guid)->increment('grabs');
         }

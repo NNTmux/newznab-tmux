@@ -54,10 +54,10 @@ class PopulateAniDB
         $this->echooutput = config('nntmux.echocli');
         $this->colorCli = new ColorCLI;
 
-        $anidbupdint = Settings::settingValue('APIs.AniDB.max_update_frequency');
-        $lastupdated = Settings::settingValue('APIs.AniDB.last_full_update');
+        $anidbupdint = Settings::settingValue('max_update_frequency');
+        $lastupdated = Settings::settingValue('last_full_update');
 
-        $this->imgSavePath = storage_path('covers/anime/');
+        $this->imgSavePath = config('nntmux_settings.covers_path').'/anime/';
         $this->apiKey = config('nntmux_api.anidb_api_key');
 
         $this->updateInterval = $anidbupdint ?? '7';
@@ -90,7 +90,7 @@ class PopulateAniDB
      */
     private function getAniDbAPI($aniDbId)
     {
-        $timestamp = Settings::settingValue('APIs.AniDB.banned') + 90000;
+        $timestamp = Settings::settingValue('banned') + 90000;
         if ($timestamp > time()) {
             echo 'Banned from AniDB lookups until '.date('Y-m-d H:i:s', $timestamp).PHP_EOL;
 

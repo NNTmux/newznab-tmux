@@ -32,7 +32,7 @@ $runVar['paths']['scraper'] = base_path().'/misc/IRCScraper/scrape.php';
 
 $db_name = config('nntmux.db_name');
 
-$tmux_niceness = Settings::settingValue('site.tmux.niceness') ?? 2;
+$tmux_niceness = Settings::settingValue('niceness') ?? 2;
 
 $runVar['constants'] = (array) Arr::first(DB::select($tRun->getConstantSettings()));
 
@@ -388,7 +388,7 @@ while ($runVar['counts']['iterations'] > 0) {
         }
     }
 
-    $exit = Settings::settingValue('tmux.running.exit');
+    $exit = Settings::settingValue('exit');
     if ((int) $exit === 0) {
         $runVar['counts']['iterations']++;
         sleep(10);

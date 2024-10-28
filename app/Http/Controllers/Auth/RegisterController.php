@@ -151,7 +151,7 @@ class RegisterController extends Controller
                     return $this->showRegistrationForm($request, $error);
                 }
 
-                if (Invite::isAllowed($inviteCode, $email) || Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+                if (Invite::isAllowed($inviteCode, $email) || Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
                     $user = $this->create(
                         [
                             'username' => $userName,
@@ -201,7 +201,7 @@ class RegisterController extends Controller
             $this->inviteCodeQuery = '&invitecode='.$inviteCode;
         }
 
-        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+        if ((int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE) {
             if (! empty($inviteCode)) {
                 if (Invite::isValid($inviteCode)) {
                     $error = '';
@@ -214,7 +214,7 @@ class RegisterController extends Controller
                 $error = 'Registrations are currently invite only.';
                 $showRegister = 0;
             }
-        } elseif ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
+        } elseif ((int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
             $error = 'Registrations are currently closed.';
             $showRegister = 0;
         } elseif ($request->has('invitecode')) {

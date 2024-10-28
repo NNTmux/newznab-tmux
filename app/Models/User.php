@@ -555,7 +555,7 @@ class User extends Authenticatable
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
         $invitedBy = 0;
-        if (! $forceInviteMode && (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+        if (! $forceInviteMode && (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE) {
             if ($inviteCode === '') {
                 return self::ERR_SIGNUP_BADINVITECODE;
             }

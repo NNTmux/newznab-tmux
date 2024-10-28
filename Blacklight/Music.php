@@ -80,13 +80,13 @@ class Music
 
         $this->colorCli = new ColorCLI;
 
-        $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
-        $this->privkey = Settings::settingValue('APIs..amazonprivkey');
-        $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
-        $this->musicqty = Settings::settingValue('..maxmusicprocessed') !== '' ? (int) Settings::settingValue('..maxmusicprocessed') : 150;
-        $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
-        $this->imgSavePath = storage_path('covers/music/');
-        $this->renamed = (int) Settings::settingValue('..lookupmusic') === 2 ? 'AND isrenamed = 1' : '';
+        $this->pubkey = Settings::settingValue('amazonpubkey');
+        $this->privkey = Settings::settingValue('amazonprivkey');
+        $this->asstag = Settings::settingValue('amazonassociatetag');
+        $this->musicqty = Settings::settingValue('maxmusicprocessed') !== '' ? (int) Settings::settingValue('maxmusicprocessed') : 150;
+        $this->sleeptime = Settings::settingValue('amazonsleep') !== '' ? (int) Settings::settingValue('amazonsleep') : 1000;
+        $this->imgSavePath = config('nntmux_settings.covers_path').'/music/';
+        $this->renamed = (int) Settings::settingValue('lookupmusic') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
     }

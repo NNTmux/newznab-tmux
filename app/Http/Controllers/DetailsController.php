@@ -76,10 +76,10 @@ class DetailsController extends BasePageController
                     $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
                     $mov['genre'] = makeFieldLinks($mov, 'genre', 'movies');
                     $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
-                    if (Settings::settingValue('site.trailers.trailers_display')) {
+                    if (Settings::settingValue('trailers_display')) {
                         $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
                         if ($trailer) {
-                            $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('site.trailers.trailers_size_x'), Settings::settingValue('site.trailers.trailers_size_y'), $trailer);
+                            $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('trailers_size_x'), Settings::settingValue('trailers_size_y'), $trailer);
                         }
                     }
                 }

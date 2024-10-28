@@ -180,15 +180,15 @@ class Binaries
         $this->_nntp = new NNTP;
         $this->_collectionsCleaning = new CollectionsCleaning;
 
-        $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
-            (int) Settings::settingValue('..maxmssgs') : 20000;
+        $this->messageBuffer = Settings::settingValue('maxmssgs') !== '' ?
+            (int) Settings::settingValue('maxmssgs') : 20000;
         $this->_compressedHeaders = config('nntmux_nntp.compressed_headers');
-        $this->_partRepair = (int) Settings::settingValue('..partrepair') === 1;
-        $this->_newGroupScanByDays = (int) Settings::settingValue('..newgroupscanmethod') === 1;
-        $this->_newGroupMessagesToScan = Settings::settingValue('..newgroupmsgstoscan') !== '' ? (int) Settings::settingValue('..newgroupmsgstoscan') : 50000;
-        $this->_newGroupDaysToScan = Settings::settingValue('..newgroupdaystoscan') !== '' ? (int) Settings::settingValue('..newgroupdaystoscan') : 3;
-        $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
-        $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
+        $this->_partRepair = (int) Settings::settingValue('partrepair') === 1;
+        $this->_newGroupScanByDays = (int) Settings::settingValue('newgroupscanmethod') === 1;
+        $this->_newGroupMessagesToScan = Settings::settingValue('newgroupmsgstoscan') !== '' ? (int) Settings::settingValue('newgroupmsgstoscan') : 50000;
+        $this->_newGroupDaysToScan = Settings::settingValue('newgroupdaystoscan') !== '' ? (int) Settings::settingValue('newgroupdaystoscan') : 3;
+        $this->_partRepairLimit = Settings::settingValue('maxpartrepair') !== '' ? (int) Settings::settingValue('maxpartrepair') : 15000;
+        $this->_partRepairMaxTries = (Settings::settingValue('partrepairmaxtries') !== '' ? (int) Settings::settingValue('partrepairmaxtries') : 3);
 
         $this->blackList = $this->whiteList = [];
     }
