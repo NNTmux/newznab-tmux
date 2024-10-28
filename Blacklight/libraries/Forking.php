@@ -789,7 +789,7 @@ class Forking
      */
     private function checkProcessTV(): bool
     {
-        if ((int) Settings::settingValue('lookuptvrage') > 0) {
+        if ((int) Settings::settingValue('lookuptv') > 0) {
             return DB::select(sprintf('
 						SELECT id
 						FROM releases
@@ -798,7 +798,7 @@ class Forking
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
 						%s %s
-						', NZB::NZB_ADDED, (int) Settings::settingValue('lookuptvrage') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) > 0;
+						', NZB::NZB_ADDED, (int) Settings::settingValue('lookuptv') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) > 0;
         }
 
         return false;
@@ -826,7 +826,7 @@ class Forking
 					LIMIT 16',
                     ($this->ppRenamedOnly ? 2 : 1),
                     NZB::NZB_ADDED,
-                    (int) Settings::settingValue('lookuptvrage') === 2 ? 'AND isrenamed = 1' : '',
+                    (int) Settings::settingValue('lookuptv') === 2 ? 'AND isrenamed = 1' : '',
                     ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
                 )
             );

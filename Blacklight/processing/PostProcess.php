@@ -168,7 +168,7 @@ class PostProcess
     public function processNfos(NNTP $nntp, string $groupID = '', string $guidChar = ''): void
     {
         if ((int) Settings::settingValue('lookupnfo') === 1) {
-            $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptvrage'));
+            $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptv'));
         }
     }
 
@@ -184,7 +184,7 @@ class PostProcess
      */
     public function processTv(string $groupID = '', string $guidChar = '', int|string|null $processTV = ''): void
     {
-        $processTV = (is_numeric($processTV) ? $processTV : Settings::settingValue('lookuptvrage'));
+        $processTV = (is_numeric($processTV) ? $processTV : Settings::settingValue('lookuptv'));
         if ($processTV > 0) {
             (new TVDB(['Echo' => $this->echooutput]))->processSite($groupID, $guidChar, $processTV);
             (new TVMaze(['Echo' => $this->echooutput]))->processSite($groupID, $guidChar, $processTV);

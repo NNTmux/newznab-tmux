@@ -309,7 +309,7 @@ switch ($options[1]) {
                 echo $e->getMessage();
             }
             try {
-                (new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptvrage'));
+                (new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptv'));
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
@@ -331,7 +331,7 @@ switch ($options[1]) {
 
             if ($options[1] === 'pp_nfo') {
                 try {
-                    (new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptvrage'));
+                    (new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptv'));
                 } catch (Throwable $e) {
                     echo $e->getMessage();
                 }

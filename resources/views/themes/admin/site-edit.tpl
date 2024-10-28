@@ -269,9 +269,9 @@
 			<legend>Lookup Settings</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
-					<td style="width:180px;"><label for="lookuptvrage">Lookup TV:</label></td>
+					<td style="width:180px;"><label for="lookuptv">Lookup TV:</label></td>
 					<td>
-						{html_options style="width:180px;" id="lookuptvrage" name='lookuptvrage' values=$lookuptv_ids output=$lookuptv_names selected=$site->lookuptvrage}
+						{html_options style="width:180px;" id="lookuptv" name='lookuptv' values=$lookuptv_ids output=$lookuptv_names selected=$site->lookuptv}
 						<div class="hint">Whether to attempt to lookup TvRage ids on the web.</div>
 					</td>
 				</tr>
@@ -381,10 +381,10 @@
 			<legend>Password Settings</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
-					<td style="width:180px;"><label for="fetchlastcompressedfiles">Download last compressed
+					<td style="width:180px;"><label for="end">Download last compressed
 							file:</label></td>
 					<td>
-						{html_radios id="fetchlastcompressedfiles" name='fetchlastcompressedfiles' values=$yesno_ids output=$yesno_names selected=$site->end separator='<br />'}
+						{html_radios id="end" name='end' values=$yesno_ids output=$yesno_names selected=$site->end separator='<br />'}
 						<div class="hint">Try to download the last rar or zip file? (This is good if most of the files
 							are at the end.) Note: The first rar/zip is still downloaded.
 						</div>

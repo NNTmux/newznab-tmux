@@ -13,6 +13,7 @@ return [
     'ffmpeg_path' => env('FFMPEG_PATH', '/usr/bin/ffmpeg'),
     'ffprobe_path' => env('FFPROBE_PATH', '/usr/bin/ffprobe'),
     'mediainfo_path' => env('MEDIAINFO_PATH', '/usr/bin/mediainfo'),
+    'lame_path' => env('LAME_PATH', '/usr/bin/lame'),
     'timeout_path' => env('TIMEOUT_PATH', '/usr/bin/timeout'),
     'magic_file_path' => env('MAGIC_FILE_PATH', '/usr/share/misc/magic'),
     'covers_path' => env('COVERS_PATH', storage_path('covers')),
