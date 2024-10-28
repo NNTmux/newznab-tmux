@@ -843,8 +843,7 @@ class Forking
      */
     private function processSingle(): void
     {
-        $postProcess = new PostProcess(['ColorCLI' => $this->colorCli]);
-        //$postProcess->processAnime();
+        $postProcess = new PostProcess();
         $postProcess->processBooks();
         $postProcess->processConsoles();
         $postProcess->processGames();
