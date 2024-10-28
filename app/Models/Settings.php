@@ -169,7 +169,7 @@ class Settings extends Model
     public static function settingsUpdate(array $data = []): void
     {
         foreach ($data as $key => $value) {
-            self::query()->where('setting', $key)->update(['value' => \is_array($value) ? implode(', ', $value) : $value]);
+            self::query()->where('name', $key)->update(['value' => \is_array($value) ? implode(', ', $value) : $value]);
         }
     }
 }
