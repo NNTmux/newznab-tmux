@@ -843,7 +843,7 @@ class Forking
      */
     private function processSingle(): void
     {
-        $postProcess = new PostProcess();
+        $postProcess = new PostProcess;
         $postProcess->processBooks();
         $postProcess->processConsoles();
         $postProcess->processGames();
