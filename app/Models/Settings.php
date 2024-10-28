@@ -157,7 +157,6 @@ class Settings extends Model
         return $tree;
     }
 
-
     public static function settingValue($setting): mixed
     {
         return self::query()->where(
