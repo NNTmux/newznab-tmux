@@ -2,7 +2,6 @@
 
 namespace Blacklight\utility;
 
-use App\Models\Settings;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;

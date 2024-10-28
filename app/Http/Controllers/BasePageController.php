@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Events\UserLoggedIn;
 use App\Models\Category;
-use App\Models\Forumpost;
 use App\Models\Settings;
 use App\Models\User;
 use Blacklight\Contents;

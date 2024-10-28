@@ -5,7 +5,6 @@ require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
-use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\Nfo;

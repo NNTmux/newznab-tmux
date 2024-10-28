@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Release;
-use App\Models\Settings;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;

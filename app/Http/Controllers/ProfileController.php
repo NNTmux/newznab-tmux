@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
-use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
-use Blacklight\utility\Utility;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;

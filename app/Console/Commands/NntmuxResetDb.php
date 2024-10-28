@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\ManticoreSearch;
 use Illuminate\Console\Command;

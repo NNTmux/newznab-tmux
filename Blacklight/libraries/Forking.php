@@ -6,7 +6,6 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\ColorCLI;
 use Blacklight\Nfo;
-use Blacklight\NNTP;
 use Blacklight\NZB;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
