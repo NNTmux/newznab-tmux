@@ -62,48 +62,11 @@
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 180px;"><label for="coverspath">Cover&apos;s path:</label></td>
-					<td>
-						<input id="coverspath" class="long" name="coverspath" type="text" value="{$site->coverspath}"/>
-						<div class="hint">The absolute path to the place covers will be stored.</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="style">Theme</label>:</td>
-					<td>
-						{html_options class="siteeditstyle" id="style" name='style' values=$themelist output=$themelist selected=$site->style}
-						<div class="hint">The theme folder which will be loaded for css and images and overriden
-							templates.
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="userselstyle">User selectable site theme</label>:</td>
-					<td>
-						{html_radios id="userselstyle" name='userselstyle' values=$yesno_ids output=$yesno_names selected=$site->userselstyle separator='<br />'}
-						<div class="hint">Should users be allowed to change their site theme or not..</div>
-					</td>
-				</tr>
-
-				<tr>
 					<td><label for="style">Dereferrer Link</label>:</td>
 					<td>
 						<input id="dereferrer_link" class="long" name="dereferrer_link" type="text"
 							   value="{$site->dereferrer_link}"/>
 						<div class="hint">Optional URL to prepend to external links</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:160px;"><label for="showrecentforumposts">Recent Forum Posts</label>:</td>
-					<td>
-						<input id="showrecentforumposts" name="showrecentforumposts" type="text"
-							   value="{$site->showrecentforumposts}"/>
-						<div class="hint">The number of recent forum posts to show in the 'recent forum posts' widget.
-							Set to 0 to disable.
-						</div>
 					</td>
 				</tr>
 				<tr>
@@ -115,173 +78,10 @@
 				</tr>
 			</table>
 		</fieldset>
-		<fieldset>
-			<legend>3<sup>rd</sup> Party API Keys (will be removed, all values should be in .env)</legend>
-			<table class="input data table table-striped responsive-utilities jambo-table">
-				<tr>
-					<td style="width:180px;"><label for="trakttvclientkey">Trakt.tv API Client ID:</label></td>
-					<td>
-						<input id="trakttvclientkey" class="long" name="trakttvclientkey" type="text"
-							   value="{$site->trakttvclientkey}"/>
-						<div class="hint">The Trakt.tv API v2 Client ID (SHA256 hash - 64 characters long string). Used
-							for movie and tv lookups.
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td style="width:180px;"><label for="fanarttvkey">Fanart.tv API key:</label></td>
-					<td>
-						<input id="fanarttvkey" class="long" name="fanarttvkey" type="text"
-							   value="{$site->fanarttvkey}"/>
-
-						<div class="hint">The Fanart.tv api key. Used for Fanart.tv lookups. Fanart.tv would appreciate
-							it if
-							you use this service to help them out by adding high quality images not already available on
-							TMDB.
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td style="width:180px;"><label for="omdbkey">Omdb API key:</label></td>
-					<td>
-						<input id="omdbkey" class="long" name="omdbkey" type="text" value="{$site->omdbkey}"/>
-
-						<div class="hint">OmdbAPI key obtained from Omdb.Used for OmdbAPI lookups. This key is private
-							and needs
-							monthly pledge. You can check the info on OmdbAPI site http://www.omdbapi.com/. You need an
-							pledge
-							with poster api access (currently 5$/month).
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="giantbombkey">Giant Bomb API Key:</label></td>
-					<td>
-						<input id="giantbombkey" class="long" name="giantbombkey" type="text"
-							   value="{$site->giantbombkey}"/>
-
-						<div class="hint">The giantbomb key. Used for game lookups.</div>
-					</td>
-				</tr>
-				<tr>
-					<td style="width:180px;"><label for="anidbkey">Anidb API key:</label></td>
-					<td>
-						<input id="anidbkey" class="long" name="anidbkey" type="text" value="{$site->anidbkey}"/>
-
-						<div class="hint">The Anidb api key. Used for Anime lookups.</div>
-					</td>
-				</tr>
-
-			</table>
-		</fieldset>
-
-		<fieldset>
-			<legend>3<sup>rd</sup> Party Application Paths</legend>
-			<table class="input data table table-striped responsive-utilities jambo-table">
-				<tr>
-					<td style="width:160px;"><label for="unrarpath">Unrar Path</label>:</td>
-					<td>
-						<input id="unrarpath" class="long" name="unrarpath" type="text" value="{$site->unrarpath}"/>
-						<div class="hint">The path to an unrar binary, used in deep password detection and media info
-							grabbing.
-							<br/>Use forward slashes in windows <span
-									style="font-family:courier;">c:/path/to/unrar.exe</span></div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="mediainfopath">Mediainfo Path</label>:</td>
-					<td>
-						<input id="mediainfopath" class="long" name="mediainfopath" type="text"
-							   value="{$site->mediainfopath}"/>
-						<div class="hint">The path to the <a href="http://mediainfo.sourceforge.net">mediainfo</a>
-							binary. Used for deep file media analysis. Use empty path to disable mediainfo checks
-							<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/mediainfo.exe</span>
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="ffmpegpath">FFmpeg or Avconv Path:</label></td>
-					<td>
-						<input id="ffmpegpath" class="long" name="ffmpegpath" type="text" value="{$site->ffmpegpath}"/>
-						<div class="hint">The path to the <a href="http://www.ffmpeg.org/">ffmpeg</a> or <a
-									href="https://libav.org/">avconv</a> binary. Used for making thumbnails and
-							video/audio
-							previews.
-							<br/>Use forward slashes in windows <span
-									style="font-family:courier;">c:/path/to/ffmpeg.exe</span>
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="lamepath">Lame Path</label>:</td>
-					<td>
-						<input id="lamepath" class="long" name="lamepath" type="text" value="{$site->lamepath}"/>
-						<div class="hint">The path to the <a href="http://lame.sourceforge.net/download">lame</a>
-							binary. Used for audio manipulation.
-							<br/>Use forward slashes in windows <span
-									style="font-family:courier;">c:/path/to/lame.exe</span></div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="zippath">7za Path:</label></td>
-					<td>
-						<input id="zippath" class="long" name="zippath" type="text" value="{$site->zippath}"/>
-
-						<div class="hint">The path to the 7za/p7zip in Ubuntu 13.10 (7zip command line in windows)
-							binary, used
-							for grabbing nfos from compressed zip files.
-							<br/>Use forward slashes in windows <span
-									style="font-family:courier;">c:/path/to/7z.exe</span>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td style="width:180px;"><label for="timeoutpath">GNU Timeout Path:</label></td>
-					<td>
-						<input id="timeoutpath" class="long" name="timeoutpath" type="text"
-							   value="{$site->timeoutpath}"/>
-						<div class="hint">The path to the <a href="http://linux.die.net/man/1/timeout">timeout</a>
-							binary.
-							This is used to limit the amount of time unrar/7zip/mediainfo/ffmpeg/avconv can run.
-							You can the time limit in the process additional section.
-							You can leave this empty to disable this.
-							<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/timeout.exe</span>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td style="width:180px;"><label for="magic_file_path">Magic Numbers file:</label></td>
-					<td>
-						<input id="magic_file_path"
-							   class="long"
-							   name="magic_file_path"
-							   type="text"
-							   value="{$site->magic_file_path}"/>
-						<div class="hint">Path to magic number database. Windows&apos; users should set this if they
-							have installed GNUWin file. *nix users can optionally set this to a file of their choice.
-						</div>
-					</td>
-				</tr>
-
-			</table>
-		</fieldset>
 
 		<fieldset>
 			<legend>Usenet Settings</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
-
-				<tr>
-					<td><label for="nzbpath">Nzb File Path</label>:</td>
-					<td>
-						<input id="nzbpath" class="long" name="nzbpath" type="text" value="{$site->nzbpath}"/>
-						<div class="hint">The directory where nzb files will be stored.</div>
-					</td>
-				</tr>
 				<tr>
 					<td style="width:180px;"><label for="nzbsplitlevel">Nzb File Path Level Deep:</label></td>
 					<td>
@@ -409,16 +209,6 @@
 						</div>
 					</td>
 				</tr
-
-				<tr>
-					<td><label for="compressedheaders">Use Compressed Headers</label>:</td>
-					<td>
-						{html_radios id="compressedheaders" name='compressedheaders' values=$yesno_ids output=$yesno_names selected=$site->compressedheaders separator='<br />'}
-						<div class="hint">Some servers allow headers to be sent over in a compressed format. If enabled
-							this will use much less bandwidth, but processing times may increase.
-						</div>
-					</td>
-				</tr>
 				<tr>
 					<td><label for="maxmssgs">Max Messages</label>:</td>
 					<td>
@@ -591,14 +381,6 @@
 			<legend>Password Settings</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
-					<td><label for="checkpasswordedrar">Check For Passworded Releases</label>:</td>
-					<td>
-						{html_radios id="checkpasswordedrar" name='checkpasswordedrar' values=$passwd_ids output=$passwd_names selected=$site->checkpasswordedrar separator='<br />'}
-						<div class="hint">Whether to attempt to peek into every release, to see if rar files are
-							password protected.<br/></div>
-					</td>
-				</tr>
-				<tr>
 					<td style="width:180px;"><label for="fetchlastcompressedfiles">Download last compressed
 							file:</label></td>
 					<td>
@@ -608,16 +390,6 @@
 						</div>
 					</td>
 				</tr>
-
-				<tr>
-					<td><label for="deletepasswordedrelease">Delete Passworded Releases</label>:</td>
-					<td>
-						{html_radios id="deletepasswordedrelease" name='deletepasswordedrelease' values=$yesno_ids output=$yesno_names selected=$site->deletepasswordedrelease separator='<br />'}
-						<div class="hint">Whether to delete releases which are passworded or potentially
-							passworded.<br/></div>
-					</td>
-				</tr>
-
 				<tr>
 					<td><label for="showpasswordedrelease">Show Passworded Releases</label>:</td>
 					<td>
@@ -659,26 +431,6 @@
 					</td>
 				</tr>
 				<tr>
-
-				<tr>
-					<td style="width:180px;"><label for="lookuppar2">Lookup PAR2:</label></td>
-					<td>
-						{html_radios id="lookuppar2" name='lookuppar2' values=$yesno_ids output=$yesno_names selected=$site->lookuppar2 separator='<br />'}
-						<div class="hint">Whether to attempt to find a better name for releases in misc->other using the
-							PAR2
-							file.<br/><strong>NOTE: this can be slow depending on the group!</strong></div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="addpar2">Add PAR2 contents to file contents:</label></td>
-					<td>
-						{html_radios id="addpar2" name='addpar2' values=$yesno_ids output=$yesno_names selected=$site->addpar2 separator='<br />'}
-						<div class="hint">When going through PAR2 files, add them to the RAR file content list of the
-							NZB.
-						</div>
-					</td>
-				</tr>
 			</table>
 		</fieldset>
 
@@ -792,19 +544,6 @@
 						</div>
 					</td>
 				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="extractusingrarinfo">Extract RAR/ZIP using rarinfo:</label>
-					</td>
-					<td>
-						{html_radios id="extractusingrarinfo" name='extractusingrarinfo' values=$yesno_ids output=$yesno_names selected=$site->extractusingrarinfo separator='<br />'}
-						<div class="hint">Whether to use rarinfo or 7zip/unrar directly to decompress zip/rar files.
-							<br/><strong>Using rarinfo is faster, but the extracted files are not as large which leads
-								to smaller video samples/ potentially black preview screenshots.</strong>
-						</div>
-					</td>
-				</tr>
-
 				<tr>
 					<td style="width:180px;"><label for="maxnestedlevels">How many levels deep to go into nested rar/zip
 							files:</label></td>
@@ -1109,17 +848,6 @@
 						</div>
 					</td>
 				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="alternate_nntp">Alternate NNTP Provider:</label></td>
-					<td>
-						{html_radios id="alternate_nntp" name='alternate_nntp' values=$yesno_ids output=$yesno_names selected=$site->alternate_nntp separator='<br />'}
-						<div class="hint">This sets Postproccessing Additional/Nfo to use the alternate NNTP provider as
-							set in
-							config.
-						</div>
-					</td>
-				</tr>
 				<tr>
 					<td style="width:180px;"><label for="delaytime">Delay Time Check:</label></td>
 					<td>
@@ -1228,16 +956,6 @@
 					</td>
 				</tr>
 				<tr>
-					<td style="width:180px;"><label for="reqidthreads">Request id Threads:</label></td>
-					<td>
-						<input class="short" id="reqidthreads" name="reqidthreads" type="text"
-							   value="{$site->reqidthreads}"/>
-						<div class="hint">The number of threads for local Request id processing.
-						</div>
-					</td>
-				</tr>
-
-				<tr>
 					<td style="width:180px;"><label for="postthreadsnon">Postprocessing Non-Amazon Threads:</label></td>
 					<td>
 						<input class="short" id="postthreadsnon" name="postthreadsnon" type="text"
@@ -1277,23 +995,7 @@
 					</td>
 				</tr>
 
-				<tr>
-					<td><label for="storeuserips">Store User Ip</label>:</td>
-					<td>
-						{html_radios id="storeuserips" name='storeuserips' values=$yesno_ids output=$yesno_names selected=$site->storeuserips separator='<br />'}
-						<div class="hint">Whether to store the users ip address when they signup or login.</div>
-					</td>
-				</tr>
 
-				</tr>
-				<tr>
-					<td style="width:180px;"><label for="privateprofiles">Private Profiles:</label></td>
-					<td>
-						{html_radios id="privateprofiles" name='privateprofiles' values=$yesno_ids output=$yesno_names selected=$site->privateprofiles separator='<br />'}
-						<div class="hint">Should we <strong>disallow</strong> users from accessing profiles other than
-							their own? (regardless of this setting admin/mod can access).
-						</div>
-					</td>
 				</tr>
 
 				<tr>
