@@ -489,7 +489,7 @@ class NNTP extends \Net_NNTP_Client
      *
      * @throws \Exception
      */
-    public function getGroups(string $wildMat = null)
+    public function getGroups(?string $wildMat = null)
     {
         // Enabled header compression if not enabled.
         $this->_enableCompression();
@@ -1285,7 +1285,7 @@ class NNTP extends \Net_NNTP_Client
      * @return mixed (bool) On success: True when posting allowed, otherwise false.
      *                      (object) On failure: pear_error
      */
-    public function connect(string $host = null, $encryption = null, int $port = null, int $timeout = 15, int $socketTimeout = 120)
+    public function connect(?string $host = null, $encryption = null, ?int $port = null, int $timeout = 15, int $socketTimeout = 120)
     {
         if ($this->_isConnected()) {
             return $this->throwError('Already connected, disconnect first!', null);

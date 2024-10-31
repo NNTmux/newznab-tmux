@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use App\Models\DnzbFailure;
 use App\Models\Predb;
 use App\Models\Release;
@@ -22,6 +21,7 @@ use Blacklight\Music;
 use Blacklight\ReleaseExtra;
 use Blacklight\Releases;
 use Blacklight\XXX;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController

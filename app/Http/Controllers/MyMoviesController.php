@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserMovie;
 use Blacklight\Movie;
 use Blacklight\Releases;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class MyMoviesController extends BasePageController
