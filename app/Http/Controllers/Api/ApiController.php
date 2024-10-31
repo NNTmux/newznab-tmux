@@ -369,9 +369,9 @@ class ApiController extends BasePageController
         return [
             'server' => [
                 'title' => config('app.name'),
-                'strapline' => Settings::settingValue('site.main.strapline'),
+                'strapline' => Settings::settingValue('strapline'),
                 'email' => config('mail.from.address'),
-                'meta' => Settings::settingValue('site.main.metakeywords'),
+                'meta' => Settings::settingValue('metakeywords'),
                 'url' => $serverroot,
                 'image' => $serverroot.'/assets/images/tmux_logo.png',
             ],
@@ -381,7 +381,7 @@ class ApiController extends BasePageController
             ],
             'registration' => [
                 'available' => 'yes',
-                'open' => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
+                'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
             ],
             'searching' => [
                 'search' => ['available' => 'yes', 'supportedParams' => 'q'],
@@ -423,7 +423,7 @@ class ApiController extends BasePageController
         if ($request->has('cat')) {
             $categoryIDs = urldecode($request->input('cat'));
             // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
-            if (str_contains($categoryIDs, (string) Category::TV_HD) && ! str_contains($categoryIDs, (string) Category::TV_WEBDL) && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+            if (str_contains($categoryIDs, (string) Category::TV_HD) && ! str_contains($categoryIDs, (string) Category::TV_WEBDL) && (int) Settings::settingValue('catwebdl') === 0) {
                 $categoryIDs .= (','.Category::TV_WEBDL);
             }
             $categoryID = explode(',', $categoryIDs);

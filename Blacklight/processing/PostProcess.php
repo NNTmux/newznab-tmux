@@ -59,8 +59,8 @@ class PostProcess
         $this->Nfo = new Nfo;
 
         // Site settings.
-        $this->addpar2 = (int) Settings::settingValue('..addpar2') !== 0;
-        $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
+        $this->addpar2 = config('nntmux:settings.add_par2');
+        $this->alternateNNTP = config('nntmux_nntp.use_alternate_nntp_server');
     }
 
     /**
@@ -91,7 +91,7 @@ class PostProcess
      */
     public function processAnime(): void
     {
-        if ((int) Settings::settingValue('..lookupanidb') !== 0) {
+        if ((int) Settings::settingValue('lookupanidb') !== 0) {
             (new AniDB(['Echo' => $this->echooutput]))->processAnimeReleases();
         }
     }
@@ -104,7 +104,7 @@ class PostProcess
      */
     public function processBooks(): void
     {
-        if ((int) Settings::settingValue('..lookupbooks') !== 0) {
+        if ((int) Settings::settingValue('lookupbooks') !== 0) {
             (new Books(['Echo' => $this->echooutput]))->processBookReleases();
         }
     }
@@ -114,7 +114,7 @@ class PostProcess
      */
     public function processConsoles(): void
     {
-        if ((int) Settings::settingValue('..lookupgames') !== 0) {
+        if ((int) Settings::settingValue('lookupgames') !== 0) {
             (new Console(['Echo' => $this->echooutput]))->processConsoleReleases();
         }
     }
@@ -124,7 +124,7 @@ class PostProcess
      */
     public function processGames(): void
     {
-        if ((int) Settings::settingValue('..lookupgames') !== 0) {
+        if ((int) Settings::settingValue('lookupgames') !== 0) {
             (new Games(['Echo' => $this->echooutput]))->processGamesReleases();
         }
     }
@@ -141,7 +141,7 @@ class PostProcess
      */
     public function processMovies(string $groupID = '', string $guidChar = '', int|string|null $processMovies = ''): void
     {
-        $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::settingValue('..lookupimdb'));
+        $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::settingValue('lookupimdb'));
         if ($processMovies > 0) {
             (new Movie(['Echo' => $this->echooutput]))->processMovieReleases($groupID, $guidChar, $processMovies);
         }
@@ -152,7 +152,7 @@ class PostProcess
      */
     public function processMusic(): void
     {
-        if ((int) Settings::settingValue('..lookupmusic') !== 0) {
+        if ((int) Settings::settingValue('lookupmusic') !== 0) {
             (new Music(['Echo' => $this->echooutput]))->processMusicReleases();
         }
     }
@@ -167,8 +167,8 @@ class PostProcess
      */
     public function processNfos(NNTP $nntp, string $groupID = '', string $guidChar = ''): void
     {
-        if ((int) Settings::settingValue('..lookupnfo') === 1) {
-            $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
+        if ((int) Settings::settingValue('lookupnfo') === 1) {
+            $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptv'));
         }
     }
 
@@ -184,7 +184,7 @@ class PostProcess
      */
     public function processTv(string $groupID = '', string $guidChar = '', int|string|null $processTV = ''): void
     {
-        $processTV = (is_numeric($processTV) ? $processTV : Settings::settingValue('..lookuptvrage'));
+        $processTV = (is_numeric($processTV) ? $processTV : Settings::settingValue('lookuptv'));
         if ($processTV > 0) {
             (new TVDB(['Echo' => $this->echooutput]))->processSite($groupID, $guidChar, $processTV);
             (new TVMaze(['Echo' => $this->echooutput]))->processSite($groupID, $guidChar, $processTV);
@@ -200,7 +200,7 @@ class PostProcess
      */
     public function processXXX(): void
     {
-        if ((int) Settings::settingValue('..lookupxxx') === 1) {
+        if ((int) Settings::settingValue('lookupxxx') === 1) {
             (new XXX(['Echo' => $this->echooutput]))->processXXXReleases();
         }
     }

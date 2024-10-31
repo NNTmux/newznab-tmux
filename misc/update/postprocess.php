@@ -2,7 +2,6 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Settings;
 use Blacklight\NNTP;
 use Blacklight\processing\PostProcess;
 
@@ -61,7 +60,8 @@ if (! isset($argv[1], $argv[2]) || ! in_array($argv[1], $args, false) || ! in_ar
 $nntp = null;
 if ($args[$argv[1]] === true) {
     $nntp = new NNTP;
-    if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+    $compressedHeaders = config('nntmux_nntp.compressed_headers');
+    if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect()) !== true) {
         echo 'Unable to connect to usenet.'.PHP_EOL;
         exit;
     }

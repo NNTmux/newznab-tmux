@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -60,14 +59,7 @@ class InstallNntmux extends Command
 
             $paths = $this->updatePaths();
             if ($paths !== false) {
-                $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
-                $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => config('nntmux.tmp_path')]);
-                $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
-                if ($sql1 === null || $sql2 === null || $sql3 === null) {
-                    $error = true;
-                } else {
-                    $this->info('Settings table updated successfully');
-                }
+                $this->info('Paths checked successfully');
             }
 
             if (! $error && $this->addAdminUser()) {
@@ -93,10 +85,10 @@ class InstallNntmux extends Command
      */
     private function updatePaths()
     {
-        $covers_path = storage_path('covers');
-        $nzb_path = storage_path('nzb');
-        $tmp_path = resource_path('tmp');
-        $unrar_path = $tmp_path.'unrar/';
+        $covers_path = config('nntmux_settings.covers_path');
+        $nzb_path = config('nntmux_settings.path_to_nzbs');
+        $tmp_path = config('nntmux.tmp_path');
+        $unrar_path = config('nntmux_settings.unrar_path');
 
         $nzbPathCheck = File::isWritable($nzb_path);
         if (! $nzbPathCheck) {
@@ -126,10 +118,18 @@ class InstallNntmux extends Command
             return false;
         }
 
+        $tmpPathCheck = File::isWritable($tmp_path);
+        if (! $tmpPathCheck) {
+            $this->warn($tmp_path.' is not writable. Please fix folder permissions');
+
+            return false;
+        }
+
         return [
             'nzb_path' => Str::finish($nzb_path, '/'),
             'covers_path' => Str::finish($covers_path, '/'),
             'unrar_path' => Str::finish($unrar_path, '/'),
+            'tmp_path' => Str::finish($tmp_path, '/'),
         ];
     }
 

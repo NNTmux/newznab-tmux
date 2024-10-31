@@ -1244,13 +1244,9 @@ DROP TABLE IF EXISTS `settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `settings` (
-  `section` varchar(25) NOT NULL DEFAULT '',
-  `subsection` varchar(25) NOT NULL DEFAULT '',
   `name` varchar(25) NOT NULL DEFAULT '',
   `value` varchar(1000) NOT NULL DEFAULT '',
-  `hint` text NOT NULL,
-  `setting` varchar(64) NOT NULL DEFAULT '',
-  PRIMARY KEY (`section`,`subsection`,`name`),
+  PRIMARY KEY (`name`),
   UNIQUE KEY `ui_settings_setting` (`setting`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -35,7 +35,7 @@ class ApiV2Controller extends BasePageController
         $capabilities = [
             'server' => [
                 'title' => config('app.name'),
-                'strapline' => Settings::settingValue('site.main.strapline'),
+                'strapline' => Settings::settingValue('strapline'),
                 'email' => config('mail.from.address'),
                 'url' => url('/'),
             ],
@@ -45,7 +45,7 @@ class ApiV2Controller extends BasePageController
             ],
             'registration' => [
                 'available' => 'no',
-                'open' => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
+                'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
             ],
             'searching' => [
                 'search' => ['available' => 'yes', 'supportedParams' => 'id'],

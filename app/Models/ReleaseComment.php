@@ -119,7 +119,7 @@ class ReleaseComment extends Model
      */
     public static function addComment($id, $gid, $text, $userid, $host): int
     {
-        if ((int) Settings::settingValue('..storeuserips') !== 1) {
+        if (config('nntmux:settings.store_user_ip') === false) {
             $host = '';
         }
 

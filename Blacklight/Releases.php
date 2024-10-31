@@ -135,7 +135,7 @@ class Releases extends Release
 
     public function showPasswords(): string
     {
-        $show = (int) Settings::settingValue('..showpasswordedrelease');
+        $show = (int) Settings::settingValue('showpasswordedrelease');
         $setting = $show ?? 0;
 
         return match ($setting) {

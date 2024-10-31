@@ -271,33 +271,31 @@ class ProcessAdditional
         $this->_nfo = new Nfo;
         $this->manticore = new ManticoreSearch;
         $this->elasticsearch = new ElasticSearchSiteSearch;
-        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
+        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
         $this->mediaInfo = new MediaInfo;
         $this->mediaInfo->setConfig('use_oldxml_mediainfo_output_format', true);
-        $this->mediaInfo->setConfig('command', Settings::settingValue('apps..mediainfopath'));
+        $this->mediaInfo->setConfig('command', config('nntmux_settings.mediainfo_path'));
 
-        $this->_innerFileBlacklist = Settings::settingValue('indexer.ppa.innerfileblacklist') === '' ? false : Settings::settingValue('indexer.ppa.innerfileblacklist');
-        $this->_maxNestedLevels = (int) Settings::settingValue('..maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('..maxnestedlevels');
-        $this->_extractUsingRarInfo = (int) Settings::settingValue('..extractusingrarinfo') !== 0;
+        $this->_innerFileBlacklist = Settings::settingValue('innerfileblacklist') === '' ? false : Settings::settingValue('innerfileblacklist');
+        $this->_maxNestedLevels = (int) Settings::settingValue('maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('maxnestedlevels');
+        $this->_extractUsingRarInfo = (int) Settings::settingValue('extractusingrarinfo') !== 0;
         $this->_fetchLastFiles = (int) Settings::settingValue('archive.fetch.end') !== 0;
         $this->_unrarPath = false;
 
         // Pass the binary extractors to ArchiveInfo.
         $clients = [];
-        if (! empty(Settings::settingValue('apps..unrarpath'))) {
-            $this->_unrarPath = Settings::settingValue('apps..unrarpath');
-            $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
-        }
+        $this->_unrarPath = config('nntmux_settings.unrar_path');
+        $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
 
         $this->_archiveInfo->setExternalClients($clients);
 
         $this->_killString = '"';
-        if (! empty(Settings::settingValue('apps..timeoutpath')) && (int) Settings::settingValue('..timeoutseconds') > 0) {
+        if (config('nntmux_settings.timeout_path') && (int) Settings::settingValue('timeoutseconds') > 0) {
             $this->_killString = (
-                '"'.Settings::settingValue('apps..timeoutpath').
+                '"'.config('nntmux_settings.timeout_path').
                 '" --foreground --signal=KILL '.
-                Settings::settingValue('..timeoutseconds').' "'
+                Settings::settingValue('timeoutseconds').' "'
             );
         }
 
@@ -305,48 +303,48 @@ class ProcessAdditional
 
         // Maximum amount of releases to fetch per run.
         $this->_queryLimit =
-            (Settings::settingValue('..maxaddprocessed') !== '') ? (int) Settings::settingValue('..maxaddprocessed') : 25;
+            (Settings::settingValue('maxaddprocessed') !== '') ? (int) Settings::settingValue('maxaddprocessed') : 25;
 
         // Maximum message ID's to download per file type in the NZB (video, jpg, etc).
         $this->_segmentsToDownload =
-            (Settings::settingValue('..segmentstodownload') !== '') ? (int) Settings::settingValue('..segmentstodownload') : 2;
+            (Settings::settingValue('segmentstodownload') !== '') ? (int) Settings::settingValue('segmentstodownload') : 2;
 
         // Maximum message ID's to download for a RAR file.
         $this->_maximumRarSegments =
-            (Settings::settingValue('..maxpartsprocessed') !== '') ? (int) Settings::settingValue('..maxpartsprocessed') : 3;
+            (Settings::settingValue('maxpartsprocessed') !== '') ? (int) Settings::settingValue('maxpartsprocessed') : 3;
 
         // Maximum RAR files to check for a password before stopping.
         $this->_maximumRarPasswordChecks =
-            (Settings::settingValue('..passchkattempts') !== '') ? (int) Settings::settingValue('..passchkattempts') : 1;
+            (Settings::settingValue('passchkattempts') !== '') ? (int) Settings::settingValue('passchkattempts') : 1;
 
         $this->_maximumRarPasswordChecks = (max($this->_maximumRarPasswordChecks, 1));
 
         // Maximum size of releases in GB.
-        $this->_maxSize = (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
+        $this->_maxSize = (Settings::settingValue('maxsizetopostprocess') !== '') ? (int) Settings::settingValue('maxsizetopostprocess') : 100;
         // Minimum size of releases in MB.
-        $this->_minSize = (Settings::settingValue('..minsizetopostprocess') !== '') ? (int) Settings::settingValue('..minsizetopostprocess') : 100;
+        $this->_minSize = (Settings::settingValue('minsizetopostprocess') !== '') ? (int) Settings::settingValue('minsizetopostprocess') : 100;
 
         // Use the alternate NNTP provider for downloading Message-ID's ?
-        $this->_alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
+        $this->_alternateNNTP = config('nntmux_nntp.use_alternate_nntp_server');
 
-        $this->_ffMPEGDuration = Settings::settingValue('..ffmpeg_duration') !== '' ? (int) Settings::settingValue('..ffmpeg_duration') : 5;
+        $this->_ffMPEGDuration = Settings::settingValue('ffmpeg_duration') !== '' ? (int) Settings::settingValue('ffmpeg_duration') : 5;
 
-        $this->_addPAR2Files = (int) Settings::settingValue('..addpar2') !== 0;
+        $this->_addPAR2Files = config('nntmux:settings.add_par2');
 
-        if (! Settings::settingValue('apps..ffmpegpath')) {
+        if (! config('nntmux_settings.ffmpeg_path')) {
             $this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
         } else {
-            $this->_processAudioSample = (int) Settings::settingValue('..saveaudiopreview') !== 0;
-            $this->_processThumbnails = (int) Settings::settingValue('..processthumbnails') !== 0;
-            $this->_processVideo = (int) Settings::settingValue('..processvideos') !== 0;
+            $this->_processAudioSample = (int) Settings::settingValue('saveaudiopreview') !== 0;
+            $this->_processThumbnails = (int) Settings::settingValue('processthumbnails') !== 0;
+            $this->_processVideo = (int) Settings::settingValue('processvideos') !== 0;
         }
 
-        $this->_processJPGSample = (int) Settings::settingValue('..processjpg') !== 0;
-        $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') !== '';
+        $this->_processJPGSample = (int) Settings::settingValue('processjpg') !== 0;
+        $this->_processMediaInfo = config('nntmux_settings.mediainfo_path');
         $this->_processAudioInfo = $this->_processMediaInfo;
-        $this->_processPasswords = ! empty(Settings::settingValue('..checkpasswordedrar')) && ! empty(Settings::settingValue('apps..unrarpath'));
+        $this->_processPasswords = config('nntmux_settings.check_passworded_rars') === true && ! empty(config('nntmux_settings.unrar_path'));
 
-        $this->_audioSavePath = storage_path('covers/audiosample/');
+        $this->_audioSavePath = config('nntmux_settings.covers_path').'/audiosample/';
 
         $this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
         $this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';

@@ -7,6 +7,7 @@ use App\Models\Settings;
 use App\Models\UserSerie;
 use App\Models\Video;
 use Blacklight\Releases;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class MyShowsController extends BasePageController
@@ -16,7 +17,7 @@ class MyShowsController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): RedirectResponse
     {
         $this->setPreferences();
         $action = $request->input('action') ?? '';
@@ -69,7 +70,7 @@ class MyShowsController extends BasePageController
                 $categories = [];
                 foreach ($tmpcats as $c) {
                     // If TV WEB-DL categorization is disabled, don't include it as an option
-                    if ((int) $c['id'] === Category::TV_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+                    if ((int) $c['id'] === Category::TV_WEBDL && (int) Settings::settingValue('catwebdl') === 0) {
                         continue;
                     }
                     $categories[$c['id']] = $c['title'];

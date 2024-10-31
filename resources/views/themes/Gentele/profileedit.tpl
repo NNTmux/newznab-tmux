@@ -211,20 +211,6 @@
 
                                     </tbody>
                                 </table>
-                                {if {{App\Models\Settings::settingValue('site.main.userselstyle')}} == 1}
-                                    <table class="data table table-striped">
-                                        <tbody>
-                                        <tr class="bg-aqua-active">
-                                            <td colspan="2" style="padding-left: 8px;"><strong>Site theme</strong></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                {html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                {/if}
                             </div>
                         </div>
                         {{Form::submit('Save', ['class' => 'btn btn-success'])}}

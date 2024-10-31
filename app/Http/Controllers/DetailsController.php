@@ -21,6 +21,7 @@ use Blacklight\Music;
 use Blacklight\ReleaseExtra;
 use Blacklight\Releases;
 use Blacklight\XXX;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
@@ -30,7 +31,7 @@ class DetailsController extends BasePageController
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function show(Request $request, string $guid)
+    public function show(Request $request, string $guid): RedirectResponse
     {
         $this->setPreferences();
 
@@ -76,10 +77,10 @@ class DetailsController extends BasePageController
                     $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
                     $mov['genre'] = makeFieldLinks($mov, 'genre', 'movies');
                     $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
-                    if (Settings::settingValue('site.trailers.trailers_display')) {
+                    if (Settings::settingValue('trailers_display')) {
                         $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
                         if ($trailer) {
-                            $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('site.trailers.trailers_size_x'), Settings::settingValue('site.trailers.trailers_size_y'), $trailer);
+                            $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('trailers_size_x'), Settings::settingValue('trailers_size_y'), $trailer);
                         }
                     }
                 }
@@ -151,7 +152,7 @@ class DetailsController extends BasePageController
             $this->smarty->assign('comments', $comments);
             $this->smarty->assign('searchname', getSimilarName($data['searchname']));
             $this->smarty->assign('similars', $similars !== false ? $similars : '');
-            $this->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
+            $this->smarty->assign('privateprofiles', config('nntmux_settings.private_profiles'));
             $this->smarty->assign('failed', $failed);
             $this->smarty->assign('cpapi', $cpapi);
             $this->smarty->assign('cpurl', $cpurl);

@@ -70,7 +70,7 @@ class NZBImport
         $this->nzb = new NZB;
         $this->releaseCleaner = new ReleaseCleaning;
         $this->colorCli = new ColorCLI;
-        $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
+        $this->crossPostt = Settings::settingValue('crossposttime') !== '' ? Settings::settingValue('crossposttime') : 2;
 
         // Set properties from options
         $this->browser = isset($options['Browser']) ? $options['Browser'] : '';

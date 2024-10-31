@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SendPasswordResetEmail;
-use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
@@ -69,7 +68,7 @@ class ResetPasswordController extends Controller
             }
         }
 
-        $theme = Settings::settingValue('site.main.style');
+        $theme = 'Gentele';
 
         $title = 'Forgotten Password';
         $meta_title = 'Forgotten Password';

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginLoginRequest;
-use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -66,7 +65,7 @@ class LoginController extends Controller
             $this->fireLockoutEvent($request);
             $request->session()->flash('message', 'You have failed to login too many times.Try again in '.$this->decayMinutes().' minutes.');
 
-            return redirect('login');
+            return redirect()->to('login');
         }
 
         if ($validator->passes()) {
@@ -77,11 +76,11 @@ class LoginController extends Controller
                 if (! $user->isVerified() || $user->isPendingVerification()) {
                     $request->session()->flash('message', 'You have not verified your email address!');
 
-                    return redirect('login');
+                    return redirect()->to('login');
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                    $userIp = (int) Settings::settingValue('..storeuserips') === 1 ? ($request->ip() ?? $request->getClientIp()) : '';
+                    $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
                     event(new UserLoggedIn($user, $userIp));
 
                     Auth::logoutOtherDevices($request->input('password'));
@@ -97,18 +96,18 @@ class LoginController extends Controller
                 $request->session()->flash('message', 'Username or email used do not match our records!');
             }
 
-            return redirect('login');
+            return redirect()->to('login');
         }
 
         $this->incrementLoginAttempts($request);
         $request->session()->flash('message', implode('', Arr::collapse($validator->errors()->toArray())));
 
-        return redirect('login');
+        return redirect()->to('login');
     }
 
     public function showLoginForm()
     {
-        $theme = Settings::settingValue('site.main.style');
+        $theme = 'Gentele';
 
         $meta_title = 'Login';
         $meta_keywords = 'Login';

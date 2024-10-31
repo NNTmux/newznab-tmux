@@ -112,7 +112,7 @@ class NNTP extends \Net_NNTP_Client
 
         $this->_echo = config('nntmux.echocli');
         $this->_tmux = new Tmux;
-        $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
+        $this->_nntpRetries = Settings::settingValue('nntpretries') !== '' ? (int) Settings::settingValue('nntpretries') : 0 + 1;
         $this->colorCli = new ColorCLI;
         $this->_currentPort = config('nntmux_nntp.port');
         $this->_currentServer = config('nntmux_nntp.server');
@@ -261,7 +261,7 @@ class NNTP extends \Net_NNTP_Client
             // If we are connected and authenticated, try enabling compression if we have it enabled.
             if ($connected && $authenticated) {
                 // Check if we should use compression on the connection.
-                if (! $compression || (int) Settings::settingValue('..compressedheaders') === 0) {
+                if (! $compression || config('nntmux_nntp.compressed_headers') === false) {
                     $this->_compressionSupported = false;
                 }
 
@@ -325,7 +325,7 @@ class NNTP extends \Net_NNTP_Client
      */
     public function enableCompression(): void
     {
-        if ((int) Settings::settingValue('..compressedheaders') !== 1) {
+        if (config('nntmux_nntp.compressed_headers') === false) {
             return;
         }
         $this->_enableCompression();
@@ -340,7 +340,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function selectGroup($group, $articles = false, $force = false)
+    public function selectGroup(string $group, bool $articles = false, bool $force = false)
     {
         $connected = $this->_checkConnection(false);
         if ($connected !== true) {
@@ -489,7 +489,7 @@ class NNTP extends \Net_NNTP_Client
      *
      * @throws \Exception
      */
-    public function getGroups($wildMat = null)
+    public function getGroups(?string $wildMat = null)
     {
         // Enabled header compression if not enabled.
         $this->_enableCompression();
@@ -554,8 +554,9 @@ class NNTP extends \Net_NNTP_Client
                     // If there is an error try the alternate provider or return the PEAR error.
                 } elseif ($alternate) {
                     if (! $aConnected) {
+                        $compressedHeaders = config('nntmux_nntp.compressed_headers');
                         // Check if the current connected server is the alternate or not.
-                        $aConnected = $this->_currentServer === config('nntmux_nntp.server') ? $nntp->doConnect(true, true) : $nntp->doConnect();
+                        $aConnected = $this->_currentServer === config('nntmux_nntp.server') ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect();
                     }
                     // If we connected successfully to usenet try to download the article body.
                     if ($aConnected === true) {
@@ -590,7 +591,8 @@ class NNTP extends \Net_NNTP_Client
         } elseif (\is_string($identifiers) || is_numeric($identifiers)) {
             $body = $this->_getMessage($groupName, $identifiers);
             if ($alternate && self::isError($body)) {
-                $nntp->doConnect(true, true);
+                $compressedHeaders = config('nntmux_nntp.compressed_headers');
+                $nntp->doConnect($compressedHeaders, true);
                 $body = $nntp->_getMessage($groupName, $identifiers);
                 $aConnected = true;
             }
@@ -1283,7 +1285,7 @@ class NNTP extends \Net_NNTP_Client
      * @return mixed (bool) On success: True when posting allowed, otherwise false.
      *                      (object) On failure: pear_error
      */
-    public function connect($host = null, $encryption = null, $port = null, $timeout = 15, $socketTimeout = 120)
+    public function connect(?string $host = null, $encryption = null, ?int $port = null, int $timeout = 15, int $socketTimeout = 120)
     {
         if ($this->_isConnected()) {
             return $this->throwError('Already connected, disconnect first!', null);

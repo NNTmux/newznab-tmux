@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\ManticoreSearch;
 use Illuminate\Console\Command;
@@ -176,7 +175,7 @@ class NntmuxResetDb extends Command
             }
 
             $this->info('Deleting nzbfiles subfolders.');
-            $files = File::allFiles(Settings::settingValue('..nzbpath'));
+            $files = File::allFiles(config('nntmux_settings.path_to_nzbs'));
             File::delete($files);
 
             $this->info('Deleting all images, previews and samples that still remain.');

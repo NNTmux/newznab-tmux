@@ -9,7 +9,6 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\NNTP;
@@ -30,7 +29,8 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
 
     $show = isset($argv[5]) && $argv[5] === 'show' ? 1 : 2;
     if ($argv[1] === 7 || $argv[1] === 8) {
-        if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+        $compressedHeaders = config('nntmux_nntp.compressed_headers');
+        if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect()) !== true) {
             $colorCli->error('Unable to connect to usenet.');
 
             return;

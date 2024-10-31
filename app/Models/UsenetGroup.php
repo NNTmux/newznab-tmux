@@ -90,7 +90,6 @@ class UsenetGroup extends Model
     public function __construct()
     {
         parent::__construct();
-        $this->allasmgr = (int) Settings::settingValue('..allasmgr') === 1;
     }
 
     public function release(): HasMany

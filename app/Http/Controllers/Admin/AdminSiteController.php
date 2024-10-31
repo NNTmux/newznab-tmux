@@ -135,7 +135,7 @@ class AdminSiteController extends BasePageController
         $this->smarty->assign('lookup_reqids_ids', [0, 1, 2]);
         $this->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded']);
 
-        $this->smarty->assign('coversPath', storage_path('covers/'));
+        $this->smarty->assign('coversPath', config('nntmux_settings.covers_path'));
 
         // return a list of audiobooks, mags, ebooks, technical and foreign books
         $result = Category::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);
@@ -156,7 +156,7 @@ class AdminSiteController extends BasePageController
         $this->smarty->assign('book_reqids_names', $book_reqids_names);
 
         // convert from a list to an array as we need to use an array, but teh Settings table only saves strings
-        $books_selected = explode(',', Settings::settingValue('..book_reqids'));
+        $books_selected = explode(',', Settings::settingValue('book_reqids'));
 
         // convert from a string array to an int array
         $books_selected = array_map(function ($value) {

@@ -85,9 +85,9 @@ class Games
         $this->colorCli = new ColorCLI;
 
         $this->publicKey = config('nntmux_api.giantbomb_api_key');
-        $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
-        $this->imgSavePath = storage_path('covers/games/');
-        $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
+        $this->gameQty = Settings::settingValue('maxgamesprocessed') !== '' ? (int) Settings::settingValue('maxgamesprocessed') : 150;
+        $this->imgSavePath = config('nntmux_settings.covers_path').'/games/';
+        $this->renamed = (int) Settings::settingValue('lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
         $this->maxHitRequest = false;
         $this->catWhere = 'AND categories_id = '.Category::PC_GAMES.' ';
@@ -678,7 +678,7 @@ class Games
             ->where('nzbstatus', '=', 1)
             ->where('gamesinfo_id', '=', 0)
             ->where('categories_id', '=', Category::PC_GAMES);
-        if ((int) Settings::settingValue('..lookupgames') === 2) {
+        if ((int) Settings::settingValue('lookupgames') === 2) {
             $query->where('isrenamed', '=', 1);
         }
         $query->select(['searchname', 'id'])

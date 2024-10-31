@@ -6,7 +6,6 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Blacklight\ColorCLI;
 use Blacklight\Nfo;
-use Blacklight\NNTP;
 use Blacklight\NZB;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
@@ -97,9 +96,9 @@ class Forking
 
         $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
-        $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
-        $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
-        $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : Nfo::NFO_UNPROC;
+        $this->maxSize = (int) Settings::settingValue('maxsizetoprocessnfo');
+        $this->minSize = (int) Settings::settingValue('minsizetoprocessnfo');
+        $this->maxRetries = (int) Settings::settingValue('maxnforetries') >= 0 ? -((int) Settings::settingValue('maxnforetries') + 1) : Nfo::NFO_UNPROC;
         $this->maxRetries = max($this->maxRetries, -8);
     }
 
@@ -185,10 +184,6 @@ class Forking
 
             case 'postProcess_nfo':
                 $this->postProcessNfo();
-                break;
-
-            case 'postProcess_sha':
-                $this->processSharing();
                 break;
 
             case 'postProcess_tv':
@@ -290,11 +285,11 @@ class Forking
 
     private function safeBackfill(): void
     {
-        $backfill_qty = (int) Settings::settingValue('site.tmux.backfill_qty');
-        $backfill_order = (int) Settings::settingValue('site.tmux.backfill_order');
-        $backfill_days = (int) Settings::settingValue('site.tmux.backfill_days');
-        $maxMessages = (int) Settings::settingValue('..maxmssgs');
-        $threads = (int) Settings::settingValue('..backfillthreads');
+        $backfill_qty = (int) Settings::settingValue('backfill_qty');
+        $backfill_order = (int) Settings::settingValue('backfill_order');
+        $backfill_days = (int) Settings::settingValue('backfill_days');
+        $maxMessages = (int) Settings::settingValue('maxmssgs');
+        $threads = (int) Settings::settingValue('backfillthreads');
 
         $orderby = 'ORDER BY a.last_record ASC';
         switch ($backfill_order) {
@@ -323,7 +318,7 @@ class Forking
         if ($backfill_days === 1) {
             $backfilldays = 'g.backfill_target';
         } elseif ($backfill_days === 2) {
-            $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate')), true);
+            $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('safebackfilldate')), true);
         }
 
         $data = DB::select(
@@ -400,7 +395,7 @@ class Forking
             )
         );
 
-        $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
+        $this->maxProcesses = (int) Settings::settingValue('binarythreads');
 
         $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
@@ -429,9 +424,9 @@ class Forking
      */
     private function safeBinaries(): void
     {
-        $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
-        $maxMessages = (int) Settings::settingValue('..maxmssgs');
-        $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
+        $maxHeaders = (int) Settings::settingValue('max_headers_iteration') ?: 1000000;
+        $maxMessages = (int) Settings::settingValue('maxmssgs');
+        $this->maxProcesses = (int) Settings::settingValue('binarythreads');
 
         $this->work = DB::select(
             '
@@ -499,8 +494,8 @@ class Forking
 
     private function fixRelNames(): void
     {
-        $this->maxProcesses = (int) Settings::settingValue('..fixnamethreads');
-        $maxPerRun = (int) Settings::settingValue('..fixnamesperrun');
+        $this->maxProcesses = (int) Settings::settingValue('fixnamethreads');
+        $maxPerRun = (int) Settings::settingValue('fixnamesperrun');
 
         if ($this->maxProcesses > 16) {
             $this->maxProcesses = 16;
@@ -569,7 +564,7 @@ class Forking
     private function releases(): void
     {
         $work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-        $this->maxProcesses = (int) Settings::settingValue('..releasethreads');
+        $this->maxProcesses = (int) Settings::settingValue('releasethreads');
 
         $uGroups = [];
         foreach ($work as $group) {
@@ -660,9 +655,9 @@ class Forking
      */
     private function postProcessAdd(): void
     {
-        $ppAddMinSize = Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
+        $ppAddMinSize = Settings::settingValue('minsizetopostprocess') !== '' ? (int) Settings::settingValue('minsizetopostprocess') : 1;
         $ppAddMinSize = ($ppAddMinSize > 0 ? ('AND r.size > '.($ppAddMinSize * 1048576)) : '');
-        $ppAddMaxSize = (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
+        $ppAddMaxSize = (Settings::settingValue('maxsizetopostprocess') !== '') ? (int) Settings::settingValue('maxsizetopostprocess') : 100;
         $ppAddMaxSize = ($ppAddMaxSize > 0 ? ('AND r.size < '.($ppAddMaxSize * 1073741824)) : '');
         $this->maxProcesses = 1;
         $ppQueue = DB::select(
@@ -686,7 +681,7 @@ class Forking
         if (\count($ppQueue) > 0) {
             $this->processAdditional = true;
             $this->work = $ppQueue;
-            $this->maxProcesses = (int) Settings::settingValue('..postthreads');
+            $this->maxProcesses = (int) Settings::settingValue('postthreads');
         }
 
         $this->postProcess($this->work, $this->maxProcesses);
@@ -702,7 +697,7 @@ class Forking
      */
     private function checkProcessNfo(): bool
     {
-        if ((int) Settings::settingValue('..lookupnfo') === 1) {
+        if ((int) Settings::settingValue('lookupnfo') === 1) {
             $this->nfoQueryString = Nfo::NfoQueryString();
 
             return DB::select(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) > 0;
@@ -730,7 +725,7 @@ class Forking
                     $this->nfoQueryString
                 )
             );
-            $this->maxProcesses = (int) Settings::settingValue('..nfothreads');
+            $this->maxProcesses = (int) Settings::settingValue('nfothreads');
         }
 
         $this->postProcess($this->work, $this->maxProcesses);
@@ -741,7 +736,7 @@ class Forking
      */
     private function checkProcessMovies(): bool
     {
-        if (Settings::settingValue('..lookupimdb') > 0) {
+        if (Settings::settingValue('lookupimdb') > 0) {
             return DB::select(sprintf('
 						SELECT id
 						FROM releases
@@ -749,7 +744,7 @@ class Forking
 						AND nzbstatus = %d
 						AND imdbid IS NULL
 						%s %s
-						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) > 0;
+						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) > 0;
         }
 
         return false;
@@ -776,11 +771,11 @@ class Forking
 					LIMIT 16',
                     ($this->ppRenamedOnly ? 2 : 1),
                     NZB::NZB_ADDED,
-                    ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''),
+                    ((int) Settings::settingValue('lookupimdb') === 2 ? 'AND isrenamed = 1' : ''),
                     ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
                 )
             );
-            $this->maxProcesses = (int) Settings::settingValue('..postthreadsnon');
+            $this->maxProcesses = (int) Settings::settingValue('postthreadsnon');
         }
 
         $this->postProcess($this->work, $this->maxProcesses);
@@ -794,7 +789,7 @@ class Forking
      */
     private function checkProcessTV(): bool
     {
-        if ((int) Settings::settingValue('..lookuptvrage') > 0) {
+        if ((int) Settings::settingValue('lookuptv') > 0) {
             return DB::select(sprintf('
 						SELECT id
 						FROM releases
@@ -803,7 +798,7 @@ class Forking
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
 						%s %s
-						', NZB::NZB_ADDED, (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) > 0;
+						', NZB::NZB_ADDED, (int) Settings::settingValue('lookuptv') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) > 0;
         }
 
         return false;
@@ -831,35 +826,14 @@ class Forking
 					LIMIT 16',
                     ($this->ppRenamedOnly ? 2 : 1),
                     NZB::NZB_ADDED,
-                    (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '',
+                    (int) Settings::settingValue('lookuptv') === 2 ? 'AND isrenamed = 1' : '',
                     ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
                 )
             );
-            $this->maxProcesses = (int) Settings::settingValue('..postthreadsnon');
+            $this->maxProcesses = (int) Settings::settingValue('postthreadsnon');
         }
 
         $this->postProcess($this->work, $this->maxProcesses);
-    }
-
-    /**
-     * Process sharing.
-     *
-     *
-     * @throws \Exception
-     */
-    private function processSharing(): bool
-    {
-        $sharing = DB::select('SELECT enabled FROM sharing');
-        if ($sharing > 0 && (int) $sharing[0]->enabled === 1) {
-            $nntp = new NNTP;
-            if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
-                (new PostProcess(['ColorCLI' => $this->colorCli]))->processSharing($nntp);
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -869,8 +843,7 @@ class Forking
      */
     private function processSingle(): void
     {
-        $postProcess = new PostProcess(['ColorCLI' => $this->colorCli]);
-        //$postProcess->processAnime();
+        $postProcess = new PostProcess;
         $postProcess->processBooks();
         $postProcess->processConsoles();
         $postProcess->processGames();
@@ -889,7 +862,7 @@ class Forking
     {
         $this->work = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
-        $maxProcess = (int) Settings::settingValue('..releasethreads');
+        $maxProcess = (int) Settings::settingValue('releasethreads');
 
         $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
         $this->processWork();

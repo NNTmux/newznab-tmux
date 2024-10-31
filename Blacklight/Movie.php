@@ -132,7 +132,7 @@ class Movie
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
 
-        $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
+        $this->lookuplanguage = Settings::settingValue('imdblanguage') !== '' ? (string) Settings::settingValue('imdblanguage') : 'en';
         $this->config = new Config;
         $this->config->language = $this->lookuplanguage;
         $this->config->throwHttpExceptions = false;
@@ -142,8 +142,8 @@ class Movie
         }
         $this->config->cachedir = $cacheDir;
 
-        $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
-        $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
+        $this->imdburl = (int) Settings::settingValue('imdburl') !== 0;
+        $this->movieqty = Settings::settingValue('maximdbprocessed') !== '' ? (int) Settings::settingValue('maximdbprocessed') : 100;
         $this->showPasswords = (new Releases)->showPasswords();
 
         $this->echooutput = config('nntmux.echocli');

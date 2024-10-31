@@ -82,19 +82,19 @@ class ProcessReleases
         $this->releases = new Releases;
         $this->releaseImage = new ReleaseImage;
 
-        $dummy = Settings::settingValue('..delaytime');
+        $dummy = Settings::settingValue('delaytime');
         $this->collectionDelayTime = ($dummy !== '' ? (int) $dummy : 2);
-        $dummy = Settings::settingValue('..crossposttime');
+        $dummy = Settings::settingValue('crossposttime');
         $this->crossPostTime = ($dummy !== '' ? (int) $dummy : 2);
-        $dummy = Settings::settingValue('..maxnzbsprocessed');
+        $dummy = Settings::settingValue('maxnzbsprocessed');
         $this->releaseCreationLimit = ($dummy !== '' ? (int) $dummy : 1000);
-        $dummy = Settings::settingValue('..completionpercent');
+        $dummy = Settings::settingValue('completionpercent');
         $this->completion = ($dummy !== '' ? (int) $dummy : 0);
         if ($this->completion > 100) {
             $this->completion = 100;
             $this->colorCLI->error(PHP_EOL.'You have an invalid setting for completion. It cannot be higher than 100.');
         }
-        $this->collectionTimeout = (int) Settings::settingValue('indexer.processing.collection_timeout');
+        $this->collectionTimeout = (int) Settings::settingValue('collection_timeout');
     }
 
     /**
@@ -120,9 +120,9 @@ class ProcessReleases
             $this->colorCLI->header('Starting release update process ('.now()->format('Y-m-d H:i:s').')');
         }
 
-        if (! file_exists(Settings::settingValue('..nzbpath'))) {
+        if (! file_exists(config('nntmux_settings.path_to_nzbs'))) {
             if ($this->echoCLI) {
-                $this->colorCLI->error('Bad or missing nzb directory - '.Settings::settingValue('..nzbpath'));
+                $this->colorCLI->error('Bad or missing nzb directory - '.config('nntmux_settings.path_to_nzbs'));
             }
 
             return 0;
@@ -303,9 +303,9 @@ class ProcessReleases
 
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
-        $maxSizeSetting = Settings::settingValue('.release.maxsizetoformrelease');
-        $minSizeSetting = Settings::settingValue('.release.minsizetoformrelease');
-        $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
+        $maxSizeSetting = Settings::settingValue('maxsizetoformrelease');
+        $minSizeSetting = Settings::settingValue('minsizetoformrelease');
+        $minFilesSetting = Settings::settingValue('minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
             $groupMinSizeSetting = $groupMinFilesSetting = 0;
@@ -665,14 +665,14 @@ class ProcessReleases
             echo $this->colorCLI->header('Process Releases -> Delete finished collections.'.PHP_EOL).
                 $this->colorCLI->primary(sprintf(
                     'Deleting collections/binaries/parts older than %d hours.',
-                    Settings::settingValue('..partretentionhours')
+                    Settings::settingValue('partretentionhours')
                 ), true);
         }
 
         DB::transaction(function () use ($deletedCount, $startTime) {
             $deleted = 0;
             $deleteQuery = Collection::query()
-                ->where('dateadded', '<', now()->subHours(Settings::settingValue('..partretentionhours')))
+                ->where('dateadded', '<', now()->subHours(Settings::settingValue('partretentionhours')))
                 ->delete();
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
@@ -757,9 +757,9 @@ class ProcessReleases
 
         $groupIDs = $groupID === '' ? UsenetGroup::getActiveIDs() : [['id' => $groupID]];
 
-        $maxSizeSetting = Settings::settingValue('.release.maxsizetoformrelease');
-        $minSizeSetting = Settings::settingValue('.release.minsizetoformrelease');
-        $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
+        $maxSizeSetting = Settings::settingValue('maxsizetoformrelease');
+        $minSizeSetting = Settings::settingValue('minsizetoformrelease');
+        $minFilesSetting = Settings::settingValue('minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
             $releases = Release::query()->where('releases.groups_id', $grpID['id'])->whereRaw('greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?) > 0 AND releases.size < greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?)', [$minSizeSetting, $minSizeSetting])->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')->select(['releases.id', 'releases.guid'])->get();
@@ -819,8 +819,8 @@ class ProcessReleases
         }
 
         // Releases past retention.
-        if ((int) Settings::settingValue('..releaseretentiondays') !== 0) {
-            $releases = Release::query()->where('postdate', '<', now()->subDays((int) Settings::settingValue('..releaseretentiondays')))->select(['id', 'guid'])->get();
+        if ((int) Settings::settingValue('releaseretentiondays') !== 0) {
+            $releases = Release::query()->where('postdate', '<', now()->subDays((int) Settings::settingValue('releaseretentiondays')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $retentionDeleted++;
@@ -828,7 +828,7 @@ class ProcessReleases
         }
 
         // Passworded releases.
-        if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
+        if ((int) Settings::settingValue('deletepasswordedrelease') === 1) {
             $releases = Release::query()
                 ->select(['id', 'guid'])
                 ->where('passwordstatus', '=', Releases::PASSWD_RAR)
@@ -904,8 +904,8 @@ class ProcessReleases
         }
 
         // Misc other.
-        if (Settings::settingValue('..miscotherretentionhours') > 0) {
-            $releases = Release::query()->where('categories_id', Category::OTHER_MISC)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('..miscotherretentionhours')))->select(['id', 'guid'])->get();
+        if (Settings::settingValue('miscotherretentionhours') > 0) {
+            $releases = Release::query()->where('categories_id', Category::OTHER_MISC)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('miscotherretentionhours')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $miscRetentionDeleted++;
@@ -913,8 +913,8 @@ class ProcessReleases
         }
 
         // Misc hashed.
-        if ((int) Settings::settingValue('..mischashedretentionhours') > 0) {
-            $releases = Release::query()->where('categories_id', Category::OTHER_HASHED)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('..mischashedretentionhours')))->select(['id', 'guid'])->get();
+        if ((int) Settings::settingValue('mischashedretentionhours') > 0) {
+            $releases = Release::query()->where('categories_id', Category::OTHER_HASHED)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('mischashedretentionhours')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $miscHashedDeleted++;
@@ -1184,7 +1184,7 @@ class ProcessReleases
      */
     private function processStuckCollections(int $groupID): void
     {
-        $lastRun = Settings::settingValue('indexer.processing.last_run_time');
+        $lastRun = Settings::settingValue('last_run_time');
 
         DB::transaction(function () use ($groupID, $lastRun) {
             $objQuery = Collection::query()

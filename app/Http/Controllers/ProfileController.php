@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
-use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
-use Blacklight\utility\Utility;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
@@ -30,7 +28,7 @@ class ProfileController extends BasePageController
 
         $userID = $this->userdata->id;
         $privileged = $this->userdata->hasRole('Admin') || $this->userdata->hasRole('Moderator');
-        $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
+        $privateProfiles = config('nntmux_settings.private_profiles');
         $publicView = false;
 
         if ($privileged || ! $privateProfiles) {
@@ -107,7 +105,7 @@ class ProfileController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): RedirectResponse
     {
         $this->setPreferences();
 
@@ -150,7 +148,7 @@ class ProfileController extends BasePageController
                         $request->has('xxxview') ? 1 : 0,
                         $request->has('consoleview') ? 1 : 0,
                         $request->has('bookview') ? 1 : 0,
-                        (int) Settings::settingValue('site.main.userselstyle') === 1 ? $request->input('style') : 'None'
+                        'None',
                     );
 
                     if ((int) $request->input('viewconsole') === 1 && $this->userdata->can('view console') && ! $this->userdata->hasDirectPermission('view console')) {
@@ -244,10 +242,6 @@ class ProfileController extends BasePageController
             case 'view':
             default:
                 break;
-        }
-        if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
-            // Get the list of themes.
-            $this->smarty->assign('themelist', Utility::getThemesList());
         }
 
         $this->smarty->assign('error', $errorStr);

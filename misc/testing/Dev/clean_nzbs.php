@@ -3,7 +3,6 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
-use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
@@ -36,7 +35,7 @@ $couldbe = ($argv[1] === 'true') ? 'could be ' : '';
 $colorCli->header('Getting List of nzbs to check against db.');
 $colorCli->header("Checked / {$couldbe}moved\n");
 
-$dirItr = new RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'));
+$dirItr = new RecursiveDirectoryIterator(config('nntux_settings.path_to_nzbs'));
 $itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);
 
 foreach ($itr as $filePath) {

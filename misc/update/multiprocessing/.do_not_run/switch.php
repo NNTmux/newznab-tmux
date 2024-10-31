@@ -18,7 +18,6 @@ use Blacklight\processing\ProcessReleases;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-
 // The type of process we want to do: $options[1] => (string): releases
 $options = explode('  ', $argv[1]);
 
@@ -29,7 +28,7 @@ switch ($options[1]) {
     // $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
     case 'backfill':
         if (in_array((int) $options[3], [1, 2], false)) {
-            $value = (int) Settings::settingValue('site.tmux.backfill_qty');
+            $value = (int) Settings::settingValue('backfill_qty');
             if ($value !== null) {
                 try {
                     $nntp = nntp();
@@ -38,7 +37,7 @@ switch ($options[1]) {
                     echo $e->getMessage();
                 }
                 try {
-                    (new Backfill())->backfillAllGroups($options[2], ($options[3] == 1 ? '' : $value['value']));
+                    (new Backfill)->backfillAllGroups($options[2], ($options[3] == 1 ? '' : $value['value']));
                 } catch (Throwable $e) {
                     Log::error($e->getTraceAsString());
                     echo $e->getMessage();
@@ -47,11 +46,11 @@ switch ($options[1]) {
         }
         break;
 
-    /*  BackFill up to x number of articles for all groups.
-     *
-     * $options[2] => (string) Group name.
-     * $options[3] => (int)    Quantity of articles to download.
-     */
+        /*  BackFill up to x number of articles for all groups.
+         *
+         * $options[2] => (string) Group name.
+         * $options[3] => (int)    Quantity of articles to download.
+         */
     case 'backfill_all_quantity':
         try {
             $nntp = nntp();
@@ -60,15 +59,15 @@ switch ($options[1]) {
             echo $e->getMessage();
         }
         try {
-            (new Backfill())->backfillAllGroups($options[2], $options[3]);
+            (new Backfill)->backfillAllGroups($options[2], $options[3]);
         } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         break;
 
-    // BackFill a single group, 10000 parts.
-    // $options[2] => (string)group name, Name of group to work on.
+        // BackFill a single group, 10000 parts.
+        // $options[2] => (string)group name, Name of group to work on.
     case 'backfill_all_quick':
         try {
             $nntp = nntp();
@@ -77,21 +76,21 @@ switch ($options[1]) {
             echo $e->getMessage();
         }
         try {
-            (new Backfill())->backfillAllGroups($options[2], 10000, 'normal');
+            (new Backfill)->backfillAllGroups($options[2], 10000, 'normal');
         } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         break;
 
-    /* Get a range of article headers for a group.
-     *
-     * $options[2] => (string) backfill/binaries
-     * $options[3] => (string) Group name.
-     * $options[4] => (int)    First article number in range.
-     * $options[5] => (int)    Last article number in range.
-     * $options[6] => (int)    Number of threads.
-     */
+        /* Get a range of article headers for a group.
+         *
+         * $options[2] => (string) backfill/binaries
+         * $options[3] => (string) Group name.
+         * $options[4] => (int)    First article number in range.
+         * $options[5] => (int)    Last article number in range.
+         * $options[6] => (int)    Number of threads.
+         */
     case 'get_range':
         try {
             $nntp = nntp();
@@ -109,7 +108,7 @@ switch ($options[1]) {
         }
         try {
             $binaries = new Binaries(['NNTP' => $nntp, 'Groups' => null]);
-            $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill'));
+            $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('safepartrepair') === 1 ? 'update' : 'backfill'));
         } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
@@ -162,10 +161,10 @@ switch ($options[1]) {
         DB::update($query);
         break;
 
-    /* Do part repair for a group.
-     *
-     * $options[2] => (string) Group name.
-     */
+        /* Do part repair for a group.
+         *
+         * $options[2] => (string) Group name.
+         */
     case 'part_repair':
         $groupMySQL = UsenetGroup::getByName($options[2])->toArray();
         try {
@@ -193,11 +192,11 @@ switch ($options[1]) {
         }
         break;
 
-    // Process releases.
-    // $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
+        // Process releases.
+        // $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
     case 'releases':
         try {
-            $releases = new ProcessReleases();
+            $releases = new ProcessReleases;
         } catch (Throwable $e) {
             echo $e->getMessage();
         }
@@ -240,10 +239,10 @@ switch ($options[1]) {
         }
         break;
 
-    /* Update a single group's article headers.
-     *
-     * $options[2] => (string) Group name.
-     */
+        /* Update a single group's article headers.
+         *
+         * $options[2] => (string) Group name.
+         */
     case 'update_group_headers':
         try {
             $nntp = nntp();
@@ -258,8 +257,8 @@ switch ($options[1]) {
         }
         break;
 
-    // Do a single group (update_binaries/backFill/update_releases/postprocess).
-    // $options[2] => (int)groupid, group to work on
+        // Do a single group (update_binaries/backFill/update_releases/postprocess).
+        // $options[2] => (int)groupid, group to work on
     case 'update_per_group':
         if (is_numeric($options[2])) {
             // Get the group info from MySQL.
@@ -276,14 +275,14 @@ switch ($options[1]) {
                 echo $e->getMessage();
             }
             try {
-                $backFill = new Backfill();
+                $backFill = new Backfill;
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
 
             // Update the group for new binaries.
             try {
-                (new Binaries())->updateGroup($groupMySQL);
+                (new Binaries)->updateGroup($groupMySQL);
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
@@ -297,7 +296,7 @@ switch ($options[1]) {
 
             // Create releases.
             try {
-                processReleases(new ProcessReleases(), $options[2]);
+                processReleases(new ProcessReleases, $options[2]);
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
@@ -309,15 +308,15 @@ switch ($options[1]) {
                 echo $e->getMessage();
             }
             try {
-                (new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
+                (new Nfo)->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptv'));
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
         }
         break;
 
-    // Post process additional and NFO.
-    // $options[2] => (char)Letter or number a-f 0-9, first character of release guid.
+        // Post process additional and NFO.
+        // $options[2] => (char)Letter or number a-f 0-9, first character of release guid.
     case 'pp_additional':
     case 'pp_nfo':
         if (charCheck($options[2])) {
@@ -331,7 +330,7 @@ switch ($options[1]) {
 
             if ($options[1] === 'pp_nfo') {
                 try {
-                    (new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
+                    (new Nfo)->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('lookupimdb'), (int) Settings::settingValue('lookuptv'));
                 } catch (Throwable $e) {
                     echo $e->getMessage();
                 }
@@ -345,30 +344,30 @@ switch ($options[1]) {
         }
         break;
 
-    /* Post process movies.
-     *
-     * $options[2] (char) Single character, first letter of release guid.
-     * $options[3] (int)  Process all releases or renamed releases only.
-     */
+        /* Post process movies.
+         *
+         * $options[2] (char) Single character, first letter of release guid.
+         * $options[3] (int)  Process all releases or renamed releases only.
+         */
     case 'pp_movie':
         if (charCheck($options[2])) {
             try {
-                (new PostProcess())->processMovies('', $options[2], $options[3] ?? '');
+                (new PostProcess)->processMovies('', $options[2], $options[3] ?? '');
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
         }
         break;
 
-    /* Post process TV.
-     *
-     * $options[2] (char) Single character, first letter of release guid.
-     * $options[3] (int)  Process all releases or renamed releases only.
-     */
+        /* Post process TV.
+         *
+         * $options[2] (char) Single character, first letter of release guid.
+         * $options[3] (int)  Process all releases or renamed releases only.
+         */
     case 'pp_tv':
         if (charCheck($options[2])) {
             try {
-                (new PostProcess())->processTv('', $options[2], $options[3] ?? '');
+                (new PostProcess)->processTv('', $options[2], $options[3] ?? '');
             } catch (Throwable $e) {
                 echo $e->getMessage();
             }
@@ -379,14 +378,12 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
- * @param    $groupID
- * @param  ProcessReleases  $releases
  *
  * @throws \Throwable
  */
 function processReleases(ProcessReleases $releases, $groupID): void
 {
-    $releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int) Settings::settingValue('..maxnzbsprocessed') : 1000);
+    $releaseCreationLimit = (Settings::settingValue('maxnzbsprocessed') !== '' ? (int) Settings::settingValue('maxnzbsprocessed') : 1000);
     $releases->processIncompleteCollections($groupID);
     $releases->processCollectionSizes($groupID);
     $releases->deleteUnwantedCollections($groupID);
@@ -396,15 +393,12 @@ function processReleases(ProcessReleases $releases, $groupID): void
         $nzbFilesAdded = $releases->createNZBs($groupID);
 
         // This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
-    } while ($releasesCount['added'] + $releasesCount['dupes'] >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit);
+    } while ($releaseCreationLimit <= $releasesCount['added'] + $releasesCount['dupes'] || $nzbFilesAdded >= $releaseCreationLimit);
     $releases->deleteCollections($groupID);
 }
 
 /**
  * Check if the character contains a-f or 0-9.
- *
- * @param  string  $char
- * @return bool
  */
 function charCheck(string $char): bool
 {
@@ -414,14 +408,13 @@ function charCheck(string $char): bool
 /**
  * Connect to usenet, return NNTP object.
  *
- * @return NNTP
  *
  * @throws \Exception
  */
 function &nntp(): NNTP
 {
-    $nntp = new NNTP();
-    if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(false, true) : $nntp->doConnect()) !== true) {
+    $nntp = new NNTP;
+    if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect(false, true) : $nntp->doConnect()) !== true) {
         exit('ERROR: Unable to connect to usenet.'.PHP_EOL);
     }
 

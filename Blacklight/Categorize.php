@@ -47,8 +47,8 @@ class Categorize
      */
     public function __construct()
     {
-        $this->categorizeForeign = (bool) Settings::settingValue('indexer.categorise.categorizeforeign');
-        $this->catWebDL = (bool) Settings::settingValue('indexer.categorise.catwebdl');
+        $this->categorizeForeign = (bool) Settings::settingValue('categorizeforeign');
+        $this->catWebDL = (bool) Settings::settingValue('catwebdl');
     }
 
     /**

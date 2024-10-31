@@ -46,7 +46,7 @@ class AniDB
         $this->padb = new PaDb;
         $this->colorCli = new ColorCLI;
 
-        $quantity = (int) Settings::settingValue('..maxanidbprocessed');
+        $quantity = (int) Settings::settingValue('maxanidbprocessed');
         $this->aniqty = $quantity ?? 100;
 
         $this->status = null;

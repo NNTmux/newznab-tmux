@@ -49,7 +49,7 @@ class XXX
         $this->releaseImage = new ReleaseImage;
         $this->colorCli = new ColorCLI;
 
-        $this->movieQty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
+        $this->movieQty = Settings::settingValue('maxxxxprocessed') ?? 100;
         $this->showPasswords = (new Releases)->showPasswords();
         $this->echoOutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/xxx/');

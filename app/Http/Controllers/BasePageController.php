@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Events\UserLoggedIn;
 use App\Models\Category;
-use App\Models\Forumpost;
 use App\Models\Settings;
 use App\Models\User;
 use Blacklight\Contents;
@@ -79,14 +78,10 @@ class BasePageController extends Controller
         if (Auth::check()) {
             $this->userdata = User::find(Auth::id());
             $this->setUserPreferences();
-            if ($this->theme === 'None') {
-                $this->theme = Settings::settingValue('site.main.style');
-            }
         } else {
-            $this->theme = Settings::settingValue('site.main.style');
             // Tell Smarty which directories to use for templates
             $this->smarty->setTemplateDir([
-                'user' => config('ytake-laravel-smarty.template_path').DIRECTORY_SEPARATOR.$this->theme,
+                'user' => config('ytake-laravel-smarty.template_path').'/Gentele',
                 'shared' => config('ytake-laravel-smarty.template_path').'/shared',
                 'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
             ]);
@@ -102,7 +97,7 @@ class BasePageController extends Controller
 
         $this->smarty->assign(
             [
-                'theme' => $this->theme,
+                'theme' => 'Gentele',
                 'site' => $this->settings,
             ]
         );
@@ -139,16 +134,6 @@ class BasePageController extends Controller
     {
         $this->userdata->categoryexclusions = User::getCategoryExclusionById(Auth::id());
 
-        // Change the theme to user's selected theme if they selected one, else use the admin one.
-        if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
-            $this->theme = $this->userdata->style ?? 'None';
-            if ($this->theme === 'None') {
-                $this->theme = Settings::settingValue('site.main.style');
-            }
-        } else {
-            $this->theme = Settings::settingValue('site.main.style');
-        }
-
         // Update last login every 15 mins.
         if (now()->subHours(3) > $this->userdata->lastlogin) {
             event(new UserLoggedIn($this->userdata));
@@ -167,7 +152,7 @@ class BasePageController extends Controller
 
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir([
-            'user' => config('ytake-laravel-smarty.template_path').DIRECTORY_SEPARATOR.$this->theme,
+            'user' => config('ytake-laravel-smarty.template_path').'/Gentele',
             'shared' => config('ytake-laravel-smarty.template_path').'/shared',
             'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
         ]);
@@ -178,10 +163,6 @@ class BasePageController extends Controller
         }
 
         $content = new Contents;
-        if ($this->userdata !== null) {
-            $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
-        }
-
         $parentcatlist = Category::getForMenu($this->userdata->categoryexclusions);
 
         $this->smarty->assign('parentcatlist', $parentcatlist);
