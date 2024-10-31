@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Models\DnzbFailure;
 use App\Models\Predb;
 use App\Models\Release;
@@ -30,7 +31,7 @@ class DetailsController extends BasePageController
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function show(Request $request, string $guid)
+    public function show(Request $request, string $guid): RedirectResponse
     {
         $this->setPreferences();
 

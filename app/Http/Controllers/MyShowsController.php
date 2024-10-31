@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserSerie;
@@ -16,7 +17,7 @@ class MyShowsController extends BasePageController
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): RedirectResponse
     {
         $this->setPreferences();
         $action = $request->input('action') ?? '';
