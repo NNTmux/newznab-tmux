@@ -33,9 +33,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->append([
             \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
-            \Monicahq\Cloudflare\Http\Middleware\TrustProxies::class,
             \App\Http\Middleware\ForceJsonOnAPI::class,
         ]);
+
+        $middleware->replace(
+			\Illuminate\Http\Middleware\TrustProxies::class,
+			\Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
+		);
 
         $middleware->web([
             \Illuminate\Session\Middleware\AuthenticateSession::class,
