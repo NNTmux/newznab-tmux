@@ -37,9 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->replace(
-			\Illuminate\Http\Middleware\TrustProxies::class,
-			\Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
-		);
+            \Illuminate\Http\Middleware\TrustProxies::class,
+            \Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
+        );
 
         $middleware->web([
             \Illuminate\Session\Middleware\AuthenticateSession::class,
