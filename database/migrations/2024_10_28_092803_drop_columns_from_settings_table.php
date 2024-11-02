@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->dropColumn(['section', 'subsection', 'hint', 'setting']);
-            $table->primary(['name']);
-        });
+            if (Schema::hasColumns('settings', ['section', 'subsection', 'hint', 'setting'])) {
+                $table->dropColumn(['section', 'subsection', 'hint', 'setting']);
+                $table->primary(['name']);
+}       });
     }
 
     /**
