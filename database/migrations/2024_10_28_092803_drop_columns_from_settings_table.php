@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->dropIndex('ui_settings_settings');
             $table->dropColumn(['section', 'subsection', 'hint', 'setting']);
-            $table->dropPrimary();
             $table->primary(['name']);
         });
     }
