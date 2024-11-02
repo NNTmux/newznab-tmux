@@ -1246,8 +1246,7 @@ DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `name` varchar(25) NOT NULL DEFAULT '',
   `value` varchar(1000) NOT NULL DEFAULT '',
-  PRIMARY KEY (`name`),
-  UNIQUE KEY `ui_settings_setting` (`setting`)
+  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `short_groups`;
