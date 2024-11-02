@@ -15,7 +15,8 @@ return new class extends Migration
             if (Schema::hasColumns('settings', ['section', 'subsection', 'hint', 'setting'])) {
                 $table->dropColumn(['section', 'subsection', 'hint', 'setting']);
                 $table->primary(['name']);
-}       });
+            }
+        });
     }
 
     /**
