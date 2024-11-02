@@ -5213,27 +5213,30 @@
         },
         {
             "name": "manticoresoftware/manticoresearch-php",
-            "version": "3.1.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/manticoresoftware/manticoresearch-php.git",
-                "reference": "a04f9cd56a64aab6a4089f663c03d5400097daa4"
+                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/a04f9cd56a64aab6a4089f663c03d5400097daa4",
-                "reference": "a04f9cd56a64aab6a4089f663c03d5400097daa4",
+                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
+                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">=7.1",
-                "psr/log": ">=1.1"
+                "php": "^7.4|^8.0",
+                "php-http/discovery": "^1.14",
+                "psr/log": "^1.1 || ^2.0 || ^3.0"
             },
             "require-dev": {
                 "mockery/mockery": "*",
-                "phpunit/phpunit": ">=7.5",
-                "squizlabs/php_codesniffer": ">=3.5"
+                "phpstan/phpstan": "^1.4",
+                "phpunit/phpunit": ">=7.5 || ^9.6",
+                "slevomat/coding-standard": "^7.0",
+                "squizlabs/php_codesniffer": "^3.7"
             },
             "suggest": {
                 "ext-curl": "*",
@@ -5276,7 +5279,7 @@
                 "issues": "https://github.com/manticoresoftware/manticoresearch-php/issues",
                 "source": "https://github.com/manticoresoftware/manticoresearch-php/"
             },
-            "time": "2023-09-15T10:43:57+00:00"
+            "time": "2024-10-31T10:38:53+00:00"
         },
         {
             "name": "marcreichel/igdb-laravel",
@@ -7867,16 +7870,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.4.6",
+            "version": "2.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "378e9d3b049b7b12e0b1e656c1d82c504173d8b2"
+                "reference": "3ce8c2d70d65e4b749818a5766d7f59d1ee0d5ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/378e9d3b049b7b12e0b1e656c1d82c504173d8b2",
-                "reference": "378e9d3b049b7b12e0b1e656c1d82c504173d8b2",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/3ce8c2d70d65e4b749818a5766d7f59d1ee0d5ce",
+                "reference": "3ce8c2d70d65e4b749818a5766d7f59d1ee0d5ce",
                 "shasum": ""
             },
             "require": {
@@ -7932,7 +7935,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.6"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.7"
             },
             "funding": [
                 {
@@ -7940,7 +7943,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-10-01T00:48:13+00:00"
+            "time": "2024-11-01T00:48:20+00:00"
         },
         {
             "name": "psr/cache",
@@ -17496,16 +17499,16 @@
         },
         {
             "name": "sebastian/comparator",
-            "version": "6.2.0",
+            "version": "6.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/comparator.git",
-                "reference": "df95a6e827808debe3dbe190022dd0f643d5d909"
+                "reference": "43d129d6a0f81c78bee378b46688293eb7ea3739"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/df95a6e827808debe3dbe190022dd0f643d5d909",
-                "reference": "df95a6e827808debe3dbe190022dd0f643d5d909",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/43d129d6a0f81c78bee378b46688293eb7ea3739",
+                "reference": "43d129d6a0f81c78bee378b46688293eb7ea3739",
                 "shasum": ""
             },
             "require": {
@@ -17561,7 +17564,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/comparator/issues",
                 "security": "https://github.com/sebastianbergmann/comparator/security/policy",
-                "source": "https://github.com/sebastianbergmann/comparator/tree/6.2.0"
+                "source": "https://github.com/sebastianbergmann/comparator/tree/6.2.1"
             },
             "funding": [
                 {
@@ -17569,7 +17572,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-10-30T13:12:44+00:00"
+            "time": "2024-10-31T05:30:08+00:00"
         },
         {
             "name": "sebastian/complexity",
@@ -18794,5 +18797,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
