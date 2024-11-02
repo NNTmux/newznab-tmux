@@ -33,7 +33,7 @@ class TmuxOutput extends Tmux
     public function updateMonitorPane(&$runVar): void
     {
         $this->runVar = $runVar;
-        $this->tmpMasks = $this->_getFormatMasks($runVar['settings']['compressed']);
+        $this->tmpMasks = $this->_getFormatMasks(config('nntmux_nntp.compressed_headers'));
 
         $buffer = $this->_getHeader();
 
@@ -92,7 +92,7 @@ class TmuxOutput extends Tmux
 
     protected function _getFormatMasks($compressed): array
     {
-        $index = ((int) $compressed === 1 ? '2.1' : '2.0');
+        $index = ($compressed === true ? '2.1' : '2.0');
 
         return [
             1 => &$this->_colourMasks[1],
