@@ -107,7 +107,7 @@ class Tmux
 
     public function getConstantSettings(): string
     {
-        $settstr = 'SELECT value FROM settings WHERE setting =';
+        $settstr = 'SELECT value FROM settings WHERE name =';
 
         $sql = sprintf(
             "SELECT
@@ -362,7 +362,7 @@ class Tmux
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
 					) AS backfill_groups_days,
 					(SELECT COUNT(id) FROM usenet_groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
-					(SELECT VALUE FROM settings WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
+					(SELECT VALUE FROM settings WHERE name = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
                     escapeString($db_name)
                 );
             case 6:
