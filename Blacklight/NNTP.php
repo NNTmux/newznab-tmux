@@ -104,6 +104,11 @@ class NNTP extends \Net_NNTP_Client
     protected Tmux $_tmux;
 
     /**
+     * @var resource
+     */
+    protected $_socket = null;
+
+    /**
      * Default constructor.
      */
     public function __construct()
@@ -118,6 +123,8 @@ class NNTP extends \Net_NNTP_Client
         $this->_currentServer = config('nntmux_nntp.server');
         $this->_primaryNntpConnections = config('nntmux_nntp.main_nntp_connections');
         $this->_alternateNntpConnections = config('nntmux_nntp.alternate_nntp_connections');
+        $this->_selectedGroupSummary = null;
+        $this->_overviewFormatCache = null;
     }
 
     /**
@@ -314,6 +321,7 @@ class NNTP extends \Net_NNTP_Client
         $this->_postingAllowed = false;
         $this->_selectedGroupSummary = null;
         $this->_overviewFormatCache = null;
+        $this->_socket = null;
     }
 
     /**
@@ -333,14 +341,14 @@ class NNTP extends \Net_NNTP_Client
 
     /**
      * @param  string  $group  Name of the group to select.
-     * @param  bool  $articles  (optional) experimental! When true the article numbers is returned in 'articles'.
+     * @param  mixed  $articles  (optional) experimental! When true the article numbers is returned in 'articles'.
      * @param  bool  $force  Force a refresh to get updated data from the usenet server.
      * @return mixed On success : (array)  Group information.
      *
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function selectGroup(string $group, bool $articles = false, bool $force = false)
+    public function selectGroup(string $group, mixed $articles = false, bool $force = false): mixed
     {
         $connected = $this->_checkConnection(false);
         if ($connected !== true) {
@@ -365,7 +373,7 @@ class NNTP extends \Net_NNTP_Client
      * @throws \Exception
      *                    On failure : (object) PEAR_Error.
      */
-    public function getOverview($range = null, $names = true, $forceNames = true)
+    public function getOverview($range = null, $names = true, $forceNames = true): mixed
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -484,12 +492,12 @@ class NNTP extends \Net_NNTP_Client
      *
      * Returns a list of valid groups (that the client is permitted to select) and associated information.
      *
-     * @param  string  $wildMat  (optional) http://tools.ietf.org/html/rfc3977#section-4
+     * @param  mixed  $wildMat  (optional) http://tools.ietf.org/html/rfc3977#section-4
      * @return array|string Pear error on failure, array with groups on success.
      *
      * @throws \Exception
      */
-    public function getGroups(?string $wildMat = null)
+    public function getGroups(mixed $wildMat = null): mixed
     {
         // Enabled header compression if not enabled.
         $this->_enableCompression();
@@ -1275,7 +1283,7 @@ class NNTP extends \Net_NNTP_Client
      * Connect to a NNTP server.
      *
      * @param  string|null  $host  (optional) The address of the NNTP-server to connect to, defaults to 'localhost'.
-     * @param  mixed  $encryption  (optional) Use TLS/SSL on the connection?
+     * @param  mixed|null  $encryption  (optional) Use TLS/SSL on the connection?
      *                             (string) 'tcp'                 => Use no encryption.
      *                             'ssl', 'sslv3', 'tls' => Use encryption.
      *                             (null)|(false) Use no encryption.
@@ -1285,7 +1293,7 @@ class NNTP extends \Net_NNTP_Client
      * @return mixed (bool) On success: True when posting allowed, otherwise false.
      *                      (object) On failure: pear_error
      */
-    public function connect(?string $host = null, $encryption = null, ?int $port = null, ?int $timeout = 15, int $socketTimeout = 120): mixed
+    public function connect(?string $host = null, mixed $encryption = null, ?int $port = null, ?int $timeout = 15, int $socketTimeout = 120): mixed
     {
         if ($this->_isConnected()) {
             return $this->throwError('Already connected, disconnect first!', null);
@@ -1330,7 +1338,6 @@ class NNTP extends \Net_NNTP_Client
                 $message .= ' Try disabling SSL/TLS, and/or try a different port.';
             }
             $message .= ' [ERROR '.$errorNumber.': '.$errorString.']';
-            $this->_logger?->notice($message);
 
             return $this->throwError($message);
         }
@@ -1339,7 +1346,6 @@ class NNTP extends \Net_NNTP_Client
         $this->_socketTimeout = $socketTimeout ?: $this->_socketTimeout;
         // Set the socket timeout.
         stream_set_timeout($this->_socket, $this->_socketTimeout);
-        $this->_logger?->info("Connection to $transport://$host:$port has been established.");
         // Retrieve the server's initial response.
         $response = $this->_getStatusResponse();
         if (self::isError($response)) {
@@ -1351,7 +1357,6 @@ class NNTP extends \Net_NNTP_Client
                 return true;
                 // 201, Posting NOT allowed
             case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED:
-                $this->_logger?->info('Posting not allowed!');
 
                 return false;
             default:

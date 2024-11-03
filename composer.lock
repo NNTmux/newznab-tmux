@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b77ae5efdf1ae2cb9f0cfcd5d1c12fc6",
+    "content-hash": "0ba181ec4daee5e458c7267cde49bda1",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -6547,21 +6547,21 @@
         },
         {
             "name": "pear/net_nntp",
-            "version": "v1.6.1",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/Net_NNTP.git",
-                "reference": "f66697dd987137acef0ea7ad251375efb81bb2d2"
+                "reference": "d977a1967f9e065fe02268290816504e2b364990"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/f66697dd987137acef0ea7ad251375efb81bb2d2",
-                "reference": "f66697dd987137acef0ea7ad251375efb81bb2d2",
+                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/d977a1967f9e065fe02268290816504e2b364990",
+                "reference": "d977a1967f9e065fe02268290816504e2b364990",
                 "shasum": ""
             },
             "require": {
                 "pear/pear": "^1.4.5",
-                "php": ">=5.0"
+                "php": ">=8.2"
             },
             "require-dev": {
                 "phpunit/phpunit": "*"
@@ -6591,7 +6591,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Net_NNTP",
                 "source": "https://github.com/pear/Net_NNTP"
             },
-            "time": "2022-02-05T23:35:21+00:00"
+            "time": "2024-11-03T11:06:55+00:00"
         },
         {
             "name": "pear/pear",
