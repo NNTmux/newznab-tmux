@@ -247,7 +247,7 @@ class Binaries
      */
     public function logIndexerStart(): void
     {
-        Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => now()]);
+        Settings::query()->where('name', '=', 'last_run_time')->update(['value' => now()]);
     }
 
     /**

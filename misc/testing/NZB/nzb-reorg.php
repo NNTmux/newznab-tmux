@@ -43,5 +43,5 @@ foreach ($objects as $filestoprocess => $nzbFile) {
     }
 }
 
-Settings::query()->where(['setting' => 'nzbsplitlevel'])->update(['value' => $argv[1]]);
+Settings::query()->where(['name' => 'nzbsplitlevel'])->update(['value' => $argv[1]]);
 $consoleTools->overWrite("Processed $iFilesProcessed nzbs in ".$time->diffForHumans()."\n");

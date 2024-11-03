@@ -184,7 +184,7 @@ class Tmux
 
     public function updateItem($setting, $value): int
     {
-        return Settings::query()->where('setting', '=', $setting)->update(['value' => $value]);
+        return Settings::query()->where('name', '=', $setting)->update(['value' => $value]);
     }
 
     public function microtime_float(): float
@@ -415,7 +415,7 @@ class Tmux
     public function startRunning(): void
     {
         if (! $this->isRunning()) {
-            Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 1]);
+            Settings::query()->where(['name' => 'running'])->update(['value' => 1]);
         }
     }
 

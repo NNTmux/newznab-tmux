@@ -104,7 +104,7 @@ class PopulateAniDB
             echo 'AniDB: Error getting response.'.PHP_EOL;
         } elseif (preg_match('/\<error\>Banned\<\/error\>/', $apiResponse)) {
             $this->banned = true;
-            Settings::query()->where(['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'banned'])->update(['value' => time()]);
+            Settings::query()->where(['name' => 'banned'])->update(['value' => time()]);
         } elseif (preg_match('/\<error\>Anime not found\<\/error\>/', $apiResponse)) {
             echo "AniDB   : Anime not yet on site. Remove until next update.\n";
         } elseif ($AniDBAPIXML = new \SimpleXMLElement($apiResponse)) {
@@ -389,7 +389,7 @@ class PopulateAniDB
      */
     private function setLastUpdated(): void
     {
-        Settings::query()->where(['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'last_full_update'])->update(['value' => time()]);
+        Settings::query()->where(['name' => 'last_full_update'])->update(['value' => time()]);
     }
 
     private function updateAniDBInfoEps($aniDbId, array $AniDBInfoArray = []): string
