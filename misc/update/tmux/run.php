@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 $tmuxPath = base_path().'/misc/update/tmux/';
-$tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
-$seq = Settings::settingValue('site.tmux.sequential') ?? 0;
-$delaytime = Settings::settingValue('..delaytime');
+$tmux_session = Settings::settingValue('tmux_session') ?? 0;
+$seq = Settings::settingValue('sequential') ?? 0;
+$delaytime = Settings::settingValue('delaytime');
 $delaytime = $delaytime ? (int) $delaytime : 2;
 $colorCli = new ColorCLI;
 
@@ -44,8 +44,50 @@ unset($value);
 
 function start_apps($tmux_session): void
 {
-    $processupdate = Settings::settingValue('site.tmux.processupdate');
-    $console_bash = Settings::settingValue('site.tmux.console');
+    $htop = Settings::settingValue('htop');
+    $vnstat = Settings::settingValue('vnstat');
+    $vnstat_args = Settings::settingValue('vnstat_args');
+    $tcptrack = Settings::settingValue('tcptrack');
+    $tcptrack_args = Settings::settingValue('tcptrack_args');
+    $nmon = Settings::settingValue('nmon');
+    $bwmng = Settings::settingValue('bwmng');
+    $mytop = Settings::settingValue('mytop');
+    $redis = Settings::settingValue('redis');
+    $showprocesslist = Settings::settingValue('showprocesslist');
+    $processupdate = Settings::settingValue('processupdate');
+    $console_bash = Settings::settingValue('console');
+
+    if ((int) $htop === 1 && command_exist('htop')) {
+        Process::run("tmux new-window -t $tmux_session -n htop 'printf \"\033]2;htop\033\" && htop'");
+    }
+
+    if ((int) $nmon === 1 && command_exist('nmon')) {
+        Process::run("tmux new-window -t $tmux_session -n nmon 'printf \"\033]2;nmon\033\" && nmon -t'");
+    }
+
+    if ((int) $vnstat === 1 && command_exist('vnstat')) {
+        Process::run("tmux new-window -t $tmux_session -n vnstat 'printf \"\033]2;vnstat\033\" && watch -n10 \"vnstat {$vnstat_args}\"'");
+    }
+
+    if ((int) $tcptrack === 1 && command_exist('tcptrack')) {
+        Process::run("tmux new-window -t $tmux_session -n tcptrack 'printf \"\033]2;tcptrack\033\" && tcptrack {$tcptrack_args}'");
+    }
+
+    if ((int) $bwmng === 1 && command_exist('bwm-ng')) {
+        Process::run("tmux new-window -t $tmux_session -n bwm-ng 'printf \"\033]2;bwm-ng\033\" && bwm-ng'");
+    }
+
+    if ((int) $mytop === 1 && command_exist('mytop')) {
+        Process::run("tmux new-window -t $tmux_session -n mytop 'printf \"\033]2;mytop\033\" && mytop -u'");
+    }
+
+    if ((int) $redis === 1 && command_exist('redis-cli')) {
+        Process::run("tmux new-window -t $tmux_session -n redis-stat 'printf \"\033]2;redis-stat\033\" && redis-stat --verbose --server=63790'");
+    }
+
+    if ((int) $showprocesslist === 1) {
+        Process::run("tmux new-window -t $tmux_session -n showprocesslist 'printf \"\033]2;showprocesslist\033\" && watch -n .5 \"mysql -e \\\"SELECT time, state, info FROM information_schema.processlist WHERE command != \\\\\\\"Sleep\\\\\\\" AND time >= $processupdate ORDER BY time DESC \\\G\\\"\"'");
+    }
 
     if ((int) $console_bash === 1) {
         Process::run("tmux new-window -t $tmux_session -n bash 'printf \"\033]2;Bash\033\" && bash -i'");
@@ -91,16 +133,20 @@ $tmuxConfig = $tmuxPath.'tmux.conf';
 if ((int) $seq === 1) {
     Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -l 67% 'printf \"\033]2;update_releases\033\"'");
+    Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -l 25% 'printf \"\033]2;nzb-import\033\"'");
 
     window_utilities($tmux_session);
     window_post($tmux_session);
 } elseif ((int) $seq === 2) {
     Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -l 67% 'printf \"\033]2;sequential\033\"'");
+    Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -l 25% 'printf \"\033]2;nzb-import\033\"'");
+
     window_stripped_utilities($tmux_session);
 } else {
     Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -l 67% 'printf \"\033]2;update_binaries\033\"'");
+    Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -l 25% 'printf \"\033]2;nzb-import\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.2; tmux splitw -t $tmux_session:0 -v -l 67% 'printf \"\033]2;backfill\033\"'");
     Process::run("tmux splitw -t $tmux_session -v -l 50% 'printf \"\033]2;update_releases\033\"'");
 
