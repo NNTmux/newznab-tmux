@@ -51,9 +51,6 @@ class TmuxRun extends Tmux
                     case 'fixnames':
                         $this->_runFixReleaseNames($runVar);
                         break;
-                    case 'import':
-                        $this->_runNZBImport($runVar);
-                        break;
                     case 'main':
                         $this->_runMainNon($runVar);
                         break;
@@ -90,9 +87,6 @@ class TmuxRun extends Tmux
                         break;
                     case 'fixnames':
                         $this->_runFixReleaseNames($runVar);
-                        break;
-                    case 'import':
-                        $this->_runNZBImport($runVar);
                         break;
                     case 'main':
                         $this->_runMainBasic($runVar);
@@ -384,38 +378,6 @@ class TmuxRun extends Tmux
         } else {
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
             shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.4 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][4]} has been disabled/terminated by Releases\"'");
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function _runNZBImport(&$runVar): void
-    {
-        switch ($runVar['settings']['import']) {
-            case 1:
-                $useFilenames = 'false';
-                break;
-            case 2:
-                $useFilenames = 'true';
-                break;
-            default:
-                $useFilenames = 'false';
-        }
-
-        if (((int) $runVar['settings']['import'] !== 0) && ($runVar['killswitch']['pp'] === false)) {
-            $log = $this->writelog($runVar['panes']['zero'][1]);
-            shell_exec(
-                "tmux respawnp -t{$runVar['constants']['tmux_session']}:0.1 ' \
-				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/multiprocessing/import.php {$runVar['settings']['nzbs']} {$runVar['settings']['nzbthreads']} true true {$useFilenames} {$runVar['settings']['import_count']} $log; \
-				date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['import_timer']}' 2>&1 1> /dev/null"
-            );
-        } elseif ($runVar['killswitch']['pp'] === true) {
-            $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.1 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][1]} has been disabled/terminated by Exceeding Limits\"'");
-        } else {
-            $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-            shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.1 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][1]} has been disabled/terminated by Import\"'");
         }
     }
 
