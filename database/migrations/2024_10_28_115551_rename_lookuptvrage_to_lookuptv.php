@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->renameColumn('lookuptvrage', 'lookuptv');
+            if (Schema::hasColumns('settings', ['lookuptvrage'])) {
+                $table->renameColumn('lookuptvrage', 'lookuptv');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->renameColumn('lookuptv', 'lookuptvrage');
+            if (Schema::hasColumns('settings', ['lookuptv'])) {
+                $table->renameColumn('lookuptv', 'lookuptvrage');
+            }
         });
     }
 };

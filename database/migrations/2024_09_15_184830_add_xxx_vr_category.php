@@ -9,6 +9,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
         DB::table('categories')->insert(
             [
                 'id' => 6046, // 6046 so it gets listed after XXX -> UHD
@@ -21,6 +22,7 @@ return new class extends Migration
                 'maxsizetoformrelease' => 0,
             ]
         );
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
