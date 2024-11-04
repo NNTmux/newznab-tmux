@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0ba181ec4daee5e458c7267cde49bda1",
+    "content-hash": "77455705f926b2e8bcc2bcf30c7150eb",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -780,16 +780,16 @@
         },
         {
             "name": "composer/ca-bundle",
-            "version": "1.5.2",
+            "version": "1.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/ca-bundle.git",
-                "reference": "48a792895a2b7a6ee65dd5442c299d7b835b6137"
+                "reference": "3b1fc3f0be055baa7c6258b1467849c3e8204eb2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/48a792895a2b7a6ee65dd5442c299d7b835b6137",
-                "reference": "48a792895a2b7a6ee65dd5442c299d7b835b6137",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/3b1fc3f0be055baa7c6258b1467849c3e8204eb2",
+                "reference": "3b1fc3f0be055baa7c6258b1467849c3e8204eb2",
                 "shasum": ""
             },
             "require": {
@@ -836,7 +836,7 @@
             "support": {
                 "irc": "irc://irc.freenode.org/composer",
                 "issues": "https://github.com/composer/ca-bundle/issues",
-                "source": "https://github.com/composer/ca-bundle/tree/1.5.2"
+                "source": "https://github.com/composer/ca-bundle/tree/1.5.3"
             },
             "funding": [
                 {
@@ -852,7 +852,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-25T07:49:53+00:00"
+            "time": "2024-11-04T10:15:26+00:00"
         },
         {
             "name": "dariusiii/php-itunes-api",
@@ -5213,30 +5213,27 @@
         },
         {
             "name": "manticoresoftware/manticoresearch-php",
-            "version": "3.2.0",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/manticoresoftware/manticoresearch-php.git",
-                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d"
+                "reference": "a04f9cd56a64aab6a4089f663c03d5400097daa4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
-                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
+                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/a04f9cd56a64aab6a4089f663c03d5400097daa4",
+                "reference": "a04f9cd56a64aab6a4089f663c03d5400097daa4",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^7.4|^8.0",
-                "php-http/discovery": "^1.14",
-                "psr/log": "^1.1 || ^2.0 || ^3.0"
+                "php": ">=7.1",
+                "psr/log": ">=1.1"
             },
             "require-dev": {
                 "mockery/mockery": "*",
-                "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": ">=7.5 || ^9.6",
-                "slevomat/coding-standard": "^7.0",
-                "squizlabs/php_codesniffer": "^3.7"
+                "phpunit/phpunit": ">=7.5",
+                "squizlabs/php_codesniffer": ">=3.5"
             },
             "suggest": {
                 "ext-curl": "*",
@@ -5279,7 +5276,7 @@
                 "issues": "https://github.com/manticoresoftware/manticoresearch-php/issues",
                 "source": "https://github.com/manticoresoftware/manticoresearch-php/"
             },
-            "time": "2024-10-31T10:38:53+00:00"
+            "time": "2023-09-15T10:43:57+00:00"
         },
         {
             "name": "marcreichel/igdb-laravel",
@@ -7370,16 +7367,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "5.4.1",
+            "version": "5.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "9d07b3f7fdcf5efec5d1609cba3c19c5ea2bdc9c"
+                "reference": "54e10d44fc1a84e2598d26f70d4f6f1f233e228a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/9d07b3f7fdcf5efec5d1609cba3c19c5ea2bdc9c",
-                "reference": "9d07b3f7fdcf5efec5d1609cba3c19c5ea2bdc9c",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/54e10d44fc1a84e2598d26f70d4f6f1f233e228a",
+                "reference": "54e10d44fc1a84e2598d26f70d4f6f1f233e228a",
                 "shasum": ""
             },
             "require": {
@@ -7392,13 +7389,13 @@
                 "webmozart/assert": "^1.9.1"
             },
             "require-dev": {
-                "mockery/mockery": "~1.3.5",
+                "mockery/mockery": "~1.3.5 || ~1.6.0",
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan": "^1.8",
                 "phpstan/phpstan-mockery": "^1.1",
                 "phpstan/phpstan-webmozart-assert": "^1.2",
                 "phpunit/phpunit": "^9.5",
-                "vimeo/psalm": "^5.13"
+                "psalm/phar": "^5.26"
             },
             "type": "library",
             "extra": {
@@ -7428,9 +7425,9 @@
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
             "support": {
                 "issues": "https://github.com/phpDocumentor/ReflectionDocBlock/issues",
-                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.4.1"
+                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.5.0"
             },
-            "time": "2024-05-21T05:55:05+00:00"
+            "time": "2024-11-04T21:26:31+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",

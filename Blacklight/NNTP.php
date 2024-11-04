@@ -1284,9 +1284,9 @@ class NNTP extends \Net_NNTP_Client
      *
      * @param  string|null  $host  (optional) The address of the NNTP-server to connect to, defaults to 'localhost'.
      * @param  mixed|null  $encryption  (optional) Use TLS/SSL on the connection?
-     *                             (string) 'tcp'                 => Use no encryption.
-     *                             'ssl', 'sslv3', 'tls' => Use encryption.
-     *                             (null)|(false) Use no encryption.
+     *                                  (string) 'tcp'                 => Use no encryption.
+     *                                  'ssl', 'sslv3', 'tls' => Use encryption.
+     *                                  (null)|(false) Use no encryption.
      * @param  int|null  $port  (optional) The port number to connect to, defaults to 119.
      * @param  int|null  $timeout  (optional) How many seconds to wait before giving up when connecting.
      * @param  int  $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
