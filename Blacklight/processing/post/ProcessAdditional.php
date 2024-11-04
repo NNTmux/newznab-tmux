@@ -329,7 +329,7 @@ class ProcessAdditional
 
         $this->_ffMPEGDuration = Settings::settingValue('ffmpeg_duration') !== '' ? (int) Settings::settingValue('ffmpeg_duration') : 5;
 
-        $this->_addPAR2Files = config('nntmux:settings.add_par2');
+        $this->_addPAR2Files = config('nntmux_settings.add_par2');
 
         if (! config('nntmux_settings.ffmpeg_path')) {
             $this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
