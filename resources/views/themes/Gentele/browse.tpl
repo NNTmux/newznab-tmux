@@ -149,7 +149,7 @@
 													<i class="fa fa-thumbs-o-down"></i>
 													{$result->failed} Failed Download{if $result->failed != 1}s{/if}
 													</span>{/if}
-												<span class="badge bg-info">{$result->group_name}</span>
+												<span class="badge bg-info">{$result->group->name}</span>
 												<span class="badge bg-info">{$result->fromname}</span>
                                                 {if $lastvisit|strtotime<$result->adddate|strtotime}
                                                     <span class="badge bg-success">New</span>
