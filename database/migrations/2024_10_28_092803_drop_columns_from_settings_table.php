@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('settings', function (Blueprint $table) {
             if (Schema::hasColumns('settings', ['section', 'subsection', 'hint', 'setting'])) {
+                $table->dropPrimary();
+                $table->dropIndex(['ui_settings_setting']);
                 $table->dropColumn(['section', 'subsection', 'hint', 'setting']);
                 $table->index(['name']);
             }
