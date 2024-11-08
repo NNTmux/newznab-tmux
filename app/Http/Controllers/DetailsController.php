@@ -26,12 +26,8 @@ use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
 {
-    /**
-     * @return \Illuminate\Http\RedirectResponse|void
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function show(Request $request, string $guid): RedirectResponse
+
+    public function show(Request $request, string $guid)
     {
         $this->setPreferences();
 
@@ -39,8 +35,6 @@ class DetailsController extends BasePageController
             $releases = new Releases;
             $re = new ReleaseExtra;
             $data = Release::getByGuid($guid);
-            $cpapi = $this->userdata->cp_api;
-            $cpurl = $this->userdata->cp_url;
             $releaseRegex = '';
             if (! empty($data)) {
                 $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
@@ -112,7 +106,7 @@ class DetailsController extends BasePageController
 
             $mus = '';
             if ($data['musicinfo_id'] !== '') {
-                $mus = (new Music(['Settings' => $this->settings]))->getMusicInfo($data['musicinfo_id']);
+                $mus = (new Music())->getMusicInfo($data['musicinfo_id']);
             }
 
             $book = '';
@@ -154,8 +148,6 @@ class DetailsController extends BasePageController
             $this->smarty->assign('similars', $similars !== false ? $similars : []);
             $this->smarty->assign('privateprofiles', config('nntmux_settings.private_profiles'));
             $this->smarty->assign('failed', $failed);
-            $this->smarty->assign('cpapi', $cpapi);
-            $this->smarty->assign('cpurl', $cpurl);
             $this->smarty->assign('regex', $releaseRegex);
             $this->smarty->assign('downloadedby', $downloadedBy);
 
