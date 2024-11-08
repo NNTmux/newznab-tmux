@@ -244,7 +244,7 @@ class Utility
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
 
-        return response($response)->header('Content-type', 'text/xml')->header('Content-Length', strlen())->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $errorHeader);
+        return response($response)->header('Content-type', 'text/xml')->header('Content-Length', strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $errorHeader);
     }
 
     public static function getRange($tableName): LengthAwarePaginator
