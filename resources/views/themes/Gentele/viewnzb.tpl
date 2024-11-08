@@ -150,7 +150,7 @@
 								{if !empty($nfo.nfo)}
 									<li role="presentation"><a href="#pane3" data-bs-toggle="tab">NFO</a></li>
 								{/if}
-								{if isset($similars) && $similars|@count > 1}
+								{if !empty($similars)}
 									<li role="presentation"><a href="#pane4" data-bs-toggle="tab">Similar</a></li>
 								{/if}
 								{if $release.jpgstatus == 1 && $userdata->can('preview') == true}
@@ -583,7 +583,7 @@
 								<pre id="nfo">{$nfo.nfo}</pre>
 							</div>
 							<div id="pane4" class="tab-pane">
-								{if isset($similars)}
+								{if !empty($similars)}
 									Similar:
 									<ul>
 										{foreach $similars as $similar}
