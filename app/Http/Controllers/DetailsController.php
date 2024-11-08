@@ -21,12 +21,10 @@ use Blacklight\Music;
 use Blacklight\ReleaseExtra;
 use Blacklight\Releases;
 use Blacklight\XXX;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
 {
-
     public function show(Request $request, string $guid)
     {
         $this->setPreferences();
@@ -106,7 +104,7 @@ class DetailsController extends BasePageController
 
             $mus = '';
             if ($data['musicinfo_id'] !== '') {
-                $mus = (new Music())->getMusicInfo($data['musicinfo_id']);
+                $mus = (new Music)->getMusicInfo($data['musicinfo_id']);
             }
 
             $book = '';
