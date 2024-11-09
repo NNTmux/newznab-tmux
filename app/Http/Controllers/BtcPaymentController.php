@@ -40,7 +40,7 @@ class BtcPaymentController extends BasePageController
                         'payment_id' => $payload['payment']['id'],
                         'payment_status' => $payload['payment']['status'],
                         'invoice_amount' => $payload['metadata']['invoice_amount'],
-                        'payment_method' => $payload['paymentMethod'],
+                        'payment_method' => $payload['paymentMethodId'],
                         'payment_value' => $payload['payment']['value'],
                         'webhook_id' => $payload['webhookId'],
                         'invoice_id' => $payload['invoiceId'],
