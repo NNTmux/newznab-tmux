@@ -27,36 +27,38 @@ class BtcPaymentController extends BasePageController
             $user = User::query()->where('email', '=', $payload['metadata']['buyerEmail'])->first();
             if ($user) {
                 $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->first();
-                if (! empty($checkOrder)) {
+                if ($checkOrder !== null) {
                     Log::error('Duplicate BTCPay webhook: '.$payload['webhookId']);
 
                     return response('Not Found', 404);
-                } else {
-                    Payment::create([
-                        'email' => $payload['metadata']['buyerEmail'],
-                        'username' => $user->username,
-                        'item_description' => $payload['metadata']['itemDesc'],
-                        'order_id' => $payload['metadata']['orderId'],
-                        'payment_id' => $payload['payment']['id'],
-                        'payment_status' => $payload['payment']['status'],
-                        'invoice_amount' => $payload['metadata']['invoice_amount'],
-                        'payment_method' => $payload['paymentMethodId'],
-                        'payment_value' => $payload['payment']['value'],
-                        'webhook_id' => $payload['webhookId'],
-                        'invoice_id' => $payload['invoiceId'],
-                    ]);
-
-                    return response('OK', 200);
                 }
-            } else {
-                Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
 
-                return response('Not Found', 404);
+                Payment::create([
+                    'email' => $payload['metadata']['buyerEmail'],
+                    'username' => $user->username,
+                    'item_description' => $payload['metadata']['itemDesc'],
+                    'order_id' => $payload['metadata']['orderId'],
+                    'payment_id' => $payload['payment']['id'],
+                    'payment_status' => $payload['payment']['status'],
+                    'invoice_amount' => $payload['metadata']['invoice_amount'],
+                    'payment_method' => $payload['paymentMethodId'],
+                    'payment_value' => $payload['payment']['value'],
+                    'webhook_id' => $payload['webhookId'],
+                    'invoice_id' => $payload['invoiceId'],
+                ]);
+
+                return response('OK', 200);
             }
-        } elseif ($payload['type'] === 'InvoiceSettled') {
+
+            Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+
+            return response('Not Found', 404);
+        }
+
+        if ($payload['type'] === 'InvoiceSettled') {
             // Check if we have the invoice_id in payments table and if we do, update the user account
             $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->first();
-            if (! empty($checkOrder)) {
+            if ($checkOrder !== null) {
                 $user = User::query()->where('email', '=', $checkOrder->email)->first();
                 if ($user) {
                     preg_match('/(?P<role>\w+(\s\+\+)?)[\s](?P<addYears>\d+)/i', $checkOrder->item_description, $matches);
@@ -65,11 +67,11 @@ class BtcPaymentController extends BasePageController
                     Log::info('User: '.$user->username.' upgraded to '.$matches['role'].' for BTCPay webhook: '.$checkOrder->webhook_id);
 
                     return response('OK', 200);
-                } else {
-                    Log::error('User not found for BTCPay webhook: '.$checkOrder->webhook_id);
-
-                    return response('Not Found', 404);
                 }
+
+                Log::error('User not found for BTCPay webhook: '.$checkOrder->webhook_id);
+
+                return response('Not Found', 404);
             }
         }
 
