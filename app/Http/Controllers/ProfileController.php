@@ -105,7 +105,7 @@ class ProfileController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request): RedirectResponse
+    public function edit(Request $request)
     {
         $this->setPreferences();
 
