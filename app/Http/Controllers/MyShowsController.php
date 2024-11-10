@@ -7,12 +7,10 @@ use App\Models\Settings;
 use App\Models\UserSerie;
 use App\Models\Video;
 use Blacklight\Releases;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class MyShowsController extends BasePageController
 {
-
     public function show(Request $request)
     {
         $this->setPreferences();
