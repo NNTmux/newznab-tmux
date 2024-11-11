@@ -7,16 +7,14 @@ use App\Models\Settings;
 use App\Models\UserMovie;
 use Blacklight\Movie;
 use Blacklight\Releases;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class MyMoviesController extends BasePageController
 {
-
     public function show(Request $request)
     {
         $this->setPreferences();
-        $mv = new Movie();
+        $mv = new Movie;
 
         $action = $request->input('id') ?? '';
         $imdbid = $request->input('imdb') ?? '';
