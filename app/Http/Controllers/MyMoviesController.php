@@ -12,15 +12,11 @@ use Illuminate\Http\Request;
 
 class MyMoviesController extends BasePageController
 {
-    /**
-     * @return \Illuminate\Http\RedirectResponse|void
-     *
-     * @throws \Exception
-     */
-    public function show(Request $request): RedirectResponse
+
+    public function show(Request $request)
     {
         $this->setPreferences();
-        $mv = new Movie(['Settings' => $this->settings]);
+        $mv = new Movie();
 
         $action = $request->input('id') ?? '';
         $imdbid = $request->input('imdb') ?? '';
