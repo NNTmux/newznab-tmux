@@ -149,7 +149,7 @@ class MyShowsController extends BasePageController
 
                         $results[$showk] = $show;
                     }
-                } 
+                }
                 $this->smarty->assign('shows', $results);
 
                 $content = $this->smarty->fetch('myshows.tpl');
