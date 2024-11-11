@@ -133,21 +133,23 @@ class MyShowsController extends BasePageController
                 $shows = UserSerie::getShows($this->userdata->id);
                 $results = [];
                 $catArr = [];
-                foreach ($shows as $showk => $show) {
-                    $showcats = explode('|', $show['categories']);
-                    if (\is_array($showcats) && ! empty($showcats)) {
-                        foreach ($showcats as $scat) {
-                            if (! empty($scat)) {
-                                $catArr[] = $categories[$scat];
+                if ($shows !== null) {
+                    foreach ($shows as $showk => $show) {
+                        $showcats = explode('|', $show['categories']);
+                        if (\is_array($showcats) && ! empty($showcats)) {
+                            foreach ($showcats as $scat) {
+                                if (! empty($scat)) {
+                                    $catArr[] = $categories[$scat];
+                                }
                             }
+                            $show['categoryNames'] = implode(', ', $catArr);
+                        } else {
+                            $show['categoryNames'] = '';
                         }
-                        $show['categoryNames'] = implode(', ', $catArr);
-                    } else {
-                        $show['categoryNames'] = '';
-                    }
 
-                    $results[$showk] = $show;
-                }
+                        $results[$showk] = $show;
+                    }
+                } 
                 $this->smarty->assign('shows', $results);
 
                 $content = $this->smarty->fetch('myshows.tpl');
