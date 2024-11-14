@@ -24,9 +24,9 @@ class Releases extends Release
 
     public const PASSWD_RAR = 1; // Definitely passworded.
 
-    public ManticoreSearch $manticoreSearch;
-
     public int $passwordStatus;
+
+    private ManticoreSearch $manticoreSearch;
 
     private ElasticSearchSiteSearch $elasticSearch;
 
