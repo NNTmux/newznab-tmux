@@ -30,7 +30,7 @@ class BtcPaymentController extends BasePageController
                 if ($checkOrder !== null) {
                     Log::error('Duplicate BTCPay webhook: '.$payload['webhookId']);
 
-                    return response('Not Found', 404);
+                    return response('OK', 200);
                 }
 
                 Payment::create([
@@ -57,7 +57,9 @@ class BtcPaymentController extends BasePageController
 
         if ($payload['type'] === 'InvoiceSettled') {
             // Check if we have the invoice_id in payments table and if we do, update the user account
-            $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->first();
+            $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->where(function ($query) {
+                return $query->where('invoice_status', 'Pending')->orWhereNull('invoice_status');
+            })->first();
             if ($checkOrder !== null) {
                 $user = User::query()->where('email', '=', $checkOrder->email)->first();
                 if ($user) {
