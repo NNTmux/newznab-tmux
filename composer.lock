@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d5779421fb03ad54a5fe739dd33b795e",
+    "content-hash": "363feeadab5a5274ac88eafafed90b2e",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -5216,27 +5216,30 @@
         },
         {
             "name": "manticoresoftware/manticoresearch-php",
-            "version": "3.1.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/manticoresoftware/manticoresearch-php.git",
-                "reference": "a04f9cd56a64aab6a4089f663c03d5400097daa4"
+                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/a04f9cd56a64aab6a4089f663c03d5400097daa4",
-                "reference": "a04f9cd56a64aab6a4089f663c03d5400097daa4",
+                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
+                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">=7.1",
-                "psr/log": ">=1.1"
+                "php": "^7.4|^8.0",
+                "php-http/discovery": "^1.14",
+                "psr/log": "^1.1 || ^2.0 || ^3.0"
             },
             "require-dev": {
                 "mockery/mockery": "*",
-                "phpunit/phpunit": ">=7.5",
-                "squizlabs/php_codesniffer": ">=3.5"
+                "phpstan/phpstan": "^1.4",
+                "phpunit/phpunit": ">=7.5 || ^9.6",
+                "slevomat/coding-standard": "^7.0",
+                "squizlabs/php_codesniffer": "^3.7"
             },
             "suggest": {
                 "ext-curl": "*",
@@ -5279,7 +5282,7 @@
                 "issues": "https://github.com/manticoresoftware/manticoresearch-php/issues",
                 "source": "https://github.com/manticoresoftware/manticoresearch-php/"
             },
-            "time": "2023-09-15T10:43:57+00:00"
+            "time": "2024-10-31T10:38:53+00:00"
         },
         {
             "name": "marcreichel/igdb-laravel",
