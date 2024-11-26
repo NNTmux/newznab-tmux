@@ -14171,16 +14171,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.24.0",
+            "version": "5.24.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "fd2c03c96b9f56441aa05fb781328eb1163a0343"
+                "reference": "1e56452fd7a7e486e5955ab72dc9ea34bb52a184"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/fd2c03c96b9f56441aa05fb781328eb1163a0343",
-                "reference": "fd2c03c96b9f56441aa05fb781328eb1163a0343",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/1e56452fd7a7e486e5955ab72dc9ea34bb52a184",
+                "reference": "1e56452fd7a7e486e5955ab72dc9ea34bb52a184",
                 "shasum": ""
             },
             "require": {
@@ -14243,7 +14243,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.24.0"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.24.1"
             },
             "funding": [
                 {
@@ -14251,7 +14251,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-23T20:36:15+00:00"
+            "time": "2024-11-26T18:42:37+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -18403,16 +18403,16 @@
         },
         {
             "name": "sebastianfeldmann/git",
-            "version": "3.11.0",
+            "version": "3.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/git.git",
-                "reference": "5cb1ea94f65c7420419abe8f12c45cc7eb094790"
+                "reference": "96b9f384d45106f757df98a74c11b42b393ff18f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/5cb1ea94f65c7420419abe8f12c45cc7eb094790",
-                "reference": "5cb1ea94f65c7420419abe8f12c45cc7eb094790",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/96b9f384d45106f757df98a74c11b42b393ff18f",
+                "reference": "96b9f384d45106f757df98a74c11b42b393ff18f",
                 "shasum": ""
             },
             "require": {
@@ -18453,7 +18453,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianfeldmann/git/issues",
-                "source": "https://github.com/sebastianfeldmann/git/tree/3.11.0"
+                "source": "https://github.com/sebastianfeldmann/git/tree/3.11.1"
             },
             "funding": [
                 {
@@ -18461,7 +18461,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-23T09:11:14+00:00"
+            "time": "2024-11-26T18:37:20+00:00"
         },
         {
             "name": "symfony/config",
