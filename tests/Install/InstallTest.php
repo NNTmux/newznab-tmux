@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of NNTmux.
  *
@@ -20,7 +21,7 @@ require_once \dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
  */
 final class InstallTest extends \PHPUnit\Framework\TestCase
 {
-    public function testFullInstall(): void
+    public function test_full_install(): void
     {
         passthru('php '.base_path().'/artisan migrate:fresh --seed');
 

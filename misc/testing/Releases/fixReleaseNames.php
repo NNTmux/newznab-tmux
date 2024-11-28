@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This script attempts to clean release names using the NFO, file name and release name, Par2 file.
  * A good way to use this script is to use it in this order: php fixReleaseNames.php 3 true other yes

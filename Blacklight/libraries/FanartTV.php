@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fanart.TV
  * PHP class - wrapper for Fanart.TV's API

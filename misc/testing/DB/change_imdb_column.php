@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This script will convert releases table imdbid column
  * from zerofilled int to varchar(15).
