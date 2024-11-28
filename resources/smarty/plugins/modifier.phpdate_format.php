@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Smarty plugin
  * phpdate_format plugin

@@ -11,7 +11,6 @@ use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Opis\Closure\SerializableClosure;
 use Spatie\Async\Output\SerializableException;
 use Spatie\Async\Pool;
 use Symfony\Component\Process\Process;
@@ -91,7 +90,6 @@ class Forking
      */
     public function __construct()
     {
-        SerializableClosure::removeSecurityProvider();
         $this->colorCli = new ColorCLI;
 
         $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
