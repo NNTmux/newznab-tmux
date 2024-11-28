@@ -123,10 +123,22 @@ class GetNzbController extends BasePageController
         $headers += ['X-DNZB-RCode' => '200',
             'X-DNZB-RText' => 'OK, NZB content follows.', ];
 
+        $buffer_size = 1000000;
+        $zd = gzopen($nzbPath, 'rb');
+
+        $contents = '';
+        // Keep repeating until the end of the input file
+        while (! gzeof($zd)) {
+            // Read buffer-size bytes
+            $contents = gzread($zd, $buffer_size);
+        }
+
+        gzclose($zd);
+
         $cleanName = str_replace([',', ' ', '/', '\\'], '_', $relData['searchname']);
 
-        return response()->streamDownload(function () use ($nzbPath) {
-            echo $nzbPath;
+        return response()->streamDownload(function () use ($contents) {
+            echo $contents;
         }, $cleanName.'.nzb', $headers);
     }
 }
