@@ -91,54 +91,59 @@ class GetNzbController extends BasePageController
         }
 
         $relData = Release::getByGuid($request->input('id'));
-        if ($relData !== null) {
-            Release::updateGrab($request->input('id'));
-            UserDownload::addDownloadRequest($uid, $relData['id']);
-            User::incrementGrabs($uid);
-            if ($request->has('del') && (int) $request->input('del') === 1) {
-                UsersRelease::delCartByUserAndRelease($request->input('id'), $uid);
-            }
-        } else {
+        if ($relData === null) {
             return Utility::showApiError(300, 'Release not found!');
         }
 
+        // Update release and user actions
+        Release::updateGrab($request->input('id'));
+        UserDownload::addDownloadRequest($uid, $relData['id']);
+        User::incrementGrabs($uid);
+
+        if ($request->has('del') && (int) $request->input('del') === 1) {
+            UsersRelease::delCartByUserAndRelease($request->input('id'), $uid);
+        }
+
+        // Build headers
         $headers = [
             'Content-Type' => 'application/x-nzb',
-            'Expires' => date('r', now()->addDays(365)->timestamp),
-            'X-DNZB-Failure' => url('/').'/failed'.'?guid='.$request->input('id').'&userid='.$uid.'&api_token='.$rssToken,
-            'X-DNZB-Category' => $relData['category_name'],
-            'X-DNZB-Details' => url('/').'/details/'.$request->input('id'),
+            'Expires' => now()->addYear()->toRfc7231String(),
+            'X-DNZB-Failure' => url('/failed').'?guid='.$request->input('id').'&userid='.$uid.'&api_token='.$rssToken,
+            'X-DNZB-Category' => e($relData['category_name']), // Escape category name
+            'X-DNZB-Details' => url('/details/'.$request->input('id')),
         ];
 
         if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
-            $headers += ['X-DNZB-MoreInfo' => 'http://www.imdb.com/title/tt'.$relData['imdbid']];
+            $headers['X-DNZB-MoreInfo'] = 'http://www.imdb.com/title/tt'.$relData['imdbid'];
         } elseif (! empty($relData['tvdb']) && $relData['tvdb'] > 0) {
-            $headers += ['X-DNZB-MoreInfo' => 'http://www.thetvdb.com/?tab=series&id='.$relData['tvdb']];
+            $headers['X-DNZB-MoreInfo'] = 'http://www.thetvdb.com/?tab=series&id='.$relData['tvdb'];
         }
 
         if ((int) $relData['nfostatus'] === 1) {
-            $headers += ['X-DNZB-NFO' => url('/').'/nfo/'.$request->input('id')];
+            $headers['X-DNZB-NFO'] = url('/nfo/'.$request->input('id'));
         }
 
-        $headers += ['X-DNZB-RCode' => '200',
-            'X-DNZB-RText' => 'OK, NZB content follows.', ];
+        $headers['X-DNZB-RCode'] = '200';
+        $headers['X-DNZB-RText'] = 'OK, NZB content follows.';
 
-        $buffer_size = 1000000;
-        $zd = gzopen($nzbPath, 'rb');
-
-        $contents = '';
-        // Keep repeating until the end of the input file
-        while (! gzeof($zd)) {
-            // Read buffer-size bytes
-            $contents = gzread($zd, $buffer_size);
-        }
-
-        gzclose($zd);
-
+        // Sanitize file name
         $cleanName = str_replace([',', ' ', '/', '\\'], '_', $relData['searchname']);
 
-        return response()->streamDownload(function () use ($contents) {
-            echo $contents;
+        // Stream the file content
+        return response()->streamDownload(function () use ($nzbPath) {
+            $bufferSize = 1000000; // 1 MB chunks
+            $gz = gzopen($nzbPath, 'rb');
+
+            if (! $gz) {
+                throw new RuntimeException('Failed to open gzipped file for streaming.');
+            }
+
+            while (! gzeof($gz)) {
+                echo gzread($gz, $bufferSize);
+                flush(); // Ensure chunks are sent immediately
+            }
+
+            gzclose($gz);
         }, $cleanName.'.nzb', $headers);
     }
 }
