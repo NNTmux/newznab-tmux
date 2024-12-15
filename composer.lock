@@ -81,12 +81,12 @@
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "Anhskohbo\\NoCaptcha\\NoCaptchaServiceProvider"
-                    ],
                     "aliases": {
                         "NoCaptcha": "Anhskohbo\\NoCaptcha\\Facades\\NoCaptcha"
-                    }
+                    },
+                    "providers": [
+                        "Anhskohbo\\NoCaptcha\\NoCaptchaServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -5350,12 +5350,12 @@
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "MailerLite\\LaravelElasticsearch\\ServiceProvider"
-                    ],
                     "aliases": {
                         "Elasticsearch": "MailerLite\\LaravelElasticsearch\\Facade"
-                    }
+                    },
+                    "providers": [
+                        "MailerLite\\LaravelElasticsearch\\ServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -19186,5 +19186,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
