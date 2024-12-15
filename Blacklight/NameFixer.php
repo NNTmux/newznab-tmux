@@ -959,7 +959,7 @@ class NameFixer
                             );
 
                         if (config('nntmux.elasticsearch_enabled') === true) {
-                            $this->elasticsearch->updateRelease($release->_releases_id);
+                            $this->elasticsearch->updateRelease($release->releases_id);
                         } else {
                             $this->manticore->updateRelease($release->releases_id);
                         }
