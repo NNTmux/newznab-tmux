@@ -298,7 +298,7 @@ class ApiController extends BasePageController
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
 
-                if ($rel->isNotEmpty()) {
+                if ($rel && $rel->isNotEmpty()) {
                     $data = ReleaseNfo::getReleaseNfo($rel->id);
                     if (! empty($data)) {
                         if ($request->has('o') && $request->input('o') === 'file') {
