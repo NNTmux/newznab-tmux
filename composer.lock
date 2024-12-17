@@ -9179,16 +9179,16 @@
         },
         {
             "name": "sentry/sentry-laravel",
-            "version": "4.10.1",
+            "version": "4.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-laravel.git",
-                "reference": "1c007fb111ff00f02efba2aca022310dae412c3a"
+                "reference": "0e2e5bc4311da51349487afcf67b8fca937f6d94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/1c007fb111ff00f02efba2aca022310dae412c3a",
-                "reference": "1c007fb111ff00f02efba2aca022310dae412c3a",
+                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/0e2e5bc4311da51349487afcf67b8fca937f6d94",
+                "reference": "0e2e5bc4311da51349487afcf67b8fca937f6d94",
                 "shasum": ""
             },
             "require": {
@@ -9252,7 +9252,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-laravel/issues",
-                "source": "https://github.com/getsentry/sentry-laravel/tree/4.10.1"
+                "source": "https://github.com/getsentry/sentry-laravel/tree/4.10.2"
             },
             "funding": [
                 {
@@ -9264,7 +9264,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-11-24T11:02:20+00:00"
+            "time": "2024-12-17T11:38:58+00:00"
         },
         {
             "name": "smarty/smarty",
@@ -9334,27 +9334,27 @@
         },
         {
             "name": "spatie/async",
-            "version": "1.6.1",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "c270e692f6eabafb4312e1ecd44e062032785635"
+                "reference": "c0a578284c752cacfdbd2f1e6000dfec03b78cb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/c270e692f6eabafb4312e1ecd44e062032785635",
-                "reference": "c270e692f6eabafb4312e1ecd44e062032785635",
+                "url": "https://api.github.com/repos/spatie/async/zipball/c0a578284c752cacfdbd2f1e6000dfec03b78cb1",
+                "reference": "c0a578284c752cacfdbd2f1e6000dfec03b78cb1",
                 "shasum": ""
             },
             "require": {
-                "laravel/serializable-closure": "^1.0",
-                "php": "^7.4|^8.0",
-                "symfony/process": "^3.3 || ^4.0 || ^5.0 || ^6.0 || ^7.0"
+                "laravel/serializable-closure": "^1.3.7",
+                "php": "^8.3",
+                "symfony/process": "^7.2"
             },
             "require-dev": {
                 "larapack/dd": "^1.1",
-                "phpunit/phpunit": "^7.5 || ^8.5.21 || ^9.0 || ^10.0",
-                "symfony/stopwatch": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+                "phpunit/phpunit": "^11.0",
+                "symfony/stopwatch": "^7.2"
             },
             "suggest": {
                 "ext-pcntl": "Required to use async processes",
@@ -9389,7 +9389,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/async/issues",
-                "source": "https://github.com/spatie/async/tree/1.6.1"
+                "source": "https://github.com/spatie/async/tree/1.6.2"
             },
             "funding": [
                 {
@@ -9397,7 +9397,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-14T13:21:46+00:00"
+            "time": "2024-12-16T15:31:12+00:00"
         },
         {
             "name": "spatie/backtrace",
@@ -9607,16 +9607,16 @@
         },
         {
             "name": "spatie/fractalistic",
-            "version": "2.9.5",
+            "version": "2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/fractalistic.git",
-                "reference": "6f12686a03d035f4558d166989c62aa93bde2151"
+                "reference": "992549566873c10c9de13644ed12eb963b907256"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/6f12686a03d035f4558d166989c62aa93bde2151",
-                "reference": "6f12686a03d035f4558d166989c62aa93bde2151",
+                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/992549566873c10c9de13644ed12eb963b907256",
+                "reference": "992549566873c10c9de13644ed12eb963b907256",
                 "shasum": ""
             },
             "require": {
@@ -9624,7 +9624,8 @@
                 "php": "^7.4|^8.0"
             },
             "require-dev": {
-                "illuminate/pagination": "~5.3.0|~5.4.0",
+                "illuminate/pagination": "~5.3.0|~5.4.0|^9.0",
+                "pestphp/pest": "^1.22",
                 "phpunit/phpunit": "^9.0"
             },
             "type": "library",
@@ -9656,7 +9657,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/fractalistic/issues",
-                "source": "https://github.com/spatie/fractalistic/tree/2.9.5"
+                "source": "https://github.com/spatie/fractalistic/tree/2.10.0"
             },
             "funding": [
                 {
@@ -9664,7 +9665,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-04-21T12:26:22+00:00"
+            "time": "2024-12-17T09:35:48+00:00"
         },
         {
             "name": "spatie/ignition",
@@ -9879,16 +9880,16 @@
         },
         {
             "name": "spatie/laravel-fractal",
-            "version": "6.3.0",
+            "version": "6.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-fractal.git",
-                "reference": "3134ca2ef69d85727777403dcc6030446637e14d"
+                "reference": "10571be5e614488d82816be0e23d2a1a26886c05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/3134ca2ef69d85727777403dcc6030446637e14d",
-                "reference": "3134ca2ef69d85727777403dcc6030446637e14d",
+                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/10571be5e614488d82816be0e23d2a1a26886c05",
+                "reference": "10571be5e614488d82816be0e23d2a1a26886c05",
                 "shasum": ""
             },
             "require": {
@@ -9948,7 +9949,7 @@
                 "transform"
             ],
             "support": {
-                "source": "https://github.com/spatie/laravel-fractal/tree/6.3.0"
+                "source": "https://github.com/spatie/laravel-fractal/tree/6.3.1"
             },
             "funding": [
                 {
@@ -9956,7 +9957,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-12-09T12:26:16+00:00"
+            "time": "2024-12-16T12:43:10+00:00"
         },
         {
             "name": "spatie/laravel-ignition",
@@ -19185,6 +19186,6 @@
         "ext-xmlwriter": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
