@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
-use Illuminate\Support\Str;
 
 class InstallNntmux extends Command
 {
@@ -15,7 +14,7 @@ class InstallNntmux extends Command
      *
      * @var string
      */
-    protected $signature = 'nntmux:install';
+    protected $signature = 'nntmux:install {--y|yes : Skip confirmation prompts and proceed with installation}';
 
     /**
      * The console command description.
@@ -36,45 +35,53 @@ class InstallNntmux extends Command
 
     public function handle(): void
     {
-        $error = false;
-
-        if ($this->confirm('Are you sure you want to install NNTmux? This will wipe your database!!')) {
-            if (File::exists(base_path().'/_install/install.lock')) {
-                if ($this->confirm('Do you want to remove install.lock file so you can continue with install?')) {
-                    $this->info('Removing install.lock file so we can continue with install process');
+        $yesMode = $this->option('yes');
+        if (File::exists(base_path().'/_install/install.lock')) {
+            if ($yesMode) {
+                $this->info('Install is locked. The file "install.lock" is present. Use interactive mode to remove it.');
+                exit;
+            } else {
+                if ($this->confirm('Install is locked. Do you want to remove the "install.lock" file to continue?')) {
+                    $this->info('Removing install.lock file so we can continue with install process...');
                     $remove = Process::timeout(600)->run('rm _install/install.lock');
                     echo $remove->output();
                     echo $remove->errorOutput();
                 } else {
-                    $this->info('Not removing install.lock, stopping install process');
+                    $this->info('Installation aborted. The file "install.lock" was not removed.');
                     exit;
                 }
             }
-            $this->info('Migrating tables and seeding them with initial data');
-            if (config('app.env') !== 'production') {
-                $this->call('migrate:fresh', ['--seed' => true]);
-            } else {
-                $this->call('migrate:fresh', ['--force' => true, '--seed' => true]);
-            }
-
-            $paths = $this->updatePaths();
-            if ($paths !== false) {
-                $this->info('Paths checked successfully');
-            }
-
-            if (! $error && $this->addAdminUser()) {
-                File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
-                $this->info('Generating application key');
-                $this->call('key:generate', ['--force' => true]);
-                $this->info('NNTmux installation completed successfully');
-                exit();
-            }
-
-            $this->error('NNTmux installation failed. Fix reported problems and try again');
-        } else {
-            $this->info('Stopping install process');
-            exit;
         }
+
+        if (! $yesMode) {
+            if (! $this->confirm('Are you sure you want to install NNTmux? This will wipe your database!!')) {
+                $this->info('Installation aborted by user.');
+                exit;
+            }
+        }
+
+        $this->info('Migrating tables and seeding them with initial data');
+        if (config('app.env') !== 'production') {
+            $this->call('migrate:fresh', ['--seed' => true]);
+        } else {
+            $this->call('migrate:fresh', ['--force' => true, '--seed' => true]);
+        }
+
+        $paths = $this->updatePaths();
+        if ($paths !== false) {
+            $this->info('Paths checked successfully');
+        }
+
+        if ($this->addAdminUser()) {
+            File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
+            $this->info('Generating application key');
+            $this->call('key:generate', ['--force' => true]);
+            $this->info('NNTmux installation completed successfully');
+            exit();
+        }
+
+        $this->error('NNTmux installation failed. Fix reported problems and try again');
+
     }
 
     /**
@@ -90,8 +97,7 @@ class InstallNntmux extends Command
         $tmp_path = config('nntmux.tmp_path');
         $unrar_path = config('nntmux_settings.unrar_path');
 
-        $nzbPathCheck = File::isWritable($nzb_path);
-        if (! $nzbPathCheck) {
+        if (! File::isWritable($nzb_path)) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
 
             return false;
@@ -104,33 +110,26 @@ class InstallNntmux extends Command
             }
             $this->info('Folder '.$unrar_path.' successfully created');
         }
-        $unrarPathCheck = is_writable($unrar_path);
-        if ($unrarPathCheck === false) {
+
+        if (! is_writable($unrar_path)) {
             $this->warn($unrar_path.' is not writable. Please fix folder permissions');
 
             return false;
         }
 
-        $coversPathCheck = File::isWritable($covers_path);
-        if (! $coversPathCheck) {
+        if (! File::isWritable($covers_path)) {
             $this->warn($covers_path.' is not writable. Please fix folder permissions');
 
             return false;
         }
 
-        $tmpPathCheck = File::isWritable($tmp_path);
-        if (! $tmpPathCheck) {
+        if (! File::isWritable($tmp_path)) {
             $this->warn($tmp_path.' is not writable. Please fix folder permissions');
 
             return false;
         }
 
-        return [
-            'nzb_path' => Str::finish($nzb_path, '/'),
-            'covers_path' => Str::finish($covers_path, '/'),
-            'unrar_path' => Str::finish($unrar_path, '/'),
-            'tmp_path' => Str::finish($tmp_path, '/'),
-        ];
+        return true;
     }
 
     private function addAdminUser(): bool
