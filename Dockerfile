@@ -1,8 +1,7 @@
 
 FROM composer:latest AS composer-base
-#FROM php:8.3-fpm AS php-base
 FROM dunglas/frankenphp:1-php8.3
-LABEL maintainer="Fossil01"
+LABEL maintainer="PyRowMan"
 ENV SERVER_NAME=:80
 ARG MYSQL_CLIENT="mariadb-client"
 ARG SEVENZIP_VERSION=2407
@@ -15,7 +14,7 @@ COPY --from=composer-base --link /usr/bin/composer /usr/bin/composer
 
 RUN apt update \
  && apt install -y --no-install-recommends \
-     unrar-free 7zip lame libcap2-bin python3 \
+     unrar-free 7zip lame libcap2-bin python3 gettext-base \
      curl zip unzip git nano bash-completion sudo wget tmux time fonts-powerline \
      gnupg libpng-dev dnsutils jq htop iputils-ping net-tools ffmpeg \
      jpegoptim webp optipng pngquant libavif-bin watch iproute2 nmon \

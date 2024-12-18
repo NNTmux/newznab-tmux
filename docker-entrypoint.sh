@@ -10,7 +10,7 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
     # Create .env file if it doesn't exist
     if [ ! -f .env ]; then
         echo "Creating .env file from environment variables..."
-        printenv >> .env
+        envsubst < .env.dist > .env
     fi
 
     # Check and wait for the database to be ready
