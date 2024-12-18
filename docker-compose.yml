@@ -28,6 +28,7 @@ services:
             - redis
             - mailpit
             - elasticsearch
+            - manticore
     worker:
       command: >
         sh -c "php artisan tmux-ui:start & php artisan horizon"
@@ -112,6 +113,28 @@ services:
               - ping
             retries: 3
             timeout: 5s
+    manticore:
+      image: manticoresearch/manticore
+      environment:
+        TZ: ${APP_TIMEZONE}
+        EXTRA: 1 # Activates extra features
+      restart: always
+      ports:
+        - 9306:9306
+        - 9308:9308
+      ulimits:
+        nproc: 65535
+        nofile:
+          soft: 65535
+          hard: 65535
+        memlock:
+          soft: -1
+          hard: -1
+      volumes:
+        - 'manticore:/var/lib/manticore'
+#        - ./misc/manticoresearch/manticore.conf:/etc/manticoresearch/manticore.conf
+      networks:
+        - nntmux
     mailpit:
         image: 'axllent/mailpit:latest'
         ports:
@@ -130,7 +153,7 @@ services:
             - 9200:9200
             - 9300:9300
         volumes:
-            - elasticsearch
+            - elasticsearch:/usr/share/elasticsearch/data
         networks:
             - nntmux
         deploy:
@@ -144,6 +167,7 @@ volumes:
   mariadb:
   redis:
   elasticsearch:
+  manticore:
   storage:
   resources:
   install:
