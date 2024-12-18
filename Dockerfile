@@ -17,7 +17,7 @@ RUN apt update \
  && apt install -y --no-install-recommends \
      unrar-free 7zip lame libcap2-bin python3 \
      curl zip unzip git nano bash-completion sudo wget tmux time fonts-powerline \
-     gnupg sqlite3 libpng-dev dnsutils jq htop iputils-ping net-tools ffmpeg \
+     gnupg libpng-dev dnsutils jq htop iputils-ping net-tools ffmpeg \
      jpegoptim webp optipng pngquant libavif-bin watch iproute2 nmon \
      libonig-dev libxml2-dev libicu-dev libjpeg-dev libfreetype6-dev libxslt-dev $MYSQL_CLIENT libcurl4-openssl-dev \
  && wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-24_all.deb \
@@ -51,12 +51,11 @@ RUN ARCH="$(dpkg --print-architecture)" && \
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-RUN npm install -g bun pnpm
-
 COPY --chmod=755 ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
 
 COPY . /app
+
+RUN rm -Rf tests/
 
 RUN composer install
 
