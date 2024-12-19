@@ -54,6 +54,9 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
     echo "Setting permissions on storage and bootstrap/cache directories..."
     chmod -R 775 storage bootstrap/cache
     chown -R www-data:www-data storage bootstrap/cache
+    php artisan nntmux:create-es-indexes
+    php artisan nntmux:populate --elastic --releases
+    php artisan nntmux:populate --elastic --predb
 fi
 
 # Run the PHP entry point with arguments
