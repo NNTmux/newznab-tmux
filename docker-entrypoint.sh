@@ -1,5 +1,10 @@
 #!/bin/sh
 set -e
+# Create .env file if it doesn't exist
+if [ ! -f .env ]; then
+    echo "Creating .env file from environment variables..."
+    envsubst < .env.dist > .env
+fi
 if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
     # Install dependencies if not already installed
     if [ ! -d 'vendor/' ]; then
@@ -7,11 +12,6 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
         composer install --prefer-dist --no-progress --no-interaction
     fi
 
-    # Create .env file if it doesn't exist
-    if [ ! -f .env ]; then
-        echo "Creating .env file from environment variables..."
-        envsubst < .env.dist > .env
-    fi
 
     # Check and wait for the database to be ready
     if grep -q ^DB_HOST= .env; then
