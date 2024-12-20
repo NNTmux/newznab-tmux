@@ -50,6 +50,7 @@ RUN ARCH="$(dpkg --print-architecture)" && \
     rm -f /tmp/7z.tar.xz && rm -f /tmp/7zzs
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+COPY ./docker/8.3/php.ini "$PHP_INI_DIR/conf.d/custom-conf.ini"
 
 COPY --chmod=755 ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
