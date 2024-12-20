@@ -37,26 +37,48 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
         fi
     fi
 
-    echo "Clearing application cache..."
-    php artisan cache:clear
-    php artisan config:clear
-    php artisan route:clear
-    php artisan view:clear
+    if [ ! -f '_install/install.lock' ]; then
+        echo "Clearing application cache..."
+        php artisan cache:clear
+        php artisan config:clear
+        php artisan route:clear
+        php artisan view:clear
 
-    echo "Caching configuration and routes..."
-    php artisan config:cache
-    php artisan route:cache
+        echo "Caching configuration and routes..."
+        php artisan config:cache
+        php artisan route:cache
 
-    # Run Laravel-specific post-installation commands
-    echo "NNTmux installation..."
-    php artisan nntmux:install --yes
-    # Set permissions for storage and bootstrap/cache directories
-    echo "Setting permissions on storage and bootstrap/cache directories..."
-    chmod -R 775 storage bootstrap/cache
-    chown -R www-data:www-data storage bootstrap/cache
-    php artisan nntmux:create-es-indexes
-    php artisan nntmux:populate --elastic --releases
-    php artisan nntmux:populate --elastic --predb
+        echo "Creating folders structure"
+
+        mkdir -p /app/storage/public
+        mkdir -p /app/storage/covers/anime
+        mkdir -p /app/storage/covers/audio
+        mkdir -p /app/storage/covers/audiosample
+        mkdir -p /app/storage/covers/book
+        mkdir -p /app/storage/covers/console
+        mkdir -p /app/storage/covers/games
+        mkdir -p /app/storage/covers/movies
+        mkdir -p /app/storage/covers/music
+        mkdir -p /app/storage/covers/preview
+        mkdir -p /app/storage/covers/sample
+        mkdir -p /app/storage/covers/tvrage
+        mkdir -p /app/storage/covers/tvshows
+        mkdir -p /app/storage/covers/video
+        mkdir -p /app/storage/covers/xxx
+        mkdir -p /app/storage/nzb
+
+        # Run Laravel-specific post-installation commands
+        echo "NNTmux installation..."
+        php artisan nntmux:install --yes
+        # Set permissions for storage and bootstrap/cache directories
+        echo "Setting permissions on storage and bootstrap/cache directories..."
+        chmod -R 775 bootstrap/cache
+        chmod -R 777 storage resources
+        chown -R www-data:www-data storage bootstrap/cache resources
+        php artisan nntmux:create-es-indexes
+        php artisan nntmux:populate --elastic --releases
+        php artisan nntmux:populate --elastic --predb
+    fi
 fi
 
 # Run the PHP entry point with arguments

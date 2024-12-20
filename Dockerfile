@@ -22,8 +22,9 @@ RUN apt update \
  && wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-24_all.deb \
  && dpkg -i repo-mediaarea_1.0-24_all.deb \
  && apt update \
- && apt install -y libmediainfo0v5 mediainfo libzen0v5 \
- && docker-php-ext-install \
+ && apt install -y libmediainfo0v5 mediainfo libzen0v5
+RUN install-php-extensions imagick/imagick@master
+RUN docker-php-ext-install \
      bcmath \
      exif \
      gd \

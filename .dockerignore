@@ -3,3 +3,5 @@ docker/mariadb-data
 docker/redis-data
 docker/manticore-data
 .env
+storage/nzb
+storage/covers
