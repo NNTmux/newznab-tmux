@@ -38,19 +38,8 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
     fi
 
     if [ ! -f '_install/install.lock' ]; then
-        echo "Clearing application cache..."
-        php artisan cache:clear
-        php artisan config:clear
-        php artisan route:clear
-        php artisan view:clear
-
-        echo "Caching configuration and routes..."
-        php artisan config:cache
-        php artisan route:cache
-
         echo "Creating folders structure"
-
-        mkdir -p /app/storage/public
+        mkdir -p /app/storage/app/public
         mkdir -p /app/storage/covers/anime
         mkdir -p /app/storage/covers/audio
         mkdir -p /app/storage/covers/audiosample
@@ -66,15 +55,28 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
         mkdir -p /app/storage/covers/video
         mkdir -p /app/storage/covers/xxx
         mkdir -p /app/storage/nzb
-
-        # Run Laravel-specific post-installation commands
-        echo "NNTmux installation..."
-        php artisan nntmux:install --yes
         # Set permissions for storage and bootstrap/cache directories
         echo "Setting permissions on storage and bootstrap/cache directories..."
         chmod -R 775 bootstrap/cache
         chmod -R 777 storage resources
         chown -R www-data:www-data storage bootstrap/cache resources
+
+        echo "Clearing application cache..."
+        php artisan cache:clear
+        php artisan config:clear
+        php artisan route:clear
+        php artisan view:clear
+
+        echo "Caching configuration and routes..."
+        php artisan config:cache
+        php artisan route:cache
+
+        # Run Laravel-specific post-installation commands
+        echo "NNTmux installation..."
+        php artisan nntmux:install --yes
+
+        #TODO: check if we selected manticore or elasticsearch
+        echo "Elasticsearch initialisation"
         php artisan nntmux:create-es-indexes
         php artisan nntmux:populate --elastic --releases
         php artisan nntmux:populate --elastic --predb
