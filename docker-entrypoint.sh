@@ -40,21 +40,23 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
     if [ ! -f '_install/install.lock' ]; then
         echo "Creating folders structure"
         mkdir -p /app/storage/app/public
-        mkdir -p /app/storage/covers/anime
-        mkdir -p /app/storage/covers/audio
-        mkdir -p /app/storage/covers/audiosample
-        mkdir -p /app/storage/covers/book
-        mkdir -p /app/storage/covers/console
-        mkdir -p /app/storage/covers/games
-        mkdir -p /app/storage/covers/movies
-        mkdir -p /app/storage/covers/music
-        mkdir -p /app/storage/covers/preview
-        mkdir -p /app/storage/covers/sample
-        mkdir -p /app/storage/covers/tvrage
-        mkdir -p /app/storage/covers/tvshows
-        mkdir -p /app/storage/covers/video
-        mkdir -p /app/storage/covers/xxx
-        mkdir -p /app/storage/nzb
+        mkdir -p "$COVERS_PATH/anime"
+        mkdir -p "$COVERS_PATH/audio"
+        mkdir -p "$COVERS_PATH/audiosample"
+        mkdir -p "$COVERS_PATH/book"
+        mkdir -p "$COVERS_PATH/console"
+        mkdir -p "$COVERS_PATH/games"
+        mkdir -p "$COVERS_PATH/movies"
+        mkdir -p "$COVERS_PATH/music"
+        mkdir -p "$COVERS_PATH/preview"
+        mkdir -p "$COVERS_PATH/sample"
+        mkdir -p "$COVERS_PATH/tvrage"
+        mkdir -p "$COVERS_PATH/tvshows"
+        mkdir -p "$COVERS_PATH/video"
+        mkdir -p "$COVERS_PATH/xxx"
+        mkdir -p "$PATH_TO_NZBS"
+        mkdir -p "$TEMP_UNRAR_PATH"
+        mkdir -p "$TEMP_UNZIP_PATH"
         # Set permissions for storage and bootstrap/cache directories
         echo "Setting permissions on storage and bootstrap/cache directories..."
         chmod -R 775 bootstrap/cache
@@ -75,11 +77,16 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
         echo "NNTmux installation..."
         php artisan nntmux:install --yes
 
-        #TODO: check if we selected manticore or elasticsearch
-        echo "Elasticsearch initialisation"
-        php artisan nntmux:create-es-indexes
-        php artisan nntmux:populate --elastic --releases
-        php artisan nntmux:populate --elastic --predb
+        if [ "${ELASTICSEARCH_ENABLED}" == "true" ]; then
+            echo "Elasticsearch initialisation"
+            php artisan nntmux:create-es-indexes
+            php artisan nntmux:populate --elastic --releases
+            php artisan nntmux:populate --elastic --predb
+        else
+            echo "Manticore initialisation"
+            php artisan nntmux:populate --manticore --releases
+            php artisan nntmux:populate --manticore --predb
+        fi
     fi
 fi
 
