@@ -11,6 +11,7 @@ failed-login.log
 php_errors.log
 php-errors.log
 test.php
+.php-cs-fixer.cache
 
 # Editor temp files
 *#
