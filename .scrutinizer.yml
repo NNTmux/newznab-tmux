@@ -4,7 +4,7 @@ build:
     elasticsearch: 6.4.2
   image: default-bionic
   environment:
-    php: 8.2
+    php: 8.3
   dependencies:
     before:
     override:
