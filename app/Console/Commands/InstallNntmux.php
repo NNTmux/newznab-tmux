@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
-use Illuminate\Support\Str;
 
 class InstallNntmux extends Command
 {
@@ -87,11 +86,10 @@ class InstallNntmux extends Command
     {
         $covers_path = config('nntmux_settings.covers_path');
         $nzb_path = config('nntmux_settings.path_to_nzbs');
-        $tmp_path = config('nntmux.tmp_path');
-        $unrar_path = config('nntmux_settings.unrar_path');
+        $zip_path = config('nntmux_settings.tmp_unzip_path');
+        $unrar_path = config('nntmux.tmp_unrar_path');
 
-        $nzbPathCheck = File::isWritable($nzb_path);
-        if (! $nzbPathCheck) {
+        if (! File::isWritable($nzb_path)) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
 
             return false;
@@ -104,33 +102,26 @@ class InstallNntmux extends Command
             }
             $this->info('Folder '.$unrar_path.' successfully created');
         }
-        $unrarPathCheck = is_writable($unrar_path);
-        if ($unrarPathCheck === false) {
+
+        if (! is_writable($unrar_path)) {
             $this->warn($unrar_path.' is not writable. Please fix folder permissions');
 
             return false;
         }
 
-        $coversPathCheck = File::isWritable($covers_path);
-        if (! $coversPathCheck) {
+        if (! File::isWritable($covers_path)) {
             $this->warn($covers_path.' is not writable. Please fix folder permissions');
 
             return false;
         }
 
-        $tmpPathCheck = File::isWritable($tmp_path);
-        if (! $tmpPathCheck) {
-            $this->warn($tmp_path.' is not writable. Please fix folder permissions');
+        if (! File::isWritable($zip_path)) {
+            $this->warn($zip_path.' is not writable. Please fix folder permissions');
 
             return false;
         }
 
-        return [
-            'nzb_path' => Str::finish($nzb_path, '/'),
-            'covers_path' => Str::finish($covers_path, '/'),
-            'unrar_path' => Str::finish($unrar_path, '/'),
-            'tmp_path' => Str::finish($tmp_path, '/'),
-        ];
+        return true;
     }
 
     private function addAdminUser(): bool
