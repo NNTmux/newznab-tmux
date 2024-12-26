@@ -2,9 +2,9 @@ build:
   services:
     mariadb: 10
     elasticsearch: 6.4.2
-  image: default-bionic
+  image: default-jammy
   environment:
-    php: 8.2
+    php: 8.3.3
   dependencies:
     before:
     override:

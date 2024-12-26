@@ -94,8 +94,8 @@ class InstallNntmux extends Command
     {
         $covers_path = config('nntmux_settings.covers_path');
         $nzb_path = config('nntmux_settings.path_to_nzbs');
-        $tmp_path = config('nntmux.tmp_path');
-        $unrar_path = config('nntmux_settings.unrar_path');
+        $zip_path = config('nntmux_settings.tmp_unzip_path');
+        $unrar_path = config('nntmux.tmp_unrar_path');
 
         if (! File::isWritable($nzb_path)) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
@@ -123,8 +123,9 @@ class InstallNntmux extends Command
             return false;
         }
 
-        if (! File::isWritable($tmp_path)) {
-            $this->warn($tmp_path.' is not writable. Please fix folder permissions');
+        if (! File::isWritable($zip_path)) {
+            $this->warn($zip_path.' is not writable. Please fix folder permissions');
+
 
             return false;
         }
