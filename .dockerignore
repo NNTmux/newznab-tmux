@@ -2,5 +2,6 @@ vendor/
 docker/mariadb-data
 docker/redis-data
 docker/manticore-data
-storage
-resources
+.env
+storage/nzb
+storage/covers
