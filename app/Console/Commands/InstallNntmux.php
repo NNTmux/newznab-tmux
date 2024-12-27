@@ -126,7 +126,6 @@ class InstallNntmux extends Command
         if (! File::isWritable($zip_path)) {
             $this->warn($zip_path.' is not writable. Please fix folder permissions');
 
-
             return false;
         }
 
