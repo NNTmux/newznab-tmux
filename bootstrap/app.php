@@ -26,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'btcpay/webhook',
             'logout',
             'register',
+            'contact-us',
+            'forgottenpassword',
             'login',
             'cart',
             'cart/*',
