@@ -2,7 +2,7 @@
 FROM composer:latest AS composer-base
 FROM dunglas/frankenphp:1-php8.3
 LABEL maintainer="PyRowMan"
-ENV SERVER_NAME=:80
+ENV SERVER_NAME=:${APP_PORT:-80}
 ARG MYSQL_CLIENT="mariadb-client"
 ARG SEVENZIP_VERSION=2407
 
@@ -65,7 +65,7 @@ RUN chmod -R 777 /app/storage/
 RUN chmod -R 777 /app/resources/
 RUN chmod -R 777 /app/public/
 
-EXPOSE 80
+EXPOSE ${APP_PORT:-80}
 
 CMD ["--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
 ENTRYPOINT ["docker-entrypoint"]
