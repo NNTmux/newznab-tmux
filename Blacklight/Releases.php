@@ -629,7 +629,6 @@ class Releases extends Release
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
-        dd(Category::getCategorySearch($cat, 'tv'));
         $siteSQL = [];
         $showSql = '';
         foreach ($siteIdArr as $column => $Id) {
