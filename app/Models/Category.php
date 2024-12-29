@@ -304,12 +304,22 @@ class Category extends Model
         return $result;
     }
 
-    public static function getCategorySearch(array $cat = []): string
+    public static function getCategorySearch(array $cat = [], ?string $searchType = null): string
     {
         $categories = [];
 
+        // if searchType is tv return TV categories
+        if ($searchType === 'tv') {
+            $cat = self::TV_GROUP;
+        }
+
+        // is searchType is movies return MOVIES categories
+        if ($searchType === 'movies') {
+            $cat = self::MOVIES_GROUP;
+        }
+
         // If multiple categories were sent in a single array position, slice and add them
-        if (strpos($cat[0], ',') !== false) {
+        if (str_contains($cat[0], ',')) {
             $tmpcats = explode(',', $cat[0]);
             // Reset the category to the first comma separated value in the string
             $cat[0] = $tmpcats[0];
@@ -329,13 +339,12 @@ class Category extends Model
         }
 
         $catCount = count($categories);
-        $catSearch = match ($catCount) {
+
+        return match ($catCount) {
             0 => 'AND 1=1',
             1 => $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '',
             default => ' AND r.categories_id IN ('.implode(', ', $categories).') ',
         };
-
-        return $catSearch;
     }
 
     /**

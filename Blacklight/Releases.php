@@ -629,6 +629,7 @@ class Releases extends Release
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
+        dd(Category::getCategorySearch($cat, 'tv'));
         $siteSQL = [];
         $showSql = '';
         foreach ($siteIdArr as $column => $Id) {
@@ -712,7 +713,7 @@ class Releases extends Release
             $this->showPasswords(),
             $showSql,
             (! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : '',
-            Category::getCategorySearch($cat),
+            Category::getCategorySearch($cat, 'tv'),
             $maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : '',
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '',
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
@@ -852,7 +853,7 @@ class Releases extends Release
             $this->showPasswords(),
             $showSql,
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            Category::getCategorySearch($cat),
+            Category::getCategorySearch($cat, 'tv'),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
@@ -1002,7 +1003,7 @@ class Releases extends Release
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
-            Category::getCategorySearch($cat),
+            Category::getCategorySearch($cat, 'movies'),
             $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
         );
