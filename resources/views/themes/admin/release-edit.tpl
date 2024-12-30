@@ -83,7 +83,7 @@
 			<tr>
 				<td><label for="postdate">Posted Date:</label></td>
 				<td>
-					<input id="postdate" class="long" name="postdate" value="{$result.postdate}"/>
+					<input id="postdate" class="long" name="postdate" value="{$release.postdate}"/>
 				</td>
 			</tr>
 			<tr>
