@@ -15,7 +15,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-
 class Release extends Model
 {
     use HasFactory;
@@ -319,7 +318,6 @@ class Release extends Model
         return $releases;
     }
 
-
     public static function getByGuid($guid)
     {
         $query = self::with([
@@ -354,8 +352,8 @@ class Release extends Model
             $release->se_complete = $release->episode->se_complete ?? null;
             $release->parent_category = $release->category->parent->title ?? null;
             $release->sub_category = $release->category->title ?? null;
-            $release->category_name = $release->parent_category . ' > ' . $release->sub_category;
-            $release->category_ids = $release->category->parentid . ',' . $release->category->id;
+            $release->category_name = $release->parent_category.' > '.$release->sub_category;
+            $release->category_ids = $release->category->parentid.','.$release->category->id;
             $release->group_names = $release->releaseGroup->pluck('group.name')->implode(',');
         });
 
