@@ -282,9 +282,9 @@ function getStreamingZip(array $guids = []): STS\ZipStream\ZipStream
 
             if ($nzbContents) {
                 $filename = $guid;
-                $r = Release::getByGuid($guid);
-                if ($r) {
-                    $filename = $r['searchname'];
+                $r = Release::query()->where('guid', $guid)->first();
+                if ($r !== null) {
+                    $filename = $r->searchname;
                 }
                 $zipped->addRaw($nzbContents, $filename.'.nzb');
             }
