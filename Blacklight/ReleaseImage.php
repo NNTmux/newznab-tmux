@@ -112,7 +112,7 @@ class ReleaseImage
 
                     if ($saveThumb) {
                         $cover->toJpeg(100)->save($imgSavePath.$imgName.'_thumb.jpg');
-                        //Optimize the thumbnail.
+                        // Optimize the thumbnail.
                         ImageOptimizer::optimize($imgSavePath.$imgName.'_thumb.jpg');
                     }
                 }
@@ -122,7 +122,7 @@ class ReleaseImage
         $coverPath = $imgSavePath.$imgName.'.jpg';
         try {
             $cover->toJpeg(100)->save($coverPath);
-            //Optimize the image.
+            // Optimize the image.
             ImageOptimizer::optimize($coverPath);
         } catch (NotWritableException $e) {
             return 0;

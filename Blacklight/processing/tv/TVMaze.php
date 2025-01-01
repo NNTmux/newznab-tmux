@@ -83,7 +83,7 @@ class TVMaze extends TV
                     $videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TVMAZE);
 
                     // Force local lookup only
-                    //$local = true, $lookupsetting = false and vice versa
+                    // $local = true, $lookupsetting = false and vice versa
                     $lookupSetting = $local !== true;
 
                     if ($videoId === 0 && $lookupSetting) {
@@ -164,17 +164,17 @@ class TVMaze extends TV
                                 $this->colorCli->climate()->info('Found TVMaze Match!', true);
                             }
                         } else {
-                            //Processing failed, set the episode ID to the next processing group
+                            // Processing failed, set the episode ID to the next processing group
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         }
                     } else {
-                        //Processing failed, set the episode ID to the next processing group
+                        // Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         $this->titleCache[] = $release['cleanname'] ?? null;
                     }
                 } else {
-                    //Processing failed, set the episode ID to the next processing group
+                    // Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
                 }
@@ -192,7 +192,7 @@ class TVMaze extends TV
     {
         $return = $response = false;
 
-        //Try for the best match with AKAs embedded
+        // Try for the best match with AKAs embedded
         $response = $this->client->getShowBySiteID($site, $siteId);
 
         sleep(1);
@@ -216,7 +216,7 @@ class TVMaze extends TV
         // Do this for the API Search only as a local lookup should require it
         $name = preg_replace('# \((19|20)\d{2}\)$#', '', $name);
 
-        //Try for the best match with AKAs embedded
+        // Try for the best match with AKAs embedded
         $response = $this->client->singleSearchAkas($name);
 
         sleep(1);
@@ -225,13 +225,13 @@ class TVMaze extends TV
             $return = $this->matchShowInfo($response, $name);
         }
         if ($return === false) {
-            //Try for the best match via full search (no AKAs can be returned but the search is better)
+            // Try for the best match via full search (no AKAs can be returned but the search is better)
             $response = $this->client->search($name);
             if (\is_array($response)) {
                 $return = $this->matchShowInfo($response, $name);
             }
         }
-        //If we didn't get any aliases do a direct alias lookup
+        // If we didn't get any aliases do a direct alias lookup
         if (\is_array($return) && empty($return['aliases']) && is_numeric($return['tvmaze'])) {
             $return['aliases'] = $this->client->getShowAKAs($return['tvmaze']);
         }
@@ -321,13 +321,13 @@ class TVMaze extends TV
 
         sleep(1);
 
-        //Handle Single Episode Lookups
+        // Handle Single Episode Lookups
         if (\is_object($response)) {
             if ($this->checkRequiredAttr($response, 'tvmazeE')) {
                 $return = $this->formatEpisodeInfo($response);
             }
         } elseif (\is_array($response)) {
-            //Handle new show/all episodes and airdate lookups
+            // Handle new show/all episodes and airdate lookups
             foreach ($response as $singleEpisode) {
                 if ($this->checkRequiredAttr($singleEpisode, 'tvmazeE')) {
                     // If this is an airdate lookup and it matches the airdate, set a return

@@ -1,6 +1,6 @@
 <?php
 
-//This script will update all records in the gamesinfo table
+// This script will update all records in the gamesinfo table
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 

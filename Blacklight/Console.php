@@ -114,7 +114,7 @@ class Console
      */
     public function getConsoleInfoByName(string $title, string $platform)
     {
-        //only used to get a count of words
+        // only used to get a count of words
         $searchWords = '';
 
         $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
@@ -330,7 +330,7 @@ class Console
         // This actual compares the two strings and outputs a percentage value.
         $titlepercent = $platformpercent = '';
 
-        //Remove import tags from console title for match
+        // Remove import tags from console title for match
         $con['title'] = trim(preg_replace('/([\[|\(]).{2,} import([\]|\)])$/i', '', $con['title']));
 
         similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
@@ -427,8 +427,8 @@ class Console
         $genreName = '';
 
         if (isset($amaz->BrowseNodes)) {
-            //had issues getting this out of the browsenodes obj
-            //workaround is to get the xml and load that into its own obj
+            // had issues getting this out of the browsenodes obj
+            // workaround is to get the xml and load that into its own obj
             $amazGenresXml = $amaz->BrowseNodes->asXml();
             $amazGenresObj = simplexml_load_string($amazGenresXml);
             $amazGenres = $amazGenresObj->xpath('//Name');
@@ -805,9 +805,9 @@ class Console
             // Replace dots, underscores, or brackets with spaces.
             $result['title'] = str_replace(['.', '_', '%20', '[', ']'], ' ', $title);
             $result['title'] = str_replace([' RF ', '.RF.', '-RF-', '_RF_'], ' ', $result['title']);
-            //Remove format tags from release title for match
+            // Remove format tags from release title for match
             $result['title'] = trim(preg_replace('/PAL|MULTI(\d)?|NTSC-?J?|\(JAPAN\)/i', '', $result['title']));
-            //Remove disc tags from release title for match
+            // Remove disc tags from release title for match
             $result['title'] = trim(preg_replace('/Dis[ck] \d.*$/i', '', $result['title']));
 
             // Needed to add code to handle DLC Properly.
@@ -930,7 +930,7 @@ class Console
     {
         $str = '';
 
-        //music nodes above mp3 download nodes
+        // music nodes above mp3 download nodes
         switch ($nodeName) {
             case 'Action_shooter':
             case 'Action_Games':

@@ -36,25 +36,25 @@ $tmux_niceness = Settings::settingValue('niceness') ?? 2;
 
 $runVar['constants'] = (array) Arr::first(DB::select($tRun->getConstantSettings()));
 
-//assign shell commands
+// assign shell commands
 $runVar['commands']['_php'] = " nice -n{$tmux_niceness} php";
 $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} php";
 $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/tmux/bin/showsleep.php";
 
-//spawn IRCScraper as soon as possible
+// spawn IRCScraper as soon as possible
 try {
     $tRun->runPane('scraper', $runVar);
 } catch (Exception $e) {
     echo $e;
 }
 
-//get list of panes by name
+// get list of panes by name
 $runVar['panes'] = $tRun->getListOfPanes($runVar['constants']);
 
-//totals per category in db, results by parentID
+// totals per category in db, results by parentID
 $catCountQuery = 'SELECT c.root_categories_id AS parentid, COUNT(r.id) AS count FROM categories c, releases r WHERE r.categories_id = c.id GROUP BY c.root_categories_id';
 
-//create timers and set to now
+// create timers and set to now
 $runVar['timers']['timer1'] = $runVar['timers']['timer2'] = $runVar['timers']['timer3'] =
 $runVar['timers']['timer4'] = $runVar['timers']['timer5'] = time();
 
@@ -80,12 +80,12 @@ while ($runVar['counts']['iterations'] > 0) {
     $runVar['settings']['book_reqids'] = (! empty($runVar['settings']['book_reqids'])
         ? $runVar['settings']['book_reqids'] : Category::BOOKS_ROOT);
 
-    //get usenet connection info
+    // get usenet connection info
     $runVar['connections'] = $tOut->getConnectionsInfo($runVar['constants']);
 
     $runVar['constants']['pre_lim'] = ($runVar['counts']['iterations'] > 1 ? '7' : '');
 
-    //assign scripts
+    // assign scripts
     $runVar['scripts']['releases'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/releases.php";
 
     $runVar['scripts']['binaries'] = match ((int) $runVar['settings']['binaries_run']) {
@@ -101,7 +101,7 @@ while ($runVar['counts']['iterations'] > 0) {
             $runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php backfill";
     }
 
-    //get usenet connection counts
+    // get usenet connection counts
     unset($runVar['conncounts']);
     $runVar['conncounts'] = $tOut->getUSPConnections('primary', $runVar['connections']);
 
@@ -109,7 +109,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['conncounts'] += $tOut->getUSPConnections('alternate', $runVar['connections']);
     }
 
-    //run queries only after time exceeded, these queries can take awhile
+    // run queries only after time exceeded, these queries can take awhile
     if ((int) $runVar['counts']['iterations'] === 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && (int) $runVar['settings']['is_running'] === 1)) {
         $runVar['counts']['proc1'] = $runVar['counts']['proc2'] = $runVar['counts']['proc3'] = $splitQry = $newOldQry = false;
         $runVar['counts']['now']['total_work'] = 0;
@@ -132,7 +132,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $splitRes = (array) Arr::first(DB::select($splitQry));
         $runVar['timers']['newOld'] = (array) Arr::first(DB::select($newOldQry));
 
-        //assign split query results to main var
+        // assign split query results to main var
         foreach ($splitRes as $splitKey => $split) {
             $runVar['counts']['now'][$splitKey] = $split;
         }
@@ -232,7 +232,7 @@ while ($runVar['counts']['iterations'] > 0) {
             }
             $runVar['timers']['newOld']['oldestcollection'] = $age;
 
-            //free up memory used by now stale data
+            // free up memory used by now stale data
             unset($age, $added, $tables);
 
             $runVar['timers']['query']['tpg_time'] = (time() - $timer07);
@@ -240,7 +240,7 @@ while ($runVar['counts']['iterations'] > 0) {
         }
         $runVar['timers']['timer2'] = time();
 
-        //assign postprocess values from $proc
+        // assign postprocess values from $proc
         if (is_array($proc1res)) {
             foreach ($proc1res as $proc1key => $proc1) {
                 $runVar['counts']['now'][$proc1key] = $proc1;
@@ -270,21 +270,21 @@ while ($runVar['counts']['iterations'] > 0) {
             }
         }
 
-        //set initial start postproc values from work queries -- this is used to determine diff variables
+        // set initial start postproc values from work queries -- this is used to determine diff variables
         if ((int) $runVar['counts']['iterations'] === 1) {
             $runVar['counts']['start'] = $runVar['counts']['now'];
         }
 
         foreach ($runVar['counts']['now'] as $key => $proc) {
-            //if key is a process type, add it to total_work
+            // if key is a process type, add it to total_work
             if (str_starts_with($key, 'process')) {
                 $runVar['counts']['now']['total_work'] += $proc;
             }
 
-            //calculate diffs
+            // calculate diffs
             $runVar['counts']['diff'][$key] = number_format($proc - $runVar['counts']['start'][$key]);
 
-            //calculate percentages -- if user has no releases, set 0 for each key or this will fail on divide by zero
+            // calculate percentages -- if user has no releases, set 0 for each key or this will fail on divide by zero
             $runVar['counts']['percent'][$key] = $runVar['counts']['now']['releases'] > 0
                 ? sprintf('%02s', floor(($proc / $runVar['counts']['now']['releases']) * 100)) : 0;
         }
@@ -300,59 +300,59 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['counts']['diff']['total_work'] = number_format($runVar['counts']['now']['total_work'] - $runVar['counts']['start']['total_work']);
     }
 
-    //set kill switches
+    // set kill switches
     $runVar['killswitch']['pp'] = (($runVar['settings']['postprocess_kill'] < $runVar['counts']['now']['total_work']) && ((int) $runVar['settings']['postprocess_kill'] !== 0));
     $runVar['killswitch']['coll'] = (($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ((int) $runVar['settings']['collections_kill'] !== 0));
 
     $tOut->updateMonitorPane($runVar);
 
-    //begin pane run execution
+    // begin pane run execution
     if ($runVar['settings']['is_running'] === '1') {
-        //run main updating function(s)
+        // run main updating function(s)
         try {
             $tRun->runPane('main', $runVar);
         } catch (Exception $e) {
             echo $e;
         }
 
-        //run nzb-import
+        // run nzb-import
         try {
             $tRun->runPane('import', $runVar);
         } catch (Exception $e) {
             echo $e;
         }
 
-        //run postprocess_releases amazon
+        // run postprocess_releases amazon
         try {
             $tRun->runPane('amazon', $runVar);
         } catch (Exception $e) {
             echo $e;
         }
 
-        //respawn IRCScraper if it has been killed
+        // respawn IRCScraper if it has been killed
         try {
             $tRun->runPane('scraper', $runVar);
         } catch (Exception $e) {
             echo $e;
         }
 
-        //update tv and theaters
+        // update tv and theaters
         try {
             $tRun->runPane('updatetv', $runVar);
         } catch (Exception $e) {
             echo $e;
         }
 
-        //run these if complete sequential not set
+        // run these if complete sequential not set
         if ((int) $runVar['constants']['sequential'] !== 2) {
-            //fix names
+            // fix names
             try {
                 $tRun->runPane('fixnames', $runVar);
             } catch (Exception $e) {
                 echo $e;
             }
 
-            //dehash releases
+            // dehash releases
             try {
                 $tRun->runPane('dehash', $runVar);
             } catch (Exception $e) {
@@ -366,14 +366,14 @@ while ($runVar['counts']['iterations'] > 0) {
                 echo $e;
             }
 
-            //run postprocess_releases additional
+            // run postprocess_releases additional
             try {
                 $tRun->runPane('ppadditional', $runVar);
             } catch (Exception $e) {
                 echo $e;
             }
 
-            //run postprocess_releases non amazon
+            // run postprocess_releases non amazon
             try {
                 $tRun->runPane('nonamazon', $runVar);
             } catch (Exception $e) {

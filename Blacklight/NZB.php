@@ -116,7 +116,7 @@ class NZB
         $XMLWriter->writeAttribute('type', 'name');
         $XMLWriter->text($release->name);
         $XMLWriter->endElement();
-        $XMLWriter->endElement(); //head
+        $XMLWriter->endElement(); // head
 
         foreach ($collections as $collection) {
             $binaries = Binary::whereCollectionsId($collection->id)->select(['id', 'name', 'totalparts'])->orderBy('name')->get();
@@ -151,7 +151,7 @@ class NZB
                 } else {
                     return false;
                 }
-                $XMLWriter->endElement(); //groups
+                $XMLWriter->endElement(); // groups
                 $XMLWriter->startElement('segments');
                 foreach ($parts as $part) {
                     if ($nzb_guid === '') {
@@ -163,12 +163,12 @@ class NZB
                     $XMLWriter->text($part->messageid);
                     $XMLWriter->endElement();
                 }
-                $XMLWriter->endElement(); //segments
-                $XMLWriter->endElement(); //file
+                $XMLWriter->endElement(); // segments
+                $XMLWriter->endElement(); // file
             }
         }
         $XMLWriter->writeComment($this->_siteCommentString);
-        $XMLWriter->endElement(); //nzb
+        $XMLWriter->endElement(); // nzb
         $XMLWriter->endDocument();
         $path = ($this->buildNZBPath($release->guid, $this->nzbSplitLevel, true).$release->guid.'.nzb.gz');
         $fp = gzopen($path, 'wb7');

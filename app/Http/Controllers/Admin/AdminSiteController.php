@@ -81,7 +81,7 @@ class AdminSiteController extends BasePageController
         $this->smarty->assign('passwd_ids', [1, 0]);
         $this->smarty->assign('passwd_names', ['Deep (requires unrar)', 'None']);
 
-        /*0 = English, 2 = Danish, 3 = French, 1 = German*/
+        /* 0 = English, 2 = Danish, 3 = French, 1 = German */
         $this->smarty->assign('langlist_ids', [0, 2, 3, 1]);
         $this->smarty->assign('langlist_names', ['English', 'Danish', 'French', 'German']);
 

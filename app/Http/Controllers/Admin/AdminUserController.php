@@ -99,7 +99,7 @@ class AdminUserController extends BasePageController
         // set the current action
         $action = $request->input('action') ?? 'view';
 
-        //get the user roles
+        // get the user roles
         $userRoles = Role::cursor()->remember();
         $roles = [];
         $defaultRole = 'User';

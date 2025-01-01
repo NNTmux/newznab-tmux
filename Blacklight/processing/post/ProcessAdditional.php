@@ -1043,7 +1043,7 @@ class ProcessAdditional
                         }
                         $this->_releaseHasPassword = true;
                         $this->_passwordStatus = Releases::PASSWD_RAR;
-                    } //Run a PreDB filename check on insert to try and match the release
+                    } // Run a PreDB filename check on insert to try and match the release
                     elseif ($file['name'] !== '' && ! str_starts_with($file['name'], '.')) {
                         $this->_release['filename'] = $file['name'];
                         $this->_release['releases_id'] = $this->_release->id;
@@ -1577,7 +1577,7 @@ class ProcessAdditional
                         if (config('app.debug') === true) {
                             Log::error($e->getTraceAsString());
                         }
-                        //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                        // We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                     }
                 }
 
@@ -1685,17 +1685,17 @@ class ProcessAdditional
                     if (config('app.debug') === true) {
                         Log::error($runtimeException->getTraceAsString());
                     }
-                    //We show no error we just log it, we failed to save the frame and move on
+                    // We show no error we just log it, we failed to save the frame and move on
                 } catch (\InvalidArgumentException $e) {
                     if (config('app.debug') === true) {
                         Log::error($e->getTraceAsString());
                     }
-                    //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                    // We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                 } catch (\Throwable $e) {
                     if (config('app.debug') === true) {
                         Log::error($e->getTraceAsString());
                     }
-                    //Again we do nothing, we just want to catch the error
+                    // Again we do nothing, we just want to catch the error
                 }
             }
 
@@ -1780,7 +1780,7 @@ class ProcessAdditional
                             if (config('app.debug') === true) {
                                 Log::error($e->getTraceAsString());
                             }
-                            //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                            // We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                         }
                     }
                 }
@@ -1799,7 +1799,7 @@ class ProcessAdditional
                     if (config('app.debug') === true) {
                         Log::error($e->getTraceAsString());
                     }
-                    //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                    // We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                 }
             }
 

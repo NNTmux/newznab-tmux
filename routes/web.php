@@ -69,7 +69,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
 
-//Auth::routes();
+// Auth::routes();
 
 Route::match(['GET', 'POST'], '/', [ContentController::class, 'show'])->name('home');
 

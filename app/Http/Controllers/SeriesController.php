@@ -63,7 +63,7 @@ class SeriesController extends BasePageController
                 $this->smarty->assign('show', $show);
                 $this->smarty->assign('myshows', $myshows);
 
-                //get series name(s), description, country and genre
+                // get series name(s), description, country and genre
                 $seriestitles = $seriessummary = $seriescountry = [];
                 $seriestitles[] = $show['title'];
 

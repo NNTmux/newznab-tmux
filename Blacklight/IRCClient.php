@@ -301,7 +301,7 @@ class IRCClient
                         return false;
                     }
                 }
-                //ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
+                // ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
             } elseif (preg_match('/^ERROR\s*:/', $this->_buffer)) {
                 echo $this->_buffer.PHP_EOL;
 

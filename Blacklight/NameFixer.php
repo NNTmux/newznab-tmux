@@ -728,7 +728,7 @@ class NameFixer
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
             $releases = Release::fromQuery($query.$this->timeall.$queryLimit);
-        } //other cats
+        } // other cats
         if ($time === 2 && $cats === 1) {
             $releases = Release::fromQuery($query.$this->fullother.$queryLimit);
         } // all cats
@@ -1018,7 +1018,7 @@ class NameFixer
             return $matching;
         }
 
-        //Find release matches with fulltext and then identify exact matches with cleaned LIKE string
+        // Find release matches with fulltext and then identify exact matches with cleaned LIKE string
         $res = Release::fromQuery(
             sprintf(
                 '

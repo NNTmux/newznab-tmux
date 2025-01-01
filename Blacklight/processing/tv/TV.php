@@ -452,7 +452,7 @@ abstract class TV extends Videos
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = [(int) $hits[3], (int) $hits[4]];
         }
-        //S01E0102 and S01E01E02 - lame no delimit numbering, regex would collide if there was ever 1000 ep season.
+        // S01E0102 and S01E01E02 - lame no delimit numbering, regex would collide if there was ever 1000 ep season.
         elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{2})[^a-z0-9]?e(\d{2})e?(\d{2})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = (int) $hits[3];
@@ -481,13 +481,13 @@ abstract class TV extends Videos
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = $hits[4].$hits[5];
             $episodeArr['episode'] = $hits[5].'/'.$hits[6];
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); //yyyy-mm-dd
+            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); // yyyy-mm-dd
         }
         // 01.01.2009
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = $hits[5].$hits[6];
             $episodeArr['episode'] = $hits[3].'/'.$hits[4];
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); //yyyy-mm-dd
+            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); // yyyy-mm-dd
         }
         // 01.01.09
         elseif (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]?/i', $relname, $hits)) {
@@ -495,7 +495,7 @@ abstract class TV extends Videos
             $episodeArr['season'] = $hits[4] = ($hits[4] <= 99 && $hits[4] > 15) ? '19'.$hits[4] : '20'.$hits[4];
             $episodeArr['episode'] = $hits[2].'/'.$hits[3];
             $tmpAirdate = $episodeArr['season'].'/'.$episodeArr['episode'];
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); //yyyy-mm-dd
+            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); // yyyy-mm-dd
         }
         // 2009.E01
         elseif (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {

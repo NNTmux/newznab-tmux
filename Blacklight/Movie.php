@@ -1059,7 +1059,7 @@ class Movie
             foreach ($res as $arr) {
                 // Try to get a name/year.
                 if (! $this->parseMovieSearchName($arr['searchname'])) {
-                    //We didn't find a name, so set to all 0's so we don't parse again.
+                    // We didn't find a name, so set to all 0's so we don't parse again.
                     Release::query()->where('id', $arr['id'])->update(['imdbid' => 0000000]);
 
                     continue;
@@ -1191,7 +1191,7 @@ class Movie
      */
     protected function localIMDBSearch()
     {
-        //If we found a year, try looking in a 4 year range.
+        // If we found a year, try looking in a 4 year range.
         $check = MovieInfo::query()
             ->where('title', 'like', '%'.$this->currentTitle.'%');
 

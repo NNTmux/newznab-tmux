@@ -179,17 +179,17 @@ class TVDB extends TV
                             $this->colorCli->climate()->info('Found TVDB Match!');
                         }
                     } else {
-                        //Processing failed, set the episode ID to the next processing group
+                        // Processing failed, set the episode ID to the next processing group
                         $this->setVideoIdFound($videoId, $row['id'], 0);
                         $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     }
                 } else {
-                    //Processing failed, set the episode ID to the next processing group
+                    // Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
                 }
             } else {
-                //Parsing failed, take it out of the queue for examination
+                // Parsing failed, take it out of the queue for examination
                 $this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
                 $this->titleCache[] = $release['cleanname'] ?? null;
             }

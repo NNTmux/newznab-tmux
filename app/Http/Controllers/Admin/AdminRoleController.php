@@ -17,7 +17,7 @@ class AdminRoleController extends BasePageController
 
         $meta_title = $title = 'User Role List';
 
-        //get the user roles
+        // get the user roles
         $userroles = Role::cursor()->remember();
 
         $this->smarty->assign('userroles', $userroles);

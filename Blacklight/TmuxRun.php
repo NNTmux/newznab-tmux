@@ -319,8 +319,8 @@ class TmuxRun extends Tmux
      */
     protected function _runNonUpdateBinaries(&$runVar): void
     {
-        //run update_binaries
-        //$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
+        // run update_binaries
+        // $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         if (((int) $runVar['settings']['binaries_run'] !== 0) && ($runVar['killswitch']['pp'] === false)) {
             $log = $this->writelog($runVar['panes']['zero'][2]);
             shell_exec(
@@ -341,7 +341,7 @@ class TmuxRun extends Tmux
      */
     protected function _runNonBackfill(&$runVar): void
     {
-        //run backfill
+        // run backfill
         $backsleep = (
             (int) $runVar['settings']['progressive'] === 1 && floor($runVar['counts']['now']['collections_table'] / 500) > $runVar['settings']['back_timer']
             ? floor($runVar['counts']['now']['collections_table'] / 500)
@@ -368,7 +368,7 @@ class TmuxRun extends Tmux
      */
     protected function _runNonUpdateReleases(&$runVar): void
     {
-        //run update_releases
+        // run update_releases
         if ((int) $runVar['settings']['releases_run'] !== 0) {
             $log = $this->writelog($runVar['panes']['zero'][4]);
             shell_exec(
@@ -409,7 +409,7 @@ class TmuxRun extends Tmux
                 $runVar['timers']['timer3'] = time();
                 break;
             case ((int) $runVar['settings']['post'] === 3) && (((int) $runVar['counts']['now']['processnfo'] > 0) || ((int) $runVar['counts']['now']['work'] > 0)):
-                //run postprocess_releases additional
+                // run postprocess_releases additional
                 $log = $this->writelog($runVar['panes']['two'][0]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.0 ' \
@@ -460,7 +460,7 @@ class TmuxRun extends Tmux
                         $runVar['modsettings']['fc']['time'] = 'full';
                     }
 
-                    //Check to see if the pane is dead, if so respawn it.
+                    // Check to see if the pane is dead, if so respawn it.
                     if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:1 | grep ^1 | grep -c dead") == 1) {
                         // Run remove crap releases.
                         shell_exec(
@@ -556,7 +556,7 @@ class TmuxRun extends Tmux
 
             shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 '$binaries $backfill $releases $date $sleep' 2>&1 1> /dev/null");
         } elseif (($runVar['killswitch']['pp'] === false) && (time() - $runVar['timers']['timer5'] >= 4800)) {
-            //run backfill all once and resets the timer
+            // run backfill all once and resets the timer
             if ((int) $runVar['settings']['backfill'] !== 0) {
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 ' \
@@ -632,7 +632,7 @@ class TmuxRun extends Tmux
     protected function _runIRCScraper($pane, &$runVar): void
     {
         if ((int) $runVar['constants']['run_ircscraper'] === 1) {
-            //Check to see if the pane is dead, if so respawn it.
+            // Check to see if the pane is dead, if so respawn it.
             if ((int) shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:{$pane} | grep ^0 | grep -c dead") === 1) {
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:{$pane}.0 ' \

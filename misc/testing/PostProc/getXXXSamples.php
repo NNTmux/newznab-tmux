@@ -30,7 +30,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
             $counterfixed++;
             if ($argv[1] === 'true') {
                 $imgpath = 'http://pic4all.eu/images/'.$row['searchname'].'_1.jpg';
-                //scan pic4all.eu for sample image
+                // scan pic4all.eu for sample image
                 if (stripos($row['searchname'], 'SDCLiP') !== false) {
                     $row['searchname'] = strtolower(preg_replace('/.XXX(.720p|.1080p)?.MP4-SDCLiP/i', '', $row['searchname']));
                     $imgpath = 'http://pic4all.eu/images/'.$row['searchname'].'.jpg';

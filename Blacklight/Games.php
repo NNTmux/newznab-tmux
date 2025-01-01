@@ -344,7 +344,7 @@ class Games
      */
     public function updateGamesInfo($gameInfo): bool
     {
-        //wait 10 seconds before proceeding (steam api limit)
+        // wait 10 seconds before proceeding (steam api limit)
         sleep(10);
         $gen = new Genres(['Settings' => null]);
         $ri = new ReleaseImage;
@@ -769,7 +769,7 @@ class Games
     {
         $str = '';
 
-        //Game genres
+        // Game genres
         switch ($gameGenre) {
             case 'Action':
             case 'Adventure':

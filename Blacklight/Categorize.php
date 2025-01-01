@@ -137,7 +137,7 @@ class Categorize
     public function isOtherTV(): bool
     {
         if (preg_match('/[._ -]S\d{1,3}.+(EP\d{1,3}|Extras|SUBPACK)[._ -]|News/i', $this->releaseName)
-            //special case for "Have.I.Got.News.For.You" tv show
+            // special case for "Have.I.Got.News.For.You" tv show
             && ! preg_match('/[._ -]Got[._ -]News[._ -]For[._ -]You/i', $this->releaseName)
         ) {
             $this->tmpCat = Category::TV_OTHER;

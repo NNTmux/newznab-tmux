@@ -45,7 +45,7 @@ class TmuxOutput extends Tmux
             $buffer .= $this->_getQueries();
         }
 
-        //begin update display with screen clear
+        // begin update display with screen clear
         passthru('clear');
         echo $buffer;
     }

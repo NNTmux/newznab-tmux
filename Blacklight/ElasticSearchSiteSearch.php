@@ -277,7 +277,7 @@ class ElasticSearchSiteSearch
 
             // Execute a Scroll request and repeat
             $results = Elasticsearch::scroll([
-                'scroll_id' => $scroll_id,  //...using our previously obtained _scroll_id
+                'scroll_id' => $scroll_id,  // ...using our previously obtained _scroll_id
                 'scroll' => '30s',        // and the same timeout window
             ]
             );

@@ -86,7 +86,7 @@ class Books
 
     public function getBookInfoByName(string $title): ?Model
     {
-        //only used to get a count of words
+        // only used to get a count of words
         $searchWords = '';
         $title = preg_replace(['/( - | -|\(.+\)|\(|\))/', '/[^\w ]+/'], [' ', ''], $title);
         $title = trim(trim(preg_replace('/\s\s+/i', ' ', $title)));
@@ -350,10 +350,10 @@ class Books
         $a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[ ._-](Novel|TIA)([ ._-]|$)|([ \.])HQ([-\. ])|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu([bp])s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $release_name);
         $b = preg_replace('/^(As Req |conversion |eq |Das neue Abenteuer \d+|Fixed version( ignore previous post)?|Full |Per Req As Found|(\s+)?R4 |REQ |revised |version |\d+(\s+)?$)|(COMPLETE|INTERNAL|RELOADED| (AZW3|eB|docx|ENG?|exe|FR|Fix|gnv64|MU|NIV|R\d\s+\d{1,2} \d{1,2}|R\d|Req|TTL|UC|v(\s+)?\d))(\s+)?$/i', '', $a);
 
-        //remove book series from title as this gets more matches on amazon
+        // remove book series from title as this gets more matches on amazon
         $c = preg_replace('/ - \[.+\]|\[.+\]/', '', $b);
 
-        //remove any brackets left behind
+        // remove any brackets left behind
         $d = preg_replace('/(\(\)|\[\])/', '', $c);
         $releasename = trim(preg_replace('/\s\s+/i', ' ', $d));
 

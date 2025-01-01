@@ -74,7 +74,7 @@ return [
 
     'scrape_irc_channels' => serialize(
         [
-            //'#Channel'                => 'Password',
+            // '#Channel'                => 'Password',
             '#PreNNTmux' => null,
             '#nZEDbPRE' => null,
         ]

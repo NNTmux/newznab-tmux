@@ -139,7 +139,7 @@ class PopulateAniDB
                 }
             }
 
-            //start and end date come from AniDB API as date strings -- no manipulation needed
+            // start and end date come from AniDB API as date strings -- no manipulation needed
             $AniDBAPIArray['startdate'] = $AniDBAPIXML->startdate ?? '0000-00-00';
             $AniDBAPIArray['enddate'] = $AniDBAPIXML->enddate ?? '0000-00-00';
 
@@ -283,8 +283,8 @@ class PopulateAniDB
 
             $animeTitles = new \SimpleXMLElement('compress.zlib://http://anidb.net/api/anime-titles.xml.gz', null, true);
 
-            //Even if the update process fails,
-            //we must mark the last update time or risk ban
+            // Even if the update process fails,
+            // we must mark the last update time or risk ban
             $this->setLastUpdated();
 
             if ($animeTitles) {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * App\Models\Video.
@@ -76,6 +77,11 @@ class Video extends Model
     public function episode(): HasMany
     {
         return $this->hasMany(TvEpisode::class, 'videos_id');
+    }
+
+    public function tvInfo(): HasOne
+    {
+        return $this->hasOne(TvInfo::class, 'videos_id');
     }
 
     /**

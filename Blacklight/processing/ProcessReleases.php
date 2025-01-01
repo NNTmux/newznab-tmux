@@ -477,10 +477,10 @@ class ProcessReleases
 
                     if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
                         foreach ($hits[1] as $grp) {
-                            //check if the group name is in a valid format
+                            // check if the group name is in a valid format
                             $grpTmp = UsenetGroup::isValidGroup($grp);
                             if ($grpTmp !== false) {
-                                //check if the group already exists in database
+                                // check if the group already exists in database
                                 $xrefGrpID = UsenetGroup::getIDByName($grpTmp);
                                 if ($xrefGrpID === '') {
                                     $xrefGrpID = UsenetGroup::addGroup(

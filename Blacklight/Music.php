@@ -104,7 +104,7 @@ class Music
      */
     public function getMusicInfoByName($artist, $album)
     {
-        //only used to get a count of words
+        // only used to get a count of words
         $searchwords = '';
         $album = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $album);
         $album = preg_replace('/[^\w ]+/', '', $album);
@@ -507,7 +507,7 @@ class Music
     {
         $str = '';
 
-        //music nodes above mp3 download nodes
+        // music nodes above mp3 download nodes
         switch ($nodeId) {
             case '163420':
                 $str = 'Music Video & Concerts';
@@ -528,9 +528,9 @@ class Music
             case '624899011':
                 $str = "Children's Music";
                 break;
-            case '173429': //christian
-            case '2231705011': //gospel
-            case '624905011': //christian & gospel
+            case '173429': // christian
+            case '2231705011': // gospel
+            case '624905011': // christian & gospel
                 $str = 'Christian & Gospel';
                 break;
             case '67204':
@@ -545,8 +545,8 @@ class Music
             case '624976011':
                 $str = 'Country';
                 break;
-            case '7': //dance & electronic
-            case '624988011': //dance & dj
+            case '7': // dance & electronic
+            case '624988011': // dance & dj
                 $str = 'Dance & Electronic';
                 break;
             case '32':
@@ -557,8 +557,8 @@ class Music
             case '625011011':
                 $str = 'Hard Rock & Metal';
                 break;
-            case '33': //world music
-            case '625021011': //international
+            case '33': // world music
+            case '625021011': // international
                 $str = 'World Music';
                 break;
             case '34':

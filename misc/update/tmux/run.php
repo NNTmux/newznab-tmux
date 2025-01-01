@@ -17,7 +17,7 @@ $colorCli = new ColorCLI;
 
 Process::run('clear');
 
-//reset collections dateadded to now if dateadded > delay time check
+// reset collections dateadded to now if dateadded > delay time check
 $colorCli->header('Resetting collections that have expired to this moment. This could take some time if many collections need to be reset');
 
 DB::transaction(function () use ($delaytime) {
@@ -31,7 +31,7 @@ function command_exist($cmd): bool
     return $returnVal->seeInOutput($cmd);
 }
 
-//check for apps
+// check for apps
 $apps = ['time', 'tmux', 'nice', 'tee'];
 foreach ($apps as &$value) {
     if (! command_exist($value)) {
@@ -126,7 +126,7 @@ function attach($tmuxPath, $tmux_session): void
     Process::run("tmux select-window -t $tmux_session:0; tmux attach-session -d -t $tmux_session");
 }
 
-//create tmux session
+// create tmux session
 
 $tmuxConfig = $tmuxPath.'tmux.conf';
 

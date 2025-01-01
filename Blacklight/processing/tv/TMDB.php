@@ -158,17 +158,17 @@ class TMDB extends TV
                                 $this->colorCli->climate()->info('Found TMDB Match!');
                             }
                         } else {
-                            //Processing failed, set the episode ID to the next processing group
+                            // Processing failed, set the episode ID to the next processing group
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                         }
                     } else {
-                        //Processing failed, set the episode ID to the next processing group
+                        // Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                         $this->titleCache[] = $release['cleanname'] ?? null;
                     }
                 } else {
-                    //Processing failed, set the episode ID to the next processing group
+                    // Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
                 }
@@ -294,7 +294,7 @@ class TMDB extends TV
 
         sleep(1);
 
-        //Handle Single Episode Lookups
+        // Handle Single Episode Lookups
         if (\is_array($response) && $this->checkRequiredAttr($response, 'tmdbE')) {
             $return = $this->formatEpisodeInfo($response);
         }

@@ -332,7 +332,7 @@ class Nfo
                     Release::whereId($arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
                     $ret++;
                     // Disable for now, we don't want to do full processing on nfo's.
-                    /*$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);*/
+                    /* $movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb); */
 
                     // If set scan for tv info.
                     // Disable for now, we don't want to do full processing on nfo's.

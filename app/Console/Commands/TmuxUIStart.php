@@ -34,7 +34,7 @@ class TmuxUIStart extends Command
         // Set running value to on.
         $tmux->startRunning();
 
-        //check if session exists
+        // check if session exists
         $session = Process::run("tmux list-session | grep $tmux_session");
         if ($session->exitCode() === 1) {
             $this->info('Starting the tmux server and monitor script');

@@ -22,7 +22,7 @@ $iFilesProcessed = $iFilesCounted = 0;
 $time = now()->toImmutable();
 
 echo "\nReorganizing files to Level $newLevel from: $sourcePath This could take a while...\n";
-//$consoleTools = new \ConsoleTools();
+// $consoleTools = new \ConsoleTools();
 foreach ($objects as $filestoprocess => $nzbFile) {
     if ($nzbFile->getExtension() != 'gz') {
         continue;

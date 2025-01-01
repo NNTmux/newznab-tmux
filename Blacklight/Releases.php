@@ -368,7 +368,7 @@ class Releases extends Release
                 try {
                     Elasticsearch::delete($params);
                 } catch (Missing404Exception $e) {
-                    //we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
+                    // we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
                 }
             }
         } else {

@@ -120,7 +120,7 @@ class TraktTv extends TV
 
                     if ((int) $videoId > 0 && (int) $traktid > 0) {
                         // Now that we have valid video and trakt ids, try to get the poster
-                        //$this->getPoster($videoId, $traktid);
+                        // $this->getPoster($videoId, $traktid);
 
                         $seasonNo = preg_replace('/^S0*/i', '', $release['season']);
                         $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
@@ -156,17 +156,17 @@ class TraktTv extends TV
                                 $this->colorCli->climate()->info('Found TRAKT Match!');
                             }
                         } else {
-                            //Processing failed, set the episode ID to the next processing group
+                            // Processing failed, set the episode ID to the next processing group
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                         }
                     } else {
-                        //Processing failed, set the episode ID to the next processing group
+                        // Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                         $this->titleCache[] = $release['cleanname'] ?? null;
                     }
                 } else {
-                    //Processing failed, set the episode ID to the next processing group
+                    // Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
                 }
