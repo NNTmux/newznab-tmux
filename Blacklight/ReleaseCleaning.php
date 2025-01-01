@@ -438,8 +438,9 @@ class ReleaseCleaning
         // Replace multiple spaces with 1 space
         $cleanerName = preg_replace([
             '/([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}$|$)/i',
-            '/^(Release Name|sample-)/i', '/\s\s+/i'
+            '/^(Release Name|sample-)/i', '/\s\s+/i',
         ], ' ', $name);
+
         // Remove invalid characters.
         return trim(mb_convert_encoding(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName), 'UTF-8', mb_list_encodings()));
     }
