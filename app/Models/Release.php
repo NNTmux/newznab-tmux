@@ -325,7 +325,7 @@ class Release extends Model
             'category:id,title',
             'category.parent:id,title',
             'video:id,title,tvdb,trakt,tvrage,tvmaze,source',
-            'video.tvInfo:id,videos_id,summary,image',
+            'video.tvInfo:videos_id,summary,image',
             'episode:id,title,firstaired,se_complete',
         ]);
 
