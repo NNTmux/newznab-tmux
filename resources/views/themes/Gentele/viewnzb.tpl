@@ -240,7 +240,7 @@
 											   href="{{url("/getnzb?id={$release.guid}")}}"><i
 														class="fa fa-cloud-download"></i> Download</a>
                                             <a href="#"><i
-                                                    id="guid{$result->guid}"
+                                                    id="guid{$release->guid}"
                                                     class="icon_cart text-muted fa fa-shopping-basket"
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top" title
