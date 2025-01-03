@@ -322,7 +322,7 @@ class Release extends Model
     {
         $query = self::with([
             'group:id,name',
-            'category:id,title',
+            'category:id,title,root_categories_id',
             'category.parent:id,title',
             'video:id,title,tvdb,trakt,tvrage,tvmaze,source',
             'video.tvInfo:videos_id,summary,image',
