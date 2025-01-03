@@ -3,9 +3,9 @@ FROM ubuntu:24.04
 LABEL maintainer="Fossil01"
 
 ARG WWWGROUP
-ARG NODE_VERSION=21
-ARG POSTGRES_VERSION=16
-ARG SEVENZIP_VERSION=2407
+ARG NODE_VERSION=22
+ARG POSTGRES_VERSION=17
+ARG SEVENZIP_VERSION=2409
 ARG MYSQL_CLIENT="mariadb-client"
 
 WORKDIR /var/www/html
@@ -40,7 +40,7 @@ RUN apt-get update \
     && curl -sLS https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm bun pnpm \
-    && apt-get install -y yarn $MYSQL_CLIENT postgresql-client-$POSTGRES_VERSION \ 
+    && apt-get install -y yarn $MYSQL_CLIENT postgresql-client-$POSTGRES_VERSION \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
