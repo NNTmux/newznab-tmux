@@ -65,11 +65,9 @@ abstract class Videos
     abstract protected function processSite(int $groupID, string $guidChar, int $process, bool $local = false): void;
 
     /**
-     * Get video info from a Video ID and column.
-     *
-     * @return array|false False if invalid site, or ID not found; Site id value otherwise.
+     * @return false|mixed
      */
-    protected function getSiteIDFromVideoID(string $siteColumn, int $videoID): bool|array
+    protected function getSiteIDFromVideoID(string $siteColumn, int $videoID): mixed
     {
         if (\in_array($siteColumn, self::$sites, false)) {
             $result = Video::query()->where('id', $videoID)->first([$siteColumn]);
