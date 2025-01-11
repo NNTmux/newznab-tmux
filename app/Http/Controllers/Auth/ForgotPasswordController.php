@@ -64,7 +64,7 @@ class ForgotPasswordController extends Controller
                 // Send the email
                 //
                 $resetLink = url('/').'/resetpassword?guid='.$guid;
-                dd(SendPasswordForgottenEmail::dispatch($ret, $resetLink));
+                SendPasswordForgottenEmail::dispatch($ret, $resetLink);
                 app('smarty.view')->assign('success', 'Password reset email has been sent!');
             }
             $sent = true;
