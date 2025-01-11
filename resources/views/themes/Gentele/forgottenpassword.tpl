@@ -21,7 +21,7 @@
 					us</a>.</p>
             {{Form::open(['url' => 'forgottenpassword?action=submit'])}}
 				<div class="form-group has-feedback">
-					<input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-control"
+					<input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-inline"
 						   placeholder="Email"/>
 					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 				</div>

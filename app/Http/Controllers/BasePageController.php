@@ -53,7 +53,7 @@ class BasePageController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release');
+        $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release', 'reset', 'showLinkRequestForm');
         // Buffer settings/DB connection.
         $this->settings = new Settings;
         $this->smarty = app('smarty.view');
@@ -157,10 +157,7 @@ class BasePageController extends Controller
             'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
         ]);
 
-        $role = User::ROLE_USER;
-        if (! empty($this->userdata)) {
-            $role = $this->userdata->roles_id;
-        }
+        $role = $this->userdata->roles_id ?? User::ROLE_USER;
 
         $content = new Contents;
         $parentcatlist = Category::getForMenu($this->userdata->categoryexclusions);

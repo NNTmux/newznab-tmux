@@ -6919,16 +6919,16 @@
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",
-            "version": "v1.3.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-FFMpeg/PHP-FFMpeg.git",
-                "reference": "5e7b15710a8607e8a3a2d9fbe2c150a99b924fa5"
+                "reference": "0fbbc4c6a6336155679adc800616001ae3328c7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-FFMpeg/PHP-FFMpeg/zipball/5e7b15710a8607e8a3a2d9fbe2c150a99b924fa5",
-                "reference": "5e7b15710a8607e8a3a2d9fbe2c150a99b924fa5",
+                "url": "https://api.github.com/repos/PHP-FFMpeg/PHP-FFMpeg/zipball/0fbbc4c6a6336155679adc800616001ae3328c7a",
+                "reference": "0fbbc4c6a6336155679adc800616001ae3328c7a",
                 "shasum": ""
             },
             "require": {
@@ -7002,9 +7002,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-FFMpeg/PHP-FFMpeg/issues",
-                "source": "https://github.com/PHP-FFMpeg/PHP-FFMpeg/tree/v1.3.0"
+                "source": "https://github.com/PHP-FFMpeg/PHP-FFMpeg/tree/v1.3.1"
             },
-            "time": "2024-11-12T15:39:52+00:00"
+            "time": "2025-01-10T20:23:57+00:00"
         },
         {
             "name": "php-http/discovery",
@@ -14287,16 +14287,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.24.1",
+            "version": "5.24.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhookphp/captainhook.git",
-                "reference": "1e56452fd7a7e486e5955ab72dc9ea34bb52a184"
+                "reference": "3e0915ff063a14d745c78e0181868e79c596b7e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/1e56452fd7a7e486e5955ab72dc9ea34bb52a184",
-                "reference": "1e56452fd7a7e486e5955ab72dc9ea34bb52a184",
+                "url": "https://api.github.com/repos/captainhookphp/captainhook/zipball/3e0915ff063a14d745c78e0181868e79c596b7e0",
+                "reference": "3e0915ff063a14d745c78e0181868e79c596b7e0",
                 "shasum": ""
             },
             "require": {
@@ -14359,7 +14359,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhookphp/captainhook/issues",
-                "source": "https://github.com/captainhookphp/captainhook/tree/5.24.1"
+                "source": "https://github.com/captainhookphp/captainhook/tree/5.24.2"
             },
             "funding": [
                 {
@@ -14367,7 +14367,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-26T18:42:37+00:00"
+            "time": "2025-01-11T12:52:49+00:00"
         },
         {
             "name": "captainhook/plugin-composer",

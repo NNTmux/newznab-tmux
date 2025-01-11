@@ -76,7 +76,7 @@ Route::match(['GET', 'POST'], '/', [ContentController::class, 'show'])->name('ho
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register'])->name('register.post');
 
-Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword');
+Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth', 'VerifyCsrfToken', 'web']);
 Route::match(['GET', 'POST'], 'terms-and-conditions', [TermsController::class, 'terms'])->name('terms-and-conditions');
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');

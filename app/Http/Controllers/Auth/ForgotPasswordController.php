@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\ShowLinkRequestFormForgotPasswordRequest;
 use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\User;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
@@ -22,8 +21,6 @@ class ForgotPasswordController extends Controller
     |
     */
 
-    use SendsPasswordResetEmails;
-
     /**
      * Create a new controller instance.
      *
@@ -37,7 +34,7 @@ class ForgotPasswordController extends Controller
     /**
      * @throws \Exception
      */
-    public function showLinkRequestForm(ShowLinkRequestFormForgotPasswordRequest $request): void
+    public function showLinkRequestForm(Request $request): void
     {
         $sent = '';
         $email = $request->input('email') ?? '';
@@ -46,6 +43,10 @@ class ForgotPasswordController extends Controller
             app('smarty.view')->assign('error', 'Missing parameter (email and/or apikey) to send password reset');
         } else {
             if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
+                $captcha = app('captcha');
+                if (! $captcha->validate($request)) {
+                    app('smarty.view')->assign('error', 'Captcha validation failed.');
+                }
             }
             //
             // Check users exists and send an email
@@ -53,7 +54,6 @@ class ForgotPasswordController extends Controller
             $ret = ! empty($rssToken) ? User::getByRssToken($rssToken) : User::getByEmail($email);
             if ($ret === null) {
                 app('smarty.view')->assign('error', 'The email or apikey are not recognised.');
-                $sent = true;
             } else {
                 //
                 // Generate a forgottenpassword guid, store it in the user table
@@ -64,9 +64,10 @@ class ForgotPasswordController extends Controller
                 // Send the email
                 //
                 $resetLink = url('/').'/resetpassword?guid='.$guid;
-                SendPasswordForgottenEmail::dispatch($ret, $resetLink);
-                $sent = true;
+                dd(SendPasswordForgottenEmail::dispatch($ret, $resetLink));
+                app('smarty.view')->assign('success', 'Password reset email has been sent!');
             }
+            $sent = true;
         }
 
         $theme = 'Gentele';
