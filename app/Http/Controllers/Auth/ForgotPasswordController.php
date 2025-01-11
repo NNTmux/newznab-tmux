@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
@@ -43,8 +44,10 @@ class ForgotPasswordController extends Controller
             app('smarty.view')->assign('error', 'Missing parameter (email and/or apikey) to send password reset');
         } else {
             if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-                $captcha = app('captcha');
-                if (! $captcha->validate($request)) {
+                $validate = Validator::make($request->all(), [
+                    'g-recaptcha-response' => 'required|captcha',
+                ]);
+                if ($validate->fails()) {
                     app('smarty.view')->assign('error', 'Captcha validation failed.');
                 }
             }
