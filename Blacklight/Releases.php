@@ -76,7 +76,7 @@ class Releases extends Release
             $query->where('postdate', '>', now()->subDays($maxAge));
         }
 
-        if (!empty($excludedCats)) {
+        if (! empty($excludedCats)) {
             $query->whereNotIn('categories_id', $excludedCats);
         }
 
