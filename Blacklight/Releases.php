@@ -81,7 +81,7 @@ class Releases extends Release
         }
 
         if ($groupName !== -1) {
-            $query->whereHas('usenetGroup', function ($q) use ($groupName) {
+            $query->whereHas('group', function ($q) use ($groupName) {
                 $q->where('name', $groupName);
             });
         }

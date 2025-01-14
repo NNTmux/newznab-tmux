@@ -111,7 +111,7 @@
 													   value="{$result->guid}"/></td>
 											<td>
 												<a href="{{url("/details/{$result->guid}")}}"
-												   class="title">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result->failed)}
+												   class="title">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>{if (count($result->failed)) > 0 }
 												<i class="fa fa-exclamation-circle" style="color: red"
 												   title="This release has failed to download for some users"></i>{/if}
 												<br/>
