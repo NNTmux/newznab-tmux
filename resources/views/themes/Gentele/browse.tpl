@@ -143,7 +143,7 @@
 												{if $result->anidbid > 0}<span><a class="badge bg-info"
 																				 href="{{url("/anime?id={$result->anidbid}")}}">View
 												Anime</a></span>{/if}
-												{if !empty($result->failed)}<span class="badge bg-info">
+												{if count($result->failed) > 0}<span class="badge bg-info">
 													<i class="fa fa-thumbs-o-up"></i>
 													{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 													<i class="fa fa-thumbs-o-down"></i>
@@ -155,7 +155,7 @@
                                                     <span class="badge bg-success">New</span>
                                                 {/if}
 											</td>
-											<td><span class="badge bg-info">{$result->category_name}</span>
+											<td><span class="badge bg-info">{$result->category->parent->title} > {$result->category->title}</span>
 											</td>
 											<td>{$result->postdate|timeago}</td>
 											<td>{$result->size|filesize}</td>
