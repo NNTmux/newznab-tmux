@@ -45,7 +45,6 @@ class Releases extends Release
     /**
      * Used for Browse results.
      *
-     *
      * @return Collection|mixed
      */
     public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0): mixed
@@ -55,54 +54,59 @@ class Releases extends Release
 
         $orderBy = $this->getBrowseOrder($orderBy);
 
-        $qry = sprintf(
-            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, cp.title AS parent_category, c.title AS sub_category, g.name as group_name,
-        CONCAT(cp.title, ' > ', c.title) AS category_name,
-        CONCAT(cp.id, ',', c.id) AS category_ids,
-        df.failed AS failed,
-        rn.releases_id AS nfoid,
-        re.releases_id AS reid,
-        v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-        tve.title, tve.firstaired
-    FROM releases r
-    LEFT JOIN usenet_groups g ON g.id = r.groups_id
-    LEFT JOIN categories c ON c.id = r.categories_id
-    LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-    LEFT OUTER JOIN videos v ON r.videos_id = v.id
-    LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-    LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-    LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-    LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-    WHERE r.nzbstatus = %d
-    AND r.passwordstatus %s
-    %s %s %s %s %s
-    GROUP BY r.id
-    ORDER BY %s %s
-    LIMIT %d OFFSET %d",
-            NZB::NZB_ADDED,
-            $this->showPasswords(),
-            Category::getCategorySearch($cat),
-            ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-            $orderBy[0],
-            $orderBy[1],
-            $num,
-            $start
-        );
+        $query = self::query()
+            ->with(['group', 'category', 'category.parent', 'video', 'video.episode', 'videoData', 'nfo', 'failed'])
+            ->where('nzbstatus', NZB::NZB_ADDED)
+            ->where('passwordstatus', $this->showPasswords());
 
-        $releases = Cache::get(md5($qry.$page));
+        if ($cat) {
+            $categories = Category::getCategorySearch($cat, null, true);
+            // If categories is empty, we don't want to return anything.
+            if (! empty($categories)) {
+                // if we have more than one category, we need to use whereIn
+                if (\count($categories) > 1) {
+                    $query->whereIn('categories_id', $categories);
+                } else {
+                    $query->where('categories_id', $categories);
+                }
+            }
+        }
+
+        if ($maxAge > 0) {
+            $query->where('postdate', '>', now()->subDays($maxAge));
+        }
+
+        if (!empty($excludedCats)) {
+            $query->whereNotIn('categories_id', $excludedCats);
+        }
+
+        if ($groupName !== -1) {
+            $query->whereHas('usenetGroup', function ($q) use ($groupName) {
+                $q->where('name', $groupName);
+            });
+        }
+
+        if ($minSize > 0) {
+            $query->where('size', '>=', $minSize);
+        }
+
+        $query->orderBy($orderBy[0], $orderBy[1])
+            ->skip($start)
+            ->take($num);
+
+        $releases = Cache::get(md5($query->toSql().$page));
         if ($releases !== null) {
             return $releases;
         }
-        $sql = self::fromQuery($qry);
-        if (\count($sql) > 0) {
+
+        $sql = $query->get();
+        if ($sql->isNotEmpty()) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
+
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($qry.$page), $sql, $expiresAt);
+        Cache::put(md5($query->toSql().$page), $sql, $expiresAt);
 
         return $sql;
     }

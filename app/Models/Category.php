@@ -304,7 +304,7 @@ class Category extends Model
         return $result;
     }
 
-    public static function getCategorySearch(array $cat = [], ?string $searchType = null): string
+    public static function getCategorySearch(array $cat = [], ?string $searchType = null, $builder = false): string|array|null
     {
         $categories = [];
 
@@ -339,6 +339,14 @@ class Category extends Model
         }
 
         $catCount = count($categories);
+
+        if ($builder) {
+            return match ($catCount) {
+                0 => null,
+                1 => $categories[0] !== -1 ? $categories[0] : null,
+                default => $categories,
+            };
+        }
 
         return match ($catCount) {
             0 => 'AND 1=1',

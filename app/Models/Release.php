@@ -89,6 +89,11 @@ class Release extends Model
         return $this->belongsTo(Video::class, 'videos_id');
     }
 
+    public function videoData(): HasOne
+    {
+        return $this->hasOne(VideoData::class, 'releases_id');
+    }
+
     public function episode(): BelongsTo
     {
         return $this->belongsTo(TvEpisode::class, 'tv_episodes_id');
