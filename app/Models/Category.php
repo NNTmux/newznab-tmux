@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -343,7 +344,7 @@ class Category extends Model
         if ($builder) {
             return match ($catCount) {
                 0 => null,
-                1 => $categories[0] !== -1 ? $categories[0] : null,
+                1 => $categories[0] !== -1 ? $categories : null,
                 default => $categories,
             };
         }

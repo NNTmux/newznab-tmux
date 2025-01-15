@@ -1,25 +1,25 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BeJLlIBX.css",
+    "file": "assets/app-BRbGd3gy.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/forum/livewire-tailwind/css/forum.css": {
-    "file": "assets/forum-j5Lwchy2.css",
+    "file": "assets/forum-CK4arI1a.css",
     "src": "resources/forum/livewire-tailwind/css/forum.css",
     "isEntry": true
   },
   "resources/forum/livewire-tailwind/js/forum.js": {
-    "file": "assets/forum-DYii3E-X.js",
+    "file": "assets/forum-DckUD3iN.js",
     "name": "forum",
     "src": "resources/forum/livewire-tailwind/js/forum.js",
     "isEntry": true,
     "css": [
-      "assets/forum-B-iLUX4_.css"
+      "assets/forum-qY4RLc9f.css"
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-CEsE5a7F.js",
+    "file": "assets/app-Xaw6OIO1.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

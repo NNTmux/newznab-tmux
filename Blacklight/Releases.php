@@ -62,9 +62,9 @@ class Releases extends Release
         if ($cat) {
             $categories = Category::getCategorySearch($cat, null, true);
             // If categories is empty, we don't want to return anything.
-            if (! empty($categories)) {
+            if ($categories !== null) {
                 // if we have more than one category, we need to use whereIn
-                if (\count($categories) > 1) {
+                if (count(Arr::wrap($categories)) > 1) {
                     $query->whereIn('categories_id', $categories);
                 } else {
                     $query->where('categories_id', $categories);
@@ -93,7 +93,6 @@ class Releases extends Release
         $query->orderBy($orderBy[0], $orderBy[1])
             ->skip($start)
             ->take($num);
-
         $releases = Cache::get(md5($query->toSql().$page));
         if ($releases !== null) {
             return $releases;
