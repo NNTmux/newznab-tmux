@@ -65,7 +65,7 @@
         "jrean/laravel-user-verification": "^12.0",
         "junaidnasir/larainvite": "^7.0",
         "kevinlebrun/colors.php": "^1.0",
-        "laravel/framework": "^11.37",
+        "laravel/framework": "^11.38",
         "laravel/horizon": "^5.30",
         "laravel/pulse": "^1.3",
         "laravel/sanctum": "^4.0",
