@@ -93,7 +93,7 @@ class Releases extends Release
         $query->orderBy($orderBy[0], $orderBy[1])
             ->skip($start)
             ->take($num);
-        $releases = Cache::get(md5($query->toSql().$page));
+        $releases = Cache::get(md5($query->toRawSql().$page));
         if ($releases !== null) {
             return $releases;
         }
@@ -105,8 +105,7 @@ class Releases extends Release
         }
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($query->toSql().$page), $sql, $expiresAt);
-
+        Cache::put(md5($query->toRawSql().$page), $sql, $expiresAt);
         return $sql;
     }
 
