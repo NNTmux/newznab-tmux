@@ -106,6 +106,7 @@ class Releases extends Release
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($query->toRawSql().$page), $sql, $expiresAt);
+
         return $sql;
     }
 
