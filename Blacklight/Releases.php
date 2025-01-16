@@ -29,7 +29,6 @@ class Releases extends Release
 
     private ElasticSearchSiteSearch $elasticSearch;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -230,7 +229,7 @@ class Releases extends Release
         return $temp_array;
     }
 
-   /**
+    /**
      * @return Collection|mixed
      */
     public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
@@ -245,7 +244,7 @@ class Releases extends Release
             ->when($maxAge > 0, function ($q) use ($maxAge) {
                 $q->where('postdate', '>', now()->subDays($maxAge));
             })
-            ->when(!empty($excludedCats), function ($q) use ($excludedCats) {
+            ->when(! empty($excludedCats), function ($q) use ($excludedCats) {
                 $q->whereNotIn('categories_id', $excludedCats);
             })
             ->whereRaw($this->uSQL($userShows, 'videos_id'))
