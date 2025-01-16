@@ -110,7 +110,7 @@ class Releases extends Release
         $setting = $show ?? 0;
 
         return match ($setting) {
-            1 =>  '<= '.self::PASSWD_RAR,
+            1 => '<= '.self::PASSWD_RAR,
             default => '= '.self::PASSWD_NONE,
         };
     }
