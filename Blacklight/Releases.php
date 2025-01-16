@@ -734,133 +734,89 @@ class Releases extends Release
     /**
      * Search TV Shows via APIv2.
      *
-     *
      * @return Collection|mixed
      */
     public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
-        $siteSQL = [];
-        $showSql = '';
-        foreach ($siteIdArr as $column => $Id) {
-            if ($Id > 0) {
-                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
-            }
+        $query = Release::query()
+            ->with(['video', 'video.episode', 'category', 'category.parent', 'group'])
+            ->where('nzbstatus', NZB::NZB_ADDED)
+            ->where('passwordstatus', $this->showPasswords(true))
+            ->whereIn('categories_id', Category::getCategorySearch($cat, 'tv', true));
+
+        if (!empty(array_filter($siteIdArr))) {
+            $query->whereHas('video', function ($q) use ($siteIdArr, $series, $episode, $airDate) {
+                foreach ($siteIdArr as $column => $id) {
+                    if ($id > 0) {
+                        $q->orWhere($column, $id);
+                    }
+                }
+                if (!empty($series)) {
+                    $q->whereHas('episode', function ($q) use ($series, $episode, $airDate) {
+                        $q->where('series', (int)preg_replace('/^s0*/i', '', $series));
+                        if (!empty($episode)) {
+                            $q->where('episode', (int)preg_replace('/^e0*/i', '', $episode));
+                        }
+                        if (!empty($airDate)) {
+                            $q->whereDate('firstaired', $airDate);
+                        }
+                    });
+                }
+            });
         }
 
-        if (\count($siteSQL) > 0) {
-            // If we have show info, find the Episode ID/Video ID first to avoid table scans
-            $showQry = sprintf(
-                "
-				SELECT
-					v.id AS video,
-					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
-				FROM videos v
-				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s
-				GROUP BY v.id
-				LIMIT 1",
-                implode(' OR ', $siteSQL),
-                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
-            );
-
-            $show = self::fromQuery($showQry);
-            if ($show->isNotEmpty()) {
-                if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
-                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                } elseif (! empty($episode) && $show[0]->episodes !== '') {
-                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
-                } elseif (! empty($series) && empty($episode)) {
-                    // If $series is set but episode is not, return Season Packs and Episodes
-                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                }
-                if ($show[0]->video > 0) {
-                    $showSql .= ' AND r.videos_id = '.$show[0]->video;
-                }
-            } else {
-                // If we were passed Site ID Info and no match was found, do not run the query
-                return [];
-            }
-        }
-        // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
-        if (! empty($name) && $showSql === '') {
-            if (! empty($series) && (int) $series < 1900) {
-                $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
-                if (! empty($episode) && ! str_contains($episode, '/')) {
-                    $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
-                }
-                // If season is not empty but episode is, add a wildcard to the search
-                if (empty($episode)) {
-                    $name .= '*';
-                }
-            } elseif (! empty($airDate)) {
-                $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airDate));
-            }
-        }
-        if (! empty($name)) {
+        if (!empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
-                if (! empty($searchResult)) {
+                if (!empty($searchResult)) {
                     $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                 }
             }
 
-            if (empty($searchResult)) {
+            if (count($searchResult) === 0) {
                 return collect();
             }
+
+            $query->whereIn('id', $searchResult);
         }
-        $whereSql = sprintf(
-            'WHERE r.nzbstatus = %d
-			AND r.passwordstatus %s
-			%s %s %s %s %s %s',
-            NZB::NZB_ADDED,
-            $this->showPasswords(),
-            $showSql,
-            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            Category::getCategorySearch($cat, 'tv'),
-            ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
-        );
-        $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id, r.haspreview, r.jpgstatus,
-				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
-				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name
-			FROM releases r
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
-			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			%s",
-            $whereSql
-        );
-        $sql = sprintf(
-            '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
-            $baseSql,
-            $limit,
-            $offset
-        );
-        $releases = Cache::get(md5($sql));
+
+        if ($maxAge > 0) {
+            $query->where('postdate', '>', now()->subDays($maxAge));
+        }
+
+        if (!empty($excludedCategories)) {
+            $query->whereNotIn('categories_id', $excludedCategories);
+        }
+
+        if ($cat !== [-1]) {
+            $query->whereIn('categories_id', $cat);
+        }
+
+        if ($minSize > 0) {
+            $query->where('size', '>=', $minSize);
+        }
+
+        $query->orderBy('postdate', 'desc')
+            ->offset($offset)
+            ->limit($limit);
+
+        $cacheKey = md5($query->toRawSql());
+        $cacheTTL = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+
+        $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
-        $releases = self::fromQuery($sql);
+
+        $releases = $query->get();
+
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
+            $releases[0]->_totalrows = $query->count();
         }
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+
+        Cache::put($cacheKey, $releases, $cacheTTL);
 
         return $releases;
     }
