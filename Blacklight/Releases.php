@@ -746,9 +746,21 @@ class Releases extends Release
             ->whereIn('categories_id', Category::getCategorySearch($cat, 'tv', true));
 
         // Check if siteIdArr contains id key
-        if (! empty($siteIdArr) && array_key_exists('id', $siteIdArr)) {
+        if (! empty($siteIdArr) && array_key_exists('id', $siteIdArr) && $siteIdArr['id'] > 0) {
             $query->where('videos_id', $siteIdArr['id']);
         }
+        if (! empty($series)) {
+            $query->whereHas('episode', function ($q) use ($series, $episode, $airDate) {
+                $q->where('series', (int) preg_replace('/^s0*/i', '', $series));
+                if (! empty($episode)) {
+                    $q->where('episode', (int) preg_replace('/^e0*/i', '', $episode));
+                }
+                if (! empty($airDate)) {
+                    $q->whereDate('firstaired', $airDate);
+                }
+            });
+        }
+
         if (! empty(array_filter($siteIdArr))) {
             $query->whereHas('video', function ($q) use ($siteIdArr, $series, $episode, $airDate) {
                 foreach ($siteIdArr as $column => $id) {
@@ -756,17 +768,6 @@ class Releases extends Release
                         $q->orWhere($column, $id);
                     }
 
-                }
-                if (! empty($series)) {
-                    $q->whereHas('episode', function ($q) use ($series, $episode, $airDate) {
-                        $q->where('series', (int) preg_replace('/^s0*/i', '', $series));
-                        if (! empty($episode)) {
-                            $q->where('episode', (int) preg_replace('/^e0*/i', '', $episode));
-                        }
-                        if (! empty($airDate)) {
-                            $q->whereDate('firstaired', $airDate);
-                        }
-                    });
                 }
             });
         }
@@ -837,7 +838,6 @@ class Releases extends Release
         }
 
         Cache::put($cacheKey, $releases, $cacheTTL);
-
         return $releases;
     }
 

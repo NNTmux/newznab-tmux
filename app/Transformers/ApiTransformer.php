@@ -39,7 +39,7 @@ class ApiTransformer extends TransformerAbstract
                 'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
                 'password' => $releases->passwordstatus,
                 'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-                'group' => $releases->group_name,
+                'group' => $releases->group->name,
             ];
         }
 
@@ -49,26 +49,26 @@ class ApiTransformer extends TransformerAbstract
                 'details' => url('/').'/details/'.$releases->guid,
                 'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
-                'category_name' => $releases->category_name,
+                'category_name' => $releases->category->parent->title. ' > '. $releases->category->title,
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
                 'poster' => $releases->fromname,
-                'episode_title' => $releases->title ?? $this->null(),
-                'season' => $releases->series ?? $this->null(),
-                'episode' => $releases->episode ?? $this->null(),
-                'tvairdate' => $releases->firstaired ?? $this->null(),
-                'tvdbid' => $releases->tvdb !== null && $releases->tvdb !== 0 ? $releases->tvdb : $this->null(),
-                'traktid' => $releases->trakt !== null && $releases->trakt !== 0 ? $releases->trakt : $this->null(),
-                'tvrageid' => $releases->tvrage !== null && $releases->tvrage !== 0 ? $releases->tvrage : $this->null(),
-                'tvmazeid' => $releases->tvmaze !== null && $releases->tvmaze !== 0 ? $releases->tvmaze : $this->null(),
-                'imdbid' => $releases->imdb !== null && $releases->imdb !== 0 ? $releases->imdb : $this->null(),
-                'tmdbid' => $releases->tmdb !== null && $releases->tmdb !== 0 ? $releases->tmdb : $this->null(),
+                'episode_title' => $releases->episode->title ?? $this->null(),
+                'season' => $releases->episode->series ?? $this->null(),
+                'episode' => $releases->episode->episode ?? $this->null(),
+                'tvairdate' => $releases->episode->firstaired ?? $this->null(),
+                'tvdbid' => $releases->video->tvdb !== null && $releases->video->tvdb !== 0 ? $releases->video->tvdb : $this->null(),
+                'traktid' => $releases->video->trakt !== null && $releases->video->trakt !== 0 ? $releases->video->trakt : $this->null(),
+                'tvrageid' => $releases->video->tvrage !== null && $releases->video->tvrage !== 0 ? $releases->video->tvrage : $this->null(),
+                'tvmazeid' => $releases->video->tvmaze !== null && $releases->video->tvmaze !== 0 ? $releases->video->tvmaze : $this->null(),
+                'imdbid' => $releases->video->imdb !== null && $releases->video->imdb !== 0 ? $releases->video->imdb : $this->null(),
+                'tmdbid' => $releases->video->tmdb !== null && $releases->video->tmdb !== 0 ? $releases->video->tmdb : $this->null(),
                 'grabs' => $releases->grabs !== 0 ? $releases->grabs : $this->null(),
                 'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
                 'password' => $releases->passwordstatus,
                 'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-                'group' => $releases->group_name,
+                'group' => $releases->group->name,
             ];
         }
 
@@ -77,7 +77,7 @@ class ApiTransformer extends TransformerAbstract
             'details' => url('/').'/details/'.$releases->guid,
             'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&r='.$this->user->api_token,
             'category' => $releases->categories_id,
-            'category_name' => $releases->category_name,
+            'category_name' => $releases->category->parent->title. ' > '. $releases->category->title,
             'added' => Carbon::parse($releases->adddate)->toRssString(),
             'size' => $releases->size,
             'files' => $releases->totalpart,
@@ -86,7 +86,7 @@ class ApiTransformer extends TransformerAbstract
             'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
             'password' => $releases->passwordstatus,
             'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-            'group' => $releases->group_name,
+            'group' => $releases->group->name,
         ];
     }
 }
