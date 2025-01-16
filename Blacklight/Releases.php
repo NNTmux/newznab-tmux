@@ -842,87 +842,88 @@ class Releases extends Release
         return $releases;
     }
 
-    /**
-     * Movies search through API and site.
-     *
-     * @return Collection|mixed
-     */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
-        $cacheKey = md5(json_encode(func_get_args()));
+        $query = self::query()
+            ->with(['movieinfo', 'group', 'category', 'category.parent', 'nfo'])
+            ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
+            ->where('nzbstatus', NZB::NZB_ADDED)
+            ->where('passwordstatus', $this->showPasswords());
+
+        if (!empty($name)) {
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
+            } else {
+                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
+                if (!empty($searchResult)) {
+                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
+                }
+            }
+
+            if (count($searchResult) === 0) {
+                return collect();
+            }
+
+            $query->whereIn('id', $searchResult);
+        }
+
+        if ($imDbId !== -1 && is_numeric($imDbId)) {
+            $query->whereHas('movieinfo', function ($q) use ($imDbId) {
+                $q->where('imdbid', $imDbId);
+            });
+        }
+
+        if ($tmDbId !== -1 && is_numeric($tmDbId)) {
+            $query->whereHas('movieinfo', function ($q) use ($tmDbId) {
+                $q->where('tmdbid', $tmDbId);
+            });
+        }
+
+        if ($traktId !== -1 && is_numeric($traktId)) {
+            $query->whereHas('movieinfo', function ($q) use ($traktId) {
+                $q->where('traktid', $traktId);
+            });
+        }
+
+        if (!empty($excludedCategories)) {
+            $query->whereNotIn('categories_id', $excludedCategories);
+        }
+
+        if ($cat !== [-1]) {
+            $query->whereIn('categories_id', $cat);
+        }
+
+        if ($maxAge > 0) {
+            $query->where('postdate', '>', now()->subDays($maxAge));
+        }
+
+        if ($minSize > 0) {
+            $query->where('size', '>=', $minSize);
+        }
+
+        $totalRows = $query->count();
+
+        $query->orderBy('postdate', 'desc')
+            ->offset($offset)
+            ->limit($limit);
+
+        $cacheKey = md5($query->toRawSql());
         $cacheTTL = now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
-        return Cache::remember($cacheKey, $cacheTTL, function () use ($imDbId, $tmDbId, $traktId, $offset, $limit, $name, $cat, $maxAge, $minSize, $excludedCategories) {
-            $query = self::query()
-                ->with(['movieinfo', 'group', 'category', 'category.parent', 'nfo'])
-                ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
-                ->where('nzbstatus', NZB::NZB_ADDED)
-                ->where('passwordstatus', $this->showPasswords());
-
-            if (! empty($name)) {
-                if (config('nntmux.elasticsearch_enabled') === true) {
-                    $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
-                } else {
-                    $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
-                    if (! empty($searchResult)) {
-                        $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
-                    }
-                }
-
-                if (count($searchResult) === 0) {
-                    return collect();
-                }
-
-                $query->whereIn('id', $searchResult);
-            }
-
-            if ($imDbId !== -1 && is_numeric($imDbId)) {
-                $query->whereHas('movieinfo', function ($q) use ($imDbId) {
-                    $q->where('imdbid', $imDbId);
-                });
-            }
-
-            if ($tmDbId !== -1 && is_numeric($tmDbId)) {
-                $query->whereHas('movieinfo', function ($q) use ($tmDbId) {
-                    $q->where('tmdbid', $tmDbId);
-                });
-            }
-
-            if ($traktId !== -1 && is_numeric($traktId)) {
-                $query->whereHas('movieinfo', function ($q) use ($traktId) {
-                    $q->where('traktid', $traktId);
-                });
-            }
-
-            if (! empty($excludedCategories)) {
-                $query->whereNotIn('categories_id', $excludedCategories);
-            }
-
-            if ($cat !== [-1]) {
-                $query->whereIn('categories_id', $cat);
-            }
-
-            if ($maxAge > 0) {
-                $query->where('postdate', '>', now()->subDays($maxAge));
-            }
-
-            if ($minSize > 0) {
-                $query->where('size', '>=', $minSize);
-            }
-
-            $totalRows = $query->count();
-
-            $releases = $query->orderBy('postdate', 'desc')
-                ->offset($offset)
-                ->limit($limit)
-                ->get();
-
-            if ($releases->isNotEmpty()) {
-                $releases[0]->_totalrows = $totalRows;
-            }
-
+        $releases= Cache::get($cacheKey);
+        if ($releases !== null) {
             return $releases;
-        });
+        }
+
+        $releases = $query->get();
+
+        if ($releases->isNotEmpty()) {
+            $releases[0]->_totalrows = $totalRows;
+        }
+
+        Cache::put($cacheKey, $releases, $cacheTTL);
+
+        return $releases;
     }
 
     public function searchSimilar($currentID, $name, array $excludedCats = []): bool|array
