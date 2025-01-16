@@ -766,6 +766,20 @@ class Releases extends Release
         }
 
         if (! empty($name)) {
+            // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
+                if (! empty($series) && (int) $series < 1900) {
+                    $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
+                    if (! empty($episode) && ! str_contains($episode, '/')) {
+                        $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
+                    }
+                    // If season is not empty but episode is, add a wildcard to the search
+                    if (empty($episode)) {
+                        $name .= '*';
+                    }
+                } elseif (! empty($airDate)) {
+                    $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airDate));
+                }
+
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
