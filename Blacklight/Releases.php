@@ -29,11 +29,7 @@ class Releases extends Release
 
     private ElasticSearchSiteSearch $elasticSearch;
 
-    /**
-     * @var array Class instances.
-     *
-     * @throws \Exception
-     */
+
     public function __construct()
     {
         parent::__construct();
@@ -162,9 +158,9 @@ class Releases extends Release
     }
 
     /**
-     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
+     * @return Collection|\Illuminate\Support\Collection|Release[]
      */
-    public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '')
+    public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = ''): Collection|array|\Illuminate\Support\Collection
     {
         $query = self::query()
             ->where('r.nzbstatus', NZB::NZB_ADDED)
@@ -234,45 +230,46 @@ class Releases extends Release
         return $temp_array;
     }
 
-    /**
-     * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
+   /**
+     * @return Collection|mixed
      */
-    public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = [])
+    public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $orderBy = $this->getBrowseOrder($orderBy);
-        $sql = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
-					CONCAT(cp.title, '->', c.title) AS category_name
-				FROM releases r
-				LEFT JOIN categories c ON c.id = r.categories_id
-				LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-				WHERE %s %s
-				AND r.nzbstatus = %d
-				AND r.categories_id BETWEEN %d AND %d
-				AND r.passwordstatus %s
-				%s
-				GROUP BY r.id
-				ORDER BY %s %s %s",
-            $this->uSQL($userShows, 'videos_id'),
-            (! empty($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            NZB::NZB_ADDED,
-            Category::TV_ROOT,
-            Category::TV_OTHER,
-            $this->showPasswords(),
-            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-            $orderBy[0],
-            $orderBy[1],
-            ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
-        );
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $result = Cache::get(md5($sql));
-        if ($result !== null) {
-            return $result;
-        }
-        $result = self::fromQuery($sql);
-        Cache::put(md5($sql), $result, $expiresAt);
 
-        return $result;
+        $query = self::query()
+            ->with(['group', 'category', 'category.parent', 'video', 'video.episode'])
+            ->where('nzbstatus', NZB::NZB_ADDED)
+            ->where('passwordstatus', $this->showPasswords(true))
+            ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
+            ->when($maxAge > 0, function ($q) use ($maxAge) {
+                $q->where('postdate', '>', now()->subDays($maxAge));
+            })
+            ->when(!empty($excludedCats), function ($q) use ($excludedCats) {
+                $q->whereNotIn('categories_id', $excludedCats);
+            })
+            ->whereRaw($this->uSQL($userShows, 'videos_id'))
+            ->orderBy($orderBy[0], $orderBy[1])
+            ->offset($offset)
+            ->limit($limit);
+
+        $cacheKey = md5($query->toRawSql());
+        $cacheTTL = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+
+        $releases = Cache::get($cacheKey);
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $query->get();
+
+        if ($releases->isNotEmpty()) {
+            $releases[0]->_totalrows = $query->count();
+        }
+
+        Cache::put($cacheKey, $releases, $cacheTTL);
+
+        return $releases;
     }
 
     public function getShowsCount($userShows, int $maxAge = -1, array $excludedCats = []): int
@@ -597,7 +594,7 @@ class Releases extends Release
     /**
      * Search for TV shows via API.
      *
-     * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
+     * @return array|\Illuminate\Cache\|Collection|\Illuminate\Support\Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
