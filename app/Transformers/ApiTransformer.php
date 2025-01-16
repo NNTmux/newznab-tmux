@@ -27,7 +27,7 @@ class ApiTransformer extends TransformerAbstract
                 'details' => url('/').'/details/'.$releases->guid,
                 'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
-                'category_name' => $releases->category_name,
+                'category_name' => $releases->category->parent->title.' > '.$releases->category->title,
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
