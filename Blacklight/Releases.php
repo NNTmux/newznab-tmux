@@ -109,14 +109,14 @@ class Releases extends Release
         return $sql;
     }
 
-    public function showPasswords(): string
+    public function showPasswords($builder = false): string
     {
         $show = (int) Settings::settingValue('showpasswordedrelease');
         $setting = $show ?? 0;
 
         return match ($setting) {
-            1 => '<= '.self::PASSWD_RAR,
-            default => '= '.self::PASSWD_NONE,
+            1 => $builder === true ? self::PASSWD_RAR : '<= '.self::PASSWD_RAR,
+            default => $builder === true ? self::PASSWD_NONE : '= '.self::PASSWD_NONE,
         };
     }
 
@@ -438,7 +438,6 @@ class Releases extends Release
 
         if (config('nntmux.elasticsearch_enabled') === true) {
             $searchResult = $this->elasticSearch->indexSearch($phrases, $limit);
-            dd($searchResult, 'elastic');
         } else {
             $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', '', [], $searchFields);
             if (! empty($searchResult)) {
@@ -453,11 +452,11 @@ class Releases extends Release
         $query = self::query()
             ->with(['group', 'category', 'category.parent', 'video', 'video.episode', 'nfo', 'failed'])
             ->where('nzbstatus', NZB::NZB_ADDED)
-            ->where('passwordstatus', $this->showPasswords())
+            ->where('passwordstatus', $this->showPasswords(true))
             ->whereIn('id', $searchResult);
 
         if ($type === 'basic') {
-            $categories = Category::getCategorySearch($cat);
+            $categories = Category::getCategorySearch($cat, null, true);
             if ($categories !== null) {
                 $query->whereIn('categories_id', Arr::wrap($categories));
             }
@@ -532,7 +531,7 @@ class Releases extends Release
         $query = self::query()
             ->with(['video', 'video.episode', 'movieinfo', 'group', 'category', 'category.parent'])
             ->where('nzbstatus', NZB::NZB_ADDED)
-            ->where('passwordstatus', $this->showPasswords());
+            ->where('passwordstatus', $this->showPasswords(true));
 
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
