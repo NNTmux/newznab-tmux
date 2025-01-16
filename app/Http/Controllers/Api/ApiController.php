@@ -215,7 +215,7 @@ class ApiController extends BasePageController
                     $airDate = str_replace('/', '-', $year[0].'-'.$episode);
                 }
 
-                $relData = $releases->tvSearch(
+                $relData = $releases->apiTvSearch(
                     $siteIdArr,
                     $series,
                     $episode,
