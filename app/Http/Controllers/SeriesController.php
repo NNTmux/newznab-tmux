@@ -48,15 +48,15 @@ class SeriesController extends BasePageController
                 // Sort releases by season, episode, date posted.
                 $series = $episode = $posted = [];
                 foreach ($rel as $rlk => $rlv) {
-                    $series[$rlk] = $rlv->series;
-                    $episode[$rlk] = $rlv->episode;
+                    $series[$rlk] = $rlv->episode->series;
+                    $episode[$rlk] = $rlv->episode->episode;
                     $posted[$rlk] = $rlv->postdate;
                 }
                 Arr::sort($series, [[$episode, false], [$posted, false], $rel]);
 
                 $series = [];
                 foreach ($rel as $r) {
-                    $series[$r->series][$r->episode][] = $r;
+                    $series[$r->episode->series][$r->episode->episode][] = $r;
                 }
 
                 $this->smarty->assign('seasons', Arr::sortRecursive($series));

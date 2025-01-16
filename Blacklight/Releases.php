@@ -104,14 +104,14 @@ class Releases extends Release
         return $sql;
     }
 
-    public function showPasswords($builder = false): string
+    public function showPasswords(): string
     {
         $show = (int) Settings::settingValue('showpasswordedrelease');
         $setting = $show ?? 0;
 
         return match ($setting) {
-            1 => $builder === true ? self::PASSWD_RAR : '<= '.self::PASSWD_RAR,
-            default => $builder === true ? self::PASSWD_NONE : '= '.self::PASSWD_NONE,
+            1 =>  '<= '.self::PASSWD_RAR,
+            default => '= '.self::PASSWD_NONE,
         };
     }
 
@@ -239,7 +239,7 @@ class Releases extends Release
         $query = self::query()
             ->with(['group', 'category', 'category.parent', 'video', 'video.episode'])
             ->where('nzbstatus', NZB::NZB_ADDED)
-            ->where('passwordstatus', $this->showPasswords(true))
+            ->where('passwordstatus', $this->showPasswords())
             ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
             ->when($maxAge > 0, function ($q) use ($maxAge) {
                 $q->where('postdate', '>', now()->subDays($maxAge));
@@ -448,7 +448,7 @@ class Releases extends Release
         $query = self::query()
             ->with(['group', 'category', 'category.parent', 'video', 'video.episode', 'nfo', 'failed'])
             ->where('nzbstatus', NZB::NZB_ADDED)
-            ->where('passwordstatus', $this->showPasswords(true))
+            ->where('passwordstatus', $this->showPasswords())
             ->whereIn('id', $searchResult);
 
         if ($type === 'basic') {
@@ -527,7 +527,7 @@ class Releases extends Release
         $query = self::query()
             ->with(['video', 'video.episode', 'movieinfo', 'group', 'category', 'category.parent'])
             ->where('nzbstatus', NZB::NZB_ADDED)
-            ->where('passwordstatus', $this->showPasswords(true));
+            ->where('passwordstatus', $this->showPasswords());
 
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
@@ -715,6 +715,7 @@ class Releases extends Release
             $limit,
             $offset
         );
+
         $releases = Cache::get(md5($sql));
         if ($releases !== null) {
             return $releases;
@@ -741,15 +742,20 @@ class Releases extends Release
         $query = Release::query()
             ->with(['video', 'video.episode', 'category', 'category.parent', 'group'])
             ->where('nzbstatus', NZB::NZB_ADDED)
-            ->where('passwordstatus', $this->showPasswords(true))
+            ->where('passwordstatus', $this->showPasswords())
             ->whereIn('categories_id', Category::getCategorySearch($cat, 'tv', true));
 
+        // Check if siteIdArr contains id key
+        if (! empty($siteIdArr) && array_key_exists('id', $siteIdArr)) {
+            $query->where('videos_id', $siteIdArr['id']);
+        }
         if (! empty(array_filter($siteIdArr))) {
             $query->whereHas('video', function ($q) use ($siteIdArr, $series, $episode, $airDate) {
                 foreach ($siteIdArr as $column => $id) {
-                    if ($id > 0) {
+                    if ($id > 0 && $column !== 'id') {
                         $q->orWhere($column, $id);
                     }
+
                 }
                 if (! empty($series)) {
                     $q->whereHas('episode', function ($q) use ($series, $episode, $airDate) {
