@@ -744,20 +744,20 @@ class Releases extends Release
             ->where('passwordstatus', $this->showPasswords(true))
             ->whereIn('categories_id', Category::getCategorySearch($cat, 'tv', true));
 
-        if (!empty(array_filter($siteIdArr))) {
+        if (! empty(array_filter($siteIdArr))) {
             $query->whereHas('video', function ($q) use ($siteIdArr, $series, $episode, $airDate) {
                 foreach ($siteIdArr as $column => $id) {
                     if ($id > 0) {
                         $q->orWhere($column, $id);
                     }
                 }
-                if (!empty($series)) {
+                if (! empty($series)) {
                     $q->whereHas('episode', function ($q) use ($series, $episode, $airDate) {
-                        $q->where('series', (int)preg_replace('/^s0*/i', '', $series));
-                        if (!empty($episode)) {
-                            $q->where('episode', (int)preg_replace('/^e0*/i', '', $episode));
+                        $q->where('series', (int) preg_replace('/^s0*/i', '', $series));
+                        if (! empty($episode)) {
+                            $q->where('episode', (int) preg_replace('/^e0*/i', '', $episode));
                         }
-                        if (!empty($airDate)) {
+                        if (! empty($airDate)) {
                             $q->whereDate('firstaired', $airDate);
                         }
                     });
@@ -765,12 +765,12 @@ class Releases extends Release
             });
         }
 
-        if (!empty($name)) {
+        if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
-                if (!empty($searchResult)) {
+                if (! empty($searchResult)) {
                     $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                 }
             }
@@ -786,7 +786,7 @@ class Releases extends Release
             $query->where('postdate', '>', now()->subDays($maxAge));
         }
 
-        if (!empty($excludedCategories)) {
+        if (! empty($excludedCategories)) {
             $query->whereNotIn('categories_id', $excludedCategories);
         }
 
