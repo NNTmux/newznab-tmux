@@ -850,12 +850,12 @@ class Releases extends Release
             ->where('nzbstatus', NZB::NZB_ADDED)
             ->where('passwordstatus', $this->showPasswords());
 
-        if (!empty($name)) {
+        if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
-                if (!empty($searchResult)) {
+                if (! empty($searchResult)) {
                     $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                 }
             }
@@ -885,7 +885,7 @@ class Releases extends Release
             });
         }
 
-        if (!empty($excludedCategories)) {
+        if (! empty($excludedCategories)) {
             $query->whereNotIn('categories_id', $excludedCategories);
         }
 
@@ -910,7 +910,7 @@ class Releases extends Release
         $cacheKey = md5($query->toRawSql());
         $cacheTTL = now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
-        $releases= Cache::get($cacheKey);
+        $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
