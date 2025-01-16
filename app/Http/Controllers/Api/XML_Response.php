@@ -404,7 +404,7 @@ class XML_Response
         );
         $this->xml->writeElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
         $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release->adddate)));
-        $this->xml->writeElement('category', $this->release->category->parent->title. ' > '. $this->release->category->title);
+        $this->xml->writeElement('category', $this->release->category->parent->title.' > '.$this->release->category->title);
         if ($this->namespace === 'newznab') {
             $this->xml->writeElement('description', $this->release->searchname);
         } else {
@@ -489,8 +489,8 @@ class XML_Response
         if (! empty($this->release->firstaired)) {
             $this->writeZedAttr('tvairdate', $this->release->firstaired);
         }
-        if (isset($this->release->video->tvdb ) && $this->release->video->tvdb > 0) {
-            $this->writeZedAttr('tvdbid', $this->release->video->tvdb );
+        if (isset($this->release->video->tvdb) && $this->release->video->tvdb > 0) {
+            $this->writeZedAttr('tvdbid', $this->release->video->tvdb);
         }
         if (isset($this->release->video->trakt) && $this->release->video->trakt > 0) {
             $this->writeZedAttr('traktid', $this->release->video->trakt);

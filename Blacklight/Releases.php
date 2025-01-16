@@ -762,7 +762,7 @@ class Releases extends Release
         }
 
         if (! empty(array_filter($siteIdArr))) {
-            $query->whereHas('video', function ($q) use ($siteIdArr, $series, $episode, $airDate) {
+            $query->whereHas('video', function ($q) use ($siteIdArr) {
                 foreach ($siteIdArr as $column => $id) {
                     if ($id > 0 && $column !== 'id') {
                         $q->orWhere($column, $id);
@@ -838,6 +838,7 @@ class Releases extends Release
         }
 
         Cache::put($cacheKey, $releases, $cacheTTL);
+
         return $releases;
     }
 
