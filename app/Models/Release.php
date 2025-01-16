@@ -99,6 +99,11 @@ class Release extends Model
         return $this->belongsTo(TvEpisode::class, 'tv_episodes_id');
     }
 
+    public function movieInfo(): BelongsTo
+    {
+        return $this->belongsTo(MovieInfo::class, 'movieinfo_id');
+    }
+
     /**
      * Insert a single release returning the ID on success or false on failure.
      *
