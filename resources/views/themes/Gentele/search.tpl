@@ -228,7 +228,7 @@
 									<td class="item">
 										<label for="chk{$result->guid|substr:0:7}">
 											<a class="title" title="View details"
-											   href="{{url("/details/{$result->guid}")}}">{$result->searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result->failed)}
+											   href="{{url("/details/{$result->guid}")}}">{$result->searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if count($result->failed) > 0}
 											<i class="fa fa-exclamation-circle" style="color: red"
 											   title="This release has failed to download for some users"></i>{/if}
 										</label value="Searchname">
@@ -301,7 +301,7 @@
 													   href="{{url("/browse/group?g={$result->group_name|escape:"htmlall"}")}}"
 													   title="Browse {$result->group_name}">{$result->group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 												{/if}
-												{if !empty($result->failed)}<span class="badge bg-info">
+												{if count($result->failed) > 0}<span class="badge bg-info">
 													<i class="fa fa-thumbs-o-up"></i>
 													{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 													<i class="fa fa-thumbs-o-down"></i>
@@ -312,8 +312,8 @@
 										</div>
 									</td>
 									<td class="category">
-										<a title="Browse {$result->category_name}"
-										   href="{{url("/browse/{$result->parent_category}/{$result->sub_category}")}}"> {$result->category_name}</a>
+										<a title="Browse {$result->category->parent->title}"
+										   href="{{url("/browse/{$result->category->parent->title}/{$result->category->title}")}}"> {$result->category->parent->title} > {$result->category->title}</a>
 									</td>
 									<td class="posted" title="{$result->postdate}">
                                         {$result->postdate|timeago}
