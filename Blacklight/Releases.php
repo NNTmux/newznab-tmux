@@ -1073,32 +1073,45 @@ class Releases extends Release
     }
 
     /**
-     * Get count of releases for pager.
+     * Get the count of releases for pager.
      *
      * @param  string  $query  The query to get the count from.
+     * @return int
      */
     private function getPagerCount(string $query): int
     {
-        $queryBuilder = DB::table(DB::raw('('.preg_replace(
+        $maxResults = (int) config('nntmux.max_pager_results');
+        $cacheExpiry = config('nntmux.cache_expiry_short');
+
+        // Rewrite the query to select only IDs with a limit
+        $rewrittenQuery = preg_replace(
             '/SELECT.+?FROM\s+releases/is',
             'SELECT r.id FROM releases',
             $query
-        ).' LIMIT '.(int) config('nntmux.max_pager_results').') as z'))
-            ->selectRaw('COUNT(z.id) as count');
+        );
 
-        $sql = $queryBuilder->toSql();
-        $count = Cache::get(md5($sql));
+        $wrappedQuery = "({$rewrittenQuery} LIMIT {$maxResults}) as z";
 
+        // Build the query for counting
+        $queryBuilder = DB::table(DB::raw($wrappedQuery))->selectRaw('COUNT(z.id) as count');
+
+        // Generate a unique cache key for the query
+        $cacheKey = md5($queryBuilder->toRawSql());
+
+        // Check if the count is cached
+        $count = Cache::get($cacheKey);
         if ($count !== null) {
-            return $count;
+            return (int) $count;
         }
 
+        // Execute the query and fetch the count
         $result = $queryBuilder->first();
-        $count = $result->count ?? 0;
+        $count = (int) ($result->count ?? 0);
 
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
-        Cache::put(md5($sql), $count, $expiresAt);
+        // Cache the count
+        Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
 
         return $count;
     }
+
 }
