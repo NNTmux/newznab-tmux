@@ -98,7 +98,7 @@ class Releases extends Release
         }
         $sql = $this->fromQuery($qry);
         if (\count($sql) > 0) {
-            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
+            $possibleRows = $sql->count();
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -533,7 +533,7 @@ class Releases extends Release
         }
         $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $releases->count();
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
@@ -614,7 +614,7 @@ class Releases extends Release
             $releases = collect();
         }
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $releases->count();
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
@@ -753,9 +753,7 @@ class Releases extends Release
         }
         $releases = ((! empty($name) && count($searchResult) !== 0) || empty($name)) ? $this->fromQuery($sql) : [];
         if (count($releases) !== 0 && $releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
+            $releases[0]->_totalrows = $releases->count();
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
@@ -887,9 +885,7 @@ class Releases extends Release
         }
         $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount(
-                preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
-            );
+            $releases[0]->_totalrows = $releases->count();
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
@@ -959,7 +955,7 @@ class Releases extends Release
         }
         $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $releases->count();
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
@@ -1035,7 +1031,7 @@ class Releases extends Release
         }
         $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $releases->count();
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
