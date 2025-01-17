@@ -96,7 +96,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $sql = self::fromQuery($qry);
+        $sql = $this->fromQuery($qry);
         if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
@@ -290,7 +290,7 @@ class Releases extends Release
         if ($result !== null) {
             return $result;
         }
-        $result = self::fromQuery($sql);
+        $result = $this->fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -468,7 +468,7 @@ class Releases extends Release
             }
         }
 
-        if (empty($searchResult)) {
+        if (count($searchResult) === 0) {
             return collect();
         }
 
@@ -531,7 +531,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = self::fromQuery($sql);
+        $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -604,12 +604,12 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        if ($searchName !== -1 && ! empty($searchResult)) {
-            $releases = self::fromQuery($sql);
-        } elseif ($searchName !== -1 && empty($searchResult)) {
+        if ($searchName !== -1 && count($searchResult) !== 0) {
+            $releases = $this->fromQuery($sql);
+        } elseif ($searchName !== -1 && count($searchResult) === 0) {
             $releases = collect();
         } elseif ($searchName === -1) {
-            $releases = self::fromQuery($sql);
+            $releases = $this->fromQuery($sql);
         } else {
             $releases = collect();
         }
@@ -631,9 +631,9 @@ class Releases extends Release
     {
         $siteSQL = [];
         $showSql = '';
-        foreach ($siteIdArr as $column => $Id) {
-            if ($Id > 0) {
-                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
+        foreach ($siteIdArr as $column => $id) {
+            if ($id > 0) {
+                $siteSQL[] = sprintf('v.%s = %d', $column, $id);
             }
         }
 
@@ -655,7 +655,7 @@ class Releases extends Release
                 ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
 
-            $show = self::fromQuery($showQry);
+            $show = $this->fromQuery($showQry);
 
             if ($show->isNotEmpty()) {
                 if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
@@ -700,7 +700,7 @@ class Releases extends Release
                 }
             }
 
-            if (empty($searchResult)) {
+            if (count($searchResult) === 0) {
                 return collect();
             }
         }
@@ -711,7 +711,7 @@ class Releases extends Release
             NZB::NZB_ADDED,
             $this->showPasswords(),
             $showSql,
-            (! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : '',
+            (! empty($name) && count($searchResult) !== 0) ? 'AND r.id IN ('.implode(',', $searchResult).')' : '',
             Category::getCategorySearch($cat, 'tv'),
             $maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : '',
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '',
@@ -751,7 +751,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ((! empty($name) && ! empty($searchResult)) || empty($name)) ? self::fromQuery($sql) : [];
+        $releases = ((! empty($name) && count($searchResult) !== 0) || empty($name)) ? $this->fromQuery($sql) : [];
         if (count($releases) !== 0 && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -797,7 +797,7 @@ class Releases extends Release
                 ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
 
-            $show = self::fromQuery($showQry);
+            $show = $this->fromQuery($showQry);
             if ($show->isNotEmpty()) {
                 if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
                     $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
@@ -840,7 +840,7 @@ class Releases extends Release
                 }
             }
 
-            if (empty($searchResult)) {
+            if (count($searchResult) === 0) {
                 return collect();
             }
         }
@@ -885,7 +885,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = self::fromQuery($sql);
+        $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -915,7 +915,7 @@ class Releases extends Release
                 }
             }
 
-            if (empty($searchResult)) {
+            if (count($searchResult) === 0) {
                 return collect();
             }
         }
@@ -957,7 +957,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = self::fromQuery($sql);
+        $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -985,7 +985,7 @@ class Releases extends Release
                 }
             }
 
-            if (empty($searchResult)) {
+            if (count($searchResult) === 0) {
                 return collect();
             }
         }
@@ -1033,7 +1033,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $releases = self::fromQuery($sql);
+        $releases = $this->fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
