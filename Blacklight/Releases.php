@@ -103,6 +103,7 @@ class Releases extends Release
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($qry.$page), $sql, $expiresAt);
+
         return $sql;
     }
 
@@ -1079,10 +1080,10 @@ class Releases extends Release
     private function getPagerCount(string $query): int
     {
         $queryBuilder = DB::table(DB::raw('('.preg_replace(
-                '/SELECT.+?FROM\s+releases/is',
-                'SELECT r.id FROM releases',
-                $query
-            ).' LIMIT '.(int) config('nntmux.max_pager_results').') as z'))
+            '/SELECT.+?FROM\s+releases/is',
+            'SELECT r.id FROM releases',
+            $query
+        ).' LIMIT '.(int) config('nntmux.max_pager_results').') as z'))
             ->selectRaw('COUNT(z.id) as count');
 
         $sql = $queryBuilder->toSql();
