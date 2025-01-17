@@ -1076,7 +1076,6 @@ class Releases extends Release
      * Get the count of releases for pager.
      *
      * @param  string  $query  The query to get the count from.
-     * @return int
      */
     private function getPagerCount(string $query): int
     {
@@ -1113,5 +1112,4 @@ class Releases extends Release
 
         return $count;
     }
-
 }
