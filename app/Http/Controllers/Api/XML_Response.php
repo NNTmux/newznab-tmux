@@ -404,7 +404,7 @@ class XML_Response
         );
         $this->xml->writeElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
         $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release->adddate)));
-        $this->xml->writeElement('category', $this->release->category->parent->title.' > '.$this->release->category->title);
+        $this->xml->writeElement('category', $this->release->category_name);
         if ($this->namespace === 'newznab') {
             $this->xml->writeElement('description', $this->release->searchname);
         } else {
@@ -466,8 +466,8 @@ class XML_Response
             $this->writeZedAttr('comments', $this->release->comments);
             $this->writeZedAttr('password', $this->release->passwordstatus);
             $this->writeZedAttr('usenetdate', Carbon::parse($this->release->postdate)->toRssString());
-            if (! empty($this->release->group->name)) {
-                $this->writeZedAttr('group', $this->release->group->name);
+            if (! empty($this->release->group_name)) {
+                $this->writeZedAttr('group', $this->release->group_name);
             }
         }
     }
@@ -489,24 +489,24 @@ class XML_Response
         if (! empty($this->release->firstaired)) {
             $this->writeZedAttr('tvairdate', $this->release->firstaired);
         }
-        if (isset($this->release->video->tvdb) && $this->release->video->tvdb > 0) {
-            $this->writeZedAttr('tvdbid', $this->release->video->tvdb);
+        if (isset($this->release->tvdb) && $this->release->tvdb > 0) {
+            $this->writeZedAttr('tvdbid', $this->release->tvdb);
         }
-        if (isset($this->release->video->trakt) && $this->release->video->trakt > 0) {
-            $this->writeZedAttr('traktid', $this->release->video->trakt);
+        if (isset($this->release->trakt) && $this->release->trakt > 0) {
+            $this->writeZedAttr('traktid', $this->release->trakt);
         }
-        if (isset($this->release->video->tvrage) && $this->release->video->tvrage > 0) {
-            $this->writeZedAttr('tvrageid', $this->release->video->tvrage);
-            $this->writeZedAttr('rageid', $this->release->video->tvrage);
+        if (isset($this->release->tvrage) && $this->release->tvrage > 0) {
+            $this->writeZedAttr('tvrageid', $this->release->tvrage);
+            $this->writeZedAttr('rageid', $this->release->tvrage);
         }
-        if (isset($this->release->video->tvmaze) && $this->release->video->tvmaze > 0) {
-            $this->writeZedAttr('tvmazeid', $this->release->video->tvmaze);
+        if (isset($this->release->tvmaze) && $this->release->tvmaze > 0) {
+            $this->writeZedAttr('tvmazeid', $this->release->tvmaze);
         }
-        if (isset($this->release->video->imdb) && $this->release->video->imdb > 0) {
-            $this->writeZedAttr('imdbid', $this->release->video->imdb);
+        if (isset($this->release->imdb) && $this->release->imdb > 0) {
+            $this->writeZedAttr('imdbid', $this->release->imdb);
         }
-        if (isset($this->release->video->tmdb) && $this->release->video->tmdb > 0) {
-            $this->writeZedAttr('tmdbid', $this->release->video->tmdb);
+        if (isset($this->release->tmdb) && $this->release->tmdb > 0) {
+            $this->writeZedAttr('tmdbid', $this->release->tmdb);
         }
     }
 
@@ -561,8 +561,8 @@ class XML_Response
             "\t<li>ID: <a href=\"{$this->server['server']['url']}/details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
             "\t<li>Name: {$this->release->searchname}</li>\n".
             "\t<li>Size: {$size}</li>\n".
-            "\t<li>Category: <a href=\"{$this->server['server']['url']}/browse/{$this->release->category->parent->title}\">{$this->release->category->title}</a></li>\n".
-            "\t<li>Group: <a href=\"{$this->server['server']['url']}/browse/group?g={$this->release->group->name}\">{$this->release->group->name}</a></li>\n".
+            "\t<li>Category: <a href=\"{$this->server['server']['url']}/browse/{$this->release->category_name}\">{$this->release->category_name}</a></li>\n".
+            "\t<li>Group: <a href=\"{$this->server['server']['url']}/browse/group?g={$this->release->group_name}\">{$this->release->group_name}</a></li>\n".
             "\t<li>Poster: {$this->release->fromname}</li>\n".
             "\t<li>Posted: {$this->release->postdate}</li>\n";
 
