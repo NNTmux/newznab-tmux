@@ -80,7 +80,7 @@
         "livewire/volt": "^1.6",
         "mailerlite/laravel-elasticsearch": "^11.1",
         "manticoresoftware/manticoresearch-php": "^3.2.0",
-        "marcreichel/igdb-laravel": "^4.3",
+        "marcreichel/igdb-laravel": "^5.0",
         "mhor/php-mediainfo": "^5.6",
         "monicahq/laravel-cloudflare": "^3.7",
         "monolog/monolog": "^3.8",
