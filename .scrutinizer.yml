@@ -1,10 +1,10 @@
 build:
   services:
-    mariadb: 10
-    elasticsearch: 6.4.2
-  image: default-jammy
+    mariadb: 11
+    elasticsearch: 8.17
+  image: default-noble
   environment:
-    php: 8.3.3
+    php: 8.3.16
   dependencies:
     before:
     override:
@@ -55,4 +55,4 @@ tools:
   php_cs_fixer: true
   php_code_sniffer:
     config:
-      standard: PSR2
+      standard: PSR12
