@@ -136,6 +136,7 @@ class Release extends Model
                     'isrenamed' => $parameters['isrenamed'],
                     'iscategorized' => 1,
                     'predb_id' => $parameters['predb_id'],
+                    'ishashed' => $parameters['ishashed'],
                 ]
             );
 

@@ -445,10 +445,12 @@ class ProcessReleases
 
                 $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
 
+                $searchName = ! empty($cleanedName) ? mb_convert_encoding($cleanedName, 'UTF-8', mb_list_encodings()) : $cleanRelName;
+
                 $releaseID = Release::insertRelease(
                     [
                         'name' => $cleanRelName,
-                        'searchname' => ! empty($cleanedName) ? mb_convert_encoding($cleanedName, 'UTF-8', mb_list_encodings()) : $cleanRelName,
+                        'searchname' => $searchName,
                         'totalpart' => $collection->totalfiles,
                         'groups_id' => $collection->groups_id,
                         'guid' => createGUID(),
@@ -459,6 +461,7 @@ class ProcessReleases
                         'isrenamed' => $properName === true ? 1 : 0,
                         'predb_id' => $preID === false ? 0 : $preID,
                         'nzbstatus' => NZB::NZB_NONE,
+                        'ishashed' => preg_match('/[a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}/i', $searchName) ? 1 : 0,
                     ]
                 );
 

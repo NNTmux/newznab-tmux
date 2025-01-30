@@ -116,6 +116,7 @@ class ReleaseFile extends Model
                     'updated_at' => now()->timestamp,
                     'passworded' => $hasPassword,
                     'crc32' => $crc,
+                    'ishashed' => preg_match('/[a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}/i', $name) ? 1 : 0,
                 ]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());
