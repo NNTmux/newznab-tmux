@@ -1,14 +1,8 @@
 <p align="center">
-    <a href="https://codeclimate.com/github/NNTmux/newznab-tmux"><img src="https://codeclimate.com/github/NNTmux/newznab-tmux/badges/gpa.svg"></a>
-    <a href="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/build-status/dev"><img src="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/build.png?b=dev"></a>
-    <a href="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/?branch=dev"><img src="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/quality-score.png?b=dev"></a>
-    <a href="https://travis-ci.org/NNTmux/newznab-tmux"><img src="https://travis-ci.org/NNTmux/newznab-tmux.svg?branch=dev"></a>
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/v/stable.svg" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/license.svg" alt="License"></a>
-    <a href="https://styleci.io/repos/22602573"><img src="https://styleci.io/repos/22602573/shield?branch=dev" alt="StyleCI"></a>
-    <a href='https://coveralls.io/github/NNTmux/newznab-tmux?branch=0.x'><img src='https://coveralls.io/repos/github/NNTmux/newznab-tmux/badge.svg?branch=dev' alt='Coverage Status' /></a>
     <a href="https://github.com/prettier/prettier"><img src=https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"></a>
-    <a href="https://www.patreon.com/bePatron?u=6160908"><img src="https://c5.patreon.com/external/logo/become_a_patron_button.png" alt="Become a Patron!" height="35"></a>
+    <a href="https://www.patreon.com/bePatron?u=6160908"><img src="https://c5.patreon.com/external/logo/become_a_patron_button.png" alt="Become a Patron!" height="20"></a>
 </p>
 
 
@@ -79,8 +73,3 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
  NNTmux is GPL v3. See LICENSE.txt for the full license.
 
  All external libraries will have their full licenses in their respective folders.
-
-
-
-
-
