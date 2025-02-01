@@ -369,6 +369,7 @@ class NZBImport
                     'reqidstatus' => 0,
                     'predb_id' => 0,
                     'nzbstatus' => NZB::NZB_ADDED,
+                    'ishashed' => 0,
                 ]
             );
         } else {
