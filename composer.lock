@@ -9331,16 +9331,16 @@
         },
         {
             "name": "spatie/async",
-            "version": "1.6.2",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "c0a578284c752cacfdbd2f1e6000dfec03b78cb1"
+                "reference": "318fed03bdaef5aa090cc08ee378e29c946ca38e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/c0a578284c752cacfdbd2f1e6000dfec03b78cb1",
-                "reference": "c0a578284c752cacfdbd2f1e6000dfec03b78cb1",
+                "url": "https://api.github.com/repos/spatie/async/zipball/318fed03bdaef5aa090cc08ee378e29c946ca38e",
+                "reference": "318fed03bdaef5aa090cc08ee378e29c946ca38e",
                 "shasum": ""
             },
             "require": {
@@ -9386,7 +9386,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/async/issues",
-                "source": "https://github.com/spatie/async/tree/1.6.2"
+                "source": "https://github.com/spatie/async/tree/1.7.0"
             },
             "funding": [
                 {
@@ -9394,7 +9394,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-12-16T15:31:12+00:00"
+            "time": "2025-01-31T14:59:30+00:00"
         },
         {
             "name": "spatie/backtrace",
@@ -19188,5 +19188,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
