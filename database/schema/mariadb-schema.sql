@@ -709,14 +709,6 @@ CREATE TABLE `predb_crcs` (
   KEY `predb_crcs_osohash_index` (`osohash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci ROW_FORMAT=DYNAMIC;
 
-DROP TABLE IF EXISTS `predb_hashes`;
-
-CREATE TABLE `predb_hashes` (
-  `predb_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'id, of the predb entry, this hash belongs to',
-  `hash` varbinary(40) NOT NULL DEFAULT '',
-  PRIMARY KEY (`hash`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-
 DROP TABLE IF EXISTS `predb_imports`;
 
 CREATE TABLE `predb_imports` (
@@ -1359,7 +1351,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (30,'2018_01_20_195
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (31,'2018_01_20_195915_create_par_hashes_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (32,'2018_01_20_195925_create_parts_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (33,'2018_01_20_195934_create_predb_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (34,'2018_01_20_195946_create_predb_hashes_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (35,'2018_01_20_195954_create_predb_imports_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (36,'2018_01_20_200005_create_release_comments_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (37,'2018_01_20_200018_create_releases_groups_table',1);

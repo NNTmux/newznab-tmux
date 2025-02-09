@@ -39,12 +39,6 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     }
 
     switch ($argv[1]) {
-        case 1:
-            $nameFixer->parseTitles(1, $update, $other, $setStatus, $show);
-            break;
-        case 2:
-            $nameFixer->parseTitles(2, $update, $other, $setStatus, $show);
-            break;
         case 3:
             $nameFixer->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
             break;
@@ -110,8 +104,6 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             .'The 3rd argument, other, will only do against other categories, to do against all categories use all, or predb_id to process all not matched to predb.'.PHP_EOL
             .'The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.'.PHP_EOL
             .'The 5th argument (optional), show, will display the release changes or only show a counter.'.PHP_EOL
-            .'php '.$argv[0].' 1 false other no ...: Fix release names using the usenet subject in the past 3 hours with predb information.'.PHP_EOL
-            .'php '.$argv[0].' 2 false other no ...: Fix release names using the usenet subject with predb information.'.PHP_EOL
             .'php '.$argv[0].' 3 false other no ...: Fix release names using NFO in the past 6 hours.'.PHP_EOL
             .'php '.$argv[0].' 4 false other no ...: Fix release names using NFO.'.PHP_EOL
             .'php '.$argv[0].' 5 false other no ...: Fix release names in misc categories using File Name in the past 6 hours.'.PHP_EOL

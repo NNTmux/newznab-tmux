@@ -82,22 +82,6 @@ switch (true) {
 
             $colorCli->primary("[{$release->releases_id}]", true);
 
-            if ((int) $release->ishashed === 1 && (int) $release->dehashstatus >= -6 && (int) $release->dehashstatus <= 0) {
-                $colorCli->primaryOver('d');
-                if (preg_match('/[a-fA-F0-9]{32,40}/i', $release->name, $hits)) {
-                    $nameFixer->matchPredbHash($hits[0], $release, true, 1, true);
-                }
-                if ($nameFixer->matched === false && ! empty($release->filehash) && preg_match('/[a-fA-F0-9]{32,40}/i', $release->filehash, $hits)) {
-                    $colorCli->primaryOver('h');
-                    $nameFixer->matchPredbHash($hits[0], $release, true, 1, true);
-                }
-            }
-
-            if ($nameFixer->matched) {
-                continue;
-            }
-            $nameFixer->reset();
-
             if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && (! empty($release->uid) || ! empty($release->mediainfo))) {
                 $colorCli->primaryOver('U');
                 if (! empty($release->uid)) {
