@@ -7679,16 +7679,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "c00d78fb6b29658347f9d37ebe104bffadf36299"
+                "reference": "72e51f7c32c5aef7c8b462195b8c599b11199893"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/c00d78fb6b29658347f9d37ebe104bffadf36299",
-                "reference": "c00d78fb6b29658347f9d37ebe104bffadf36299",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/72e51f7c32c5aef7c8b462195b8c599b11199893",
+                "reference": "72e51f7c32c5aef7c8b462195b8c599b11199893",
                 "shasum": ""
             },
             "require": {
@@ -7720,9 +7720,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.0.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.0.1"
             },
-            "time": "2024-10-13T11:29:49+00:00"
+            "time": "2025-02-13T12:25:43+00:00"
         },
         {
             "name": "pragmarx/google2fa",
@@ -9804,27 +9804,27 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.10.0",
+            "version": "1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "52c2d9d0a893f858922b99498074d85f0eaac4b5"
+                "reference": "2f6272e82b5089fbf34943751a1e7d0bffa81d3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/52c2d9d0a893f858922b99498074d85f0eaac4b5",
-                "reference": "52c2d9d0a893f858922b99498074d85f0eaac4b5",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/2f6272e82b5089fbf34943751a1e7d0bffa81d3f",
+                "reference": "2f6272e82b5089fbf34943751a1e7d0bffa81d3f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0|^12.0",
                 "nesbot/carbon": "^2.63|^3.0",
-                "php": "^7.2|^8.0"
+                "php": "^8.1"
             },
             "require-dev": {
                 "mockery/mockery": "^1.4",
-                "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
-                "phpunit/phpunit": "^9.5|^10.5"
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^9.5|^10.5|^11.5"
             },
             "type": "library",
             "extra": {
@@ -9865,7 +9865,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-directory-cleanup/issues",
-                "source": "https://github.com/spatie/laravel-directory-cleanup/tree/1.10.0"
+                "source": "https://github.com/spatie/laravel-directory-cleanup/tree/1.10.1"
             },
             "funding": [
                 {
@@ -9873,7 +9873,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-03-05T17:31:11+00:00"
+            "time": "2025-02-14T13:28:02+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
@@ -19191,5 +19191,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
