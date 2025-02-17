@@ -9804,27 +9804,27 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.10.0",
+            "version": "1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "52c2d9d0a893f858922b99498074d85f0eaac4b5"
+                "reference": "2f6272e82b5089fbf34943751a1e7d0bffa81d3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/52c2d9d0a893f858922b99498074d85f0eaac4b5",
-                "reference": "52c2d9d0a893f858922b99498074d85f0eaac4b5",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/2f6272e82b5089fbf34943751a1e7d0bffa81d3f",
+                "reference": "2f6272e82b5089fbf34943751a1e7d0bffa81d3f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0|^12.0",
                 "nesbot/carbon": "^2.63|^3.0",
-                "php": "^7.2|^8.0"
+                "php": "^8.1"
             },
             "require-dev": {
                 "mockery/mockery": "^1.4",
-                "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0",
-                "phpunit/phpunit": "^9.5|^10.5"
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^9.5|^10.5|^11.5"
             },
             "type": "library",
             "extra": {
@@ -9865,7 +9865,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-directory-cleanup/issues",
-                "source": "https://github.com/spatie/laravel-directory-cleanup/tree/1.10.0"
+                "source": "https://github.com/spatie/laravel-directory-cleanup/tree/1.10.1"
             },
             "funding": [
                 {
@@ -9873,7 +9873,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-03-05T17:31:11+00:00"
+            "time": "2025-02-14T13:28:02+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
