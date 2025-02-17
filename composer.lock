@@ -5462,16 +5462,16 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "5.0.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "551bce01db054f6eb1a2941012b24b4254151df0"
+                "reference": "bf10510f659b63bf67da09d5565f130afac83867"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/551bce01db054f6eb1a2941012b24b4254151df0",
-                "reference": "551bce01db054f6eb1a2941012b24b4254151df0",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/bf10510f659b63bf67da09d5565f130afac83867",
+                "reference": "bf10510f659b63bf67da09d5565f130afac83867",
                 "shasum": ""
             },
             "require": {
@@ -5525,9 +5525,9 @@
             ],
             "support": {
                 "issues": "https://github.com/marcreichel/igdb-laravel/issues",
-                "source": "https://github.com/marcreichel/igdb-laravel/tree/5.0.0"
+                "source": "https://github.com/marcreichel/igdb-laravel/tree/5.1.0"
             },
-            "time": "2025-01-24T18:51:06+00:00"
+            "time": "2025-02-16T14:01:50+00:00"
         },
         {
             "name": "maxmind-db/reader",
@@ -7679,16 +7679,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "c00d78fb6b29658347f9d37ebe104bffadf36299"
+                "reference": "72e51f7c32c5aef7c8b462195b8c599b11199893"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/c00d78fb6b29658347f9d37ebe104bffadf36299",
-                "reference": "c00d78fb6b29658347f9d37ebe104bffadf36299",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/72e51f7c32c5aef7c8b462195b8c599b11199893",
+                "reference": "72e51f7c32c5aef7c8b462195b8c599b11199893",
                 "shasum": ""
             },
             "require": {
@@ -7720,9 +7720,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.0.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.0.1"
             },
-            "time": "2024-10-13T11:29:49+00:00"
+            "time": "2025-02-13T12:25:43+00:00"
         },
         {
             "name": "pragmarx/google2fa",
@@ -19191,5 +19191,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
