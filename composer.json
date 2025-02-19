@@ -95,7 +95,7 @@
         "propaganistas/laravel-disposable-email": "^2.4",
         "ramsey/uuid": "^4.7",
         "riari/laravel-forum": "^6.0",
-        "sentry/sentry-laravel": "^4.12",
+        "sentry/sentry-laravel": "^4.13",
         "smarty/smarty": "^4.3",
         "spatie/async": "^1.7",
         "spatie/laravel-directory-cleanup": "^1.10",
