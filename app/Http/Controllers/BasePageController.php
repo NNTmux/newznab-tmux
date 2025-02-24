@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Settings;
@@ -13,7 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-class BasePageController extends Controller
+class BasePageController extends Controller implements HasMiddleware
 {
     public Settings $settings;
 
@@ -53,7 +55,7 @@ class BasePageController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release', 'reset', 'showLinkRequestForm');
+        
         // Buffer settings/DB connection.
         $this->settings = new Settings;
         $this->smarty = app('smarty.view');
@@ -63,6 +65,13 @@ class BasePageController extends Controller
         }
 
         $this->smarty->assign('serverroot', url('/'));
+    }
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(['auth', 'web', '2fa'], except: ['api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release', 'reset', 'showLinkRequestForm']),
+        ];
     }
 
     public function paginate($query, $totalCount, $items, $page, $path, $reqQuery): LengthAwarePaginator

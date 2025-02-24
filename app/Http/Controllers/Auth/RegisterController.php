@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Models\Invitation;
@@ -21,7 +23,7 @@ use Jrean\UserVerification\Traits\VerifiesUsers;
 use Junaidnasir\Larainvite\Facades\Invite;
 use Spatie\Permission\Models\Role;
 
-class RegisterController extends Controller
+class RegisterController extends Controller implements HasMiddleware
 {
     /*
     |--------------------------------------------------------------------------
@@ -44,14 +46,11 @@ class RegisterController extends Controller
 
     private string $inviteCodeQuery = '';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
+        return [
+            'guest',
+        ];
     }
 
     protected function create(array $data): User
