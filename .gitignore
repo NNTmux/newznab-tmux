@@ -19,8 +19,10 @@ test.php
 *.orig
 
 /.idea/
+/.nova
 /vendor/*
 /storage/covers/*
+/storage/pail
 /storage/nzb/*
 /resources/tmp/*
 !/resources/tmp/unrar/
