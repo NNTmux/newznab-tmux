@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasTable('forum_posts')) {
             Schema::create('forum_posts', function (Blueprint $table) {
@@ -30,7 +30,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('forum_posts');
     }
