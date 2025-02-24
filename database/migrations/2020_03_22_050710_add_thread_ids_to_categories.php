@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddThreadIdsToCategories extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             $table->integer('newest_thread_id')->after('accepts_threads')->unsigned()->nullable();
@@ -24,11 +24,11 @@ class AddThreadIdsToCategories extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             $table->dropColumn('newest_thread_id');
             $table->dropColumn('latest_active_thread_id');
         });
     }
-}
+};

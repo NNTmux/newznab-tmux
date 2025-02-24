@@ -21,6 +21,6 @@ class UserServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        User::observe(UserServiceObserver::class);
+
     }
 }

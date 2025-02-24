@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class UpdateForumTableCategories extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             if (! Schema::hasColumn('forum_categories', 'category_id')) {
@@ -38,7 +38,7 @@ class UpdateForumTableCategories extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('forum_categories', function (Blueprint $table) {
             $table->renameColumn('category_id', 'parent_category');
@@ -46,4 +46,4 @@ class UpdateForumTableCategories extends Migration
             $table->renameColumn('description', 'subtitle');
         });
     }
-}
+};

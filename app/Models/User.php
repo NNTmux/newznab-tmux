@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\UserServiceObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Jobs\SendInviteEmail;
@@ -147,6 +149,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|\App\Models\User whereRolesId($value)
  * @method static Builder|\App\Models\User whereVerificationToken($value)
  */
+#[ObservedBy([UserServiceObserver::class])]
 class User extends Authenticatable
 {
     use HasRoles, InviteTrait, Notifiable, UserVerification;

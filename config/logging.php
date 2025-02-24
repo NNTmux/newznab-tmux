@@ -17,6 +17,7 @@ return [
             'bubble' => true,
             'permission' => 0775,
             'locking' => false,
+            'replace_placeholders' => true,
         ],
 
         'daily' => [
@@ -27,6 +28,7 @@ return [
             'bubble' => true,
             'permission' => 0775,
             'locking' => false,
+            'replace_placeholders' => true,
         ],
 
         'flare' => [

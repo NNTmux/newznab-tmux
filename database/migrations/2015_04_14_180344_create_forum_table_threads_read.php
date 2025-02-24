@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateForumTableThreadsRead extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasTable('forum_threads_read')) {
             Schema::create('forum_threads_read', function (Blueprint $table) {
@@ -26,8 +26,8 @@ class CreateForumTableThreadsRead extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('forum_threads_read');
     }
-}
+};
