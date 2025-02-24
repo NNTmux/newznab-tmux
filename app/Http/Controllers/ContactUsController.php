@@ -15,7 +15,7 @@ class ContactUsController extends BasePageController
         $this->setPreferences();
 
         if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-            $this->validate($request, [
+            $request->validate([
                 'g-recaptcha-response' => 'required|captcha',
             ]);
         }
