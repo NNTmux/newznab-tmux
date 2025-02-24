@@ -22,6 +22,8 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
                 PDO::MYSQL_ATTR_LOCAL_INFILE => true,
             ]) : [],
+            'prefix' => '',
+            'prefix_indexes' => true,
         ],
 
         'pgsql' => [
@@ -36,6 +38,8 @@ return [
             'prefix' => '',
             'schema' => 'public',
             'sslmode' => 'prefer',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
         ],
 
         'sphinx' => [
@@ -62,6 +66,8 @@ return [
             'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            'prefix' => '',
+            'prefix_indexes' => true,
                 PDO::MYSQL_ATTR_LOCAL_INFILE => true,
             ]) : [],
         ],
@@ -72,6 +78,7 @@ return [
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => Str::slug(env('APP_NAME', 'laravel'), '_').'_database_',
+            'persistent' => env('REDIS_PERSISTENT', false),
         ],
         'default' => [
             'url' => env('REDIS_URL'),
@@ -79,6 +86,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_DB', 0),
+            'username' => env('REDIS_USERNAME'),
         ],
         'cache' => [
             'url' => env('REDIS_URL'),
@@ -86,6 +94,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_CACHE_DB', 1),
+            'username' => env('REDIS_USERNAME'),
         ],
         'session' => [
             'url' => env('REDIS_URL'),
