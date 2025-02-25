@@ -43,7 +43,7 @@
         "ext-xmlwriter": "*",
         "ext-zlib": "*",
         "aharen/omdbapi": "^2.1",
-        "anhskohbo/no-captcha": "dev-master",
+        "anhskohbo/no-captcha": "^3.7.0",
         "b3rs3rk/steamfront": "dev-master",
         "bacon/bacon-qr-code": "^3.0",
         "bhuvidya/laravel-countries": "^11.0",
