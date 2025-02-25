@@ -24,7 +24,7 @@ class ManticoreSearch
 
     protected array $connection;
 
-    public Client $manticoresearch;
+    public Client $manticoreSearch;
 
     public Search $search;
 
@@ -37,8 +37,8 @@ class ManticoreSearch
     {
         $this->config = config('sphinxsearch');
         $this->connection = ['host' => $this->config['host'], 'port' => $this->config['port']];
-        $this->manticoresearch = new Client($this->connection);
-        $this->search = new Search($this->manticoresearch);
+        $this->manticoreSearch = new Client($this->connection);
+        $this->search = new Search($this->manticoreSearch);
         $this->cli = new ColorCLI;
     }
 
@@ -49,7 +49,7 @@ class ManticoreSearch
     {
         if ($parameters['id']) {
             try {
-                $this->manticoresearch->table($this->config['indexes']['releases'])
+                $this->manticoreSearch->table($this->config['indexes']['releases'])
                     ->replaceDocument(
                         [
                             'name' => $parameters['name'],
@@ -76,7 +76,7 @@ class ManticoreSearch
     {
         try {
             if ($parameters['id']) {
-                $this->manticoresearch->table($this->config['indexes']['predb'])
+                $this->manticoreSearch->table($this->config['indexes']['predb'])
                     ->replaceDocument(['title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']], $parameters['id']);
             }
         } catch (ResponseException $re) {
@@ -103,7 +103,7 @@ class ManticoreSearch
             }
         }
         if ($identifiers['i'] !== false) {
-            $this->manticoresearch->table($this->config['indexes']['releases'])->deleteDocument($identifiers['i']);
+            $this->manticoreSearch->table($this->config['indexes']['releases'])->deleteDocument($identifiers['i']);
         }
     }
 
@@ -168,12 +168,12 @@ class ManticoreSearch
         foreach ($indexes as $index) {
             if (\in_array($index, $this->config['indexes'], true)) {
                 try {
-                    $this->manticoresearch->table($index)->truncate();
+                    $this->manticoreSearch->table($index)->truncate();
                     $this->cli->info('Truncating index '.$index.' finished.');
                 } catch (ResponseException $e) {
                     if ($e->getMessage() === 'Invalid index') {
                         if ($index === 'releases_rt') {
-                            $this->manticoresearch->table($index)->create([
+                            $this->manticoreSearch->table($index)->create([
                                 'name' => ['type' => 'string'],
                                 'searchname' => ['type' => 'string'],
                                 'fromname' => ['type' => 'string'],
@@ -181,7 +181,7 @@ class ManticoreSearch
                                 'categories_id' => ['type' => 'integer'],
                             ]);
                         } elseif ($index === 'predb_rt') {
-                            $this->manticoresearch->table($index)->create([
+                            $this->manticoreSearch->table($index)->create([
                                 'title' => ['type' => 'string'],
                                 'filename' => ['type' => 'string'],
                                 'source' => ['type' => 'string'],
@@ -206,8 +206,8 @@ class ManticoreSearch
     {
         try {
             foreach ($this->config['indexes'] as $index) {
-                $this->manticoresearch->table($index)->flush();
-                $this->manticoresearch->table($index)->optimize();
+                $this->manticoreSearch->table($index)->flush();
+                $this->manticoreSearch->table($index)->optimize();
                 Log::info("Successfully optimized index: {$index}");
             }
 
