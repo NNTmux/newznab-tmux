@@ -49,7 +49,7 @@ class ManticoreSearch
     {
         if ($parameters['id']) {
             try {
-                $this->manticoresearch->index($this->config['indexes']['releases'])
+                $this->manticoresearch->table($this->config['indexes']['releases'])
                     ->replaceDocument(
                         [
                             'name' => $parameters['name'],
@@ -76,7 +76,7 @@ class ManticoreSearch
     {
         try {
             if ($parameters['id']) {
-                $this->manticoresearch->index($this->config['indexes']['predb'])
+                $this->manticoresearch->table($this->config['indexes']['predb'])
                     ->replaceDocument(['title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']], $parameters['id']);
             }
         } catch (ResponseException $re) {
@@ -103,7 +103,7 @@ class ManticoreSearch
             }
         }
         if ($identifiers['i'] !== false) {
-            $this->manticoresearch->index($this->config['indexes']['releases'])->deleteDocument($identifiers['i']);
+            $this->manticoresearch->table($this->config['indexes']['releases'])->deleteDocument($identifiers['i']);
         }
     }
 
@@ -168,12 +168,12 @@ class ManticoreSearch
         foreach ($indexes as $index) {
             if (\in_array($index, $this->config['indexes'], true)) {
                 try {
-                    $this->manticoresearch->index($index)->truncate();
+                    $this->manticoresearch->table($index)->truncate();
                     $this->cli->info('Truncating index '.$index.' finished.');
                 } catch (ResponseException $e) {
                     if ($e->getMessage() === 'Invalid index') {
                         if ($index === 'releases_rt') {
-                            $this->manticoresearch->index($index)->create([
+                            $this->manticoresearch->table($index)->create([
                                 'name' => ['type' => 'string'],
                                 'searchname' => ['type' => 'string'],
                                 'fromname' => ['type' => 'string'],
@@ -181,7 +181,7 @@ class ManticoreSearch
                                 'categories_id' => ['type' => 'integer'],
                             ]);
                         } elseif ($index === 'predb_rt') {
-                            $this->manticoresearch->index($index)->create([
+                            $this->manticoresearch->table($index)->create([
                                 'title' => ['type' => 'string'],
                                 'filename' => ['type' => 'string'],
                                 'source' => ['type' => 'string'],
@@ -198,13 +198,25 @@ class ManticoreSearch
     }
 
     /**
-     * Optimize the RT index.
+     * Optimize the RT indices.
+     *
+     * @return bool Returns true if optimization was successful, false otherwise
      */
-    public function optimizeRTIndex(): void
+    public function optimizeRTIndex(): bool
     {
-        foreach ($this->config['indexes'] as $index) {
-            $this->manticoresearch->index($index)->flush();
-            $this->manticoresearch->index($index)->optimize();
+        try {
+            foreach ($this->config['indexes'] as $index) {
+                $this->manticoresearch->table($index)->flush();
+                $this->manticoresearch->table($index)->optimize();
+                Log::info("Successfully optimized index: {$index}");
+            }
+            return true;
+        } catch (ResponseException $e) {
+            Log::error("Failed to optimize RT indices: " . $e->getMessage());
+            return false;
+        } catch (\Throwable $e) {
+            Log::error("Unexpected error while optimizing RT indices: " . $e->getMessage());
+            return false;
         }
     }
 
@@ -213,7 +225,7 @@ class ManticoreSearch
         $resultId = [];
         $resultData = [];
         try {
-            $query = $this->search->setIndex($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
+            $query = $this->search->setTable($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
             if (! empty($searchArray)) {
                 foreach ($searchArray as $key => $value) {
                     $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
@@ -222,7 +234,7 @@ class ManticoreSearch
                 // If $column is an array and has more than one item, implode it and wrap in parentheses.
                 if (! empty($column) && \count($column) > 1) {
                     $searchColumns = '@('.implode(',', $column).')';
-                } elseif (! empty($column) && \count($column) == 1) { // If $column is an array and has only one item, use as is.
+                } elseif (! empty($column) && \count($column) === 1) { // If $column is an array and has only one item, use as is.
                     $searchColumns = '@'.$column[0];
                 } else {
                     $searchColumns = ''; // Careful, this will search all columns.
