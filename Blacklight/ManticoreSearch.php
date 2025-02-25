@@ -210,12 +210,15 @@ class ManticoreSearch
                 $this->manticoresearch->table($index)->optimize();
                 Log::info("Successfully optimized index: {$index}");
             }
+
             return true;
         } catch (ResponseException $e) {
-            Log::error("Failed to optimize RT indices: " . $e->getMessage());
+            Log::error('Failed to optimize RT indices: '.$e->getMessage());
+
             return false;
         } catch (\Throwable $e) {
-            Log::error("Unexpected error while optimizing RT indices: " . $e->getMessage());
+            Log::error('Unexpected error while optimizing RT indices: '.$e->getMessage());
+
             return false;
         }
     }
