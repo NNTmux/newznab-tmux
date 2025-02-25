@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ae7b1646b10a0497f08a40ef19e76d6",
+    "content-hash": "152ab9c3dfc714edf9b6c53e6f6ddb29",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -5391,16 +5391,16 @@
         },
         {
             "name": "manticoresoftware/manticoresearch-php",
-            "version": "3.2.0",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/manticoresoftware/manticoresearch-php.git",
-                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d"
+                "reference": "9d3b9bfb58ead131a9f75bd0bf3959d211a64ec7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
-                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
+                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/9d3b9bfb58ead131a9f75bd0bf3959d211a64ec7",
+                "reference": "9d3b9bfb58ead131a9f75bd0bf3959d211a64ec7",
                 "shasum": ""
             },
             "require": {
@@ -5412,7 +5412,7 @@
             "require-dev": {
                 "mockery/mockery": "*",
                 "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": ">=7.5 || ^9.6",
+                "phpunit/phpunit": ">=7.5 || ^10.5",
                 "slevomat/coding-standard": "^7.0",
                 "squizlabs/php_codesniffer": "^3.7"
             },
@@ -5457,7 +5457,7 @@
                 "issues": "https://github.com/manticoresoftware/manticoresearch-php/issues",
                 "source": "https://github.com/manticoresoftware/manticoresearch-php/"
             },
-            "time": "2024-10-31T10:38:53+00:00"
+            "time": "2025-02-20T16:12:16+00:00"
         },
         {
             "name": "marcreichel/igdb-laravel",
@@ -19192,5 +19192,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
