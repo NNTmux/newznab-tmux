@@ -501,8 +501,9 @@ class Categorize
     public function isXxx(): bool
     {
         switch (true) {
+            case preg_match('/(Kitsune|PlayWEB|CtrlHD|NTb|iVy|PiRaTeS)/i', $this->releaseName):
             case ! preg_match('/\bXXX\b|(a\.b\.erotica|ClubSeventeen|Cum(ming|shot)|Err?oticax?|Porn(o|lation)?|Imageset|PICTURESET|JAV Uncensored|lesb(ians?|os?)|mastur(bation|e?bate)|My_Stepfather_Made_Me|nympho?|OLDER ANGELS|pictures\.erotica\.anime|sexontv|slut|Squirt|SWE6RUS|Transsexual|whore)/i', $this->releaseName):
-                return false;
+                    return false;
             case $this->isXxxPack():
             case $this->isXxxClipSD():
             case $this->isXxxSD():
