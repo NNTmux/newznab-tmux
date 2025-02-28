@@ -275,16 +275,16 @@
         },
         {
             "name": "brick/math",
-            "version": "0.12.2",
+            "version": "0.12.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "901eddb1e45a8e0f689302e40af871c181ecbe40"
+                "reference": "866551da34e9a618e64a819ee1e01c20d8a588ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/901eddb1e45a8e0f689302e40af871c181ecbe40",
-                "reference": "901eddb1e45a8e0f689302e40af871c181ecbe40",
+                "url": "https://api.github.com/repos/brick/math/zipball/866551da34e9a618e64a819ee1e01c20d8a588ba",
+                "reference": "866551da34e9a618e64a819ee1e01c20d8a588ba",
                 "shasum": ""
             },
             "require": {
@@ -323,7 +323,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.12.2"
+                "source": "https://github.com/brick/math/tree/0.12.3"
             },
             "funding": [
                 {
@@ -331,7 +331,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-02-26T10:21:45+00:00"
+            "time": "2025-02-28T13:11:00+00:00"
         },
         {
             "name": "cache/adapter-common",
@@ -5461,22 +5461,22 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "5.1.0",
+            "version": "5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "bf10510f659b63bf67da09d5565f130afac83867"
+                "reference": "fe760947ad0f59b0351924617774b04113fc8f05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/bf10510f659b63bf67da09d5565f130afac83867",
-                "reference": "bf10510f659b63bf67da09d5565f130afac83867",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/fe760947ad0f59b0351924617774b04113fc8f05",
+                "reference": "fe760947ad0f59b0351924617774b04113fc8f05",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "~6.0|~7.0",
-                "illuminate/support": "^11.0",
+                "illuminate/support": "^11.0|^12.0",
                 "nesbot/carbon": "^2.53.1|^3.0",
                 "php": "^8.2"
             },
@@ -5484,7 +5484,7 @@
                 "larastan/larastan": "^3.0.2",
                 "laravel/pint": "^1.13",
                 "nunomaduro/collision": "^8.0",
-                "orchestra/testbench": "^9.0",
+                "orchestra/testbench": "^9.0|^10.0",
                 "pestphp/pest": "^3.7.4",
                 "pestphp/pest-plugin-type-coverage": "^3.2.3",
                 "rector/rector": "^2.0.7",
@@ -5524,9 +5524,9 @@
             ],
             "support": {
                 "issues": "https://github.com/marcreichel/igdb-laravel/issues",
-                "source": "https://github.com/marcreichel/igdb-laravel/tree/5.1.0"
+                "source": "https://github.com/marcreichel/igdb-laravel/tree/5.2.0"
             },
-            "time": "2025-02-16T14:01:50+00:00"
+            "time": "2025-02-28T07:53:39+00:00"
         },
         {
             "name": "maxmind-db/reader",
