@@ -453,7 +453,7 @@ class ProcessReleases
                         'searchname' => $searchName,
                         'totalpart' => $collection->totalfiles,
                         'groups_id' => $collection->groups_id,
-                        'guid' => createGUID(),
+                        'guid' => Str::uuid()->toString(),
                         'postdate' => $collection->date,
                         'fromname' => $fromName,
                         'size' => $collection->filesize,
