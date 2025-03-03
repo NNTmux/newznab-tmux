@@ -2805,16 +2805,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v8.2.0",
+            "version": "v8.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "c622579ac6a232d41ecd95d1cab20975da1b25d1"
+                "reference": "b007c383b416e714c7212516284c41d974beba43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/c622579ac6a232d41ecd95d1cab20975da1b25d1",
-                "reference": "c622579ac6a232d41ecd95d1cab20975da1b25d1",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/b007c383b416e714c7212516284c41d974beba43",
+                "reference": "b007c383b416e714c7212516284c41d974beba43",
                 "shasum": ""
             },
             "require": {
@@ -2829,10 +2829,10 @@
             },
             "require-dev": {
                 "cache/array-adapter": "^1.2",
-                "friendsofphp/php-cs-fixer": "^3.13",
-                "mockery/mockery": "1.5.1",
-                "phpstan/phpstan": "^1.9",
-                "phpunit/phpunit": "^9.5"
+                "mockery/mockery": "^1.6",
+                "php-cs-fixer/shim": "^3.9",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^9.6"
             },
             "type": "library",
             "autoload": {
@@ -2847,9 +2847,9 @@
             "description": "Library for retrieving film and tv information from IMDb",
             "support": {
                 "issues": "https://github.com/tboothman/imdbphp/issues",
-                "source": "https://github.com/tboothman/imdbphp/tree/v8.2.0"
+                "source": "https://github.com/tboothman/imdbphp/tree/v8.3.0"
             },
-            "time": "2024-02-25T10:22:15+00:00"
+            "time": "2025-03-02T18:05:46+00:00"
         },
         {
             "name": "intervention/gif",
@@ -19191,6 +19191,6 @@
         "ext-xmlwriter": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
 }
