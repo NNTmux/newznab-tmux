@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8d1ea40a5cd23b8ffea1fd3af66bbcd5",
+    "content-hash": "667b92d9b719441b39e2f81e4c7056df",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -963,28 +963,28 @@
         },
         {
             "name": "dariusiii/tmdb-laravel",
-            "version": "v7.0.0",
+            "version": "12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/tmdb-laravel.git",
-                "reference": "330822f162d5742c44d568a78393280c630b3ceb"
+                "reference": "15462e9fb43a2515e8caf95f1e4c149e86371c71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/330822f162d5742c44d568a78393280c630b3ceb",
-                "reference": "330822f162d5742c44d568a78393280c630b3ceb",
+                "url": "https://api.github.com/repos/DariusIII/tmdb-laravel/zipball/15462e9fb43a2515e8caf95f1e4c149e86371c71",
+                "reference": "15462e9fb43a2515e8caf95f1e4c149e86371c71",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^7.2",
-                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
                 "nyholm/psr7": "^1.3",
                 "php": ">=8.0",
                 "php-tmdb/api": "^4.0"
             },
             "require-dev": {
                 "doctrine/cache": "^1.8",
-                "illuminate/events": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/events": "^8.0|^9.0|^10.0|^11.0|^12.0",
                 "monolog/monolog": "^3.0",
                 "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0|^11.0",
                 "psr/event-dispatcher": "^1.0",
@@ -1033,9 +1033,9 @@
                 "wrapper"
             ],
             "support": {
-                "source": "https://github.com/DariusIII/tmdb-laravel/tree/v7.0.0"
+                "source": "https://github.com/DariusIII/tmdb-laravel/tree/12.0"
             },
-            "time": "2024-04-25T20:50:30+00:00"
+            "time": "2025-02-28T12:09:35+00:00"
         },
         {
             "name": "dariusiii/tv-maze-php-api",
@@ -19191,5 +19191,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
