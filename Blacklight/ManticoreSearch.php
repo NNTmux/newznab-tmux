@@ -120,7 +120,7 @@ class ManticoreSearch
         }
 
         $from = ['\\', '(', ')', '@', '~', '"', '&', '/', '$', '=', "'", '--', '[', ']'];
-        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', '\'', '\--', '\[', '\]'];
+        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\', '\--", '\[', '\]'];
 
         $string = str_replace($from, $to, $string);
         // Remove these characaters if they are the last chars in $string
@@ -228,87 +228,10 @@ class ManticoreSearch
         $resultId = [];
         $resultData = [];
         try {
-            $query = $this->search->setTable($rt_index)
-                ->option('ranker', 'sph04')
-                ->option('sort_method', 'pq')
-                ->maxMatches(10000)
-                ->limit(10000)
-                ->sort('id', 'desc')
-                ->stripBadUtf8(true)
-                ->trackScores(true);
-
-            // Process search string to handle apostrophes
-            $processSearchString = function ($text) {
-                if (empty($text)) {
-                    return '';
-                }
-
-                // For words with apostrophes, add a version without apostrophes
-                $processedText = preg_replace_callback('/\b(\w+\'(?:\w+)?)\b/', function ($matches) {
-                    $withApostrophe = self::escapeString($matches[1]);
-                    $withoutApostrophe = self::escapeString(str_replace("'", '', $matches[1]));
-
-                    return "($withApostrophe | $withoutApostrophe)";
-                }, $text);
-
-                // For common contractions without apostrophes, add versions with apostrophes
-                $contractions = [
-                    '/\bim\b/i' => "i'm",
-                    '/\bdont\b/i' => "don't",
-                    '/\bcant\b/i' => "can't",
-                    '/\bwont\b/i' => "won't",
-                    '/\bdidnt\b/i' => "didn't",
-                    '/\bisnt\b/i' => "isn't",
-                    '/\bwasnt\b/i' => "wasn't",
-                    '/\bwouldnt\b/i' => "wouldn't",
-                    '/\bcouldnt\b/i' => "couldn't",
-                    '/\bshouldnt\b/i' => "shouldn't",
-                    '/\barent\b/i' => "aren't",
-                    '/\bwerent\b/i' => "weren't",
-                    '/\byoure\b/i' => "you're",
-                    '/\btheyre\b/i' => "they're",
-                    '/\bive\b/i' => "i've",
-                    '/\btheyve\b/i' => "they've",
-                    '/\bweve\b/i' => "we've",
-                    '/\byouve\b/i' => "you've",
-                    '/\byoull\b/i' => "you'll",
-                    '/\btheyll\b/i' => "they'll",
-                    '/\bhes\b/i' => "he's",
-                    '/\bshes\b/i' => "she's",
-                    '/\bthats\b/i' => "that's",
-                    '/\bwhats\b/i' => "what's",
-                    '/\bwhos\b/i' => "who's",
-                ];
-
-                foreach ($contractions as $pattern => $replacement) {
-                    $processedText = preg_replace_callback($pattern, function ($matches) use ($replacement) {
-                        $withoutApostrophe = self::escapeString($matches[0]);
-                        $withApostrophe = self::escapeString($replacement);
-
-                        return "($withoutApostrophe | $withApostrophe)";
-                    }, $processedText);
-                }
-
-                // Escape any remaining words
-                $words = preg_split('/\s+/', $processedText);
-                $finalWords = [];
-
-                foreach ($words as $word) {
-                    // Skip if it's already a combined condition
-                    if (strpos($word, ' | ') !== false) {
-                        $finalWords[] = $word;
-                    } else {
-                        $finalWords[] = self::escapeString($word);
-                    }
-                }
-
-                return implode(' ', $finalWords);
-            };
-
+            $query = $this->search->setTable($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
             if (! empty($searchArray)) {
                 foreach ($searchArray as $key => $value) {
-                    $processedValue = $processSearchString($value);
-                    $query->search('@@relaxed @'.$key.' '.$processedValue);
+                    $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
                 }
             } elseif (! empty($searchString)) {
                 // If $column is an array and has more than one item, implode it and wrap in parentheses.
@@ -320,12 +243,10 @@ class ManticoreSearch
                     $searchColumns = ''; // Careful, this will search all columns.
                 }
 
-                $processedSearchString = $processSearchString($searchString);
-                $query->search('@@relaxed '.$searchColumns.' '.$processedSearchString);
+                $query->search('@@relaxed '.$searchColumns.' '.self::escapeString($searchString));
             } else {
                 return [];
             }
-
             $results = $query->get();
             foreach ($results as $doc) {
                 $resultId[] = [
