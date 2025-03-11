@@ -232,56 +232,80 @@ class ManticoreSearch
 
             // Function to process apostrophe variations
             $processApostropheVariants = function ($text) {
+                if (empty($text)) {
+                    return '';
+                }
+
                 // Split the text into words for processing
-                $words = preg_split('/\s+/', $text);
+                $words = preg_split('/\s+/', trim($text));
                 $modifiedWords = [];
 
                 foreach ($words as $word) {
                     // Check if word contains apostrophe
-                    if (str_contains($word, "'")) {
+                    if (strpos($word, "'") !== false) {
                         $withoutApostrophe = str_replace("'", '', $word);
-                        $modifiedWords[] = '('.self::escapeString($word).' | '.self::escapeString($withoutApostrophe).')';
+                        // Escape both variants properly and combine with OR
+                        $escapedWithApostrophe = self::escapeString($word);
+                        $escapedWithoutApostrophe = self::escapeString($withoutApostrophe);
+
+                        // Make sure both variants are properly formed
+                        if (! empty($escapedWithApostrophe) && ! empty($escapedWithoutApostrophe)) {
+                            $modifiedWords[] = "($escapedWithApostrophe | $escapedWithoutApostrophe)";
+                        } else {
+                            // If one is empty, use the non-empty one
+                            $modifiedWords[] = ! empty($escapedWithApostrophe) ? $escapedWithApostrophe : $escapedWithoutApostrophe;
+                        }
                     } else {
                         // Check for common contractions missing apostrophes
                         $patterns = [
-                            '/\b(im)\b/i' => "i'm",
-                            '/\b(dont)\b/i' => "don't",
-                            '/\b(cant)\b/i' => "can't",
-                            '/\b(wont)\b/i' => "won't",
-                            '/\b(didnt)\b/i' => "didn't",
-                            '/\b(isnt)\b/i' => "isn't",
-                            '/\b(wasnt)\b/i' => "wasn't",
-                            '/\b(wouldnt)\b/i' => "wouldn't",
-                            '/\b(couldnt)\b/i' => "couldn't",
-                            '/\b(shouldnt)\b/i' => "shouldn't",
-                            '/\b(arent)\b/i' => "aren't",
-                            '/\b(werent)\b/i' => "weren't",
-                            '/\b(youre)\b/i' => "you're",
-                            '/\b(theyre)\b/i' => "they're",
-                            '/\b(ive)\b/i' => "i've",
-                            '/\b(theyve)\b/i' => "they've",
-                            '/\b(weve)\b/i' => "we've",
-                            '/\b(youve)\b/i' => "you've",
-                            '/\b(youll)\b/i' => "you'll",
-                            '/\b(theyll)\b/i' => "they'll",
-                            '/\b(hes)\b/i' => "he's",
-                            '/\b(shes)\b/i' => "she's",
-                            '/\b(thats)\b/i' => "that's",
-                            '/\b(whats)\b/i' => "what's",
-                            '/\b(whos)\b/i' => "who's",
+                            '/^im$/i' => "i'm",
+                            '/^dont$/i' => "don't",
+                            '/^cant$/i' => "can't",
+                            '/^wont$/i' => "won't",
+                            '/^didnt$/i' => "didn't",
+                            '/^isnt$/i' => "isn't",
+                            '/^wasnt$/i' => "wasn't",
+                            '/^wouldnt$/i' => "wouldn't",
+                            '/^couldnt$/i' => "couldn't",
+                            '/^shouldnt$/i' => "shouldn't",
+                            '/^arent$/i' => "aren't",
+                            '/^werent$/i' => "weren't",
+                            '/^youre$/i' => "you're",
+                            '/^theyre$/i' => "they're",
+                            '/^ive$/i' => "i've",
+                            '/^theyve$/i' => "they've",
+                            '/^weve$/i' => "we've",
+                            '/^youve$/i' => "you've",
+                            '/^youll$/i' => "you'll",
+                            '/^theyll$/i' => "they'll",
+                            '/^hes$/i' => "he's",
+                            '/^shes$/i' => "she's",
+                            '/^thats$/i' => "that's",
+                            '/^whats$/i' => "what's",
+                            '/^whos$/i' => "who's",
                         ];
 
                         $modified = false;
                         foreach ($patterns as $pattern => $replacement) {
                             if (preg_match($pattern, $word)) {
-                                $modifiedWords[] = '('.self::escapeString($word).' | '.self::escapeString($replacement).')';
+                                $escapedWithoutApostrophe = self::escapeString($word);
+                                $escapedWithApostrophe = self::escapeString($replacement);
+
+                                if (! empty($escapedWithoutApostrophe) && ! empty($escapedWithApostrophe)) {
+                                    $modifiedWords[] = "($escapedWithoutApostrophe | $escapedWithApostrophe)";
+                                } else {
+                                    $modifiedWords[] = ! empty($escapedWithoutApostrophe) ? $escapedWithoutApostrophe : $escapedWithApostrophe;
+                                }
                                 $modified = true;
                                 break;
                             }
                         }
 
                         if (! $modified) {
-                            $modifiedWords[] = self::escapeString($word);
+                            $escapedWord = self::escapeString($word);
+                            if (! empty($escapedWord)) {
+                                $modifiedWords[] = $escapedWord;
+                            }
                         }
                     }
                 }
