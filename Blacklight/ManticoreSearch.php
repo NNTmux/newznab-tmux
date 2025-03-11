@@ -120,7 +120,7 @@ class ManticoreSearch
         }
 
         $from = ['\\', '(', ')', '@', '~', '"', '&', '/', '$', '=', "'", '--', '[', ']'];
-        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\', '\--", '\[', '\]'];
+        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', '\'', '\--', '\[', '\]'];
 
         $string = str_replace($from, $to, $string);
         // Remove these characaters if they are the last chars in $string
