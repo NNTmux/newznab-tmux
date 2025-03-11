@@ -233,7 +233,7 @@ class ManticoreSearch
             // Function to process apostrophe variations
             $processApostropheVariants = function ($text) {
                 // If there's an apostrophe, create a version without it
-                if (strpos($text, "'") !== false) {
+                if (str_contains($text, "'")) {
                     $withoutApostrophe = str_replace("'", '', $text);
 
                     // Return both variations combined with OR operator
