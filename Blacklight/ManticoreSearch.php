@@ -228,94 +228,86 @@ class ManticoreSearch
         $resultId = [];
         $resultData = [];
         try {
-            $query = $this->search->setTable($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
+            $query = $this->search->setTable($rt_index)
+                ->option('ranker', 'sph04')
+                ->option('sort_method', 'pq')
+                ->maxMatches(10000)
+                ->limit(10000)
+                ->sort('id', 'desc')
+                ->stripBadUtf8(true)
+                ->trackScores(true);
 
-            // Function to process apostrophe variations
-            $processApostropheVariants = function ($text) {
+            // Process search string to handle apostrophes
+            $processSearchString = function ($text) {
                 if (empty($text)) {
                     return '';
                 }
 
-                // Split the text into words for processing
-                $words = preg_split('/\s+/', trim($text));
-                $modifiedWords = [];
+                // For words with apostrophes, add a version without apostrophes
+                $processedText = preg_replace_callback('/\b(\w+\'(?:\w+)?)\b/', function ($matches) {
+                    $withApostrophe = self::escapeString($matches[1]);
+                    $withoutApostrophe = self::escapeString(str_replace("'", '', $matches[1]));
+
+                    return "($withApostrophe | $withoutApostrophe)";
+                }, $text);
+
+                // For common contractions without apostrophes, add versions with apostrophes
+                $contractions = [
+                    '/\bim\b/i' => "i'm",
+                    '/\bdont\b/i' => "don't",
+                    '/\bcant\b/i' => "can't",
+                    '/\bwont\b/i' => "won't",
+                    '/\bdidnt\b/i' => "didn't",
+                    '/\bisnt\b/i' => "isn't",
+                    '/\bwasnt\b/i' => "wasn't",
+                    '/\bwouldnt\b/i' => "wouldn't",
+                    '/\bcouldnt\b/i' => "couldn't",
+                    '/\bshouldnt\b/i' => "shouldn't",
+                    '/\barent\b/i' => "aren't",
+                    '/\bwerent\b/i' => "weren't",
+                    '/\byoure\b/i' => "you're",
+                    '/\btheyre\b/i' => "they're",
+                    '/\bive\b/i' => "i've",
+                    '/\btheyve\b/i' => "they've",
+                    '/\bweve\b/i' => "we've",
+                    '/\byouve\b/i' => "you've",
+                    '/\byoull\b/i' => "you'll",
+                    '/\btheyll\b/i' => "they'll",
+                    '/\bhes\b/i' => "he's",
+                    '/\bshes\b/i' => "she's",
+                    '/\bthats\b/i' => "that's",
+                    '/\bwhats\b/i' => "what's",
+                    '/\bwhos\b/i' => "who's",
+                ];
+
+                foreach ($contractions as $pattern => $replacement) {
+                    $processedText = preg_replace_callback($pattern, function ($matches) use ($replacement) {
+                        $withoutApostrophe = self::escapeString($matches[0]);
+                        $withApostrophe = self::escapeString($replacement);
+
+                        return "($withoutApostrophe | $withApostrophe)";
+                    }, $processedText);
+                }
+
+                // Escape any remaining words
+                $words = preg_split('/\s+/', $processedText);
+                $finalWords = [];
 
                 foreach ($words as $word) {
-                    // Check if word contains apostrophe
-                    if (strpos($word, "'") !== false) {
-                        $withoutApostrophe = str_replace("'", '', $word);
-                        // Escape both variants properly and combine with OR
-                        $escapedWithApostrophe = self::escapeString($word);
-                        $escapedWithoutApostrophe = self::escapeString($withoutApostrophe);
-
-                        // Make sure both variants are properly formed
-                        if (! empty($escapedWithApostrophe) && ! empty($escapedWithoutApostrophe)) {
-                            $modifiedWords[] = "($escapedWithApostrophe | $escapedWithoutApostrophe)";
-                        } else {
-                            // If one is empty, use the non-empty one
-                            $modifiedWords[] = ! empty($escapedWithApostrophe) ? $escapedWithApostrophe : $escapedWithoutApostrophe;
-                        }
+                    // Skip if it's already a combined condition
+                    if (strpos($word, ' | ') !== false) {
+                        $finalWords[] = $word;
                     } else {
-                        // Check for common contractions missing apostrophes
-                        $patterns = [
-                            '/^im$/i' => "i'm",
-                            '/^dont$/i' => "don't",
-                            '/^cant$/i' => "can't",
-                            '/^wont$/i' => "won't",
-                            '/^didnt$/i' => "didn't",
-                            '/^isnt$/i' => "isn't",
-                            '/^wasnt$/i' => "wasn't",
-                            '/^wouldnt$/i' => "wouldn't",
-                            '/^couldnt$/i' => "couldn't",
-                            '/^shouldnt$/i' => "shouldn't",
-                            '/^arent$/i' => "aren't",
-                            '/^werent$/i' => "weren't",
-                            '/^youre$/i' => "you're",
-                            '/^theyre$/i' => "they're",
-                            '/^ive$/i' => "i've",
-                            '/^theyve$/i' => "they've",
-                            '/^weve$/i' => "we've",
-                            '/^youve$/i' => "you've",
-                            '/^youll$/i' => "you'll",
-                            '/^theyll$/i' => "they'll",
-                            '/^hes$/i' => "he's",
-                            '/^shes$/i' => "she's",
-                            '/^thats$/i' => "that's",
-                            '/^whats$/i' => "what's",
-                            '/^whos$/i' => "who's",
-                        ];
-
-                        $modified = false;
-                        foreach ($patterns as $pattern => $replacement) {
-                            if (preg_match($pattern, $word)) {
-                                $escapedWithoutApostrophe = self::escapeString($word);
-                                $escapedWithApostrophe = self::escapeString($replacement);
-
-                                if (! empty($escapedWithoutApostrophe) && ! empty($escapedWithApostrophe)) {
-                                    $modifiedWords[] = "($escapedWithoutApostrophe | $escapedWithApostrophe)";
-                                } else {
-                                    $modifiedWords[] = ! empty($escapedWithoutApostrophe) ? $escapedWithoutApostrophe : $escapedWithApostrophe;
-                                }
-                                $modified = true;
-                                break;
-                            }
-                        }
-
-                        if (! $modified) {
-                            $escapedWord = self::escapeString($word);
-                            if (! empty($escapedWord)) {
-                                $modifiedWords[] = $escapedWord;
-                            }
-                        }
+                        $finalWords[] = self::escapeString($word);
                     }
                 }
 
-                return implode(' ', $modifiedWords);
+                return implode(' ', $finalWords);
             };
 
             if (! empty($searchArray)) {
                 foreach ($searchArray as $key => $value) {
-                    $processedValue = $processApostropheVariants($value);
+                    $processedValue = $processSearchString($value);
                     $query->search('@@relaxed @'.$key.' '.$processedValue);
                 }
             } elseif (! empty($searchString)) {
@@ -328,7 +320,7 @@ class ManticoreSearch
                     $searchColumns = ''; // Careful, this will search all columns.
                 }
 
-                $processedSearchString = $processApostropheVariants($searchString);
+                $processedSearchString = $processSearchString($searchString);
                 $query->search('@@relaxed '.$searchColumns.' '.$processedSearchString);
             } else {
                 return [];
