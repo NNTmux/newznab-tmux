@@ -234,9 +234,10 @@ class ManticoreSearch
             $processApostropheVariants = function ($text) {
                 // If there's an apostrophe, create a version without it
                 if (strpos($text, "'") !== false) {
-                    $withoutApostrophe = str_replace("'", "", $text);
+                    $withoutApostrophe = str_replace("'", '', $text);
+
                     // Return both variations combined with OR operator
-                    return "(" . self::escapeString($text) . " | " . self::escapeString($withoutApostrophe) . ")";
+                    return '('.self::escapeString($text).' | '.self::escapeString($withoutApostrophe).')';
                 }
 
                 // If there's no apostrophe, look for potential spots where it might be missing
@@ -276,18 +277,18 @@ class ManticoreSearch
                     $modified = false;
                     foreach ($patterns as $pattern => $replacement) {
                         if (preg_match($pattern, $word)) {
-                            $modifiedWords[] = "(" . self::escapeString($word) . " | " . self::escapeString($replacement) . ")";
+                            $modifiedWords[] = '('.self::escapeString($word).' | '.self::escapeString($replacement).')';
                             $modified = true;
                             break;
                         }
                     }
 
-                    if (!$modified) {
+                    if (! $modified) {
                         $modifiedWords[] = self::escapeString($word);
                     }
                 }
 
-                return implode(" ", $modifiedWords);
+                return implode(' ', $modifiedWords);
             };
 
             if (! empty($searchArray)) {
