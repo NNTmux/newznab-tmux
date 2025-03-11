@@ -229,9 +229,71 @@ class ManticoreSearch
         $resultData = [];
         try {
             $query = $this->search->setTable($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
+
+            // Function to process apostrophe variations
+            $processApostropheVariants = function ($text) {
+                // If there's an apostrophe, create a version without it
+                if (strpos($text, "'") !== false) {
+                    $withoutApostrophe = str_replace("'", "", $text);
+                    // Return both variations combined with OR operator
+                    return "(" . self::escapeString($text) . " | " . self::escapeString($withoutApostrophe) . ")";
+                }
+
+                // If there's no apostrophe, look for potential spots where it might be missing
+                $words = preg_split('/\s+/', $text);
+                $modifiedWords = [];
+
+                foreach ($words as $word) {
+                    // Common contractions that might be missing apostrophes
+                    $patterns = [
+                        '/\b(im)\b/i' => "i'm",
+                        '/\b(dont)\b/i' => "don't",
+                        '/\b(cant)\b/i' => "can't",
+                        '/\b(wont)\b/i' => "won't",
+                        '/\b(didnt)\b/i' => "didn't",
+                        '/\b(isnt)\b/i' => "isn't",
+                        '/\b(wasnt)\b/i' => "wasn't",
+                        '/\b(wouldnt)\b/i' => "wouldn't",
+                        '/\b(couldnt)\b/i' => "couldn't",
+                        '/\b(shouldnt)\b/i' => "shouldn't",
+                        '/\b(arent)\b/i' => "aren't",
+                        '/\b(werent)\b/i' => "weren't",
+                        '/\b(youre)\b/i' => "you're",
+                        '/\b(theyre)\b/i' => "they're",
+                        '/\b(ive)\b/i' => "i've",
+                        '/\b(theyve)\b/i' => "they've",
+                        '/\b(weve)\b/i' => "we've",
+                        '/\b(youve)\b/i' => "you've",
+                        '/\b(youll)\b/i' => "you'll",
+                        '/\b(theyll)\b/i' => "they'll",
+                        '/\b(hes)\b/i' => "he's",
+                        '/\b(shes)\b/i' => "she's",
+                        '/\b(thats)\b/i' => "that's",
+                        '/\b(whats)\b/i' => "what's",
+                        '/\b(whos)\b/i' => "who's",
+                    ];
+
+                    $modified = false;
+                    foreach ($patterns as $pattern => $replacement) {
+                        if (preg_match($pattern, $word)) {
+                            $modifiedWords[] = "(" . self::escapeString($word) . " | " . self::escapeString($replacement) . ")";
+                            $modified = true;
+                            break;
+                        }
+                    }
+
+                    if (!$modified) {
+                        $modifiedWords[] = self::escapeString($word);
+                    }
+                }
+
+                return implode(" ", $modifiedWords);
+            };
+
             if (! empty($searchArray)) {
                 foreach ($searchArray as $key => $value) {
-                    $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
+                    $processedValue = $processApostropheVariants($value);
+                    $query->search('@@relaxed @'.$key.' '.$processedValue);
                 }
             } elseif (! empty($searchString)) {
                 // If $column is an array and has more than one item, implode it and wrap in parentheses.
@@ -243,10 +305,12 @@ class ManticoreSearch
                     $searchColumns = ''; // Careful, this will search all columns.
                 }
 
-                $query->search('@@relaxed '.$searchColumns.' '.self::escapeString($searchString));
+                $processedSearchString = $processApostropheVariants($searchString);
+                $query->search('@@relaxed '.$searchColumns.' '.$processedSearchString);
             } else {
                 return [];
             }
+
             $results = $query->get();
             foreach ($results as $doc) {
                 $resultId[] = [
