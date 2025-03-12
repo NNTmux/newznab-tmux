@@ -96,7 +96,7 @@ class NntmuxPopulateSearchIndexes extends Command
                     ];
                     $bar->advance();
                 }
-                $manticore->manticoresearch->index('releases_rt')->replaceDocuments($data);
+                $manticore->manticoreSearch->table('releases_rt')->replaceDocuments($data);
             });
         $bar->finish();
         $this->newLine();
@@ -139,7 +139,7 @@ class NntmuxPopulateSearchIndexes extends Command
                     ];
                     $bar->advance();
                 }
-                $manticore->manticoresearch->index('predb_rt')->replaceDocuments($data);
+                $manticore->manticoreSearch->table('predb_rt')->replaceDocuments($data);
             });
 
         $bar->finish();
