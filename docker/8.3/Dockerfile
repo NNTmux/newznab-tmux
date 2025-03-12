@@ -30,10 +30,10 @@ RUN apt-get update \
         php8.3-yaml php8.3-zip php8.3-zstd php8.3-pgsql php8.3-sockets php8.3-imap php8.3-ldap php8.3-memcached php8.3-pcov \
         tmux iputils-ping net-tools ffmpeg \
         sudo jq htop fonts-powerline nano bash-completion time wget cron \
-        nginx php8.3-fpm libnginx-mod-brotli \
+        nginx php8.3-fpm \
         jpegoptim webp optipng pngquant libavif-bin \
-    && wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-24_all.deb \
-    && dpkg -i repo-mediaarea_1.0-24_all.deb \
+    && wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-25_all.deb \
+    && dpkg -i repo-mediaarea_1.0-25_all.deb \
     && apt-get update \
     && apt-get install -y libmediainfo0v5 mediainfo libzen0v5 \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
