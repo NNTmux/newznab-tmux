@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0477e71cad57f70b0c2d57fdbd88f018",
+    "content-hash": "50c1c085727a0c083dec91681655f1c2",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3175,22 +3175,22 @@
         },
         {
             "name": "junaidnasir/larainvite",
-            "version": "v7.0.0",
+            "version": "v12.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/junaidnasir/larainvite.git",
-                "reference": "c4b178c22ced18e7469fad7c81a69de91ddc2dbb"
+                "reference": "b39adf46b6c0202c2da038400acb8fe8989e7592"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/c4b178c22ced18e7469fad7c81a69de91ddc2dbb",
-                "reference": "c4b178c22ced18e7469fad7c81a69de91ddc2dbb",
+                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/b39adf46b6c0202c2da038400acb8fe8989e7592",
+                "reference": "b39adf46b6c0202c2da038400acb8fe8989e7592",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/events": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/support": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/database": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/events": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": ">=5.5.9"
             },
             "require-dev": {
@@ -3231,9 +3231,9 @@
             ],
             "support": {
                 "issues": "https://github.com/junaidnasir/larainvite/issues",
-                "source": "https://github.com/junaidnasir/larainvite/tree/v7.0.0"
+                "source": "https://github.com/junaidnasir/larainvite/tree/v12.0.0"
             },
-            "time": "2024-04-18T11:07:27+00:00"
+            "time": "2025-03-12T23:26:59+00:00"
         },
         {
             "name": "kalnoy/nestedset",
@@ -4262,30 +4262,30 @@
         },
         {
             "name": "laravelcollective/html",
-            "version": "v6.5.0",
+            "version": "v6.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/html.git",
-                "reference": "b60b4689db108b78851a05d95f3c876ba8b6da12"
+                "reference": "71df241442ac0d94c900c0171e8d4a4c707b1954"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/html/zipball/b60b4689db108b78851a05d95f3c876ba8b6da12",
-                "reference": "b60b4689db108b78851a05d95f3c876ba8b6da12",
+                "url": "https://api.github.com/repos/DariusIII/html/zipball/71df241442ac0d94c900c0171e8d4a4c707b1954",
+                "reference": "71df241442ac0d94c900c0171e8d4a4c707b1954",
                 "shasum": ""
             },
             "require": {
-                "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/session": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/view": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/session": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/view": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": ">=7.2.5"
             },
             "require-dev": {
-                "illuminate/database": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/database": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "mockery/mockery": "~1.0",
-                "phpunit/phpunit": "~8.5|^9.5.10|^10.0|^11.0"
+                "phpunit/phpunit": "~8.5|^9.5.10|^10.0|^11.0|^12.0"
             },
             "type": "library",
             "extra": {
@@ -4329,7 +4329,7 @@
                 "issues": "https://github.com/LaravelCollective/html/issues",
                 "source": "https://github.com/LaravelCollective/html"
             },
-            "time": "2024-04-23T17:03:57+00:00"
+            "time": "2025-03-21T20:56:50+00:00"
         },
         {
             "name": "league/climate",

@@ -63,7 +63,7 @@
         "imdbphp/imdbphp": "^8.3",
         "intervention/image": "^3.11",
         "jrean/laravel-user-verification": "^12.0",
-        "junaidnasir/larainvite": "^7.0",
+        "junaidnasir/larainvite": "^12.0",
         "kevinlebrun/colors.php": "^1.0",
         "laravel/framework": "^11.44",
         "laravel/horizon": "^5.31",
