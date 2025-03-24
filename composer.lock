@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05ee755faebd1ad6f831dbdfc69dafe7",
+    "content-hash": "18d225385e73037982eeed4cf16806ec",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -218,21 +218,21 @@
         },
         {
             "name": "bhuvidya/laravel-countries",
-            "version": "v11.0",
+            "version": "v12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bhuvidya/laravel-countries.git",
-                "reference": "3b108146d3992c716e072f5b17e25c8e2e7bfef5"
+                "reference": "c27ee169a0d3c61aa829cd0e4e65ef43d708bfcc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/3b108146d3992c716e072f5b17e25c8e2e7bfef5",
-                "reference": "3b108146d3992c716e072f5b17e25c8e2e7bfef5",
+                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/c27ee169a0d3c61aa829cd0e4e65ef43d708bfcc",
+                "reference": "c27ee169a0d3c61aa829cd0e4e65ef43d708bfcc",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/support": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/database": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": ">=7.0.0"
             },
             "type": "library",
@@ -271,7 +271,7 @@
                 "issues": "https://github.com/bhuvidya/laravel-countries/issues",
                 "source": "https://github.com/bhuvidya/laravel-countries"
             },
-            "time": "2024-04-26T00:19:45+00:00"
+            "time": "2025-03-13T01:11:07+00:00"
         },
         {
             "name": "brick/math",

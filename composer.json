@@ -46,7 +46,7 @@
         "anhskohbo/no-captcha": "^3.7.0",
         "b3rs3rk/steamfront": "dev-master",
         "bacon/bacon-qr-code": "^3.0",
-        "bhuvidya/laravel-countries": "^11.0",
+        "bhuvidya/laravel-countries": "^12.0",
         "brick/math": "^0.12.3",
         "canihavesomecoffee/thetvdbapi": "^2.0",
         "dariusiii/php-itunes-api": "^1.0",
