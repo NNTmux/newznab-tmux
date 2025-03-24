@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0477e71cad57f70b0c2d57fdbd88f018",
+    "content-hash": "335ef55af0ccd07366841539ae97f4af",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2160,29 +2160,28 @@
         },
         {
             "name": "genealabs/laravel-caffeine",
-            "version": "11.0.0",
+            "version": "12.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikebronner/laravel-caffeine.git",
-                "reference": "0d03494417cda0e4258f13c45275974dbf30717b"
+                "reference": "79a3cb163f1d3c79a004725cbd9ee17ed9e06415"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikebronner/laravel-caffeine/zipball/0d03494417cda0e4258f13c45275974dbf30717b",
-                "reference": "0d03494417cda0e4258f13c45275974dbf30717b",
+                "url": "https://api.github.com/repos/mikebronner/laravel-caffeine/zipball/79a3cb163f1d3c79a004725cbd9ee17ed9e06415",
+                "reference": "79a3cb163f1d3c79a004725cbd9ee17ed9e06415",
                 "shasum": ""
             },
             "require": {
-                "illuminate/routing": "^10.0|^11.0",
-                "illuminate/support": "^10.0|^11.0",
-                "jenssegers/model": "^1.5"
+                "illuminate/routing": "^10.0|^11.0|^12.0",
+                "illuminate/support": "^10.0|^11.0|^12.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^8.0|^9.0",
-                "orchestra/testbench-browser-kit": "^8.0",
-                "orchestra/testbench-dusk": "^8.0",
+                "orchestra/testbench": "^10.0",
+                "orchestra/testbench-browser-kit": "^10.0",
+                "orchestra/testbench-dusk": "^10.0",
                 "phpmd/phpmd": "^2.13",
-                "phpunit/phpunit": "^10.0"
+                "phpunit/phpunit": "^11.5.3"
             },
             "type": "library",
             "extra": {
@@ -2210,7 +2209,7 @@
             "description": "Keeping Your Laravel Forms Awake",
             "support": {
                 "issues": "https://github.com/mikebronner/laravel-caffeine/issues",
-                "source": "https://github.com/mikebronner/laravel-caffeine/tree/11.0.0"
+                "source": "https://github.com/mikebronner/laravel-caffeine/tree/12.0.3"
             },
             "funding": [
                 {
@@ -2218,7 +2217,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-03T17:43:07+00:00"
+            "time": "2025-03-18T12:36:36+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -3054,57 +3053,6 @@
                 "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.1"
             },
             "time": "2025-03-19T14:43:43+00:00"
-        },
-        {
-            "name": "jenssegers/model",
-            "version": "v1.5.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jenssegers/model.git",
-                "reference": "eb8fb6e770e4c7e7b9c5c7ba6a7787f8669bce86"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jenssegers/model/zipball/eb8fb6e770e4c7e7b9c5c7ba6a7787f8669bce86",
-                "reference": "eb8fb6e770e4c7e7b9c5c7ba6a7787f8669bce86",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-                "illuminate/support": "^4.0|^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0"
-            },
-            "require-dev": {
-                "php-coveralls/php-coveralls": "*",
-                "phpunit/phpunit": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Jenssegers\\Model\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jens Segers",
-                    "homepage": "https://jenssegers.com"
-                }
-            ],
-            "description": "An Laravel eloquent-like model class, for Laravel and other frameworks",
-            "homepage": "https://github.com/jenssegers/model",
-            "keywords": [
-                "eloquent",
-                "laravel",
-                "model"
-            ],
-            "support": {
-                "issues": "https://github.com/jenssegers/model/issues",
-                "source": "https://github.com/jenssegers/model/tree/v1.5.4"
-            },
-            "time": "2025-03-16T15:13:01+00:00"
         },
         {
             "name": "jrean/laravel-user-verification",
@@ -8654,16 +8602,16 @@
         },
         {
             "name": "ramsey/collection",
-            "version": "2.1.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/collection.git",
-                "reference": "3c5990b8a5e0b79cd1cf11c2dc1229e58e93f109"
+                "reference": "344572933ad0181accbf4ba763e85a0306a8c5e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/collection/zipball/3c5990b8a5e0b79cd1cf11c2dc1229e58e93f109",
-                "reference": "3c5990b8a5e0b79cd1cf11c2dc1229e58e93f109",
+                "url": "https://api.github.com/repos/ramsey/collection/zipball/344572933ad0181accbf4ba763e85a0306a8c5e2",
+                "reference": "344572933ad0181accbf4ba763e85a0306a8c5e2",
                 "shasum": ""
             },
             "require": {
@@ -8724,9 +8672,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ramsey/collection/issues",
-                "source": "https://github.com/ramsey/collection/tree/2.1.0"
+                "source": "https://github.com/ramsey/collection/tree/2.1.1"
             },
-            "time": "2025-03-02T04:48:29+00:00"
+            "time": "2025-03-22T05:38:12+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -19029,6 +18977,6 @@
         "ext-xmlwriter": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
 }
