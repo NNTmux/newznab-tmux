@@ -51,7 +51,7 @@
         "canihavesomecoffee/thetvdbapi": "^2.0",
         "dariusiii/php-itunes-api": "^1.0",
         "dariusiii/rarinfo": "^2.7",
-        "dariusiii/tmdb-laravel": "^12.0",
+        "dariusiii/tmdb-laravel": "^12.0.2",
         "dariusiii/tv-maze-php-api": "^2.0.0",
         "dborsatto/php-giantbomb": "^2.2",
         "divineomega/php-cli-progress-bar": "^2.1",
@@ -64,7 +64,7 @@
         "intervention/image": "^3.11",
         "jrean/laravel-user-verification": "^13.0",
         "junaidnasir/larainvite": "^12.0",
-        "laravel/framework": "^11.44",
+        "laravel/framework": "^v12.3",
         "laravel/horizon": "^5.31",
         "laravel/pulse": "^1.4",
         "laravel/sanctum": "^4.0",
@@ -92,8 +92,7 @@
         "pragmarx/google2fa-laravel": "^2.3",
         "predis/predis": "^2.3",
         "propaganistas/laravel-disposable-email": "^2.4",
-        "ramsey/uuid": "^4.7",
-        "riari/laravel-forum": "^6.0",
+        "riari/laravel-forum": "^7.0",
         "sentry/sentry-laravel": "^4.13",
         "smarty/smarty": "^4.3",
         "spatie/async": "^1.7",
@@ -103,31 +102,31 @@
         "spatie/laravel-image-optimizer": "^1.8",
         "spatie/laravel-permission": "^6.16",
         "sspat/es-query-sanitizer": "^1.0",
-        "stechstudio/laravel-zipstream": "^4.14",
+        "stechstudio/laravel-zipstream": "^5.4",
         "symfony/http-client": "^7.0",
         "symfony/postmark-mailer": "^7.0",
         "symfony/process": "^7.0",
         "vlucas/phpdotenv": "^5.6",
         "voku/simple_html_dom": "^4.8",
-        "ytake/laravel-smarty": "^8.0"
+        "ytake/laravel-smarty": "^12.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
         "beyondcode/laravel-dump-server": "^2.1",
         "captainhook/captainhook": "^5.4",
         "captainhook/plugin-composer": "^5.2",
-        "driftingly/rector-laravel": "^0.29",
+        "driftingly/rector-laravel": "^2.0",
         "ergebnis/composer-normalize": "^2.30",
         "friendsofphp/php-cs-fixer": "^3.70",
         "jubeki/laravel-code-style": "^2.0",
-        "larastan/larastan": "^2.8",
+        "larastan/larastan": "^3.2",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
         "php-coveralls/php-coveralls": "^2.4",
         "phpunit/phpunit": "^11.0.1",
-        "rector/rector": "^0.18.13"
+        "rector/rector": "^2.0"
     },
     "suggest": {
         "ext-gd": "to use GD library based image processing.",
@@ -142,6 +141,14 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/html"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/Laravel.Smarty"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/tmdbapi"
         }
     ],
     "minimum-stability": "dev",
