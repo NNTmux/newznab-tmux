@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "18d225385e73037982eeed4cf16806ec",
+    "content-hash": "5d44ed8c5d7770f94ae13d646cd02d0b",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3056,20 +3056,20 @@
         },
         {
             "name": "jrean/laravel-user-verification",
-            "version": "v12.0.0",
+            "version": "v13.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jrean/laravel-user-verification.git",
-                "reference": "114e67354f1ec6c7b350587a274d2759ab08b011"
+                "reference": "c9e3f45a28cf0dfc0e549327be5f210fcdd489f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/114e67354f1ec6c7b350587a274d2759ab08b011",
-                "reference": "114e67354f1ec6c7b350587a274d2759ab08b011",
+                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/c9e3f45a28cf0dfc0e549327be5f210fcdd489f2",
+                "reference": "c9e3f45a28cf0dfc0e549327be5f210fcdd489f2",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^6.0 || ^7.0 || ^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": ">=7.2.0"
             },
             "require-dev": {
@@ -3117,9 +3117,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jrean/laravel-user-verification/issues",
-                "source": "https://github.com/jrean/laravel-user-verification/tree/v12.0.0"
+                "source": "https://github.com/jrean/laravel-user-verification/tree/v13.0.0"
             },
-            "time": "2024-07-02T15:04:21+00:00"
+            "time": "2025-03-25T16:26:47+00:00"
         },
         {
             "name": "junaidnasir/larainvite",
