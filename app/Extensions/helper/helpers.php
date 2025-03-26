@@ -4,11 +4,11 @@ use App\Models\Release;
 use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Blacklight\XXX;
-use Colors\Color;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -256,7 +256,7 @@ if (! function_exists('is_it_json')) {
 /**
  * @throws Exception
  */
-function getStreamingZip(array $guids = []): STS\ZipStream\ZipStream
+function getStreamingZip(array $guids = [])
 {
     $nzb = new NZB;
     $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
