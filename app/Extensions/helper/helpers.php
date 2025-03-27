@@ -4,6 +4,7 @@ use App\Models\Release;
 use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Blacklight\XXX;
+use Colors\Color;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -147,10 +148,7 @@ if (! function_exists('getSimilarName')) {
 }
 
 if (! function_exists('color')) {
-    /**
-     * @param  string  $string
-     */
-    function color($string = ''): Color
+    function color(string $string = ''): Color
     {
         return new Color($string);
     }
