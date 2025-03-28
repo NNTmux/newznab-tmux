@@ -999,34 +999,50 @@ class Releases extends Release
         }
 
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s
-			AND r.nzbstatus = %d
-			%s %s %s %s %s',
-            $this->showPasswords(),
+            'WHERE r.nzbstatus = %d
+            AND r.passwordstatus %s
+            %s
+            %s
+            %s
+            %s
+            %s',
             NZB::NZB_ADDED,
-            ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
+            $this->showPasswords(),
+            // ID-based filters (most selective)
+            ($aniDbID > -1 ? sprintf('AND r.anidbid = %d', $aniDbID) : ''),
+            // Search result filter (highly selective)
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
+            // Category filters
+            (! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(%s)', implode(',', $excludedCategories)) : ''),
             Category::getCategorySearch($cat),
-            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
+            // Date filtering (least selective)
+            ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name,
-				rn.releases_id AS nfoid
-			FROM releases r
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s",
+            "SELECT
+                r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
+                r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                r.adddate, r.haspreview, r.jpgstatus,
+
+                cp.title AS parent_category,
+                c.title AS sub_category,
+                CONCAT(cp.title, ' > ', c.title) AS category_name,
+
+                g.name AS group_name,
+
+                rn.releases_id AS nfoid
+            FROM releases r
+            LEFT JOIN categories c ON c.id = r.categories_id
+            LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN release_nfos rn ON rn.releases_id = r.id
+            %s",
             $whereSql
         );
         $sql = sprintf(
             '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
+            ORDER BY r.postdate DESC
+            LIMIT %d OFFSET %d',
             $baseSql,
             $limit,
             $offset
