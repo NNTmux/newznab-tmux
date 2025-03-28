@@ -165,7 +165,6 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][0]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 1 true other yes show $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 3 true other yes show $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 5 true other yes show $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 7 true other yes show $log; \

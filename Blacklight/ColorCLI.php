@@ -111,15 +111,12 @@ class ColorCLI
         $this->climate->red()->inline($str);
     }
 
-    /**
-     * @return mixed
-     */
-    public function progress()
+    public function progress(): mixed
     {
         return $this->climate->progress();
     }
 
-    public function climate()
+    public function climate(): CLImate
     {
         return $this->climate;
     }

@@ -148,10 +148,7 @@ if (! function_exists('getSimilarName')) {
 }
 
 if (! function_exists('color')) {
-    /**
-     * @param  string  $string
-     */
-    function color($string = ''): Color
+    function color(string $string = ''): Color
     {
         return new Color($string);
     }
@@ -256,7 +253,7 @@ if (! function_exists('is_it_json')) {
 /**
  * @throws Exception
  */
-function getStreamingZip(array $guids = []): STS\ZipStream\ZipStream
+function getStreamingZip(array $guids = [])
 {
     $nzb = new NZB;
     $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');

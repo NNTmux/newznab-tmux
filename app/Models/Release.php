@@ -290,13 +290,14 @@ class Release extends Model
     /**
      * Used for admin page release-list.
      *
-     *
+     * @param  int  $page  The page number to retrieve
      * @return LengthAwarePaginator|mixed
      */
-    public static function getReleasesRange()
+    public static function getReleasesRange(int $page = 1): mixed
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $releases = Cache::get(md5('releasesRange'));
+        $cacheKey = md5('releasesRange_'.$page);
+        $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
@@ -316,15 +317,15 @@ class Release extends Model
                     'releases.grabs',
                     'cp.title as parent_category',
                     'c.title as sub_category',
-                    DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
+                    DB::raw('CONCAT(cp.title, \' > \', c.title) AS category_name'),
                 ]
             )
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->orderByDesc('releases.postdate')
-            ->paginate(config('nntmux.items_per_page'));
+            ->paginate(config('nntmux.items_per_page'), ['*'], 'page', $page);
 
-        Cache::put(md5('releasesRange'), $releases, $expiresAt);
+        Cache::put($cacheKey, $releases, $expiresAt);
 
         return $releases;
     }
