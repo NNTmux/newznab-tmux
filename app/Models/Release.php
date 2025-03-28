@@ -290,13 +290,13 @@ class Release extends Model
     /**
      * Used for admin page release-list.
      *
-     * @param int $page The page number to retrieve
+     * @param  int  $page  The page number to retrieve
      * @return LengthAwarePaginator|mixed
      */
     public static function getReleasesRange(int $page = 1): mixed
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $cacheKey = md5('releasesRange_' . $page);
+        $cacheKey = md5('releasesRange_'.$page);
         $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
