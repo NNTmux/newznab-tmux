@@ -575,39 +575,47 @@ class Releases extends Release
         $catQuery = Category::getCategorySearch($cat);
 
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s',
-            $this->showPasswords(),
+            'WHERE r.nzbstatus = %d
+            AND r.passwordstatus %s
+            %s %s %s %s %s %s',
             NZB::NZB_ADDED,
-            ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
-            $catQuery,
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            $this->showPasswords(),
+            // This is likely the most restrictive condition - should be early
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            // Category filtering
+            $catQuery,
+            (\count($excludedCats) > 0 ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            // Group filtering
+            ((int) $groupName !== -1 ? sprintf('AND r.groups_id = %d', UsenetGroup::getIDByName($groupName)) : ''),
+            // Date filtering
+            ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
+            // Size filtering
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name,
-				cp.id AS categoryparentid,
-				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tve.firstaired, tve.title, tve.series, tve.episode
-			FROM releases r
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			%s",
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size,
+                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                    r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
+                    m.imdbid, m.tmdbid, m.traktid,
+                    cp.title AS parent_category, c.title AS sub_category, cp.id AS categoryparentid,
+                    CONCAT(cp.title, ' > ', c.title) AS category_name,
+                    g.name AS group_name,
+                    v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+                    tve.firstaired, tve.title, tve.series, tve.episode
+                FROM releases r
+                LEFT JOIN categories c ON c.id = r.categories_id
+                LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+                LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
+                LEFT JOIN usenet_groups g ON g.id = r.groups_id
+                LEFT JOIN videos v ON r.videos_id = v.id
+                LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+                %s",
             $whereSql
         );
         $sql = sprintf(
-            'SELECT * FROM (
-				%s
-			) r
-			ORDER BY r.postdate DESC
-			LIMIT %d OFFSET %d',
+            '%s
+            ORDER BY r.postdate DESC
+            LIMIT %d OFFSET %d',
             $baseSql,
             $limit,
             $offset
