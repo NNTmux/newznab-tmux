@@ -483,48 +483,56 @@ class Releases extends Release
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s',
-            $this->showPasswords(),
+            'WHERE r.nzbstatus = %d
+            AND r.passwordstatus %s
+            %s %s %s %s %s %s %s %s %s',
             NZB::NZB_ADDED,
-            ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
-            (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
-            (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
+            $this->showPasswords(),
+            // Search ID filter (most restrictive, should be early)
+            (!empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            // Category filters
             $catQuery,
-            ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
-            ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            ('AND r.id IN ('.implode(',', $searchResult).')'),
+            (\count($excludedCats) > 0 ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            // Group filter
+            ((int) $groupName !== -1 ? sprintf('AND r.groups_id = %d', UsenetGroup::getIDByName($groupName)) : ''),
+            // Date filters - combined when possible
+            ($maxAge > 0 ? sprintf('AND r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge) : ''),
+            ((int) $daysNew !== -1 ? sprintf('AND r.postdate < (NOW() - INTERVAL %d DAY)', $daysNew) : ''),
+            ((int) $daysOld !== -1 ? sprintf('AND r.postdate > (NOW() - INTERVAL %d DAY)', $daysOld) : ''),
+            // Size filters
+            (array_key_exists($sizeFrom, $sizeRange) ? sprintf('AND r.size > %d', 104857600 * (int) $sizeRange[$sizeFrom]) : ''),
+            (array_key_exists($sizeTo, $sizeRange) ? sprintf('AND r.size < %d', 104857600 * (int) $sizeRange[$sizeTo]) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,  cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				df.failed AS failed,
-				g.name AS group_name,
-				rn.releases_id AS nfoid,
-				re.releases_id AS reid,
-				cp.id AS categoryparentid,
-				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tve.firstaired
-			FROM releases r
-			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			%s",
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size,
+                r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
+                cp.title AS parent_category, c.title AS sub_category,
+                CONCAT(cp.title, ' > ', c.title) AS category_name,
+                df.failed AS failed,
+                g.name AS group_name,
+                rn.releases_id AS nfoid,
+                re.releases_id AS reid,
+                cp.id AS categoryparentid,
+                v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+                tve.firstaired
+            FROM releases r
+            LEFT JOIN categories c ON c.id = r.categories_id
+            LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN videos v ON r.videos_id = v.id
+            LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+            LEFT JOIN video_data re ON re.releases_id = r.id
+            LEFT JOIN release_nfos rn ON rn.releases_id = r.id
+            LEFT JOIN dnzb_failures df ON df.release_id = r.id
+            %s",
             $whereSql
         );
         $sql = sprintf(
-            'SELECT * FROM (
-				%s
-			) r
-			ORDER BY r.%s %s
-			LIMIT %d OFFSET %d',
+            '%s
+            ORDER BY %s %s
+            LIMIT %d OFFSET %d',
             $baseSql,
             $orderBy[0],
             $orderBy[1],
