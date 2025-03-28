@@ -55,8 +55,8 @@ class Releases extends Release
 
         $orderBy = $this->getBrowseOrder($orderBy);
 
-       $qry = sprintf(
-                "SELECT DISTINCT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id,
+        $qry = sprintf(
+            "SELECT DISTINCT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id,
                     r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
                     r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
                     cp.title AS parent_category, c.title AS sub_category, g.name as group_name,
@@ -81,18 +81,18 @@ class Releases extends Release
                 %s %s %s %s %s
                 ORDER BY %s %s
                 LIMIT %d OFFSET %d",
-                NZB::NZB_ADDED,
-                $this->showPasswords(),
-                Category::getCategorySearch($cat),
-                ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-                (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
-                ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
-                ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-                $orderBy[0],
-                $orderBy[1],
-                $num,
-                $start
-            );
+            NZB::NZB_ADDED,
+            $this->showPasswords(),
+            Category::getCategorySearch($cat),
+            ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
+            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
+            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
+            $orderBy[0],
+            $orderBy[1],
+            $num,
+            $start
+        );
 
         $releases = Cache::get(md5($qry.$page));
         if ($releases !== null) {
