@@ -1085,39 +1085,61 @@ class Releases extends Release
         }
 
         $whereSql = sprintf(
-            'WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
-			AND r.nzbstatus = %d
-			AND r.passwordstatus %s
-			%s %s %s %s %s %s %s',
+            'WHERE r.categories_id BETWEEN %d AND %d
+            AND r.nzbstatus = %d
+            AND r.passwordstatus %s
+            %s
+            %s
+            %s
+            %s
+            %s
+            %s
+            %s
+            %s',
+            Category::MOVIE_ROOT,
+            Category::MOVIE_OTHER,
             NZB::NZB_ADDED,
             $this->showPasswords(),
+            // ID-based filters (most selective)
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            ($imDbId !== -1 && $imDbId) ? sprintf(' AND m.imdbid = \'%s\' ', $imDbId) : '',
-            ($tmDbId !== -1 && $tmDbId) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
-            ($traktId !== -1 && $traktId) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
+            ($imDbId !== -1 && $imDbId ? sprintf('AND m.imdbid = %s', $imDbId) : ''),
+            ($tmDbId !== -1 && $tmDbId ? sprintf('AND m.tmdbid = %d', $tmDbId) : ''),
+            ($traktId !== -1 && $traktId ? sprintf('AND m.traktid = %d', $traktId) : ''),
+            // Category filters
+            (! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(%s)', implode(',', $excludedCategories)) : ''),
             Category::getCategorySearch($cat, 'movies'),
-            $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
-            $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
+            // Date and size filters (least selective)
+            ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
+            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
-				concat(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name,
-				rn.releases_id AS nfoid
-			FROM releases r
-			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s",
+            "SELECT
+                r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
+                r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
+
+                m.imdbid, m.tmdbid, m.traktid,
+
+                cp.title AS parent_category,
+                c.title AS sub_category,
+                CONCAT(cp.title, ' > ', c.title) AS category_name,
+
+                g.name AS group_name,
+
+                rn.releases_id AS nfoid
+            FROM releases r
+            LEFT JOIN categories c ON c.id = r.categories_id
+            LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN release_nfos rn ON rn.releases_id = r.id
+            %s",
             $whereSql
         );
         $sql = sprintf(
             '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
+            ORDER BY r.postdate DESC
+            LIMIT %d OFFSET %d',
             $baseSql,
             $limit,
             $offset
