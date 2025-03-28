@@ -87,16 +87,30 @@ class AdminReleasesController extends BasePageController
         $this->adminrender();
     }
 
-    /**
-     * @throws \Exception
-     */
     public function destroy($id): RedirectResponse
     {
-        if ($id) {
-            $releases = new Releases;
-            $releases->deleteMultiple($id);
-        }
+        try {
+            if ($id) {
+                $releases = new Releases;
+                $releases->deleteMultiple($id);
+                session()->flash('success', 'Release deleted successfully');
+            }
 
-        return redirect()->back();
+            // Check if request is coming from the NZB details page
+            $referer = request()->headers->get('referer');
+            if ($referer && str_contains($referer, '/details/')) {
+                // If coming from details page, redirect to home page
+                return redirect()->route('All');
+            }
+
+            // Default redirection logic for other cases
+            $redirectUrl = session('intended_redirect') ?? route('admin.release-list');
+            session()->forget('intended_redirect');
+
+            return redirect($redirectUrl);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting release: ' . $e->getMessage());
+            return redirect()->route('admin.release-list');
+        }
     }
 }
