@@ -660,19 +660,21 @@ class Releases extends Release
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
-                "
-				SELECT
-					v.id AS video,
-					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
-				FROM videos v
-				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s
-				GROUP BY v.id
-				LIMIT 1",
+                "SELECT
+                    v.id AS video,
+                    GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
+                FROM videos v
+                LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
+                WHERE (%s)
+                    %s
+                    %s
+                    %s
+                GROUP BY v.id
+                LIMIT 1",
                 implode(' OR ', $siteSQL),
-                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
+                $series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : '',
+                $episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : '',
+                $airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : ''
             );
 
             $show = $this->fromQuery($showQry);
@@ -726,43 +728,66 @@ class Releases extends Release
         }
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
-			AND r.passwordstatus %s
-			%s %s %s %s %s %s',
+            AND r.passwordstatus %s
+            %s
+            %s
+            %s
+            %s
+            %s
+            %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
+            // Custom show conditions (likely very selective)
             $showSql,
-            (! empty($name) && count($searchResult) !== 0) ? 'AND r.id IN ('.implode(',', $searchResult).')' : '',
+            // Search ID filter (highly selective, should be early)
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            // Category filtering
             Category::getCategorySearch($cat, 'tv'),
-            $maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : '',
-            $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '',
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
+            // Excluded categories filter
+            (! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(%s)', implode(',', $excludedCategories)) : ''),
+            // Date filtering
+            ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
+            // Size filtering
+            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
-				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
-					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
-				tvi.summary, tvi.publisher, tvi.image,
-				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary, cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name,
-				rn.releases_id AS nfoid,
-				re.releases_id AS reid
-			FROM releases r
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
-			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s",
+            "SELECT
+                r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size,
+                r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
+
+                v.title AS video_title, v.countries_id, v.started, v.tvdb, v.trakt,
+                v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
+
+                tvi.summary AS tvinfo_summary, tvi.publisher, tvi.image,
+
+                tve.series, tve.episode, tve.se_complete, tve.title AS episode_title,
+                tve.firstaired, tve.summary AS episode_summary,
+
+                cp.title AS parent_category,
+                c.title AS sub_category,
+                CONCAT(cp.title, ' > ', c.title) AS category_name,
+
+                g.name AS group_name,
+
+                rn.releases_id AS nfoid,
+                re.releases_id AS reid
+            FROM releases r
+            LEFT JOIN categories c ON c.id = r.categories_id
+            LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0
+            LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
+            LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+            LEFT JOIN video_data re ON re.releases_id = r.id
+            LEFT JOIN release_nfos rn ON rn.releases_id = r.id
+            %s",
             $whereSql
         );
         $sql = sprintf(
             '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
+            ORDER BY r.postdate DESC
+            LIMIT %d OFFSET %d',
             $baseSql,
             $limit,
             $offset
