@@ -827,38 +827,51 @@ class Releases extends Release
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
-                "
-				SELECT
-					v.id AS video,
-					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
-				FROM videos v
-				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s
-				GROUP BY v.id
-				LIMIT 1",
+                "SELECT
+                    v.id AS video,
+                    GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
+                FROM videos v
+                LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
+                WHERE (%s)
+                    %s
+                    %s
+                    %s
+                GROUP BY v.id
+                LIMIT 1",
                 implode(' OR ', $siteSQL),
-                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
+                $series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : '',
+                $episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : '',
+                $airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : ''
             );
 
             $show = $this->fromQuery($showQry);
-            if ($show->isNotEmpty()) {
-                if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
-                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                } elseif (! empty($episode) && $show[0]->episodes !== '') {
-                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
-                } elseif (! empty($series) && empty($episode)) {
-                    // If $series is set but episode is not, return Season Packs and Episodes
-                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                }
-                if ($show[0]->video > 0) {
-                    $showSql .= ' AND r.videos_id = '.$show[0]->video;
-                }
-            } else {
-                // If we were passed Site ID Info and no match was found, do not run the query
+            if ($show->isEmpty()) {
+                // If we were passed Site ID Info and no match was found, exit early
                 return [];
             }
+        }
+
+        // Initialize the SQL condition string
+        $showSql = '';
+
+        // Only proceed if we have valid episode data
+        if (! empty($show[0]->episodes)) {
+            // Build episode filter conditions
+            $episodeFilter = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
+
+            if (! empty($series)) {
+                // Add series filter when series is specified
+                $seriesFilter = sprintf('AND tve.series = %d', (int) $series);
+                $showSql .= $episodeFilter.' '.$seriesFilter;
+            } elseif (! empty($episode)) {
+                // Episode specified without series - just filter by episode IDs
+                $showSql = $episodeFilter;
+            }
+        }
+
+        // Add video filter if we have a valid video ID
+        if (! empty($show[0]->video) && $show[0]->video > 0) {
+            $showSql .= sprintf(' AND r.videos_id = %d', (int) $show[0]->video);
         }
         // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
         if (! empty($name) && $showSql === '') {
@@ -891,37 +904,57 @@ class Releases extends Release
         }
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
-			AND r.passwordstatus %s
-			%s %s %s %s %s %s',
+            AND r.passwordstatus %s
+            %s
+            %s
+            %s
+            %s
+            %s
+            %s',
             NZB::NZB_ADDED,
             $this->showPasswords(),
+            // Show-specific conditions (highly selective)
             $showSql,
+            // Search ID filter (very selective)
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            // Category filtering
             Category::getCategorySearch($cat, 'tv'),
+            // Date filtering
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
+            // Size filtering
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
+            // Excluded categories filter
+            (! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN(%s)', implode(',', $excludedCategories)) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id, r.haspreview, r.jpgstatus,
-				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
-				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name
-			FROM releases r
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
-			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			%s",
+            "SELECT
+                r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size,
+                r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                r.tv_episodes_id, r.haspreview, r.jpgstatus,
+
+                v.title AS video_title, v.type, v.tvdb, v.trakt, v.imdb, v.tmdb, v.tvmaze, v.tvrage,
+
+                tve.series, tve.episode, tve.se_complete, tve.title AS episode_title, tve.firstaired,
+
+                cp.title AS parent_category,
+                c.title AS sub_category,
+                CONCAT(cp.title, ' > ', c.title) AS category_name,
+
+                g.name AS group_name
+            FROM releases r
+            LEFT JOIN categories c ON c.id = r.categories_id
+            LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0
+            LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
+            LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+            %s",
             $whereSql
         );
         $sql = sprintf(
             '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
+            ORDER BY r.postdate DESC
+            LIMIT %d OFFSET %d',
             $baseSql,
             $limit,
             $offset
