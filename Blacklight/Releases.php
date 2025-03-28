@@ -489,7 +489,7 @@ class Releases extends Release
             NZB::NZB_ADDED,
             $this->showPasswords(),
             // Search ID filter (most restrictive, should be early)
-            (!empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             // Category filters
             $catQuery,
             (\count($excludedCats) > 0 ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
