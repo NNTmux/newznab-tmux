@@ -109,7 +109,8 @@ class AdminReleasesController extends BasePageController
 
             return redirect($redirectUrl);
         } catch (\Exception $e) {
-            session()->flash('error', 'Error deleting release: ' . $e->getMessage());
+            session()->flash('error', 'Error deleting release: '.$e->getMessage());
+
             return redirect()->route('admin.release-list');
         }
     }
