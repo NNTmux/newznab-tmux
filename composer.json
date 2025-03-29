@@ -71,7 +71,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.13",
         "laravel/telescope": "^5.5",
-        "laravel/tinker": "^2.9",
+        "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
         "laravelcollective/html": "^6.4",
         "league/climate": "^3.10",
@@ -122,11 +122,11 @@
         "jubeki/laravel-code-style": "^2.0",
         "larastan/larastan": "^3.2",
         "laravel/pint": "^1.13",
-        "laravel/sail": "^1.26",
+        "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.0",
+        "nunomaduro/collision": "^8.6",
         "php-coveralls/php-coveralls": "^2.4",
-        "phpunit/phpunit": "^11.0.1",
+        "phpunit/phpunit": "^11.5.3",
         "rector/rector": "^2.0"
     },
     "suggest": {
