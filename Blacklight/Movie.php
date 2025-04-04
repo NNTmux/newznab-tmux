@@ -176,25 +176,7 @@ class Movie
         $page = max(1, $page);
         $start = max(0, $start);
         $order = $this->getMovieOrder($orderBy);
-
-        // Create a consistent cache key
-        $cacheKey = sprintf(
-            'movies_range_%s_%s_%d_%d_%s_%s_%d',
-            md5(json_encode($cat)),
-            md5(json_encode($excludedCats)),
-            $page,
-            $num,
-            $orderBy,
-            $this->showPasswords,
-            $maxAge
-        );
-
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-
-        // Check cache first
-        if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
-        }
 
         // Build category search conditions
         $catsrch = '';
@@ -240,19 +222,29 @@ class Movie
             $start
         );
 
-        // Execute first query
-        $data = MovieInfo::fromQuery($moviesSql);
-        $totalCount = DB::select('SELECT FOUND_ROWS() AS total')[0]->total ?? 0;
+        // Cache the first SQL query with page
+        $firstQueryCacheKey = md5($moviesSql.$page);
+
+        // Check if first query is cached
+        if (Cache::has($firstQueryCacheKey)) {
+            $data = Cache::get($firstQueryCacheKey);
+            $totalCount = Cache::get($firstQueryCacheKey.'_count', 0);
+        } else {
+            // Execute first query
+            $data = MovieInfo::fromQuery($moviesSql);
+            $totalCount = DB::select('SELECT FOUND_ROWS() AS total')[0]->total ?? 0;
+
+            // Cache the first query results
+            Cache::put($firstQueryCacheKey, $data, $expiresAt);
+            Cache::put($firstQueryCacheKey.'_count', $totalCount, $expiresAt);
+        }
 
         // Process movie and release IDs
         $movieIDs = [];
         $releaseIDs = [];
 
         if (empty($data)) {
-            $emptyResult = [];
-            Cache::put($cacheKey, $emptyResult, $expiresAt);
-
-            return $emptyResult;
+            return [];
         }
 
         foreach ($data as $movie) {
@@ -269,10 +261,7 @@ class Movie
 
         // If no movie IDs found, return empty result
         if (empty($movieIDs)) {
-            $emptyResult = [];
-            Cache::put($cacheKey, $emptyResult, $expiresAt);
-
-            return $emptyResult;
+            return [];
         }
 
         // Build the second query with the collected IDs
@@ -314,19 +303,27 @@ class Movie
             $order[1]
         );
 
-        // Execute second query and convert to array
-        $result = Release::fromQuery($sql);
+        // Cache the second SQL query with page
+        $secondQueryCacheKey = md5($sql.$page);
 
-        // Convert Collection to array
-        $resultArray = $result->toArray();
+        // Check if second query is cached
+        if (Cache::has($secondQueryCacheKey)) {
+            $resultArray = Cache::get($secondQueryCacheKey);
+        } else {
+            // Execute second query and convert to array
+            $result = Release::fromQuery($sql);
+
+            // Convert Collection to array
+            $resultArray = $result->toArray();
+
+            // Cache the second query results
+            Cache::put($secondQueryCacheKey, $resultArray, $expiresAt);
+        }
 
         // Add total count to the first result if it exists
         if (! empty($resultArray)) {
             $resultArray[0]['_totalcount'] = $totalCount;
         }
-
-        // Cache the results as array
-        Cache::put($cacheKey, $resultArray, $expiresAt);
 
         return $resultArray;
     }
