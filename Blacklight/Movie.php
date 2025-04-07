@@ -1408,6 +1408,7 @@ class Movie
                     if ($this->echooutput) {
                         $this->colorCli->climate()->success('Successfully updated release with IMDB ID');
                     }
+
                     continue;
                 } else {
                     // Verify the release wasn't actually updated
@@ -1416,6 +1417,7 @@ class Movie
                         if ($this->echooutput) {
                             $this->colorCli->climate()->info('Release already has IMDB ID, skipping');
                         }
+
                         continue;
                     }
                 }
