@@ -187,6 +187,8 @@ class NntmuxResetDb extends Command
                 }
             }
 
+            $this->call('cache:clear');
+
             $this->info('Deleted all releases, images, previews and samples. This script finished '.now()->diffForHumans($timestart).' start');
             DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
         } else {

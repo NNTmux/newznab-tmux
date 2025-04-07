@@ -555,6 +555,41 @@ class Categorize
 
     public function isXxxClipHD(): bool
     {
+        // First check for specific adult content to exclude that's not clips
+        if (preg_match('/\b(Complete|Pack|Collection|Compilation|Anthology|Siterip|SiteRip|Website\.Rip|WEBRip)\b/i', $this->releaseName)) {
+            return false;
+        }
+
+        // Comprehensive clip detection with various date formats and release groups
+        if (preg_match('/(
+            # Date formats with scene release groups
+            ^[\w\-.]+(\d{2}\.(\d{2}|\w{3})\.(\d{2}|\d{4}))[._ -]+.*(720p|1080p|HD)|
+            # Direct date formats with resolutions
+            \d{2}[._ -]\d{2}[._ -]\d{2,4}[._ -]+(720p|1080p)[._ -]|
+            # Scene naming with release groups
+            [\w\-.]+[._ -]+(720p|1080p)[._ -]+[\w\-.]+[._ -]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH|FUNKY|WAXO|CHiKANi|KLEENEX|PORNOSTATIC|VSEX|iMAGESET|SHDXXX|NYMPHO|PORNOLATiON|SWE6))|
+            # Studio followed by date and resolution
+            (CzechVR|VirtualTaboo|RealityLovers|VRBangers|VRHush|WankzVR)[._ -]+\d{2}[._ -]\d{2}[._ -]\d{2,4}[._ -]+(720p|1080p)|
+            # Resolution with date in various formats
+            (720p|1080p)[._ -]+\d{2}[._ -]\d{2}[._ -]\d{2,4}|
+            # Clear clip identifier with HD resolution
+            Clip[._ -]+(720p|1080p)|
+            # Extended group detection
+            (720p|1080p)[._ -]+(HEVC|H264|H\.264)[._ -]+(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH)
+            )/ix', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+
+            return true;
+        }
+
+        // Specific studio release pattern
+        if (preg_match('/^(Brazzers|NaughtyAmerica|RealityKings|Bangbros|TeenFidelity|PornPros|MrLuckyPOV|SexArt|WowGirls|Vixen|Blacked|Tushy)[._ -]+\d{2}[._ -]\d{2}[._ -]\d{2,4}[._ -]+(720p|1080p)/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+
+            return true;
+        }
+
+        // Original pattern as fallback
         if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
 
