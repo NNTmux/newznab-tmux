@@ -578,18 +578,21 @@ class Categorize
             (720p|1080p)[._ -]+(HEVC|H264|H\.264)[._ -]+(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH)
             )/ix', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         // Specific studio release pattern
         if (preg_match('/^(Brazzers|NaughtyAmerica|RealityKings|Bangbros|TeenFidelity|PornPros|MrLuckyPOV|SexArt|WowGirls|Vixen|Blacked|Tushy)[._ -]+\d{2}[._ -]\d{2}[._ -]\d{2,4}[._ -]+(720p|1080p)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         // Original pattern as fallback
         if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
