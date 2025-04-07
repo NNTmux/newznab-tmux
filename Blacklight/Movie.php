@@ -1411,13 +1411,22 @@ class Movie
 
             // Batch update all failed releases at once
             if (! empty($failedIDs)) {
+                // Get searchnames for failed releases to show in output
+                if ($this->echooutput) {
+                    $failedReleases = Release::query()
+                        ->select(['id', 'searchname'])
+                        ->whereIn('id', $failedIDs)
+                        ->get();
+
+                    $this->colorCli->header('Failed to find IMDB IDs for '.count($failedIDs).' releases:');
+                    foreach ($failedReleases as $release) {
+                        $this->colorCli->climate()->error("ID: {$release->id} - {$release->searchname}");
+                    }
+                }
+
                 // Use chunk to avoid huge queries for many IDs
                 foreach (array_chunk($failedIDs, 100) as $chunk) {
                     Release::query()->whereIn('id', $chunk)->update(['imdbid' => 0000000]);
-                }
-
-                if ($this->echooutput) {
-                    $this->colorCli->climate()->warning('Failed to find IMDB IDs for '.count($failedIDs).' releases.');
                 }
             }
         }
