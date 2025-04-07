@@ -1396,13 +1396,28 @@ class Movie
                 }
 
                 // Try all available sources to find IMDB ID
-                if ($this->searchLocalDatabase($arr['id']) ||
-                    $this->searchIMDb($arr['id']) ||
-                    $this->searchOMDbAPI($arr['id']) ||
-                    $this->searchTraktTV($arr['id'], $movieName) ||
-                    $this->searchTMDB($arr['id'])) {
+                $foundIMDB = $this->searchLocalDatabase($arr['id']) ||
+                             $this->searchIMDb($arr['id']) ||
+                             $this->searchOMDbAPI($arr['id']) ||
+                             $this->searchTraktTV($arr['id'], $movieName) ||
+                             $this->searchTMDB($arr['id']);
+
+                // Double-check if we actually got an IMDB ID
+                if ($foundIMDB) {
                     // Movie was successfully updated by one of the services
+                    if ($this->echooutput) {
+                        $this->colorCli->climate()->success('Successfully updated release with IMDB ID');
+                    }
                     continue;
+                } else {
+                    // Verify the release wasn't actually updated
+                    $releaseCheck = Release::query()->where('id', $arr['id'])->whereNotNull('imdbid')->exists();
+                    if ($releaseCheck) {
+                        if ($this->echooutput) {
+                            $this->colorCli->climate()->info('Release already has IMDB ID, skipping');
+                        }
+                        continue;
+                    }
                 }
 
                 // If we get here, all searches failed
