@@ -557,36 +557,42 @@ class Categorize
         // Match performer name pattern with descriptive title, spelled-out month name, and HD resolution
         if (preg_match('/^([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+)?(\.|\s)([A-Z][a-z]+)?(\.|\s)?(January|February|March|April|May|June|July|August|September|October|November|December)[._ -](\d{1,2})[_.-]*(\d{4})[._ -]?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         // Match studio name + performer names + descriptive title + HD resolution (without requiring date)
-        if (preg_match('/^(' . $knownStudios . ')\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?(\.and\.|\.&\.)([A-Z][a-z]+)(\.([A-Z][a-z]+))?\.([A-Z][a-z]+).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
+        if (preg_match('/^('.$knownStudios.')\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?(\.and\.|\.&\.)([A-Z][a-z]+)(\.([A-Z][a-z]+))?\.([A-Z][a-z]+).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         // Rest of the existing patterns remain unchanged
-        if (preg_match('/^(' . $knownStudios . ')\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?\.([A-Z][a-z]+\.)+.*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
+        if (preg_match('/^('.$knownStudios.')\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?\.([A-Z][a-z]+\.)+.*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         // Match studio name + YY.MM.DD + model name + XXX identifier + HD resolution
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{2})\.(\d{2})\.(\d{2})\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?.*?(XXX|Porn|Sex|Adult).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         // Match releases with month name in date format and HD resolution
         if (preg_match('/^([A-Z][a-z]+)[._ -]([A-Z][a-z]+).*?(January|February|March|April|May|June|July|August|September|October|November|December)[._ -](\d{1,2})[_._ -](\d{4})[._ -]?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         // Match releases with model name, descriptive title with adult keywords, date and HD resolution
         if (preg_match('/^([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+).*?('.$adultKeywords.').*?(\d{2})\.(\d{2})\.(\d{4}|20\d{2}).*?(720p|1080p|2160p|4k|HD)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
@@ -594,6 +600,7 @@ class Categorize
         if (preg_match('/([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+).*?(\d{2})[\.\-](\d{2})[\.\-](20\d{2}|\d{2}).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName) &&
             preg_match('/('.$adultKeywords.')/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
@@ -601,29 +608,34 @@ class Categorize
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(20\d\d)\.(\d{2})\.(\d{2})\.[A-Z][a-z]/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{2})\.(\d{2})\.(\d{2})\./i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)(\.Com)?\.\.(\d{2})\.(\d{2})\.(\d{2})\./i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/\b(Scene[._-]?\d+|MILF|Anal|Hardcore|Sex|Porn|XXX|Explicit|Adult).*?(720p|1080p|2160p|HD|4K)\b|\b(720p|1080p|2160p|HD|4K).*?(Scene[._-]?\d+|MILF|Anal|Hardcore|Sex|Porn|XXX)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/^('.$knownStudios.'|[A-Z][a-zA-Z0-9]{2,})[._ -]+(?:\d{4}|\d{2})[\.\-_ ]\d{2}[\.\-_ ]\d{2,4}[._ -]/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
@@ -631,28 +643,33 @@ class Categorize
             preg_match('/(720p|1080p|1440p|2160p|HD|4K)/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)[._ -]+\d{4}[._ -]\d{2}[._ -]\d{2}[._ -]([A-Z][a-z]+[._ -][A-Z][a-z]+|[A-Z][a-z]+)/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{4}|\d{2})[\.\-_ ](\d{2})[\.\-_ ](\d{2})(\.[A-Z][\w]+)?/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/\b(XXX|MILF|Anal|Sex|Porn)[._ -]+(720p|1080p|2160p|HD|4K)\b|\b(720p|1080p|2160p|HD|4K)[._ -]+(XXX|MILF|Anal|Sex|Porn)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
         if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
+
             return true;
         }
 
