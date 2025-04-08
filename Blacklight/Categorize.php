@@ -543,24 +543,50 @@ class Categorize
     public function isXxxClipHD(): bool
     {
         // First check for specific adult content to exclude that's not clips
-        if (preg_match('/\b(Complete|Pack|Collection|Compilation|Anthology|Siterip|SiteRip|Website\.Rip|WEBRip)\b/i', $this->releaseName)) {
+        // Refined to exclude only if these words are standalone or at the beginning
+        if (preg_match('/^(Complete|Pack|Collection|Anthology|Siterip|SiteRip|Website\.Rip|WEBRip)\b|\b(Complete|Pack|Collection|Anthology)\b.+(Pack|Set|of|[0-9]{2,})/i', $this->releaseName)) {
             return false;
         }
 
         // Adult keywords commonly found in titles
-        $adultKeywords = 'Anal|Ass|BBW|BDSM|Blow|Boob|Bukkake|Casting|Couch|Cock|Creampie|Cum|Dick|Dildo|Facial|Fetish|Fuck|Gang|Hardcore|Homemade|Horny|Interracial|Lesbian|MILF|Masturbat|Nympho|Oral|Orgasm|Penetrat|Pornstar|POV|Pussy|Riding|Seduct|Sex|Shaved|Slut|Squirt|Suck|Swallow|Threesome|Tits|Titty|Toy|Virgin|Whore';
+        $adultKeywords = 'Anal|Ass|BBW|BDSM|Blow|Boob|Bukkake|Casting|Couch|Cock|Compilation|Creampie|Cum|Dick|Dildo|Facial|Fetish|Fuck|Gang|Hardcore|Homemade|Horny|Interracial|Lesbian|MILF|Masturbat|Nympho|Oral|Orgasm|Penetrat|Pornstar|POV|Pussy|Riding|Seduct|Sex|Shaved|Slut|Squirt|Suck|Swallow|Threesome|Tits|Titty|Toy|Virgin|Whore';
+
+        // Known adult studios
+        $knownStudios = 'Brazzers|NaughtyAmerica|RealityKings|Bangbros|BangBros18|TeenFidelity|PornPros|SexArt|WowGirls|Vixen|Blacked|Tushy|Deeper|Bellesa|Defloration|MetArt|MetArtX|TheLifeErotic|VivThomas|JoyMii|Nubiles|NubileFilms|FamilyStrokes|X-Art|Babes|Twistys|WetAndPuffy|WowPorn|MomsTeachSex|Mofos|BangBus|Passion-HD|EvilAngel|DorcelClub|Private|Hustler|CherryPimps|HuCows|TransSensual|SexMex|FamilyTherapy|ATKGirlfriends';
+
+        // Match performer name pattern with descriptive title, spelled-out month name, and HD resolution
+        if (preg_match('/^([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+)?(\.|\s)([A-Z][a-z]+)?(\.|\s)?(January|February|March|April|May|June|July|August|September|October|November|December)[._ -](\d{1,2})[_.-]*(\d{4})[._ -]?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Match studio name + performer names + descriptive title + HD resolution (without requiring date)
+        if (preg_match('/^(' . $knownStudios . ')\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?(\.and\.|\.&\.)([A-Z][a-z]+)(\.([A-Z][a-z]+))?\.([A-Z][a-z]+).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Rest of the existing patterns remain unchanged
+        if (preg_match('/^(' . $knownStudios . ')\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?\.([A-Z][a-z]+\.)+.*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Match studio name + YY.MM.DD + model name + XXX identifier + HD resolution
+        if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{2})\.(\d{2})\.(\d{2})\.([A-Z][a-z]+)(\.([A-Z][a-z]+))?.*?(XXX|Porn|Sex|Adult).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
 
         // Match releases with month name in date format and HD resolution
         if (preg_match('/^([A-Z][a-z]+)[._ -]([A-Z][a-z]+).*?(January|February|March|April|May|June|July|August|September|October|November|December)[._ -](\d{1,2})[_._ -](\d{4})[._ -]?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
         // Match releases with model name, descriptive title with adult keywords, date and HD resolution
         if (preg_match('/^([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+).*?('.$adultKeywords.').*?(\d{2})\.(\d{2})\.(\d{4}|20\d{2}).*?(720p|1080p|2160p|4k|HD)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
@@ -568,87 +594,65 @@ class Categorize
         if (preg_match('/([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+).*?(\d{2})[\.\-](\d{2})[\.\-](20\d{2}|\d{2}).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName) &&
             preg_match('/('.$adultKeywords.')/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Match common adult studio release pattern with date format without requiring specific studio names
+        // Rest of the existing patterns remain unchanged
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(20\d\d)\.(\d{2})\.(\d{2})\.[A-Z][a-z]/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Match releases with short date format (YY.MM.DD)
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{2})\.(\d{2})\.(\d{2})\./i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Match domain suffix pattern with date
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)(\.Com)?\.\.(\d{2})\.(\d{2})\.(\d{2})\./i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Match scene patterns with HD resolution
         if (preg_match('/\b(Scene[._-]?\d+|MILF|Anal|Hardcore|Sex|Porn|XXX|Explicit|Adult).*?(720p|1080p|2160p|HD|4K)\b|\b(720p|1080p|2160p|HD|4K).*?(Scene[._-]?\d+|MILF|Anal|Hardcore|Sex|Porn|XXX)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
-
-        // Match sites with date formats (both common known adult studios and generic patterns)
-        $knownStudios = 'Brazzers|NaughtyAmerica|RealityKings|Bangbros|BangBros18|TeenFidelity|PornPros|SexArt|WowGirls|Vixen|Blacked|Tushy|Deeper|Bellesa|Defloration|MetArt|MetArtX|TheLifeErotic|VivThomas|JoyMii|Nubiles|NubileFilms|FamilyStrokes|X-Art|Babes|Twistys|WetAndPuffy|WowPorn|MomsTeachSex|Mofos|BangBus|Passion-HD|EvilAngel|DorcelClub|Private|Hustler|CherryPimps|HuCows|TransSensual|SexMex|FamilyTherapy';
 
         if (preg_match('/^('.$knownStudios.'|[A-Z][a-zA-Z0-9]{2,})[._ -]+(?:\d{4}|\d{2})[\.\-_ ]\d{2}[\.\-_ ]\d{2,4}[._ -]/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Generic pattern for YYYY-MM-DD format with resolution
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\b.*\d{4}[._ -]\d{2}[._ -]\d{2}/i', $this->releaseName) &&
             preg_match('/(720p|1080p|1440p|2160p|HD|4K)/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Generic pattern for studio with date and model name (Capitalized)
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)[._ -]+\d{4}[._ -]\d{2}[._ -]\d{2}[._ -]([A-Z][a-z]+[._ -][A-Z][a-z]+|[A-Z][a-z]+)/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Generic studio with date format and optional model name
         if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{4}|\d{2})[\.\-_ ](\d{2})[\.\-_ ](\d{2})(\.[A-Z][\w]+)?/i', $this->releaseName) &&
             ! preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Pattern for HD resolution with adult content identifiers
         if (preg_match('/\b(XXX|MILF|Anal|Sex|Porn)[._ -]+(720p|1080p|2160p|HD|4K)\b|\b(720p|1080p|2160p|HD|4K)[._ -]+(XXX|MILF|Anal|Sex|Porn)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Original pattern as fallback for specific release groups
         if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
