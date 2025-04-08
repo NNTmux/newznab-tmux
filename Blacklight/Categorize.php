@@ -101,7 +101,7 @@ class Categorize
     public function isTV(): bool
     {
         if (preg_match('/Daily[\-_\.]Show|Nightly News|^\[[a-zA-Z\.\-]+\].*[\-_].*\d{1,3}[\-_. ](([\[\(])(h264-)?\d{3,4}([pi])([\]\)])\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?|(\d\d-){2}[12]\d{3}|[12]\d{3}(\.\d\d){2}|\d+x\d+|\.e\d{1,3}\.|s\d{1,4}[._ -]?[ed]\d{1,3}([ex]\d{1,3}|[\-.\w ])|[._ -](\dx\d\d|C4TV|Complete[._ -]Season|DSR|([DHPS])DTV|EP[._ -]?\d{1,3}|S\d{1,3}.+Extras|SUBPACK|Season[._ -]\d{1,2})([._ -]|$)|TVRIP|TV[._ -](19|20)\d\d|Troll(HD|UHD)/i', $this->releaseName)
-            && ! preg_match('/[._ -](flac|imageset|mp3|xxx)[._ -]|[ .]exe$/i', $this->releaseName)) {
+            && ! preg_match('/^(Defloration|MetArt|MetArtX|SexArt|TheLifeErotic|VivThomas|CzechVR|VRBangers|WankzVR|BadoinkVR|NaughtyAmerica)(.|\s)?\d{4}[._ -]\d{2}[._ -]\d{2}|[._ -](flac|imageset|mp3|xxx|XXX|porn|adult|sex)[._ -]|[ .]exe$|[._ -](shemale|transsexual|bisexual|siterip|JAV|JavHD)\b/i', $this->releaseName)) {
             switch (true) {
                 case $this->isOtherTV():
                 case $this->categorizeForeign && $this->isForeignTV():
@@ -500,40 +500,27 @@ class Categorize
 
     public function isXxx(): bool
     {
-        switch (true) {
-            case preg_match('/(Kitsune|PlayWEB|CtrlHD|NTb|iVy|PiRaTeS)/i', $this->releaseName):
-            case ! preg_match('/\bXXX\b|(a\.b\.erotica|ClubSeventeen|Cum(ming|shot)|Err?oticax?|Porn(o|lation)?|Imageset|PICTURESET|JAV Uncensored|lesb(ians?|os?)|mastur(bation|e?bate)|My_Stepfather_Made_Me|nympho?|OLDER ANGELS|pictures\.erotica\.anime|sexontv|slut|Squirt|SWE6RUS|Transsexual|whore)/i', $this->releaseName):
-                return false;
-            case $this->isXxxPack():
-            case $this->isXxxClipSD():
-            case $this->isXxxSD():
-            case $this->isXxxUHD():
-            case $this->isXxxClipHD():
-            case $this->isXxxVr():
-            case $this->catWebDL && $this->isXxxWEBDL():
-            case $this->isXxx264():
-            case $this->isXxxXvid():
-            case $this->isXxxImageset():
-            case $this->isXxxWMV():
-            case $this->isXxxDVD():
-            case $this->isXxxOther():
-
-                return true;
-            default:
-                $this->tmpCat = Category::XXX_OTHER;
-
-                return true;
-        }
+        return match (true) {
+            $this->isXxxVr(), $this->isXxxClipHD(), $this->isXxxPack(), $this->isXxxClipSD(), $this->isXxxSD(), $this->isXxxUHD(), $this->catWebDL && $this->isXxxWEBDL(), $this->isXxx264(), $this->isXxxXvid(), $this->isXxxImageset(), $this->isXxxWMV(), $this->isXxxDVD(), $this->isXxxOther() => true,
+            default => false,
+        };
     }
 
     public function isXxx264(): bool
     {
-        if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && ! preg_match('/\bwmv\b/i', $this->releaseName) && stripos($this->releaseName, 'SDX264XXX') === false) {
+        if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) &&
+            !preg_match('/\bwmv\b|S\d{1,2}E\d{1,2}|\d+x\d+/i', $this->releaseName) &&
+            stripos($this->releaseName, 'SDX264XXX') === false &&
+            preg_match('/\bXXX\b|a\.b\.erotica|BangBros|ClubSeventeen|Cum(ming|shot)|Defloration|Err?oticax?|JoyMii|MetArt|MetArtX|Nubiles|Porn(o|lation)?|SexArt|TheLifeErotic|Tushy|Vixen|VivThomas|X-Art|JAV|lesb(ians?|os?)|NaughtyAmerica|RealityKings|Brazzers|WowGirls/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_X264;
 
             return true;
         }
-        if ($this->catWebDL === false && preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName)) {
+
+        // Add explicit check for adult content before matching web-dl/web-rip
+        if ($this->catWebDL === false &&
+            preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName) &&
+            preg_match('/\bXXX\b|a\.b\.erotica|BangBros|BangBros18|ClubSeventeen|Cum(ming|shot)|Defloration|Err?oticax?|JoyMii|MetArt|MetArtX|Nubiles|Porn(o|lation)?|SexArt|TheLifeErotic|Tushy|Vixen|VivThomas|X-Art|JAV Uncensored|lesb(ians?|os?)|mastur(bation|e?bate)|nympho?|OLDER ANGELS|Brazzers|NaughtyAmerica|RealityKings|sexontv|slut|Squirt|Transsexual|WowGirls|Playboy/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_X264;
 
             return true;
@@ -553,46 +540,102 @@ class Categorize
         return false;
     }
 
-    public function isXxxClipHD(): bool
+   public function isXxxClipHD(): bool
     {
         // First check for specific adult content to exclude that's not clips
         if (preg_match('/\b(Complete|Pack|Collection|Compilation|Anthology|Siterip|SiteRip|Website\.Rip|WEBRip)\b/i', $this->releaseName)) {
             return false;
         }
 
-        // Comprehensive clip detection with various date formats and release groups
-        if (preg_match('/(
-            # Date formats with scene release groups
-            ^[\w\-.]+(\d{2}\.(\d{2}|\w{3})\.(\d{2}|\d{4}))[._ -]+.*(720p|1080p|HD)|
-            # Direct date formats with resolutions
-            \d{2}[._ -]\d{2}[._ -]\d{2,4}[._ -]+(720p|1080p)[._ -]|
-            # Scene naming with release groups
-            [\w\-.]+[._ -]+(720p|1080p)[._ -]+[\w\-.]+[._ -]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH|FUNKY|WAXO|CHiKANi|KLEENEX|PORNOSTATIC|VSEX|iMAGESET|SHDXXX|NYMPHO|PORNOLATiON|SWE6))|
-            # Studio followed by date and resolution
-            (CzechVR|VirtualTaboo|RealityLovers|VRBangers|VRHush|WankzVR)[._ -]+\d{2}[._ -]\d{2}[._ -]\d{2,4}[._ -]+(720p|1080p)|
-            # Resolution with date in various formats
-            (720p|1080p)[._ -]+\d{2}[._ -]\d{2}[._ -]\d{2,4}|
-            # Clear clip identifier with HD resolution
-            Clip[._ -]+(720p|1080p)|
-            # Extended group detection
-            (720p|1080p)[._ -]+(HEVC|H264|H\.264)[._ -]+(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH)
-            )/ix', $this->releaseName)) {
-            $this->tmpCat = Category::XXX_CLIPHD;
+        // Adult keywords commonly found in titles
+        $adultKeywords = 'Anal|Ass|BBW|BDSM|Blow|Boob|Bukkake|Casting|Couch|Cock|Creampie|Cum|Dick|Dildo|Facial|Fetish|Fuck|Gang|Hardcore|Homemade|Horny|Interracial|Lesbian|MILF|Masturbat|Nympho|Oral|Orgasm|Penetrat|Pornstar|POV|Pussy|Riding|Seduct|Sex|Shaved|Slut|Squirt|Suck|Swallow|Threesome|Tits|Titty|Toy|Virgin|Whore';
 
+        // Match releases with month name in date format and HD resolution
+        if (preg_match('/^([A-Z][a-z]+)[._ -]([A-Z][a-z]+).*?(January|February|March|April|May|June|July|August|September|October|November|December)[._ -](\d{1,2})[_._ -](\d{4})[._ -]?(720p|1080p|2160p|HD|4K)/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
             return true;
         }
 
-        // Specific studio release pattern
-        if (preg_match('/^(Brazzers|NaughtyAmerica|RealityKings|Bangbros|TeenFidelity|PornPros|MrLuckyPOV|SexArt|WowGirls|Vixen|Blacked|Tushy)[._ -]+\d{2}[._ -]\d{2}[._ -]\d{2,4}[._ -]+(720p|1080p)/i', $this->releaseName)) {
+        // Match releases with model name, descriptive title with adult keywords, date and HD resolution
+        if (preg_match('/^([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+).*?(' . $adultKeywords . ').*?(\d{2})\.(\d{2})\.(\d{4}|20\d{2}).*?(720p|1080p|2160p|4k|HD)/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
-        // Original pattern as fallback
+        // Match common date formats found in adult content with HD resolution
+        if (preg_match('/([A-Z][a-z]+)(\.|\s)([A-Z][a-z]+).*?(\d{2})[\.\-](\d{2})[\.\-](20\d{2}|\d{2}).*?(720p|1080p|2160p|HD|4K)/i', $this->releaseName) &&
+            preg_match('/(' . $adultKeywords . ')/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Match common adult studio release pattern with date format without requiring specific studio names
+        if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(20\d\d)\.(\d{2})\.(\d{2})\.[A-Z][a-z]/i', $this->releaseName) &&
+            !preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Match releases with short date format (YY.MM.DD)
+        if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{2})\.(\d{2})\.(\d{2})\./i', $this->releaseName) &&
+            !preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Match domain suffix pattern with date
+        if (preg_match('/^([A-Z][a-zA-Z0-9]+)(\.Com)?\.\.(\d{2})\.(\d{2})\.(\d{2})\./i', $this->releaseName) &&
+            !preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Match scene patterns with HD resolution
+        if (preg_match('/\b(Scene[._-]?\d+|MILF|Anal|Hardcore|Sex|Porn|XXX|Explicit|Adult).*?(720p|1080p|2160p|HD|4K)\b|\b(720p|1080p|2160p|HD|4K).*?(Scene[._-]?\d+|MILF|Anal|Hardcore|Sex|Porn|XXX)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Match sites with date formats (both common known adult studios and generic patterns)
+        $knownStudios = 'Brazzers|NaughtyAmerica|RealityKings|Bangbros|BangBros18|TeenFidelity|PornPros|SexArt|WowGirls|Vixen|Blacked|Tushy|Deeper|Bellesa|Defloration|MetArt|MetArtX|TheLifeErotic|VivThomas|JoyMii|Nubiles|NubileFilms|FamilyStrokes|X-Art|Babes|Twistys|WetAndPuffy|WowPorn|MomsTeachSex|Mofos|BangBus|Passion-HD|EvilAngel|DorcelClub|Private|Hustler|CherryPimps|HuCows|TransSensual|SexMex|FamilyTherapy';
+
+        if (preg_match('/^(' . $knownStudios . '|[A-Z][a-zA-Z0-9]{2,})[._ -]+(?:\d{4}|\d{2})[\.\-_ ]\d{2}[\.\-_ ]\d{2,4}[._ -]/i', $this->releaseName) &&
+            !preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Generic pattern for YYYY-MM-DD format with resolution
+        if (preg_match('/^([A-Z][a-zA-Z0-9]+)\b.*\d{4}[._ -]\d{2}[._ -]\d{2}/i', $this->releaseName) &&
+            preg_match('/(720p|1080p|1440p|2160p|HD|4K)/i', $this->releaseName) &&
+            !preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Generic pattern for studio with date and model name (Capitalized)
+        if (preg_match('/^([A-Z][a-zA-Z0-9]+)[._ -]+\d{4}[._ -]\d{2}[._ -]\d{2}[._ -]([A-Z][a-z]+[._ -][A-Z][a-z]+|[A-Z][a-z]+)/i', $this->releaseName) &&
+            !preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Generic studio with date format and optional model name
+        if (preg_match('/^([A-Z][a-zA-Z0-9]+)\.(\d{4}|\d{2})[\.\-_ ](\d{2})[\.\-_ ](\d{2})(\.[A-Z][\w]+)?/i', $this->releaseName) &&
+            !preg_match('/\b(S\d{2}E\d{2}|Documentary|Series)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Pattern for HD resolution with adult content identifiers
+        if (preg_match('/\b(XXX|MILF|Anal|Sex|Porn)[._ -]+(720p|1080p|2160p|HD|4K)\b|\b(720p|1080p|2160p|HD|4K)[._ -]+(XXX|MILF|Anal|Sex|Porn)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_CLIPHD;
+            return true;
+        }
+
+        // Original pattern as fallback for specific release groups
         if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
-
             return true;
         }
 
@@ -601,9 +644,44 @@ class Categorize
 
     public function isXxxWMV(): bool
     {
-        if (preg_match('/(\d{2}\.\d{2}\.\d{2})|([ex]\d{2,})|[^a-z0-9](f4v|flv|isom|(issue\.\d{2,})|mov|mp(4|eg)|multiformat|pack-|realmedia|uhq|wmv)[^a-z0-9]/i', $this->releaseName) && stripos($this->releaseName, 'SDX264XXX') === false) {
-            $this->tmpCat = Category::XXX_WMV;
+        // First check for formats that should NOT be categorized as WMV
+        if (preg_match('/\b(720p|1080p|2160p|x264|x265|h264|h265|hevc|XviD|MP4-|\.mp4)[._ -]/i', $this->releaseName) ||
+            stripos($this->releaseName, 'SDX264XXX') !== false) {
+            return false;
+        }
 
+        // Check for explicit WMV indicators
+        if (preg_match('/(
+            # Explicit WMV format mentions
+            \b(WMV|Windows\s?Media\s?Video)\b|
+            # WMV file extensions
+            \b\w+\.wmv\b|[._ -]wmv[._ -]|\.wmv$|
+            # WMV scene release groups
+            \b(WMV-SEXORS|KTR-wmv|FaiLED-wmv|wmv-PORNO)\b|
+            # WMV specific sizes
+            \b(wmv|windows\s?media)[._ -]\d+(\.\d+)?\s?(mb|gb)\b
+            )/ix', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_WMV;
+            return true;
+        }
+
+        // Check for older legacy formats often associated with WMV
+        if (preg_match('/(
+            # Older video formats commonly used with WMV
+            \b(wm9|wmvhd)\b|
+            # Legacy scene patterns for WMV
+            \b(REALMEDIA|DIVX-WMVHD)\b|
+            # Additional reliable WMV identifiers
+            (WMAZ|WMAS|Windows-Media|MS-Video)
+            )/ix', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_WMV;
+            return true;
+        }
+
+        // Original pattern but much more restricted to avoid false positives
+        if (preg_match('/[^a-z0-9](wmv)[^a-z0-9]/i', $this->releaseName) &&
+            !preg_match('/\b(mp4|xvid|webm|mkv|avi)\b/i', $this->releaseName)) {
+            $this->tmpCat = Category::XXX_WMV;
             return true;
         }
 
@@ -638,11 +716,12 @@ class Categorize
             case preg_match('/OnlyFans/i', $this->releaseName):
                 return false;
             case preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(VR(180|360))+.*/i', $this->releaseName):
-            case preg_match('/^VR(Hush|\.?(Cosplay|Spy|Conk|Porn|Latina|Bangers|KM|Mansion|Intimacy|oomed))|^VirtualReal|iStripper|SLROriginals|VirtualPorn|XSinsVR|NaughtyAmericaVR|WetVR|VRStars|SexBabesVR|VR Porn|\[VR\][.\s]Pack|BIBIVR|VRCosplayX|CzechVRFetish|GearVR|Oculus|SexLikeReal|3584p|^.*VR[\. -_]+?/i', $this->releaseName):
+            case preg_match('/^VR(Hush|\.?(Cosplay|Spy|Conk|Porn|Latina|Bangers|KM|Mansion|Intimacy|oomed|Allure))|^VirtualReal|^Virtual(Taboo|Porn)|iStripper|SLROriginals|XSinsVR|NaughtyAmericaVR|WetVR|VRStars|SexBabesVR|BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR|HoloGirlsVR|VR Porn|\[VR\][.\s]Pack|BIBIVR|VRCosplayX|CzechVRFetish/i', $this->releaseName):
+            case preg_match('/GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax|Reverb|RiftS|SexLikeReal|3584p|^.*VR[\. -_]+?/i', $this->releaseName):
             case preg_match('/.+\.VR(180|360)\.(3584|3840|3072)p/i', $this->releaseName):
             case preg_match('/^SLR.+(VR|LR_180|LR-180|3072p)/i', $this->releaseName):
             case preg_match('/^SLR_SLR|^REQUEST\.SLR/i', $this->releaseName):
-            case preg_match('/180x180_3dh/i', $this->releaseName):
+            case preg_match('/180x180_3dh|8K[\. _]VR|5K[\. _]VR|4K[\. _]VR/i', $this->releaseName):
                 $this->tmpCat = Category::XXX_VR;
 
                 return true;
