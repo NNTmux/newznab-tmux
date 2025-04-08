@@ -56,40 +56,43 @@ class Releases extends Release
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(
-            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, cp.title AS parent_category, c.title AS sub_category, g.name as group_name,
-        CONCAT(cp.title, ' > ', c.title) AS category_name,
-        CONCAT(cp.id, ',', c.id) AS category_ids,
-        df.failed AS failed,
-        rn.releases_id AS nfoid,
-        re.releases_id AS reid,
-        v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-        tve.title, tve.firstaired
-    FROM releases r
-    LEFT JOIN usenet_groups g ON g.id = r.groups_id
-    LEFT JOIN categories c ON c.id = r.categories_id
-    LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-    LEFT OUTER JOIN videos v ON r.videos_id = v.id
-    LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-    LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-    LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-    LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-    WHERE r.nzbstatus = %d
-    AND r.passwordstatus %s
-    %s %s %s %s %s
-    GROUP BY r.id
-    ORDER BY %s %s
-    LIMIT %d OFFSET %d",
+            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, cp.title AS parent_category, c.title AS sub_category, r.group_name,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.id, ',', c.id) AS category_ids,
+				df.failed AS failed,
+				rn.releases_id AS nfoid,
+				re.releases_id AS reid,
+				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+				tve.title, tve.firstaired
+			FROM
+			(
+				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, g.name AS group_name
+				FROM releases r
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
+				WHERE r.nzbstatus = %d
+				AND r.passwordstatus %s
+				%s %s %s %s %s
+				ORDER BY %s %s %s
+			) r
+			LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+			LEFT OUTER JOIN videos v ON r.videos_id = v.id
+			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			GROUP BY r.id
+			ORDER BY %8\$s %9\$s",
             NZB::NZB_ADDED,
             $this->showPasswords(),
             Category::getCategorySearch($cat),
-            ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
+            ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $orderBy[0],
             $orderBy[1],
-            $num,
-            $start
+            ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
         $releases = Cache::get(md5($qry.$page));
