@@ -40,7 +40,7 @@ switch (true) {
 						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
 						IFNULL(ru.uniqueid, '') AS uid,
 						IFNULL(ph.hash, 0) AS hash,
-					    IFNULL(rf.crc32, '') AS crc,
+					    IFNULL(rf.crc32, '') AS crc
 					FROM releases r
 					LEFT JOIN release_nfos rn ON rn.releases_id = r.id
 					LEFT JOIN release_files rf ON rf.releases_id = r.id
