@@ -15,10 +15,10 @@ class TermsController extends BasePageController
         $meta_keywords = 'terms,conditions';
         $meta_description = 'Terms and Conditions for '.config('app.name');
 
-        $content = $this->smarty->fetch($this->theme.'/terms.tpl');
+        $content = $this->smarty->fetch('terms.tpl');
 
         $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
 
-        $this->smarty->display($this->theme.'/basepage.tpl');
+        $this->pagerender();
     }
 }
