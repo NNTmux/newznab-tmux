@@ -366,7 +366,9 @@ class Release extends Model
             $release->sub_category = $release->category->title ?? null;
             $release->category_name = $release->parent_category.' > '.$release->sub_category;
             $release->category_ids = $release->category->parentid.','.$release->category->id;
-            $release->group_names = $release->releaseGroup->pluck('group.name')->implode(',');
+            $release->group_names = $release->releaseGroup->map(function($relGroup) {
+                return $relGroup->group->name;
+            })->implode(',');
         });
 
         return is_array($guid) ? $releases : $releases->first();

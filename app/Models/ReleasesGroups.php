@@ -75,4 +75,9 @@ class ReleasesGroups extends Model
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
+
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(UsenetGroup::class, 'groups_id');
+    }
 }
