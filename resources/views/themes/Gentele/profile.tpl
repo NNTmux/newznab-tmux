@@ -1,244 +1,428 @@
-<div class="header">
-    <h2>Profile > <strong>{$user.username|escape:"htmlall"}</strong></h2>
+<div class="container-fluid px-4 py-3">
+                                  <!-- Breadcrumb -->
+                                  <nav aria-label="breadcrumb" class="mb-3">
+                                      <ol class="breadcrumb">
+                                          <li class="breadcrumb-item"><a href="{{url("{$site->home_link}")}}">Home</a></li>
+                                          <li class="breadcrumb-item"><a href="#">Profile</a></li>
+                                          <li class="breadcrumb-item active">{$user.username|escape:"htmlall"}</li>
+                                      </ol>
+                                  </nav>
 
-    <div class="breadcrumb-wrapper">
-        <ol class="breadcrumb">
-            <li><a href="{{url("{$site->home_link}")}}">Home</a></li>
-            / Profile / {$user.username|escape:"htmlall"}
-        </ol>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card card-default">
-                    <div class="card-body">
-                        <div class="card-body">
-                            <ul class="nav nav-tabs">
-                                <li class="nav-item">
-                                    <a class="nav-link active" href="#">Main</a>
-                                    <table cellpadding="0" cellspacing="0" width="100%">
-                                        <tbody>
-                                        <tr valign="top">
-                                            <td>
-                                                <table class="data table table-striped">
-                                                    <tbody>
-                                                    <tr class="bg-blue-sky">
-                                                        <td colspan="2" style="padding-left: 8px;">
-                                                            <strong>General</strong>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th width="200">Username</th>
-                                                        <td>{$user.username|escape:"htmlall"}</td>
-                                                    </tr>
-                                                    {if (isset($isadmin) && $isadmin === "true") || !$publicview}
-                                                        <tr>
-                                                            <th width="200" title="Not public">E-mail</th>
-                                                            <td>{$user.email}</td>
-                                                        </tr>
-                                                    {/if}
-                                                    <tr>
-                                                        <th width="200">Registered</th>
-                                                        <td>{$user.created_at|date_format}
-                                                            ({$user.created_at|timeago} ago)
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th width="200">Last Login</th>
-                                                        <td>{$user.lastlogin|date_format}
-                                                            ({$user.lastlogin|timeago} ago)
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th width="200">Role</th>
-                                                        <td>{$user->role->name}</td>
-                                                    </tr>
-                                                    {if !empty($user.rolechangedate)}
-                                                        <tr>
-                                                            <th width="200">Role expiration date</th>
-                                                            <td>{$user.rolechangedate|date_format:"%A, %B %e, %Y"}</td>
-                                                        </tr>
-                                                    {/if}
-                                                    </tbody>
-                                                </table>
-                                                <table class="data table table-striped">
-                                                    <tbody>
-                                                    <tr class="bg-blue-sky">
-                                                        <td colspan="2" style="padding-left: 8px;"><strong>UI
-                                                                Preferences</strong></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Theme:</th>
-                                                        <td>{$user.style}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Cover view:</th>
-                                                        <td>
-                                                            {if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}
-                                                            <br/>
-                                                            {if $user.musicview == "1"}View music covers{else}View standard music category{/if}
-                                                            <br/>
-                                                            {if $user.consoleview == "1"}View console covers{else}View standard console category{/if}
-                                                            <br/>
-                                                            {if $user.gameview == "1"}View games covers{else}View standard games category{/if}
-                                                            <br/>
-                                                            {if $user.bookview == "1"}View book covers{else}View standard book category{/if}
-                                                            <br/>
-                                                            {if $user.xxxview == "1"}View xxx covers{else}View standard xxx category{/if}
-                                                            <br/>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                                <table class="data data table table-striped">
-                                                    <tbody>
-                                                    <tr class="bg-blue-sky">
-                                                        <td colspan="2" style="padding-left: 8px;"><strong>API &
-                                                                Downloads</strong></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>API Hits last 24 hours</th>
-                                                        <td>
-                                                            <span>
-                                                                {$apirequests}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Downloads last 24 hours</th>
-                                                        <td>
-                                                            <span>
-                                                                {$grabstoday}
-                                                            </span> /
-                                                            {$user->role->downloadrequests}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Downloads Total</th>
-                                                        <td>{$user.grabs}</td>
-                                                    </tr>
-                                                    {if (isset($isadmin) && $isadmin === "true") || !$publicview}
-                                                        <tr>
-                                                            <th title="Not public">API/RSS Key</th>
-                                                            <td>
-                                                                <a href="{{url("/rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}")}}">{$user.api_token}</a>
-                                                                <a href="{{url("profileedit?action=newapikey")}}"
-                                                                   class="badge bg-danger">GENERATE NEW
-                                                                    KEY</a>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th title="Admin Notes">Notes:</th>
-                                                            <td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}
-                                                                    <br/>
-                                                                {/if}{if (isset($isadmin) && $isadmin === "true")}<a
-                                                                    href="{{url("/admin/user-edit.php?id={$user.id}#notes")}}"
-                                                                    class="badge bg-info">Add/Edit</a>{/if}</td>
-                                                        </tr>
-                                                    {/if}
-                                                    </tbody>
-                                                </table>
-                                                {if ($user.id === $userdata.id || $isadmin === "true") && $site->registerstatus == 1}
-                                                    <table class="data data table table-striped">
-                                                        <tbody>
-                                                        <tr class="bg-blue-sky">
-                                                            <td colspan="2" style="padding-left: 8px;"><strong>Invites</strong>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                        <tr>
-                                                            <th title="Not public">Send Invite:</th>
-                                                            <td>{$user.invites}
-                                                                {if $user.invites > 0}
-                                                                    [
-                                                                    <a id="lnkSendInvite"
-                                                                       onclick="return false;" href="#">Send
-                                                                        Invite</a>
-                                                                    ]
-                                                                    <span title="Your invites will be reduced when the invitation is claimed."
-                                                                          class="invitesuccess"
-                                                                          id="divInviteSuccess"></span>
-                                                                    <span class="invitefailed"
-                                                                          id="divInviteError"></span>
-                                                                    <div style="display:none;" id="divInvite">
-                                                                        {{Form::open(['id' => 'frmSendInvite', 'method' => 'get'])}}
-                                                                        {{Form::label('txtInvite', 'Email')}}
-                                                                        {{Form::text('txtInvite', null, ['id' => 'txtInvite'])}}
-                                                                        {{Form::submit('Send')}}
-                                                                        {{Form::close()}}
-                                                                    </div>
-                                                                {/if}
-                                                            </td>
-                                                        </tr>
-                                                        {if $userinvitedby && $userinvitedby.username != ""}
-                                                            <tr>
-                                                                <th width="200">Invited By</th>
-                                                                {if $privileged || !$privateprofiles}
-                                                                    <td>
-                                                                        <a title="View {$userinvitedby.username}'s profile"
-                                                                           href="{{url("/profile?name={$userinvitedby.username}")}}">{$userinvitedby.username}</a>
-                                                                    </td>
-                                                                {else}
-                                                                    <td>
-                                                                        {$userinvitedby.username}
-                                                                    </td>
-                                                                {/if}
-                                                            </tr>
-                                                        {/if}
-                                                        </tbody>
-                                                    </table>
-                                                {/if}
-                                                {if (isset($isadmin) && $isadmin === "true") && $downloadlist|@count > 0}
-                                                    <table class="data data table table-striped">
-                                                        <tbody>
-                                                        <tr class="bg-blue-sky">
-                                                            <td colspan="2" style="padding-left: 8px;"><strong>Downloads
-                                                                    for user</strong>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>date</th>
-                                                            <th>release</th>
-                                                        </tr>
-                                                        {foreach $downloadlist as $download}
-                                                            {if $download@iteration == 10}
-                                                                <tr class="more">
-                                                                    <td colspan="3"><a
-                                                                            onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;"
-                                                                            href="#">show all...</a></td>
-                                                                </tr>
-                                                            {/if}
-                                                            <tr {if $download@iteration >= 10}class="extra"
-                                                                style="display:none;"{/if}>
-                                                                <td width="80"
-                                                                    title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-                                                                <td>{if $download->release->guid == ""}n/a{else}<a
-                                                                        href="{{url("/details/{$download->release->guid}")}}">{$download->release->searchname}</a>{/if}
-                                                                </td>
-                                                            </tr>
-                                                        {/foreach}
-                                                    </table>
-                                                {/if}
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </li>
-                            </ul>
-                        </div>
-                        {if (isset($isadmin) && $isadmin === "true") || !$publicview}
-                            <a class="btn btn-success" href="{{route("profileedit")}}">Edit
-                                Profile</a>
-                        {/if}
-                        {if $isadmin === "false" && !$publicview}
-                            <a class="btn btn-warning confirm_action"
-                               href="{{url("profile_delete?id={$user.id}")}}">Delete your account</a>
-                        {/if}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                  <div class="row">
+                                      <div class="col-md-12">
+                                          <div class="card shadow-sm mb-4">
+                                              <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                                  <h5 class="mb-0"><i class="fa fa-user me-2"></i>User Profile</h5>
+                                                  <div>
+                                                      {if (isset($isadmin) && $isadmin === "true") || !$publicview}
+                                                          <a class="btn btn-sm btn-success" href="{{route("profileedit")}}">
+                                                              <i class="fa fa-edit me-1"></i>Edit Profile
+                                                          </a>
+                                                      {/if}
+                                                      {if $isadmin === "false" && !$publicview}
+                                                          <a class="btn btn-sm btn-danger confirm_action" href="{{url("profile_delete?id={$user.id}")}}">
+                                                              <i class="fa fa-trash me-1"></i>Delete Account
+                                                          </a>
+                                                      {/if}
+                                                  </div>
+                                              </div>
+                                              <div class="card-body">
+                                                  <div class="row">
+                                                      <!-- Left column -->
+                                                      <div class="col-lg-3 mb-4 mb-lg-0">
+                                                          <div class="text-center mb-4">
+                                                              <div class="avatar-placeholder rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
+                                                                  <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
+                                                              </div>
+                                                              <h4>{$user.username|escape:"htmlall"}</h4>
+                                                              <span class="badge bg-secondary rounded-pill">{$user->role->name}</span>
+                                                              {if !empty($user.rolechangedate)}
+                                                                  <div class="mt-2 small text-muted">
+                                                                      Role expires: {$user.rolechangedate|date_format:"%B %e, %Y"}
+                                                                  </div>
+                                                              {/if}
+                                                          </div>
+
+                                                          <div class="list-group mb-4">
+                                                              <a href="#general" class="list-group-item list-group-item-action active">
+                                                                  <i class="fa fa-info-circle me-2"></i>General Information
+                                                              </a>
+                                                              <a href="#preferences" class="list-group-item list-group-item-action">
+                                                                  <i class="fa fa-sliders me-2"></i>UI Preferences
+                                                              </a>
+                                                              <a href="#api" class="list-group-item list-group-item-action">
+                                                                  <i class="fa fa-key me-2"></i>API & Downloads
+                                                              </a>
+                                                              {if ($user.id === $userdata.id || $isadmin === "true") && $site->registerstatus == 1}
+                                                                  <a href="#invites" class="list-group-item list-group-item-action">
+                                                                      <i class="fa fa-envelope me-2"></i>Invites
+                                                                  </a>
+                                                              {/if}
+                                                              {if (isset($isadmin) && $isadmin === "true") && $downloadlist|@count > 0}
+                                                                  <a href="#downloads" class="list-group-item list-group-item-action">
+                                                                      <i class="fa fa-download me-2"></i>Recent Downloads
+                                                                  </a>
+                                                              {/if}
+                                                          </div>
+                                                      </div>
+
+                                                      <!-- Right column -->
+                                                      <div class="col-lg-9">
+                                                          <!-- General Information -->
+                                                          <div class="card mb-4" id="general">
+                                                              <div class="card-header bg-light d-flex align-items-center">
+                                                                  <i class="fa fa-info-circle me-2"></i>
+                                                                  <h6 class="mb-0">General Information</h6>
+                                                              </div>
+                                                              <div class="card-body">
+                                                                  <div class="row mb-3">
+                                                                      <div class="col-md-4 text-muted">Username</div>
+                                                                      <div class="col-md-8 fw-medium">{$user.username|escape:"htmlall"}</div>
+                                                                  </div>
+
+                                                                  {if (isset($isadmin) && $isadmin === "true") || !$publicview}
+                                                                      <div class="row mb-3">
+                                                                          <div class="col-md-4 text-muted">Email</div>
+                                                                          <div class="col-md-8 fw-medium">{$user.email}</div>
+                                                                      </div>
+                                                                  {/if}
+
+                                                                  <div class="row mb-3">
+                                                                      <div class="col-md-4 text-muted">Registered</div>
+                                                                      <div class="col-md-8">
+                                                                          <div class="d-flex align-items-center">
+                                                                              <i class="fa fa-calendar text-muted me-2"></i>
+                                                                              {$user.created_at|date_format}
+                                                                              <span class="badge bg-light text-dark ms-2">({$user.created_at|timeago} ago)</span>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  <div class="row mb-3">
+                                                                      <div class="col-md-4 text-muted">Last Login</div>
+                                                                      <div class="col-md-8">
+                                                                          <div class="d-flex align-items-center">
+                                                                              <i class="fa fa-clock-o text-muted me-2"></i>
+                                                                              {$user.lastlogin|date_format}
+                                                                              <span class="badge bg-light text-dark ms-2">({$user.lastlogin|timeago} ago)</span>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  {if $userinvitedby && $userinvitedby.username != ""}
+                                                                      <div class="row">
+                                                                          <div class="col-md-4 text-muted">Invited By</div>
+                                                                          <div class="col-md-8">
+                                                                              {if $privileged || !$privateprofiles}
+                                                                                  <a href="{{url("/profile?name={$userinvitedby.username}")}}" class="text-decoration-none">
+                                                                                      <i class="fa fa-user text-muted me-2"></i>{$userinvitedby.username}
+                                                                                  </a>
+                                                                              {else}
+                                                                                  <i class="fa fa-user text-muted me-2"></i>{$userinvitedby.username}
+                                                                              {/if}
+                                                                          </div>
+                                                                      </div>
+                                                                  {/if}
+                                                              </div>
+                                                          </div>
+
+                                                          <!-- UI Preferences -->
+                                                          <div class="card mb-4" id="preferences">
+                                                              <div class="card-header bg-light d-flex align-items-center">
+                                                                  <i class="fa fa-sliders me-2"></i>
+                                                                  <h6 class="mb-0">UI Preferences</h6>
+                                                              </div>
+                                                              <div class="card-body">
+                                                                  <div class="row mb-3">
+                                                                      <div class="col-md-4 text-muted">Theme</div>
+                                                                      <div class="col-md-8">
+                                                                          <span class="badge bg-primary">{$user.style}</span>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  <div class="row">
+                                                                      <div class="col-md-4 text-muted">Cover Preferences</div>
+                                                                      <div class="col-md-8">
+                                                                          <div class="d-flex flex-wrap gap-2">
+                                                                              <span class="badge {if $user.movieview == "1"}bg-success{else}bg-secondary{/if}">
+                                                                                  <i class="fa fa-film me-1"></i>
+                                                                                  {if $user.movieview == "1"}Movie Covers{else}Standard Movie View{/if}
+                                                                              </span>
+
+                                                                              <span class="badge {if $user.musicview == "1"}bg-success{else}bg-secondary{/if}">
+                                                                                  <i class="fa fa-music me-1"></i>
+                                                                                  {if $user.musicview == "1"}Music Covers{else}Standard Music View{/if}
+                                                                              </span>
+
+                                                                              <span class="badge {if $user.consoleview == "1"}bg-success{else}bg-secondary{/if}">
+                                                                                  <i class="fa fa-gamepad me-1"></i>
+                                                                                  {if $user.consoleview == "1"}Console Covers{else}Standard Console View{/if}
+                                                                              </span>
+
+                                                                              <span class="badge {if $user.gameview == "1"}bg-success{else}bg-secondary{/if}">
+                                                                                  <i class="fa fa-gamepad me-1"></i>
+                                                                                  {if $user.gameview == "1"}Game Covers{else}Standard Game View{/if}
+                                                                              </span>
+
+                                                                              <span class="badge {if $user.bookview == "1"}bg-success{else}bg-secondary{/if}">
+                                                                                  <i class="fa fa-book me-1"></i>
+                                                                                  {if $user.bookview == "1"}Book Covers{else}Standard Book View{/if}
+                                                                              </span>
+
+                                                                              <span class="badge {if $user.xxxview == "1"}bg-success{else}bg-secondary{/if}">
+                                                                                  <i class="fa fa-eye me-1"></i>
+                                                                                  {if $user.xxxview == "1"}XXX Covers{else}Standard XXX View{/if}
+                                                                              </span>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          </div>
+
+                                                          <!-- API & Downloads -->
+                                                          <div class="card mb-4" id="api">
+                                                              <div class="card-header bg-light d-flex align-items-center">
+                                                                  <i class="fa fa-key me-2"></i>
+                                                                  <h6 class="mb-0">API & Downloads</h6>
+                                                              </div>
+                                                              <div class="card-body">
+                                                                  <div class="row mb-3">
+                                                                      <div class="col-md-5 text-muted">API Hits (Last 24 Hours)</div>
+                                                                      <div class="col-md-7">
+                                                                          <div class="d-flex align-items-center">
+                                                                              <i class="fa fa-server text-muted me-2"></i>
+                                                                              <span class="badge bg-primary rounded-pill">{$apirequests}</span>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  <div class="row mb-3">
+                                                                      <div class="col-md-5 text-muted">Downloads (Last 24 Hours)</div>
+                                                                      <div class="col-md-7">
+                                                                          <div class="d-flex align-items-center">
+                                                                              <i class="fa fa-cloud-download text-muted me-2"></i>
+                                                                              <div class="progress flex-grow-1" style="height: 20px;">
+                                                                                  <div class="progress-bar {if $grabstoday >= $user->role->downloadrequests}bg-danger{else}bg-success{/if}"
+                                                                                       role="progressbar"
+                                                                                       style="width: {min(($grabstoday / $user->role->downloadrequests) * 100, 100)}%;"
+                                                                                       aria-valuenow="{$grabstoday}"
+                                                                                       aria-valuemin="0"
+                                                                                       aria-valuemax="{$user->role->downloadrequests}">
+                                                                                      {$grabstoday} / {$user->role->downloadrequests}
+                                                                                  </div>
+                                                                              </div>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  <div class="row mb-3">
+                                                                      <div class="col-md-5 text-muted">Total Downloads</div>
+                                                                      <div class="col-md-7">
+                                                                          <div class="d-flex align-items-center">
+                                                                              <i class="fa fa-download text-muted me-2"></i>
+                                                                              <span class="badge bg-secondary rounded-pill">{$user.grabs}</span>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  {if (isset($isadmin) && $isadmin === "true") || !$publicview}
+                                                                      <div class="row mb-3">
+                                                                          <div class="col-md-5 text-muted">API/RSS Key</div>
+                                                                          <div class="col-md-7">
+                                                                              <div class="input-group">
+                                                                                  <input type="text" class="form-control form-control-sm" value="{$user.api_token}" readonly>
+                                                                                  <a href="{{url("/rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}")}}" class="btn btn-sm btn-outline-secondary">
+                                                                                      <i class="fa fa-rss me-1"></i>RSS
+                                                                                  </a>
+                                                                                  <a href="{{url("profileedit?action=newapikey")}}" class="btn btn-sm btn-danger">
+                                                                                      <i class="fa fa-refresh me-1"></i>Generate New
+                                                                                  </a>
+                                                                              </div>
+                                                                          </div>
+                                                                      </div>
+
+                                                                      {if $user.notes|count_characters > 0 || $isadmin === "true"}
+                                                                          <div class="row">
+                                                                              <div class="col-md-5 text-muted">Admin Notes</div>
+                                                                              <div class="col-md-7">
+                                                                                  {if $user.notes|count_characters > 0}
+                                                                                      <div class="alert alert-info mb-2 p-2">
+                                                                                          <i class="fa fa-sticky-note me-2"></i>{$user.notes|escape:htmlall}
+                                                                                      </div>
+                                                                                  {/if}
+                                                                                  {if $isadmin === "true"}
+                                                                                      <a href="{{url("/admin/user-edit.php?id={$user.id}#notes")}}" class="btn btn-sm btn-outline-info">
+                                                                                          <i class="fa fa-edit me-1"></i>Add/Edit Notes
+                                                                                      </a>
+                                                                                  {/if}
+                                                                              </div>
+                                                                          </div>
+                                                                      {/if}
+                                                                  {/if}
+                                                              </div>
+                                                          </div>
+
+                                                          <!-- Invites Section -->
+                                                          {if ($user.id === $userdata.id || $isadmin === "true") && $site->registerstatus == 1}
+                                                              <div class="card mb-4" id="invites">
+                                                                  <div class="card-header bg-light d-flex align-items-center">
+                                                                      <i class="fa fa-envelope me-2"></i>
+                                                                      <h6 class="mb-0">Invites</h6>
+                                                                  </div>
+                                                                  <div class="card-body">
+                                                                      <div class="row mb-3">
+                                                                          <div class="col-md-4 text-muted">Available Invites</div>
+                                                                          <div class="col-md-8">
+                                                                              <div class="d-flex align-items-center">
+                                                                                  <span class="badge bg-primary rounded-pill me-3">{$user.invites}</span>
+
+                                                                                  {if $user.invites > 0}
+                                                                                      <button id="lnkSendInvite" class="btn btn-sm btn-outline-success" onclick="return false;">
+                                                                                          <i class="fa fa-paper-plane me-1"></i>Send Invite
+                                                                                      </button>
+                                                                                  {/if}
+                                                                              </div>
+
+                                                                              {if $user.invites > 0}
+                                                                                  <div class="mt-3">
+                                                                                      <span class="invitesuccess text-success" id="divInviteSuccess"></span>
+                                                                                      <span class="invitefailed text-danger" id="divInviteError"></span>
+
+                                                                                      <div style="display:none;" id="divInvite" class="mt-2">
+                                                                                          {{Form::open(['id' => 'frmSendInvite', 'method' => 'get', 'class' => 'row g-2'])}}
+                                                                                              <div class="col-md-8">
+                                                                                                  <div class="input-group">
+                                                                                                      <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                                                                                                      {{Form::text('txtInvite', null, ['id' => 'txtInvite', 'class' => 'form-control', 'placeholder' => 'Email address'])}}
+                                                                                                  </div>
+                                                                                              </div>
+                                                                                              <div class="col-md-4">
+                                                                                                  {{Form::submit('Send Invite', ['class' => 'btn btn-primary w-100'])}}
+                                                                                              </div>
+                                                                                          {{Form::close()}}
+                                                                                      </div>
+                                                                                  </div>
+                                                                              {/if}
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          {/if}
+
+                                                          <!-- Downloads Section -->
+                                                          {if (isset($isadmin) && $isadmin === "true") && $downloadlist|@count > 0}
+                                                              <div class="card mb-4" id="downloads">
+                                                                  <div class="card-header bg-light d-flex align-items-center justify-content-between">
+                                                                      <div>
+                                                                          <i class="fa fa-download me-2"></i>
+                                                                          <h6 class="d-inline mb-0">Recent Downloads</h6>
+                                                                      </div>
+                                                                      {if $downloadlist|@count > 10}
+                                                                          <button class="btn btn-sm btn-outline-secondary" id="toggleDownloads">
+                                                                              <i class="fa fa-eye me-1"></i>Show All
+                                                                          </button>
+                                                                      {/if}
+                                                                  </div>
+                                                                  <div class="card-body p-0">
+                                                                      <div class="table-responsive">
+                                                                          <table class="table table-hover mb-0">
+                                                                              <thead class="table-light">
+                                                                                  <tr>
+                                                                                      <th><i class="fa fa-calendar me-1"></i>Date</th>
+                                                                                      <th><i class="fa fa-file-archive-o me-1"></i>Release</th>
+                                                                                  </tr>
+                                                                              </thead>
+                                                                              <tbody>
+                                                                                  {foreach $downloadlist as $download}
+                                                                                      <tr class="{if $download@iteration > 10}extra-download d-none{/if}">
+                                                                                          <td width="180" class="align-middle">
+                                                                                              <div class="d-flex align-items-center" title="{$download.timestamp}">
+                                                                                                  <i class="fa fa-clock-o text-muted me-2"></i>
+                                                                                                  {$download.timestamp|date_format}
+                                                                                              </div>
+                                                                                          </td>
+                                                                                          <td>
+                                                                                              {if $download->release->guid == ""}
+                                                                                                  <span class="text-muted">n/a</span>
+                                                                                              {else}
+                                                                                                  <a href="{{url("/details/{$download->release->guid}")}}" class="text-decoration-none">
+                                                                                                      {$download->release->searchname}
+                                                                                                  </a>
+                                                                                              {/if}
+                                                                                          </td>
+                                                                                      </tr>
+                                                                                  {/foreach}
+                                                                              </tbody>
+                                                                          </table>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          {/if}
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <script>
+                              {literal}
+                                  document.addEventListener('DOMContentLoaded', function() {
+                                      // Invites functionality
+                                      const sendInviteBtn = document.getElementById('lnkSendInvite');
+                                      const inviteDiv = document.getElementById('divInvite');
+
+                                      if (sendInviteBtn) {
+                                          sendInviteBtn.addEventListener('click', function() {
+                                              if (inviteDiv.style.display === 'none') {
+                                                  inviteDiv.style.display = 'block';
+                                                  this.innerHTML = '<i class="fa fa-times me-1"></i>Cancel';
+                                              } else {
+                                                  inviteDiv.style.display = 'none';
+                                                  this.innerHTML = '<i class="fa fa-paper-plane me-1"></i>Send Invite';
+                                              }
+                                          });
+                                      }
+
+                                      // Downloads toggle
+                                      const toggleDownloadsBtn = document.getElementById('toggleDownloads');
+
+                                      if (toggleDownloadsBtn) {
+                                          toggleDownloadsBtn.addEventListener('click', function() {
+                                              const extraRows = document.querySelectorAll('.extra-download');
+                                              extraRows.forEach(row => row.classList.toggle('d-none'));
+
+                                              if (this.innerHTML.includes('Show All')) {
+                                                  this.innerHTML = '<i class="fa fa-eye-slash me-1"></i>Show Less';
+                                              } else {
+                                                  this.innerHTML = '<i class="fa fa-eye me-1"></i>Show All';
+                                              }
+                                          });
+                                      }
+
+                                      // Smooth scroll for sidebar navigation
+                                      document.querySelectorAll('.list-group-item').forEach(link => {
+                                          link.addEventListener('click', function(e) {
+                                              e.preventDefault();
+
+                                              // Remove active class from all links
+                                              document.querySelectorAll('.list-group-item').forEach(item => {
+                                                  item.classList.remove('active');
+                                              });
+
+                                              // Add active class to clicked link
+                                              this.classList.add('active');
+
+                                              // Scroll to target section
+                                              const targetId = this.getAttribute('href');
+                                              const targetElement = document.querySelector(targetId);
+
+                                              if (targetElement) {
+                                                  targetElement.scrollIntoView({ behavior: 'smooth' });
+                                              }
+                                          });
+                                      });
+                                  });
+                              {/literal}
+                              </script>
