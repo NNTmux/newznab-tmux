@@ -11,7 +11,7 @@
 	{if $showregister == 1}
 		<div class="register-box">
 			<div class="register-logo">
-				<a href="{$serverroot}"><b>{$site->title}</b></a>
+				<a href="{$serverroot}"><b>{{config('app.name')}}</b></a>
 			</div>
 			<div class="register-box-body">
 				<p class="login-box-msg">Register a new membership</p>

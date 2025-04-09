@@ -11,7 +11,7 @@
 	{if $confirmed == '' && $sent == ''}
 	<div class="login-box">
 		<div class="login-logo">
-			<a href="{$serverroot}"><b{$site->title}</b></a>
+			<a href="{$serverroot}"><b{{config('app.name')}}</b></a>
 		</div><!-- /.login-logo -->
 		<div class="login-box-body">
 			<p class="login-box-msg">Please enter the email address you used to register and we will send an email to

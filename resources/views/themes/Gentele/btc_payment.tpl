@@ -2,7 +2,7 @@
 	<div class="card-body pagination2">
 		<div class="row">
 			<div class="alert alert-info">
-			<span style="align-content: center"> This page will redirect you to site outside of {$site->title} to make your payment
+			<span style="align-content: center"> This page will redirect you to site outside of {{config('app.name')}} to make your payment
 			<br>
 			If, for some reason, your account isn't updated automaticaly, please send us an email or use our contact form to inform us so we can fix the issue.</span>
 			</div>

@@ -4,7 +4,7 @@
 	{/if}
 	<div class="login-box">
 		<div class="login-logo">
-			<a href="{{url('/')}}"><b>{$site->title}</b></a>
+			<a href="{{url('/')}}"><b>{{config('app.name')}}</b></a>
 		</div><!-- /.login-logo -->
 		<div class="login-box-body">
 			<p class="login-box-msg">Please sign in to access the site</p>
