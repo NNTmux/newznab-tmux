@@ -5009,3 +5009,50 @@ ul.notifications {
 .calendar-exibit .calendar-table {
     padding: 0 0 4px 0;
 }
+.badge {
+    transition: all 0.2s ease;
+}
+
+a.badge:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Group badges by color */
+.badge.bg-primary, .badge.bg-success, .badge.bg-info {
+    font-weight: 500;
+}
+
+.badge.bg-dark {
+    font-size: 0.75rem;
+}
+
+.sort-controls {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.sort-icon {
+    color: rgba(108, 117, 125, 0.6);
+    transition: color 0.2s, transform 0.2s;
+    font-size: 0.85rem;
+}
+
+.sort-icon:hover {
+    color: #0d6efd;
+    transform: translateY(-1px);
+}
+
+.sort-icon.active {
+    color: #0d6efd;
+}
+
+th .d-flex {
+    min-height: 24px;
+}
+
+thead th {
+    font-weight: 600;
+    border-bottom-width: 2px;
+}
