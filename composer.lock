@@ -3368,16 +3368,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.7.2",
+            "version": "v12.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "a4ba76e06fe6dd02312359f8184ab259900a7780"
+                "reference": "d1ea3566f6e0cad34834c6d18db0bf995438eb87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/a4ba76e06fe6dd02312359f8184ab259900a7780",
-                "reference": "a4ba76e06fe6dd02312359f8184ab259900a7780",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/d1ea3566f6e0cad34834c6d18db0bf995438eb87",
+                "reference": "d1ea3566f6e0cad34834c6d18db0bf995438eb87",
                 "shasum": ""
             },
             "require": {
@@ -3579,7 +3579,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-04-03T18:00:49+00:00"
+            "time": "2025-04-08T19:58:59+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -5162,16 +5162,16 @@
         },
         {
             "name": "livewire/volt",
-            "version": "v1.7.0",
+            "version": "v1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/volt.git",
-                "reference": "94091094aa745c8636f9c7bed1e2da2d2a3f32b3"
+                "reference": "ba3e609fd4c71f8b5783f024baf51715e48e93a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/volt/zipball/94091094aa745c8636f9c7bed1e2da2d2a3f32b3",
-                "reference": "94091094aa745c8636f9c7bed1e2da2d2a3f32b3",
+                "url": "https://api.github.com/repos/livewire/volt/zipball/ba3e609fd4c71f8b5783f024baf51715e48e93a6",
+                "reference": "ba3e609fd4c71f8b5783f024baf51715e48e93a6",
                 "shasum": ""
             },
             "require": {
@@ -5230,7 +5230,7 @@
                 "issues": "https://github.com/livewire/volt/issues",
                 "source": "https://github.com/livewire/volt"
             },
-            "time": "2025-03-05T15:20:55+00:00"
+            "time": "2025-04-08T15:13:36+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -15858,16 +15858,16 @@
         },
         {
             "name": "laravel/pint",
-            "version": "v1.21.2",
+            "version": "v1.22.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
-                "reference": "370772e7d9e9da087678a0edf2b11b6960e40558"
+                "reference": "7ddfaa6523a675fae5c4123ee38fc6bfb8ee4f36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/370772e7d9e9da087678a0edf2b11b6960e40558",
-                "reference": "370772e7d9e9da087678a0edf2b11b6960e40558",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/7ddfaa6523a675fae5c4123ee38fc6bfb8ee4f36",
+                "reference": "7ddfaa6523a675fae5c4123ee38fc6bfb8ee4f36",
                 "shasum": ""
             },
             "require": {
@@ -15878,9 +15878,9 @@
                 "php": "^8.2.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.72.0",
+                "friendsofphp/php-cs-fixer": "^3.75.0",
                 "illuminate/view": "^11.44.2",
-                "larastan/larastan": "^3.2.0",
+                "larastan/larastan": "^3.3.1",
                 "laravel-zero/framework": "^11.36.1",
                 "mockery/mockery": "^1.6.12",
                 "nunomaduro/termwind": "^2.3",
@@ -15920,7 +15920,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-            "time": "2025-03-14T22:31:42+00:00"
+            "time": "2025-04-08T22:11:45+00:00"
         },
         {
             "name": "laravel/sail",
