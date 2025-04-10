@@ -47,7 +47,7 @@
                                 <!-- sidebar menu -->
                                 <div id="sidebar-container" class="sidebar-expanded d-md-block">
                                     <ul class="list-group">
-                                        <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+                                        <li class="bg-transparent list-group-item sidebar-separator-title text-white d-flex align-items-center menu-collapsed">
                                             <small>MAIN MENU</small>
                                         </li>
                                         {if Auth::check()}
