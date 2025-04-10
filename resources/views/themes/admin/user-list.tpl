@@ -2,7 +2,7 @@
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">{$title}</h4>
-                <a href="{{url("/admin/user-add")}}" class="btn btn-outline-success">
+                <a href="{{url("/admin/user-edit?action=add")}}" class="btn btn-outline-success">
                     <i class="fa fa-plus me-2"></i>Add New User
                 </a>
             </div>
