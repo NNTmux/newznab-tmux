@@ -20,12 +20,12 @@
 
                                         {if count($results) > 0}
                                             {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
-                                            <div class="card card-default shadow-sm mb-4">
-                                                <div class="card-header bg-light">
-                                                    <div class="row">
-                                                        <div class="col-md-4">
+                                            <div class="card-header bg-light">
+                                                    <div class="row g-3">
+                                                        <!-- Changed from col-md-4 to col-lg-4 for better small screen handling -->
+                                                        <div class="col-lg-4 col-md-12">
                                                             {if isset($shows)}
-                                                                <div class="mb-2">
+                                                                <div class="mb-3">
                                                                     <a href="{{route('series')}}" class="me-2" title="View available TV series">Series List</a> |
                                                                     <a href="{{route('myshows')}}" class="mx-2" title="Manage your shows">Manage My Shows</a> |
                                                                     <a href="{{url("/rss/myshows?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}" class="ms-2" title="All releases in your shows as an RSS feed">RSS Feed</a>
@@ -33,16 +33,16 @@
                                                             {/if}
 
                                                             {if isset($covgroup) && $covgroup != ''}
-                                                                <div class="mb-2">
+                                                                <div class="mb-3">
                                                                     <span class="me-2">View:</span>
                                                                     <a href="{{url("/{$covgroup}/{$category}")}}" class="me-2">Covers</a> |
                                                                     <b class="ms-2">List</b>
                                                                 </div>
                                                             {/if}
 
-                                                            <div class="nzb_multi_operations d-flex align-items-center">
-                                                                <small class="me-2">With Selected:</small>
-                                                                <div class="btn-group">
+                                                            <div class="nzb_multi_operations d-flex flex-wrap align-items-center">
+                                                                <small class="me-2 mb-2">With Selected:</small>
+                                                                <div class="btn-group mb-2">
                                                                     <button type="button" class="nzb_multi_operations_download btn btn-sm btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Download NZBs">
                                                                         <i class="fa fa-cloud-download"></i>
                                                                     </button>
@@ -56,8 +56,11 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-8 d-flex justify-content-end align-items-center">
-                                                            {$results->onEachSide(5)->links()}
+                                                        <!-- Changed from col-md-8 to col-lg-8 and added order classes -->
+                                                        <div class="col-lg-8 col-md-12 d-flex justify-content-lg-end justify-content-center align-items-center order-lg-2 order-md-1">
+                                                            <div class="pagination-container overflow-auto w-100 d-flex justify-content-lg-end justify-content-center">
+                                                                {$results->onEachSide(5)->links()}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -285,12 +288,13 @@
                                                 </div>
 
                                                 <div class="card-footer">
-                                                    <div class="row">
-                                                        <div class="col-md-4">
+                                                    <div class="row g-3">
+                                                        <!-- Changed from col-md-4 to col-lg-4 to match header -->
+                                                        <div class="col-lg-4 col-md-12">
                                                             <div class="nzb_multi_operations">
-                                                                <div class="d-flex align-items-center gap-2">
-                                                                    <small>With Selected:</small>
-                                                                    <div class="btn-group">
+                                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                                    <small class="me-2 mb-2">With Selected:</small>
+                                                                    <div class="btn-group mb-2">
                                                                         <button type="button" class="nzb_multi_operations_download btn btn-sm btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Download NZBs">
                                                                             <i class="fa fa-cloud-download"></i>
                                                                         </button>
@@ -305,8 +309,11 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-8 d-flex justify-content-end align-items-center">
-                                                            {$results->onEachSide(5)->links()}
+                                                        <!-- Changed from col-md-8 to col-lg-8 and improved responsive behavior -->
+                                                        <div class="col-lg-8 col-md-12 d-flex justify-content-lg-end justify-content-center align-items-center order-lg-2 order-md-1">
+                                                            <div class="pagination-container overflow-auto w-100 d-flex justify-content-lg-end justify-content-center">
+                                                                {$results->onEachSide(5)->links()}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
