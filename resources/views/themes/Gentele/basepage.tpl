@@ -1,101 +1,207 @@
 <!DOCTYPE html>
-<html lang="{{App::getLocale()}}">
+            <html lang="{{App::getLocale()}}">
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="csrf-token" content="{{csrf_token()}}">
+                <title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+                {{Html::style("{{asset('/assets/css/all-css.css')}}")}}
+            </head>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{csrf_token()}}">
+            <body class="nav-md">
+                <div class="container body">
+                    <div class="main_container">
+                        <!-- Left sidebar navigation -->
+                        <div class="col-md-3 left_col">
+                            <div class="left_col scroll-view">
+                                <!-- Mobile toggle button -->
+                                <button id="sidebar-toggle" class="d-md-none btn btn-primary position-absolute"
+                                        style="right: 10px; top: 10px; z-index: 1000;" aria-label="Toggle sidebar">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
 
-    <title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-    {{Html::style("{{asset('/assets/css/all-css.css')}}")}}
+                                <div class="navbar nav_title" style="border: 0;">
+                                    <a href="{$site->home_link}" class="site_title">
+                                        <i class="fab fa-phoenix-framework" aria-hidden="true"></i>
+                                        <span>{{config('app.name')}}</span>
+                                    </a>
+                                </div>
+                                <div class="clearfix"></div>
 
-</head>
-<body class="nav-md">
-<div class="container body">
-    <div class="main_container">
-        <div class="col-md-3 left_col">
-            <div class="left_col scroll-view">
-                <div class="navbar nav_title" style="border: 0;">
-                    <a href="{$site->home_link}" class="site_title"><i class="fab fa-phoenix-framework"></i>
-                        <span>{{config('app.name')}}</span></a>
-                </div>
-                <div class="clearfix"></div>
-                <!-- menu profile quick info -->
-                {if Auth::check()}
-                    <div class="profile">
-                        <div class="profile_pic">
-                            <img src="{{asset('/assets/images/userimage.png')}}" alt="User Image"
-                                 class="img-circle profile_img">
+                                <!-- menu profile quick info -->
+                                {if Auth::check()}
+                                    <div class="profile">
+                                        <div class="profile_pic">
+                                            <img src="{{asset('/assets/images/userimage.png')}}" alt="User Image"
+                                                 class="img-circle profile_img">
+                                        </div>
+                                        <div class="profile_info">
+                                            <span>Welcome,</span>
+                                            <h2 class="text-break">{{Auth::user()->username}}</h2>
+                                        </div>
+                                    </div>
+                                {/if}
+                                <!-- /menu profile quick info -->
+                                <div class="clearfix"></div>
+
+                                <!-- sidebar menu -->
+                                <div id="sidebar-container" class="sidebar-expanded d-md-block">
+                                    <ul class="list-group">
+                                        <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+                                            <small>MAIN MENU</small>
+                                        </li>
+                                        {if Auth::check()}
+                                            {$sidebar}
+                                        {else}
+                                            <a href="{{route('login')}}"
+                                               class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+                                                <span class="fa fa-lock me-3"></span>
+                                                <span>Sign In</span>
+                                            </a>
+                                        {/if}
+                                        <a href="{{route('contact-us')}}"
+                                           class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+                                            <span class="fa fa-envelope-open-text me-3"></span>
+                                            <span>Contact</span>
+                                        </a>
+                                    </ul>
+                                </div>
+                                <!-- /sidebar menu -->
+                            </div>
                         </div>
-                        <div class="profile_info">
-                            <span>Welcome,</span>
-                            <h2 class="text-break">{{Auth::user()->username}}</h2>
-                        </div>
-                    </div>
-                {/if}
-                <!-- /menu profile quick info -->
-                <br/>
-                <div class="clearfix"></div>
-                <!-- sidebar menu -->
-                <div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
-                    <ul class="list-group">
-                        <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-                            <small>MAIN MENU</small>
-                        </li>
+
+                        <!-- top navigation -->
                         {if Auth::check()}
-                            {$sidebar}
-                        {else}
-                            <a href="{{route('login')}}"
-                               class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
-                                <span class="fa fa-lock mr-3"></span>
-                                <span>Sign In</span>
-                            </a>
+                            <div class="top_nav">
+                                <div class="nav_menu">
+                                    {$header_menu}
+                                </div>
+                            </div>
                         {/if}
-                        <a href="{{route('contact-us')}}"
-                           class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
-                            <span class="fa fa-envelope-open-text mr-3"></span>
-                            <span>Contact</span>
-                        </a>
-                    </ul>
+                        <!-- /top navigation -->
+
+                        <!-- page content -->
+                        <div class="right_col" role="main">
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-12">
+                                    {$notification}
+                                    {$content}
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /page content -->
+                    </div>
                 </div>
 
-                <!-- /sidebar menu -->
-            </div>
-        </div>
-        <!-- top navigation -->
-        {if Auth::check()}
-            <div class="top_nav">
-                <div class="nav_menu">
-                    {$header_menu}
-                </div>
-            </div>
-        {/if}
-        <!-- /top navigation -->
+                <!-- footer content -->
+                {$footer}
+                <!-- /footer content -->
 
-        <!-- page content -->
-        <div class="right_col" role="main">
-            <div class="clearfix"></div>
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-12">
-                    {$notification}
-                    {$content}
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        </div>
-        <!-- /page content -->
-    </div>
-</div>
-<!-- footer content -->
-{$footer}
-<!-- /footer content -->
+                <!-- jQuery and scripts -->
+                {{Html::script("{{asset("/assets/js/all-js.js")}}")}}
 
-<!-- jQuery 3.3.0 -->
-{{Html::script("{{asset("/assets/js/all-js.js")}}")}}
+                {{Form::open(['id' => 'frm-logout', 'route' => 'logout'])}}
+                {{Form::close()}}
 
-{{Form::open(['id' => 'frm-logout', 'route' => 'logout'])}}
-{{Form::close()}}
+                <script>
+                {literal}
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Toggle sidebar on mobile
+                        const sidebarToggle = document.getElementById('sidebar-toggle');
+                        const sidebarContainer = document.getElementById('sidebar-container');
+                        const leftCol = document.querySelector('.left_col');
 
-</body>
+                        if (sidebarToggle) {
+                            sidebarToggle.addEventListener('click', function() {
+                                leftCol.classList.toggle('mobile-expanded');
+                                sidebarContainer.classList.toggle('d-none');
+                            });
+                        }
 
-</html>
+                        // Initial state setup based on screen size
+                        function adjustSidebar() {
+                            if (window.innerWidth < 768) {
+                                if (!leftCol.classList.contains('mobile-expanded')) {
+                                    sidebarContainer.classList.add('d-none');
+                                }
+                            } else {
+                                sidebarContainer.classList.remove('d-none');
+                            }
+                        }
+
+                        // Initial setup
+                        adjustSidebar();
+
+                        // Handle resize events
+                        window.addEventListener('resize', function() {
+                            clearTimeout(window.resizeTimer);
+                            window.resizeTimer = setTimeout(adjustSidebar, 100);
+                        });
+                    });
+                {/literal}
+                </script>
+
+                <style>
+                {literal}
+                    /* Mobile styles only - large screens remain unchanged */
+                    @media (max-width: 767px) {
+                        .left_col {
+                            position: fixed;
+                            z-index: 999;
+                            width: 85%;
+                            max-width: 300px;
+                            height: 100vh;
+                            transform: translateX(-100%);
+                            transition: transform 0.3s ease;
+                            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+                        }
+
+                        .left_col.mobile-expanded {
+                            transform: translateX(0);
+                        }
+
+                        .profile_info {
+                            padding-right: 45px;
+                        }
+
+                        /* Bootstrap 5 spacing utilities */
+                        .me-3 {
+                            margin-right: 1rem !important;
+                        }
+
+                        /* Add overlay when sidebar is open */
+                        .left_col.mobile-expanded::after {
+                            content: "";
+                            position: fixed;
+                            top: 0;
+                            right: 0;
+                            bottom: 0;
+                            left: 300px;
+                            background: rgba(0, 0, 0, 0.5);
+                            z-index: -1;
+                        }
+
+                        /* Adjust spacing for mobile view */
+                        .right_col {
+                            padding-left: 15px;
+                            padding-right: 15px;
+                            margin-left: 0;
+                            width: 100%;
+                        }
+
+                        /* Improve smaller screens layout */
+                        .profile_pic {
+                            width: 40px;
+                            height: 40px;
+                        }
+
+                        .profile_info h2 {
+                            font-size: 1rem;
+                        }
+                    }
+                {/literal}
+                </style>
+            </body>
+            </html>
