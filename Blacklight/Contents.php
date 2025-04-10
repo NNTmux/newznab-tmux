@@ -169,6 +169,7 @@ class Contents
                     'contenttype' => $content['contenttype'],
                     'status' => $content['status'],
                     'ordinal' => $content['ordinal'],
+                    'updated_at' => now(),
                 ]
             );
     }
@@ -187,6 +188,8 @@ class Contents
                     'contenttype' => $content['contenttype'],
                     'status' => $content['status'],
                     'ordinal' => $content['ordinal'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
     }
