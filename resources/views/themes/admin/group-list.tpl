@@ -137,6 +137,9 @@
 				                                </td>
 				                                <td class="text-center" id="groupdel-{$group.id}">
 				                                    <div class="btn-group btn-group-sm" role="group">
+				                                        <a href="{{url("/admin/group-edit?id={$group.id}")}}" class="btn btn-primary" data-bs-toggle="tooltip" title="Edit this group">
+				                                            <i class="fa fa-pencil"></i>
+				                                        </a>
 				                                        <button type="button" onclick="ajax_group_reset({$group.id})" class="btn btn-warning" data-bs-toggle="tooltip" title="Reset this group">
 				                                            <i class="fa fa-refresh"></i>
 				                                        </button>
