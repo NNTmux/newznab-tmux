@@ -729,16 +729,18 @@ class Releases extends Release
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
-				re.releases_id AS reid
+				re.releases_id AS reid,
+				df.failed as failed
 			FROM releases r
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
-			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0
+			LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
+			LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT JOIN video_data re ON re.releases_id = r.id
+			LEFT JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT JOIN dnzb_failures df ON df.release_id = r.id
 			%s",
             $whereSql
         );
