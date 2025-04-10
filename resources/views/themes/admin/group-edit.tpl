@@ -1,89 +1,232 @@
-<div class="card card-body">
-	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{{url("/admin/group-list")}}"><i class="fa fa-arrow-left"></i> Go
-		back</a>
-	<form action="group-edit?action=submit" method="POST">
-		{{csrf_field()}}
-		<table class="input data table table-striped responsive-utilities jambo-table">
-			<tr>
-				<td>Name:</td>
-				<td>
-					<input type="hidden" name="id" value="{$group.id}"/>
-					<input id="name" class="long" name="name" type="text" value="{$group.name}"/>
-					<div class="hint">Changing the name to an invalid group will break things.</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="description">Description:</label></td>
-				<td>
-					<textarea id="description" name="description">{$group.description}</textarea>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="backfill_target">Backfill Days</label></td>
-				<td>
-					<input class="small" id="backfill_target" name="backfill_target" type="text"
-						   value="{$group.backfill_target}"/>
-					<div class="hint">Number of days to attempt to backfill this group. Adjust as necessary.</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="minfilestoformrelease">Minimum Files <br/>To Form Release</label></td>
-				<td>
-					<input class="small" id="minfilestoformrelease" name="minfilestoformrelease" type="text"
-						   value="{$group.minfilestoformrelease}"/>
-					<div class="hint">The minimum number of files to make a release. i.e. if set to two, then releases
-						which only contain one file will not be created. If left blank, will use the site wide setting.
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="minsizetoformrelease">Minimum File Size to Make a Release:</label></td>
-				<td>
-					<input class="small" id="minsizetoformrelease" name="minsizetoformrelease" type="text"
-						   value="{$group.minsizetoformrelease}"/>
-					<div class="hint">The minimum total size in bytes to make a release. If left blank, will use the
-						site wide setting.
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="first_record">First Record ID:</label></td>
-				<td>
-					<input class="small" id="first_record" name="first_record" type="text"
-						   value="{$group.first_record}"/>
-					<div class="hint">The oldest record number for the group.</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="last_record">Last Record ID:</label></td>
-				<td>
-					<input class="small" id="last_record" name="last_record" type="text" value="{$group.last_record}"/>
-					<div class="hint">The newest record number for the group.</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="active">Active:</label></td>
-				<td>
-					{html_radios id="active" name='active' values=$yesno_ids output=$yesno_names selected=$group.active separator='<br />'}
-					<div class="hint">Inactive groups will not have headers downloaded for them.</div>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="backfill">Backfill:</label></td>
-				<td>
-					{html_radios id="backfill" name='backfill' values=$yesno_ids output=$yesno_names selected=$group.backfill separator='<br />'}
-					<div class="hint">If set to false, backfill will ignore this group. This works even if the above
-						setting is no.
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td>
-					<input class="btn btn-success" type="submit" value="Save"/>
-				</td>
-			</tr>
-		</table>
-	</form>
-</div>
+<div class="card">
+			    <div class="card-header">
+			        <div class="d-flex justify-content-between align-items-center">
+			            <h4 class="mb-0">{$title}</h4>
+			            <a href="{{url("/admin/group-list")}}" class="btn btn-outline-secondary">
+			                <i class="fa fa-arrow-left me-2"></i>Back to Groups
+			            </a>
+			        </div>
+			    </div>
+
+			    {if isset($error) && $error != ''}
+			        <div class="alert alert-danger m-3">
+			            <i class="fa fa-exclamation-circle me-2"></i>{$error}
+			        </div>
+			    {/if}
+
+			    <div class="card-body">
+			        <form action="{{url("/admin/group-edit?action=submit")}}" method="POST" id="groupForm">
+			            {{csrf_field()}}
+			            <input type="hidden" name="id" value="{$group.id}"/>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label for="name" class="form-label fw-bold">Group Name:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="input-group">
+			                        <span class="input-group-text"><i class="fa fa-users"></i></span>
+			                        <input type="text" id="name" name="name" class="form-control" value="{$group.name}"/>
+			                    </div>
+			                    <small class="text-muted">Changing the name to an invalid group will break things.</small>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label for="description" class="form-label fw-bold">Description:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="input-group">
+			                        <span class="input-group-text"><i class="fa fa-align-left"></i></span>
+			                        <textarea id="description" name="description" class="form-control" rows="3">{$group.description}</textarea>
+			                    </div>
+			                    <small class="text-muted">Brief explanation of this group's content</small>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label for="backfill_target" class="form-label fw-bold">Backfill Days:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="input-group">
+			                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+			                        <input type="number" id="backfill_target" name="backfill_target" class="form-control" value="{$group.backfill_target}"/>
+			                    </div>
+			                    <small class="text-muted">Number of days to attempt to backfill this group. Adjust as necessary.</small>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label for="minfilestoformrelease" class="form-label fw-bold">Minimum Files To Form Release:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="input-group">
+			                        <span class="input-group-text"><i class="fa fa-file"></i></span>
+			                        <input type="number" id="minfilestoformrelease" name="minfilestoformrelease" class="form-control" value="{$group.minfilestoformrelease}"/>
+			                    </div>
+			                    <small class="text-muted">The minimum number of files to make a release. If left blank, will use the site wide setting.</small>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label for="minsizetoformrelease" class="form-label fw-bold">Minimum File Size (bytes):</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="input-group">
+			                        <span class="input-group-text"><i class="fa fa-download"></i></span>
+			                        <input type="number" id="minsizetoformrelease" name="minsizetoformrelease" class="form-control" value="{$group.minsizetoformrelease}"/>
+			                    </div>
+			                    <small class="text-muted">The minimum total size in bytes to make a release. If left blank, will use the site wide setting.</small>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label for="first_record" class="form-label fw-bold">First Record ID:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="input-group">
+			                        <span class="input-group-text"><i class="fa fa-angle-double-left"></i></span>
+			                        <input type="number" id="first_record" name="first_record" class="form-control" value="{$group.first_record}"/>
+			                    </div>
+			                    <small class="text-muted">The oldest record number for the group.</small>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label for="last_record" class="form-label fw-bold">Last Record ID:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="input-group">
+			                        <span class="input-group-text"><i class="fa fa-angle-double-right"></i></span>
+			                        <input type="number" id="last_record" name="last_record" class="form-control" value="{$group.last_record}"/>
+			                    </div>
+			                    <small class="text-muted">The newest record number for the group.</small>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label class="form-label fw-bold">Active:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="form-check form-check-inline">
+			                        <input type="radio" id="active_1" name="active" value="1" class="form-check-input" {if $group.active == 1}checked{/if}>
+			                        <label for="active_1" class="form-check-label">Yes</label>
+			                    </div>
+			                    <div class="form-check form-check-inline">
+			                        <input type="radio" id="active_0" name="active" value="0" class="form-check-input" {if $group.active == 0}checked{/if}>
+			                        <label for="active_0" class="form-check-label">No</label>
+			                    </div>
+			                    <div class="mt-2">
+			                        <small class="text-muted">Inactive groups will not have headers downloaded for them.</small>
+			                    </div>
+			                </div>
+			            </div>
+
+			            <div class="row mb-4">
+			                <div class="col-lg-3 col-md-4">
+			                    <label class="form-label fw-bold">Backfill:</label>
+			                </div>
+			                <div class="col-lg-9 col-md-8">
+			                    <div class="form-check form-check-inline">
+			                        <input type="radio" id="backfill_1" name="backfill" value="1" class="form-check-input" {if $group.backfill == 1}checked{/if}>
+			                        <label for="backfill_1" class="form-check-label">Yes</label>
+			                    </div>
+			                    <div class="form-check form-check-inline">
+			                        <input type="radio" id="backfill_0" name="backfill" value="0" class="form-check-input" {if $group.backfill == 0}checked{/if}>
+			                        <label for="backfill_0" class="form-check-label">No</label>
+			                    </div>
+			                    <div class="mt-2">
+			                        <small class="text-muted">If set to No, backfill will ignore this group. This works even if the above setting is No.</small>
+			                    </div>
+			                </div>
+			            </div>
+			        </form>
+			    </div>
+
+			    <div class="card-footer">
+			        <div class="d-flex justify-content-between">
+			            <button type="button" class="btn btn-outline-secondary" onclick="window.location='{{url("/admin/group-list")}}'">
+			                <i class="fa fa-times me-2"></i>Cancel
+			            </button>
+			            <button type="submit" form="groupForm" class="btn btn-success">
+			                <i class="fa fa-save me-2"></i>Save Changes
+			            </button>
+			        </div>
+			    </div>
+			</div>
+
+			<script>
+			{literal}
+			document.addEventListener('DOMContentLoaded', function() {
+			    // Form validation
+			    const form = document.getElementById('groupForm');
+			    form.addEventListener('submit', function(event) {
+			        // Basic validation example - can be expanded
+			        const minFiles = document.getElementById('minfilestoformrelease').value;
+			        const minSize = document.getElementById('minsizetoformrelease').value;
+			        const firstRecord = document.getElementById('first_record').value;
+			        const lastRecord = document.getElementById('last_record').value;
+
+			        // Validate record IDs relationship
+			        if (parseInt(firstRecord) > parseInt(lastRecord) && parseInt(lastRecord) > 0) {
+			            event.preventDefault();
+			            alert('First record ID cannot be greater than last record ID');
+			            return false;
+			        }
+
+			        // Additional validation can be added here
+			    });
+			});
+			{/literal}
+			</script>
+
+			<style>
+			{literal}
+			/* Form styling improvements */
+			.form-label {
+			    margin-bottom: 0.5rem;
+			}
+
+			/* Responsive adjustments */
+			@media (max-width: 767.98px) {
+			    .card-footer .btn {
+			        padding: 0.375rem 0.75rem;
+			    }
+
+			    .input-group .input-group-text {
+			        padding: 0.375rem 0.75rem;
+			    }
+			}
+
+			/* Number input styling */
+			input[type="number"] {
+			    -moz-appearance: textfield;
+			}
+
+			input[type="number"]::-webkit-inner-spin-button,
+			input[type="number"]::-webkit-outer-spin-button {
+			    -webkit-appearance: none;
+			    margin: 0;
+			}
+
+			/* Improve input focus states */
+			.form-control:focus,
+			.form-select:focus {
+			    border-color: #80bdff;
+			    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+			}
+
+			/* Form check styling */
+			.form-check-input:checked {
+			    background-color: #198754;
+			    border-color: #198754;
+			}
+			{/literal}
+			</style>
