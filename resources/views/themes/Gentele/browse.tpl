@@ -247,7 +247,7 @@
                                                                         </td>
                                                                         <td class="text-center">
                                                                             <div class="d-flex align-items-center justify-content-center">
-                                                                                <a class="d-flex align-items-center text-decoration-none" title="View file list" href="{{url("/filelist/{$result.guid}")}}">
+                                                                                <a class="d-flex align-items-center text-decoration-none" title="View file list" href="#" data-bs-toggle="modal" data-bs-target="#filelistModal" data-guid="{$result.guid}">
                                                                                     <i class="far fa-file text-primary me-1"></i>
                                                                                     <span class="fw-medium">{$result->totalpart}</span>
                                                                                 </a>
@@ -339,6 +339,51 @@
     </div>
 </div>
 
+<!-- File List Modal -->
+<div class="modal fade" id="filelistModal" tabindex="-1" aria-labelledby="filelistModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filelistModalLabel">File List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3 filelist-loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading file list...</p>
+                </div>
+                <div id="filelistContent" class="d-none">
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted small">Total Files: <span id="total-files">0</span></span>
+                        <span class="text-muted small">Total Size: <span id="total-size">0 B</span></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="width: 40px" class="text-center">#</th>
+                                    <th>Filename</th>
+                                    <th style="width: 60px" class="text-center">Type</th>
+                                    <th style="width: 120px" class="text-center">Completion</th>
+                                    <th style="width: 100px" class="text-center">Size</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filelist-tbody">
+                                <!-- Files will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 {literal}
     // NFO Modal content loading
@@ -402,5 +447,129 @@
             });
         }
     });
+
+// File List Modal
+document.addEventListener('DOMContentLoaded', function() {
+    const filelistModal = document.getElementById('filelistModal');
+
+    if (filelistModal) {
+        filelistModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const guid = button.getAttribute('data-guid');
+            const loading = filelistModal.querySelector('.filelist-loading');
+            const contentElement = document.getElementById('filelistContent');
+            const tbody = document.getElementById('filelist-tbody');
+            const totalFiles = document.getElementById('total-files');
+            const totalSize = document.getElementById('total-size');
+
+            // Reset and show loading state
+            loading.style.display = 'block';
+            contentElement.classList.add('d-none');
+            tbody.innerHTML = '';
+
+            // Fetch the file list via AJAX
+            fetch(`/filelist/${guid}?modal=true`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Extract data from the HTML response
+                    const files = [];
+                    const tableRows = doc.querySelectorAll('table tbody tr');
+                    let totalSizeBytes = 0;
+
+                    tableRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 5) {
+                            const file = {
+                                num: cells[0].textContent.trim(),
+                                filename: cells[1].querySelector('.text-truncate').getAttribute('title'),
+                                ext: cells[2].querySelector('.badge') ? cells[2].querySelector('.badge').textContent.trim() : '',
+                                completion: cells[3].querySelector('.progress-bar') ?
+                                    cells[3].querySelector('.progress-bar').getAttribute('aria-valuenow') : '100',
+                                size: cells[4].textContent.trim()
+                            };
+
+                            // Parse filesize for total calculation
+                            const sizeMatch = file.size.match(/(\d+(\.\d+)?)\s*(KB|MB|GB|TB)/i);
+                            if (sizeMatch) {
+                                const size = parseFloat(sizeMatch[1]);
+                                const unit = sizeMatch[3].toUpperCase();
+                                let bytes = size;
+                                if (unit === 'KB') bytes *= 1024;
+                                else if (unit === 'MB') bytes *= 1024 * 1024;
+                                else if (unit === 'GB') bytes *= 1024 * 1024 * 1024;
+                                else if (unit === 'TB') bytes *= 1024 * 1024 * 1024 * 1024;
+                                totalSizeBytes += bytes;
+                            }
+
+                            files.push(file);
+                        }
+                    });
+
+                    // Format total size
+                    function formatFileSize(bytes) {
+                        if (bytes < 1024) return bytes + ' B';
+                        else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+                        else if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+                        else if (bytes < 1024 * 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+                        else return (bytes / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TB';
+                    }
+
+                    // Display total information
+                    totalFiles.textContent = files.length;
+                    totalSize.textContent = formatFileSize(totalSizeBytes);
+
+                    // Populate the modal with files
+                    files.forEach(file => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="text-center">${file.num}</td>
+                            <td class="text-break">
+                                <span class="d-inline-block text-truncate" style="max-width: 400px;" title="${file.filename}">${file.filename}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary text-uppercase">${file.ext}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="progress" style="height: 20px">
+                                    <div class="progress-bar ${file.completion < 100 ? 'bg-warning' : 'bg-success'}"
+                                         role="progressbar"
+                                         style="width: ${file.completion}%"
+                                         aria-valuenow="${file.completion}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        ${file.completion}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fa fa-hdd-o text-muted me-2"></i>
+                                    <span class="fw-medium">${file.size}</span>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    // Show content, hide loading
+                    loading.style.display = 'none';
+                    contentElement.classList.remove('d-none');
+                })
+                .catch(error => {
+                    console.error('Error fetching file list:', error);
+                    loading.style.display = 'none';
+                    contentElement.classList.remove('d-none');
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading file list</td></tr>';
+                });
+        });
+    }
+});
 {/literal}
 </script>
