@@ -67,7 +67,7 @@
 
                                                 <div class="card-body px-0 py-0">
                                                     <div class="table-responsive">
-                                                        <table class="table table-striped table-hover mb-0">
+                                                        <table class="table table-striped table-hover data mb-0">
                                                             <thead class="thead-light">
                                                                 <tr>
                                                                     <th style="width: 30px">
