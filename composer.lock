@@ -10062,16 +10062,16 @@
         },
         {
             "name": "spatie/laravel-package-tools",
-            "version": "1.92.2",
+            "version": "1.92.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-package-tools.git",
-                "reference": "d55de371a6f609772c79a8d4d5e5b8fae11398f5"
+                "reference": "d20b1969f836d210459b78683d85c9cd5c5f508c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/d55de371a6f609772c79a8d4d5e5b8fae11398f5",
-                "reference": "d55de371a6f609772c79a8d4d5e5b8fae11398f5",
+                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/d20b1969f836d210459b78683d85c9cd5c5f508c",
+                "reference": "d20b1969f836d210459b78683d85c9cd5c5f508c",
                 "shasum": ""
             },
             "require": {
@@ -10082,6 +10082,7 @@
                 "mockery/mockery": "^1.5",
                 "orchestra/testbench": "^7.7|^8.0|^9.0|^10.0",
                 "pestphp/pest": "^1.23|^2.1|^3.1",
+                "phpunit/php-code-coverage": "^9.0|^10.0|^11.0",
                 "phpunit/phpunit": "^9.5.24|^10.5|^11.5",
                 "spatie/pest-plugin-test-time": "^1.1|^2.2"
             },
@@ -10110,7 +10111,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-package-tools/issues",
-                "source": "https://github.com/spatie/laravel-package-tools/tree/1.92.2"
+                "source": "https://github.com/spatie/laravel-package-tools/tree/1.92.4"
             },
             "funding": [
                 {
@@ -10118,7 +10119,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-10T14:16:34+00:00"
+            "time": "2025-04-11T15:27:14+00:00"
         },
         {
             "name": "spatie/laravel-permission",
