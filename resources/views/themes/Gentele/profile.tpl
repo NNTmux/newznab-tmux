@@ -30,25 +30,18 @@
                                                   <div class="row">
                                                       <!-- Left column -->
                                                       <div class="col-lg-3 mb-4 mb-lg-0">
-                                                         <div class="text-center mb-4">
-                                                              <div class="profile-image-container position-relative mx-auto mb-3" style="width: 120px; height: 120px;">
-                                                                  {if isset($user.avatar) && $user.avatar}
-                                                                      <img src="{{$user.avatar}}" alt="{{$user.username}}" class="img-circle profile-img w-100 h-100">
-                                                                  {elseif isset($user.email)}
-                                                                      <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim($user.email)))}}.jpg?s=120&d=mp" alt="{{$user.username}}" class="img-circle profile-img w-100 h-100">
-                                                                  {else}
-                                                                      <div class="profile-initial rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
-                                                                          <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
-                                                                      </div>
-                                                                  {/if}
+                                                         <div class="profile-image-container position-relative mx-auto mb-3" style="width: 120px; height: 120px;">
+                                                              <!-- First letter fallback (positioned behind the Gravatar) -->
+                                                              <div class="profile-initial rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
+                                                                  <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
                                                               </div>
-                                                              <h4>{$user.username|escape:"htmlall"}</h4>
-                                                              <span class="badge bg-secondary rounded-pill">{$user->role->name}</span>
-                                                              {if !empty($user.rolechangedate)}
-                                                                  <div class="mt-2 small text-muted">
-                                                                      Role expires: {$user.rolechangedate|date_format:"%B %e, %Y"}
-                                                                  </div>
-                                                              {/if}
+
+                                                              <!-- Gravatar image on top (will be visible if it loads) -->
+                                                              <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim($user.email)))}}.jpg?s=120&d=mp"
+                                                                   alt="{{$user.username}}"
+                                                                   class="img-circle profile-img w-100 h-100 position-relative"
+                                                                   style="z-index: 2;"
+                                                                   onerror="this.style.display='none'">
                                                           </div>
 
                                                           <div class="list-group mb-4">
