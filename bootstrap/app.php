@@ -8,6 +8,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         \Laravel\Tinker\TinkerServiceProvider::class,
         \Jrean\UserVerification\UserVerificationServiceProvider::class,
+        \Creativeorange\Gravatar\GravatarServiceProvider::class,
     ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

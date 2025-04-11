@@ -37,8 +37,8 @@
                                                                   <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
                                                               </div>
 
-                                                              <!-- Gravatar image on top -->
-                                                              <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim($user.email)))}}.jpg?s=120&d=mp"
+                                                              <!-- Gravatar image using the creativeorange/gravatar package -->
+                                                              <img src="{{Gravatar::get($user.email, ['size' => 120, 'default' => 'mp'])}}"
                                                                    alt="{{$user.username}}"
                                                                    class="img-circle profile-img w-100 h-100 position-absolute top-0 start-0"
                                                                    style="z-index: 2; background-color: white;"

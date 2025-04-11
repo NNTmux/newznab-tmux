@@ -225,19 +225,9 @@
                                             <div class="dropdown">
                                                 <a class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span class="header-profile-img me-2">
-                                                        <!-- First letter fallback (positioned behind Gravatar) -->
                                                         <span class="header-initial img-circle d-flex align-items-center justify-content-center">
                                                             {{substr($userdata.username, 0, 1)|upper}}
                                                         </span>
-
-                                                        <!-- Gravatar image (will be visible if it loads properly) -->
-                                                        {if isset($userdata.email)}
-                                                            <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim($userdata.email)))}}.jpg?s=30&d=mp"
-                                                                 alt="{{$userdata.username}}"
-                                                                 class="img-circle header-img"
-                                                                 style="position: absolute; top: 0; left: 0; z-index: 2;"
-                                                                 onerror="this.style.display='none'">
-                                                        {/if}
                                                     </span>
                                                     <span>{$userdata.username}</span>
                                                 </a>
