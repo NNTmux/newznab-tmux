@@ -248,40 +248,89 @@ jQuery(function ($) {
         return false;
     });
 
-    $('button.nzb_multi_operations_download').on('click', function () {
-        let ids = '';
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != 'on') ids += $(row).val() + ',';
-        });
-        ids = ids.substring(0, ids.length - 1);
-        if (ids) window.location = base_url + '/getnzb?zip=1&id=' + ids;
+    // Reusable function to get selected item IDs
+    function getSelectedItemIds() {
+        const selectedIds = [];
+
+        // Try multiple common container selectors to find checkboxes
+        const checkboxSelectors = [
+            "INPUT[type='checkbox']:checked",               // Any checked checkbox
+            ".table INPUT[type='checkbox']:checked",        // Table checkboxes
+            ".card INPUT[type='checkbox']:checked",         // Card layout checkboxes
+            "[data-guid] INPUT[type='checkbox']:checked",   // Elements with data-guid attribute
+            "form INPUT[type='checkbox']:checked"           // Form checkboxes
+        ];
+
+        // Try each selector until we find checked boxes
+        for (const selector of checkboxSelectors) {
+            $(selector).each(function() {
+                const value = $(this).val();
+                if (value && value !== 'on') {
+                    selectedIds.push(value);
+                }
+            });
+
+            // If we found any items, stop searching
+            if (selectedIds.length > 0) {
+                break;
+            }
+        }
+
+        console.log('Selected IDs:', selectedIds); // Debugging
+        return selectedIds;
+    }
+
+    // Download button handler
+    $('button.nzb_multi_operations_download').on('click', function() {
+        const ids = getSelectedItemIds().join(',');
+        if (ids) {
+            window.location = base_url + '/getnzb?zip=1&id=' + ids;
+        } else {
+            PNotify.alert({
+                title: 'No items selected',
+                text: 'Please select at least one item to download.',
+                type: 'info'
+            });
+        }
     });
 
-    $('input.nzb_multi_operations_download_cart').on('click', function () {
-        let ids = '';
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != 'on') ids += $(row).val() + ',';
-        });
-        ids = ids.substring(0, ids.length - 1);
-        if (ids) window.location = base_url + '/getnzb?zip=1&id=' + ids;
-    });
+    // Cart button handler
+    $('button.nzb_multi_operations_cart').on('click', function() {
+        const selectedIds = getSelectedItemIds();
+        if (selectedIds.length === 0) {
+            PNotify.alert({
+                title: 'No items selected',
+                text: 'Please select at least one item to add to your cart.',
+                type: 'info'
+            });
+            return;
+        }
 
-    $('button.nzb_multi_operations_cart').on('click', function () {
-        let guids = new Array();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
         });
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            let guid = $(row).val();
-            let $cartIcon = $(row).parent().children('div.icons').children('.icon_cart');
-            if (guid && !$cartIcon.hasClass('icon_cart_clicked')) {
+
+        // Find and update cart icons using data attributes
+        selectedIds.forEach(guid => {
+            // Look for cart icon with matching data attribute
+            const $cartIcon = $(`[data-guid="${guid}"] .icon_cart, #guid${guid}`);
+            if ($cartIcon.length && !$cartIcon.hasClass('icon_cart_clicked')) {
                 $cartIcon.addClass('icon_cart_clicked').attr('title', 'Added to Cart');
-                guids.push(guid);
+            }
+        });
+
+        // Uncheck all selected checkboxes
+        $('input[type="checkbox"]:checked').prop('checked', false);
+
+        // Send to cart
+        if (selectedIds.length > 0) {
+            const guidString = selectedIds.join(',');
+            $.post(base_url + '/cart/add?id=' + guidString, function() {
                 PNotify.defaults.icons = 'fontawesome5';
                 PNotify.success({
-                    title: 'Release added to your Download Basket!',
+                    title: 'Items added to your Download Basket!',
                     type: 'success',
                     icon: 'fa fa-info fa-3x',
                     Animate: {
@@ -294,12 +343,8 @@ jQuery(function ($) {
                         fallback: true,
                     },
                 });
-            }
-            $(this).attr('checked', false);
-        });
-        let guidstring = guids.toString();
-        //alert (guidstring); // This is just for testing shit
-        $.post(base_url + '/cart/add?id=' + guidstring);
+            });
+        }
     });
     $('button.nzb_multi_operations_sab').on('click', function () {
         $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
