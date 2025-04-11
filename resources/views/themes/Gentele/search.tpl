@@ -12,14 +12,7 @@
                         <div class="card-body">
                            <!-- Search Type Toggle -->
                             <div class="text-center mb-3">
-                                <a href="#" class="btn btn-outline-secondary btn-sm" onclick="
-                                    if (jQuery(this).text().trim() === 'Advanced Search') {
-                                        jQuery(this).text('Basic Search');
-                                    } else {
-                                        jQuery(this).text('Advanced Search');
-                                    }
-                                    jQuery('#sbasic,#sadvanced').toggle();
-                                    return false;">
+                                <a href="#" class="btn btn-outline-secondary btn-sm" id="searchTypeToggle" data-current-type="{if $sadvanced}basic{else}advanced{/if}">
                                     {if $sadvanced}Basic{else}Advanced{/if} Search
                                 </a>
                             </div>
@@ -383,3 +376,30 @@
                             {/if}
                         </div>
                     </div>
+<script>
+    {literal}
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchTypeToggle = document.getElementById('searchTypeToggle');
+        if (searchTypeToggle) {
+            searchTypeToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const currentType = this.getAttribute('data-current-type');
+                const sbasic = document.getElementById('sbasic');
+                const sadvanced = document.getElementById('sadvanced');
+
+                if (currentType === 'advanced') {
+                    this.textContent = 'Basic Search';
+                    this.setAttribute('data-current-type', 'basic');
+                } else {
+                    this.textContent = 'Advanced Search';
+                    this.setAttribute('data-current-type', 'advanced');
+                }
+
+                sbasic.style.display = sbasic.style.display === 'none' ? 'flex' : 'none';
+                sadvanced.style.display = sadvanced.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+    });
+    {/literal}
+</script>
