@@ -30,20 +30,13 @@
                                                   <div class="row">
                                                       <!-- Left column -->
                                                       <div class="col-lg-3 mb-4 mb-lg-0">
-                                                         <div class="profile-image-container position-relative mx-auto mb-3" style="width: 120px; height: 120px;">
-                                                              <!-- First letter fallback (hidden by default, shown only if Gravatar fails) -->
-                                                              <div class="profile-initial rounded-circle d-flex align-items-center justify-content-center w-100 h-100"
-                                                                   style="visibility: hidden;">
-                                                                  <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
+                                                              <div class="profile-image-container position-relative mx-auto mb-3" style="width: 120px; height: 120px;">
+                                                                  <!-- Gravatar image -->
+                                                                  <img src="{{Gravatar::get($user.email, ['size' => 120, 'default' => 'mp'])}}"
+                                                                       alt="{{$user.username}}"
+                                                                       class="img-circle profile-img w-100 h-100"
+                                                                       style="background-color: white;">
                                                               </div>
-
-                                                              <!-- Gravatar image using the creativeorange/gravatar package -->
-                                                              <img src="{{Gravatar::get($user.email, ['size' => 120, 'default' => 'mp'])}}"
-                                                                   alt="{{$user.username}}"
-                                                                   class="img-circle profile-img w-100 h-100 position-absolute top-0 start-0"
-                                                                   style="z-index: 2; background-color: white;"
-                                                                   onerror="this.style.display='none'; this.previousElementSibling.style.visibility='visible';">
-                                                          </div>
 
                                                           <div class="list-group mb-4">
                                                               <a href="#general" class="list-group-item list-group-item-action active">
