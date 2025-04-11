@@ -112,8 +112,8 @@ class LoginController extends Controller
         $meta_title = 'Login';
         $meta_keywords = 'Login';
         $meta_description = 'Login';
-        //$content = app('smarty.view')->fetch($theme.'/login.tpl');
-        app('smarty.view')->assign(compact(/*'content',*/ 'meta_title', 'meta_keywords', 'meta_description'));
+        // $content = app('smarty.view')->fetch($theme.'/login.tpl');
+        app('smarty.view')->assign(compact(/* 'content', */ 'meta_title', 'meta_keywords', 'meta_description'));
 
         return app('smarty.view')->display($theme.'/login.tpl');
     }
