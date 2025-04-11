@@ -120,3 +120,132 @@
 	        </div>
 	    {/if}
 	</div>
+<script>
+    {literal}
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle "check all" functionality
+        const checkAllBox = document.getElementById('check-all');
+        if (checkAllBox) {
+            checkAllBox.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('input[name="table_records"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = checkAllBox.checked;
+                });
+            });
+        }
+
+        // Handle multi-download button
+        const downloadButtons = document.querySelectorAll('.nzb_multi_operations_download_cart');
+        downloadButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const selectedGuids = getSelectedGuids();
+                if (selectedGuids.length === 0) {
+                    PNotify.error({
+                        title: 'No Items Selected',
+                        text: 'Please select at least one item to download',
+                        icon: 'fa fa-exclamation-circle'
+                    });
+                    return;
+                }
+
+                // Instead of creating multiple iframes, create one download request with all GUIDs
+                if (selectedGuids.length === 1) {
+                    // For single items, direct download
+                    window.location.href = `/getnzb?id=${selectedGuids[0]}`;
+                    PNotify.success({
+                        title: 'Download Started',
+                        text: 'Your NZB file is being downloaded',
+                        icon: 'fa fa-cloud-download'
+                    });
+                } else {
+                    // For multiple items, create a single iframe with all GUIDs
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = `/getnzb?id=${selectedGuids.join(',')}&zip=1`;
+                    document.body.appendChild(iframe);
+
+                    PNotify.success({
+                        title: 'Download Started',
+                        text: `${selectedGuids.length} NZB files are being downloaded as a ZIP archive`,
+                        icon: 'fa fa-cloud-download'
+                    });
+
+                    // Remove iframe after download starts
+                    setTimeout(() => {
+                        document.body.removeChild(iframe);
+                    }, 5000);
+                }
+            });
+        });
+
+        // Handle multi-delete button
+        const deleteButtons = document.querySelectorAll('.nzb_multi_operations_cartdelete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const selectedGuids = getSelectedGuids();
+                if (selectedGuids.length === 0) {
+                    PNotify.error({
+                        title: 'No Items Selected',
+                        text: 'Please select at least one item to delete',
+                        icon: 'fa fa-exclamation-circle'
+                    });
+                    return;
+                }
+
+                PNotify.notice({
+                    title: 'Confirm Deletion',
+                    text: 'Are you sure you want to remove these items from your cart?',
+                    icon: 'fa fa-question-circle',
+                    hide: false,
+                    modules: {
+                        Confirm: {
+                            confirm: true,
+                            buttons: [{
+                                text: 'Yes',
+                                primary: true,
+                                click: function(notice) {
+                                    notice.close();
+
+                                    // Create and submit a form to delete selected items
+                                    const form = document.createElement('form');
+                                    form.method = 'POST';
+                                    form.action = '/cart/delete/' + selectedGuids.join(',');
+
+                                    // Add CSRF token
+                                    const csrfToken = document.querySelector('input[name="_token"]').value;
+                                    const csrfInput = document.createElement('input');
+                                    csrfInput.type = 'hidden';
+                                    csrfInput.name = '_token';
+                                    csrfInput.value = csrfToken;
+                                    form.appendChild(csrfInput);
+
+                                    document.body.appendChild(form);
+                                    form.submit();
+
+                                    PNotify.success({
+                                        title: 'Items Removed',
+                                        text: `${selectedGuids.length} item(s) are being removed from your cart`,
+                                        icon: 'fa fa-trash',
+                                        delay: 3000
+                                    });
+                                }
+                            }, {
+                                text: 'No',
+                                click: function(notice) {
+                                    notice.close();
+                                }
+                            }]
+                        }
+                    }
+                });
+            });
+        });
+
+        // Helper function to get selected GUIDs
+        function getSelectedGuids() {
+            const checkboxes = document.querySelectorAll('input[name="table_records"]:checked');
+            return Array.from(checkboxes).map(checkbox => checkbox.value);
+        }
+    });
+    {/literal}
+</script>

@@ -30,9 +30,17 @@
                                                   <div class="row">
                                                       <!-- Left column -->
                                                       <div class="col-lg-3 mb-4 mb-lg-0">
-                                                          <div class="text-center mb-4">
-                                                              <div class="avatar-placeholder rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
-                                                                  <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
+                                                         <div class="text-center mb-4">
+                                                              <div class="profile-image-container position-relative mx-auto mb-3" style="width: 120px; height: 120px;">
+                                                                  {if isset($user.avatar) && $user.avatar}
+                                                                      <img src="{{$user.avatar}}" alt="{{$user.username}}" class="img-circle profile-img w-100 h-100">
+                                                                  {elseif isset($user.email)}
+                                                                      <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim($user.email)))}}.jpg?s=120&d=mp" alt="{{$user.username}}" class="img-circle profile-img w-100 h-100">
+                                                                  {else}
+                                                                      <div class="profile-initial rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
+                                                                          <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
+                                                                      </div>
+                                                                  {/if}
                                                               </div>
                                                               <h4>{$user.username|escape:"htmlall"}</h4>
                                                               <span class="badge bg-secondary rounded-pill">{$user->role->name}</span>
@@ -426,3 +434,28 @@
                                   });
                               {/literal}
                               </script>
+<style>
+    {literal}
+    .profile-image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+
+    .profile-img {
+        object-fit: cover;
+        border-radius: 50% !important;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-initial {
+        background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        color: white;
+        font-weight: bold;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+    {/literal}
+</style>

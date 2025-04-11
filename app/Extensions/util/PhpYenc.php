@@ -22,60 +22,72 @@
 namespace App\Extensions\util;
 
 /**
- * Class Php.
+ * Class PhpYenc for encoding and decoding yEnc format.
  */
 class PhpYenc
 {
-    public static function decode(&$text, bool $ignore = false): bool|string
+    /**
+     * Decode a yEnc encoded string.
+     *
+     * @param  string  &$text  The text to decode, passed by reference
+     * @param  bool  $ignore  Whether to ignore errors (not used in this implementation)
+     * @return bool|string The decoded string on success, false on failure
+     *
+     * @throws \RuntimeException if the file size doesn't match or CRC check fails
+     */
+    public static function decode(string &$text, bool $ignore = false): bool|string
     {
         $crc = '';
         // Extract the yEnc string itself.
-        if (preg_match(
-            '/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims',
-            $text,
-            $encoded
-        )) {
-            if (preg_match('/crc32=([^ $\\r\\n]+)/ims', $encoded[4], $trailer)) {
-                $crc = trim($trailer[1]);
-            }
-
-            [$headerSize, $encoded, $trailerSize] = $encoded;
-        } else {
+        if (! preg_match('/=ybegin.*size=([^ $]+).*\r\n(.*)\r\n=yend.*size=([^ $\r\n]+)(.*)/ims', $text, $encoded)) {
             return false;
         }
+
+        if (preg_match('/crc32=([^ $\r\n]+)/ims', $encoded[4], $trailer)) {
+            $crc = trim($trailer[1]);
+        }
+
+        $headerSize = (int) $encoded[1];
+        $trailerSize = (int) $encoded[3];
+        $encoded = $encoded[2];
 
         // Remove line breaks from the string.
         $encoded = trim(str_replace("\r\n", '', $encoded));
 
         // Make sure the header and trailer file sizes match up.
         if ($headerSize !== $trailerSize) {
-            $message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
-            throw new \RuntimeException($message);
+            throw new \RuntimeException('Header and trailer file sizes do not match. This is a violation of the yEnc specification.');
         }
 
-        // Decode.
+        // Decode
         $decoded = '';
-        $encodedLength = \strlen($encoded);
-        for ($chr = 0; $chr < $encodedLength; $chr++) {
-            $decoded .= (
-                $encoded[$chr] === '=' ?
-                    \chr((\ord($encoded[$chr]) - 42) % 256) :
-                    \chr((((\ord($encoded[++$chr]) - 64) % 256) - 42) % 256)
-            );
+        $encodedLength = strlen($encoded);
+        $chr = 0;
+
+        while ($chr < $encodedLength) {
+            if ($encoded[$chr] === '=') {
+                // Handle escaped character
+                $chr++;
+                if ($chr < $encodedLength) {
+                    $decoded .= chr(((ord($encoded[$chr]) - 64) % 256));
+                }
+            } else {
+                // Normal character
+                $decoded .= chr((ord($encoded[$chr]) - 42) % 256);
+            }
+            $chr++;
         }
 
         // Make sure the decoded file size is the same as the size specified in the header.
-        if (\strlen($decoded) !== $headerSize) {
-            $message = 'Header file size ('.$headerSize.') and actual file size ('.\strlen($decoded).') do not match. The file is probably corrupt.';
-
-            throw new \RuntimeException($message);
+        if (strlen($decoded) !== $headerSize) {
+            throw new \RuntimeException(
+                "Header file size ({$headerSize}) and actual file size (".strlen($decoded).') do not match. The file is probably corrupt.'
+            );
         }
 
         // Check the CRC value
-        if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf('%04X', crc32($decoded))))) {
-            $message = 'CRC32 checksums do not match. The file is probably corrupt.';
-
-            throw new \RuntimeException($message);
+        if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf('%08X', crc32($decoded))))) {
+            throw new \RuntimeException('CRC32 checksums do not match. The file is probably corrupt.');
         }
 
         return $decoded;
@@ -84,51 +96,65 @@ class PhpYenc
     /**
      * Decode a string of text encoded with yEnc. Ignores all errors.
      *
-     * @param  string  $text  The encoded text to decode.
+     * @param  string  &$text  The encoded text to decode.
      * @return string The decoded yEnc string, or the input string, if it's not yEnc.
      */
     public static function decodeIgnore(string &$text): string
     {
-        if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input)) {
-            $text = '';
-            $input =
-                trim(
-                    preg_replace(
-                        '/\r\n/im',
-                        '',
-                        preg_replace(
-                            '/(^=yEnd.*)/im',
-                            '',
-                            preg_replace(
-                                '/(^=yPart.*\\r\\n)/im',
-                                '',
-                                preg_replace('/(^=yBegin.*\\r\\n)/im', '', $input[1], 1),
-                                1
-                            ),
-                            1
-                        )
-                    )
-                );
-
-            $length = \strlen($input);
-            for ($chr = 0; $chr < $length; $chr++) {
-                $text .= (
-                    $input[$chr] === '=' ?
-                        \chr((((\ord($input[++$chr]) - 64) % 256) - 42) % 256) :
-                        \chr((\ord($input[$chr]) - 42) % 256)
-                );
-            }
+        if (! preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $matches)) {
+            return $text;
         }
+
+        $input = $matches[1];
+        // Remove headers and footers
+        $input = preg_replace('/^=yBegin.*\r\n/im', '', $input);
+        $input = preg_replace('/^=yPart.*\r\n/im', '', $input);
+        $input = preg_replace('/^=yEnd.*/im', '', $input);
+        $input = trim(str_replace("\r\n", '', $input));
+
+        $result = '';
+        $length = strlen($input);
+        $chr = 0;
+
+        while ($chr < $length) {
+            if ($input[$chr] === '=') {
+                $chr++;
+                if ($chr < $length) {
+                    $result .= chr(((ord($input[$chr]) - 64) % 256));
+                }
+            } else {
+                $result .= chr((ord($input[$chr]) - 42) % 256);
+            }
+            $chr++;
+        }
+
+        $text = $result;
 
         return $text;
     }
 
+    /**
+     * Check if yEnc functionality is enabled.
+     *
+     * @return bool Always returns true
+     */
     public static function enabled(): bool
     {
         return true;
     }
 
-    public static function encode($data, $filename, int $lineLength = 128, bool $crc32 = true): string
+    /**
+     * Encode data using yEnc format.
+     *
+     * @param  string  $data  The data to encode
+     * @param  string  $filename  The filename to include in the yEnc header
+     * @param  int  $lineLength  The line length to use (max 254)
+     * @param  bool  $crc32  Whether to include a CRC32 checksum
+     * @return string The yEnc encoded data
+     *
+     * @throws \RuntimeException if line length is invalid
+     */
+    public static function encode(string $data, string $filename, int $lineLength = 128, bool $crc32 = true): string
     {
         // yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
         if ($lineLength > 254) {
@@ -136,39 +162,31 @@ class PhpYenc
         }
 
         if ($lineLength < 1) {
-            $message = $lineLength.' is not a valid line length.';
-
-            throw new \RuntimeException($message);
+            throw new \RuntimeException("$lineLength is not a valid line length.");
         }
 
+        $stringLength = strlen($data);
         $encoded = '';
-        $stringLength = \strlen($data);
+
         // Encode each character of the string one at a time.
-        foreach ($data as $i => $iValue) {
-            $value = ((\ord($iValue) + 42) % 256);
+        for ($i = 0; $i < $stringLength; $i++) {
+            $value = ((ord($data[$i]) + 42) % 256);
 
             // Escape NULL, TAB, LF, CR, space, . and = characters.
-            $encoded .= match ($value) {
-                0, 10, 13, 61 => ('='.\chr(($value + 64) % 256)),
-                default => \chr($value),
-            };
+            if (in_array($value, [0, 10, 13, 61])) {
+                $encoded .= '='.chr(($value + 64) % 256);
+            } else {
+                $encoded .= chr($value);
+            }
         }
 
-        $encoded =
-            '=ybegin line='.
-            $lineLength.
-            ' size='.
-            $stringLength.
-            ' name='.
-            trim($filename).
-            "\r\n".
-            trim(chunk_split($encoded, $lineLength)).
-            "\r\n=yend size=".
-            $stringLength;
+        $encoded = "=ybegin line=$lineLength size=$stringLength name=".trim($filename)."\r\n".
+                  trim(chunk_split($encoded, $lineLength)).
+                  "\r\n=yend size=$stringLength";
 
         // Add a CRC32 checksum if desired.
-        if ($crc32 === true) {
-            $encoded .= ' crc32='.strtolower(sprintf('%X', crc32($data)));
+        if ($crc32) {
+            $encoded .= ' crc32='.strtolower(sprintf('%08X', crc32($data)));
         }
 
         return $encoded;
