@@ -223,8 +223,18 @@
                                         <!-- User menu -->
                                         {if $loggedin == "true"}
                                             <div class="dropdown">
-                                                <a class="btn btn-outline-light btn-sm dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fa fa-user-circle me-1"></i>
+                                                <a class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="header-profile-img me-2">
+                                                        {if isset($userdata.avatar) && $userdata.avatar}
+                                                            <img src="{{$userdata.avatar}}" alt="{{$userdata.username}}" class="img-circle header-img">
+                                                        {elseif isset($userdata.email)}
+                                                            <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim($userdata.email)))}}.jpg?s=30&d=mp" alt="{{$userdata.username}}" class="img-circle header-img">
+                                                        {else}
+                                                            <span class="header-initial img-circle d-flex align-items-center justify-content-center">
+                                                                {{substr($userdata.username, 0, 1)}}
+                                                            </span>
+                                                        {/if}
+                                                    </span>
                                                     <span>{$userdata.username}</span>
                                                 </a>
                                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
@@ -313,5 +323,30 @@
                         .navbar .nav-link:hover {
                             background-color: rgba(255,255,255,.1);
                             border-radius: 3px;
+                        }
+                        .header-profile-img {
+                            position: relative;
+                            width: 24px;
+                            height: 24px;
+                            overflow: hidden;
+                        }
+
+                        .header-img, .header-initial {
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 50% !important;
+                            object-fit: cover;
+                            border: 1px solid rgba(255, 255, 255, 0.3);
+                        }
+
+                        .header-initial {
+                            background: linear-gradient(135deg, #4a89dc, #5d9cec);
+                            color: white;
+                            font-weight: bold;
+                            font-size: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            text-transform: uppercase;
                         }
                         </style>
