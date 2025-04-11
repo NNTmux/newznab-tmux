@@ -32,8 +32,17 @@
                                 {if Auth::check()}
                                     <div class="profile">
                                         <div class="profile_pic">
-                                            <img src="{{asset('/assets/images/userimage.png')}}" alt="User Image"
-                                                 class="img-circle profile_img">
+                                            {if isset(Auth::user()->avatar) && Auth::user()->avatar}
+                                                <img src="{{Auth::user()->avatar}}" alt="{{Auth::user()->username}}"
+                                                     class="img-circle profile_img">
+                                            {elseif isset(Auth::user()->email)}
+                                                <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim(Auth::user()->email)))}}.jpg?s=200&d=mp"
+                                                     alt="{{Auth::user()->username}}" class="img-circle profile_img">
+                                            {else}
+                                                <div class="profile_initial img-circle profile_img d-flex align-items-center justify-content-center">
+                                                    {{substr(Auth::user()->username, 0, 1)}}
+                                                </div>
+                                            {/if}
                                         </div>
                                         <div class="profile_info">
                                             <span>Welcome,</span>
@@ -201,6 +210,52 @@
                             font-size: 1rem;
                         }
                     }
+                /* Profile image enhancements */
+                .profile_pic {
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .profile_img {
+                    width: 50px;
+                    height: 50px;
+                    object-fit: cover;
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                    transition: all 0.3s ease;
+                }
+
+                .profile_img:hover {
+                    border-color: rgba(255, 255, 255, 0.6);
+                    transform: scale(1.05);
+                }
+
+                .profile_initial {
+                    background: linear-gradient(135deg, #4a89dc, #5d9cec);
+                    color: white;
+                    font-weight: bold;
+                    font-size: 20px;
+                    width: 50px;
+                    height: 50px;
+                    text-transform: uppercase;
+                }
+
+                @media (max-width: 767px) {
+                    .profile_img, .profile_initial {
+                        width: 40px;
+                        height: 40px;
+                        font-size: 16px;
+                    }
+                }
+                .img-circle,
+                .profile_img {
+                    border-radius: 50% !important;
+                    overflow: hidden;
+                }
+
+                .profile_initial {
+                    border-radius: 50% !important;
+                }
                 {/literal}
                 </style>
             </body>
