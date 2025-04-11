@@ -31,17 +31,18 @@
                                                       <!-- Left column -->
                                                       <div class="col-lg-3 mb-4 mb-lg-0">
                                                          <div class="profile-image-container position-relative mx-auto mb-3" style="width: 120px; height: 120px;">
-                                                              <!-- First letter fallback (positioned behind the Gravatar) -->
-                                                              <div class="profile-initial rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
+                                                              <!-- First letter fallback (hidden by default, shown only if Gravatar fails) -->
+                                                              <div class="profile-initial rounded-circle d-flex align-items-center justify-content-center w-100 h-100"
+                                                                   style="visibility: hidden;">
                                                                   <span class="display-4 text-white">{$user.username|substr:0:1|upper}</span>
                                                               </div>
 
-                                                              <!-- Gravatar image on top (will be visible if it loads) -->
+                                                              <!-- Gravatar image on top -->
                                                               <img src="https://www.gravatar.com/avatar/{{md5(strtolower(trim($user.email)))}}.jpg?s=120&d=mp"
                                                                    alt="{{$user.username}}"
-                                                                   class="img-circle profile-img w-100 h-100 position-relative"
-                                                                   style="z-index: 2;"
-                                                                   onerror="this.style.display='none'">
+                                                                   class="img-circle profile-img w-100 h-100 position-absolute top-0 start-0"
+                                                                   style="z-index: 2; background-color: white;"
+                                                                   onerror="this.style.display='none'; this.previousElementSibling.style.visibility='visible';">
                                                           </div>
 
                                                           <div class="list-group mb-4">
