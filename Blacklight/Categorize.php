@@ -854,6 +854,7 @@ class Categorize
              preg_match('/('.$knownStudios.')/i', $this->releaseName) ||
              preg_match('/\b(XXX|Porn|Adult|JAV|Hentai)\b/i', $this->releaseName))) {
             $this->tmpCat = Category::XXX_WEBDL;
+
             return true;
         }
 

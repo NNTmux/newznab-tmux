@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\Category;
 use App\Models\Release;
 use Blacklight\Categorize;
-use Blacklight\NameFixer;
 use Illuminate\Console\Command;
 
 class RecategorizeReleases extends Command
@@ -40,7 +39,16 @@ class RecategorizeReleases extends Command
         if ($this->option('misc')) {
             $countQuery->whereIn('categories_id', Category::OTHERS_GROUP);
         } elseif ($this->option('all')) {
-            $countQuery->where('iscategorized', 0);
+            if ($this->confirm('This will reset categorization on all releases and re-categorize them all from scratch. Are you sure? (y/n)', 'n')) {
+                Release::query()->where('iscategorized', 1)->update([
+                    'iscategorized' => 0,
+                ]);
+                $countQuery->where('iscategorized', 0);
+            } else {
+                $this->info('Reset script stopped.');
+                exit();
+            }
+
         } elseif ($this->option('group')) {
             $countQuery->where('groups_id', $this->option('group'));
         } elseif ($this->option('groups')) {
@@ -83,15 +91,14 @@ class RecategorizeReleases extends Command
                         'categories_id' => $catId['categories_id'],
                     ]);
 
-                    NameFixer::echoChangedReleaseName([
-                        'new_name' => $result->searchname,
-                        'old_name' => $result->searchname,
-                        'new_category' => $catId['categories_id'],
-                        'old_category' => $result->categories_id,
-                        'group' => $result->group->name,
-                        'releases_id' => $result->id,
-                        'method' => 'Recategorize',
-                    ]);
+                    $newCatName = Category::query()->where('id', $catId['categories_id'])->first()->title;
+
+                    $this->line('');
+                    $this->output->writeln('<fg=yellow>ID       :</> '.$result->id);
+                    $this->output->writeln('<fg=green>Release  :</> '.$result->searchname);
+                    $this->output->writeln('<fg=cyan>Group    :</> '.$result->group->name);
+                    $this->output->writeln('<fg=white>Category :</> '.$result->category->title.' <fg=yellow>→</> <fg=magenta>'.$newCatName.'</>');
+                    $this->line('');
                 }
             }
         }
