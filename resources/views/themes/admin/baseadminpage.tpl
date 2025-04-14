@@ -54,8 +54,12 @@
 						                            {$page->head}
 						                            <div class="nav-item dropdown ms-3">
 						                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-						                                    <img src="{{asset('/assets/images/userimage.png')}}" alt="Admin Profile" class="img-circle" width="30">
-						                                    <span class="ms-2 d-none d-lg-inline-block">{{Auth::user()->username}}</span>
+						                                    <span class="header-profile-img me-2">
+						                                        <span class="header-initial img-circle d-flex align-items-center justify-content-center">
+						                                            {{substr(Auth::user()->username, 0, 1)|upper}}
+						                                        </span>
+						                                    </span>
+						                                    <span class="ms-1 d-none d-lg-inline-block">{{Auth::user()->username}}</span>
 						                                </a>
 						                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
 						                                    <li><a class="dropdown-item" href="{{url("/profile")}}"><i class="fa fa-user me-2"></i>Profile</a></li>
@@ -350,6 +354,32 @@
                                 .site_title:hover .app-logo {
                                     transform: rotate(5deg);
                                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                                }
+
+                                .header-profile-img {
+                                    position: relative;
+                                    width: 24px;
+                                    height: 24px;
+                                    overflow: hidden;
+                                }
+
+                                .header-img, .header-initial {
+                                    width: 24px;
+                                    height: 24px;
+                                    border-radius: 50% !important;
+                                    object-fit: cover;
+                                    border: 1px solid rgba(255, 255, 255, 0.3);
+                                }
+
+                                .header-initial {
+                                    background: linear-gradient(135deg, #4a89dc, #5d9cec);
+                                    color: white;
+                                    font-weight: bold;
+                                    font-size: 12px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    text-transform: uppercase;
                                 }
 						    {/literal}
 						    </style>
