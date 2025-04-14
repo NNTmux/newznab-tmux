@@ -548,6 +548,11 @@ class Categorize
             return false;
         }
 
+        if (preg_match('/\b(S\d{1,2}E\d{1,2}|S\d{1,2}|Season\s\d{1,2}|E\d{1,2})\b/i', $this->releaseName) ||
+            preg_match('/\b(Rick\.And\.Morty|Game\.Of\.Thrones|Walking\.Dead|Breaking\.Bad|Stranger\.Things)\b/i', $this->releaseName)) {
+            return false;
+        }
+
         // Adult keywords commonly found in titles
         $adultKeywords = 'Anal|Ass|BBW|BDSM|Blow|Boob|Bukkake|Casting|Couch|Cock|Compilation|Creampie|Cum|Dick|Dildo|Facial|Fetish|Fuck|Gang|Hardcore|Homemade|Horny|Interracial|Lesbian|MILF|Masturbat|Nympho|Oral|Orgasm|Penetrat|Pornstar|POV|Pussy|Riding|Seduct|Sex|Shaved|Slut|Squirt|Suck|Swallow|Threesome|Tits|Titty|Toy|Virgin|Whore';
 
@@ -831,9 +836,24 @@ class Categorize
 
     public function isXxxWEBDL(): bool
     {
-        if (preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName)) {
-            $this->tmpCat = Category::XXX_WEBDL;
+        // First check if this is a TV show to exclude it
+        if (preg_match('/\b(S\d{1,2}E\d{1,2}|S\d{1,2}|Season\s\d{1,2}|E\d{1,2})\b/i', $this->releaseName) ||
+            preg_match('/\b(Rick\.And\.Morty|Game\.Of\.Thrones|Walking\.Dead|Breaking\.Bad|Stranger\.Things)\b/i', $this->releaseName)) {
+            return false;
+        }
 
+        // Adult keywords commonly found in titles
+        $adultKeywords = 'Anal|Ass|BBW|BDSM|Blow|Boob|Bukkake|Casting|Couch|Cock|Compilation|Creampie|Cum|Dick|Dildo|Facial|Fetish|Fuck|Gang|Hardcore|Homemade|Horny|Interracial|Lesbian|MILF|Masturbat|Nympho|Oral|Orgasm|Penetrat|Pornstar|POV|Pussy|Riding|Seduct|Sex|Shaved|Slut|Squirt|Suck|Swallow|Threesome|Tits|Titty|Toy|Virgin|Whore';
+
+        // Known adult studios
+        $knownStudios = 'Brazzers|NaughtyAmerica|RealityKings|Bangbros|TeenFidelity|PornPros|SexArt|WowGirls|Vixen|Blacked|Tushy|Deeper|Bellesa|Defloration|MetArt|TheLifeErotic|VivThomas|JoyMii|Nubiles|NubileFilms|FamilyStrokes|X-Art|Babes|Twistys|WetAndPuffy|WowPorn|MomsTeachSex|Mofos|BangBus|Passion-HD|EvilAngel|DorcelClub';
+
+        // Check for web-dl/webrip and require adult content keywords
+        if (preg_match('/web[._ -]dl|web-?rip/i', $this->releaseName) &&
+            (preg_match('/('.$adultKeywords.')/i', $this->releaseName) ||
+             preg_match('/('.$knownStudios.')/i', $this->releaseName) ||
+             preg_match('/\b(XXX|Porn|Adult|JAV|Hentai)\b/i', $this->releaseName))) {
+            $this->tmpCat = Category::XXX_WEBDL;
             return true;
         }
 
