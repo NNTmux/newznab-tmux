@@ -23,27 +23,17 @@
 
 						                    <div class="navbar nav_title" style="border: 0;">
 						                        <a href="{$site->home_link}" class="site_title">
-						                            <i class="fab fa-phoenix-framework" aria-hidden="true"></i>
+						                            <div class="app-logo">
+						                                <i class="fas fa-file-download" aria-hidden="true"></i>
+						                            </div>
 						                            <span>{{config('app.name')}} Admin</span>
 						                        </a>
 						                    </div>
 						                    <div class="clearfix"></div>
 
-						                    <!-- Admin profile info -->
-						                    {if Auth::check()}
-						                        <div class="profile">
-						                            <div class="profile_pic">
-						                                <img src="{{asset('/assets/images/userimage.png')}}" alt="Admin Profile"
-						                                     class="img-circle profile_img">
-						                            </div>
-						                            <div class="profile_info">
-						                                <span>Welcome,</span>
-						                                <h2 class="text-break">{{Auth::user()->username}}</h2>
-						                            </div>
-						                        </div>
-						                    {/if}
-						                    <!-- /profile info -->
+						                    <!-- Empty space replacing profile section -->
 						                    <div class="clearfix"></div>
+						                    <div class="sidebar-spacer" style="height: 50px;"></div>
 
 						                    <!-- sidebar menu -->
 						                    {$admin_menu}
@@ -337,6 +327,30 @@
 						            background-color: rgba(255,255,255,.15) !important;
 						            border-left: 3px solid #5294ff;
 						        }
+
+                                /* App logo styling */
+                                .app-logo {
+                                    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+                                    display: inline-flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 35px;
+                                    height: 35px;
+                                    border-radius: 8px;
+                                    margin-right: 5px;
+                                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                                    transition: all 0.3s ease;
+                                }
+
+                                .app-logo i {
+                                    font-size: 18px;
+                                    color: white;
+                                }
+
+                                .site_title:hover .app-logo {
+                                    transform: rotate(5deg);
+                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                                }
 						    {/literal}
 						    </style>
 						</body>
