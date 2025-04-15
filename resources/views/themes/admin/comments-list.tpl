@@ -3,7 +3,7 @@
 				        <div class="d-flex justify-content-between align-items-center">
 				            <h4 class="mb-0">{$title}</h4>
 				            <div>
-				                <a href="{{url("/admin")}}" class="btn btn-outline-secondary">
+				                <a href="{{url("/admin/index")}}" class="btn btn-outline-secondary">
 				                    <i class="fa fa-arrow-left me-2"></i>Back to Dashboard
 				                </a>
 				            </div>
