@@ -9095,16 +9095,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "4.10.0",
+            "version": "4.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "2af937d47d8aadb8dab0b1d7b9557e495dd12856"
+                "reference": "ebf67deb9902b6da58a4b3383cbd12fed3f4f555"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/2af937d47d8aadb8dab0b1d7b9557e495dd12856",
-                "reference": "2af937d47d8aadb8dab0b1d7b9557e495dd12856",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/ebf67deb9902b6da58a4b3383cbd12fed3f4f555",
+                "reference": "ebf67deb9902b6da58a4b3383cbd12fed3f4f555",
                 "shasum": ""
             },
             "require": {
@@ -9168,7 +9168,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/4.10.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/4.11.0"
             },
             "funding": [
                 {
@@ -9180,7 +9180,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-11-06T07:44:19+00:00"
+            "time": "2025-04-14T09:04:23+00:00"
         },
         {
             "name": "sentry/sentry-laravel",
@@ -14909,16 +14909,16 @@
         },
         {
             "name": "ergebnis/composer-normalize",
-            "version": "2.46.0",
+            "version": "2.47.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/composer-normalize.git",
-                "reference": "6d4dc58cb098507397116c921ad3bd68f44c2849"
+                "reference": "ed24b9f8901f8fbafeca98f662eaca39427f0544"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/6d4dc58cb098507397116c921ad3bd68f44c2849",
-                "reference": "6d4dc58cb098507397116c921ad3bd68f44c2849",
+                "url": "https://api.github.com/repos/ergebnis/composer-normalize/zipball/ed24b9f8901f8fbafeca98f662eaca39427f0544",
+                "reference": "ed24b9f8901f8fbafeca98f662eaca39427f0544",
                 "shasum": ""
             },
             "require": {
@@ -14935,7 +14935,7 @@
                 "composer/composer": "^2.8.3",
                 "ergebnis/license": "^2.6.0",
                 "ergebnis/php-cs-fixer-config": "^6.46.0",
-                "ergebnis/phpunit-slow-test-detector": "^2.19.0",
+                "ergebnis/phpunit-slow-test-detector": "^2.19.1",
                 "fakerphp/faker": "^1.24.1",
                 "infection/infection": "~0.26.6",
                 "phpstan/extension-installer": "^1.4.3",
@@ -14988,7 +14988,7 @@
                 "security": "https://github.com/ergebnis/composer-normalize/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/composer-normalize"
             },
-            "time": "2025-04-10T18:54:20+00:00"
+            "time": "2025-04-15T11:09:27+00:00"
         },
         {
             "name": "ergebnis/json",
