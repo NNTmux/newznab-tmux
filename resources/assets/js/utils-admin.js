@@ -21,15 +21,15 @@ function ajax_group_status(id, what) {
                 // switch some links around
                 if (what == 0) {
                     $('td#group-' + id).html(
-                        '<a href="javascript:ajax_group_status(' +
-                            id +
-                            ', 1)" class="group_deactive">Activate</a>'
+                        `<button type="button" onclick="ajax_group_status(${id}, 1)" class="btn btn-sm btn-outline-secondary">
+                            <i class="fa fa-times-circle me-1"></i>Inactive
+                        </button>`
                     );
                 } else {
                     $('td#group-' + id).html(
-                        '<a href="javascript:ajax_group_status(' +
-                            id +
-                            ', 0)" class="group_active">Deactivate</a>'
+                        `<button type="button" onclick="ajax_group_status(${id}, 0)" class="btn btn-sm btn-success">
+                            <i class="fa fa-check-circle me-1"></i>Active
+                        </button>`
                     );
                 }
 
@@ -66,15 +66,15 @@ function ajax_backfill_status(id, what) {
                 // switch some links around
                 if (what == 0) {
                     $('td#backfill-' + id).html(
-                        '<a href="javascript:ajax_backfill_status(' +
-                            id +
-                            ', 1)" class="backfill_deactive">Activate</a>'
+                        `<button type="button" onclick="ajax_backfill_status(${id}, 1)" class="btn btn-sm btn-outline-secondary">
+                            <i class="fa fa-times-circle me-1"></i>Disabled
+                        </button>`
                     );
                 } else {
                     $('td#backfill-' + id).html(
-                        '<a href="javascript:ajax_backfill_status(' +
-                            id +
-                            ', 0)" class="backfill_active">Deactivate</a>'
+                        `<button type="button" onclick="ajax_backfill_status(${id}, 0)" class="btn btn-sm btn-info">
+                            <i class="fa fa-check-circle me-1"></i>Enabled
+                        </button>`
                     );
                 }
 
