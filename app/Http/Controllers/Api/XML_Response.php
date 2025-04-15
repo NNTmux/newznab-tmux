@@ -513,8 +513,8 @@ class XML_Response
     /**
      * Writes individual zed (newznab) type attributes.
      *
-     * @param string $name The namespaced attribute name tag
-     * @param string|null $value The namespaced attribute value
+     * @param  string  $name  The namespaced attribute name tag
+     * @param  string|null  $value  The namespaced attribute value
      */
     protected function writeZedAttr(string $name, ?string $value): void
     {
