@@ -12,10 +12,9 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NameFixer;
 use Blacklight\NNTP;
-use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-$output = new ConsoleOutput();
+$output = new ConsoleOutput;
 $nameFixer = new NameFixer;
 $nntp = new NNTP;
 
@@ -34,6 +33,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
         $compressedHeaders = config('nntmux_nntp.compressed_headers');
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect()) !== true) {
             $output->writeln('<error>Unable to connect to usenet.</error>');
+
             return;
         }
     }
