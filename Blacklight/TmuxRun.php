@@ -165,16 +165,17 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][0]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 3 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 5 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 7 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 9 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 11 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 13 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 15 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 17 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 19 true other yes show  $log; date +\"{$this->_dateFormat}\"; \
-						{$runVar['commands']['_sleep']} {$runVar['settings']['fix_timer']}' 2>&1 1> /dev/null"
+    		php artisan releases:fix-names 3 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 5 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 7 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 9 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 11 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 13 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 15 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 17 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		php artisan releases:fix-names 19 --update --category=other --set-status --show 2>&1 | tee -a $log; \
+    		date +\"{$this->_dateFormat}\"; \
+    		{$runVar['commands']['_sleep']} {$runVar['settings']['fix_timer']}' 2>&1 1> /dev/null"
                 );
             } else {
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);

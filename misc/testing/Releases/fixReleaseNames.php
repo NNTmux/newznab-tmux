@@ -10,12 +10,13 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\NNTP;
+use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
+$output = new ConsoleOutput();
 $nameFixer = new NameFixer;
-$colorCli = new ColorCLI;
 $nntp = new NNTP;
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
@@ -29,99 +30,102 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     $setStatus = $argv[4] === 'yes';
 
     $show = isset($argv[5]) && $argv[5] === 'show' ? 1 : 2;
-    if ($argv[1] === 7 || $argv[1] === 8) {
+    if ($argv[1] === '7' || $argv[1] === '8') {
         $compressedHeaders = config('nntmux_nntp.compressed_headers');
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect()) !== true) {
-            $colorCli->error('Unable to connect to usenet.');
-
+            $output->writeln('<error>Unable to connect to usenet.</error>');
             return;
         }
     }
 
     switch ($argv[1]) {
-        case 3:
+        case '3':
             $nameFixer->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
             break;
-        case 4:
+        case '4':
             $nameFixer->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
             break;
-        case 5:
+        case '5':
             $nameFixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
             break;
-        case 6:
+        case '6':
             $nameFixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
             break;
-        case 7:
+        case '7':
             $nameFixer->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
             break;
-        case 8:
+        case '8':
             $nameFixer->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
             break;
-        case 9:
+        case '9':
             $nameFixer->fixNamesWithMedia(1, $update, $other, $setStatus, $show);
             break;
-        case 10:
+        case '10':
             $nameFixer->fixNamesWithMedia(2, $update, $other, $setStatus, $show);
             break;
-        case 11:
+        case '11':
             $nameFixer->fixXXXNamesWithFiles(1, $update, $other, $setStatus, $show);
             break;
-        case 12:
+        case '12':
             $nameFixer->fixXXXNamesWithFiles(2, $update, $other, $setStatus, $show);
             break;
-        case 13:
+        case '13':
             $nameFixer->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
             break;
-        case 14:
+        case '14':
             $nameFixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
             break;
-        case 15:
+        case '15':
             $nameFixer->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
             break;
-        case 16:
+        case '16':
             $nameFixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
             break;
-        case 17:
+        case '17':
             $nameFixer->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
             break;
-        case 18:
+        case '18':
             $nameFixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
             break;
-        case 19:
+        case '19':
             $nameFixer->fixNamesWithCrc(1, $update, $other, $setStatus, $show);
             break;
-        case 20:
+        case '20':
             $nameFixer->fixNamesWithCrc(2, $update, $other, $setStatus, $show);
             break;
         default:
-            $colorCli->error(PHP_EOL.'ERROR: Wrong argument, type php $argv[0] to see a list of valid arguments.');
-            exit();
-            break;
+            $output->writeln('<error>'.PHP_EOL.'ERROR: Wrong argument, type php '.$argv[0].' to see a list of valid arguments.</error>');
+            exit(1);
     }
 } else {
-    $colorCli->error(PHP_EOL.'You must supply 4 arguments.'.PHP_EOL
-            .'The 2nd argument, false, will display the results, but not change the name, type true to have the names changed.'.PHP_EOL
-            .'The 3rd argument, other, will only do against other categories, to do against all categories use all, or predb_id to process all not matched to predb.'.PHP_EOL
-            .'The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.'.PHP_EOL
-            .'The 5th argument (optional), show, will display the release changes or only show a counter.'.PHP_EOL
-            .'php '.$argv[0].' 3 false other no ...: Fix release names using NFO in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 4 false other no ...: Fix release names using NFO.'.PHP_EOL
-            .'php '.$argv[0].' 5 false other no ...: Fix release names in misc categories using File Name in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 6 false other no ...: Fix release names in misc categories using File Name.'.PHP_EOL
-            .'php '.$argv[0].' 7 false other no ...: Fix release names in misc categories using Par2 Files in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 8 false other no ...: Fix release names in misc categories using Par2 Files.'.PHP_EOL
-            .'php '.$argv[0].' 9 false other no ...: Fix release names in misc categories using UID in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 10 false other no ...: Fix release names in misc categories using UID.'.PHP_EOL
-            .'php '.$argv[0].' 11 false other no ...: Fix SDPORN XXX release names in misc categories using specific File Name in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 12 false other no ...: Fix SDPORN XXX release names in misc categories using specific File Name.'.PHP_EOL
-            .'php '.$argv[0].' 13 false other no ...: Fix release names in misc categories using SRR files in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 14 false other no ...: Fix release names in misc categories using SRR files.'.PHP_EOL
-            .'php '.$argv[0].' 15 false other no ...: Fix release names in misc categories using PAR2 hash_16K block in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 16 false other no ...: Fix release names in misc categories using PAR2 hash_16K block.'.PHP_EOL
-            .'php '.$argv[0].' 17 false other no ...: Fix release names in misc categories using Mediainfo in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.'.PHP_EOL
-            .'php '.$argv[0].' 19 false other no ...: Fix release names in misc categories using CRC32 in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 20 false other no ...: Fix release names in misc categories using CRC32.'.PHP_EOL);
+    $output->writeln([
+        '',
+        '<error>You must supply 4 arguments.</error>',
+        '<comment>The 2nd argument, false, will display the results, but not change the name, type true to have the names changed.</comment>',
+        '<comment>The 3rd argument, other, will only do against other categories, to do against all categories use all, or predb_id to process all not matched to predb.</comment>',
+        '<comment>The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.</comment>',
+        '<comment>The 5th argument (optional), show, will display the release changes or only show a counter.</comment>',
+        '',
+        '<info>php '.$argv[0].' 3 false other no ...: Fix release names using NFO in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 4 false other no ...: Fix release names using NFO.</info>',
+        '<info>php '.$argv[0].' 5 false other no ...: Fix release names in misc categories using File Name in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 6 false other no ...: Fix release names in misc categories using File Name.</info>',
+        '<info>php '.$argv[0].' 7 false other no ...: Fix release names in misc categories using Par2 Files in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 8 false other no ...: Fix release names in misc categories using Par2 Files.</info>',
+        '<info>php '.$argv[0].' 9 false other no ...: Fix release names in misc categories using UID in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 10 false other no ...: Fix release names in misc categories using UID.</info>',
+        '<info>php '.$argv[0].' 11 false other no ...: Fix SDPORN XXX release names in misc categories using specific File Name in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 12 false other no ...: Fix SDPORN XXX release names in misc categories using specific File Name.</info>',
+        '<info>php '.$argv[0].' 13 false other no ...: Fix release names in misc categories using SRR files in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 14 false other no ...: Fix release names in misc categories using SRR files.</info>',
+        '<info>php '.$argv[0].' 15 false other no ...: Fix release names in misc categories using PAR2 hash_16K block in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 16 false other no ...: Fix release names in misc categories using PAR2 hash_16K block.</info>',
+        '<info>php '.$argv[0].' 17 false other no ...: Fix release names in misc categories using Mediainfo in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.</info>',
+        '<info>php '.$argv[0].' 19 false other no ...: Fix release names in misc categories using CRC32 in the past 6 hours.</info>',
+        '<info>php '.$argv[0].' 20 false other no ...: Fix release names in misc categories using CRC32.</info>',
+        '',
+    ]);
 
-    exit();
+    exit(1);
 }
