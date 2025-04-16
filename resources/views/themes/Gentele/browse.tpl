@@ -578,5 +578,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Add this to your JavaScript file or in a script tag at the bottom of the page
+document.addEventListener('DOMContentLoaded', function() {
+    // Delegate the click event to the document so it works for dynamically loaded content
+    document.addEventListener('click', function(e) {
+        // Find if the click was on a cart button or its child elements
+        const cartBtn = e.target.closest('a:has(.icon_cart)');
+
+        if (cartBtn) {
+            e.preventDefault(); // Prevent jumping to top of page
+
+            // Extract the GUID from the icon ID
+            const iconElement = cartBtn.querySelector('.icon_cart');
+            const guidId = iconElement.id;
+            const guid = guidId.replace('guid', '');
+
+            // Send AJAX request to add item to cart
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ guid: guid })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Show success message or update cart count
+                if (data.success) {
+                    iconElement.classList.remove('fa-shopping-basket');
+                    iconElement.classList.add('fa-check');
+                    setTimeout(() => {
+                        iconElement.classList.remove('fa-check');
+                        iconElement.classList.add('fa-shopping-basket');
+                    }, 1000);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+
+    // Initialize tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
 {/literal}
 </script>
