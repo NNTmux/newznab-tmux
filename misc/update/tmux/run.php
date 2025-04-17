@@ -97,14 +97,11 @@ function start_apps($tmux_session): void
 function window_utilities($tmux_session)
 {
     Process::run("tmux new-window -t $tmux_session -n utils 'printf \"\033]2;fixReleaseNames\033\"'");
-    Process::run("tmux splitw -t $tmux_session:1 -v -l 50% 'printf \"\033]2;updateTVandTheaters\033\"'");
     Process::run("tmux selectp -t $tmux_session:1.0; tmux splitw -t $tmux_session:1 -h -l 50% 'printf \"\033]2;removeCrapReleases\033\"'");
-    Process::run("tmux selectp -t $tmux_session:1.2; tmux splitw -t $tmux_session:1 -h -l 50% 'printf \"\033]2;decryptHashes\033\"'");
 }
 
 function window_stripped_utilities($tmux_session)
 {
-    Process::run("tmux new-window -t $tmux_session -n utils 'printf \"\033]2;updateTVandTheaters\033\"'");
     Process::run("tmux selectp -t $tmux_session:1.0; tmux splitw -t $tmux_session:1 -h -l 50% 'printf \"\033]2;postprocessing_amazon\033\"'");
 }
 
@@ -133,20 +130,17 @@ $tmuxConfig = $tmuxPath.'tmux.conf';
 if ((int) $seq === 1) {
     Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -l 67% 'printf \"\033]2;update_releases\033\"'");
-    Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -l 25% 'printf \"\033]2;nzb-import\033\"'");
 
     window_utilities($tmux_session);
     window_post($tmux_session);
 } elseif ((int) $seq === 2) {
     Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -l 67% 'printf \"\033]2;sequential\033\"'");
-    Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -l 25% 'printf \"\033]2;nzb-import\033\"'");
 
     window_stripped_utilities($tmux_session);
 } else {
     Process::run("cd {$tmuxPath}; tmux -f $tmuxConfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -l 67% 'printf \"\033]2;update_binaries\033\"'");
-    Process::run("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -l 25% 'printf \"\033]2;nzb-import\033\"'");
     Process::run("tmux selectp -t $tmux_session:0.2; tmux splitw -t $tmux_session:0 -v -l 67% 'printf \"\033]2;backfill\033\"'");
     Process::run("tmux splitw -t $tmux_session -v -l 50% 'printf \"\033]2;update_releases\033\"'");
 
