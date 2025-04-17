@@ -69,9 +69,6 @@ class TmuxRun extends Tmux
                     case 'scraper':
                         $this->_runIRCScraper(3, $runVar);
                         break;
-                    case 'sharing':
-                        $this->_runSharing(4, $runVar);
-                        break;
                     case 'updatetv':
                         $this->_runUpdateTv($runVar);
                         break;
@@ -106,9 +103,6 @@ class TmuxRun extends Tmux
                     case 'scraper':
                         $this->_runIRCScraper(3, $runVar);
                         break;
-                    case 'sharing':
-                        $this->_runSharing(4, $runVar);
-                        break;
                     case 'updatetv':
                         $this->_runUpdateTv($runVar);
                         break;
@@ -127,7 +121,7 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][3]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 3000 show $log; \
+					php artisan match:prefiles 3000 --show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -135,8 +129,8 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][3]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/tmux/bin/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 3000 show $log; \
+					php artisan predb:check {$runVar['constants']['pre_lim']} $log; \
+					php artisan match:prefiles 3000 --show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -144,8 +138,8 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][3]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/tmux/bin/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 300 show $log; \
+					php artisan predb:check {$runVar['constants']['pre_lim']} $log; \
+					php artisan match:prefiles 3000 --show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -641,19 +635,6 @@ class TmuxRun extends Tmux
             }
         } else {
             shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:{$pane}.0 'echo \"\nIRCScraper has been disabled/terminated by IRCSCraper\"'");
-        }
-    }
-
-    protected function _runSharing($pane, &$runVar): void
-    {
-        $sharing = (array) Arr::first(DB::select('SELECT enabled, posting, fetching FROM sharing'));
-
-        if (! empty($sharing) && (int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:{$pane} | grep ^0 | grep -c dead") == 1) {
-            shell_exec(
-                "tmux respawnp -t{$runVar['constants']['tmux_session']}:{$pane}.0 ' \
-                    {$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/multiprocessing/postprocess.php sha; \
-                    {$runVar['commands']['_sleep']} {$runVar['settings']['sharing_timer']}' 2>&1 1> /dev/null"
-            );
         }
     }
 }
