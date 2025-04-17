@@ -34,7 +34,7 @@ $db_name = config('nntmux.db_name');
 
 $tmux_niceness = Settings::settingValue('niceness') ?? 2;
 
-$runVar['constants'] = (array) Arr::first(DB::select($tRun->getConstantSettings()));
+$runVar['constants'] = $tRun->getConstantSettings();
 
 // assign shell commands
 $runVar['commands']['_php'] = " nice -n{$tmux_niceness} php";
@@ -74,7 +74,7 @@ $psTableRowCount = $pdo->prepare($tblCount);
 while ($runVar['counts']['iterations'] > 0) {
     $timer01 = time();
     // These queries are very fast, run every loop -- tmux and site settings
-    $runVar['settings'] = (array) Arr::first(DB::select($tRun->getMonitorSettings()));
+    $runVar['settings'] = $tRun->getMonitorSettings();
     $runVar['timers']['query']['tmux_time'] = (time() - $timer01);
 
     $runVar['settings']['book_reqids'] = (! empty($runVar['settings']['book_reqids'])

@@ -105,81 +105,82 @@ class Tmux
         return $panes;
     }
 
-    public function getConstantSettings(): string
+    public function getConstantSettings(): array
     {
-        $settstr = 'SELECT value FROM settings WHERE name =';
+        $settings = [
+            'sequential',
+            'tmux_session',
+            'run_ircscraper',
+            'alternate_nntp',
+            'delaytime'
+        ];
 
-        $sql = sprintf(
-            "SELECT
-					(%1\$s 'sequential') AS sequential,
-					(%1\$s 'tmux_session') AS tmux_session,
-					(%1\$s 'run_ircscraper') AS run_ircscraper,
-					(%1\$s 'alternate_nntp') AS alternate_nntp,
-					(%1\$s 'delaytime') AS delaytime",
-            $settstr
-        );
-
-        return $sql;
+        return Settings::query()
+            ->whereIn('name', $settings)
+            ->pluck('value', 'name')
+            ->toArray();
     }
 
-    public function getMonitorSettings(): string
+    public function getMonitorSettings(): array
     {
-        $settstr = 'SELECT value FROM settings WHERE name =';
+        $settingsMap = [
+            'monitor_delay' => 'monitor',
+            'binaries' => 'binaries_run',
+            'backfill' => 'backfill',
+            'backfill_qty' => 'backfill_qty',
+            'nzbs' => 'nzbs',
+            'post' => 'post',
+            'releases' => 'releases_run',
+            'fix_names' => 'fix_names',
+            'seq_timer' => 'seq_timer',
+            'bins_timer' => 'bins_timer',
+            'back_timer' => 'back_timer',
+            'rel_timer' => 'rel_timer',
+            'fix_timer' => 'fix_timer',
+            'post_timer' => 'post_timer',
+            'collections_kill' => 'collections_kill',
+            'postprocess_kill' => 'postprocess_kill',
+            'crap_timer' => 'crap_timer',
+            'fix_crap' => 'fix_crap',
+            'fix_crap_opt' => 'fix_crap_opt',
+            'post_kill_timer' => 'post_kill_timer',
+            'monitor_path' => 'monitor_path',
+            'monitor_path_a' => 'monitor_path_a',
+            'monitor_path_b' => 'monitor_path_b',
+            'progressive' => 'progressive',
+            'dehash' => 'dehash',
+            'dehash_timer' => 'dehash_timer',
+            'backfill_days' => 'backfilldays',
+            'post_amazon' => 'post_amazon',
+            'post_timer_amazon' => 'post_timer_amazon',
+            'post_non' => 'post_non',
+            'post_timer_non' => 'post_timer_non',
+            'colors_start' => 'colors_start',
+            'colors_end' => 'colors_end',
+            'colors_exc' => 'colors_exc',
+            'showquery' => 'show_query',
+            'running' => 'is_running',
+            'lookupbooks' => 'processbooks',
+            'lookupmusic' => 'processmusic',
+            'lookupgames' => 'processgames',
+            'lookupxxx' => 'processxxx',
+            'lookupimdb' => 'processmovies',
+            'lookuptv' => 'processtvrage',
+            'lookupanidb' => 'processanime',
+            'lookupnfo' => 'processnfo',
+            'lookuppar2' => 'processpar2',
+            'nzbthreads' => 'nzbthreads',
+            'maxsizetopostprocess' => 'maxsize_pp',
+            'minsizetopostprocess' => 'minsize_pp'
+        ];
 
-        $sql = sprintf(
-            "SELECT
-					(%1\$s 'monitor_delay') AS monitor,
-					(%1\$s 'binaries') AS binaries_run,
-					(%1\$s 'backfill') AS backfill,
-					(%1\$s 'backfill_qty') AS backfill_qty,
-					(%1\$s 'nzbs') AS nzbs,
-					(%1\$s 'post') AS post,
-					(%1\$s 'releases') AS releases_run,
-					(%1\$s 'fix_names') AS fix_names,
-					(%1\$s 'seq_timer') AS seq_timer,
-					(%1\$s 'bins_timer') AS bins_timer,
-					(%1\$s 'back_timer') AS back_timer,
-					(%1\$s 'rel_timer') AS rel_timer,
-					(%1\$s 'fix_timer') AS fix_timer,
-					(%1\$s 'post_timer') AS post_timer,
-					(%1\$s 'collections_kill') AS collections_kill,
-					(%1\$s 'postprocess_kill') AS postprocess_kill,
-					(%1\$s 'crap_timer') AS crap_timer,
-					(%1\$s 'fix_crap') AS fix_crap,
-					(%1\$s 'fix_crap_opt') AS fix_crap_opt,
-					(%1\$s 'post_kill_timer') AS post_kill_timer,
-					(%1\$s 'monitor_path') AS monitor_path,
-					(%1\$s 'monitor_path_a') AS monitor_path_a,
-					(%1\$s 'monitor_path_b') AS monitor_path_b,
-					(%1\$s 'progressive') AS progressive,
-					(%1\$s 'dehash') AS dehash,
-					(%1\$s 'dehash_timer') AS dehash_timer,
-					(%1\$s 'backfill_days') AS backfilldays,
-					(%1\$s 'post_amazon') AS post_amazon,
-					(%1\$s 'post_timer_amazon') AS post_timer_amazon,
-					(%1\$s 'post_non') AS post_non,
-					(%1\$s 'post_timer_non') AS post_timer_non,
-					(%1\$s 'colors_start') AS colors_start,
-					(%1\$s 'colors_end') AS colors_end,
-					(%1\$s 'colors_exc') AS colors_exc,
-					(%1\$s 'showquery') AS show_query,
-					(%1\$s 'running') AS is_running,
-					(%1\$s 'lookupbooks') AS processbooks,
-					(%1\$s 'lookupmusic') AS processmusic,
-					(%1\$s 'lookupgames') AS processgames,
-					(%1\$s 'lookupxxx') AS processxxx,
-					(%1\$s 'lookupimdb') AS processmovies,
-					(%1\$s 'lookuptv') AS processtvrage,
-					(%1\$s 'lookupanidb') AS processanime,
-					(%1\$s 'lookupnfo') AS processnfo,
-					(%1\$s 'lookuppar2') AS processpar2,
-					(%1\$s 'nzbthreads') AS nzbthreads,
-					(%1\$s 'maxsizetopostprocess') AS maxsize_pp,
-					(%1\$s 'minsizetopostprocess') AS minsize_pp",
-            $settstr
-        );
-
-        return $sql;
+        return Settings::query()
+            ->whereIn('name', array_keys($settingsMap))
+            ->get()
+            ->mapWithKeys(function ($item) use ($settingsMap) {
+                return [$settingsMap[$item->name] => $item->value];
+            })
+            ->toArray();
     }
 
     public function updateItem($setting, $value): int
@@ -194,19 +195,29 @@ class Tmux
         return (float) $usec + (float) $sec;
     }
 
-    public function decodeSize(float $bytes): string
+    public function decodeSize(int|float $bytes): string
     {
-        $types = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $suffix = 'B';
-        foreach ($types as $type) {
-            if ($bytes < 1024.0) {
-                $suffix = $type;
-                break;
-            }
-            $bytes /= 1024;
+        // Handle zero case
+        if ($bytes === 0) {
+            return '0 B';
         }
 
-        return round($bytes, 2).' '.$suffix;
+        // Handle negative values
+        if ($bytes < 0) {
+            return '-' . $this->decodeSize(abs($bytes));
+        }
+
+        // Add more size units (PB, EB)
+        $types = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
+        $index = 0;
+
+        // Use while loop instead of foreach for more efficiency
+        while ($bytes >= 1024.0 && $index < count($types) - 1) {
+            $bytes /= 1024.0;
+            $index++;
+        }
+
+        return round($bytes, 2) . ' ' . $types[$index];
     }
 
     public function writelog($pane): ?string
@@ -241,33 +252,9 @@ class Tmux
         return $number;
     }
 
-    /**
-     * Returns random bool, weighted by $chance.
-     *
-     *
-     *
-     * @throws \Exception
-     */
-    public function rand_bool($loop, int $chance = 60): bool
-    {
-        $usecache = Settings::settingValue('usecache') ?? 0;
-        if ($loop === 1 || $usecache === 0) {
-            return false;
-        }
-
-        return random_int(1, 100) <= $chance;
-    }
-
     public function relativeTime($_time): string
     {
         return Carbon::createFromTimestamp($_time, date_default_timezone_get())->ago();
-    }
-
-    public function command_exist($cmd): bool
-    {
-        $returnVal = shell_exec("which $cmd 2>/dev/null");
-
-        return ! empty($returnVal);
     }
 
     /**
