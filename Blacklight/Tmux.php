@@ -112,7 +112,7 @@ class Tmux
             'tmux_session',
             'run_ircscraper',
             'alternate_nntp',
-            'delaytime'
+            'delaytime',
         ];
 
         return Settings::query()
@@ -171,7 +171,7 @@ class Tmux
             'lookuppar2' => 'processpar2',
             'nzbthreads' => 'nzbthreads',
             'maxsizetopostprocess' => 'maxsize_pp',
-            'minsizetopostprocess' => 'minsize_pp'
+            'minsizetopostprocess' => 'minsize_pp',
         ];
 
         return Settings::query()
@@ -204,7 +204,7 @@ class Tmux
 
         // Handle negative values
         if ($bytes < 0) {
-            return '-' . $this->decodeSize(abs($bytes));
+            return '-'.$this->decodeSize(abs($bytes));
         }
 
         // Add more size units (PB, EB)
@@ -217,7 +217,7 @@ class Tmux
             $index++;
         }
 
-        return round($bytes, 2) . ' ' . $types[$index];
+        return round($bytes, 2).' '.$types[$index];
     }
 
     public function writelog($pane): ?string
