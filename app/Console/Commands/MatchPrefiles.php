@@ -1,61 +1,64 @@
 <?php
 
-     namespace App\Console\Commands;
+namespace App\Console\Commands;
 
-     use Exception;
-     use Illuminate\Console\Command;
-     use Blacklight\NameFixer;
+use Blacklight\NameFixer;
+use Exception;
+use Illuminate\Console\Command;
 
-     class MatchPrefiles extends Command
-     {
-         /**
-          * The name and signature of the console command.
-          *
-          * @var string
-          */
-         protected $signature = 'match:prefiles
+class MatchPrefiles extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'match:prefiles
                                  {limit=full : Number of releases to process or "full" for all}
                                  {--show : Display the changes}';
 
-         /**
-          * The console command description.
-          *
-          * @var string
-          */
-         protected $description = 'Tries to match release filenames to PreDB filenames';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Tries to match release filenames to PreDB filenames';
 
-         /**
-          * Execute the console command.
-          *
-          * @return int
-          */
-         public function handle()
-         {
-             $limit = $this->argument('limit');
+    /**
+     * Execute the console command.
+     *
+     * @return int
+     */
+    public function handle()
+    {
+        $limit = $this->argument('limit');
 
-             // Validate the limit argument
-             if ($limit !== 'full' && !is_numeric($limit)) {
-                 $this->error('Limit must be "full" or a numeric value.');
-                 return 1;
-             }
+        // Validate the limit argument
+        if ($limit !== 'full' && ! is_numeric($limit)) {
+            $this->error('Limit must be "full" or a numeric value.');
 
-             // Build the arguments array for NameFixer
-             $argv = [
-                 'match_prefiles.php',
-                 $limit,
-             ];
+            return 1;
+        }
 
-             if ($this->option('show')) {
-                 $argv[] = 'show';
-             }
+        // Build the arguments array for NameFixer
+        $argv = [
+            'match_prefiles.php',
+            $limit,
+        ];
 
-             try {
-                 $nameFixer = new NameFixer();
-                 $nameFixer->getPreFileNames($argv);
-                 return 0;
-             } catch (Exception $e) {
-                 $this->error($e->getMessage());
-                 return 1;
-             }
-         }
-     }
+        if ($this->option('show')) {
+            $argv[] = 'show';
+        }
+
+        try {
+            $nameFixer = new NameFixer;
+            $nameFixer->getPreFileNames($argv);
+
+            return 0;
+        } catch (Exception $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
+    }
+}

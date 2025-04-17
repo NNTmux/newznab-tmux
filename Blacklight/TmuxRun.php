@@ -3,8 +3,6 @@
 namespace Blacklight;
 
 use App\Models\Settings;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Tmux pane shell exec functions for pane respawning.
