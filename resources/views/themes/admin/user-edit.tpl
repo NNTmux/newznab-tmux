@@ -54,17 +54,21 @@
 				                                </select>
 				                            </div>
 
-				                            {if !empty($user.id)}
-				                                <div class="mb-3">
-				                                    <label for="rolechangedate" class="form-label fw-bold">Role Change Date:</label>
-				                                    <input type="text" class="form-control" id="rolechangedate" name="rolechangedate"
-				                                           data-provide="datepicker" data-date-format="yyyy-mm-dd"
-				                                           data-date-autoclose="true" data-date-today-highlight="true"
-				                                           data-date-clear-btn="true" value="{$user.rolechangedate}">
-				                                </div>
-				                            {/if}
+                                            {if !empty($user.id)}
+                                                <div class="mb-3">
+                                                    <label for="rolechangedate" class="form-label fw-bold">Role Change Date:</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="rolechangedate" name="rolechangedate"
+                                                               value="{$user.rolechangedate}" placeholder="YYYY-MM-DD HH:MM:SS" autocomplete="off">
+                                                        <span class="input-group-text">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            {/if}
 
-				                            <div class="mb-3">
+
+                                            <div class="mb-3">
 				                                <label for="notes" class="form-label fw-bold">Notes:</label>
 				                                <input type="text" class="form-control" id="notes" name="notes"
 				                                       value="{$user.notes|escape:htmlall}">
@@ -190,7 +194,23 @@
 				        return new bootstrap.Tooltip(tooltipTriggerEl);
 				    });
 
-				    // Basic form validation
+                    // *** START: Added Flatpickr Initialization ***
+                    const datepickerInput = document.getElementById('rolechangedate');
+                    if (datepickerInput) {
+                        flatpickr(datepickerInput, {
+                            enableTime: true,       // Enable time selection
+                            time_24hr: true,        // Use 24-hour format for time
+                            dateFormat: "Y-m-d H:i:S", // Format for the server (YYYY-MM-DD HH:MM:SS)
+                            allowInput: true,       // Allow manual input
+                            altInput: true,         // Show a user-friendly format
+                            altFormat: "F j, Y H:i", // How the date and time are displayed (e.g., June 10, 2024 14:30)
+                        });
+                    }
+
+                    // *** END: Added Flatpickr Initialization ***
+
+
+                    // Basic form validation
 				    const form = document.getElementById('userEditForm');
 				    if (form) {
 				        form.addEventListener('submit', function(event) {
