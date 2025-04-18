@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class AdminNzbController extends BasePageController
 {
-   /**
+    /**
      * @throws \Exception
      */
     public function import(Request $request): void
@@ -26,7 +26,7 @@ class AdminNzbController extends BasePageController
             $deleteNZB = true;
 
             // Get the list of NZB files from php /tmp folder if nzb files were uploaded.
-            if (isset($_FILES['uploadedfiles']) && !empty($_FILES['uploadedfiles']['name'][0])) {
+            if (isset($_FILES['uploadedfiles']) && ! empty($_FILES['uploadedfiles']['name'][0])) {
                 $maxFileSize = min(
                     $this->convertToBytes(ini_get('upload_max_filesize')),
                     $this->convertToBytes(ini_get('post_max_size'))
@@ -64,7 +64,7 @@ class AdminNzbController extends BasePageController
                     $uploadMessages[] = "No NZB files found in the specified path: {$path}";
                 } else {
                     $filesToProcess = $nzbFiles;
-                    $uploadMessages[] = "Found " . count($nzbFiles) . " NZB file(s) in the specified path.";
+                    $uploadMessages[] = 'Found '.count($nzbFiles).' NZB file(s) in the specified path.';
                 }
             }
 
@@ -75,7 +75,7 @@ class AdminNzbController extends BasePageController
                 $importResults = $NZBImport->beginImport($filesToProcess, $useNzbName, $deleteNZB);
             }
 
-            $output = implode("<br>", array_merge($uploadMessages, is_array($importResults) ? $importResults : [$importResults]));
+            $output = implode('<br>', array_merge($uploadMessages, is_array($importResults) ? $importResults : [$importResults]));
             $this->smarty->assign('output', $output);
         }
 
@@ -92,9 +92,9 @@ class AdminNzbController extends BasePageController
     {
         $sizeStr = trim($sizeStr);
         $unit = strtolower(substr($sizeStr, -1));
-        $size = (int)$sizeStr;
+        $size = (int) $sizeStr;
 
-        switch($unit) {
+        switch ($unit) {
             case 'g':
                 $size *= 1024;
             case 'm':
@@ -111,10 +111,10 @@ class AdminNzbController extends BasePageController
      */
     private function getUploadErrorMessage($errorCode, $fileName, $maxFileSize)
     {
-        switch($errorCode) {
+        switch ($errorCode) {
             case UPLOAD_ERR_INI_SIZE:
-                return "The file '{$fileName}' exceeds the upload_max_filesize directive (" .
-                       ini_get('upload_max_filesize') . ").";
+                return "The file '{$fileName}' exceeds the upload_max_filesize directive (".
+                       ini_get('upload_max_filesize').').';
             case UPLOAD_ERR_FORM_SIZE:
                 return "The file '{$fileName}' exceeds the MAX_FILE_SIZE directive specified in the HTML form.";
             case UPLOAD_ERR_PARTIAL:
