@@ -93,6 +93,23 @@
                                                                       </div>
                                                                   </div>
 
+                                                                    <div class="row mb-3">
+                                                                            <div class="col-md-4 text-muted">Role</div>
+                                                                            <div class="col-md-8">
+                                                                                <div class="d-flex align-items-center flex-wrap">
+                                                                                    <i class="fa fa-id-badge text-muted me-2"></i>
+                                                                                    <span class="badge bg-primary rounded-pill">{$user.role.name}</span>
+
+                                                                                    {if isset($user.rolechangedate) && $user.rolechangedate != "0000-00-00 00:00:00" && $user.rolechangedate != ""}
+                                                                                        <div class="ms-2 d-flex align-items-center">
+                                                                                            <i class="fa fa-clock-o text-muted me-1"></i>
+                                                                                            <small>Expires: {$user.rolechangedate|date_format}</small>
+                                                                                        </div>
+                                                                                    {/if}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
                                                                   <div class="row mb-3">
                                                                       <div class="col-md-4 text-muted">Last Login</div>
                                                                       <div class="col-md-8">
