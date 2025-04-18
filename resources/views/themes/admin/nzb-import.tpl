@@ -25,64 +25,6 @@
 		                <li>If imported successfully the NZB will be deleted.</li>
 		            </ul>
 		        </div>
-
-		        <div class="card mb-4">
-		            <div class="card-header bg-light">
-		                <h5 class="mb-0">Import From Directory</h5>
-		            </div>
-		            <div class="card-body">
-		                <form action="{{url("/admin/nzb-import#results")}}" method="POST" id="folderImportForm">
-		                    {{csrf_field()}}
-
-		                    <div class="row mb-4">
-		                        <div class="col-lg-3 col-md-4">
-		                            <label for="folder" class="form-label fw-bold">Folder:</label>
-		                        </div>
-		                        <div class="col-lg-9 col-md-8">
-		                            <div class="input-group">
-		                                <span class="input-group-text"><i class="fa fa-folder-open"></i></span>
-		                                <input id="folder" class="form-control" name="folder" type="text" value=""/>
-		                            </div>
-		                            <small class="text-muted">Windows file paths should be specified with forward slashes e.g. c:/temp/</small>
-		                        </div>
-		                    </div>
-
-		                    <div class="row mb-4">
-		                        <div class="col-lg-3 col-md-4">
-		                            <label for="usefilename" class="form-label fw-bold">Use Filename:</label>
-		                        </div>
-		                        <div class="col-lg-9 col-md-8">
-		                            <div class="form-check form-switch">
-		                                <input type="checkbox" id="usefilename" name="usefilename" class="form-check-input"/>
-		                                <label for="usefilename" class="form-check-label">Use the NZB's filename as the release name</label>
-		                            </div>
-		                            <small class="text-muted">If unchecked, the name inside the NZB will be used</small>
-		                        </div>
-		                    </div>
-
-		                    <div class="row mb-4">
-		                        <div class="col-lg-3 col-md-4">
-		                            <label for="deleteNZB" class="form-label fw-bold">Delete NZBs:</label>
-		                        </div>
-		                        <div class="col-lg-9 col-md-8">
-		                            <div class="form-check form-switch">
-		                                <input type="checkbox" id="deleteNZB" name="deleteNZB" class="form-check-input"/>
-		                                <label for="deleteNZB" class="form-check-label">Delete successfully imported NZB files</label>
-		                            </div>
-		                            <small class="text-muted">Delete the NZB when we have successfully imported it?</small>
-		                        </div>
-		                    </div>
-		                </form>
-		            </div>
-		            <div class="card-footer">
-		                <div class="d-flex justify-content-end">
-		                    <button type="submit" form="folderImportForm" class="btn btn-success">
-		                        <i class="fa fa-file-import me-2"></i>Import from Directory
-		                    </button>
-		                </div>
-		            </div>
-		        </div>
-
 		        <div class="card">
 		            <div class="card-header bg-light">
 		                <h5 class="mb-0">Import From Browser</h5>
@@ -101,13 +43,17 @@
 		                                <input id="uploadedfiles" name="uploadedfiles[]" type="file" class="form-control" multiple accept=".nzb"/>
 		                            </div>
 		                            <small class="text-muted">Select one or more .nzb files. These NZBs will not be deleted once imported.</small>
+		                            <div id="upload-progress" class="progress mt-2 d-none">
+		                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+		                            </div>
+		                            <div id="upload-messages" class="mt-2"></div>
 		                        </div>
 		                    </div>
 		                </form>
 		            </div>
 		            <div class="card-footer">
 		                <div class="d-flex justify-content-end">
-		                    <button type="submit" form="browserImportForm" class="btn btn-success">
+		                    <button type="submit" form="browserImportForm" id="uploadButton" class="btn btn-success">
 		                        <i class="fa fa-upload me-2"></i>Import from Browser
 		                    </button>
 		                </div>
@@ -186,5 +132,76 @@
 		        });
 		    }
 		});
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('browserImportForm');
+            const fileInput = document.getElementById('uploadedfiles');
+            const uploadButton = document.getElementById('uploadButton');
+            const progressBar = document.querySelector('.progress-bar');
+            const progressContainer = document.getElementById('upload-progress');
+            const messagesContainer = document.getElementById('upload-messages');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const files = e.target.files;
+                    if (files.length > 0) {
+                        // Reset messages
+                        messagesContainer.innerHTML = '';
+
+                        // Validate file extensions
+                        let allValid = true;
+                        for (let i = 0; i < files.length; i++) {
+                            if (!files[i].name.toLowerCase().endsWith('.nzb')) {
+                                const alertDiv = document.createElement('div');
+                                alertDiv.className = 'alert alert-warning';
+                                alertDiv.innerHTML = `<i class="fa fa-exclamation-triangle"></i> "${files[i].name}" is not an NZB file`;
+                                messagesContainer.appendChild(alertDiv);
+                                allValid = false;
+                            }
+                        }
+
+                        if (!allValid) {
+                            uploadButton.disabled = true;
+                            return;
+                        }
+
+                        uploadButton.disabled = false;
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-info';
+                        alertDiv.innerHTML = `<i class="fa fa-info-circle"></i> ${files.length} file(s) selected and ready for upload`;
+                        messagesContainer.appendChild(alertDiv);
+                    }
+                });
+            }
+
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const files = fileInput.files;
+                    if (files.length === 0) {
+                        e.preventDefault();
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger';
+                        alertDiv.innerHTML = '<i class="fa fa-times-circle"></i> Please select at least one NZB file to upload';
+                        messagesContainer.innerHTML = '';
+                        messagesContainer.appendChild(alertDiv);
+                        return;
+                    }
+
+                    // Show progress bar
+                    progressContainer.classList.remove('d-none');
+                    uploadButton.disabled = true;
+
+                    // Simulate upload progress (in real world this would use XHR/fetch with progress events)
+                    let progress = 0;
+                    const interval = setInterval(function() {
+                        progress += 10;
+                        if (progress > 90) {
+                            clearInterval(interval);
+                        }
+                        progressBar.style.width = progress + '%';
+                    }, 300);
+                });
+            }
+        });
 		{/literal}
 		</script>
