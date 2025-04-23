@@ -97,7 +97,9 @@ class RecategorizeReleases extends Command
                     $this->output->writeln('<fg=yellow>ID       :</> '.$result->id);
                     $this->output->writeln('<fg=green>Release  :</> '.$result->searchname);
                     $this->output->writeln('<fg=cyan>Group    :</> '.$result->group->name);
-                    $this->output->writeln('<fg=white>Category :</> '.($result->category->parent ? $result->category->parent->title.' -> '.$result->category->title : $result->category->title).' <fg=yellow>→</> <fg=magenta>'.($newCatName->parent ? $newCatName->parent->title.' -> '.$newCatName->title : $newCatName->title).'</>');
+                    $oldCategoryTitle = $result->category?->parent ? ($result->category->parent->title . ' -> ' . $result->category->title) : ($result->category?->title ?? 'N/A');
+                    $newCategoryTitle = $newCatName?->parent ? ($newCatName->parent->title . ' -> ' . $newCatName->title) : ($newCatName?->title ?? 'N/A');
+                    $this->output->writeln('<fg=white>Category :</> ' . $oldCategoryTitle . ' <fg=yellow>→</> <fg=magenta>' . $newCategoryTitle . '</>');
                     $this->line('');
                 }
             }
