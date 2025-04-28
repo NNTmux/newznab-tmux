@@ -400,9 +400,9 @@
                                                 <a class="btn btn-success" href="{{url("/getnzb?id={$release.guid}")}}">
                                                     <i class="fa fa-cloud-download-alt me-1"></i>Download NZB
                                                 </a>
-                                                <button class="btn btn-outline-secondary add-to-cart" data-id="{$release.guid}" data-bs-toggle="tooltip" title="Add to cart">
-                                                    <i class="fa fa-shopping-cart me-1"></i>Add to Cart
-                                                </button>
+                                                <a href="#" class="btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to Cart">
+                                                    <i id="guid{$release.guid}" class="icon_cart fa fa-shopping-cart"></i> Add to Cart
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -1302,6 +1302,86 @@
                 });
             });
         }
+    });
+
+    // Add to Cart functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('click', function(e) {
+            // First find if the click target or any parent is the cart icon
+            const cartIcon = e.target.closest('.icon_cart');
+
+            // Or check if the click target is a parent element with a child cart icon
+            const parentWithCart = e.target.closest('a') && e.target.closest('a').querySelector('.icon_cart');
+
+            // Exit early if neither applies - important to prevent triggering on any click
+            if (!cartIcon && !parentWithCart) return;
+
+            // Get the actual icon element
+            const iconElement = cartIcon || (parentWithCart ? e.target.closest('a').querySelector('.icon_cart') : null);
+
+            // Secondary validation to prevent errors
+            if (!iconElement || !iconElement.id) return;
+            if (iconElement.classList.contains('icon_cart_clicked')) return;
+
+            // Now we can safely call preventDefault() since we know it's a cart click
+            e.preventDefault();
+
+            const guid = iconElement.id.replace('guid', '');
+            const originalIcon = iconElement.classList.contains('fa-shopping-cart') ? 'fa-shopping-cart' : 'fa-shopping-basket';
+
+            // Send AJAX request
+            fetch(`${base_url}/cart/add?id=${guid}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Success feedback
+                    iconElement.classList.remove(originalIcon);
+                    iconElement.classList.add('fa-check', 'icon_cart_clicked');
+                    iconElement.setAttribute('title', 'Release added to Cart');
+
+                    // Show notification with 5000ms timeout
+                    if (typeof PNotify !== 'undefined') {
+                        PNotify.success({
+                            title: 'Release added to your download basket!',
+                            icon: 'fa fa-info fa-3x',
+                            delay: 5000
+                        });
+                    }
+
+                    // Restore original icon after delay
+                    setTimeout(() => {
+                        iconElement.classList.remove('fa-check');
+                        iconElement.classList.add(originalIcon);
+                    }, 1500);
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            })
+            .catch(error => {
+                console.error('Cart error:', error);
+
+                iconElement.classList.remove(originalIcon);
+                iconElement.classList.add('fa-times');
+
+                if (typeof PNotify !== 'undefined') {
+                    PNotify.error({
+                        title: 'Error',
+                        text: 'Failed to add item to cart',
+                        icon: 'fa fa-exclamation-circle',
+                        delay: 5000
+                    });
+                }
+
+                setTimeout(() => {
+                    iconElement.classList.remove('fa-times');
+                    iconElement.classList.add(originalIcon);
+                }, 1500);
+            });
+        });
     });
 {/literal}
 </script>

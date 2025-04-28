@@ -31,22 +31,35 @@ class CartController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $this->setPreferences();
         $guids = explode(',', $request->input('id'));
 
+
         $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
 
-        if (empty($data)) {
-            return redirect()->to('/cart/index');
+        if ($data->isEmpty()) {
+            return $request->ajax() || $request->wantsJson()
+                ? response()->json(['success' => false, 'message' => 'No releases found'], 404)
+                : redirect()->to('/cart/index');
         }
 
+        $addedCount = 0;
         foreach ($data as $d) {
             $check = UsersRelease::whereReleasesId($d['id'])->first();
             if (empty($check)) {
                 UsersRelease::addCart($this->userdata->id, $d['id']);
+                $addedCount++;
             }
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $addedCount > 0 ? "{$addedCount} item(s) added to cart" : 'Items already in cart',
+                'cartCount' => UsersRelease::where('users_id', $this->userdata->id)->count()
+            ]);
         }
 
         return redirect()->to('/cart/index');
