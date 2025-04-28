@@ -36,7 +36,6 @@ class CartController extends BasePageController
         $this->setPreferences();
         $guids = explode(',', $request->input('id'));
 
-
         $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
 
         if ($data->isEmpty()) {
@@ -58,7 +57,7 @@ class CartController extends BasePageController
             return response()->json([
                 'success' => true,
                 'message' => $addedCount > 0 ? "{$addedCount} item(s) added to cart" : 'Items already in cart',
-                'cartCount' => UsersRelease::where('users_id', $this->userdata->id)->count()
+                'cartCount' => UsersRelease::where('users_id', $this->userdata->id)->count(),
             ]);
         }
 
