@@ -63,7 +63,7 @@ mix
             'node_modules/icheck/icheck.min.js',
             'resources/assets/js/utils-admin.js',
             'resources/assets/js/custom.js',
-            'resources/assets/js/functions.js'
+            'resources/assets/js/functions.js',
+            'resources/assets/js/themes/Gentele/search.js',
         ]
     , 'public/assets/js/all-js.js');
-
