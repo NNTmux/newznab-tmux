@@ -28,7 +28,6 @@ class MediaInfo extends Model
             'releases_id' => $id,
             'movie_name' => $mediainfoArray->get('movie_name') ?? null,
             'file_name' => $mediainfoArray->get('file_name') ?? null,
-            'title' => $mediainfoArray->get('title') ?? null,
             'unique_id' => $mediainfoArray->get('unique_id') ?? null,
             'created_at' => now(),
             'updated_at' => now(),
