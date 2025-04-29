@@ -63,7 +63,7 @@ class Categorize
      *
      * @throws \Exception
      */
-    public function determineCategory($groupId, string $releaseName = '', string $poster = '', bool $debug = false): array
+    public function determineCategory($groupId, string $releaseName = '', string $poster = '', bool $debug = true): array
     {
         // Initialize properties
         $this->releaseName = $releaseName;
@@ -138,70 +138,28 @@ class Categorize
      */
     public function byGroupName(): bool
     {
-        // Adult content groups
-        if (preg_match('/alt\.binaries\.(erotica|boneless|multimedia\.erotica|pictures\.erotica|movies\.erotica|sounds\.erotica)/i', $this->groupName)) {
-            if ($this->isXxx()) {
-                return true; // Already categorized by the isXxx method
-            }
-            $this->tmpCat = Category::XXX_OTHER;
+        switch (true) {
+            case preg_match('/alt\.binaries\.erotica([.]\w+)?/i', $this->groupName):
+                if ($this->isXxx()) {
+                    return true;
+                }
+                $this->tmpCat = Category::XXX_OTHER;
 
-            return true;
+                return true;
+            case preg_match('/alt\.binaries\.podcast$/i', $this->groupName):
+                $this->tmpCat = Category::MUSIC_PODCAST;
+
+                return true;
+            case preg_match('/alt\.binaries\.music\.(\w+)?/i', $this->groupName):
+                if ($this->isMusic()) {
+                    return true;
+                }
+                $this->tmpCat = Category::MUSIC_OTHER;
+
+                return true;
+            default:
+                return false;
         }
-
-        // Audio/Music groups
-        if (preg_match('/alt\.binaries\.(sounds|mp3|music|multimedia\.sound\-clips)/i', $this->groupName)) {
-            $this->tmpCat = Category::MUSIC_MP3;
-
-            return true;
-        }
-
-        if (preg_match('/alt\.binaries\.podcast$/i', $this->groupName)) {
-            $this->tmpCat = Category::MUSIC_PODCAST;
-
-            return true;
-        }
-
-        if (preg_match('/alt\.binaries\.(audiobooks|sounds\.audiobooks)/i', $this->groupName)) {
-            $this->tmpCat = Category::BOOKS_EBOOK;
-
-            return true;
-        }
-
-        // Video content groups
-        if (preg_match('/alt\.binaries\.(hdtv|teevee|multimedia|tv|multimedia\.tv|tv\.swedish|tv\.deutsch|multimedia\.tv)/i', $this->groupName)) {
-            $this->tmpCat = Category::TV_OTHER;
-
-            return true;
-        }
-
-        if (preg_match('/alt\.binaries\.(movies|console-movies|dvd|xvid|divx|mpeg)/i', $this->groupName)) {
-            $this->tmpCat = Category::MOVIE_OTHER;
-
-            return true;
-        }
-
-        // Software/Games groups
-        if (preg_match('/alt\.binaries\.(warez|games|pc.games|mac|apps)/i', $this->groupName)) {
-            $this->tmpCat = Category::PC_0DAY;
-
-            return true;
-        }
-
-        if (preg_match('/alt\.binaries\.(console|xbox|ps3|ps4|wii|nintendo|psp|nds)/i', $this->groupName)) {
-            $this->tmpCat = Category::GAME_OTHER;
-
-            return true;
-        }
-
-        // E-books and documents
-        if (preg_match('/alt\.binaries\.(e-book|ebook|documentaries|magazines|comics|pictures\.comics)/i', $this->groupName)) {
-            $this->tmpCat = Category::BOOKS_EBOOK;
-
-            return true;
-        }
-
-        // Fallback case when no match is found
-        return false;
     }
 
     //
