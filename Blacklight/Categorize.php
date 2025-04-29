@@ -55,7 +55,7 @@ class Categorize
     /**
      * Determine the most appropriate category for a release based on name and group.
      *
-     * @param int|string $groupId  The usenet group ID
+     * @param  int|string  $groupId  The usenet group ID
      * @param  string  $releaseName  The name of the release to categorize
      * @param  string  $poster  The person/entity who posted the release
      * @param  bool  $debug  Whether to include debug information in the return value
