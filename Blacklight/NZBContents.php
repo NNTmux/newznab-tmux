@@ -47,11 +47,10 @@ class NZBContents
     /**
      * Look for an .nfo file in the NZB, download it, verify it, and return the content.
      *
-     * @param string $guid      The release GUID.
-     * @param int    $relID     The release ID.
-     * @param int    $groupID   The group ID.
-     * @param string $groupName The group name.
-     *
+     * @param  string  $guid  The release GUID.
+     * @param  int  $relID  The release ID.
+     * @param  int  $groupID  The group ID.
+     * @param  string  $groupName  The group name.
      * @return string|false The verified NFO content as a string, or false if not found, download failed, or verification failed.
      *
      * @throws \Exception If NNTP operations fail.
@@ -62,12 +61,13 @@ class NZBContents
         $messageID = $this->parseNZB($guid, $relID, $groupID, true);
 
         // If no NFO message ID found
-        if ($messageID === false || !isset($messageID['id'])) {
+        if ($messageID === false || ! isset($messageID['id'])) {
             if ($this->echooutput) {
                 echo '-';
             }
             // Make sure we set status to NFO_NONFO
             Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
+
             return false;
         }
 
@@ -81,6 +81,7 @@ class NZBContents
             if ($this->echooutput) {
                 echo 'f';
             }
+
             return false;
         }
 
@@ -91,6 +92,7 @@ class NZBContents
                 // Show if it was found via explicit name (+) or potentially hidden (*)
                 echo $messageID['hidden'] === false ? '+' : '*';
             }
+
             return $fetchedBinary;
         }
 
@@ -99,6 +101,7 @@ class NZBContents
             echo '-';
         }
         Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
+
         return false;
     }
 
@@ -107,11 +110,10 @@ class NZBContents
      *
      * This version includes improved regex for PAR2 file detection.
      *
-     * @param string $guid The release GUID.
-     * @param int $relID The release ID.
-     * @param int $groupID The group ID.
-     * @param bool $nfoCheck Whether to specifically look for an NFO file.
-     *
+     * @param  string  $guid  The release GUID.
+     * @param  int  $relID  The release ID.
+     * @param  int  $groupID  The group ID.
+     * @param  bool  $nfoCheck  Whether to specifically look for an NFO file.
      * @return array|false An array containing NFO message ID and hidden status, or false if not found/error.
      *
      * @throws \Exception If NNTP operations fail.
@@ -139,42 +141,41 @@ class NZBContents
                 $segmentCountInFile++;
                 // Store the first segment ID of the current file, potentially useful for NFO/PAR2
                 if ($segmentCountInFile === 1) {
-                     $firstSegmentId = (string) $segment;
+                    $firstSegmentId = (string) $segment;
                 }
             }
 
             $subject = (string) $nzbContents->attributes()->subject;
             if (preg_match('/(?:[(\[])?(\d+)[\/)\\]](\d+)[)\]]?$/', $subject, $parts)) {
                 // Improve artificial parts calculation robustness (e.g., "[15/20]", "(15/20)")
-                 if (isset($parts[2]) && (int)$parts[2] > 0) {
-                     // Use the total count from the subject if available and seems valid
-                     $artificialParts += (int)$parts[2];
-                 }
-            } else if (preg_match('/(\d+)\)$/', $subject, $parts)) {
-                 // Fallback to original simple check if the more robust one fails
-                 $artificialParts += (int)$parts[1];
+                if (isset($parts[2]) && (int) $parts[2] > 0) {
+                    // Use the total count from the subject if available and seems valid
+                    $artificialParts += (int) $parts[2];
+                }
+            } elseif (preg_match('/(\d+)\)$/', $subject, $parts)) {
+                // Fallback to original simple check if the more robust one fails
+                $artificialParts += (int) $parts[1];
             }
-
 
             // --- NFO Detection ---
             // Check for explicit NFO files first
-            if ($nfoCheck && !$foundNFO && isset($firstSegmentId) && preg_match('/\.\b(nfo|diz|info?)\b(?![.-])/i', $subject)) {
+            if ($nfoCheck && ! $foundNFO && isset($firstSegmentId) && preg_match('/\.\b(nfo|diz|info?)\b(?![.-])/i', $subject)) {
                 $nfoMessageId = ['hidden' => false, 'id' => $firstSegmentId];
                 $foundNFO = true; // Found an explicit NFO, prioritize this
             }
             // Check for potential "hidden" NFOs (single segment, common name, not other known types)
             // Only consider this if an explicit NFO wasn't found yet
-            else if ($nfoCheck && !$foundNFO && !$hiddenNFO && isset($firstSegmentId) && $segmentCountInFile === 1 && preg_match('/\(1\/1\)$/i', $subject)) {
-                 // Simplified exclusion: check if it's NOT likely another common file type based on extension pattern
-                 if (!preg_match('/\.(?:exe|com|bat|cmd|scr|dll|zip|rar|[rst]\d{2}|[a-z0-9]{3}|7z|ace|tar|gz|bz2|iso|bin|cue|img|mdf|nrg|dmg|vhd|mp3|flac|ogg|aac|wav|wma|avi|mkv|mp4|mov|wmv|mpg|mpeg|ts|vob|jpg|jpeg|png|gif|bmp|tif|tiff|psd|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|log|xml|html|css|js|php|py|java|c|cpp|h|cs|sql|db|dbf|mdb|accdb|par2?|sfv|md5|sha1|sha256|url|lnk|cfg|ini|inf|sys|tmp|bak|msi|pkg|deb|rpm|apk|ipa)\b/i', $subject)) {
-                     $nfoMessageId = ['hidden' => true, 'id' => $firstSegmentId];
-                     $hiddenNFO = true; // Found a potential hidden NFO
-                 }
+            elseif ($nfoCheck && ! $foundNFO && ! $hiddenNFO && isset($firstSegmentId) && $segmentCountInFile === 1 && preg_match('/\(1\/1\)$/i', $subject)) {
+                // Simplified exclusion: check if it's NOT likely another common file type based on extension pattern
+                if (! preg_match('/\.(?:exe|com|bat|cmd|scr|dll|zip|rar|[rst]\d{2}|[a-z0-9]{3}|7z|ace|tar|gz|bz2|iso|bin|cue|img|mdf|nrg|dmg|vhd|mp3|flac|ogg|aac|wav|wma|avi|mkv|mp4|mov|wmv|mpg|mpeg|ts|vob|jpg|jpeg|png|gif|bmp|tif|tiff|psd|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|log|xml|html|css|js|php|py|java|c|cpp|h|cs|sql|db|dbf|mdb|accdb|par2?|sfv|md5|sha1|sha256|url|lnk|cfg|ini|inf|sys|tmp|bak|msi|pkg|deb|rpm|apk|ipa)\b/i', $subject)) {
+                    $nfoMessageId = ['hidden' => true, 'id' => $firstSegmentId];
+                    $hiddenNFO = true; // Found a potential hidden NFO
+                }
             }
 
             // --- PAR2 Detection ---
             // Look specifically for the .par2 index file (often small, but not always 1/1)
-            if ($this->lookuppar2 && !$foundPAR2 && isset($firstSegmentId) && preg_match('/\.par2$/i', $subject)) {
+            if ($this->lookuppar2 && ! $foundPAR2 && isset($firstSegmentId) && preg_match('/\.par2$/i', $subject)) {
                 // Attempt to parse the PAR2 file using its first segment ID
                 // Ensure $this->pp is initialized and parsePAR2 exists and accepts these parameters
                 if (method_exists($this->pp, 'parsePAR2') && $this->pp->parsePAR2($firstSegmentId, $relID, $groupID, $this->nntp, 1) === true) {
@@ -188,15 +189,14 @@ class NZBContents
         // Avoid division by zero and handle cases where parts info might be missing/incorrect
         if ($artificialParts > 0) {
             $completion = min(100, ($actualParts / $artificialParts) * 100);
-        } else if ($actualParts > 0) {
+        } elseif ($actualParts > 0) {
             // If artificial parts couldn't be determined, but we have actual parts,
             // we can't calculate completion accurately based on subject.
             // Consider if $actualParts alone means 100% or if it's unknown.
             // Setting to 100 if actual parts > 0 and artificial is 0 might be misleading.
             // Let's default to 0 or another state indicating unknown completion from subject.
             $completion = 0; // Or potentially set a specific status?
-        }
-         else {
+        } else {
             // If both are zero (e.g., empty NZB or parsing issue), completion is 0.
             $completion = 0;
         }
@@ -210,9 +210,10 @@ class NZBContents
 
         // If NFO check was requested but nothing suitable was found
         if ($nfoCheck && $nfoMessageId === null) {
-             // Update status to indicate no NFO was found in the NZB structure
-             Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
-             return false;
+            // Update status to indicate no NFO was found in the NZB structure
+            Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
+
+            return false;
         }
 
         // If NFO check was not requested, the function's primary goal might be just completion/PAR2 update.
@@ -224,8 +225,7 @@ class NZBContents
     /**
      * Loads and parses an NZB file based on a GUID.
      *
-     * @param string $guid The release GUID to locate the NZB file
-     *
+     * @param  string  $guid  The release GUID to locate the NZB file
      * @return \SimpleXMLElement|bool The parsed NZB file as SimpleXMLElement or false on failure
      */
     public function loadNzb(string $guid): \SimpleXMLElement|bool
@@ -242,8 +242,9 @@ class NZBContents
             if ($this->echooutput) {
                 $perms = fileperms($nzbPath);
                 $formattedPerms = $perms !== false ? decoct($perms & 0777) : 'unknown';
-                echo PHP_EOL . "Unable to decompress: {$nzbPath} - {$formattedPerms} - may have bad file permissions, skipping." . PHP_EOL;
+                echo PHP_EOL."Unable to decompress: {$nzbPath} - {$formattedPerms} - may have bad file permissions, skipping.".PHP_EOL;
             }
+
             return false;
         }
 
@@ -254,10 +255,11 @@ class NZBContents
         if ($nzbFile === false) {
             if ($this->echooutput) {
                 $errors = libxml_get_errors();
-                $errorMsg = !empty($errors) ? " - XML error: " . $errors[0]->message : "";
-                echo PHP_EOL . "Unable to load NZB: {$guid} appears to be an invalid NZB{$errorMsg}, skipping." . PHP_EOL;
+                $errorMsg = ! empty($errors) ? ' - XML error: '.$errors[0]->message : '';
+                echo PHP_EOL."Unable to load NZB: {$guid} appears to be an invalid NZB{$errorMsg}, skipping.".PHP_EOL;
                 libxml_clear_errors();
             }
+
             return false;
         }
 

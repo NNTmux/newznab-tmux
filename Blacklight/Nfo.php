@@ -21,29 +21,25 @@ use Throwable;
  */
 class Nfo
 {
-        /**
-         * Regex to detect common non-NFO file headers/signatures.
-         * @var string
-         */
-        protected string $_nonNfoHeaderRegex = '/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i';
+    /**
+     * Regex to detect common non-NFO file headers/signatures.
+     */
+    protected string $_nonNfoHeaderRegex = '/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i';
 
-        /**
-         * Regex to identify text encoding from the 'file' command output.
-         * @var string
-         */
-        protected string $_textFileRegex = '/(ASCII|ISO-8859|UTF-(8|16|32).*?)\s*text/';
+    /**
+     * Regex to identify text encoding from the 'file' command output.
+     */
+    protected string $_textFileRegex = '/(ASCII|ISO-8859|UTF-(8|16|32).*?)\s*text/';
 
-        /**
-         * Regex to identify common binary file types from the 'file' command output.
-         * @var string
-         */
-        protected string $_binaryFileRegex = '/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/';
+    /**
+     * Regex to identify common binary file types from the 'file' command output.
+     */
+    protected string $_binaryFileRegex = '/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/';
 
-        /**
-         * Regex to detect binary characters within the content.
-         * @var string
-         */
-        protected string $_binaryCharsRegex = '/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/';
+    /**
+     * Regex to detect binary characters within the content.
+     */
+    protected string $_binaryCharsRegex = '/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/';
 
     /**
      * @var int
@@ -146,7 +142,7 @@ class Nfo
     /**
      * Confirm this is an NFO file.
      *
-     * @param bool|string $possibleNFO  The nfo content.
+     * @param  bool|string  $possibleNFO  The nfo content.
      * @param  string  $guid  The guid of the release.
      * @return bool True if it's likely an NFO, False otherwise.
      */
@@ -163,7 +159,7 @@ class Nfo
             return false;
         }
 
-        $tmpPath = $this->tmpPath . $guid . '.nfo';
+        $tmpPath = $this->tmpPath.$guid.'.nfo';
         $isNfo = false; // Default assumption
 
         try {
@@ -172,29 +168,30 @@ class Nfo
 
             // Use 'file' command via Utility::fileInfo if available
             $result = Utility::fileInfo($tmpPath);
-            if (!empty($result)) {
+            if (! empty($result)) {
                 if (preg_match($this->_textFileRegex, $result)) {
                     $isNfo = true; // It's text, likely NFO
                 } elseif (preg_match($this->_binaryFileRegex, $result) || preg_match($this->_binaryCharsRegex, $possibleNFO)) {
                     $isNfo = false; // Detected binary format or characters
                 }
+
                 // If fileInfo gave a result, trust it and return
                 return $isNfo;
             }
 
             // Fallback checks if 'file' command is unavailable or inconclusive
             // Check if it's a par2.
-            $par2info = new Par2Info();
+            $par2info = new Par2Info;
             $par2info->setData($possibleNFO);
-            if (!$par2info->error) {
-                 // It's a PAR2 file
-                 return false;
+            if (! $par2info->error) {
+                // It's a PAR2 file
+                return false;
             }
 
             // Check if it's an SFV.
-            $sfv = new SfvInfo();
+            $sfv = new SfvInfo;
             $sfv->setData($possibleNFO);
-            if (!$sfv->error) {
+            if (! $sfv->error) {
                 // It's an SFV file
                 return false;
             }
@@ -202,11 +199,11 @@ class Nfo
             // If it wasn't identified as a known non-NFO binary type by fileInfo,
             // and isn't PAR2 or SFV, assume it might be NFO (especially if fileInfo failed).
             // Further checks (like binary char check) could be added here if needed.
-            $isNfo = !preg_match($this->_binaryCharsRegex, $possibleNFO);
+            $isNfo = ! preg_match($this->_binaryCharsRegex, $possibleNFO);
 
         } catch (Throwable $e) {
             // Log errors during file operations
-            Log::error("Error processing potential NFO for GUID {$guid}: " . $e->getMessage());
+            Log::error("Error processing potential NFO for GUID {$guid}: ".$e->getMessage());
             $isNfo = false; // Treat errors as non-NFO
         } finally {
             // Ensure temporary file is always deleted
@@ -214,7 +211,7 @@ class Nfo
                 try {
                     File::delete($tmpPath);
                 } catch (Throwable $e) {
-                    Log::error("Error deleting temporary NFO file {$tmpPath}: " . $e->getMessage());
+                    Log::error("Error deleting temporary NFO file {$tmpPath}: ".$e->getMessage());
                 }
             }
         }
@@ -265,15 +262,14 @@ class Nfo
         return false;
     }
 
-   /**
+    /**
      * Attempt to find NFO files inside the NZB's of releases.
      *
-     * @param NNTP $nntp The NNTP connection object
-     * @param string $groupID (optional) Group ID to filter releases by
-     * @param string $guidChar (optional) First character of the GUID for parallel processing
-     * @param bool $processImdb (optional) Process IMDB IDs (currently unused)
-     * @param bool $processTv (optional) Process TV IDs (currently unused)
-     *
+     * @param  NNTP  $nntp  The NNTP connection object
+     * @param  string  $groupID  (optional) Group ID to filter releases by
+     * @param  string  $guidChar  (optional) First character of the GUID for parallel processing
+     * @param  bool  $processImdb  (optional) Process IMDB IDs (currently unused)
+     * @param  bool  $processTv  (optional) Process TV IDs (currently unused)
      * @return int Count of successfully processed NFO files
      *
      * @throws \Exception If NNTP operations fail
@@ -316,10 +312,10 @@ class Nfo
                         try {
                             // Only insert if not already present
                             $exists = ReleaseNfo::whereReleasesId($release['id'])->exists();
-                            if (!$exists) {
+                            if (! $exists) {
                                 ReleaseNfo::query()->insert([
                                     'releases_id' => $release['id'],
-                                    'nfo' => "\x1f\x8b\x08\x00".gzcompress($fetchedBinary)
+                                    'nfo' => "\x1f\x8b\x08\x00".gzcompress($fetchedBinary),
                                 ]);
                             }
 
