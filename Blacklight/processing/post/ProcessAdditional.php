@@ -1949,13 +1949,18 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws \Exception Potentially thrown by addAlternateNfo
      */
-    protected function _processNfoFile($fileLocation): void
+    protected function _processNfoFile(string $fileLocation): void
     {
-        $data = @File::get($fileLocation);
-        if ($data != false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, $this->_release, $this->_nntp)) {
-            $this->_releaseHasNoNFO = false;
+        try {
+            $data = File::get($fileLocation);
+            if ($this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, $this->_release, $this->_nntp)) {
+                $this->_releaseHasNoNFO = false;
+            }
+        } catch (FileNotFoundException $e) {
+            // Log or handle the case where the file doesn't exist or isn't readable
+            Log::warning("Could not read potential NFO file: {$fileLocation} - {$e->getMessage()}");
         }
     }
 
