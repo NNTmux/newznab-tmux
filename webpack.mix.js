@@ -33,7 +33,7 @@ mix
             'node_modules/pnotify/dist/PNotifyBrightTheme.css',
             'node_modules/flexboxgrid2/flexboxgrid2.min.css',
             'resources/assets/css/custom.css'
-    ], 'public/assets/css/all-css.css')
+        ], 'public/assets/css/all-css.css')
     .scripts(
         [
             'node_modules/jquery/dist/jquery.min.js',
@@ -63,8 +63,6 @@ mix
             'node_modules/icheck/icheck.min.js',
             'resources/assets/js/utils-admin.js',
             'resources/assets/js/custom.js',
-            'resources/assets/js/functions.js',
-            'resources/assets/js/themes/Gentele/search.js',
-            'resources/assets/js/themes/Gentele/browse.js',
+            'resources/assets/js/functions.js'
         ]
-    , 'public/assets/js/all-js.js');
+        , 'public/assets/js/all-js.js');
