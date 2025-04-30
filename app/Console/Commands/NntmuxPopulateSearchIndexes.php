@@ -58,11 +58,10 @@ class NntmuxPopulateSearchIndexes extends Command
     /**
      * Run releases.
      */
-    private function manticoreReleases(): void
+   private function manticoreReleases(): void
     {
         $manticore = new ManticoreSearch;
         $manticore->truncateRTIndex(Arr::wrap('releases_rt'));
-        $data = [];
         $total = Release::count();
         if (! $total) {
             $this->warn('Releases table is empty. Nothing to do.');
@@ -84,19 +83,23 @@ class NntmuxPopulateSearchIndexes extends Command
             ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id'])
             ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
             ->groupBy('id')
-            ->chunk($max, function ($releases) use ($manticore, $bar, $data) {
+            ->chunk($max, function ($releases) use ($manticore, $bar) {
+                $data = [];
                 foreach ($releases as $r) {
                     $data[] = [
                         'id' => $r->id,
-                        'name' => $r->name,
-                        'searchname' => $r->searchname,
-                        'fromname' => $r->fromname,
-                        'categories_id' => (string) $r->categories_id,
-                        'filename' => $r->filename,
+                        'name' => (string) ($r->name ?? ''),
+                        'searchname' => (string) ($r->searchname ?? ''),
+                        'fromname' => (string) ($r->fromname ?? ''),
+                        'categories_id' => (string) ($r->categories_id ?? '0'),
+                        'filename' => (string) ($r->filename ?? ''),
+                        'dummy' => 1, // Adding dummy integer field as required by schema
                     ];
                     $bar->advance();
                 }
-                $manticore->manticoreSearch->table('releases_rt')->replaceDocuments($data);
+                if (!empty($data)) {
+                    $manticore->manticoreSearch->table('releases_rt')->replaceDocuments($data);
+                }
             });
         $bar->finish();
         $this->newLine();
@@ -109,7 +112,6 @@ class NntmuxPopulateSearchIndexes extends Command
     {
         $manticore = new ManticoreSearch;
         $manticore->truncateRTIndex(['predb_rt']);
-        $data = [];
 
         $total = Predb::count();
         if (! $total) {
@@ -129,17 +131,21 @@ class NntmuxPopulateSearchIndexes extends Command
             ->select(['id', 'title', 'filename', 'source'])
             ->groupBy('id')
             ->orderBy('id')
-            ->chunk($max, function ($pre) use ($manticore, $bar, $data) {
+            ->chunk($max, function ($pre) use ($manticore, $bar) {
+                $data = [];
                 foreach ($pre as $p) {
                     $data[] = [
                         'id' => $p->id,
-                        'title' => $p->title,
-                        'filename' => $p->filename,
-                        'source' => $p->source,
+                        'title' => (string) ($p->title ?? ''),
+                        'filename' => (string) ($p->filename ?? ''),
+                        'source' => (string) ($p->source ?? ''),
+                        'dummy' => 1, // Adding dummy integer field as required by schema
                     ];
                     $bar->advance();
                 }
-                $manticore->manticoreSearch->table('predb_rt')->replaceDocuments($data);
+                if (!empty($data)) {
+                    $manticore->manticoreSearch->table('predb_rt')->replaceDocuments($data);
+                }
             });
 
         $bar->finish();
