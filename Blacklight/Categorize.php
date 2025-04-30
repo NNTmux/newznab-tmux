@@ -63,15 +63,14 @@ class Categorize
      *
      * @throws \Exception
      */
-   public function determineCategory(int|string $groupId, string $releaseName = '', ?string $poster = '', bool $debug = false): array
-        {
-            // Initialize properties
-            $this->releaseName = $releaseName;
-            $this->groupId = $groupId;
-            $this->poster = $poster ?? ''; // Use null coalescing operator to ensure a string is assigned
-            $this->groupName = UsenetGroup::whereId($this->groupId)->value('name') ?? '';
-            $this->tmpCat = Category::OTHER_MISC;
-
+    public function determineCategory(int|string $groupId, string $releaseName = '', ?string $poster = '', bool $debug = false): array
+    {
+        // Initialize properties
+        $this->releaseName = $releaseName;
+        $this->groupId = $groupId;
+        $this->poster = $poster ?? ''; // Use null coalescing operator to ensure a string is assigned
+        $this->groupName = UsenetGroup::whereId($this->groupId)->value('name') ?? '';
+        $this->tmpCat = Category::OTHER_MISC;
 
         // Store original category for debugging
         $originalCategory = $this->tmpCat;
