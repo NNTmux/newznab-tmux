@@ -57,20 +57,21 @@ class Categorize
      *
      * @param  int|string  $groupId  The usenet group ID
      * @param  string  $releaseName  The name of the release to categorize
-     * @param  string  $poster  The person/entity who posted the release
+     * @param  null|string  $poster  The person/entity who posted the release
      * @param  bool  $debug  Whether to include debug information in the return value
      * @return array The categorization result with category ID and optional debug info
      *
      * @throws \Exception
      */
-    public function determineCategory(int|string $groupId, string $releaseName = '', string $poster = '', bool $debug = false): array
-    {
-        // Initialize properties
-        $this->releaseName = $releaseName;
-        $this->groupId = $groupId;
-        $this->poster = $poster;
-        $this->groupName = UsenetGroup::whereId($this->groupId)->value('name') ?? '';
-        $this->tmpCat = Category::OTHER_MISC;
+   public function determineCategory(int|string $groupId, string $releaseName = '', ?string $poster = '', bool $debug = false): array
+        {
+            // Initialize properties
+            $this->releaseName = $releaseName;
+            $this->groupId = $groupId;
+            $this->poster = $poster ?? ''; // Use null coalescing operator to ensure a string is assigned
+            $this->groupName = UsenetGroup::whereId($this->groupId)->value('name') ?? '';
+            $this->tmpCat = Category::OTHER_MISC;
+
 
         // Store original category for debugging
         $originalCategory = $this->tmpCat;
