@@ -58,7 +58,7 @@ class NntmuxPopulateSearchIndexes extends Command
     /**
      * Run releases.
      */
-   private function manticoreReleases(): void
+    private function manticoreReleases(): void
     {
         $manticore = new ManticoreSearch;
         $manticore->truncateRTIndex(Arr::wrap('releases_rt'));
@@ -97,7 +97,7 @@ class NntmuxPopulateSearchIndexes extends Command
                     ];
                     $bar->advance();
                 }
-                if (!empty($data)) {
+                if (! empty($data)) {
                     $manticore->manticoreSearch->table('releases_rt')->replaceDocuments($data);
                 }
             });
@@ -143,7 +143,7 @@ class NntmuxPopulateSearchIndexes extends Command
                     ];
                     $bar->advance();
                 }
-                if (!empty($data)) {
+                if (! empty($data)) {
                     $manticore->manticoreSearch->table('predb_rt')->replaceDocuments($data);
                 }
             });
