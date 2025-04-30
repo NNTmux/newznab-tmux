@@ -11,7 +11,7 @@ class ADM extends AdultMovies
      * Define Adult DVD Marketplace url
      * Needed Search Queries Constant.
      */
-    private const ADMURL = 'http://www.adultdvdmarketplace.com';
+    private const ADMURL = 'https://www.adultdvdmarketplace.com';
 
     private const TRAILINGSEARCH = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
 

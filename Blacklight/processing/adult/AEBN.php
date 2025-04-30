@@ -14,7 +14,7 @@ class AEBN extends AdultMovies
     /**
      * Url Constants used within this class.
      */
-    private const AEBNSURL = 'http://straight.theater.aebn.net';
+    private const AEBNSURL = 'https://straight.theater.aebn.net';
 
     private const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
 

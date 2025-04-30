@@ -20,7 +20,7 @@ class ADE extends AdultMovies
     /**
      * Define ADE Url here.
      */
-    private const ADE = 'http://www.adultdvdempire.com';
+    private const ADE = 'https://www.adultdvdempire.com';
 
     /**
      * Direct Url returned in getAll method.

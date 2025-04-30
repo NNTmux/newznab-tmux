@@ -10,7 +10,7 @@ class Hotmovies extends AdultMovies
      */
     private const EXTRASEARCH = '&complete=on&search_in=video_title';
 
-    private const HMURL = 'http://www.hotmovies.com';
+    private const HMURL = 'https://www.hotmovies.com';
 
     private const TRAILINGSEARCH = '/search.php?words=';
 
