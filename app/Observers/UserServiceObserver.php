@@ -7,7 +7,6 @@ use App\Jobs\SendWelcomeEmail;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
