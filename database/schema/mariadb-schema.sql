@@ -1207,7 +1207,6 @@ CREATE TABLE `users` (
   `bookview` int(11) NOT NULL DEFAULT 1,
   `gameview` int(11) NOT NULL DEFAULT 1,
   `rate_limit` int(11) NOT NULL DEFAULT 60,
-  `userseed` varchar(50) NOT NULL,
   `notes` varchar(255) DEFAULT NULL,
   `style` varchar(255) DEFAULT NULL,
   `rolechangedate` datetime DEFAULT NULL COMMENT 'When does the role expire',

@@ -28,7 +28,6 @@ class UserServiceObserver
         $user->update(
             [
                 'api_token' => md5(Password::getRepository()->createNewToken()),
-                'userseed' => md5(Str::uuid()->toString()),
                 'rate_limit' => $rateLimit,
             ]
         );

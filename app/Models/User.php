@@ -65,7 +65,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $nzbgetpassword
  * @property string|null $nzbvortex_api_key
  * @property string|null $nzbvortex_server_url
- * @property string $userseed
  * @property string $notes
  * @property string|null $cp_url
  * @property string|null $cp_api
@@ -118,7 +117,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|\App\Models\User whereUpdatedAt($value)
  * @method static Builder|\App\Models\User whereUserRolesId($value)
  * @method static Builder|\App\Models\User whereUsername($value)
- * @method static Builder|\App\Models\User whereUserseed($value)
  * @method static Builder|\App\Models\User whereXxxview($value)
  * @method static Builder|\App\Models\User whereVerified($value)
  * @method static Builder|\App\Models\User whereApiToken($value)
@@ -484,7 +482,7 @@ class User extends Authenticatable
 
     public static function updatePassword(int $id, string $password): int
     {
-        self::find($id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Str::uuid()->toString())]);
+        self::find($id)->update(['password' => self::hashPassword($password)]);
 
         return self::SUCCESS;
     }

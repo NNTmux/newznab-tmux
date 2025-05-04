@@ -65,7 +65,6 @@ class RegisterController extends Controller
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
             'api_token' => md5(PasswordFacade::getRepository()->createNewToken()),
-            'userseed' => md5(Str::uuid()->toString()),
         ]);
 
         $role = Role::query()->where('id', '=', $data['roles_id'])->first();
