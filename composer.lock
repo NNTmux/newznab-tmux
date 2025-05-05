@@ -6670,16 +6670,16 @@
         },
         {
             "name": "pear/net_nntp",
-            "version": "2.0.1",
+            "version": "2.0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/Net_NNTP.git",
-                "reference": "d977a1967f9e065fe02268290816504e2b364990"
+                "reference": "b61cb07a29557bea679daa8620e714c1cc21f19e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/d977a1967f9e065fe02268290816504e2b364990",
-                "reference": "d977a1967f9e065fe02268290816504e2b364990",
+                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/b61cb07a29557bea679daa8620e714c1cc21f19e",
+                "reference": "b61cb07a29557bea679daa8620e714c1cc21f19e",
                 "shasum": ""
             },
             "require": {
@@ -6714,7 +6714,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Net_NNTP",
                 "source": "https://github.com/pear/Net_NNTP"
             },
-            "time": "2024-11-03T11:06:55+00:00"
+            "time": "2025-05-05T11:41:46+00:00"
         },
         {
             "name": "pear/pear",
@@ -17495,21 +17495,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.0.14",
+            "version": "2.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "63923bc9383c1212476c41d8cebf58a425e6f98d"
+                "reference": "abbbf32474a67e242d26bffc098a712a05b3d32a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/63923bc9383c1212476c41d8cebf58a425e6f98d",
-                "reference": "63923bc9383c1212476c41d8cebf58a425e6f98d",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/abbbf32474a67e242d26bffc098a712a05b3d32a",
+                "reference": "abbbf32474a67e242d26bffc098a712a05b3d32a",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.4|^8.0",
-                "phpstan/phpstan": "^2.1.12"
+                "phpstan/phpstan": "^2.1.14"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -17542,7 +17542,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.0.14"
+                "source": "https://github.com/rectorphp/rector/tree/2.0.15"
             },
             "funding": [
                 {
@@ -17550,7 +17550,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-28T00:03:14+00:00"
+            "time": "2025-05-05T10:00:41+00:00"
         },
         {
             "name": "sebastian/cli-parser",
