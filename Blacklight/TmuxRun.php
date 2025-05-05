@@ -43,9 +43,6 @@ class TmuxRun extends Tmux
                     case 'amazon':
                         $this->_runAmazon($runVar);
                         break;
-                    case 'dehash':
-                        $this->_runDehash($runVar);
-                        break;
                     case 'fixnames':
                         $this->_runFixReleaseNames($runVar);
                         break;
@@ -74,9 +71,6 @@ class TmuxRun extends Tmux
                     case 'amazon':
                         $this->_runAmazon($runVar);
                         break;
-                    case 'dehash':
-                        $this->_runDehash($runVar);
-                        break;
                     case 'fixnames':
                         $this->_runFixReleaseNames($runVar);
                         break;
@@ -100,44 +94,6 @@ class TmuxRun extends Tmux
                         break;
                 }
                 break;
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function _runDehash(&$runVar): void
-    {
-        switch ($runVar['settings']['dehash']) {
-            case 1:
-                $log = $this->writelog($runVar['panes']['one'][3]);
-                shell_exec(
-                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					php artisan match:prefiles 3000 --show $log; \
-					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
-                );
-                break;
-            case 2:
-                $log = $this->writelog($runVar['panes']['one'][3]);
-                shell_exec(
-                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					php artisan predb:check {$runVar['constants']['pre_lim']} $log; \
-					php artisan match:prefiles 3000 --show $log; \
-					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
-                );
-                break;
-            case 3:
-                $log = $this->writelog($runVar['panes']['one'][3]);
-                shell_exec(
-                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					php artisan predb:check {$runVar['constants']['pre_lim']} $log; \
-					php artisan match:prefiles 3000 --show $log; \
-					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
-                );
-                break;
-            default:
-                $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-                shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.1 'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][1]} has been disabled/terminated by Decrypt Hashes\"'");
         }
     }
 
