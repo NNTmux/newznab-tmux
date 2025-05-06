@@ -27,7 +27,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // Add the column back if it doesn't exist
-            if (!Schema::hasColumn('users', 'userseed')) {
+            if (! Schema::hasColumn('users', 'userseed')) {
                 $table->string('userseed')->nullable();
             }
         });
