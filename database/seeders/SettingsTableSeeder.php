@@ -476,14 +476,6 @@ class SettingsTableSeeder extends Seeder
                 'name' => 'crap_timer',
                 'value' => '30',
             ],
-            176 => [
-                'name' => 'dehash',
-                'value' => '0',
-            ],
-            177 => [
-                'name' => 'dehash_timer',
-                'value' => '30',
-            ],
             178 => [
                 'name' => 'fix_crap',
                 'value' => '0',
