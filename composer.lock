@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fae75295bd741b70156f58387d9dc368",
+    "content-hash": "03f39cab20bcd22f2daaa24ab30d2b51",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -7941,26 +7941,27 @@
         },
         {
             "name": "predis/predis",
-            "version": "v2.4.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/predis/predis.git",
-                "reference": "f49e13ee3a2a825631562aa0223ac922ec5d058b"
+                "reference": "7d86f7afb37940bfc7aaa2909147616881377667"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/predis/predis/zipball/f49e13ee3a2a825631562aa0223ac922ec5d058b",
-                "reference": "f49e13ee3a2a825631562aa0223ac922ec5d058b",
+                "url": "https://api.github.com/repos/predis/predis/zipball/7d86f7afb37940bfc7aaa2909147616881377667",
+                "reference": "7d86f7afb37940bfc7aaa2909147616881377667",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2 || ^8.0"
+                "php": "^7.2 || ^8.0",
+                "psr/http-message": "^1.0|^2.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.3",
                 "phpstan/phpstan": "^1.9",
                 "phpunit/phpcov": "^6.0 || ^8.0",
-                "phpunit/phpunit": "^8.0 || ^9.4"
+                "phpunit/phpunit": "^8.0 || ~9.4.4"
             },
             "suggest": {
                 "ext-relay": "Faster connection with in-memory caching (>=0.6.2)"
@@ -7991,7 +7992,7 @@
             ],
             "support": {
                 "issues": "https://github.com/predis/predis/issues",
-                "source": "https://github.com/predis/predis/tree/v2.4.0"
+                "source": "https://github.com/predis/predis/tree/v3.0.0"
             },
             "funding": [
                 {
@@ -7999,7 +8000,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-30T15:16:02+00:00"
+            "time": "2025-05-02T23:18:59+00:00"
         },
         {
             "name": "propaganistas/laravel-disposable-email",
@@ -9407,16 +9408,16 @@
         },
         {
             "name": "spatie/backtrace",
-            "version": "1.7.3",
+            "version": "1.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/backtrace.git",
-                "reference": "80ae5fabe2a1e3bc7df5c7ca5d91b094dc314b20"
+                "reference": "cd37a49fce7137359ac30ecc44ef3e16404cccbe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/backtrace/zipball/80ae5fabe2a1e3bc7df5c7ca5d91b094dc314b20",
-                "reference": "80ae5fabe2a1e3bc7df5c7ca5d91b094dc314b20",
+                "url": "https://api.github.com/repos/spatie/backtrace/zipball/cd37a49fce7137359ac30ecc44ef3e16404cccbe",
+                "reference": "cd37a49fce7137359ac30ecc44ef3e16404cccbe",
                 "shasum": ""
             },
             "require": {
@@ -9454,7 +9455,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/backtrace/tree/1.7.3"
+                "source": "https://github.com/spatie/backtrace/tree/1.7.4"
             },
             "funding": [
                 {
@@ -9466,7 +9467,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2025-05-07T07:20:00+00:00"
+            "time": "2025-05-08T15:41:09+00:00"
         },
         {
             "name": "spatie/error-solutions",

@@ -91,7 +91,7 @@
         "php-http/guzzle7-adapter": "^1.1",
         "php-http/message": "^1.16",
         "pragmarx/google2fa-laravel": "^2.3",
-        "predis/predis": "^v2.4.0",
+        "predis/predis": "^v3.0.0",
         "propaganistas/laravel-disposable-email": "^2.4",
         "riari/laravel-forum": "^7.0",
         "sentry/sentry-laravel": "^4.13",
