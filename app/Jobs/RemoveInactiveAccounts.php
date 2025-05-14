@@ -32,11 +32,11 @@ class RemoveInactiveAccounts implements ShouldQueue
         User::query()->where('roles_id', '=', 1)
             ->where(function ($query) use ($purgeDays) {
                 $query->where('lastlogin', '<', now()->subDays($purgeDays))
-                      ->orWhereNull('lastlogin');
+                    ->orWhereNull('lastlogin');
             })
             ->where(function ($query) use ($purgeDays) {
                 $query->where('apiaccess', '<', now()->subDays($purgeDays))
-                      ->orWhereNull('apiaccess');
+                    ->orWhereNull('apiaccess');
             })
             ->delete();
     }
