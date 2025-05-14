@@ -22,6 +22,7 @@ use Blacklight\Releases;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
+use Exception;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -29,6 +30,7 @@ use FFMpeg\FFProbe;
 use FFMpeg\Filters\Video\ResizeFilter;
 use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Format\Video\Ogg;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +46,7 @@ class ProcessAdditional
      *
      * @var int
      */
-    public const maxCompressedFilesToCheck = 10;
+    public const int maxCompressedFilesToCheck = 10;
 
     protected $_releases;
 
@@ -253,7 +255,7 @@ class ProcessAdditional
      * ProcessAdditional constructor.
      *
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
@@ -361,7 +363,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function start(string $groupID = '', string $guidChar = ''): void
     {
@@ -391,7 +393,7 @@ class ProcessAdditional
 
     /**
      * @throws \RuntimeException
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _setMainTempPath(&$guidChar, string &$groupID = ''): void
     {
@@ -497,7 +499,7 @@ class ProcessAdditional
      * Loop through the releases, processing them 1 at a time.
      *
      * @throws \RuntimeException
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processReleases(): void
     {
@@ -585,7 +587,7 @@ class ProcessAdditional
      *
      *
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _createTempFolder(): bool
     {
@@ -606,10 +608,10 @@ class ProcessAdditional
     }
 
     /**
-     * Get list of contents inside a release's NZB file.
+     * Get a list of contents inside a release's NZB file.
      *
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _getNZBContents(): bool
     {
@@ -653,7 +655,7 @@ class ProcessAdditional
     }
 
     /**
-     * Current file we are working on inside a NZB.
+     * The current file we are working on inside a NZB.
      */
     protected array $_currentNZBFile;
 
@@ -746,7 +748,7 @@ class ProcessAdditional
     protected array $_triedCompressedMids = [];
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processNZBCompressedFiles(bool $reverse = false): void
     {
@@ -839,7 +841,7 @@ class ProcessAdditional
      * Check if the data is a ZIP / RAR file, extract files, get file info.
      *
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processCompressedData(string &$compressedData): bool
     {
@@ -865,7 +867,7 @@ class ProcessAdditional
         try {
             // Get a summary of the compressed file.
             $dataSummary = $this->_archiveInfo->getSummary(true);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             // Log the exception and continue to next item
             if (config('app.debug') === true) {
                 Log::warning($exception->getTraceAsString());
@@ -941,7 +943,7 @@ class ProcessAdditional
      * Get a list of all files in the compressed file, add the file info to the DB.
      *
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processCompressedFileList(): bool
     {
@@ -1012,7 +1014,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _addFileInfo(&$file): void
     {
@@ -1057,7 +1059,7 @@ class ProcessAdditional
     /**
      * Go through all the extracted files in the temp folder and process them.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processExtractedFiles(): void
     {
@@ -1177,7 +1179,7 @@ class ProcessAdditional
      *
      * @void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processMessageIDDownloads(): void
     {
@@ -1192,7 +1194,7 @@ class ProcessAdditional
      *
      * @void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processSampleMessageIDs(): void
     {
@@ -1238,7 +1240,7 @@ class ProcessAdditional
      *
      * @void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processMediaInfoMessageIDs(): void
     {
@@ -1290,11 +1292,11 @@ class ProcessAdditional
      *
      * @void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processAudioInfoMessageIDs(): void
     {
-        // Download audio file, use media info to try to get the artist / album.
+        // Download an audio file, use media info to try to get the artist / album.
         if (! $this->_foundAudioInfo || ! $this->_foundAudioSample) {
             if (! empty($this->_AudioInfoMessageIDs)) {
                 // Try to download it from usenet.
@@ -1326,7 +1328,7 @@ class ProcessAdditional
      *
      * @void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processJPGMessageIDs(): void
     {
@@ -1389,7 +1391,7 @@ class ProcessAdditional
             $updateRows += ['jpgstatus' => 1];
         }
 
-        // Get the amount of files we found inside the RAR/ZIP files.
+        // Get the number of files we found inside the RAR/ZIP files.
 
         $releaseFilesCount = ReleaseFile::whereReleasesId($this->_release->id)->count('releases_id');
 
@@ -1451,7 +1453,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _getAudioInfo($fileLocation, $fileExtension): bool
     {
@@ -1563,7 +1565,7 @@ class ProcessAdditional
 
             // Check if creating audio samples is enabled.
             if (! $audVal) {
-                // File name to store audio file.
+                // File name to store an audio file.
                 $audioFileName = ($this->_release->guid.'.ogg');
 
                 // Create an audio sample.
@@ -1618,7 +1620,7 @@ class ProcessAdditional
     }
 
     /**
-     * Try to get JPG picture, resize it and store it on disk.
+     * Try to get a JPG picture, resize it and store it on disk.
      */
     protected function _getJPGSample(string $fileLocation): void
     {
@@ -1650,7 +1652,7 @@ class ProcessAdditional
             return '';
         }
 
-        // Reduce the last number by 1, this is to make sure we don't ask avconv/ffmpeg for non existing data.
+        // Reduce the last number by 1; this is to make sure we don't ask avconv/ffmpeg for non-existing data.
         if ($numbers[3] > 0) {
             $numbers[3]--;
         } elseif ($numbers[1] > 0) {
@@ -1658,12 +1660,12 @@ class ProcessAdditional
             $numbers[3] = '99';
         }
 
-        // Manually pad the numbers in case they are 1 number. to get 02 for example instead of 2.
+        // Manually pad the numbers in case they are 1 number. to get 02, for example, instead of 2.
         return '00:00:'.str_pad($numbers[2], 2, '0', STR_PAD_LEFT).'.'.str_pad($numbers[3], 2, '0', STR_PAD_LEFT);
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _getSample(string $fileLocation): bool
     {
@@ -1672,7 +1674,7 @@ class ProcessAdditional
         }
 
         if (File::isFile($fileLocation)) {
-            // Create path to temp file.
+            // Create a path to a temp file.
             $fileName = ($this->tmpPath.'zzzz'.random_int(5, 12).random_int(5, 12).'.jpg');
 
             $time = $this->getVideoTime($fileLocation);
@@ -1728,7 +1730,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _getVideo(string $fileLocation): bool
     {
@@ -1742,7 +1744,7 @@ class ProcessAdditional
             $fileName = ($this->tmpPath.'zzzz'.$this->_release->guid.'.ogv');
 
             $newMethod = false;
-            // If wanted sample length is less than 60, try to get sample from the end of the video.
+            // If the wanted sample length is less than 60, try to get a sample from the end of the video.
             if ($this->_ffMPEGDuration < 60) {
                 // Get the real duration of the file.
                 $time = $this->getVideoTime($fileLocation);
@@ -1756,7 +1758,7 @@ class ProcessAdditional
                         $lowestLength = '00:00:00.00';
                     } else {
                         // If the clip is longer than the length we want.
-                        // The lowest we want is the the difference between the max video length and our wanted total time.
+                        // The lowest we want is the difference between the max video length and our wanted total time.
                         $lowestLength = ($numbers[1] - $this->_ffMPEGDuration);
                         // Form the time string.
                         $end = '.'.$numbers[2];
@@ -1799,7 +1801,7 @@ class ProcessAdditional
                     if (config('app.debug') === true) {
                         Log::error($e->getTraceAsString());
                     }
-                    // We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                    // We do nothing, just prevent displaying errors because the file cannot be open (a corrupted or incomplete file)
                 }
             }
 
@@ -1839,7 +1841,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _getMediaInfo($fileLocation): bool
     {
@@ -1880,7 +1882,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _siftPAR2Info($fileLocation): void
     {
@@ -1949,7 +1951,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception Potentially thrown by addAlternateNfo
+     * @throws Exception Potentially thrown by addAlternateNfo
      */
     protected function _processNfoFile(string $fileLocation): void
     {
@@ -1965,7 +1967,7 @@ class ProcessAdditional
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _processVideoFile($fileLocation): void
     {
@@ -2061,7 +2063,7 @@ class ProcessAdditional
         $this->_releaseGroupName = UsenetGroup::getNameByID($this->_release->groups_id);
 
         $this->_releaseHasNoNFO = false;
-        // Make sure we don't already have an nfo.
+        // Make sure we don't already have a nfo.
         if ((int) $this->_release->nfostatus !== 1) {
             $this->_releaseHasNoNFO = true;
         }
