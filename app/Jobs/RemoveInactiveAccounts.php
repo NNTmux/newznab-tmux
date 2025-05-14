@@ -28,7 +28,16 @@ class RemoveInactiveAccounts implements ShouldQueue
      */
     public function handle(): void
     {
-        User::query()->where('lastlogin', '<', now()->subMonths(6))->where('apiaccess', '<', now()->subMonths(6))->where('roles_id', '=', 1)->delete();
-        User::query()->where('lastlogin', '<', now()->subMonths(6))->whereNull('apiaccess')->where('roles_id', '=', 1)->delete();
+        $purgeDays = config('nntmux.purge_inactive_users_days');
+        User::query()->where('roles_id', '=', 1)
+            ->where(function ($query) use ($purgeDays) {
+                $query->where('lastlogin', '<', now()->subDays($purgeDays))
+                      ->orWhereNull('lastlogin');
+            })
+            ->where(function ($query) use ($purgeDays) {
+                $query->where('apiaccess', '<', now()->subDays($purgeDays))
+                      ->orWhereNull('apiaccess');
+            })
+            ->delete();
     }
 }

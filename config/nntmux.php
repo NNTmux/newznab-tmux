@@ -16,6 +16,7 @@ return [
     'admin_email' => env('ADMIN_EMAIL', 'admin@example.com'),
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
+    'purge_inactive_users_days' => env('PURGE_INACTIVE_USERS_DAYS', 180),
     'elasticsearch_enabled' => env('ELASTICSEARCH_ENABLED', false),
     'btcpay_webhook_secret' => env('BTCPAY_SECRET'),
     'tmp_unrar_path' => env('TEMP_UNRAR_PATH', storage_path('tmp/unrar/')),
