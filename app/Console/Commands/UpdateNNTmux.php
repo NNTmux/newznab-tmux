@@ -132,6 +132,7 @@ class UpdateNNTmux extends Command
 
             if (empty($missingKeys)) {
                 $this->info('No new keys found in .env.example to merge into .env');
+
                 return;
             }
 
@@ -148,7 +149,7 @@ class UpdateNNTmux extends Command
 
             // Write updated content back to .env
             if (file_put_contents(base_path('.env'), $newEnvContent)) {
-                $this->info('Successfully merged ' . count($missingKeys) . ' new keys from .env.example into .env');
+                $this->info('Successfully merged '.count($missingKeys).' new keys from .env.example into .env');
                 $this->line('The following keys were added:');
                 foreach ($missingKeys as $key => $value) {
                     $this->line("  $key=$value");
@@ -158,7 +159,7 @@ class UpdateNNTmux extends Command
             }
 
         } catch (\Exception $e) {
-            $this->error('Failed to merge changes: ' . $e->getMessage());
+            $this->error('Failed to merge changes: '.$e->getMessage());
             $this->info('There are changes in .env.example that need to be added manually to .env');
         }
 
