@@ -80,6 +80,10 @@ class ProcessAdditional
      */
     protected mixed $_unrarPath;
 
+    protected mixed $_unzipPath;
+
+    protected mixed $_7zipPath;
+
     protected string $_killString;
 
     protected string|bool $_showCLIReleaseID;
@@ -283,11 +287,12 @@ class ProcessAdditional
         $this->_maxNestedLevels = (int) Settings::settingValue('maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('maxnestedlevels');
         $this->_extractUsingRarInfo = (int) Settings::settingValue('extractusingrarinfo') !== 0;
         $this->_fetchLastFiles = (int) Settings::settingValue('archive.fetch.end') !== 0;
-        $this->_unrarPath = false;
+        $this->_unrarPath = config('nntmux_settings.unrar_path');
+        $this->_unzipPath = config('nntmux_settings.unzip_path');
+        $this->_7zipPath = config('nntmux_settings.7zip_path');
 
         // Pass the binary extractors to ArchiveInfo.
         $clients = [];
-        $this->_unrarPath = config('nntmux_settings.unrar_path');
         $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
 
         $this->_archiveInfo->setExternalClients($clients);
@@ -928,7 +933,7 @@ class ProcessAdditional
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
                     // Use the unzip command instead of 7zip
-                    runCmd('unzip -o "'.$fileName.'" -d "'.$this->tmpPath.'unzip/"');
+                    runCmd($this->_unzipPath.' -o "'.$fileName.'" -d "'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
                 break;
