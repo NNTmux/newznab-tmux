@@ -163,7 +163,20 @@ class RegisterController extends Controller
                     );
                     Invite::consume($inviteCode);
 
-                    return $this->registered($request, $user) ?: redirect()->to($this->redirectPath())->with('info', 'Your Account has been created. You will receive a separate verification email shortly.');
+                    // Create verification message that will be shown on login page
+                    $notificationMessage = 'Your Account has been created. A verification email has been sent to your email address. You will be able to log in after completing the verification process.';
+
+                    // Store notification in session so it's available after redirect
+                    // Use 'message' key to match the key expected by the login template
+                    $request->session()->flash('message', $notificationMessage);
+
+                    // Set the message type to info for proper styling
+                    $request->session()->flash('message_type', 'info');
+
+                    // First ensure the user is created and verification is sent, then redirect to login
+                    $this->registered($request, $user);
+
+                    return redirect('/login');
                 }
                 break;
             case 'view':
