@@ -100,7 +100,7 @@ class PasswordSecurityController extends Controller
         ]);
 
         // Get the user ID from session
-        if (!$request->session()->has('2fa:user:id')) {
+        if (! $request->session()->has('2fa:user:id')) {
             return redirect()->route('login')
                 ->with('message', 'The two-factor authentication session has expired. Please login again.')
                 ->with('message_type', 'danger');
@@ -109,8 +109,9 @@ class PasswordSecurityController extends Controller
         $userId = $request->session()->get('2fa:user:id');
         $user = \App\Models\User::find($userId);
 
-        if (!$user || !$user->passwordSecurity) {
+        if (! $user || ! $user->passwordSecurity) {
             $request->session()->forget('2fa:user:id');
+
             return redirect()->route('login')
                 ->with('message', 'User not found or 2FA not configured. Please login again.')
                 ->with('message_type', 'danger');
@@ -122,7 +123,7 @@ class PasswordSecurityController extends Controller
             $request->input('one_time_password')
         );
 
-        if (!$valid) {
+        if (! $valid) {
             return redirect()->route('2fa.verify')
                 ->with('message', 'Invalid authentication code. Please try again.')
                 ->with('message_type', 'danger');
@@ -155,7 +156,7 @@ class PasswordSecurityController extends Controller
     public function getVerify2fa(Request $request)
     {
         // Check if user ID is stored in the session
-        if (!$request->session()->has('2fa:user:id')) {
+        if (! $request->session()->has('2fa:user:id')) {
             return redirect()->route('login')
                 ->withErrors(['msg' => 'The two-factor authentication session has expired. Please login again.']);
         }
@@ -165,8 +166,9 @@ class PasswordSecurityController extends Controller
 
         // Get the user
         $user = \App\Models\User::find($userId);
-        if (!$user) {
+        if (! $user) {
             $request->session()->forget('2fa:user:id');
+
             return redirect()->route('login')
                 ->withErrors(['msg' => 'User not found. Please login again.']);
         }
