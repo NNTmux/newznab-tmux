@@ -83,6 +83,9 @@ Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login.post');
 Route::match(['GET', 'POST'], 'logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::get('2fa/verify', [PasswordSecurityController::class, 'getVerify2fa'])->name('2fa.verify');
+Route::post('2faVerify', [PasswordSecurityController::class, 'verify2fa'])->name('2faVerify');
+
 Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
@@ -208,9 +211,5 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
 Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'release-edit', [AdminReleasesController::class, 'edit'])->name('admin.release-edit');
 });
-
-Route::post('2faVerify', function () {
-    return redirect()->to(URL()->previous());
-})->name('2faVerify')->middleware('2fa');
 
 Route::post('btcpay/webhook', [BtcPaymentController::class, 'btcPayCallback'])->name('btcpay.webhook');

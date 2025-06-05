@@ -83,6 +83,18 @@ class LoginController extends Controller
                     $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
                     event(new UserLoggedIn($user, $userIp));
 
+                    // Check if the user has 2FA enabled
+                    if ($user->passwordSecurity && $user->passwordSecurity->google2fa_enable) {
+                        // Store intended URL for redirecting after 2FA verification
+                        $request->session()->put('url.intended', $this->redirectPath());
+                        Auth::logout();
+
+                        // Store user ID in the session for 2FA verification
+                        $request->session()->put('2fa:user:id', $user->id);
+
+                        return redirect()->route('2fa.verify');
+                    }
+
                     Auth::logoutOtherDevices($request->input('password'));
                     $this->clearLoginAttempts($request);
 

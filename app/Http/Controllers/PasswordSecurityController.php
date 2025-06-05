@@ -9,6 +9,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class PasswordSecurityController extends Controller
@@ -87,5 +88,96 @@ class PasswordSecurityController extends Controller
         $user->passwordSecurity->save();
 
         return redirect()->to('2fa')->with('success', '2FA is now Disabled.');
+    }
+
+    /**
+     * Verify the 2FA code provided by the user.
+     */
+    public function verify2fa(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'one_time_password' => 'required|numeric',
+        ]);
+
+        // Get the user ID from session
+        if (!$request->session()->has('2fa:user:id')) {
+            return redirect()->route('login')
+                ->with('message', 'The two-factor authentication session has expired. Please login again.')
+                ->with('message_type', 'danger');
+        }
+
+        $userId = $request->session()->get('2fa:user:id');
+        $user = \App\Models\User::find($userId);
+
+        if (!$user || !$user->passwordSecurity) {
+            $request->session()->forget('2fa:user:id');
+            return redirect()->route('login')
+                ->with('message', 'User not found or 2FA not configured. Please login again.')
+                ->with('message_type', 'danger');
+        }
+
+        // Verify the OTP code
+        $valid = \Google2FA::verifyKey(
+            $user->passwordSecurity->google2fa_secret,
+            $request->input('one_time_password')
+        );
+
+        if (!$valid) {
+            return redirect()->route('2fa.verify')
+                ->with('message', 'Invalid authentication code. Please try again.')
+                ->with('message_type', 'danger');
+        }
+
+        // Log the user back in
+        Auth::login($user);
+
+        // Mark the user as having passed 2FA
+        session([config('google2fa.session_var') => true]);
+
+        // Store the timestamp for determining how long the 2FA session is valid
+        session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+
+        // Clean up the temporary session variable
+        $request->session()->forget('2fa:user:id');
+
+        // Determine where to redirect after successful verification
+        $redirectUrl = $request->session()->pull('url.intended', '/');
+
+        return redirect()->to($redirectUrl)
+            ->with('message', 'Two-factor authentication verified successfully.')
+            ->with('message_type', 'success');
+    }
+
+    /**
+     * Display the 2FA verification form for a user who has already authenticated with username/password
+     * but needs to enter their 2FA code.
+     */
+    public function getVerify2fa(Request $request)
+    {
+        // Check if user ID is stored in the session
+        if (!$request->session()->has('2fa:user:id')) {
+            return redirect()->route('login')
+                ->withErrors(['msg' => 'The two-factor authentication session has expired. Please login again.']);
+        }
+
+        // Get the user ID from session
+        $userId = $request->session()->get('2fa:user:id');
+
+        // Get the user
+        $user = \App\Models\User::find($userId);
+        if (!$user) {
+            $request->session()->forget('2fa:user:id');
+            return redirect()->route('login')
+                ->withErrors(['msg' => 'User not found. Please login again.']);
+        }
+
+        $theme = 'Gentele';
+        $meta_title = 'Two Factor Authentication';
+        $meta_keywords = 'Two Factor Authentication, 2FA';
+        $meta_description = 'Two Factor Authentication Verification';
+
+        app('smarty.view')->assign(compact('meta_title', 'meta_keywords', 'meta_description', 'user'));
+
+        return app('smarty.view')->display($theme.'/2fa_verify.tpl');
     }
 }
