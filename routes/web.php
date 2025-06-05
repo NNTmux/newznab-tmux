@@ -64,6 +64,7 @@ use App\Http\Controllers\MyShowsController;
 use App\Http\Controllers\NfoController;
 use App\Http\Controllers\PasswordSecurityController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileSecurityController;
 use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeriesController;
@@ -140,9 +141,16 @@ Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'series/{id?}', [SeriesController::class, 'index'])->name('series');
     Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
     Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
+    Route::get('2fa/enable', [PasswordSecurityController::class, 'showEnable2faForm'])->name('2fa.enable');
+    Route::get('2fa/disable', [PasswordSecurityController::class, 'showDisable2faForm'])->name('2fa.disable');
     Route::post('generate2faSecret', [PasswordSecurityController::class, 'generate2faSecret'])->name('generate2faSecret');
     Route::post('2fa', [PasswordSecurityController::class, 'enable2fa'])->name('enable2fa');
     Route::post('disable2fa', [PasswordSecurityController::class, 'disable2fa'])->name('disable2fa');
+    Route::post('profile-disable2fa', [PasswordSecurityController::class, 'profileDisable2fa'])->name('profile-disable2fa');
+    // Custom 2FA routes that redirect to profile page
+    Route::post('profileedit/enable2fa', [PasswordSecurityController::class, 'enable2fa'])->name('profileedit.enable2fa');
+    Route::post('profileedit/disable2fa', [PasswordSecurityController::class, 'disable2fa'])->name('profileedit.disable2fa');
+    Route::post('profile-security/disable-2fa', [ProfileSecurityController::class, 'disable2fa'])->name('profile.security.disable2fa');
 });
 
 Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {

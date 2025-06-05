@@ -375,9 +375,19 @@
                                                     <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
                                                         <div class="card border mb-4">
                                                             <div class="card-header bg-light">
-                                                                <h6 class="mb-0"><i class="fa fa-shield me-2"></i>Security Settings</h6>
+                                                                <h6 class="mb-0"><i class="fa fa-shield me-2"></i>Two-Factor Authentication (2FA)</h6>
                                                             </div>
                                                             <div class="card-body">
+                                                                {if isset($error_2fa)}
+                                                                    <div class="alert alert-danger">
+                                                                        <i class="fa fa-exclamation-circle me-2"></i>{$error_2fa}
+                                                                    </div>
+                                                                {/if}
+                                                                {if isset($success_2fa)}
+                                                                    <div class="alert alert-success">
+                                                                        <i class="fa fa-check-circle me-2"></i>{$success_2fa}
+                                                                    </div>
+                                                                {/if}
                                                                 <div class="d-flex align-items-center mb-4">
                                                                     <div class="me-4">
                                                                         <i class="fa fa-lock fa-3x text-primary"></i>
@@ -386,11 +396,55 @@
                                                                         <h5 class="mb-1">Two-Factor Authentication</h5>
                                                                         <p class="mb-0 text-muted">Add an extra layer of security to your account</p>
                                                                     </div>
-                                                                    <div class="ms-auto">
-                                                                        <a href="{{url("{'2fa'}")}}" class="btn btn-primary">
-                                                                            <i class="fa fa-cog me-2"></i>Manage 2FA
-                                                                        </a>
+                                                                </div>
+
+                                                                <div class="card bg-light mb-4">
+                                                                    <div class="card-body">
+                                                                        <div class="d-flex align-items-center">
+                                                                            {if !isset($user->passwordSecurity) || !$user->passwordSecurity->google2fa_enable}
+                                                                                <div class="me-3">
+                                                                                    <span class="badge bg-warning rounded-pill">Not Enabled</span>
+                                                                                </div>
+                                                                                <div class="me-auto">
+                                                                                    <h6 class="mb-0">Two-factor authentication is currently disabled</h6>
+                                                                                    <p class="text-muted small mb-0">Enable 2FA to add an additional layer of security to your account</p>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <a href="{{url("2fa/enable")}}" class="btn btn-primary">
+                                                                                        <i class="fa fa-lock me-2"></i>Enable 2FA
+                                                                                    </a>
+                                                                                </div>
+                                                                            {else}
+                                                                                <div class="me-3">
+                                                                                    <span class="badge bg-success rounded-pill">Enabled</span>
+                                                                                </div>
+                                                                                <div class="me-auto">
+                                                                                    <h6 class="mb-0">Two-factor authentication is active</h6>
+                                                                                    <p class="text-muted small mb-0">Your account is protected with an additional layer of security</p>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <a href="{{url("2fa/disable")}}" class="btn btn-outline-danger">
+                                                                                        <i class="fa fa-lock-open me-2"></i>Disable 2FA
+                                                                                    </a>
+                                                                                </div>
+                                                                            {/if}
+                                                                        </div>
                                                                     </div>
+                                                                </div>
+
+                                                                <div class="alert alert-info mb-4">
+                                                                    <h6 class="mb-2"><i class="fa fa-info-circle me-2"></i>What is Two-Factor Authentication?</h6>
+                                                                    <p class="mb-0">Two-factor authentication adds a second layer of security to your account. In addition to your password, you'll need a code from your authenticator app to sign in. This helps protect your account even if your password is compromised.</p>
+                                                                </div>
+
+                                                                <div class="mt-4">
+                                                                    <h6>Security Best Practices:</h6>
+                                                                    <ul class="text-muted">
+                                                                        <li>Use a strong, unique password for your account</li>
+                                                                        <li>Store your 2FA backup codes in a secure location</li>
+                                                                        <li>Never share your authentication codes with others</li>
+                                                                        <li>Consider using a password manager for all your accounts</li>
+                                                                    </ul>
                                                                 </div>
                                                             </div>
                                                         </div>

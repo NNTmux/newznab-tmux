@@ -69,7 +69,17 @@ class PasswordSecurityController extends Controller
             $user->passwordSecurity->google2fa_enable = 1;
             $user->passwordSecurity->save();
 
+            // Check if we should redirect to profile page
+            if ($request->has('redirect_to_profile')) {
+                return redirect()->to('profileedit#security')->with('success_2fa', '2FA is Enabled Successfully.');
+            }
+
             return redirect()->to('2fa')->with('success', '2FA is Enabled Successfully.');
+        }
+
+        // Check if we should redirect to profile page on failure as well
+        if ($request->has('redirect_to_profile')) {
+            return redirect()->to('profileedit#security')->with('error_2fa', 'Invalid Verification Code, Please try again.');
         }
 
         return redirect()->to('2fa')->with('error', 'Invalid Verification Code, Please try again.');
@@ -78,7 +88,10 @@ class PasswordSecurityController extends Controller
     public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if (! (Hash::check($request->get('current-password'), $request->user()->password))) {
-            // The passwords matches
+            // Password doesn't match
+            if ($request->has('redirect_to_profile') || $request->has('from_profile')) {
+                return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
+            }
             return redirect()->back()->with('error', 'Your password does not match with your account password. Please try again.');
         }
 
@@ -86,6 +99,11 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
         $user->passwordSecurity->google2fa_enable = 0;
         $user->passwordSecurity->save();
+
+        // Check if this request is from the profile edit page
+        if ($request->has('redirect_to_profile') || $request->has('from_profile')) {
+            return redirect()->to('profileedit#security')->with('success_2fa', '2FA is now Disabled.');
+        }
 
         return redirect()->to('2fa')->with('success', '2FA is now Disabled.');
     }
@@ -181,5 +199,61 @@ class PasswordSecurityController extends Controller
         app('smarty.view')->assign(compact('meta_title', 'meta_keywords', 'meta_description', 'user'));
 
         return app('smarty.view')->display($theme.'/2fa_verify.tpl');
+    }
+
+    /**
+     * Handle disabling 2FA directly from profile page to avoid form conflicts.
+     * This route is specifically for the profile page 2FA section.
+     */
+    public function profileDisable2fa(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'current-password' => 'required',
+        ]);
+
+        if (! (Hash::check($request->get('current-password'), $request->user()->password))) {
+            return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
+        }
+
+        $user = $request->user();
+        if ($user->passwordSecurity) {
+            $user->passwordSecurity->google2fa_enable = 0;
+            $user->passwordSecurity->save();
+        }
+
+        return redirect()->to('profileedit#security')->with('success_2fa', '2FA is now Disabled.');
+    }
+
+    /**
+     * Show the 2FA enable form on a dedicated page
+     */
+    public function showEnable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
+    {
+        $user = $request->user();
+        $success = $request->session()->get('success');
+        $error = $request->session()->get('error');
+
+        $google2fa_url = '';
+        if ($user->passwordSecurity()->exists()) {
+            $google2fa_url = \Google2FA::getQRCodeInline(
+                config('app.name'),
+                $user->email,
+                $user->passwordSecurity->google2fa_secret
+            );
+        }
+
+        return view('themes.Gentele.2fa_enable', compact('user', 'google2fa_url', 'success', 'error'));
+    }
+
+    /**
+     * Show the 2FA disable form on a dedicated page
+     */
+    public function showDisable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
+    {
+        $user = $request->user();
+        $success = $request->session()->get('success');
+        $error = $request->session()->get('error');
+
+        return view('themes.Gentele.2fa_disable', compact('user', 'success', 'error'));
     }
 }

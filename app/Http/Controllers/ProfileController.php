@@ -117,6 +117,18 @@ class ProfileController extends BasePageController
         }
 
         $errorStr = '';
+        $success_2fa = $request->session()->get('success');
+        $error_2fa = $request->session()->get('error');
+
+        // Generate 2FA QR code URL if 2FA is set up but not enabled
+        $google2fa_url = '';
+        if ($this->userdata->passwordSecurity()->exists() && !$this->userdata->passwordSecurity->google2fa_enable) {
+            $google2fa_url = \Google2FA::getQRCodeInline(
+                config('app.name'),
+                $this->userdata->email,
+                $this->userdata->passwordSecurity->google2fa_secret
+            );
+        }
 
         switch ($action) {
             case 'newapikey':
@@ -247,6 +259,9 @@ class ProfileController extends BasePageController
         $this->smarty->assign('error', $errorStr);
         $this->smarty->assign('user', $this->userdata);
         $this->smarty->assign('userexccat', User::getCategoryExclusionById($userid));
+        $this->smarty->assign('success_2fa', $success_2fa);
+        $this->smarty->assign('error_2fa', $error_2fa);
+        $this->smarty->assign('google2fa_url', $google2fa_url);
 
         $meta_title = 'Edit User Profile';
         $meta_keywords = 'edit,profile,user,details';
