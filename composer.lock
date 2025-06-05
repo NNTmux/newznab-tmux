@@ -5522,16 +5522,16 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "5.3.0",
+            "version": "5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "88f3cbd0b68d7a3f0f0ac71b70a783655411de58"
+                "reference": "59632c0c76a20731dd40a4399c1ed0a8cea8aa0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/88f3cbd0b68d7a3f0f0ac71b70a783655411de58",
-                "reference": "88f3cbd0b68d7a3f0f0ac71b70a783655411de58",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/59632c0c76a20731dd40a4399c1ed0a8cea8aa0c",
+                "reference": "59632c0c76a20731dd40a4399c1ed0a8cea8aa0c",
                 "shasum": ""
             },
             "require": {
@@ -5585,9 +5585,9 @@
             ],
             "support": {
                 "issues": "https://github.com/marcreichel/igdb-laravel/issues",
-                "source": "https://github.com/marcreichel/igdb-laravel/tree/5.3.0"
+                "source": "https://github.com/marcreichel/igdb-laravel/tree/5.3.1"
             },
-            "time": "2025-03-30T11:34:14+00:00"
+            "time": "2025-06-03T05:44:58+00:00"
         },
         {
             "name": "maxmind-db/reader",
@@ -18488,16 +18488,16 @@
         },
         {
             "name": "sebastianfeldmann/git",
-            "version": "3.14.2",
+            "version": "3.14.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/git.git",
-                "reference": "bc13c3bab8f67dee26352c94e23a4ee775d9d05b"
+                "reference": "22584df8df01d95b0700000cfd855779fae7d8ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/bc13c3bab8f67dee26352c94e23a4ee775d9d05b",
-                "reference": "bc13c3bab8f67dee26352c94e23a4ee775d9d05b",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/22584df8df01d95b0700000cfd855779fae7d8ea",
+                "reference": "22584df8df01d95b0700000cfd855779fae7d8ea",
                 "shasum": ""
             },
             "require": {
@@ -18538,7 +18538,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianfeldmann/git/issues",
-                "source": "https://github.com/sebastianfeldmann/git/tree/3.14.2"
+                "source": "https://github.com/sebastianfeldmann/git/tree/3.14.3"
             },
             "funding": [
                 {
@@ -18546,7 +18546,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-03-28T19:09:31+00:00"
+            "time": "2025-06-05T16:05:10+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
