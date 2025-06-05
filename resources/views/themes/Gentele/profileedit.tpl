@@ -488,6 +488,57 @@
                                                 this.setAttribute('data-bs-original-title', 'Copy to clipboard');
                                             }, 2000);
                                         });
+
+                                        // Check if there's a hash in the URL to activate the appropriate tab
+                                        var hash = window.location.hash;
+                                        if (hash) {
+                                            var tabId = hash.substring(1);
+                                            var tabElement = document.getElementById(tabId + '-tab');
+                                            if (tabElement) {
+                                                var tab = new bootstrap.Tab(tabElement);
+                                                tab.show();
+
+                                                // If the security tab is opened and there are 2FA messages, animate them
+                                                if (tabId === 'security') {
+                                                    animateAlerts();
+                                                }
+                                            }
+                                        }
+
+                                        // Animate alerts when they become visible
+                                        function animateAlerts() {
+                                            var alerts = document.querySelectorAll('#security .alert');
+                                            alerts.forEach(function(alert) {
+                                                if (alert.style.opacity !== '1') {
+                                                    alert.style.opacity = '0';
+                                                    alert.style.transition = 'opacity 0.4s ease-in-out';
+                                                    setTimeout(function() {
+                                                        alert.style.opacity = '1';
+                                                    }, 100);
+
+                                                    // Add auto-dismiss after 10 seconds for success alerts
+                                                    if (alert.classList.contains('alert-success')) {
+                                                        setTimeout(function() {
+                                                            alert.style.opacity = '0';
+                                                            setTimeout(function() {
+                                                                alert.style.display = 'none';
+                                                            }, 400);
+                                                        }, 10000);
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                        // Add event listener for tab changes
+                                        var tabElements = document.querySelectorAll('a[data-bs-toggle="tab"]');
+                                        tabElements.forEach(function(tabElement) {
+                                            tabElement.addEventListener('shown.bs.tab', function(event) {
+                                                // When security tab is shown, animate alerts
+                                                if (event.target.getAttribute('href') === '#security') {
+                                                    animateAlerts();
+                                                }
+                                            });
+                                        });
                                     });
                                     {/literal}
                                     </script>
