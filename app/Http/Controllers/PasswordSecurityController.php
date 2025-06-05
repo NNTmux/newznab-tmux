@@ -92,6 +92,7 @@ class PasswordSecurityController extends Controller
             if ($request->has('redirect_to_profile') || $request->has('from_profile')) {
                 return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
             }
+
             return redirect()->back()->with('error', 'Your password does not match with your account password. Please try again.');
         }
 

@@ -122,7 +122,7 @@ class ProfileController extends BasePageController
 
         // Generate 2FA QR code URL if 2FA is set up but not enabled
         $google2fa_url = '';
-        if ($this->userdata->passwordSecurity()->exists() && !$this->userdata->passwordSecurity->google2fa_enable) {
+        if ($this->userdata->passwordSecurity()->exists() && ! $this->userdata->passwordSecurity->google2fa_enable) {
             $google2fa_url = \Google2FA::getQRCodeInline(
                 config('app.name'),
                 $this->userdata->email,

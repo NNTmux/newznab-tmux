@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -19,7 +19,6 @@ class ProfileSecurityController extends BasePageController
      * Disable 2FA for the authenticated user from the profile page
      * This is separate from the main profile edit functionality
      *
-     * @param Request $request
      * @return JsonResponse|RedirectResponse
      */
     public function disable2fa(Request $request)
@@ -30,11 +29,11 @@ class ProfileSecurityController extends BasePageController
         ]);
 
         // Check if password is correct
-        if (!Hash::check($validated['current_password'], Auth::user()->password)) {
+        if (! Hash::check($validated['current_password'], Auth::user()->password)) {
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Your password does not match. Please try again.'
+                    'message' => 'Your password does not match. Please try again.',
                 ]);
             }
 
@@ -52,7 +51,7 @@ class ProfileSecurityController extends BasePageController
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
-                    'message' => '2FA has been successfully disabled.'
+                    'message' => '2FA has been successfully disabled.',
                 ]);
             }
 
@@ -64,7 +63,7 @@ class ProfileSecurityController extends BasePageController
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No 2FA configuration found for this user.'
+                'message' => 'No 2FA configuration found for this user.',
             ]);
         }
 
