@@ -1141,19 +1141,6 @@
 
 <div class="row mb-4">
     <div class="col-lg-3 col-md-4">
-        <label for="nzbthreads" class="form-label fw-bold">Import-nzb Threads:</label>
-    </div>
-    <div class="col-lg-9 col-md-8">
-        <div class="input-group">
-            <span class="input-group-text"><i class="fa fa-tasks"></i></span>
-            <input id="nzbthreads" class="form-control" name="nzbthreads" type="text" value="{$site->nzbthreads}"/>
-        </div>
-        <small class="text-muted">The number of threads for import-nzb(bulk). This will thread each subfolder.</small>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-4">
         <label for="postthreads" class="form-label fw-bold">Postprocessing Additional Threads:</label>
     </div>
     <div class="col-lg-9 col-md-8">
