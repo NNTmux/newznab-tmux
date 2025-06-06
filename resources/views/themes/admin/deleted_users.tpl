@@ -8,10 +8,16 @@
     <div class="card-body">
 
 {if isset($smarty.session.success)}
-    <div class="alert alert-success">{$smarty.session.success}</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {$smarty.session.success}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 {/if}
 {if isset($smarty.session.error)}
-    <div class="alert alert-error">{$smarty.session.error}</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {$smarty.session.error}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 {/if}
 
 <form name="deletedusersearch" method="get" action="{{url("/admin/deleted-users")}}" id="deleted-user-search-form" class="mb-4">
@@ -91,9 +97,12 @@
                                             <a href="{$smarty.const.WWW_TOP}/admin/deleted-users/restore/{$user->id}" class="btn btn-success btn-sm me-2" title="Restore User">
                                                 <i class="fas fa-user-check"></i> Restore
                                             </a>
-                                            <a href="{$smarty.const.WWW_TOP}/admin/deleted-users/permanent-delete/{$user->id}" class="btn btn-danger btn-sm" title="Permanently Delete User" onclick="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');">
+                                            <button class="btn btn-danger btn-sm delete-permanently"
+                                                data-user-id="{$user->id}"
+                                                data-username="{$user->username}"
+                                                title="Permanently Delete User">
                                                 <i class="fas fa-trash-alt"></i> Delete Permanently
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                 {/foreach}
@@ -122,3 +131,49 @@
 
     </div> <!-- end of card-body -->
 </div> <!-- end of card -->
+
+<!-- Delete User Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteUserModalLabel">Confirm Permanent Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Warning: This action cannot be undone!
+                </div>
+                <p>You are about to permanently delete user <strong id="deleteUserName"></strong>.</p>
+                <p>All user data including history, comments, and settings will be permanently removed from the database.</p>
+                <p>Are you sure you want to continue?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Permanently Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up delete confirmation modal
+    const deleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+    const deleteButtons = document.querySelectorAll('.delete-permanently');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-user-id');
+            const username = this.getAttribute('data-username');
+
+            document.getElementById('deleteUserName').textContent = username;
+            document.getElementById('confirmDeleteBtn').href = '{$smarty.const.WWW_TOP}/admin/deleted-users/permanent-delete/' + userId;
+
+            deleteUserModal.show();
+        });
+    });
+});
+</script>
