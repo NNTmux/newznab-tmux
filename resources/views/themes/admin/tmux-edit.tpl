@@ -89,27 +89,6 @@
 
 		<div class="row mb-4">
 		    <div class="col-lg-3 col-md-4">
-		        <label for="monitor_path" class="form-label fw-bold">Monitor a Ramdisk:</label>
-		    </div>
-		    <div class="col-lg-9 col-md-8">
-		        <div class="input-group mb-2">
-		            <span class="input-group-text"><i class="fa fa-hdd-o"></i></span>
-		            <input id="monitor_path" name="monitor_path" class="form-control" type="text" value="{$site->monitor_path}"/>
-		        </div>
-		        <div class="input-group mb-2">
-		            <span class="input-group-text"><i class="fa fa-hdd-o"></i></span>
-		            <input id="monitor_path_a" name="monitor_path_a" class="form-control" type="text" value="{$site->monitor_path_a}"/>
-		        </div>
-		        <div class="input-group mb-2">
-		            <span class="input-group-text"><i class="fa fa-hdd-o"></i></span>
-		            <input id="monitor_path_b" name="monitor_path_b" class="form-control" type="text" value="{$site->monitor_path_b}"/>
-		        </div>
-		        <small class="text-muted">Enter a path here to have Monitor track its usage and free space. Must be a valid path.<br/>To use this example, add to fstab and edit path, gid and uid, then mount as user not root:<br/><code>tmpfs /var/www/newznab/nzbfiles/tmpunrar tmpfs user,uid=1000,gid=33,nodev,nodiratime,nosuid,size=1G,mode=777 0 0</code><br/>gid == group id == /etc/groups, uid == user id == /etc/passwd</small>
-		    </div>
-		</div>
-
-		<div class="row mb-4">
-		    <div class="col-lg-3 col-md-4">
 		        <label class="form-label fw-bold">Information:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
