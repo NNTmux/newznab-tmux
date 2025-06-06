@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View;
 
 class DeletedUsersController extends BasePageController
 {
@@ -23,13 +22,13 @@ class DeletedUsersController extends BasePageController
 
         $deletedUsers = User::onlyTrashed()
             ->when($username !== '', function ($query) use ($username) {
-                return $query->where('username', 'like', '%' . $username . '%');
+                return $query->where('username', 'like', '%'.$username.'%');
             })
             ->when($email !== '', function ($query) use ($email) {
-                return $query->where('email', 'like', '%' . $email . '%');
+                return $query->where('email', 'like', '%'.$email.'%');
             })
             ->when($host !== '', function ($query) use ($host) {
-                return $query->where('host', 'like', '%' . $host . '%');
+                return $query->where('host', 'like', '%'.$host.'%');
             });
 
         // Determine sort order
@@ -63,6 +62,7 @@ class DeletedUsersController extends BasePageController
 
         if ($user) {
             $user->restore();
+
             return redirect()->route('admin.deleted.users.index')
                 ->with('success', "User '{$user->username}' has been restored successfully.");
         }
@@ -81,6 +81,7 @@ class DeletedUsersController extends BasePageController
         if ($user) {
             $username = $user->username;
             $user->forceDelete();
+
             return redirect()->route('admin.deleted.users.index')
                 ->with('success', "User '{$username}' has been permanently deleted.");
         }

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -27,7 +28,6 @@ use Junaidnasir\Larainvite\Facades\Invite;
 use Junaidnasir\Larainvite\InviteTrait;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\User.
@@ -148,7 +148,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class User extends Authenticatable
 {
-    use HasRoles, InviteTrait, Notifiable, UserVerification, SoftDeletes;
+    use HasRoles, InviteTrait, Notifiable, SoftDeletes, UserVerification;
 
     public const ERR_SIGNUP_BADUNAME = -1;
 

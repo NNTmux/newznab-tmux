@@ -31,6 +31,7 @@ class NntmuxPurgeDeletedAccounts extends Command
         PurgeDeletedAccounts::dispatch();
 
         $this->info('Job dispatched to purge deleted accounts');
+
         return Command::SUCCESS;
     }
 }
