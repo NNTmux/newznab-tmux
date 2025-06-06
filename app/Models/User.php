@@ -27,6 +27,7 @@ use Junaidnasir\Larainvite\Facades\Invite;
 use Junaidnasir\Larainvite\InviteTrait;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\User.
@@ -147,7 +148,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
-    use HasRoles, InviteTrait, Notifiable, UserVerification;
+    use HasRoles, InviteTrait, Notifiable, UserVerification, SoftDeletes;
 
     public const ERR_SIGNUP_BADUNAME = -1;
 

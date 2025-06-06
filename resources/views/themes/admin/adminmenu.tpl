@@ -236,6 +236,9 @@
                     <a href="{{url("/admin/role-add")}}" class="list-group-item list-group-item-action bg-dark text-white">
                         <span class="menu-collapsed">Add User Roles</span>
                     </a>
+                    <a href="{{url("/admin/deleted-users")}}" class="list-group-item list-group-item-action bg-dark text-white">
+                        <span class="menu-collapsed">Deleted Users</span>
+                    </a>
                 </div>
 
                 <!-- Tmux -->

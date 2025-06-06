@@ -38,6 +38,8 @@ class RemoveInactiveAccounts implements ShouldQueue
                 $query->where('apiaccess', '<', now()->subDays($purgeDays))
                     ->orWhereNull('apiaccess');
             })
-            ->delete();
+            ->get()->each(function ($user) {
+                $user->delete(); // Use soft delete instead of mass deletion
+            });
     }
 }

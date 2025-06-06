@@ -121,8 +121,11 @@
                                         </div>
                                     </div>
                                 </th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Stats</th>
+                                <th>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span>Status</span>
+                                    </div>
+                                </th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -178,6 +181,22 @@
                                                 <span class="badge bg-info" data-bs-toggle="tooltip" data-bs-placement="top" title="{$user->apiaccess}"><i class="fa fa-key me-1"></i>API Access</span>
                                             {/if}
                                         </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge {if isset($user->deleted_at)}bg-danger{else}bg-success{/if} rounded-pill">
+                                                {if isset($user->deleted_at)}
+                                                    <i class="fa fa-trash me-1"></i>Soft-Deleted
+                                                {else}
+                                                    <i class="fa fa-check me-1"></i>Active
+                                                {/if}
+                                            </span>
+                                        </div>
+                                        {if isset($user->deleted_at)}
+                                            <small class="d-block text-muted mt-1" title="Deletion date">
+                                                <i class="fa fa-calendar me-1"></i>{$user->deleted_at}
+                                            </small>
+                                        {/if}
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex flex-column gap-2">

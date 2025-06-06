@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\AdminShowsController;
 use App\Http\Controllers\Admin\AdminSiteController;
 use App\Http\Controllers\Admin\AdminTmuxController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\DeletedUsersController;
 use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\AnimeController;
@@ -214,6 +215,10 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'group-list-active', [AdminGroupController::class, 'active'])->name('admin.group-list-active');
     Route::match(['GET', 'POST'], 'group-list-inactive', [AdminGroupController::class, 'inactive'])->name('admin.group-list-inactive');
 
+    // Deleted Users Management Routes
+    Route::match(['GET', 'POST'], 'deleted-users', [DeletedUsersController::class, 'index'])->name('admin.deleted.users.index');
+    Route::match(['GET', 'POST'], 'deleted-users/restore/{id}', [DeletedUsersController::class, 'restore'])->name('admin.deleted.users.restore');
+    Route::match(['GET', 'POST'], 'deleted-users/permanent-delete/{id}', [DeletedUsersController::class, 'permanentDelete'])->name('admin.deleted.users.permanent-delete');
 });
 
 Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {
