@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\PurgeDeletedAccounts;
 use App\Jobs\RemoveInactiveAccounts;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Schedule;
@@ -32,4 +33,5 @@ Schedule::command('nntmux:collect-stats')->hourly();
 Schedule::command('nntmux:populate-steam-apps')->monthly();
 if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
+    Schedule::job(new PurgeDeletedAccounts)->daily();
 }

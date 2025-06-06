@@ -32,7 +32,7 @@ class PurgeDeletedAccounts implements ShouldQueue
     {
         // Find users that were soft-deleted 6 months ago
         User::onlyTrashed()
-            ->where('deleted_at', '<', now()->subMonths(6))
+            ->where('deleted_at', '<', now()->subDays(config('nntmux.purge_inactive_users_days')))
             ->get()
             ->each(function ($user) {
                 $user->forceDelete(); // Permanently delete the user
