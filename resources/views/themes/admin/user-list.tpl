@@ -144,6 +144,12 @@
                                         </div>
                                         <small class="text-muted d-block mt-1">
                                             <i class="fa fa-globe me-1"></i>{$user->host}
+                                            {if $user->country_code}
+                                                <span class="ms-2">
+                                                    <img src="https://flagcdn.com/16x12/{$user->country_code|lower}.png" alt="{$user->country_name}" width="16" height="12" class="me-1">
+                                                    <span>{$user->country_name}</span>
+                                                </span>
+                                            {/if}
                                         </small>
                                     </td>
                                     <td>

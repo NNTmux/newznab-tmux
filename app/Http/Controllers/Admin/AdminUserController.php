@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
+use Stevebauman\Location\Facades\Location;
 
 class AdminUserController extends BasePageController
 {
@@ -52,6 +53,16 @@ class AdminUserController extends BasePageController
         );
 
         $results = $this->paginate($result ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+
+        // Add country data to each user based on their host IP
+        foreach ($results as $user) {
+            $position = null;
+            if (!empty($user->host) && filter_var($user->host, FILTER_VALIDATE_IP)) {
+                $position = Location::get($user->host);
+            }
+            $user->country_name = $position ? $position->countryName : null;
+            $user->country_code = $position ? $position->countryCode : null;
+        }
 
         $this->smarty->assign(
             [
