@@ -216,10 +216,12 @@ class AdminUserController extends BasePageController
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
+            $username = $user->username; // Store username before deletion
 
             $user->delete();
 
-            return redirect()->to('admin/user-list');
+            // Redirect with username to display in notification
+            return redirect()->to('admin/user-list?deleted=1&username='.urlencode($username));
         }
 
         if ($request->has('redir')) {

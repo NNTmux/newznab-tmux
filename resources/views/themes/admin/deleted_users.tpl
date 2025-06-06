@@ -94,9 +94,12 @@
                                         <td>{$user->deleted_at|date_format:"%Y-%m-%d %H:%M"}</td>
                                         <td>{if $user->lastlogin != ""}{$user->lastlogin|date_format:"%Y-%m-%d %H:%M"}{else}Never{/if}</td>
                                         <td>
-                                            <a href="{$smarty.const.WWW_TOP}/admin/deleted-users/restore/{$user->id}" class="btn btn-success btn-sm me-2" title="Restore User">
+                                            <button class="btn btn-success btn-sm me-2 restore-user"
+                                                data-user-id="{$user->id}"
+                                                data-username="{$user->username}"
+                                                title="Restore User">
                                                 <i class="fas fa-user-check"></i> Restore
-                                            </a>
+                                            </button>
                                             <button class="btn btn-danger btn-sm delete-permanently"
                                                 data-user-id="{$user->id}"
                                                 data-username="{$user->username}"
@@ -158,6 +161,32 @@
     </div>
 </div>
 
+<!-- Restore User Confirmation Modal -->
+<div class="modal fade" id="restoreUserModal" tabindex="-1" aria-labelledby="restoreUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="restoreUserModalLabel">Confirm User Restoration</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Please confirm this action
+                </div>
+                <p>You are about to restore user <strong id="restoreUserName"></strong>.</p>
+                <p>This will reactivate the user account and grant them access to the system again.</p>
+                <p>Are you sure you want to continue?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmRestoreBtn" class="btn btn-success">
+                    <i class="fas fa-user-check"></i> Restore User
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Set up delete confirmation modal
@@ -173,6 +202,22 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('confirmDeleteBtn').href = '{$smarty.const.WWW_TOP}/admin/deleted-users/permanent-delete/' + userId;
 
             deleteUserModal.show();
+        });
+    });
+
+    // Set up restore confirmation modal
+    const restoreUserModal = new bootstrap.Modal(document.getElementById('restoreUserModal'));
+    const restoreButtons = document.querySelectorAll('.restore-user');
+
+    restoreButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-user-id');
+            const username = this.getAttribute('data-username');
+
+            document.getElementById('restoreUserName').textContent = username;
+            document.getElementById('confirmRestoreBtn').href = '{$smarty.const.WWW_TOP}/admin/deleted-users/restore/' + userId;
+
+            restoreUserModal.show();
         });
     });
 });

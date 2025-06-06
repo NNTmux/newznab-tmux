@@ -233,7 +233,7 @@
                                                 </a>
                                             {/if}
                                             {if $user->roles_id != "2"}
-                                                <a href="{{url("/admin/user-delete?id={$user->id}")}}" class="btn btn-sm btn-outline-danger confirm_action" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete user">
+                                                <a href="{{url("/admin/user-delete?id={$user->id}")}}" class="btn btn-sm btn-outline-danger custom_delete_action" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete user">
                                                     <i class="fa fa-trash"></i>
                                                 </a>
                                             {/if}
@@ -265,94 +265,132 @@
         {/if}
     </div>
 
-    <script>
-    {literal}
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+    <!-- Delete User Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteUserModalLabel">
+                    <i class="fa fa-exclamation-triangle me-2"></i>Delete User Confirmation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fw-bold mb-2">You are about to delete the following user:</p>
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="fa fa-user me-2 fs-5"></i>
+                    <span id="deleteUserName" class="fw-bold fs-5"></span>
+                </div>
+                <p>This action will soft-delete the user account. The user will no longer be able to log in, but their data will remain in the database.</p>
+                <p class="text-danger fw-bold">Are you absolutely sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
+                    <i class="fa fa-trash me-1"></i>Delete User
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Confirm action for delete
-        document.querySelectorAll('.confirm_action').forEach(function(element) {
-            element.addEventListener('click', function(e) {
-                if (!confirm('Are you sure you want to delete this user? This cannot be undone.')) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
+<script>
+{literal}
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Enhanced delete confirmation
+    document.querySelectorAll('.custom_delete_action').forEach(function(element) {
+        element.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Get the user details
+            const row = this.closest('tr');
+            const username = row.querySelector('td:first-child a').textContent.trim();
+            const deleteUrl = this.getAttribute('href');
+
+            // Set the modal content
+            document.getElementById('deleteUserName').textContent = username;
+            document.getElementById('confirmDeleteBtn').setAttribute('href', deleteUrl);
+
+            // Show the modal
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+            deleteModal.show();
         });
     });
-    {/literal}
-    </script>
 
-    <style>
-    {literal}
-    /* Sort controls styling */
-    .sort-controls {
-        display: flex;
-        flex-direction: column;
-        font-size: 0.8rem;
-        margin-left: 0.3rem;
+    // Toast notification system
+    function showToast(message, type) {
+        const toastContainer = document.getElementById('toast-container');
+
+        const toastElement = document.createElement('div');
+        toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+
+        const toastFlex = document.createElement('div');
+        toastFlex.className = 'd-flex';
+
+        const toastBody = document.createElement('div');
+        toastBody.className = 'toast-body';
+        toastBody.innerHTML = message;
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'btn-close btn-close-white me-2 m-auto';
+        closeButton.setAttribute('data-bs-dismiss', 'toast');
+        closeButton.setAttribute('aria-label', 'Close');
+
+        toastFlex.appendChild(toastBody);
+        toastFlex.appendChild(closeButton);
+        toastElement.appendChild(toastFlex);
+        toastContainer.appendChild(toastElement);
+
+        const toast = new bootstrap.Toast(toastElement, {
+            delay: 5000
+        });
+        toast.show();
+
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
     }
 
-    .sort-icon {
-        color: #6c757d;
-        opacity: 0.6;
-        transition: opacity 0.2s;
+    // If there's a success parameter in URL (will be added by our controller)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('deleted')) {
+        const username = urlParams.get('username');
+        showToast(`User "${username}" has been successfully deleted.`, 'success');
     }
+});
+{/literal}
+</script>
 
-    .sort-icon:hover, .sort-icon.active {
-        color: #0d6efd;
-        opacity: 1;
-    }
+<!-- Toast container for notifications -->
+<div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
-    /* Table styling improvements */
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
+<style>
+{literal}
+/* Sort controls styling */
+.sort-controls {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
+}
 
-    /* Badge styling */
-    .badge {
-        font-weight: 500;
-        padding: 0.4em 0.6em;
-    }
+.sort-icon {
+    color: #6c757d;
+}
 
-    /* Pagination container */
-    .pagination-container {
-        max-width: 100%;
-    }
-
-    /* Improve buttons spacing in small screens */
-    @media (max-width: 767.98px) {
-        .btn-group .btn {
-            padding: 0.25rem 0.5rem;
-        }
-
-        .card-footer .d-flex {
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: center !important;
-        }
-
-        .pagination-container {
-            justify-content: center !important;
-        }
-    }
-
-    /* Improve search form on small screens */
-    @media (max-width: 767.98px) {
-        #user-search-form .row {
-            margin-right: 0;
-            margin-left: 0;
-        }
-
-        #user-search-form .col-md-12 {
-            padding-right: 0;
-            padding-left: 0;
-        }
-    }
-    {/literal}
-    </style>
+/* Toast styling */
+.toast {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+{/literal}
+</style>
