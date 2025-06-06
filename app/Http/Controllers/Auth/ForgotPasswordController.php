@@ -58,17 +58,23 @@ class ForgotPasswordController extends Controller
             if ($ret === null) {
                 app('smarty.view')->assign('error', 'The email or apikey are not recognised.');
             } else {
-                //
-                // Generate a forgottenpassword guid, store it in the user table
-                //
-                $guid = Str::random(32);
-                User::updatePassResetGuid($ret['id'], $guid);
-                //
-                // Send the email
-                //
-                $resetLink = url('/').'/resetpassword?guid='.$guid;
-                SendPasswordForgottenEmail::dispatch($ret, $resetLink);
-                app('smarty.view')->assign('success', 'Password reset email has been sent!');
+                // Check if user is soft deleted
+                $user = User::withTrashed()->find($ret['id']);
+                if ($user && $user->trashed()) {
+                    app('smarty.view')->assign('error', 'This account has been deactivated.');
+                } else {
+                    //
+                    // Generate a forgottenpassword guid, store it in the user table
+                    //
+                    $guid = Str::random(32);
+                    User::updatePassResetGuid($ret['id'], $guid);
+                    //
+                    // Send the email
+                    //
+                    $resetLink = url('/').'/resetpassword?guid='.$guid;
+                    SendPasswordForgottenEmail::dispatch($ret, $resetLink);
+                    app('smarty.view')->assign('success', 'Password reset email has been sent!');
+                }
             }
             $sent = true;
         }

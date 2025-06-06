@@ -142,6 +142,14 @@ class RegisterController extends Controller
                 $confirmPassword = $request->input('password_confirmation');
                 $email = $request->input('email');
 
+                // Check if the email is associated with a soft-deleted user
+                $existingUser = User::withTrashed()->where('email', $email)->first();
+                if ($existingUser && $existingUser->trashed()) {
+                    $error = 'This email address belongs to a deactivated account.';
+
+                    return $this->showRegistrationForm($request, $error);
+                }
+
                 // Get the default user role.
                 $userDefault = Role::query()->where('isdefault', '=', 1)->first();
 

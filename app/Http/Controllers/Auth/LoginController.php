@@ -69,8 +69,15 @@ class LoginController extends Controller
         }
 
         if ($validator->passes()) {
-            $user = User::query()->orWhere(['username' => $request->input('username'), 'email' => $request->input('username')])->first();
+            $user = User::query()->orWhere(['username' => $request->input('username'), 'email' => $request->input('username')])->withTrashed()->first();
             if ($user !== null) {
+                // Check if user is soft deleted
+                if ($user->trashed()) {
+                    $request->session()->flash('message', 'This account has been deactivated. Please contact us through contact form to have your account reactivated.');
+
+                    return redirect()->to('login');
+                }
+
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
                 if (! $user->isVerified() || $user->isPendingVerification()) {

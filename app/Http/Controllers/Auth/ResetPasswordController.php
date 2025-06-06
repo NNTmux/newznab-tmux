@@ -55,16 +55,22 @@ class ResetPasswordController extends Controller
             if ($ret === null) {
                 $error = 'Bad reset code provided.';
             } else {
-                //
-                // reset the password, inform the user, send out the email
-                //
-                User::updatePassResetGuid($ret['id'], '');
-                $newpass = User::generatePassword();
-                User::updatePassword($ret['id'], $newpass);
+                // Check if user is soft deleted
+                $user = User::withTrashed()->find($ret['id']);
+                if ($user && $user->trashed()) {
+                    $error = 'This account has been deactivated.';
+                } else {
+                    //
+                    // reset the password, inform the user, send out the email
+                    //
+                    User::updatePassResetGuid($ret['id'], '');
+                    $newpass = User::generatePassword();
+                    User::updatePassword($ret['id'], $newpass);
 
-                $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
-                SendPasswordResetEmail::dispatch($ret, $newpass);
-                $confirmed = true;
+                    $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
+                    SendPasswordResetEmail::dispatch($ret, $newpass);
+                    $confirmed = true;
+                }
             }
         }
 
