@@ -57,7 +57,7 @@ class AdminUserController extends BasePageController
         // Add country data to each user based on their host IP
         foreach ($results as $user) {
             $position = null;
-            if (!empty($user->host) && filter_var($user->host, FILTER_VALIDATE_IP)) {
+            if (! empty($user->host) && filter_var($user->host, FILTER_VALIDATE_IP)) {
                 $position = Location::get($user->host);
             }
             $user->country_name = $position ? $position->countryName : null;
