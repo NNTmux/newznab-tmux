@@ -10,10 +10,6 @@ class TrustedDevice2FAMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param Request $request
-     * @param Closure $next
-     * @return mixed
      */
     public function handle(Request $request, Closure $next): mixed
     {
@@ -27,7 +23,7 @@ class TrustedDevice2FAMiddleware
                 // If cookie data is valid and user matches
                 if (json_last_error() === JSON_ERROR_NONE &&
                     isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at']) &&
-                    (int)$cookieData['user_id'] === (int)auth()->id() &&
+                    (int) $cookieData['user_id'] === (int) auth()->id() &&
                     time() <= $cookieData['expires_at']) {
 
                     // Mark this user's session as having passed 2FA
@@ -36,7 +32,7 @@ class TrustedDevice2FAMiddleware
                 }
             } catch (\Exception $e) {
                 Log::error('TrustedDevice2FAMiddleware - Error processing cookie', [
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -76,14 +72,14 @@ class TrustedDevice2FAMiddleware
                     'domain' => '',
                     'secure' => $request->secure(),
                     'httponly' => false,
-                    'samesite' => 'Lax'
+                    'samesite' => 'Lax',
                 ]);
 
                 // Keep in session for backup access
                 $request->session()->put('2fa_trusted_device_value', $cookieValue);
             } catch (\Exception $e) {
                 Log::error('TrustedDevice2FAMiddleware - Error setting cookie', [
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

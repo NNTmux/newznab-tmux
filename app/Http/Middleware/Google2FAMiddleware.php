@@ -25,7 +25,7 @@ class Google2FAMiddleware
                     // Check if all required fields exist
                     if (isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at'])) {
                         // Check if cookie user ID matches authenticated user
-                        if ((int)$cookieData['user_id'] === (int)auth()->id()) {
+                        if ((int) $cookieData['user_id'] === (int) auth()->id()) {
                             // Check if cookie is not expired
                             if (time() <= $cookieData['expires_at']) {
                                 // Set the session variables for 2FA authentication

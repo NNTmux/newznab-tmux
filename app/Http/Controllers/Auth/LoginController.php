@@ -105,7 +105,7 @@ class LoginController extends Controller
                                 // Validate the cookie data
                                 if (json_last_error() === JSON_ERROR_NONE &&
                                     isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at']) &&
-                                    (int)$cookieData['user_id'] === (int)$user->id &&
+                                    (int) $cookieData['user_id'] === (int) $user->id &&
                                     time() <= $cookieData['expires_at']) {
 
                                     // Cookie is valid - mark 2FA as passed
@@ -120,7 +120,7 @@ class LoginController extends Controller
                                 }
                             } catch (\Exception $e) {
                                 \Log::error('Login - Error processing trusted device cookie', [
-                                    'error' => $e->getMessage()
+                                    'error' => $e->getMessage(),
                                 ]);
                             }
                         }
@@ -197,7 +197,7 @@ class LoginController extends Controller
                         'expires_at' => $cookieData['expires_at'],
                         'current_time' => time(),
                         'remaining_seconds' => $remainingSeconds,
-                        'remaining_minutes' => $remainingMinutes
+                        'remaining_minutes' => $remainingMinutes,
                     ]);
 
                     // Only preserve the cookie if it hasn't expired yet
@@ -225,7 +225,7 @@ class LoginController extends Controller
                 }
             } catch (\Exception $e) {
                 \Log::error('Logout - Error Processing Cookie', [
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

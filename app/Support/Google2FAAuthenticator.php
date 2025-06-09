@@ -35,17 +35,17 @@ class Google2FAAuthenticator extends Authenticator
         try {
             $data = @json_decode($cookie, true);
 
-            if (!is_array($data)) {
+            if (! is_array($data)) {
                 return false;
             }
 
             // Validate all required fields
-            if (!isset($data['user_id'], $data['token'], $data['expires_at'])) {
+            if (! isset($data['user_id'], $data['token'], $data['expires_at'])) {
                 return false;
             }
 
             // Ensure the user ID matches
-            if ((int)$data['user_id'] !== (int)$this->getUser()->id) {
+            if ((int) $data['user_id'] !== (int) $this->getUser()->id) {
                 return false;
             }
 
@@ -148,7 +148,7 @@ class Google2FAAuthenticator extends Authenticator
 
                 if (json_last_error() === JSON_ERROR_NONE &&
                     isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at']) &&
-                    (int)$cookieData['user_id'] === (int)auth()->id() &&
+                    (int) $cookieData['user_id'] === (int) auth()->id() &&
                     time() <= $cookieData['expires_at']) {
 
                     // If we have a valid cookie, force-disable 2FA

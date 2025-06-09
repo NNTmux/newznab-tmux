@@ -197,7 +197,7 @@ class PasswordSecurityController extends Controller
                     'domain' => '',
                     'secure' => request()->secure(),
                     'httponly' => false,
-                    'samesite' => 'Lax'
+                    'samesite' => 'Lax',
                 ]
             );
 
@@ -243,6 +243,7 @@ class PasswordSecurityController extends Controller
 
         // Create a response with the rendered content instead of directly outputting
         $content = app('smarty.view')->fetch($theme.'/2fa_verify.tpl');
+
         return response($content);
     }
 
