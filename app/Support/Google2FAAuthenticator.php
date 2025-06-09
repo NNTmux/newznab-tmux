@@ -23,14 +23,12 @@ class Google2FAAuthenticator extends Authenticator
 
     /**
      * Check if current device is trusted
-     *
-     * @return bool
      */
     protected function isDeviceTrusted(): bool
     {
         $cookie = request()->cookie('2fa_trusted_device');
 
-        if (!$cookie) {
+        if (! $cookie) {
             return false;
         }
 
@@ -38,12 +36,12 @@ class Google2FAAuthenticator extends Authenticator
             $data = json_decode($cookie, true);
 
             // Check if cookie contains the required data
-            if (!isset($data['user_id'], $data['token'], $data['expires_at'])) {
+            if (! isset($data['user_id'], $data['token'], $data['expires_at'])) {
                 return false;
             }
 
             // Check if the token belongs to the current user
-            if ((int)$data['user_id'] !== (int)$this->getUser()->id) {
+            if ((int) $data['user_id'] !== (int) $this->getUser()->id) {
                 return false;
             }
 

@@ -161,7 +161,7 @@ class PasswordSecurityController extends Controller
         // If the user has checked "trust this device", create a trust token
         if ($request->has('trust_device') && $request->input('trust_device') == 1) {
             // Generate a unique token for this device
-            $token = hash('sha256', $user->id . uniqid() . time());
+            $token = hash('sha256', $user->id.uniqid().time());
 
             // Store the token with an expiry time of 30 days
             $expiresAt = now()->addDays(30)->timestamp;
@@ -172,7 +172,7 @@ class PasswordSecurityController extends Controller
                 json_encode([
                     'user_id' => $user->id,
                     'token' => $token,
-                    'expires_at' => $expiresAt
+                    'expires_at' => $expiresAt,
                 ]),
                 60 * 24 * 30 // 30 days in minutes
             );
