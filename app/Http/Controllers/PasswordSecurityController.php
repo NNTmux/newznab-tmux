@@ -158,39 +158,56 @@ class PasswordSecurityController extends Controller
         // Store the timestamp for determining how long the 2FA session is valid
         session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
-        // If the user has checked "trust this device", create a trust token
-        if ($request->has('trust_device') && $request->input('trust_device') == 1) {
-            // Generate a unique token for this device
-            $token = hash('sha256', $user->id.uniqid().time());
-
-            // Store the token with an expiry time of 30 days
-            $expiresAt = now()->addDays(30)->timestamp;
-
-            // Store the trusted device token in a cookie
-            cookie()->queue(
-                '2fa_trusted_device',
-                json_encode([
-                    'user_id' => $user->id,
-                    'token' => $token,
-                    'expires_at' => $expiresAt,
-                ]),
-                60 * 24 * 30 // 30 days in minutes
-            );
-
-            // Store the token in the database if you want to manage/revoke trusted devices
-            // This would require creating a new table for trusted devices
-            // We're using cookies only for this implementation
-        }
-
         // Clean up the temporary session variable
         $request->session()->forget('2fa:user:id');
 
         // Determine where to redirect after successful verification
         $redirectUrl = $request->session()->pull('url.intended', '/');
 
-        return redirect()->to($redirectUrl)
+        // Create the redirect response
+        $redirect = redirect()->to($redirectUrl)
             ->with('message', 'Two-factor authentication verified successfully.')
             ->with('message_type', 'success');
+
+        // If the user has checked "trust this device", create a trust token
+        if ($request->has('trust_device') && $request->input('trust_device') == 1) {
+
+            // Generate a unique token for this device
+            $token = hash('sha256', $user->id.uniqid().time());
+
+            // Store the token with an expiry time of 30 days
+            $expiresAt = time() + (60 * 60 * 24 * 30); // 30 days in seconds
+
+            // Create the cookie data
+            $cookieData = [
+                'user_id' => $user->id,
+                'token' => $token,
+                'expires_at' => $expiresAt,
+            ];
+
+            $cookieValue = json_encode($cookieData);
+
+            // Use PHP's native setcookie function as the primary method
+            setcookie(
+                '2fa_trusted_device',
+                $cookieValue,
+                [
+                    'expires' => $expiresAt,
+                    'path' => '/',
+                    'domain' => '',
+                    'secure' => request()->secure(),
+                    'httponly' => false,
+                    'samesite' => 'Lax'
+                ]
+            );
+
+            // Also attach the cookie to the Laravel response as a backup approach
+            $redirect->withCookie(
+                cookie('2fa_trusted_device', $cookieValue, 43200, '/', null, null, false)
+            );
+        }
+
+        return $redirect;
     }
 
     /**
@@ -224,7 +241,9 @@ class PasswordSecurityController extends Controller
 
         app('smarty.view')->assign(compact('meta_title', 'meta_keywords', 'meta_description', 'user'));
 
-        return app('smarty.view')->display($theme.'/2fa_verify.tpl');
+        // Create a response with the rendered content instead of directly outputting
+        $content = app('smarty.view')->fetch($theme.'/2fa_verify.tpl');
+        return response($content);
     }
 
     /**

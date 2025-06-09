@@ -46,6 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web([
             \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \App\Http\Middleware\TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
         ]);
 
         $middleware->throttleApi('60,1');
