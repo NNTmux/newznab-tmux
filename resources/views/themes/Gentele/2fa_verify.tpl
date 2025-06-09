@@ -62,7 +62,7 @@
 
                         {{Form::open(['url' => route('2faVerify'), 'id' => '2faVerify'])}}
                             <div class="mb-3">
-                                <div class="d-flex justify-content-between gap-2 mb-2">
+                                <div class="d-flex justify-content-between gap-2 mb-2" id="otp-inputs-container">
                                     <input type="text" class="form-control text-center otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" required>
                                     <input type="text" class="form-control text-center otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" required>
                                     <input type="text" class="form-control text-center otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" required>
@@ -74,6 +74,11 @@
                                 <div class="form-text text-muted">
                                     Enter the 6-digit code from your authentication app
                                 </div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="trust_device" name="trust_device" value="1">
+                                <label class="form-check-label" for="trust_device">Trust this device for 30 days</label>
                             </div>
 
                             <div class="d-grid gap-2">
@@ -108,17 +113,34 @@
     }
 
     .otp-input {
-        width: 45px;
-        height: 45px;
+        width: 100%;
+        aspect-ratio: 1/1;
         font-size: 1.2rem;
         font-weight: bold;
+        padding: 0;
+        text-align: center;
+    }
+
+    #otp-inputs-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
     }
 
     @media (max-width: 576px) {
         .otp-input {
-            width: 40px;
-            height: 40px;
-            font-size: 1.1rem;
+            font-size: 1rem;
+        }
+
+        #otp-inputs-container {
+            gap: 4px;
+        }
+    }
+
+    @media (max-width: 320px) {
+        .otp-input {
+            font-size: 0.9rem;
         }
     }
 
@@ -142,6 +164,22 @@
     a:hover .app-logo {
         transform: rotate(5deg);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-pulse {
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
     }
     </style>
 

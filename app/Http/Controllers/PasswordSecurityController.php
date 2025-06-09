@@ -116,6 +116,7 @@ class PasswordSecurityController extends Controller
     {
         $request->validate([
             'one_time_password' => 'required|numeric',
+            'trust_device' => 'nullable|boolean',
         ]);
 
         // Get the user ID from session
@@ -156,6 +157,30 @@ class PasswordSecurityController extends Controller
 
         // Store the timestamp for determining how long the 2FA session is valid
         session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+
+        // If the user has checked "trust this device", create a trust token
+        if ($request->has('trust_device') && $request->input('trust_device') == 1) {
+            // Generate a unique token for this device
+            $token = hash('sha256', $user->id . uniqid() . time());
+
+            // Store the token with an expiry time of 30 days
+            $expiresAt = now()->addDays(30)->timestamp;
+
+            // Store the trusted device token in a cookie
+            cookie()->queue(
+                '2fa_trusted_device',
+                json_encode([
+                    'user_id' => $user->id,
+                    'token' => $token,
+                    'expires_at' => $expiresAt
+                ]),
+                60 * 24 * 30 // 30 days in minutes
+            );
+
+            // Store the token in the database if you want to manage/revoke trusted devices
+            // This would require creating a new table for trusted devices
+            // We're using cookies only for this implementation
+        }
 
         // Clean up the temporary session variable
         $request->session()->forget('2fa:user:id');
