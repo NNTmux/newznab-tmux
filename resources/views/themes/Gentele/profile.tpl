@@ -1,3 +1,4 @@
+<div style="position: static;">
 <div class="container-fluid px-4 py-3">
                                   <!-- Breadcrumb -->
                                   <nav aria-label="breadcrumb" class="mb-3">
@@ -380,7 +381,41 @@
 
                               <script>
                               {literal}
+                                  // Parse URL parameters
+                                  function getUrlParameter(name) {
+                                      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                                      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                                      var results = regex.exec(location.search);
+                                      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+                                  }
+
                                   document.addEventListener('DOMContentLoaded', function() {
+                                      // Force the window to scroll to top immediately
+                                      window.scrollTo(0, 0);
+
+                                      // Clear location hash and force any anchors to load at top of page
+                                      if (window.location.hash) {
+                                          history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                                      }
+
+                                      // Direct approach to prevent scrolling: add inline CSS to body
+                                      document.body.style.scrollBehavior = "auto";
+                                      document.body.style.overflowAnchor = "none";
+                                      document.documentElement.style.scrollPaddingTop = "0";
+
+                                      // Add scroll blocking
+                                      function preventScroll(e) {
+                                          window.scrollTo(0, 0);
+                                      }
+
+                                      // Add event listener to block scrolling for half a second
+                                      window.addEventListener('scroll', preventScroll);
+
+                                      // Remove the event listener after a delay
+                                      setTimeout(function() {
+                                          window.removeEventListener('scroll', preventScroll);
+                                      }, 500);
+
                                       // Invites functionality
                                       const sendInviteBtn = document.getElementById('lnkSendInvite');
                                       const inviteDiv = document.getElementById('divInvite');
@@ -416,30 +451,52 @@
                                       // Smooth scroll for sidebar navigation
                                       document.querySelectorAll('.list-group-item').forEach(link => {
                                           link.addEventListener('click', function(e) {
-                                              e.preventDefault();
-
-                                              // Remove active class from all links
-                                              document.querySelectorAll('.list-group-item').forEach(item => {
-                                                  item.classList.remove('active');
-                                              });
-
-                                              // Add active class to clicked link
-                                              this.classList.add('active');
-
-                                              // Scroll to target section
+                                              // Get target section ID from href attribute
                                               const targetId = this.getAttribute('href');
-                                              const targetElement = document.querySelector(targetId);
 
-                                              if (targetElement) {
-                                                  targetElement.scrollIntoView({ behavior: 'smooth' });
+                                              // Only if this is an anchor link to a section on this page
+                                              if (targetId && targetId.startsWith('#')) {
+                                                  e.preventDefault(); // Prevent default only for same-page links
+
+                                                  // Remove active class from all links
+                                                  document.querySelectorAll('.list-group-item').forEach(item => {
+                                                      item.classList.remove('active');
+                                                  });
+
+                                                  // Add active class to clicked link
+                                                  this.classList.add('active');
+
+                                                  // Get the target element
+                                                  const targetElement = document.querySelector(targetId);
+                                                  if (targetElement) {
+                                                      // Allow smooth scrolling for user-initiated actions
+                                                      targetElement.scrollIntoView({ behavior: 'smooth' });
+                                                  }
                                               }
+                                              // For external links, let the browser handle navigation normally
                                           });
                                       });
+                                  });
+
+                                  // After all page resources have loaded
+                                  window.addEventListener('load', function() {
+                                      // Force scroll back to top
+                                      window.scrollTo(0, 0);
+
+                                      // Set focus to body to prevent auto-focus on elements down the page
+                                      document.body.focus();
                                   });
                               {/literal}
                               </script>
 <style>
     {literal}
+    html, body {
+        scroll-behavior: auto !important;
+        scroll-padding-top: 0 !important;
+    }
+    body {
+        overflow-anchor: none !important;
+    }
     .profile-image-container {
         position: relative;
         overflow: hidden;
@@ -463,3 +520,4 @@
     }
     {/literal}
 </style>
+</div>
