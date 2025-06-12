@@ -228,7 +228,16 @@ class ManticoreSearch
         $resultId = [];
         $resultData = [];
         try {
-            $query = $this->search->setTable($rt_index)->option('ranker', 'sph04')->option('sort_method', 'pq')->maxMatches(10000)->limit(10000)->sort('id', 'desc')->stripBadUtf8(true)->trackScores(true);
+            // Modified query to reduce sort-by attributes
+            $query = $this->search->setTable($rt_index)
+                ->option('ranker', 'sph04')
+                ->maxMatches(10000)
+                ->limit(10000)
+                ->sort('id', 'desc')
+                ->stripBadUtf8(true);
+
+            // Removed option('sort_method', 'pq') and trackScores(true) which may contribute to additional sort attributes
+
             if (! empty($searchArray)) {
                 foreach ($searchArray as $key => $value) {
                     $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
