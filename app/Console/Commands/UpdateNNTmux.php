@@ -102,7 +102,7 @@ class UpdateNNTmux extends Command
             $envExampleVars = [];
             foreach (preg_split("/\r\n|\n|\r/", $envExampleContent) as $line) {
                 $line = trim($line);
-                if (empty($line) || strpos($line, '#') === 0) {
+                if (empty($line) || str_starts_with($line, '#')) {
                     continue;
                 }
 
@@ -116,7 +116,7 @@ class UpdateNNTmux extends Command
             $envVars = [];
             foreach (preg_split("/\r\n|\n|\r/", $envContent) as $line) {
                 $line = trim($line);
-                if (empty($line) || strpos($line, '#') === 0) {
+                if (empty($line) || str_starts_with($line, '#')) {
                     continue;
                 }
 
@@ -132,30 +132,28 @@ class UpdateNNTmux extends Command
 
             if (empty($missingKeys)) {
                 $this->info('No new keys found in .env.example to merge into .env');
-
-                return;
-            }
-
-            // Add missing keys to .env file
-            $newEnvContent = $envContent;
-            if (substr($newEnvContent, -1) !== "\n") {
-                $newEnvContent .= "\n";
-            }
-            $newEnvContent .= "\n# New settings added from .env.example\n";
-
-            foreach ($missingKeys as $key => $value) {
-                $newEnvContent .= "$key=$value\n";
-            }
-
-            // Write updated content back to .env
-            if (file_put_contents(base_path('.env'), $newEnvContent)) {
-                $this->info('Successfully merged '.count($missingKeys).' new keys from .env.example into .env');
-                $this->line('The following keys were added:');
-                foreach ($missingKeys as $key => $value) {
-                    $this->line("  $key=$value");
-                }
             } else {
-                throw new \Exception('Failed to write changes to .env file');
+                // Add missing keys to .env file
+                $newEnvContent = $envContent;
+                if (! str_ends_with($newEnvContent, "\n")) {
+                    $newEnvContent .= "\n";
+                }
+                $newEnvContent .= "\n# New settings added from .env.example\n";
+
+                foreach ($missingKeys as $key => $value) {
+                    $newEnvContent .= "$key=$value\n";
+                }
+
+                // Write updated content back to .env
+                if (file_put_contents(base_path('.env'), $newEnvContent)) {
+                    $this->info('Successfully merged '.count($missingKeys).' new keys from .env.example into .env');
+                    $this->line('The following keys were added:');
+                    foreach ($missingKeys as $key => $value) {
+                        $this->line("  $key=$value");
+                    }
+                } else {
+                    throw new \Exception('Failed to write changes to .env file');
+                }
             }
 
         } catch (\Exception $e) {
