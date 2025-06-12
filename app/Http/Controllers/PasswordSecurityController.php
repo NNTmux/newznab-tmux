@@ -149,8 +149,11 @@ class PasswordSecurityController extends Controller
                 ->with('message_type', 'danger');
         }
 
-        // Log the user back in
-        Auth::login($user);
+        // Get the remember me preference from session (defaults to false if not set)
+        $rememberMe = $request->session()->get('2fa:remember', false);
+
+        // Log the user back in with the remember me preference
+        Auth::login($user, $rememberMe);
 
         // Mark the user as having passed 2FA
         session([config('google2fa.session_var') => true]);
@@ -158,8 +161,8 @@ class PasswordSecurityController extends Controller
         // Store the timestamp for determining how long the 2FA session is valid
         session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
-        // Clean up the temporary session variable
-        $request->session()->forget('2fa:user:id');
+        // Clean up the temporary session variables
+        $request->session()->forget(['2fa:user:id', '2fa:remember']);
 
         // Determine where to redirect after successful verification
         $redirectUrl = $request->session()->pull('url.intended', '/');

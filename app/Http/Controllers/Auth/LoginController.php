@@ -128,6 +128,10 @@ class LoginController extends Controller
                         // No valid trusted device cookie, proceed with 2FA verification
                         // Store intended URL for redirecting after 2FA verification
                         $request->session()->put('url.intended', $this->redirectPath());
+
+                        // Store rememberme preference in the session for 2FA flow
+                        $request->session()->put('2fa:remember', $rememberMe);
+
                         Auth::logout();
 
                         // Store user ID in the session for 2FA verification
