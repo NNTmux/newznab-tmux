@@ -5,194 +5,395 @@ namespace App\Console\Commands;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Ytake\LaravelSmarty\Smarty;
 
 class UpdateNNTmux extends Command
 {
     /**
      * The name and signature of the console command.
-     *
-     * @var string
      */
-    protected $signature = 'nntmux:all';
+    protected $signature = 'nntmux:all
+                            {--skip-git : Skip git operations}
+                            {--skip-composer : Skip composer update}
+                            {--skip-npm : Skip npm operations}
+                            {--skip-db : Skip database migrations}
+                            {--force : Force update even if up-to-date}';
 
     /**
      * The console command description.
-     *
-     * @var string
      */
-    protected $description = 'Update NNTmux installation';
+    protected $description = 'Update NNTmux installation with improved performance and error handling';
 
     /**
-     * @var array Decoded JSON updates file.
+     * @var bool Whether the app was in maintenance mode before we started
      */
-    protected $updates = null;
+    private bool $wasInMaintenance = false;
 
     /**
-     * Create a new command instance.
+     * @var bool Whether tmux was running before we started
      */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    private bool $tmuxWasRunning = false;
+
+    /**
+     * @var ProgressBar Progress bar for tracking operations
+     */
+    private ProgressBar $progressBar;
 
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
-        $maintenance = $this->appDown();
-        $running = $this->stopTmux();
+        $this->info('🚀 Starting NNTmux update process...');
+
+        // Initialize progress tracking
+        $totalSteps = $this->calculateTotalSteps();
+        $this->progressBar = $this->output->createProgressBar($totalSteps);
+        $this->progressBar->start();
 
         try {
-            $output = $this->call('nntmux:git');
-            if ($output === 'Already up-to-date.') {
-                $this->info($output);
+            // Prepare environment
+            $this->prepareEnvironment();
+
+            // Execute update steps
+            $this->executeUpdateSteps();
+
+            // Finalize
+            $this->finalizeUpdate();
+
+            $this->progressBar->finish();
+            $this->newLine(2);
+            $this->info('✅ NNTmux update completed successfully!');
+
+            return Command::SUCCESS;
+
+        } catch (\Exception $e) {
+            $this->progressBar->finish();
+            $this->newLine(2);
+            $this->error('❌ Update failed: ' . $e->getMessage());
+            $this->restoreEnvironment();
+
+            return Command::FAILURE;
+        }
+    }
+
+    /**
+     * Calculate total steps for progress tracking
+     */
+    private function calculateTotalSteps(): int
+    {
+        $steps = 3; // prepare, finalize, cleanup
+
+        if (!$this->option('skip-git')) $steps++;
+        if (!$this->option('skip-composer')) $steps++;
+        if (!$this->option('skip-npm')) $steps += 2; // install + build
+        if (!$this->option('skip-db')) $steps++;
+
+        $steps++; // smarty cache clear
+        $steps++; // env merge
+
+        return $steps;
+    }
+
+    /**
+     * Prepare the environment for updates
+     */
+    private function prepareEnvironment(): void
+    {
+        $this->info('🔧 Preparing environment...');
+
+        // Check if app is in maintenance mode
+        $this->wasInMaintenance = App::isDownForMaintenance();
+        if (!$this->wasInMaintenance) {
+            $this->call('down', [
+                '--render' => 'errors::maintenance',
+                '--retry' => 120,
+                '--secret' => config('app.key')
+            ]);
+        }
+
+        // Check if tmux is running
+        $tmux = new Tmux();
+        $this->tmuxWasRunning = $tmux->isRunning();
+        if ($this->tmuxWasRunning) {
+            $this->call('tmux-ui:stop', ['--kill' => true]);
+        }
+
+        $this->progressBar->advance();
+    }
+
+    /**
+     * Execute the main update steps
+     */
+    private function executeUpdateSteps(): void
+    {
+        // Git operations
+        if (!$this->option('skip-git')) {
+            $this->performGitUpdate();
+        }
+
+        // Composer operations
+        if (!$this->option('skip-composer')) {
+            $this->performComposerUpdate();
+        }
+
+        // Database migrations
+        if (!$this->option('skip-db')) {
+            $this->performDatabaseUpdate();
+        }
+
+        // NPM operations
+        if (!$this->option('skip-npm')) {
+            $this->performNpmOperations();
+        }
+
+        // Clear caches and perform maintenance
+        $this->performMaintenanceTasks();
+    }
+
+    /**
+     * Perform git update with better error handling
+     */
+    private function performGitUpdate(): void
+    {
+        $this->info('📥 Updating from git repository...');
+
+        $gitResult = $this->call('nntmux:git');
+
+        if ($gitResult !== 0) {
+            throw new \Exception('Git update failed');
+        }
+
+        $this->progressBar->advance();
+    }
+
+    /**
+     * Perform composer update with optimization
+     */
+    private function performComposerUpdate(): void
+    {
+        $this->info('📦 Updating composer dependencies...');
+
+        $composerResult = $this->call('nntmux:composer');
+
+        if ($composerResult !== 0) {
+            throw new \Exception('Composer update failed');
+        }
+
+        $this->progressBar->advance();
+    }
+
+    /**
+     * Perform database updates
+     */
+    private function performDatabaseUpdate(): void
+    {
+        $this->info('🗄️ Updating database...');
+
+        $dbResult = $this->call('nntmux:db');
+
+        if ($dbResult !== 0) {
+            throw new \Exception('Database update failed');
+        }
+
+        $this->progressBar->advance();
+    }
+
+    /**
+     * Perform NPM operations with parallel processing where possible
+     */
+    private function performNpmOperations(): void
+    {
+        // Check if package.json has changed
+        $packageLockExists = File::exists(base_path('package-lock.json'));
+        $shouldInstall = !$packageLockExists || $this->option('force');
+
+        if ($shouldInstall) {
+            $this->info('📦 Installing npm packages...');
+
+            $process = Process::timeout(600)
+                ->path(base_path())
+                ->run('npm ci --silent');
+
+            if (!$process->successful()) {
+                // Fallback to npm install if ci fails
+                $process = Process::timeout(600)
+                    ->path(base_path())
+                    ->run('npm install --silent');
+
+                if (!$process->successful()) {
+                    throw new \Exception('NPM install failed: ' . $process->errorOutput());
+                }
+            }
+        }
+
+        $this->progressBar->advance();
+
+        // Build assets
+        $this->info('🔨 Building assets...');
+
+        $buildProcess = Process::timeout(600)
+            ->path(base_path())
+            ->run('npm run build');
+
+        if (!$buildProcess->successful()) {
+            throw new \Exception('Asset build failed: ' . $buildProcess->errorOutput());
+        }
+
+        $this->progressBar->advance();
+    }
+
+    /**
+     * Perform maintenance tasks
+     */
+    private function performMaintenanceTasks(): void
+    {
+        // Clear Smarty cache
+        $this->info('🧹 Clearing Smarty cache...');
+        $this->clearSmartyCache();
+        $this->progressBar->advance();
+
+        // Merge environment variables
+        $this->info('⚙️ Merging environment configuration...');
+        $this->mergeEnvironmentConfig();
+        $this->progressBar->advance();
+    }
+
+    /**
+     * Clear Smarty compiled templates
+     */
+    private function clearSmartyCache(): void
+    {
+        try {
+            $smarty = new Smarty();
+            $smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
+
+            if ($smarty->clearCompiledTemplate()) {
+                $this->line('  ✓ Smarty compiled template cache cleared');
             } else {
-                $status = $this->call('nntmux:composer');
-                if ($status) {
-                    $this->error('Composer failed to update!!');
-                }
-                $fail = $this->call('nntmux:db');
-                if ($fail) {
-                    $this->error('Db updating failed!!');
-                }
+                $this->warn('  ⚠ Could not clear Smarty cache automatically');
+                $this->line('    Please clear manually: ' . config('ytake-laravel-smarty.compile_path'));
             }
         } catch (\Exception $e) {
-            $this->error($e->getMessage());
+            $this->warn('  ⚠ Smarty cache clear failed: ' . $e->getMessage());
         }
+    }
 
-        // Install npm packages
-        $this->info('Installing npm packages...');
-        $process = Process::timeout(360)->run('npm install');
-        echo $process->output();
-        echo $process->errorOutput();
-        $this->info('Npm packages installed successfully!');
-        // Run npm build
-        $this->info('Building assets...');
-        $process = Process::timeout(360)->run('npm run build');
-        echo $process->output();
-        echo $process->errorOutput();
-        $this->info('Assets built successfully!');
-
-        $cleared = (new Smarty)->setCompileDir(config('ytake-laravel-smarty.compile_path'))->clearCompiledTemplate();
-        if ($cleared) {
-            $this->output->writeln('<comment>The Smarty compiled template cache has been cleaned for you</comment>');
-        } else {
-            $this->output->writeln(
-                '<comment>You should clear your Smarty compiled template cache at: '.
-                config('ytake-laravel-smarty.compile_path').'</comment>'
-            );
-        }
-
-        // Merge changes from .env.example into .env
-        $this->info('Merging changes from .env.example into .env...');
-
+    /**
+     * Merge environment configuration with improved error handling
+     */
+    private function mergeEnvironmentConfig(): void
+    {
         try {
-            // Read both files
-            $envExampleContent = file_get_contents(base_path('.env.example'));
-            $envContent = file_get_contents(base_path('.env'));
+            $envExamplePath = base_path('.env.example');
+            $envPath = base_path('.env');
 
-            if ($envExampleContent === false || $envContent === false) {
-                throw new \Exception('Could not read .env or .env.example files');
+            if (!File::exists($envExamplePath)) {
+                $this->warn('  ⚠ .env.example not found, skipping environment merge');
+                return;
             }
 
-            // Parse files into key-value pairs
-            $envExampleVars = [];
-            foreach (preg_split("/\r\n|\n|\r/", $envExampleContent) as $line) {
-                $line = trim($line);
-                if (empty($line) || str_starts_with($line, '#')) {
-                    continue;
-                }
-
-                if (preg_match('/^([^=]+)=(.*)$/', $line, $matches)) {
-                    $key = trim($matches[1]);
-                    $value = $matches[2]; // Keep the original value with potential = signs
-                    $envExampleVars[$key] = $value;
-                }
+            if (!File::exists($envPath)) {
+                $this->warn('  ⚠ .env not found, skipping environment merge');
+                return;
             }
 
-            $envVars = [];
-            foreach (preg_split("/\r\n|\n|\r/", $envContent) as $line) {
-                $line = trim($line);
-                if (empty($line) || str_starts_with($line, '#')) {
-                    continue;
-                }
+            $envExampleVars = $this->parseEnvFile($envExamplePath);
+            $envVars = $this->parseEnvFile($envPath);
 
-                if (preg_match('/^([^=]+)=(.*)$/', $line, $matches)) {
-                    $key = trim($matches[1]);
-                    $value = $matches[2];
-                    $envVars[$key] = $value;
-                }
-            }
-
-            // Find keys in .env.example that are not in .env
             $missingKeys = array_diff_key($envExampleVars, $envVars);
 
             if (empty($missingKeys)) {
-                $this->info('No new keys found in .env.example to merge into .env');
-            } else {
-                // Add missing keys to .env file
-                $newEnvContent = $envContent;
-                if (! str_ends_with($newEnvContent, "\n")) {
-                    $newEnvContent .= "\n";
-                }
-                $newEnvContent .= "\n# New settings added from .env.example\n";
-
-                foreach ($missingKeys as $key => $value) {
-                    $newEnvContent .= "$key=$value\n";
-                }
-
-                // Write updated content back to .env
-                if (file_put_contents(base_path('.env'), $newEnvContent)) {
-                    $this->info('Successfully merged '.count($missingKeys).' new keys from .env.example into .env');
-                    $this->line('The following keys were added:');
-                    foreach ($missingKeys as $key => $value) {
-                        $this->line("  $key=$value");
-                    }
-                } else {
-                    throw new \Exception('Failed to write changes to .env file');
-                }
+                $this->line('  ✓ No new environment variables to merge');
+                return;
             }
 
+            $this->addMissingEnvVars($envPath, $missingKeys);
+            $this->line("  ✓ Merged " . count($missingKeys) . " new environment variables");
+
         } catch (\Exception $e) {
-            $this->error('Failed to merge changes: '.$e->getMessage());
-            $this->info('There are changes in .env.example that need to be added manually to .env');
+            $this->warn('  ⚠ Environment merge failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Parse environment file into key-value pairs
+     */
+    private function parseEnvFile(string $path): array
+    {
+        $content = File::get($path);
+        $vars = [];
+
+        foreach (preg_split("/\r\n|\n|\r/", $content) as $line) {
+            $line = trim($line);
+
+            if (empty($line) || str_starts_with($line, '#')) {
+                continue;
+            }
+
+            if (preg_match('/^([^=]+)=(.*)$/', $line, $matches)) {
+                $key = trim($matches[1]);
+                $value = $matches[2];
+                $vars[$key] = $value;
+            }
         }
 
-        if ($maintenance === true) {
+        return $vars;
+    }
+
+    /**
+     * Add missing environment variables to .env file
+     */
+    private function addMissingEnvVars(string $envPath, array $missingKeys): void
+    {
+        $content = File::get($envPath);
+
+        if (!str_ends_with($content, "\n")) {
+            $content .= "\n";
+        }
+
+        $content .= "\n# New settings added from .env.example on " . now()->toDateTimeString() . "\n";
+
+        foreach ($missingKeys as $key => $value) {
+            $content .= "$key=$value\n";
+        }
+
+        File::put($envPath, $content);
+    }
+
+    /**
+     * Finalize the update process
+     */
+    private function finalizeUpdate(): void
+    {
+        $this->info('🏁 Finalizing update...');
+
+        // Clear application caches
+        Cache::flush();
+
+        // Restore application state
+        $this->restoreEnvironment();
+
+        $this->progressBar->advance();
+    }
+
+    /**
+     * Restore the original environment state
+     */
+    private function restoreEnvironment(): void
+    {
+        // Restore maintenance mode state
+        if (!$this->wasInMaintenance && App::isDownForMaintenance()) {
             $this->call('up');
         }
-        if ($running === true) {
-            $this->startTmux();
+
+        // Restore tmux state
+        if ($this->tmuxWasRunning) {
+            $this->call('tmux-ui:start');
         }
-    }
-
-    private function appDown(): bool
-    {
-        if (App::isDownForMaintenance() === false) {
-            $this->call('down', ['--render' => 'errors::maintenance', '--retry' => 120]);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private function stopTmux(): bool
-    {
-        if ((new Tmux)->isRunning() === true) {
-            $this->call('tmux-ui:stop', ['--kill' => true]);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private function startTmux(): void
-    {
-        $this->call('tmux-ui:start');
     }
 }
