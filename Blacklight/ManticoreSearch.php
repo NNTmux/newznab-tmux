@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Release;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -17,9 +18,6 @@ use Manticoresearch\Search;
  */
 class ManticoreSearch
 {
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
     protected mixed $config;
 
     protected array $connection;
@@ -47,25 +45,37 @@ class ManticoreSearch
      */
     public function insertRelease(array $parameters): void
     {
-        if ($parameters['id']) {
-            try {
-                $this->manticoreSearch->table($this->config['indexes']['releases'])
-                    ->replaceDocument(
-                        [
-                            'name' => $parameters['name'],
-                            'searchname' => $parameters['searchname'],
-                            'fromname' => $parameters['fromname'],
-                            'categories_id' => (string) $parameters['categories_id'],
-                            'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'],
-                        ], $parameters['id']);
-            } catch (ResponseException $re) {
-                Log::error($re->getMessage());
-            } catch (\RuntimeException $ru) {
-                Log::error($ru->getMessage());
-            } catch (\Throwable $exception) {
-                Log::error($exception->getMessage());
-            }
+        if (empty($parameters['id'])) {
+            Log::warning('ManticoreSearch: Cannot insert release without ID');
+            return;
+        }
 
+        try {
+            $document = [
+                'name' => $parameters['name'] ?? '',
+                'searchname' => $parameters['searchname'] ?? '',
+                'fromname' => $parameters['fromname'] ?? '',
+                'categories_id' => (string) ($parameters['categories_id'] ?? ''),
+                'filename' => $parameters['filename'] ?? '',
+            ];
+
+            $this->manticoreSearch->table($this->config['indexes']['releases'])
+                ->replaceDocument($document, $parameters['id']);
+
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch insertRelease ResponseException: ' . $e->getMessage(), [
+                'release_id' => $parameters['id'],
+                'index' => $this->config['indexes']['releases']
+            ]);
+        } catch (RuntimeException $e) {
+            Log::error('ManticoreSearch insertRelease RuntimeException: ' . $e->getMessage(), [
+                'release_id' => $parameters['id']
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch insertRelease unexpected error: ' . $e->getMessage(), [
+                'release_id' => $parameters['id'],
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 
@@ -74,19 +84,34 @@ class ManticoreSearch
      */
     public function insertPredb(array $parameters): void
     {
-        try {
-            if ($parameters['id']) {
-                $this->manticoreSearch->table($this->config['indexes']['predb'])
-                    ->replaceDocument(['title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']], $parameters['id']);
-            }
-        } catch (ResponseException $re) {
-            Log::error($re->getMessage());
-        } catch (\RuntimeException $ru) {
-            Log::error($ru->getMessage());
-        } catch (\Throwable $exception) {
-            Log::error($exception->getMessage());
+        if (empty($parameters['id'])) {
+            Log::warning('ManticoreSearch: Cannot insert predb without ID');
+            return;
         }
 
+        try {
+            $document = [
+                'title' => $parameters['title'] ?? '',
+                'filename' => $parameters['filename'] ?? '',
+                'source' => $parameters['source'] ?? ''
+            ];
+
+            $this->manticoreSearch->table($this->config['indexes']['predb'])
+                ->replaceDocument($document, $parameters['id']);
+
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch insertPredb ResponseException: ' . $e->getMessage(), [
+                'predb_id' => $parameters['id']
+            ]);
+        } catch (RuntimeException $e) {
+            Log::error('ManticoreSearch insertPredb RuntimeException: ' . $e->getMessage(), [
+                'predb_id' => $parameters['id']
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch insertPredb unexpected error: ' . $e->getMessage(), [
+                'predb_id' => $parameters['id']
+            ]);
+        }
     }
 
     /**
@@ -96,139 +121,207 @@ class ManticoreSearch
      */
     public function deleteRelease(array $identifiers): void
     {
-        if ($identifiers['i'] === false) {
-            $identifiers['i'] = Release::query()->where('guid', $identifiers['g'])->first(['id']);
-            if ($identifiers['i'] !== null) {
-                $identifiers['i'] = $identifiers['i']['id'];
-            }
+        if (empty($identifiers['g'])) {
+            Log::warning('ManticoreSearch: Cannot delete release without GUID');
+            return;
         }
-        if ($identifiers['i'] !== false) {
-            $this->manticoreSearch->table($this->config['indexes']['releases'])->deleteDocument($identifiers['i']);
+
+        try {
+            if ($identifiers['i'] === false || empty($identifiers['i'])) {
+                $release = Release::query()->where('guid', $identifiers['g'])->first(['id']);
+                $identifiers['i'] = $release?->id;
+            }
+
+            if (!empty($identifiers['i'])) {
+                $this->manticoreSearch->table($this->config['indexes']['releases'])
+                    ->deleteDocument($identifiers['i']);
+            } else {
+                Log::warning('ManticoreSearch: Could not find release ID for deletion', [
+                    'guid' => $identifiers['g']
+                ]);
+            }
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch deleteRelease error: ' . $e->getMessage(), [
+                'guid' => $identifiers['g'],
+                'id' => $identifiers['i'] ?? null
+            ]);
         }
     }
 
     /**
      * Escapes characters that are treated as special operators by the query language parser.
-     *
-     * @param  string  $string  unescaped string
-     * @return string Escaped string.
      */
     public static function escapeString(string $string): string
     {
-        if ($string === '*') {
+        if ($string === '*' || empty($string)) {
             return '';
         }
 
-        $from = ['\\', '(', ')', '@', '~', '"', '&', '/', '$', '=', "'", '--', '[', ']'];
-        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\', '\--", '\[', '\]'];
+        $from = ['\\', '(', ')', '@', '~', '"', '&', '/', '$', '=', "'", '--', '[', ']', '!', '-'];
+        $to = ['\\\\', '\(', '\)', '\@', '\~', '\"', '\&', '\/', '\$', '\=', "\'", '\--', '\[', '\]', '\!', '\-'];
 
         $string = str_replace($from, $to, $string);
-        // Remove these characaters if they are the last chars in $string
-        $string = Str::of($string)->rtrim('-');
-        $string = Str::of($string)->rtrim('!');
 
-        return $string;
+        // Clean up trailing special characters
+        $string = rtrim($string, '-!');
+
+        return trim($string);
     }
 
     public function updateRelease(int|string $releaseID): void
     {
-        $new = Release::query()
-            ->where('releases.id', $releaseID)
-            ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
-            ->groupBy('releases.id')
-            ->first();
+        if (empty($releaseID)) {
+            Log::warning('ManticoreSearch: Cannot update release without ID');
+            return;
+        }
 
-        if ($new !== null) {
-            $release = $new->toArray();
-            $this->insertRelease($release);
+        try {
+            $release = Release::query()
+                ->where('releases.id', $releaseID)
+                ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
+                ->select([
+                    'releases.id',
+                    'releases.name',
+                    'releases.searchname',
+                    'releases.fromname',
+                    'releases.categories_id',
+                    DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')
+                ])
+                ->groupBy('releases.id')
+                ->first();
+
+            if ($release !== null) {
+                $this->insertRelease($release->toArray());
+            } else {
+                Log::warning('ManticoreSearch: Release not found for update', ['id' => $releaseID]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch updateRelease error: ' . $e->getMessage(), [
+                'release_id' => $releaseID
+            ]);
         }
     }
 
     /**
      * Update Manticore Predb index for given predb_id.
-     *
-     *
-     * @throws \Exception
      */
     public function updatePreDb(array $parameters): void
     {
-        if (! empty($parameters)) {
-            $this->insertPredb($parameters);
+        if (empty($parameters)) {
+            Log::warning('ManticoreSearch: Cannot update predb with empty parameters');
+            return;
         }
+
+        $this->insertPredb($parameters);
     }
 
     public function truncateRTIndex(array $indexes = []): bool
     {
         if (empty($indexes)) {
             $this->cli->error('You need to provide index name to truncate');
-
             return false;
         }
+
+        $success = true;
         foreach ($indexes as $index) {
-            if (\in_array($index, $this->config['indexes'], true)) {
-                try {
-                    $this->manticoreSearch->table($index)->truncate();
-                    $this->cli->info('Truncating index '.$index.' finished.');
-                } catch (ResponseException $e) {
-                    if ($e->getMessage() === 'Invalid index') {
-                        if ($index === 'releases_rt') {
-                            $this->manticoreSearch->table($index)->create([
-                                'name' => ['type' => 'string'],
-                                'searchname' => ['type' => 'string'],
-                                'fromname' => ['type' => 'string'],
-                                'filename' => ['type' => 'string'],
-                                'categories_id' => ['type' => 'integer'],
-                            ]);
-                        } elseif ($index === 'predb_rt') {
-                            $this->manticoreSearch->table($index)->create([
-                                'title' => ['type' => 'string'],
-                                'filename' => ['type' => 'string'],
-                                'source' => ['type' => 'string'],
-                            ]);
-                        }
-                    }
+            if (!\in_array($index, $this->config['indexes'], true)) {
+                $this->cli->error('Unsupported index: ' . $index);
+                $success = false;
+                continue;
+            }
+
+            try {
+                $this->manticoreSearch->table($index)->truncate();
+                $this->cli->info('Truncating index ' . $index . ' finished.');
+            } catch (ResponseException $e) {
+                if ($e->getMessage() === 'Invalid index') {
+                    $this->createIndexIfNotExists($index);
+                } else {
+                    $this->cli->error('Error truncating index ' . $index . ': ' . $e->getMessage());
+                    $success = false;
                 }
-            } else {
-                $this->cli->error('Unsupported index: '.$index);
+            } catch (\Throwable $e) {
+                $this->cli->error('Unexpected error truncating index ' . $index . ': ' . $e->getMessage());
+                $success = false;
             }
         }
 
-        return true;
+        return $success;
+    }
+
+    /**
+     * Create index if it doesn't exist
+     */
+    private function createIndexIfNotExists(string $index): void
+    {
+        try {
+            if ($index === 'releases_rt') {
+                $this->manticoreSearch->table($index)->create([
+                    'name' => ['type' => 'string'],
+                    'searchname' => ['type' => 'string'],
+                    'fromname' => ['type' => 'string'],
+                    'filename' => ['type' => 'string'],
+                    'categories_id' => ['type' => 'integer'],
+                ]);
+                $this->cli->info('Created releases_rt index');
+            } elseif ($index === 'predb_rt') {
+                $this->manticoreSearch->table($index)->create([
+                    'title' => ['type' => 'string'],
+                    'filename' => ['type' => 'string'],
+                    'source' => ['type' => 'string'],
+                ]);
+                $this->cli->info('Created predb_rt index');
+            }
+        } catch (\Throwable $e) {
+            $this->cli->error('Error creating index ' . $index . ': ' . $e->getMessage());
+        }
     }
 
     /**
      * Optimize the RT indices.
-     *
-     * @return bool Returns true if optimization was successful, false otherwise
      */
     public function optimizeRTIndex(): bool
     {
-        try {
-            foreach ($this->config['indexes'] as $index) {
+        $success = true;
+
+        foreach ($this->config['indexes'] as $index) {
+            try {
                 $this->manticoreSearch->table($index)->flush();
                 $this->manticoreSearch->table($index)->optimize();
                 Log::info("Successfully optimized index: {$index}");
+            } catch (ResponseException $e) {
+                Log::error('Failed to optimize index ' . $index . ': ' . $e->getMessage());
+                $success = false;
+            } catch (\Throwable $e) {
+                Log::error('Unexpected error optimizing index ' . $index . ': ' . $e->getMessage());
+                $success = false;
             }
-
-            return true;
-        } catch (ResponseException $e) {
-            Log::error('Failed to optimize RT indices: '.$e->getMessage());
-
-            return false;
-        } catch (\Throwable $e) {
-            Log::error('Unexpected error while optimizing RT indices: '.$e->getMessage());
-
-            return false;
         }
+
+        return $success;
     }
 
     public function searchIndexes(string $rt_index, ?string $searchString, array $column = [], array $searchArray = []): array
     {
-        $resultId = [];
-        $resultData = [];
+        if (empty($rt_index)) {
+            Log::warning('ManticoreSearch: Index name is required for search');
+            return [];
+        }
+
+        // Create cache key for search results
+        $cacheKey = md5(serialize([
+            'index' => $rt_index,
+            'search' => $searchString,
+            'columns' => $column,
+            'array' => $searchArray
+        ]));
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
         try {
-            // Modified query to reduce sort-by attributes
             $query = $this->search->setTable($rt_index)
                 ->option('ranker', 'sph04')
                 ->maxMatches(10000)
@@ -236,51 +329,78 @@ class ManticoreSearch
                 ->sort('id', 'desc')
                 ->stripBadUtf8(true);
 
-            // Removed option('sort_method', 'pq') and trackScores(true) which may contribute to additional sort attributes
-
-            if (! empty($searchArray)) {
+            if (!empty($searchArray)) {
+                $searchTerms = [];
                 foreach ($searchArray as $key => $value) {
-                    $query->search('@@relaxed @'.$key.' '.self::escapeString($value));
-                }
-            } elseif (! empty($searchString)) {
-                // If $column is an array and has more than one item, implode it and wrap in parentheses.
-                if (! empty($column) && \count($column) > 1) {
-                    $searchColumns = '@('.implode(',', $column).')';
-                } elseif (! empty($column) && \count($column) === 1) { // If $column is an array and has only one item, use as is.
-                    $searchColumns = '@'.$column[0];
-                } else {
-                    $searchColumns = ''; // Careful, this will search all columns.
+                    if (!empty($value)) {
+                        $escapedValue = self::escapeString($value);
+                        if (!empty($escapedValue)) {
+                            $searchTerms[] = '@@relaxed @' . $key . ' ' . $escapedValue;
+                        }
+                    }
                 }
 
-                $query->search('@@relaxed '.$searchColumns.' '.self::escapeString($searchString));
+                if (!empty($searchTerms)) {
+                    $query->search(implode(' ', $searchTerms));
+                } else {
+                    return [];
+                }
+            } elseif (!empty($searchString)) {
+                $escapedSearch = self::escapeString($searchString);
+                if (empty($escapedSearch)) {
+                    return [];
+                }
+
+                $searchColumns = '';
+                if (!empty($column)) {
+                    if (count($column) > 1) {
+                        $searchColumns = '@(' . implode(',', $column) . ')';
+                    } else {
+                        $searchColumns = '@' . $column[0];
+                    }
+                }
+
+                $query->search('@@relaxed ' . $searchColumns . ' ' . $escapedSearch);
             } else {
                 return [];
             }
+
             $results = $query->get();
+            $resultIds = [];
+            $resultData = [];
+
             foreach ($results as $doc) {
-                $resultId[] = [
-                    'id' => $doc->getId(),
-                ];
-                $resultData[] = [
-                    'data' => $doc->getData(),
-                ];
+                $resultIds[] = $doc->getId();
+                $resultData[] = $doc->getData();
             }
 
-            return [
-                'id' => Arr::pluck($resultId, 'id'),
-                'data' => Arr::pluck($resultData, 'data'),
+            $result = [
+                'id' => $resultIds,
+                'data' => $resultData,
             ];
-        } catch (ResponseException $exception) {
-            Log::error($exception->getMessage());
 
+            // Cache results for 5 minutes
+            Cache::put($cacheKey, $result, now()->addMinutes(5));
+
+            return $result;
+
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch searchIndexes ResponseException: ' . $e->getMessage(), [
+                'index' => $rt_index,
+                'search' => $searchString
+            ]);
             return [];
-        } catch (RuntimeException $exception) {
-            Log::error($exception->getMessage());
-
+        } catch (RuntimeException $e) {
+            Log::error('ManticoreSearch searchIndexes RuntimeException: ' . $e->getMessage(), [
+                'index' => $rt_index,
+                'search' => $searchString
+            ]);
             return [];
-        } catch (\Throwable $exception) {
-            Log::error($exception->getMessage());
-
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchIndexes unexpected error: ' . $e->getMessage(), [
+                'index' => $rt_index,
+                'search' => $searchString
+            ]);
             return [];
         }
     }
