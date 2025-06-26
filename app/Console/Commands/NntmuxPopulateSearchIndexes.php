@@ -1,265 +1,483 @@
 <?php
 
-namespace App\Console\Commands;
+            namespace App\Console\Commands;
 
-use App\Models\Predb;
-use App\Models\Release;
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
-use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
+            use App\Models\Predb;
+            use App\Models\Release;
+            use Blacklight\ElasticSearchSiteSearch;
+            use Blacklight\ManticoreSearch;
+            use Illuminate\Console\Command;
+            use Illuminate\Support\Arr;
+            use Illuminate\Support\Facades\DB;
+            use Exception;
 
-class NntmuxPopulateSearchIndexes extends Command
-{
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = '
-    nntmux:populate
-    {--manticore : Use ManticoreSearch}
-    {--elastic : Use ElasticSearch}
-    {--releases : Populates the releases_rt index}
-    {--predb  : Populates the predb_rt index}
-    {--count=20000 : Sets the chunk size}
-    {--optimize : Optimize ManticoreSearch indexes}';
+            class NntmuxPopulateSearchIndexes extends Command
+            {
+                /**
+                 * The name and signature of the console command.
+                 *
+                 * @var string
+                 */
+                protected $signature = 'nntmux:populate
+                                       {--manticore : Use ManticoreSearch}
+                                       {--elastic : Use ElasticSearch}
+                                       {--releases : Populates the releases index}
+                                       {--predb : Populates the predb index}
+                                       {--count=20000 : Sets the chunk size}
+                                       {--optimize : Optimize ManticoreSearch indexes}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Populate Manticore/Elasticsearch indexes with either releases or predb';
+                /**
+                 * The console command description.
+                 *
+                 * @var string
+                 */
+                protected $description = 'Populate Manticore/Elasticsearch indexes with either releases or predb';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(): int
-    {
-        if ($this->option('releases') && $this->option('manticore')) {
-            $this->manticoreReleases();
-        } elseif ($this->option('predb') && $this->option('manticore')) {
-            $this->manticorePreDB();
-        } elseif ($this->option('optimize')) {
-            $this->optimize();
-        } elseif ($this->option('elastic') && $this->option('releases')) {
-            $this->elasticReleases();
-        } elseif ($this->option('elastic') && $this->option('predb')) {
-            $this->elasticPreDB();
-        } else {
-            $this->error('You need to specify which index to populate! Check the options with the -h parameter.');
-        }
+                private const SUPPORTED_ENGINES = ['manticore', 'elastic'];
+                private const SUPPORTED_INDEXES = ['releases', 'predb'];
+                private const GROUP_CONCAT_MAX_LEN = 16384;
+                private const DEFAULT_CHUNK_SIZE = 20000;
 
-        return 0;
-    }
+                /**
+                 * Execute the console command.
+                 */
+                public function handle(): int
+                {
+                    try {
+                        if ($this->option('optimize')) {
+                            return $this->handleOptimize();
+                        }
 
-    /**
-     * Run releases.
-     */
-    private function manticoreReleases(): void
-    {
-        $manticore = new ManticoreSearch;
-        $manticore->truncateRTIndex(Arr::wrap('releases_rt'));
-        $total = Release::count();
-        if (! $total) {
-            $this->warn('Releases table is empty. Nothing to do.');
-            exit();
-        }
-        $max = $this->option('count');
+                        $engine = $this->getSelectedEngine();
+                        $index = $this->getSelectedIndex();
 
-        DB::statement('SET SESSION group_concat_max_len=16384;');
+                        if (!$engine || !$index) {
+                            $this->error('You must specify both an engine (--manticore or --elastic) and an index (--releases or --predb).');
+                            $this->info('Use --help to see all available options.');
+                            return Command::FAILURE;
+                        }
 
-        $this->info("Starting to populate Manticore RT index 'releases_rt' with $total rows and $max inserts per loop.");
+                        return $this->populateIndex($engine, $index);
 
-        $bar = $this->output->createProgressBar($total);
-        $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
-        $bar->start();
+                    } catch (Exception $e) {
+                        $this->error("An error occurred: {$e->getMessage()}");
 
-        Release::query()
-            ->orderByDesc('id')
-            ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
-            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id'])
-            ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
-            ->groupBy('id')
-            ->chunk($max, function ($releases) use ($manticore, $bar) {
-                $data = [];
-                foreach ($releases as $r) {
-                    $data[] = [
-                        'id' => $r->id,
-                        'name' => (string) ($r->name ?? ''),
-                        'searchname' => (string) ($r->searchname ?? ''),
-                        'fromname' => (string) ($r->fromname ?? ''),
-                        'categories_id' => (string) ($r->categories_id ?? '0'),
-                        'filename' => (string) ($r->filename ?? ''),
-                        'dummy' => 1, // Adding dummy integer field as required by schema
-                    ];
-                    $bar->advance();
+                        if ($this->output->isVerbose()) {
+                            $this->error($e->getTraceAsString());
+                        }
+
+                        return Command::FAILURE;
+                    }
                 }
-                if (! empty($data)) {
-                    $manticore->manticoreSearch->table('releases_rt')->replaceDocuments($data);
+
+                /**
+                 * Get the selected search engine from options
+                 */
+                private function getSelectedEngine(): ?string
+                {
+                    foreach (self::SUPPORTED_ENGINES as $engine) {
+                        if ($this->option($engine)) {
+                            return $engine;
+                        }
+                    }
+                    return null;
                 }
-            });
-        $bar->finish();
-        $this->newLine();
-    }
 
-    /**
-     * Run predb.
-     */
-    private function manticorePreDB(): void
-    {
-        $manticore = new ManticoreSearch;
-        $manticore->truncateRTIndex(['predb_rt']);
-
-        $total = Predb::count();
-        if (! $total) {
-            $this->warn('PreDB table is empty. Nothing to do.');
-            exit();
-        }
-        $max = $this->option('count');
-
-        DB::statement('SET SESSION group_concat_max_len=16384;');
-
-        $this->info("Starting to populate Manticore RT index 'predb_rt' with $total rows and $max inserts per loop.");
-
-        $bar = $this->output->createProgressBar($total);
-        $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
-        $bar->start();
-        Predb::query()
-            ->select(['id', 'title', 'filename', 'source'])
-            ->groupBy('id')
-            ->orderBy('id')
-            ->chunk($max, function ($pre) use ($manticore, $bar) {
-                $data = [];
-                foreach ($pre as $p) {
-                    $data[] = [
-                        'id' => $p->id,
-                        'title' => (string) ($p->title ?? ''),
-                        'filename' => (string) ($p->filename ?? ''),
-                        'source' => (string) ($p->source ?? ''),
-                        'dummy' => 1, // Adding dummy integer field as required by schema
-                    ];
-                    $bar->advance();
+                /**
+                 * Get the selected index from options
+                 */
+                private function getSelectedIndex(): ?string
+                {
+                    foreach (self::SUPPORTED_INDEXES as $index) {
+                        if ($this->option($index)) {
+                            return $index;
+                        }
+                    }
+                    return null;
                 }
-                if (! empty($data)) {
-                    $manticore->manticoreSearch->table('predb_rt')->replaceDocuments($data);
+
+                /**
+                 * Handle the optimize command
+                 */
+                private function handleOptimize(): int
+                {
+                    $this->info('Optimizing ManticoreSearch indexes...');
+
+                    try {
+                        (new ManticoreSearch)->optimizeRTIndex();
+                        $this->info('Optimization completed successfully!');
+                        return Command::SUCCESS;
+                    } catch (Exception $e) {
+                        $this->error("Optimization failed: {$e->getMessage()}");
+                        return Command::FAILURE;
+                    }
                 }
-            });
 
-        $bar->finish();
-        $this->newLine();
-    }
+                /**
+                 * Populate the specified index with the specified engine
+                 */
+                private function populateIndex(string $engine, string $index): int
+                {
+                    $methodName = "{$engine}" . ucfirst($index);
 
-    private function elasticReleases(): void
-    {
-        $data = ['body' => []];
-        $elastic = new ElasticSearchSiteSearch;
-        $total = Release::count();
-        if (! $total) {
-            $this->warn('Could not get database information for releases table.');
-            exit();
-        }
-        $max = $this->option('count');
-        $this->info("Starting to populate ElasticSearch index releases with $total releases.");
+                    if (!method_exists($this, $methodName)) {
+                        $this->error("Method {$methodName} not implemented.");
+                        return Command::FAILURE;
+                    }
 
-        $bar = $this->output->createProgressBar($total);
-        $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
-        $bar->start();
+                    $this->info("Starting {$engine} {$index} population...");
 
-        DB::statement('SET SESSION group_concat_max_len=16384;');
-        Release::query()
-            ->orderByDesc('id')
-            ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
-            ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', 'releases.categories_id', 'releases.postdate'])
-            ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") filename')
-            ->groupBy('id')
-            ->chunk($max, function ($releases) use ($bar, $data) {
-                foreach ($releases as $r) {
-                    $searchName = str_replace(['.', '-'], ' ', $r->searchname);
-                    $data['body'][] = [
-                        'index' => [
-                            '_index' => 'releases',
-                            '_id' => $r->id,
-                        ],
-                    ];
-                    $data['body'][] = [
-                        'id' => $r->id,
-                        'name' => $r->name,
-                        'searchname' => $r->searchname,
-                        'plainsearchname' => $searchName,
-                        'fromname' => $r->fromname,
-                        'categories_id' => $r->categories_id,
-                        'filename' => $r->filename,
-                        'postdate' => $r->postdate,
-                    ];
-                    $bar->advance();
+                    $startTime = microtime(true);
+                    $result = $this->{$methodName}();
+                    $executionTime = round(microtime(true) - $startTime, 2);
+
+                    if ($result === Command::SUCCESS) {
+                        $this->info("Population completed in {$executionTime} seconds.");
+                    }
+
+                    return $result;
                 }
-                \Elasticsearch::bulk($data);
-            });
-        $bar->finish();
-        $this->newLine();
-        $this->info('Done');
-    }
 
-    private function elasticPreDB(): void
-    {
-        $data = ['body' => []];
-        $elastic = new ElasticSearchSiteSearch;
-        $total = Predb::count();
-        if (! $total) {
-            $this->warn('Could not get database information for predb table.');
-            exit();
-        }
-        $max = $this->option('count');
+                /**
+                 * Populate ManticoreSearch releases index
+                 */
+                private function manticoreReleases(): int
+                {
+                    $manticore = new ManticoreSearch;
+                    $indexName = 'releases_rt';
 
-        DB::statement('SET SESSION group_concat_max_len=16384;');
+                    $manticore->truncateRTIndex(Arr::wrap($indexName));
 
-        $this->info("Starting to populate Manticore RT index 'predb_rt' with $total rows and $max inserts per loop.");
+                    $total = Release::count();
+                    if (!$total) {
+                        $this->warn('Releases table is empty. Nothing to do.');
+                        return Command::SUCCESS;
+                    }
 
-        $bar = $this->output->createProgressBar($total);
-        $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
-        $bar->start();
-        Predb::query()
-            ->select(['id', 'title', 'filename', 'source'])
-            ->groupBy('id')
-            ->orderBy('id')
-            ->chunk($max, function ($pre) use ($bar, $data) {
-                foreach ($pre as $p) {
-                    $data['body'][] = [
-                        'index' => [
-                            '_index' => 'predb',
-                            '_id' => $p->id,
-                        ],
-                    ];
-                    $data['body'][] = [
-                        'id' => $p->id,
-                        'title' => $p->title,
-                        'filename' => $p->filename,
-                        'source' => $p->source,
-                    ];
-                    $bar->advance();
+                    $query = Release::query()
+                        ->orderByDesc('releases.id')
+                        ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
+                        ->select([
+                            'releases.id',
+                            'releases.name',
+                            'releases.searchname',
+                            'releases.fromname',
+                            'releases.categories_id'
+                        ])
+                        ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") AS filename')
+                        ->groupBy([
+                            'releases.id',
+                            'releases.name',
+                            'releases.searchname',
+                            'releases.fromname',
+                            'releases.categories_id'
+                        ]);
+
+                    return $this->processManticoreData(
+                        $indexName,
+                        $total,
+                        $query,
+                        function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'name' => (string) ($item->name ?? ''),
+                                'searchname' => (string) ($item->searchname ?? ''),
+                                'fromname' => (string) ($item->fromname ?? ''),
+                                'categories_id' => (int) ($item->categories_id ?? 0),
+                                'filename' => (string) ($item->filename ?? ''),
+                                'dummy' => 1,
+                            ];
+                        }
+                    );
                 }
-                \Elasticsearch::bulk($data);
-            });
 
-        $bar->finish();
-        $this->newLine();
-        $this->info('Done');
-    }
+                /**
+                 * Populate ManticoreSearch predb index
+                 */
+                private function manticorePredb(): int
+                {
+                    $manticore = new ManticoreSearch;
+                    $indexName = 'predb_rt';
 
-    /**
-     * Optimize Manticore indexes
-     */
-    private function optimize(): void
-    {
-        $this->info('Optimizing release_rt & predb_rt indexes');
-        try {
-            (new ManticoreSearch)->optimizeRTIndex();
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
-        $this->line('Done!');
-    }
-}
+                    $manticore->truncateRTIndex([$indexName]);
+
+                    $total = Predb::count();
+                    if (!$total) {
+                        $this->warn('PreDB table is empty. Nothing to do.');
+                        return Command::SUCCESS;
+                    }
+
+                    $query = Predb::query()
+                        ->select(['id', 'title', 'filename', 'source'])
+                        ->orderBy('id');
+
+                    return $this->processManticoreData(
+                        $indexName,
+                        $total,
+                        $query,
+                        function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'title' => (string) ($item->title ?? ''),
+                                'filename' => (string) ($item->filename ?? ''),
+                                'source' => (string) ($item->source ?? ''),
+                                'dummy' => 1,
+                            ];
+                        }
+                    );
+                }
+
+                /**
+                 * Process data for ManticoreSearch
+                 */
+                private function processManticoreData(string $indexName, int $total, $query, callable $transformer): int
+                {
+                    $manticore = new ManticoreSearch;
+                    $chunkSize = $this->getChunkSize();
+
+                    $this->setGroupConcatMaxLen();
+
+                    $this->info(sprintf(
+                        "Populating ManticoreSearch index '%s' with %s rows using chunks of %s.",
+                        $indexName,
+                        number_format($total),
+                        number_format($chunkSize)
+                    ));
+
+                    $bar = $this->output->createProgressBar($total);
+                    $bar->setFormat('verbose');
+                    $bar->start();
+
+                    $processedCount = 0;
+                    $errorCount = 0;
+
+                    try {
+                        $query->chunk($chunkSize, function ($items) use ($manticore, $indexName, $transformer, $bar, &$processedCount, &$errorCount) {
+                            $data = [];
+
+                            foreach ($items as $item) {
+                                try {
+                                    $data[] = $transformer($item);
+                                    $processedCount++;
+                                } catch (Exception $e) {
+                                    $errorCount++;
+                                    if ($this->output->isVerbose()) {
+                                        $this->error("Error processing item {$item->id}: {$e->getMessage()}");
+                                    }
+                                }
+                                $bar->advance();
+                            }
+
+                            if (!empty($data)) {
+                                $manticore->manticoreSearch->table($indexName)->replaceDocuments($data);
+                            }
+                        });
+
+                        $bar->finish();
+                        $this->newLine();
+
+                        if ($errorCount > 0) {
+                            $this->warn("Completed with {$errorCount} errors out of {$processedCount} processed items.");
+                        } else {
+                            $this->info('ManticoreSearch population completed successfully!');
+                        }
+
+                        return Command::SUCCESS;
+
+                    } catch (Exception $e) {
+                        $bar->finish();
+                        $this->newLine();
+                        $this->error("Failed to populate ManticoreSearch: {$e->getMessage()}");
+                        return Command::FAILURE;
+                    }
+                }
+
+                /**
+                 * Populate ElasticSearch releases index
+                 */
+                private function elasticReleases(): int
+                {
+                    $total = Release::count();
+                    if (!$total) {
+                        $this->warn('Releases table is empty. Nothing to do.');
+                        return Command::SUCCESS;
+                    }
+
+                    $query = Release::query()
+                        ->orderByDesc('releases.id')
+                        ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
+                        ->select([
+                            'releases.id',
+                            'releases.name',
+                            'releases.searchname',
+                            'releases.fromname',
+                            'releases.categories_id',
+                            'releases.postdate'
+                        ])
+                        ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") AS filename')
+                        ->groupBy([
+                            'releases.id',
+                            'releases.name',
+                            'releases.searchname',
+                            'releases.fromname',
+                            'releases.categories_id',
+                            'releases.postdate'
+                        ]);
+
+                    return $this->processElasticData(
+                        'releases',
+                        $total,
+                        $query,
+                        function ($item) {
+                            $searchName = str_replace(['.', '-'], ' ', $item->searchname ?? '');
+                            return [
+                                'id' => $item->id,
+                                'name' => $item->name,
+                                'searchname' => $item->searchname,
+                                'plainsearchname' => $searchName,
+                                'fromname' => $item->fromname,
+                                'categories_id' => $item->categories_id,
+                                'filename' => $item->filename ?? '',
+                                'postdate' => $item->postdate,
+                            ];
+                        }
+                    );
+                }
+
+                /**
+                 * Populate ElasticSearch predb index
+                 */
+                private function elasticPredb(): int
+                {
+                    $total = Predb::count();
+                    if (!$total) {
+                        $this->warn('PreDB table is empty. Nothing to do.');
+                        return Command::SUCCESS;
+                    }
+
+                    $query = Predb::query()
+                        ->select(['id', 'title', 'filename', 'source'])
+                        ->orderBy('id');
+
+                    return $this->processElasticData(
+                        'predb',
+                        $total,
+                        $query,
+                        function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'title' => $item->title,
+                                'filename' => $item->filename,
+                                'source' => $item->source,
+                            ];
+                        }
+                    );
+                }
+
+                /**
+                 * Process data for ElasticSearch
+                 */
+                private function processElasticData(string $indexName, int $total, $query, callable $transformer): int
+                {
+                    $chunkSize = $this->getChunkSize();
+
+                    $this->setGroupConcatMaxLen();
+
+                    $this->info(sprintf(
+                        "Populating ElasticSearch index '%s' with %s rows using chunks of %s.",
+                        $indexName,
+                        number_format($total),
+                        number_format($chunkSize)
+                    ));
+
+                    $bar = $this->output->createProgressBar($total);
+                    $bar->setFormat('verbose');
+                    $bar->start();
+
+                    $processedCount = 0;
+                    $errorCount = 0;
+                    $batchSize = min($chunkSize, 1000); // ElasticSearch performs better with smaller bulk sizes
+
+                    try {
+                        $query->chunk($chunkSize, function ($items) use ($indexName, $transformer, $bar, &$processedCount, &$errorCount, $batchSize) {
+                            // Process in smaller batches for ElasticSearch
+                            foreach ($items->chunk($batchSize) as $batch) {
+                                $data = ['body' => []];
+
+                                foreach ($batch as $item) {
+                                    try {
+                                        $transformedData = $transformer($item);
+
+                                        $data['body'][] = [
+                                            'index' => [
+                                                '_index' => $indexName,
+                                                '_id' => $item->id,
+                                            ],
+                                        ];
+                                        $data['body'][] = $transformedData;
+
+                                        $processedCount++;
+                                    } catch (Exception $e) {
+                                        $errorCount++;
+                                        if ($this->output->isVerbose()) {
+                                            $this->error("Error processing item {$item->id}: {$e->getMessage()}");
+                                        }
+                                    }
+
+                                    $bar->advance();
+                                }
+
+                                if (!empty($data['body'])) {
+                                    $response = \Elasticsearch::bulk($data);
+
+                                    // Check for errors in bulk response
+                                    if (isset($response['errors']) && $response['errors']) {
+                                        foreach ($response['items'] as $item) {
+                                            if (isset($item['index']['error'])) {
+                                                $errorCount++;
+                                                if ($this->output->isVerbose()) {
+                                                    $this->error("ElasticSearch error: " . json_encode($item['index']['error']));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        $bar->finish();
+                        $this->newLine();
+
+                        if ($errorCount > 0) {
+                            $this->warn("Completed with {$errorCount} errors out of {$processedCount} processed items.");
+                        } else {
+                            $this->info('ElasticSearch population completed successfully!');
+                        }
+
+                        return Command::SUCCESS;
+
+                    } catch (Exception $e) {
+                        $bar->finish();
+                        $this->newLine();
+                        $this->error("Failed to populate ElasticSearch: {$e->getMessage()}");
+                        return Command::FAILURE;
+                    }
+                }
+
+                /**
+                 * Get the chunk size from options
+                 */
+                private function getChunkSize(): int
+                {
+                    $chunkSize = (int) $this->option('count');
+                    return $chunkSize > 0 ? $chunkSize : self::DEFAULT_CHUNK_SIZE;
+                }
+
+                /**
+                 * Set the GROUP_CONCAT max length for the session
+                 */
+                private function setGroupConcatMaxLen(): void
+                {
+                    DB::statement('SET SESSION group_concat_max_len = ?', [self::GROUP_CONCAT_MAX_LEN]);
+                }
+            }
