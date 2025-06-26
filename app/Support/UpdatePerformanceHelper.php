@@ -11,18 +11,19 @@ class UpdatePerformanceHelper
     /**
      * Check if a file has changed since last update
      */
-    public static function hasFileChanged(string $filePath, string $cacheKey = null): bool
+    public static function hasFileChanged(string $filePath, ?string $cacheKey = null): bool
     {
-        if (!File::exists($filePath)) {
+        if (! File::exists($filePath)) {
             return false;
         }
 
-        $cacheKey = $cacheKey ?? 'file_hash_' . md5($filePath);
+        $cacheKey = $cacheKey ?? 'file_hash_'.md5($filePath);
         $currentHash = md5_file($filePath);
         $lastHash = Cache::get($cacheKey);
 
         if ($currentHash !== $lastHash) {
             Cache::put($cacheKey, $currentHash, now()->addDays(7));
+
             return true;
         }
 
@@ -49,7 +50,7 @@ class UpdatePerformanceHelper
                 'successful' => $process->successful(),
                 'output' => $process->output(),
                 'errorOutput' => $process->errorOutput(),
-                'exitCode' => $process->exitCode()
+                'exitCode' => $process->exitCode(),
             ];
         }
 
@@ -62,11 +63,11 @@ class UpdatePerformanceHelper
     public static function clearAllCaches(): array
     {
         $cacheOperations = [
-            'config' => fn() => \Artisan::call('config:clear'),
-            'route' => fn() => \Artisan::call('route:clear'),
-            'view' => fn() => \Artisan::call('view:clear'),
-            'cache' => fn() => \Artisan::call('cache:clear'),
-            'opcache' => fn() => function_exists('opcache_reset') ? opcache_reset() : true,
+            'config' => fn () => \Artisan::call('config:clear'),
+            'route' => fn () => \Artisan::call('route:clear'),
+            'view' => fn () => \Artisan::call('view:clear'),
+            'cache' => fn () => \Artisan::call('cache:clear'),
+            'opcache' => fn () => function_exists('opcache_reset') ? opcache_reset() : true,
         ];
 
         $results = [];
@@ -75,7 +76,7 @@ class UpdatePerformanceHelper
                 $operation();
                 $results[$type] = 'success';
             } catch (\Exception $e) {
-                $results[$type] = 'failed: ' . $e->getMessage();
+                $results[$type] = 'failed: '.$e->getMessage();
             }
         }
 
@@ -114,7 +115,7 @@ class UpdatePerformanceHelper
         $memoryUsage = memory_get_usage(true);
         $memoryLimit = ini_get('memory_limit');
 
-        if ($memoryUsage > (int)$memoryLimit * 0.8) {
+        if ($memoryUsage > (int) $memoryLimit * 0.8) {
             $recommendations[] = 'Consider increasing PHP memory_limit';
         }
 
@@ -129,7 +130,7 @@ class UpdatePerformanceHelper
         // Check PHP extensions
         $requiredExtensions = ['pdo', 'mbstring', 'openssl', 'json', 'curl'];
         foreach ($requiredExtensions as $ext) {
-            if (!extension_loaded($ext)) {
+            if (! extension_loaded($ext)) {
                 $recommendations[] = "Missing PHP extension: $ext";
             }
         }

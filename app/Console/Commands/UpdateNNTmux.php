@@ -74,7 +74,7 @@ class UpdateNNTmux extends Command
         } catch (\Exception $e) {
             $this->progressBar->finish();
             $this->newLine(2);
-            $this->error('❌ Update failed: ' . $e->getMessage());
+            $this->error('❌ Update failed: '.$e->getMessage());
             $this->restoreEnvironment();
 
             return Command::FAILURE;
@@ -88,10 +88,18 @@ class UpdateNNTmux extends Command
     {
         $steps = 3; // prepare, finalize, cleanup
 
-        if (!$this->option('skip-git')) $steps++;
-        if (!$this->option('skip-composer')) $steps++;
-        if (!$this->option('skip-npm')) $steps += 2; // install + build
-        if (!$this->option('skip-db')) $steps++;
+        if (! $this->option('skip-git')) {
+            $steps++;
+        }
+        if (! $this->option('skip-composer')) {
+            $steps++;
+        }
+        if (! $this->option('skip-npm')) {
+            $steps += 2;
+        } // install + build
+        if (! $this->option('skip-db')) {
+            $steps++;
+        }
 
         $steps++; // smarty cache clear
         $steps++; // env merge
@@ -108,16 +116,16 @@ class UpdateNNTmux extends Command
 
         // Check if app is in maintenance mode
         $this->wasInMaintenance = App::isDownForMaintenance();
-        if (!$this->wasInMaintenance) {
+        if (! $this->wasInMaintenance) {
             $this->call('down', [
                 '--render' => 'errors::maintenance',
                 '--retry' => 120,
-                '--secret' => config('app.key')
+                '--secret' => config('app.key'),
             ]);
         }
 
         // Check if tmux is running
-        $tmux = new Tmux();
+        $tmux = new Tmux;
         $this->tmuxWasRunning = $tmux->isRunning();
         if ($this->tmuxWasRunning) {
             $this->call('tmux-ui:stop', ['--kill' => true]);
@@ -132,22 +140,22 @@ class UpdateNNTmux extends Command
     private function executeUpdateSteps(): void
     {
         // Git operations
-        if (!$this->option('skip-git')) {
+        if (! $this->option('skip-git')) {
             $this->performGitUpdate();
         }
 
         // Composer operations
-        if (!$this->option('skip-composer')) {
+        if (! $this->option('skip-composer')) {
             $this->performComposerUpdate();
         }
 
         // Database migrations
-        if (!$this->option('skip-db')) {
+        if (! $this->option('skip-db')) {
             $this->performDatabaseUpdate();
         }
 
         // NPM operations
-        if (!$this->option('skip-npm')) {
+        if (! $this->option('skip-npm')) {
             $this->performNpmOperations();
         }
 
@@ -210,7 +218,7 @@ class UpdateNNTmux extends Command
     {
         // Check if package.json has changed
         $packageLockExists = File::exists(base_path('package-lock.json'));
-        $shouldInstall = !$packageLockExists || $this->option('force');
+        $shouldInstall = ! $packageLockExists || $this->option('force');
 
         if ($shouldInstall) {
             $this->info('📦 Installing npm packages...');
@@ -219,14 +227,14 @@ class UpdateNNTmux extends Command
                 ->path(base_path())
                 ->run('npm ci --silent');
 
-            if (!$process->successful()) {
+            if (! $process->successful()) {
                 // Fallback to npm install if ci fails
                 $process = Process::timeout(600)
                     ->path(base_path())
                     ->run('npm install --silent');
 
-                if (!$process->successful()) {
-                    throw new \Exception('NPM install failed: ' . $process->errorOutput());
+                if (! $process->successful()) {
+                    throw new \Exception('NPM install failed: '.$process->errorOutput());
                 }
             }
         }
@@ -240,8 +248,8 @@ class UpdateNNTmux extends Command
             ->path(base_path())
             ->run('npm run build');
 
-        if (!$buildProcess->successful()) {
-            throw new \Exception('Asset build failed: ' . $buildProcess->errorOutput());
+        if (! $buildProcess->successful()) {
+            throw new \Exception('Asset build failed: '.$buildProcess->errorOutput());
         }
 
         $this->progressBar->advance();
@@ -269,17 +277,17 @@ class UpdateNNTmux extends Command
     private function clearSmartyCache(): void
     {
         try {
-            $smarty = new Smarty();
+            $smarty = new Smarty;
             $smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
 
             if ($smarty->clearCompiledTemplate()) {
                 $this->line('  ✓ Smarty compiled template cache cleared');
             } else {
                 $this->warn('  ⚠ Could not clear Smarty cache automatically');
-                $this->line('    Please clear manually: ' . config('ytake-laravel-smarty.compile_path'));
+                $this->line('    Please clear manually: '.config('ytake-laravel-smarty.compile_path'));
             }
         } catch (\Exception $e) {
-            $this->warn('  ⚠ Smarty cache clear failed: ' . $e->getMessage());
+            $this->warn('  ⚠ Smarty cache clear failed: '.$e->getMessage());
         }
     }
 
@@ -292,13 +300,15 @@ class UpdateNNTmux extends Command
             $envExamplePath = base_path('.env.example');
             $envPath = base_path('.env');
 
-            if (!File::exists($envExamplePath)) {
+            if (! File::exists($envExamplePath)) {
                 $this->warn('  ⚠ .env.example not found, skipping environment merge');
+
                 return;
             }
 
-            if (!File::exists($envPath)) {
+            if (! File::exists($envPath)) {
                 $this->warn('  ⚠ .env not found, skipping environment merge');
+
                 return;
             }
 
@@ -309,14 +319,15 @@ class UpdateNNTmux extends Command
 
             if (empty($missingKeys)) {
                 $this->line('  ✓ No new environment variables to merge');
+
                 return;
             }
 
             $this->addMissingEnvVars($envPath, $missingKeys);
-            $this->line("  ✓ Merged " . count($missingKeys) . " new environment variables");
+            $this->line('  ✓ Merged '.count($missingKeys).' new environment variables');
 
         } catch (\Exception $e) {
-            $this->warn('  ⚠ Environment merge failed: ' . $e->getMessage());
+            $this->warn('  ⚠ Environment merge failed: '.$e->getMessage());
         }
     }
 
@@ -352,11 +363,11 @@ class UpdateNNTmux extends Command
     {
         $content = File::get($envPath);
 
-        if (!str_ends_with($content, "\n")) {
+        if (! str_ends_with($content, "\n")) {
             $content .= "\n";
         }
 
-        $content .= "\n# New settings added from .env.example on " . now()->toDateTimeString() . "\n";
+        $content .= "\n# New settings added from .env.example on ".now()->toDateTimeString()."\n";
 
         foreach ($missingKeys as $key => $value) {
             $content .= "$key=$value\n";
@@ -387,7 +398,7 @@ class UpdateNNTmux extends Command
     private function restoreEnvironment(): void
     {
         // Restore maintenance mode state
-        if (!$this->wasInMaintenance && App::isDownForMaintenance()) {
+        if (! $this->wasInMaintenance && App::isDownForMaintenance()) {
             $this->call('up');
         }
 

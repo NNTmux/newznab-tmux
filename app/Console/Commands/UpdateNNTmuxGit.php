@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\Tmux;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
@@ -43,13 +42,14 @@ class UpdateNNTmuxGit extends Command
             $this->info('🔄 Starting git update process...');
 
             // Check if we're in a git repository
-            if (!$this->isGitRepository()) {
+            if (! $this->isGitRepository()) {
                 $this->error('Not in a git repository');
+
                 return Command::FAILURE;
             }
 
             // Check for uncommitted changes
-            if ($this->hasUncommittedChanges() && !$this->option('no-stash')) {
+            if ($this->hasUncommittedChanges() && ! $this->option('no-stash')) {
                 $this->info('📦 Stashing local changes...');
                 $this->stashChanges();
             }
@@ -63,8 +63,9 @@ class UpdateNNTmuxGit extends Command
             $this->fetchChanges();
 
             // Check if update is needed
-            if (!$this->option('force') && !$this->isUpdateNeeded($targetBranch)) {
+            if (! $this->option('force') && ! $this->isUpdateNeeded($targetBranch)) {
                 $this->info('✅ Already up-to-date');
+
                 return Command::SUCCESS;
             }
 
@@ -73,10 +74,12 @@ class UpdateNNTmuxGit extends Command
             $this->pullChanges($targetBranch);
 
             $this->info('✅ Git update completed successfully');
+
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('❌ Git update failed: ' . $e->getMessage());
+            $this->error('❌ Git update failed: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -95,7 +98,8 @@ class UpdateNNTmuxGit extends Command
     private function hasUncommittedChanges(): bool
     {
         $process = Process::run('git status --porcelain');
-        return !empty(trim($process->output()));
+
+        return ! empty(trim($process->output()));
     }
 
     /**
@@ -103,10 +107,10 @@ class UpdateNNTmuxGit extends Command
      */
     private function stashChanges(): void
     {
-        $process = Process::run('git stash push -m "Auto-stash before update on ' . now()->toDateTimeString() . '"');
+        $process = Process::run('git stash push -m "Auto-stash before update on '.now()->toDateTimeString().'"');
 
-        if (!$process->successful()) {
-            throw new \Exception('Failed to stash changes: ' . $process->errorOutput());
+        if (! $process->successful()) {
+            throw new \Exception('Failed to stash changes: '.$process->errorOutput());
         }
 
         $this->line('  ✓ Changes stashed successfully');
@@ -119,8 +123,8 @@ class UpdateNNTmuxGit extends Command
     {
         $process = Process::run('git branch --show-current');
 
-        if (!$process->successful()) {
-            throw new \Exception('Failed to get current branch: ' . $process->errorOutput());
+        if (! $process->successful()) {
+            throw new \Exception('Failed to get current branch: '.$process->errorOutput());
         }
 
         return trim($process->output());
@@ -133,8 +137,8 @@ class UpdateNNTmuxGit extends Command
     {
         $process = Process::timeout(300)->run('git fetch --prune');
 
-        if (!$process->successful()) {
-            throw new \Exception('Failed to fetch changes: ' . $process->errorOutput());
+        if (! $process->successful()) {
+            throw new \Exception('Failed to fetch changes: '.$process->errorOutput());
         }
     }
 
@@ -145,7 +149,7 @@ class UpdateNNTmuxGit extends Command
     {
         $process = Process::run("git rev-list HEAD...origin/$branch --count");
 
-        if (!$process->successful()) {
+        if (! $process->successful()) {
             // If we can't check, assume update is needed
             return true;
         }
@@ -164,8 +168,8 @@ class UpdateNNTmuxGit extends Command
 
         $process = Process::timeout(300)->run($pullCommand);
 
-        if (!$process->successful()) {
-            throw new \Exception('Failed to pull changes: ' . $process->errorOutput());
+        if (! $process->successful()) {
+            throw new \Exception('Failed to pull changes: '.$process->errorOutput());
         }
 
         $this->line('  ✓ Changes pulled successfully');

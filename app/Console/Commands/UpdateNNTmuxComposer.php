@@ -34,8 +34,9 @@ class UpdateNNTmuxComposer extends Command
             $this->info('📦 Starting composer update process...');
 
             // Check if composer.json exists
-            if (!File::exists(base_path('composer.json'))) {
+            if (! File::exists(base_path('composer.json'))) {
                 $this->error('composer.json not found');
+
                 return Command::FAILURE;
             }
 
@@ -55,10 +56,12 @@ class UpdateNNTmuxComposer extends Command
             $this->clearAutoloaderCache();
 
             $this->info('✅ Composer update completed successfully');
+
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('❌ Composer update failed: ' . $e->getMessage());
+            $this->error('❌ Composer update failed: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -74,8 +77,8 @@ class UpdateNNTmuxComposer extends Command
             ->path(base_path())
             ->run($command);
 
-        if (!$process->successful()) {
-            throw new \Exception('Composer install failed: ' . $process->errorOutput());
+        if (! $process->successful()) {
+            throw new \Exception('Composer install failed: '.$process->errorOutput());
         }
 
         $this->line('  ✓ Dependencies installed successfully');
@@ -92,8 +95,8 @@ class UpdateNNTmuxComposer extends Command
             ->path(base_path())
             ->run($command);
 
-        if (!$process->successful()) {
-            throw new \Exception('Composer update failed: ' . $process->errorOutput());
+        if (! $process->successful()) {
+            throw new \Exception('Composer update failed: '.$process->errorOutput());
         }
 
         $this->line('  ✓ Dependencies updated successfully');
@@ -133,7 +136,7 @@ class UpdateNNTmuxComposer extends Command
             ->path(base_path())
             ->run('composer dump-autoload --optimize');
 
-        if (!$process->successful()) {
+        if (! $process->successful()) {
             $this->warn('  ⚠ Failed to optimize autoloader');
         } else {
             $this->line('  ✓ Autoloader optimized');

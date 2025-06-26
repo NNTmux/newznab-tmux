@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class UpdateNNTmuxDB extends Command
 {
@@ -31,8 +30,9 @@ class UpdateNNTmuxDB extends Command
 
             // Check database connection and detect database type
             $dbType = $this->checkDatabaseConnection();
-            if (!$dbType) {
+            if (! $dbType) {
                 $this->error('Database connection failed');
+
                 return Command::FAILURE;
             }
 
@@ -61,10 +61,12 @@ class UpdateNNTmuxDB extends Command
             $this->optimizeDatabase($dbType);
 
             $this->info('✅ Database update completed successfully');
+
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('❌ Database update failed: ' . $e->getMessage());
+            $this->error('❌ Database update failed: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -77,7 +79,7 @@ class UpdateNNTmuxDB extends Command
         try {
             DB::connection()->getPdo();
 
-            $dbConfig = config('database.connections.' . config('database.default'));
+            $dbConfig = config('database.connections.'.config('database.default'));
             $driver = $dbConfig['driver'] ?? null;
 
             // Detect actual database type for MySQL-compatible drivers
@@ -91,14 +93,17 @@ class UpdateNNTmuxDB extends Command
                 }
 
                 $this->line("  ✓ Database connection established ($actualType $version)");
+
                 return $actualType;
             }
 
             $this->line("  ✓ Database connection established ($driver)");
+
             return $driver;
 
         } catch (\Exception $e) {
-            $this->error('  ✗ Database connection failed: ' . $e->getMessage());
+            $this->error('  ✗ Database connection failed: '.$e->getMessage());
+
             return null;
         }
     }
@@ -112,13 +117,15 @@ class UpdateNNTmuxDB extends Command
 
         if ($steps <= 0) {
             $this->error('Invalid rollback steps. Must be a positive integer.');
+
             return Command::FAILURE;
         }
 
         $this->warn("⚠️ Rolling back $steps migrations...");
 
-        if (!$this->confirm('Are you sure you want to rollback migrations? This may cause data loss.')) {
+        if (! $this->confirm('Are you sure you want to rollback migrations? This may cause data loss.')) {
             $this->info('Rollback cancelled');
+
             return Command::SUCCESS;
         }
 
@@ -137,6 +144,7 @@ class UpdateNNTmuxDB extends Command
     private function checkMigrationStatus(): int
     {
         $this->info('📊 Migration Status:');
+
         return $this->call('migrate:status');
     }
 
@@ -194,7 +202,7 @@ class UpdateNNTmuxDB extends Command
                 $this->line("  ℹ Database optimization skipped (unsupported type: $dbType)");
             }
         } catch (\Exception $e) {
-            $this->warn('  ⚠ Database optimization failed: ' . $e->getMessage());
+            $this->warn('  ⚠ Database optimization failed: '.$e->getMessage());
         }
     }
 
@@ -203,9 +211,9 @@ class UpdateNNTmuxDB extends Command
      */
     private function optimizeMysqlCompatible(string $dbType): void
     {
-        $dbConfig = config('database.connections.' . config('database.default'));
+        $dbConfig = config('database.connections.'.config('database.default'));
         $tables = DB::select('SHOW TABLES');
-        $tableKey = 'Tables_in_' . $dbConfig['database'];
+        $tableKey = 'Tables_in_'.$dbConfig['database'];
 
         $optimizedCount = 0;
         foreach ($tables as $table) {
@@ -218,7 +226,7 @@ class UpdateNNTmuxDB extends Command
             }
         }
 
-        $this->line("  ✓ $dbType tables optimized ($optimizedCount/" . count($tables) . ")");
+        $this->line("  ✓ $dbType tables optimized ($optimizedCount/".count($tables).')');
     }
 
     /**
@@ -230,7 +238,7 @@ class UpdateNNTmuxDB extends Command
             DB::statement('VACUUM ANALYZE');
             $this->line('  ✓ PostgreSQL database optimized (VACUUM ANALYZE)');
         } catch (\Exception $e) {
-            $this->warn('  ⚠ PostgreSQL optimization failed: ' . $e->getMessage());
+            $this->warn('  ⚠ PostgreSQL optimization failed: '.$e->getMessage());
         }
     }
 }

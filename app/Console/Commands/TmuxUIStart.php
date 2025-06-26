@@ -35,7 +35,7 @@ class TmuxUIStart extends Command
         try {
             $this->info('🚀 Starting Tmux UI...');
 
-            $tmux = new Tmux();
+            $tmux = new Tmux;
             $tmuxSession = Settings::settingValue('tmux_session') ?? 0;
             $timeout = (int) $this->option('timeout');
 
@@ -43,10 +43,10 @@ class TmuxUIStart extends Command
             $this->checkSystemResources();
 
             // Check if session already exists
-            if (!$this->option('force') && $this->isSessionRunning($tmuxSession)) {
+            if (! $this->option('force') && $this->isSessionRunning($tmuxSession)) {
                 $this->error("❌ Tmux session '$tmuxSession' is already running");
 
-                if (!$this->confirm('Would you like to restart the session?')) {
+                if (! $this->confirm('Would you like to restart the session?')) {
                     return Command::FAILURE;
                 }
 
@@ -62,10 +62,12 @@ class TmuxUIStart extends Command
             $this->startTmuxSession($tmuxSession, $timeout);
 
             $this->info('✅ Tmux UI started successfully');
+
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('❌ Failed to start Tmux UI: ' . $e->getMessage());
+            $this->error('❌ Failed to start Tmux UI: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -77,13 +79,13 @@ class TmuxUIStart extends Command
     {
         $recommendations = UpdatePerformanceHelper::checkSystemResources();
 
-        if (!empty($recommendations)) {
+        if (! empty($recommendations)) {
             $this->warn('⚠️ System resource warnings:');
             foreach ($recommendations as $recommendation) {
                 $this->line("  • $recommendation");
             }
 
-            if (!$this->confirm('Continue despite warnings?')) {
+            if (! $this->confirm('Continue despite warnings?')) {
                 throw new \Exception('Aborted due to system resource concerns');
             }
         }
@@ -95,6 +97,7 @@ class TmuxUIStart extends Command
     private function isSessionRunning(string $sessionName): bool
     {
         $process = Process::timeout(10)->run("tmux list-session 2>/dev/null | grep -q '^$sessionName:'");
+
         return $process->successful();
     }
 
@@ -107,7 +110,7 @@ class TmuxUIStart extends Command
 
         $runScript = base_path('misc/update/tmux/run.php');
 
-        if (!file_exists($runScript)) {
+        if (! file_exists($runScript)) {
             throw new \Exception("Tmux run script not found: $runScript");
         }
 
@@ -122,8 +125,8 @@ class TmuxUIStart extends Command
             $this->info('📊 Starting in monitoring mode...');
             $process = Process::timeout($timeout)->tty()->run($command);
 
-            if (!$process->successful()) {
-                throw new \Exception('Tmux session failed to start: ' . $process->errorOutput());
+            if (! $process->successful()) {
+                throw new \Exception('Tmux session failed to start: '.$process->errorOutput());
             }
         } else {
             // Start in background
@@ -133,7 +136,7 @@ class TmuxUIStart extends Command
             // Give it a moment to start
             sleep(3);
 
-            if (!$this->isSessionRunning($sessionName)) {
+            if (! $this->isSessionRunning($sessionName)) {
                 throw new \Exception('Failed to start tmux session');
             }
         }
