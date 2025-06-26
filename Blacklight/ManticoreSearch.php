@@ -3,11 +3,9 @@
 namespace Blacklight;
 
 use App\Models\Release;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
 use Manticoresearch\Exceptions\RuntimeException;
@@ -47,6 +45,7 @@ class ManticoreSearch
     {
         if (empty($parameters['id'])) {
             Log::warning('ManticoreSearch: Cannot insert release without ID');
+
             return;
         }
 
@@ -63,18 +62,18 @@ class ManticoreSearch
                 ->replaceDocument($document, $parameters['id']);
 
         } catch (ResponseException $e) {
-            Log::error('ManticoreSearch insertRelease ResponseException: ' . $e->getMessage(), [
+            Log::error('ManticoreSearch insertRelease ResponseException: '.$e->getMessage(), [
                 'release_id' => $parameters['id'],
-                'index' => $this->config['indexes']['releases']
+                'index' => $this->config['indexes']['releases'],
             ]);
         } catch (RuntimeException $e) {
-            Log::error('ManticoreSearch insertRelease RuntimeException: ' . $e->getMessage(), [
-                'release_id' => $parameters['id']
+            Log::error('ManticoreSearch insertRelease RuntimeException: '.$e->getMessage(), [
+                'release_id' => $parameters['id'],
             ]);
         } catch (\Throwable $e) {
-            Log::error('ManticoreSearch insertRelease unexpected error: ' . $e->getMessage(), [
+            Log::error('ManticoreSearch insertRelease unexpected error: '.$e->getMessage(), [
                 'release_id' => $parameters['id'],
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -86,6 +85,7 @@ class ManticoreSearch
     {
         if (empty($parameters['id'])) {
             Log::warning('ManticoreSearch: Cannot insert predb without ID');
+
             return;
         }
 
@@ -93,23 +93,23 @@ class ManticoreSearch
             $document = [
                 'title' => $parameters['title'] ?? '',
                 'filename' => $parameters['filename'] ?? '',
-                'source' => $parameters['source'] ?? ''
+                'source' => $parameters['source'] ?? '',
             ];
 
             $this->manticoreSearch->table($this->config['indexes']['predb'])
                 ->replaceDocument($document, $parameters['id']);
 
         } catch (ResponseException $e) {
-            Log::error('ManticoreSearch insertPredb ResponseException: ' . $e->getMessage(), [
-                'predb_id' => $parameters['id']
+            Log::error('ManticoreSearch insertPredb ResponseException: '.$e->getMessage(), [
+                'predb_id' => $parameters['id'],
             ]);
         } catch (RuntimeException $e) {
-            Log::error('ManticoreSearch insertPredb RuntimeException: ' . $e->getMessage(), [
-                'predb_id' => $parameters['id']
+            Log::error('ManticoreSearch insertPredb RuntimeException: '.$e->getMessage(), [
+                'predb_id' => $parameters['id'],
             ]);
         } catch (\Throwable $e) {
-            Log::error('ManticoreSearch insertPredb unexpected error: ' . $e->getMessage(), [
-                'predb_id' => $parameters['id']
+            Log::error('ManticoreSearch insertPredb unexpected error: '.$e->getMessage(), [
+                'predb_id' => $parameters['id'],
             ]);
         }
     }
@@ -123,6 +123,7 @@ class ManticoreSearch
     {
         if (empty($identifiers['g'])) {
             Log::warning('ManticoreSearch: Cannot delete release without GUID');
+
             return;
         }
 
@@ -132,18 +133,18 @@ class ManticoreSearch
                 $identifiers['i'] = $release?->id;
             }
 
-            if (!empty($identifiers['i'])) {
+            if (! empty($identifiers['i'])) {
                 $this->manticoreSearch->table($this->config['indexes']['releases'])
                     ->deleteDocument($identifiers['i']);
             } else {
                 Log::warning('ManticoreSearch: Could not find release ID for deletion', [
-                    'guid' => $identifiers['g']
+                    'guid' => $identifiers['g'],
                 ]);
             }
         } catch (ResponseException $e) {
-            Log::error('ManticoreSearch deleteRelease error: ' . $e->getMessage(), [
+            Log::error('ManticoreSearch deleteRelease error: '.$e->getMessage(), [
                 'guid' => $identifiers['g'],
-                'id' => $identifiers['i'] ?? null
+                'id' => $identifiers['i'] ?? null,
             ]);
         }
     }
@@ -172,6 +173,7 @@ class ManticoreSearch
     {
         if (empty($releaseID)) {
             Log::warning('ManticoreSearch: Cannot update release without ID');
+
             return;
         }
 
@@ -185,7 +187,7 @@ class ManticoreSearch
                     'releases.searchname',
                     'releases.fromname',
                     'releases.categories_id',
-                    DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')
+                    DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename'),
                 ])
                 ->groupBy('releases.id')
                 ->first();
@@ -196,8 +198,8 @@ class ManticoreSearch
                 Log::warning('ManticoreSearch: Release not found for update', ['id' => $releaseID]);
             }
         } catch (\Throwable $e) {
-            Log::error('ManticoreSearch updateRelease error: ' . $e->getMessage(), [
-                'release_id' => $releaseID
+            Log::error('ManticoreSearch updateRelease error: '.$e->getMessage(), [
+                'release_id' => $releaseID,
             ]);
         }
     }
@@ -209,6 +211,7 @@ class ManticoreSearch
     {
         if (empty($parameters)) {
             Log::warning('ManticoreSearch: Cannot update predb with empty parameters');
+
             return;
         }
 
@@ -219,29 +222,31 @@ class ManticoreSearch
     {
         if (empty($indexes)) {
             $this->cli->error('You need to provide index name to truncate');
+
             return false;
         }
 
         $success = true;
         foreach ($indexes as $index) {
-            if (!\in_array($index, $this->config['indexes'], true)) {
-                $this->cli->error('Unsupported index: ' . $index);
+            if (! \in_array($index, $this->config['indexes'], true)) {
+                $this->cli->error('Unsupported index: '.$index);
                 $success = false;
+
                 continue;
             }
 
             try {
                 $this->manticoreSearch->table($index)->truncate();
-                $this->cli->info('Truncating index ' . $index . ' finished.');
+                $this->cli->info('Truncating index '.$index.' finished.');
             } catch (ResponseException $e) {
                 if ($e->getMessage() === 'Invalid index') {
                     $this->createIndexIfNotExists($index);
                 } else {
-                    $this->cli->error('Error truncating index ' . $index . ': ' . $e->getMessage());
+                    $this->cli->error('Error truncating index '.$index.': '.$e->getMessage());
                     $success = false;
                 }
             } catch (\Throwable $e) {
-                $this->cli->error('Unexpected error truncating index ' . $index . ': ' . $e->getMessage());
+                $this->cli->error('Unexpected error truncating index '.$index.': '.$e->getMessage());
                 $success = false;
             }
         }
@@ -273,7 +278,7 @@ class ManticoreSearch
                 $this->cli->info('Created predb_rt index');
             }
         } catch (\Throwable $e) {
-            $this->cli->error('Error creating index ' . $index . ': ' . $e->getMessage());
+            $this->cli->error('Error creating index '.$index.': '.$e->getMessage());
         }
     }
 
@@ -290,10 +295,10 @@ class ManticoreSearch
                 $this->manticoreSearch->table($index)->optimize();
                 Log::info("Successfully optimized index: {$index}");
             } catch (ResponseException $e) {
-                Log::error('Failed to optimize index ' . $index . ': ' . $e->getMessage());
+                Log::error('Failed to optimize index '.$index.': '.$e->getMessage());
                 $success = false;
             } catch (\Throwable $e) {
-                Log::error('Unexpected error optimizing index ' . $index . ': ' . $e->getMessage());
+                Log::error('Unexpected error optimizing index '.$index.': '.$e->getMessage());
                 $success = false;
             }
         }
@@ -305,6 +310,7 @@ class ManticoreSearch
     {
         if (empty($rt_index)) {
             Log::warning('ManticoreSearch: Index name is required for search');
+
             return [];
         }
 
@@ -313,7 +319,7 @@ class ManticoreSearch
             'index' => $rt_index,
             'search' => $searchString,
             'columns' => $column,
-            'array' => $searchArray
+            'array' => $searchArray,
         ]));
 
         $cached = Cache::get($cacheKey);
@@ -329,38 +335,38 @@ class ManticoreSearch
                 ->sort('id', 'desc')
                 ->stripBadUtf8(true);
 
-            if (!empty($searchArray)) {
+            if (! empty($searchArray)) {
                 $searchTerms = [];
                 foreach ($searchArray as $key => $value) {
-                    if (!empty($value)) {
+                    if (! empty($value)) {
                         $escapedValue = self::escapeString($value);
-                        if (!empty($escapedValue)) {
-                            $searchTerms[] = '@@relaxed @' . $key . ' ' . $escapedValue;
+                        if (! empty($escapedValue)) {
+                            $searchTerms[] = '@@relaxed @'.$key.' '.$escapedValue;
                         }
                     }
                 }
 
-                if (!empty($searchTerms)) {
+                if (! empty($searchTerms)) {
                     $query->search(implode(' ', $searchTerms));
                 } else {
                     return [];
                 }
-            } elseif (!empty($searchString)) {
+            } elseif (! empty($searchString)) {
                 $escapedSearch = self::escapeString($searchString);
                 if (empty($escapedSearch)) {
                     return [];
                 }
 
                 $searchColumns = '';
-                if (!empty($column)) {
+                if (! empty($column)) {
                     if (count($column) > 1) {
-                        $searchColumns = '@(' . implode(',', $column) . ')';
+                        $searchColumns = '@('.implode(',', $column).')';
                     } else {
-                        $searchColumns = '@' . $column[0];
+                        $searchColumns = '@'.$column[0];
                     }
                 }
 
-                $query->search('@@relaxed ' . $searchColumns . ' ' . $escapedSearch);
+                $query->search('@@relaxed '.$searchColumns.' '.$escapedSearch);
             } else {
                 return [];
             }
@@ -385,22 +391,25 @@ class ManticoreSearch
             return $result;
 
         } catch (ResponseException $e) {
-            Log::error('ManticoreSearch searchIndexes ResponseException: ' . $e->getMessage(), [
+            Log::error('ManticoreSearch searchIndexes ResponseException: '.$e->getMessage(), [
                 'index' => $rt_index,
-                'search' => $searchString
+                'search' => $searchString,
             ]);
+
             return [];
         } catch (RuntimeException $e) {
-            Log::error('ManticoreSearch searchIndexes RuntimeException: ' . $e->getMessage(), [
+            Log::error('ManticoreSearch searchIndexes RuntimeException: '.$e->getMessage(), [
                 'index' => $rt_index,
-                'search' => $searchString
+                'search' => $searchString,
             ]);
+
             return [];
         } catch (\Throwable $e) {
-            Log::error('ManticoreSearch searchIndexes unexpected error: ' . $e->getMessage(), [
+            Log::error('ManticoreSearch searchIndexes unexpected error: '.$e->getMessage(), [
                 'index' => $rt_index,
-                'search' => $searchString
+                'search' => $searchString,
             ]);
+
             return [];
         }
     }

@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Log;
 class ElasticSearchSiteSearch
 {
     private const CACHE_TTL_MINUTES = 5;
+
     private const SCROLL_TIMEOUT = '30s';
+
     private const MAX_RESULTS = 10000;
 
     private static $client = null;
@@ -28,7 +30,7 @@ class ElasticSearchSiteSearch
         if (self::$client === null) {
             try {
                 // Check if cURL extension is loaded
-                if (!extension_loaded('curl')) {
+                if (! extension_loaded('curl')) {
                     throw new \RuntimeException('cURL extension is not loaded');
                 }
 
@@ -44,11 +46,11 @@ class ElasticSearchSiteSearch
                         'port' => $host['port'] ?? 9200,
                     ];
 
-                    if (!empty($host['scheme'])) {
+                    if (! empty($host['scheme'])) {
                         $hostConfig['scheme'] = $host['scheme'];
                     }
 
-                    if (!empty($host['user']) && !empty($host['pass'])) {
+                    if (! empty($host['user']) && ! empty($host['pass'])) {
                         $hostConfig['user'] = $host['user'];
                         $hostConfig['pass'] = $host['pass'];
                     }
@@ -59,7 +61,7 @@ class ElasticSearchSiteSearch
                 $clientBuilder->setHosts($hosts);
 
                 // Explicitly set cURL handler
-                $clientBuilder->setHandler(new CurlHandler());
+                $clientBuilder->setHandler(new CurlHandler);
 
                 // Set connection timeout and other options
                 $clientBuilder->setConnectionParams([
@@ -70,8 +72,8 @@ class ElasticSearchSiteSearch
                 self::$client = $clientBuilder->build();
 
             } catch (\Throwable $e) {
-                Log::error('Failed to initialize Elasticsearch client: ' . $e->getMessage());
-                throw new \RuntimeException('Elasticsearch client initialization failed: ' . $e->getMessage());
+                Log::error('Failed to initialize Elasticsearch client: '.$e->getMessage());
+                throw new \RuntimeException('Elasticsearch client initialization failed: '.$e->getMessage());
             }
         }
 
@@ -86,16 +88,18 @@ class ElasticSearchSiteSearch
         try {
             $client = $this->getClient();
             $client->ping();
+
             return true;
         } catch (\Throwable $e) {
-            Log::warning('Elasticsearch is not available: ' . $e->getMessage());
+            Log::warning('Elasticsearch is not available: '.$e->getMessage());
+
             return false;
         }
     }
 
     public function indexSearch(array|string $phrases, int $limit): array|Collection
     {
-        if (empty($phrases) || !$this->isElasticsearchAvailable()) {
+        if (empty($phrases) || ! $this->isElasticsearchAvailable()) {
             return [];
         }
 
@@ -105,7 +109,7 @@ class ElasticSearchSiteSearch
         }
 
         // Create cache key
-        $cacheKey = md5('es_index_search_' . serialize([$keywords, $limit]));
+        $cacheKey = md5('es_index_search_'.serialize([$keywords, $limit]));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -123,35 +127,37 @@ class ElasticSearchSiteSearch
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
                             'fuzziness' => 'AUTO',
-                            'minimum_should_match' => '75%'
+                            'minimum_should_match' => '75%',
                         ],
                     ],
                     'size' => min($limit, self::MAX_RESULTS),
                     'sort' => [
                         ['_score' => ['order' => 'desc']],
                         ['add_date' => ['order' => 'desc']],
-                        ['post_date' => ['order' => 'desc']]
+                        ['post_date' => ['order' => 'desc']],
                     ],
-                    '_source' => ['id']
+                    '_source' => ['id'],
                 ],
             ];
 
             $result = $this->search($search);
             Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
             return $result;
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch indexSearch error: ' . $e->getMessage(), [
+            Log::error('ElasticSearch indexSearch error: '.$e->getMessage(), [
                 'keywords' => $keywords,
-                'limit' => $limit
+                'limit' => $limit,
             ]);
+
             return [];
         }
     }
 
     public function indexSearchApi(array|string $searchName, int $limit): array|Collection
     {
-        if (empty($searchName) || !$this->isElasticsearchAvailable()) {
+        if (empty($searchName) || ! $this->isElasticsearchAvailable()) {
             return [];
         }
 
@@ -160,7 +166,7 @@ class ElasticSearchSiteSearch
             return [];
         }
 
-        $cacheKey = md5('es_api_search_' . serialize([$keywords, $limit]));
+        $cacheKey = md5('es_api_search_'.serialize([$keywords, $limit]));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -177,35 +183,37 @@ class ElasticSearchSiteSearch
                             'fields' => ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
-                            'fuzziness' => 'AUTO'
+                            'fuzziness' => 'AUTO',
                         ],
                     ],
                     'size' => min($limit, self::MAX_RESULTS),
                     'sort' => [
                         ['_score' => ['order' => 'desc']],
                         ['add_date' => ['order' => 'desc']],
-                        ['post_date' => ['order' => 'desc']]
+                        ['post_date' => ['order' => 'desc']],
                     ],
-                    '_source' => ['id']
+                    '_source' => ['id'],
                 ],
             ];
 
             $result = $this->search($search);
             Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
             return $result;
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch indexSearchApi error: ' . $e->getMessage(), [
+            Log::error('ElasticSearch indexSearchApi error: '.$e->getMessage(), [
                 'keywords' => $keywords,
-                'limit' => $limit
+                'limit' => $limit,
             ]);
+
             return [];
         }
     }
 
     public function indexSearchTMA(array|string $name, int $limit): array|Collection
     {
-        if (empty($name) || !$this->isElasticsearchAvailable()) {
+        if (empty($name) || ! $this->isElasticsearchAvailable()) {
             return [];
         }
 
@@ -214,7 +222,7 @@ class ElasticSearchSiteSearch
             return [];
         }
 
-        $cacheKey = md5('es_tma_search_' . serialize([$keywords, $limit]));
+        $cacheKey = md5('es_tma_search_'.serialize([$keywords, $limit]));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -231,35 +239,37 @@ class ElasticSearchSiteSearch
                             'fields' => ['searchname^2', 'plainsearchname^1.5'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
-                            'boost' => 1.2
+                            'boost' => 1.2,
                         ],
                     ],
                     'size' => min($limit, self::MAX_RESULTS),
                     'sort' => [
                         ['_score' => ['order' => 'desc']],
                         ['add_date' => ['order' => 'desc']],
-                        ['post_date' => ['order' => 'desc']]
+                        ['post_date' => ['order' => 'desc']],
                     ],
-                    '_source' => ['id']
+                    '_source' => ['id'],
                 ],
             ];
 
             $result = $this->search($search);
             Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
             return $result;
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch indexSearchTMA error: ' . $e->getMessage(), [
+            Log::error('ElasticSearch indexSearchTMA error: '.$e->getMessage(), [
                 'keywords' => $keywords,
-                'limit' => $limit
+                'limit' => $limit,
             ]);
+
             return [];
         }
     }
 
     public function predbIndexSearch(array|string $searchTerm): array|Collection
     {
-        if (empty($searchTerm) || !$this->isElasticsearchAvailable()) {
+        if (empty($searchTerm) || ! $this->isElasticsearchAvailable()) {
             return [];
         }
 
@@ -268,7 +278,7 @@ class ElasticSearchSiteSearch
             return [];
         }
 
-        $cacheKey = md5('es_predb_search_' . $keywords);
+        $cacheKey = md5('es_predb_search_'.$keywords);
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -285,34 +295,37 @@ class ElasticSearchSiteSearch
                             'fields' => ['title^2', 'filename'],
                             'analyze_wildcard' => true,
                             'default_operator' => 'and',
-                            'fuzziness' => 'AUTO'
+                            'fuzziness' => 'AUTO',
                         ],
                     ],
                     'size' => 1000,
                     'sort' => [
-                        ['_score' => ['order' => 'desc']]
-                    ]
+                        ['_score' => ['order' => 'desc']],
+                    ],
                 ],
             ];
 
             $result = $this->search($search, true);
             Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
             return $result;
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch predbIndexSearch error: ' . $e->getMessage(), [
-                'keywords' => $keywords
+            Log::error('ElasticSearch predbIndexSearch error: '.$e->getMessage(), [
+                'keywords' => $keywords,
             ]);
+
             return [];
         }
     }
 
     public function insertRelease(array $parameters): void
     {
-        if (empty($parameters['id']) || !$this->isElasticsearchAvailable()) {
+        if (empty($parameters['id']) || ! $this->isElasticsearchAvailable()) {
             if (empty($parameters['id'])) {
                 Log::warning('ElasticSearch: Cannot insert release without ID');
             }
+
             return;
         }
 
@@ -338,12 +351,12 @@ class ElasticSearchSiteSearch
             $client->index($data);
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch insertRelease error: ' . $e->getMessage(), [
-                'release_id' => $parameters['id']
+            Log::error('ElasticSearch insertRelease error: '.$e->getMessage(), [
+                'release_id' => $parameters['id'],
             ]);
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch insertRelease unexpected error: ' . $e->getMessage(), [
-                'release_id' => $parameters['id']
+            Log::error('ElasticSearch insertRelease unexpected error: '.$e->getMessage(), [
+                'release_id' => $parameters['id'],
             ]);
         }
     }
@@ -352,6 +365,7 @@ class ElasticSearchSiteSearch
     {
         if (empty($id)) {
             Log::warning('ElasticSearch: Cannot update release without ID');
+
             return;
         }
 
@@ -365,13 +379,14 @@ class ElasticSearchSiteSearch
                     'releases.searchname',
                     'releases.fromname',
                     'releases.categories_id',
-                    DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')
+                    DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename'),
                 ])
                 ->groupBy('releases.id')
                 ->first();
 
             if ($release === null) {
                 Log::warning('ElasticSearch: Release not found for update', ['id' => $id]);
+
                 return;
             }
 
@@ -396,12 +411,12 @@ class ElasticSearchSiteSearch
             Elasticsearch::update($data);
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch updateRelease error: ' . $e->getMessage(), [
-                'release_id' => $id
+            Log::error('ElasticSearch updateRelease error: '.$e->getMessage(), [
+                'release_id' => $id,
             ]);
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch updateRelease unexpected error: ' . $e->getMessage(), [
-                'release_id' => $id
+            Log::error('ElasticSearch updateRelease unexpected error: '.$e->getMessage(), [
+                'release_id' => $id,
             ]);
         }
     }
@@ -426,24 +441,26 @@ class ElasticSearchSiteSearch
                         'fields' => ['title^2', 'filename'],
                         'analyze_wildcard' => true,
                         'default_operator' => 'and',
-                        'fuzziness' => 'AUTO'
+                        'fuzziness' => 'AUTO',
                     ],
                 ],
                 'size' => 100,
                 'sort' => [
-                    ['_score' => ['order' => 'desc']]
-                ]
+                    ['_score' => ['order' => 'desc']],
+                ],
             ],
         ];
 
         try {
             $primaryResults = Elasticsearch::search($search);
+
             return $primaryResults['hits']['hits'] ?? [];
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch searchPreDb error: ' . $e->getMessage(), [
-                'search_term' => $searchTerm
+            Log::error('ElasticSearch searchPreDb error: '.$e->getMessage(), [
+                'search_term' => $searchTerm,
             ]);
+
             return [];
         }
     }
@@ -452,6 +469,7 @@ class ElasticSearchSiteSearch
     {
         if (empty($parameters['id'])) {
             Log::warning('ElasticSearch: Cannot insert predb without ID');
+
             return;
         }
 
@@ -470,12 +488,12 @@ class ElasticSearchSiteSearch
             Elasticsearch::index($data);
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch insertPreDb error: ' . $e->getMessage(), [
-                'predb_id' => $parameters['id']
+            Log::error('ElasticSearch insertPreDb error: '.$e->getMessage(), [
+                'predb_id' => $parameters['id'],
             ]);
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch insertPreDb unexpected error: ' . $e->getMessage(), [
-                'predb_id' => $parameters['id']
+            Log::error('ElasticSearch insertPreDb unexpected error: '.$e->getMessage(), [
+                'predb_id' => $parameters['id'],
             ]);
         }
     }
@@ -484,6 +502,7 @@ class ElasticSearchSiteSearch
     {
         if (empty($parameters['id'])) {
             Log::warning('ElasticSearch: Cannot update predb without ID');
+
             return;
         }
 
@@ -505,12 +524,12 @@ class ElasticSearchSiteSearch
             Elasticsearch::update($data);
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch updatePreDb error: ' . $e->getMessage(), [
-                'predb_id' => $parameters['id']
+            Log::error('ElasticSearch updatePreDb error: '.$e->getMessage(), [
+                'predb_id' => $parameters['id'],
             ]);
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch updatePreDb unexpected error: ' . $e->getMessage(), [
-                'predb_id' => $parameters['id']
+            Log::error('ElasticSearch updatePreDb unexpected error: '.$e->getMessage(), [
+                'predb_id' => $parameters['id'],
             ]);
         }
     }
@@ -545,7 +564,7 @@ class ElasticSearchSiteSearch
 
     protected function search(array $search, bool $fullResults = false): array
     {
-        if (empty($search) || !$this->isElasticsearchAvailable()) {
+        if (empty($search) || ! $this->isElasticsearchAvailable()) {
             return [];
         }
 
@@ -564,7 +583,7 @@ class ElasticSearchSiteSearch
                 }
 
                 // Handle scrolling for large result sets
-                if (!isset($results['_scroll_id'])) {
+                if (! isset($results['_scroll_id'])) {
                     break;
                 }
 
@@ -578,10 +597,12 @@ class ElasticSearchSiteSearch
             return $searchResult;
 
         } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch search error: ' . $e->getMessage());
+            Log::error('ElasticSearch search error: '.$e->getMessage());
+
             return [];
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch search unexpected error: ' . $e->getMessage());
+            Log::error('ElasticSearch search unexpected error: '.$e->getMessage());
+
             return [];
         }
     }
