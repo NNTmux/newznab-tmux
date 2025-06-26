@@ -46,12 +46,6 @@ class UpdateNNTmuxDB extends Command
                 return $this->checkMigrationStatus();
             }
 
-            // Backup database before migration (in production)
-            if (app()->environment('production')) {
-                $this->info('📋 Creating database backup...');
-                $this->createDatabaseBackup($dbType);
-            }
-
             // Run migrations
             $this->info('🔄 Running database migrations...');
             $this->runMigrations();
@@ -144,98 +138,6 @@ class UpdateNNTmuxDB extends Command
     {
         $this->info('📊 Migration Status:');
         return $this->call('migrate:status');
-    }
-
-    /**
-     * Create database backup with proper driver detection
-     */
-    private function createDatabaseBackup(string $dbType): void
-    {
-        try {
-            $backupPath = storage_path('backups');
-
-            if (!is_dir($backupPath)) {
-                mkdir($backupPath, 0755, true);
-            }
-
-            $timestamp = now()->format('Y-m-d_H-i-s');
-            $filename = "nntmux_backup_{$timestamp}.sql";
-            $fullPath = $backupPath . '/' . $filename;
-
-            $dbConfig = config('database.connections.' . config('database.default'));
-
-            if (in_array($dbType, ['mysql', 'mariadb'])) {
-                $this->createMysqlCompatibleBackup($dbConfig, $fullPath, $dbType);
-            } elseif ($dbType === 'pgsql') {
-                $this->createPostgresBackup($dbConfig, $fullPath);
-            } else {
-                $this->warn("  ⚠ Backup not supported for database type: $dbType");
-            }
-
-        } catch (\Exception $e) {
-            $this->warn('  ⚠ Backup creation failed: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Create backup for MySQL/MariaDB
-     */
-    private function createMysqlCompatibleBackup(array $dbConfig, string $fullPath, string $dbType): void
-    {
-        $command = sprintf(
-            '%s -h%s -P%s -u%s %s %s > %s 2>/dev/null',
-            $dbType === 'mariadb' ? 'mariadb-dump' : 'mysqldump',
-            escapeshellarg($dbConfig['host']),
-            escapeshellarg($dbConfig['port']),
-            escapeshellarg($dbConfig['username']),
-            !empty($dbConfig['password']) ? '-p' . escapeshellarg($dbConfig['password']) : '',
-            escapeshellarg($dbConfig['database']),
-            escapeshellarg($fullPath)
-        );
-
-        exec($command, $output, $returnVar);
-
-        if ($returnVar === 0 && file_exists($fullPath) && filesize($fullPath) > 0) {
-            $this->line("  ✓ $dbType backup created: " . basename($fullPath));
-        } else {
-            // Fallback to mysqldump if mariadb-dump failed
-            if ($dbType === 'mariadb') {
-                $fallbackCommand = str_replace('mariadb-dump', 'mysqldump', $command);
-                exec($fallbackCommand, $output, $returnVar);
-
-                if ($returnVar === 0 && file_exists($fullPath) && filesize($fullPath) > 0) {
-                    $this->line("  ✓ MySQL backup created (fallback): " . basename($fullPath));
-                } else {
-                    $this->warn('  ⚠ Backup creation failed');
-                }
-            } else {
-                $this->warn('  ⚠ Backup creation failed');
-            }
-        }
-    }
-
-    /**
-     * Create backup for PostgreSQL
-     */
-    private function createPostgresBackup(array $dbConfig, string $fullPath): void
-    {
-        $command = sprintf(
-            'PGPASSWORD=%s pg_dump -h %s -p %s -U %s %s > %s 2>/dev/null',
-            escapeshellarg($dbConfig['password']),
-            escapeshellarg($dbConfig['host']),
-            escapeshellarg($dbConfig['port']),
-            escapeshellarg($dbConfig['username']),
-            escapeshellarg($dbConfig['database']),
-            escapeshellarg($fullPath)
-        );
-
-        exec($command, $output, $returnVar);
-
-        if ($returnVar === 0 && file_exists($fullPath) && filesize($fullPath) > 0) {
-            $this->line("  ✓ PostgreSQL backup created: " . basename($fullPath));
-        } else {
-            $this->warn('  ⚠ PostgreSQL backup creation failed');
-        }
     }
 
     /**
