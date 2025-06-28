@@ -509,10 +509,10 @@ class TmuxRun extends Tmux
     protected function _notRunningNon(&$runVar): void
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-        for ($g = 1; $g <= 4; $g++) {
+        for ($g = 1; $g <= 3; $g++) {
             shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
         }
-        for ($g = 0; $g <= 3; $g++) {
+        for ($g = 0; $g <= 1; $g++) {
             shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
         }
         for ($g = 0; $g <= 2; $g++) {
