@@ -56,9 +56,11 @@ class UpdateNNTmuxDB extends Command
                 $this->runSeeders();
             }
 
+            /* <!-- disabled for now, can be re-enabled later -->
             // Optimize database
             $this->info('⚡ Optimizing database...');
             $this->optimizeDatabase($dbType);
+            */
 
             $this->info('✅ Database update completed successfully');
 
