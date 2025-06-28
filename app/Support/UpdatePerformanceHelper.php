@@ -111,12 +111,26 @@ class UpdatePerformanceHelper
     {
         $recommendations = [];
 
-        // Check memory usage
-        $memoryUsage = memory_get_usage(true);
-        $memoryLimit = ini_get('memory_limit');
+        // Check system memory usage
+        $memInfo = self::getSystemMemoryInfo();
+        if ($memInfo && $memInfo['usage_percent'] > 80) {
+            $recommendations[] = sprintf(
+                'High system memory usage: %.1f%% (%.1fGB of %.1fGB used)',
+                $memInfo['usage_percent'],
+                $memInfo['used'] / 1024 / 1024 / 1024,
+                $memInfo['total'] / 1024 / 1024 / 1024
+            );
+        }
 
-        if ($memoryUsage > (int) $memoryLimit * 0.8) {
-            $recommendations[] = 'Consider increasing PHP memory_limit';
+        // Still check PHP memory separately
+        $phpMemoryUsage = memory_get_usage(true);
+        $phpMemoryLimit = self::parseMemoryLimit(ini_get('memory_limit'));
+        if ($phpMemoryLimit > 0 && $phpMemoryUsage > ($phpMemoryLimit * 0.8)) {
+            $recommendations[] = sprintf(
+                'PHP memory usage high: %.1fMB of %s',
+                $phpMemoryUsage / 1024 / 1024,
+                ini_get('memory_limit')
+            );
         }
 
         // Check disk space
@@ -136,6 +150,64 @@ class UpdatePerformanceHelper
         }
 
         return $recommendations;
+    }
+
+    /**
+     * Get system memory information
+     */
+    private static function getSystemMemoryInfo(): ?array
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return null; // Windows memory check would require different approach
+        }
+
+        $memInfo = @file_get_contents('/proc/meminfo');
+        if (! $memInfo) {
+            return null;
+        }
+
+        preg_match('/MemTotal:\s+(\d+)/', $memInfo, $totalMatch);
+        preg_match('/MemAvailable:\s+(\d+)/', $memInfo, $availableMatch);
+
+        if (! isset($totalMatch[1]) || ! isset($availableMatch[1])) {
+            return null;
+        }
+
+        $total = (int) $totalMatch[1] * 1024; // Convert from KB to bytes
+        $available = (int) $availableMatch[1] * 1024;
+        $used = $total - $available;
+
+        return [
+            'total' => $total,
+            'available' => $available,
+            'used' => $used,
+            'usage_percent' => ($used / $total) * 100,
+        ];
+    }
+
+    /**
+     * Parse memory limit string to bytes
+     */
+    private static function parseMemoryLimit(string $limit): int
+    {
+        $limit = trim($limit);
+        if ($limit === '-1') {
+            return -1;
+        }
+
+        $last = strtolower($limit[strlen($limit) - 1]);
+        $value = (int) $limit;
+
+        switch ($last) {
+            case 'g':
+                $value *= 1024;
+            case 'm':
+                $value *= 1024;
+            case 'k':
+                $value *= 1024;
+        }
+
+        return $value;
     }
 
     /**
