@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ApiV2Controller extends BasePageController
 {
@@ -64,47 +65,63 @@ class ApiV2Controller extends BasePageController
      */
     public function movie(Request $request): JsonResponse
     {
-        if ($request->missing('api_token') || ($request->has('api_token') && $request->isNotFilled('api_token'))) {
+        // Validate API token and get user in one query
+        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
             return response()->json(['error' => 'Missing parameter (apikey)'], 403);
         }
-        $releases = new Releases;
-        $user = User::query()->where('api_token', $request->input('api_token'))->first();
-        $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $maxAge = $this->api->maxAge($request);
-        $catExclusions = User::getCategoryExclusionForApi($request);
+
+        $user = User::query()
+            ->where('api_token', $request->input('api_token'))
+            ->with('role') // Eager load role to avoid N+1
+            ->first();
+
+        if (! $user) {
+            return response()->json(['error' => 'Invalid API key'], 403);
+        }
+
+        // Process request asynchronously where possible
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         event(new UserAccessedApi($user));
 
-        $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? $request->input('imdbid') : -1;
-        $tmdbId = $request->has('tmdbid') && $request->filled('tmdbid') ? $request->input('tmdbid') : -1;
-        $traktId = $request->has('traktid') && $request->filled('traktid') ? $request->input('traktid') : -1;
+        // Get request parameters efficiently
+        $params = [
+            'imdbId' => $request->input('imdbid', -1),
+            'tmdbId' => $request->input('tmdbid', -1),
+            'traktId' => $request->input('traktid', -1),
+            'minSize' => max(0, (int) $request->input('minsize', 0)),
+            'searchName' => $request->input('id', ''),
+        ];
 
-        $relData = $releases->moviesSearch(
-            $imdbId,
-            $tmdbId,
-            $traktId,
+        // Perform search
+        $relData = (new Releases)->moviesSearch(
+            $params['imdbId'],
+            $params['tmdbId'],
+            $params['traktId'],
             $this->api->offset($request),
             $this->api->limit($request),
-            $request->input('id') ?? '',
+            $params['searchName'],
             $this->api->categoryID($request),
-            $maxAge,
-            $minSize,
-            $catExclusions
+            $this->api->maxAge($request),
+            $params['minSize'],
+            User::getCategoryExclusionForApi($request)
         );
 
-        $time = UserRequest::whereUsersId($user->id)->min('timestamp');
-        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
-        $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
-        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
+        // Get both timestamps in a single query
+        $timestamps = DB::selectOne('
+            SELECT
+                (SELECT MIN(timestamp) FROM user_requests WHERE users_id = ?) as api_time,
+                (SELECT MIN(timestamp) FROM user_downloads WHERE users_id = ?) as grab_time
+        ', [$user->id, $user->id]);
 
+        // Build response
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
             'apiCurrent' => UserRequest::getApiRequests($user->id),
             'apiMax' => $user->role->apirequests,
             'grabCurrent' => UserDownload::getDownloadRequests($user->id),
             'grabMax' => $user->role->downloadrequests,
-            'apiOldestTime' => $apiOldestTime,
-            'grabOldestTime' => $oldestGrabTime,
+            'apiOldestTime' => $timestamps->api_time ? Carbon::parse($timestamps->api_time)->toRfc2822String() : '',
+            'grabOldestTime' => $timestamps->grab_time ? Carbon::parse($timestamps->grab_time)->toRfc2822String() : '',
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
