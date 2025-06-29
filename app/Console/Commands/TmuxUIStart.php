@@ -80,14 +80,11 @@ class TmuxUIStart extends Command
         $recommendations = UpdatePerformanceHelper::checkSystemResources();
 
         if (! empty($recommendations)) {
-            $this->warn('⚠️ System resource warnings:');
+            $this->warn('⚠️ System resource information:');
             foreach ($recommendations as $recommendation) {
                 $this->line("  • $recommendation");
             }
-
-            if (! $this->confirm('Continue despite warnings?')) {
-                throw new \Exception('Aborted due to system resource concerns');
-            }
+            $this->line(''); // Add empty line for better readability
         }
     }
 
