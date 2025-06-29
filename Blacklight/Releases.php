@@ -13,6 +13,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Releases.
@@ -1264,34 +1265,138 @@ class Releases extends Release
         $maxResults = (int) config('nntmux.max_pager_results');
         $cacheExpiry = config('nntmux.cache_expiry_short');
 
-        // Rewrite the query to select only IDs with a limit
-        $rewrittenQuery = preg_replace(
-            '/SELECT.+?FROM\s+releases/is',
-            'SELECT r.id FROM releases',
-            $query
-        );
+        // Generate cache key from original query
+        $cacheKey = 'pager_count_' . md5($query);
 
-        $wrappedQuery = "({$rewrittenQuery} LIMIT {$maxResults}) as z";
-
-        // Build the query for counting
-        $queryBuilder = DB::table(DB::raw($wrappedQuery))->selectRaw('COUNT(z.id) as count');
-
-        // Generate a unique cache key for the query
-        $cacheKey = md5($queryBuilder->toRawSql());
-
-        // Check if the count is cached
+        // Check cache first
         $count = Cache::get($cacheKey);
         if ($count !== null) {
             return (int) $count;
         }
 
-        // Execute the query and fetch the count
-        $result = $queryBuilder->first();
-        $count = (int) ($result->count ?? 0);
+        // Check if this is already a COUNT query
+        if (preg_match('/SELECT\s+COUNT\s*\(/is', $query)) {
+            // It's already a COUNT query, just execute it
+            try {
+                $result = DB::select($query);
+                if (isset($result[0])) {
+                    // Handle different possible column names
+                    $count = $result[0]->count ?? $result[0]->total ?? 0;
+                    // Check for COUNT(*) result without alias
+                    if ($count === 0) {
+                        foreach ($result[0] as $value) {
+                            $count = (int) $value;
+                            break;
+                        }
+                    }
+                } else {
+                    $count = 0;
+                }
 
-        // Cache the count
-        Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
+                // Cap the count at max results if applicable
+                if ($maxResults > 0 && $count > $maxResults) {
+                    $count = $maxResults;
+                }
 
-        return $count;
+                // Cache the result
+                Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
+
+                return $count;
+            } catch (\Exception $e) {
+                return 0;
+            }
+        }
+
+        // For regular SELECT queries, optimize for counting
+        $countQuery = $query;
+
+        // Remove ORDER BY clause (not needed for COUNT)
+        $countQuery = preg_replace('/ORDER\s+BY\s+[^)]+$/is', '', $countQuery);
+
+        // Remove GROUP BY if it's only grouping by r.id
+        $countQuery = preg_replace('/GROUP\s+BY\s+r\.id\s*$/is', '', $countQuery);
+
+        // Check if query has DISTINCT in SELECT
+        $hasDistinct = preg_match('/SELECT\s+DISTINCT/is', $countQuery);
+
+        // Replace SELECT clause with COUNT
+        if ($hasDistinct || preg_match('/GROUP\s+BY/is', $countQuery)) {
+            // For queries with DISTINCT or GROUP BY, count distinct r.id
+            $countQuery = preg_replace(
+                '/SELECT\s+.+?\s+FROM/is',
+                'SELECT COUNT(DISTINCT r.id) as count FROM',
+                $countQuery
+            );
+        } else {
+            // For simple queries, use COUNT(*)
+            $countQuery = preg_replace(
+                '/SELECT\s+.+?\s+FROM/is',
+                'SELECT COUNT(*) as count FROM',
+                $countQuery
+            );
+        }
+
+        // Remove LIMIT/OFFSET from the count query
+        $countQuery = preg_replace('/LIMIT\s+\d+(\s+OFFSET\s+\d+)?$/is', '', $countQuery);
+
+        try {
+            // If max results is set and query might return too many results
+            if ($maxResults > 0) {
+                // First check if count would exceed max
+                $testQuery = sprintf('SELECT 1 FROM (%s) as test LIMIT %d',
+                    preg_replace('/SELECT\s+COUNT.+?\s+FROM/is', 'SELECT 1 FROM', $countQuery),
+                    $maxResults + 1
+                );
+
+                $testResult = DB::select($testQuery);
+                if (count($testResult) > $maxResults) {
+                    Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry));
+                    return $maxResults;
+                }
+            }
+
+            // Execute the count query
+            $result = DB::select($countQuery);
+            $count = isset($result[0]) ? (int) $result[0]->count : 0;
+
+            // Cache the result
+            Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
+
+            return $count;
+        } catch (\Exception $e) {
+            // If optimization fails, try a simpler approach
+            try {
+                // Extract the core table and WHERE conditions
+                if (preg_match('/FROM\s+releases\s+r\s+(.+?)(?:ORDER\s+BY|LIMIT|$)/is', $query, $matches)) {
+                    $conditions = $matches[1];
+                    // Remove JOINs but keep WHERE
+                    $conditions = preg_replace('/(?:LEFT\s+|INNER\s+)?(?:OUTER\s+)?JOIN\s+.+?(?=WHERE|LEFT|INNER|JOIN|$)/is', '', $conditions);
+
+                    $fallbackQuery = sprintf('SELECT COUNT(*) as count FROM releases r %s', trim($conditions));
+
+                    if ($maxResults > 0) {
+                        $fallbackQuery = sprintf('SELECT COUNT(*) as count FROM (SELECT 1 FROM releases r %s LIMIT %d) as limited',
+                            trim($conditions),
+                            $maxResults
+                        );
+                    }
+
+                    $result = DB::select($fallbackQuery);
+                    $count = isset($result[0]) ? (int) $result[0]->count : 0;
+
+                    Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
+
+                    return $count;
+                }
+            } catch (\Exception $fallbackException) {
+                // Log the error for debugging
+                Log::error('getPagerCount failed', [
+                    'query' => $query,
+                    'error' => $fallbackException->getMessage()
+                ]);
+            }
+
+            return 0;
+        }
     }
 }
