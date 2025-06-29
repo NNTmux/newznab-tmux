@@ -1153,11 +1153,12 @@ class Releases extends Release
     /**
      * Movies search through API and site.
      *
-     *
      * @return Collection|mixed
      */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
+        // Early return if searching by name yields no results
+        $searchResult = [];
         if (! empty($name)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
@@ -1168,60 +1169,118 @@ class Releases extends Release
                 }
             }
 
-            if (count($searchResult) === 0) {
+            if (empty($searchResult)) {
                 return collect();
             }
         }
 
-        $whereSql = sprintf(
-            'WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
-			AND r.nzbstatus = %d
-			AND r.passwordstatus %s
-			%s %s %s %s %s %s %s',
-            NZB::NZB_ADDED,
-            $this->showPasswords(),
-            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            ($imDbId !== -1 && $imDbId) ? sprintf(' AND m.imdbid = \'%s\' ', $imDbId) : '',
-            ($tmDbId !== -1 && $tmDbId) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
-            ($traktId !== -1 && $traktId) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
-            Category::getCategorySearch($cat, 'movies'),
-            $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
-            $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
-        );
+        // Build WHERE conditions more efficiently
+        $conditions = [
+            sprintf('r.categories_id BETWEEN %d AND %d', Category::MOVIE_ROOT, Category::MOVIE_OTHER),
+            sprintf('r.nzbstatus = %d', NZB::NZB_ADDED),
+            sprintf('r.passwordstatus %s', $this->showPasswords()),
+        ];
+
+        // Add search results condition
+        if (! empty($searchResult)) {
+            $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
+        }
+
+        // Add movie ID conditions - only join movieinfo if we have movie IDs
+        $needsMovieInfoJoin = false;
+        if ($imDbId !== -1 && $imDbId) {
+            $conditions[] = sprintf('m.imdbid = %d', $imDbId);
+            $needsMovieInfoJoin = true;
+        }
+        if ($tmDbId !== -1 && $tmDbId) {
+            $conditions[] = sprintf('m.tmdbid = %d', $tmDbId);
+            $needsMovieInfoJoin = true;
+        }
+        if ($traktId !== -1 && $traktId) {
+            $conditions[] = sprintf('m.traktid = %d', $traktId);
+            $needsMovieInfoJoin = true;
+        }
+
+        // Add other conditions
+        if (! empty($excludedCategories)) {
+            $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCategories)));
+        }
+
+        // Add category search condition
+        $catQuery = Category::getCategorySearch($cat, 'movies');
+        $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
+        if (! empty($catQuery) && $catQuery !== '1=1') {
+            $conditions[] = $catQuery;
+        }
+
+        if ($maxAge > 0) {
+            $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
+        }
+
+        if ($minSize > 0) {
+            $conditions[] = sprintf('r.size >= %d', $minSize);
+        }
+
+        $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+
+        // Build optimized query with conditional joins
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
-				concat(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name,
-				rn.releases_id AS nfoid
-			FROM releases r
-			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s",
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
+                    r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                    r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
+                    %s
+                    cp.title AS parent_category, c.title AS sub_category,
+                    CONCAT(cp.title, ' > ', c.title) AS category_name,
+                    g.name AS group_name,
+                    rn.releases_id AS nfoid
+             FROM releases r
+             INNER JOIN categories c ON c.id = r.categories_id
+             INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+             %s
+             LEFT JOIN usenet_groups g ON g.id = r.groups_id
+             LEFT JOIN release_nfos rn ON rn.releases_id = r.id
+             %s",
+            $needsMovieInfoJoin ? 'm.imdbid, m.tmdbid, m.traktid,' : 'NULL AS imdbid, NULL AS tmdbid, NULL AS traktid,',
+            $needsMovieInfoJoin ? 'INNER JOIN movieinfo m ON m.id = r.movieinfo_id' : '',
             $whereSql
         );
+
+        // Add ORDER BY and LIMIT
         $sql = sprintf(
-            '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
+            '%s ORDER BY r.postdate DESC LIMIT %d OFFSET %d',
             $baseSql,
             $limit,
             $offset
         );
 
-        $releases = Cache::get(md5($sql));
+        // Generate cache key including all parameters for better cache hits
+        $cacheKey = md5($sql . serialize(func_get_args()));
+
+        // Check cache
+        $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
+
+        // Execute query
         $releases = $this->fromQuery($sql);
+
+        // Add total count for pagination
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            // Use a more efficient count query
+            $countSql = sprintf(
+                'SELECT COUNT(*) as count FROM releases r %s %s',
+                $needsMovieInfoJoin ? 'INNER JOIN movieinfo m ON m.id = r.movieinfo_id' : '',
+                $whereSql
+            );
+
+            $countResult = $this->fromQuery($countSql);
+            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
         }
+
+        // Cache results
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        Cache::put($cacheKey, $releases, $expiresAt);
 
         return $releases;
     }
