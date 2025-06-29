@@ -1266,7 +1266,7 @@ class Releases extends Release
         $cacheExpiry = config('nntmux.cache_expiry_short');
 
         // Generate cache key from original query
-        $cacheKey = 'pager_count_' . md5($query);
+        $cacheKey = 'pager_count_'.md5($query);
 
         // Check cache first
         $count = Cache::get($cacheKey);
@@ -1351,6 +1351,7 @@ class Releases extends Release
                 $testResult = DB::select($testQuery);
                 if (count($testResult) > $maxResults) {
                     Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry));
+
                     return $maxResults;
                 }
             }
@@ -1392,7 +1393,7 @@ class Releases extends Release
                 // Log the error for debugging
                 Log::error('getPagerCount failed', [
                     'query' => $query,
-                    'error' => $fallbackException->getMessage()
+                    'error' => $fallbackException->getMessage(),
                 ]);
             }
 
