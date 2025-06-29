@@ -684,7 +684,7 @@ class Releases extends Release
         );
     }
 
-   /**
+    /**
      * Search function for API.
      *
      * @return Collection|mixed
@@ -698,7 +698,7 @@ class Releases extends Release
                 $searchResult = $this->elasticSearch->indexSearchApi($searchName, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $searchName, ['searchname']);
-                if (!empty($searchResult)) {
+                if (! empty($searchResult)) {
                     $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                 }
             }
@@ -719,7 +719,7 @@ class Releases extends Release
             $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
         }
 
-        if ((int)$groupName !== -1) {
+        if ((int) $groupName !== -1) {
             $groupId = UsenetGroup::getIDByName($groupName);
             if ($groupId) {
                 $conditions[] = sprintf('r.groups_id = %d', $groupId);
@@ -729,15 +729,15 @@ class Releases extends Release
         // Add category conditions
         $catQuery = Category::getCategorySearch($cat);
         $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
-        if (!empty($catQuery) && $catQuery !== '1=1') {
+        if (! empty($catQuery) && $catQuery !== '1=1') {
             $conditions[] = $catQuery;
         }
 
-        if (!empty($excludedCats)) {
+        if (! empty($excludedCats)) {
             $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCats)));
         }
 
-        if (!empty($searchResult)) {
+        if (! empty($searchResult)) {
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
         }
 
@@ -745,7 +745,7 @@ class Releases extends Release
             $conditions[] = sprintf('r.size >= %d', $minSize);
         }
 
-        $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+        $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
         // Optimized query with selective joins and indexed columns first
         $sql = sprintf(
@@ -788,7 +788,7 @@ class Releases extends Release
         if ($releases->isNotEmpty()) {
             // Use a more efficient count query
             $countSql = sprintf(
-                "SELECT COUNT(*) as count FROM releases r %s",
+                'SELECT COUNT(*) as count FROM releases r %s',
                 $whereSql
             );
             $countResult = $this->fromQuery($countSql);
