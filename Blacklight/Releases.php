@@ -684,83 +684,120 @@ class Releases extends Release
         );
     }
 
-    /**
+   /**
      * Search function for API.
-     *
      *
      * @return Collection|mixed
      */
     public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed
     {
+        // Early return if searching with no results
+        $searchResult = [];
         if ($searchName !== -1) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchApi($searchName, $limit);
             } else {
                 $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $searchName, ['searchname']);
-                if (! empty($searchResult)) {
+                if (!empty($searchResult)) {
                     $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                 }
             }
+
+            // Early return if search yielded no results
+            if (empty($searchResult)) {
+                return collect();
+            }
         }
 
-        $catQuery = Category::getCategorySearch($cat);
+        // Build WHERE conditions more efficiently
+        $conditions = [
+            sprintf('r.passwordstatus %s', $this->showPasswords()),
+            sprintf('r.nzbstatus = %d', NZB::NZB_ADDED),
+        ];
 
-        $whereSql = sprintf(
-            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s',
-            $this->showPasswords(),
-            NZB::NZB_ADDED,
-            ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
-            $catQuery,
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
-        );
-        $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name,
-				cp.id AS categoryparentid,
-				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tve.firstaired, tve.title, tve.series, tve.episode
-			FROM releases r
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			%s",
-            $whereSql
-        );
+        if ($maxAge > 0) {
+            $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
+        }
+
+        if ((int)$groupName !== -1) {
+            $groupId = UsenetGroup::getIDByName($groupName);
+            if ($groupId) {
+                $conditions[] = sprintf('r.groups_id = %d', $groupId);
+            }
+        }
+
+        // Add category conditions
+        $catQuery = Category::getCategorySearch($cat);
+        $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
+        if (!empty($catQuery) && $catQuery !== '1=1') {
+            $conditions[] = $catQuery;
+        }
+
+        if (!empty($excludedCats)) {
+            $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCats)));
+        }
+
+        if (!empty($searchResult)) {
+            $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
+        }
+
+        if ($minSize > 0) {
+            $conditions[] = sprintf('r.size >= %d', $minSize);
+        }
+
+        $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+
+        // Optimized query with selective joins and indexed columns first
         $sql = sprintf(
-            'SELECT * FROM (
-				%s
-			) r
-			ORDER BY r.postdate DESC
-			LIMIT %d OFFSET %d',
-            $baseSql,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
+                    r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                    r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
+                    m.imdbid, m.tmdbid, m.traktid,
+                    cp.title AS parent_category, c.title AS sub_category,
+                    CONCAT(cp.title, ' > ', c.title) AS category_name,
+                    g.name AS group_name,
+                    cp.id AS categoryparentid,
+                    v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+                    tve.firstaired, tve.title, tve.series, tve.episode
+            FROM releases r
+            INNER JOIN categories c ON c.id = r.categories_id
+            INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN videos v ON r.videos_id = v.id AND r.videos_id > 0
+            LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id AND r.tv_episodes_id > 0
+            LEFT JOIN movieinfo m ON m.id = r.movieinfo_id AND r.movieinfo_id > 0
+            %s
+            ORDER BY r.postdate DESC
+            LIMIT %d OFFSET %d",
+            $whereSql,
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
+
+        // Check cache
+        $cacheKey = md5($sql);
+        $cachedReleases = Cache::get($cacheKey);
+        if ($cachedReleases !== null) {
+            return $cachedReleases;
         }
-        if ($searchName !== -1 && count($searchResult) !== 0) {
-            $releases = $this->fromQuery($sql);
-        } elseif ($searchName !== -1 && count($searchResult) === 0) {
-            $releases = collect();
-        } elseif ($searchName === -1) {
-            $releases = $this->fromQuery($sql);
-        } else {
-            $releases = collect();
-        }
+
+        // Execute query
+        $releases = $this->fromQuery($sql);
+
+        // Add total count if results exist
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            // Use a more efficient count query
+            $countSql = sprintf(
+                "SELECT COUNT(*) as count FROM releases r %s",
+                $whereSql
+            );
+            $countResult = $this->fromQuery($countSql);
+            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
         }
+
+        // Cache results
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        Cache::put($cacheKey, $releases, $expiresAt);
 
         return $releases;
     }
