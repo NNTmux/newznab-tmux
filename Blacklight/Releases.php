@@ -1221,7 +1221,7 @@ class Releases extends Release
             $conditions[] = sprintf('r.size >= %d', $minSize);
         }
 
-        $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+        $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
         // Build optimized query with conditional joins
         $baseSql = sprintf(
@@ -1254,7 +1254,7 @@ class Releases extends Release
         );
 
         // Generate cache key including all parameters for better cache hits
-        $cacheKey = md5($sql . serialize(func_get_args()));
+        $cacheKey = md5($sql.serialize(func_get_args()));
 
         // Check cache
         $releases = Cache::get($cacheKey);
