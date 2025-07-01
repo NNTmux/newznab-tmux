@@ -14,7 +14,7 @@ class MovieController extends BasePageController
     public function showMovies(Request $request, string $id = ''): void
     {
         $this->setPreferences();
-        $movie = new Movie;
+        $movie = new Movie(['Settings' => $this->settings]);
 
         $moviecats = Category::getChildren(Category::MOVIE_ROOT)->map(function ($mcat) {
             return ['id' => $mcat->id, 'title' => $mcat->title];
@@ -47,7 +47,6 @@ class MovieController extends BasePageController
         $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
-        // First process the original data mapping that was removed
         $movies = $results->map(function ($result) {
             $result['genre'] = makeFieldLinks($result, 'genre', 'movies');
             $result['actors'] = makeFieldLinks($result, 'actors', 'movies');
@@ -56,12 +55,6 @@ class MovieController extends BasePageController
 
             return $result;
         });
-
-        // Then move heavy processing from frontend template to backend
-        $processedMovies = $movie->processMovieDataForDisplay($movies->toArray());
-
-        // Update the results collection with processed data
-        $results->setCollection(collect($processedMovies));
 
         $this->smarty->assign('title', stripslashes($request->input('title', '')));
         $this->smarty->assign('actors', stripslashes($request->input('actors', '')));
