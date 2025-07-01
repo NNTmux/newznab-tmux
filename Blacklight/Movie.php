@@ -187,7 +187,7 @@ class Movie
             'maxAge' => $maxAge,
             'excludedCats' => $excludedCats,
             'browseBy' => $this->getBrowseBy(),
-            'showPasswords' => $this->showPasswords
+            'showPasswords' => $this->showPasswords,
         ]));
 
         // Check cache first
