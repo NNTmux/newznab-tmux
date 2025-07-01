@@ -47,34 +47,11 @@ class MovieController extends BasePageController
         $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
-        // Optimize data processing - do heavy lifting in backend
         $movies = $results->map(function ($result) {
-            // Pre-process exploded data to avoid template overhead
             $result['genre'] = makeFieldLinks($result, 'genre', 'movies');
             $result['actors'] = makeFieldLinks($result, 'actors', 'movies');
             $result['director'] = makeFieldLinks($result, 'director', 'movies');
             $result['languages'] = explode(', ', $result['language']);
-
-            // Pre-explode release data to reduce template processing
-            $result['release_ids'] = explode(',', $result['grp_release_id']);
-            $result['release_guids'] = explode(',', $result['grp_release_guid']);
-            $result['release_nfoids'] = explode(',', $result['grp_release_nfoid']);
-            $result['release_groups'] = explode(',', $result['grp_release_grpname']);
-            $result['release_names'] = explode('#', $result['grp_release_name']);
-            $result['release_postdates'] = explode(',', $result['grp_release_postdate']);
-            $result['release_sizes'] = explode(',', $result['grp_release_size']);
-            $result['release_totalparts'] = explode(',', $result['grp_release_totalparts']);
-            $result['release_comments'] = explode(',', $result['grp_release_comments']);
-            $result['release_grabs'] = explode(',', $result['grp_release_grabs']);
-            $result['release_failed'] = explode(',', $result['grp_release_failed']);
-            $result['release_password'] = explode(',', $result['grp_release_password']);
-            $result['release_innerfiles'] = explode(',', $result['grp_rarinnerfilecount']);
-            $result['release_haspreview'] = explode(',', $result['grp_haspreview']);
-
-            // Pre-process category data
-            if (isset($result['category_name'])) {
-                $result['category_split'] = explode('>', $result['category_name']);
-            }
 
             return $result;
         });
