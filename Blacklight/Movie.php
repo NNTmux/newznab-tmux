@@ -1743,7 +1743,7 @@ class Movie
 
             // Process genre tags for display (genre field links are already processed in controller)
             $processedMovie['genre_tags'] = [];
-            if (!empty($processedMovie['genre'])) {
+            if (! empty($processedMovie['genre'])) {
                 // Extract original genre text from the field links for tag display
                 $genreText = strip_tags($processedMovie['genre']);
                 $processedMovie['genre_tags'] = explode(', ', $genreText);
@@ -1768,20 +1768,20 @@ class Movie
         $movieData = (array) $movie;
 
         // Split all the grouped release data - use array access instead of object notation
-        $releaseIds = !empty($movieData['grp_release_id']) ? explode(',', $movieData['grp_release_id']) : [];
-        $releaseGuids = !empty($movieData['grp_release_guid']) ? explode(',', $movieData['grp_release_guid']) : [];
-        $releaseNfos = !empty($movieData['grp_release_nfoid']) ? explode(',', $movieData['grp_release_nfoid']) : [];
-        $releaseGroups = !empty($movieData['grp_release_grpname']) ? explode(',', $movieData['grp_release_grpname']) : [];
-        $releaseNames = !empty($movieData['grp_release_name']) ? explode('#', $movieData['grp_release_name']) : [];
-        $releasePostdates = !empty($movieData['grp_release_postdate']) ? explode(',', $movieData['grp_release_postdate']) : [];
-        $releaseSizes = !empty($movieData['grp_release_size']) ? explode(',', $movieData['grp_release_size']) : [];
-        $releaseTotalparts = !empty($movieData['grp_release_totalparts']) ? explode(',', $movieData['grp_release_totalparts']) : [];
-        $releaseComments = !empty($movieData['grp_release_comments']) ? explode(',', $movieData['grp_release_comments']) : [];
-        $releaseGrabs = !empty($movieData['grp_release_grabs']) ? explode(',', $movieData['grp_release_grabs']) : [];
-        $releaseFailed = !empty($movieData['grp_release_failed']) ? explode(',', $movieData['grp_release_failed']) : [];
-        $releasePasswords = !empty($movieData['grp_release_password']) ? explode(',', $movieData['grp_release_password']) : [];
-        $releaseInnerfiles = !empty($movieData['grp_rarinnerfilecount']) ? explode(',', $movieData['grp_rarinnerfilecount']) : [];
-        $releaseHaspreview = !empty($movieData['grp_haspreview']) ? explode(',', $movieData['grp_haspreview']) : [];
+        $releaseIds = ! empty($movieData['grp_release_id']) ? explode(',', $movieData['grp_release_id']) : [];
+        $releaseGuids = ! empty($movieData['grp_release_guid']) ? explode(',', $movieData['grp_release_guid']) : [];
+        $releaseNfos = ! empty($movieData['grp_release_nfoid']) ? explode(',', $movieData['grp_release_nfoid']) : [];
+        $releaseGroups = ! empty($movieData['grp_release_grpname']) ? explode(',', $movieData['grp_release_grpname']) : [];
+        $releaseNames = ! empty($movieData['grp_release_name']) ? explode('#', $movieData['grp_release_name']) : [];
+        $releasePostdates = ! empty($movieData['grp_release_postdate']) ? explode(',', $movieData['grp_release_postdate']) : [];
+        $releaseSizes = ! empty($movieData['grp_release_size']) ? explode(',', $movieData['grp_release_size']) : [];
+        $releaseTotalparts = ! empty($movieData['grp_release_totalparts']) ? explode(',', $movieData['grp_release_totalparts']) : [];
+        $releaseComments = ! empty($movieData['grp_release_comments']) ? explode(',', $movieData['grp_release_comments']) : [];
+        $releaseGrabs = ! empty($movieData['grp_release_grabs']) ? explode(',', $movieData['grp_release_grabs']) : [];
+        $releaseFailed = ! empty($movieData['grp_release_failed']) ? explode(',', $movieData['grp_release_failed']) : [];
+        $releasePasswords = ! empty($movieData['grp_release_password']) ? explode(',', $movieData['grp_release_password']) : [];
+        $releaseInnerfiles = ! empty($movieData['grp_rarinnerfilecount']) ? explode(',', $movieData['grp_rarinnerfilecount']) : [];
+        $releaseHaspreview = ! empty($movieData['grp_haspreview']) ? explode(',', $movieData['grp_haspreview']) : [];
 
         // Build structured release data
         $maxCount = max(
@@ -1799,7 +1799,7 @@ class Movie
                 'name' => $releaseNames[$i] ?? '',
                 'postdate' => $releasePostdates[$i] ?? '',
                 'size' => $releaseSizes[$i] ?? '',
-                'size_formatted' => !empty($releaseSizes[$i]) ? $this->formatFileSize($releaseSizes[$i]) : '',
+                'size_formatted' => ! empty($releaseSizes[$i]) ? $this->formatFileSize($releaseSizes[$i]) : '',
                 'totalparts' => $releaseTotalparts[$i] ?? '',
                 'comments' => $releaseComments[$i] ?? '',
                 'grabs' => $releaseGrabs[$i] ?? '',
@@ -1807,7 +1807,7 @@ class Movie
                 'password_status' => $releasePasswords[$i] ?? '',
                 'inner_files' => $releaseInnerfiles[$i] ?? '',
                 'has_preview' => $releaseHaspreview[$i] ?? '',
-                'postdate_formatted' => !empty($releasePostdates[$i]) ? $this->formatTimeAgo($releasePostdates[$i]) : '',
+                'postdate_formatted' => ! empty($releasePostdates[$i]) ? $this->formatTimeAgo($releasePostdates[$i]) : '',
             ];
         }
 
@@ -1819,7 +1819,7 @@ class Movie
      */
     private function formatFileSize($bytes): string
     {
-        if (!is_numeric($bytes)) {
+        if (! is_numeric($bytes)) {
             return $bytes;
         }
 
@@ -1830,7 +1830,7 @@ class Movie
             $bytes /= 1024;
         }
 
-        return round($bytes, 2) . ' ' . $units[$i];
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
@@ -1840,6 +1840,7 @@ class Movie
     {
         try {
             $date = Carbon::parse($timestamp);
+
             return $date->diffForHumans();
         } catch (\Exception $e) {
             return $timestamp;
@@ -1865,7 +1866,7 @@ class Movie
                     return trim($genre);
                 })
                 ->filter(function ($genre) {
-                    return !empty($genre);
+                    return ! empty($genre);
                 })
                 ->unique()
                 ->sort()

@@ -14,7 +14,7 @@ class MovieController extends BasePageController
     public function showMovies(Request $request, string $id = ''): void
     {
         $this->setPreferences();
-        $movie = new Movie();
+        $movie = new Movie;
 
         $moviecats = Category::getChildren(Category::MOVIE_ROOT)->map(function ($mcat) {
             return ['id' => $mcat->id, 'title' => $mcat->title];
