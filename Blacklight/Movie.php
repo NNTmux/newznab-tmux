@@ -1729,37 +1729,150 @@ class Movie
     }
 
     /**
-     * Get IMDB genres.
+     * Process movie data for frontend display - moves heavy processing from template to backend
+     */
+    public function processMovieDataForDisplay(array $movies): array
+    {
+        $processedMovies = [];
+
+        foreach ($movies as $movie) {
+            $processedMovie = (array) $movie;
+
+            // Process all the comma/delimiter-separated fields that were being processed in the template
+            $processedMovie['releases'] = $this->parseMovieReleaseData($movie);
+
+            // Process genre tags for display (genre field links are already processed in controller)
+            $processedMovie['genre_tags'] = [];
+            if (!empty($processedMovie['genre'])) {
+                // Extract original genre text from the field links for tag display
+                $genreText = strip_tags($processedMovie['genre']);
+                $processedMovie['genre_tags'] = explode(', ', $genreText);
+            }
+
+            // Languages are already processed in the controller, no need to duplicate
+
+            $processedMovies[] = $processedMovie;
+        }
+
+        return $processedMovies;
+    }
+
+    /**
+     * Parse individual movie release data for frontend display
+     */
+    private function parseMovieReleaseData($movie): array
+    {
+        $releases = [];
+
+        // Convert to array if it's an object to ensure consistent access
+        $movieData = (array) $movie;
+
+        // Split all the grouped release data - use array access instead of object notation
+        $releaseIds = !empty($movieData['grp_release_id']) ? explode(',', $movieData['grp_release_id']) : [];
+        $releaseGuids = !empty($movieData['grp_release_guid']) ? explode(',', $movieData['grp_release_guid']) : [];
+        $releaseNfos = !empty($movieData['grp_release_nfoid']) ? explode(',', $movieData['grp_release_nfoid']) : [];
+        $releaseGroups = !empty($movieData['grp_release_grpname']) ? explode(',', $movieData['grp_release_grpname']) : [];
+        $releaseNames = !empty($movieData['grp_release_name']) ? explode('#', $movieData['grp_release_name']) : [];
+        $releasePostdates = !empty($movieData['grp_release_postdate']) ? explode(',', $movieData['grp_release_postdate']) : [];
+        $releaseSizes = !empty($movieData['grp_release_size']) ? explode(',', $movieData['grp_release_size']) : [];
+        $releaseTotalparts = !empty($movieData['grp_release_totalparts']) ? explode(',', $movieData['grp_release_totalparts']) : [];
+        $releaseComments = !empty($movieData['grp_release_comments']) ? explode(',', $movieData['grp_release_comments']) : [];
+        $releaseGrabs = !empty($movieData['grp_release_grabs']) ? explode(',', $movieData['grp_release_grabs']) : [];
+        $releaseFailed = !empty($movieData['grp_release_failed']) ? explode(',', $movieData['grp_release_failed']) : [];
+        $releasePasswords = !empty($movieData['grp_release_password']) ? explode(',', $movieData['grp_release_password']) : [];
+        $releaseInnerfiles = !empty($movieData['grp_rarinnerfilecount']) ? explode(',', $movieData['grp_rarinnerfilecount']) : [];
+        $releaseHaspreview = !empty($movieData['grp_haspreview']) ? explode(',', $movieData['grp_haspreview']) : [];
+
+        // Build structured release data
+        $maxCount = max(
+            count($releaseIds),
+            count($releaseGuids),
+            count($releaseNames)
+        );
+
+        for ($i = 0; $i < $maxCount; $i++) {
+            $releases[] = [
+                'id' => $releaseIds[$i] ?? '',
+                'guid' => $releaseGuids[$i] ?? '',
+                'nfo_id' => $releaseNfos[$i] ?? '',
+                'group_name' => $releaseGroups[$i] ?? '',
+                'name' => $releaseNames[$i] ?? '',
+                'postdate' => $releasePostdates[$i] ?? '',
+                'size' => $releaseSizes[$i] ?? '',
+                'size_formatted' => !empty($releaseSizes[$i]) ? $this->formatFileSize($releaseSizes[$i]) : '',
+                'totalparts' => $releaseTotalparts[$i] ?? '',
+                'comments' => $releaseComments[$i] ?? '',
+                'grabs' => $releaseGrabs[$i] ?? '',
+                'failed' => $releaseFailed[$i] ?? '',
+                'password_status' => $releasePasswords[$i] ?? '',
+                'inner_files' => $releaseInnerfiles[$i] ?? '',
+                'has_preview' => $releaseHaspreview[$i] ?? '',
+                'postdate_formatted' => !empty($releasePostdates[$i]) ? $this->formatTimeAgo($releasePostdates[$i]) : '',
+            ];
+        }
+
+        return $releases;
+    }
+
+    /**
+     * Format file size for display
+     */
+    private function formatFileSize($bytes): string
+    {
+        if (!is_numeric($bytes)) {
+            return $bytes;
+        }
+
+        $bytes = (int) $bytes;
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, 2) . ' ' . $units[$i];
+    }
+
+    /**
+     * Format timestamp to time ago
+     */
+    private function formatTimeAgo($timestamp): string
+    {
+        try {
+            $date = Carbon::parse($timestamp);
+            return $date->diffForHumans();
+        } catch (\Exception $e) {
+            return $timestamp;
+        }
+    }
+
+    /**
+     * Get all unique genres from the movieinfo table
      */
     public function getGenres(): array
     {
-        return [
-            'Action',
-            'Adventure',
-            'Animation',
-            'Biography',
-            'Comedy',
-            'Crime',
-            'Documentary',
-            'Drama',
-            'Family',
-            'Fantasy',
-            'Film-Noir',
-            'Game-Show',
-            'History',
-            'Horror',
-            'Music',
-            'Musical',
-            'Mystery',
-            'News',
-            'Reality-TV',
-            'Romance',
-            'Sci-Fi',
-            'Sport',
-            'Talk-Show',
-            'Thriller',
-            'War',
-            'Western',
-        ];
+        $cacheKey = 'movie_genres_list';
+        $expiresAt = now()->addHours(24); // Cache for 24 hours
+
+        return Cache::remember($cacheKey, $expiresAt, function () {
+            $genres = MovieInfo::whereNotNull('genre')
+                ->where('genre', '!=', '')
+                ->pluck('genre')
+                ->flatMap(function ($genre) {
+                    return explode(', ', $genre);
+                })
+                ->map(function ($genre) {
+                    return trim($genre);
+                })
+                ->filter(function ($genre) {
+                    return !empty($genre);
+                })
+                ->unique()
+                ->sort()
+                ->values()
+                ->toArray();
+
+            return $genres;
+        });
     }
 }
