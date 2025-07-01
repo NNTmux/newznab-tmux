@@ -195,9 +195,9 @@ class Movie
                 $this->getBrowseBy(),
                 (! empty($catsrch) ? $catsrch : ''),
                 (
-                $maxAge > 0
-                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                    : ''
+                    $maxAge > 0
+                        ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
+                        : ''
                 ),
                 \count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '',
                 $order[0],
