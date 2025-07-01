@@ -27,7 +27,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Imdb\Config;
 use Imdb\Title;
-use Imdb\TitleSearch;
 use Tmdb\Exception\TmdbApiException;
 use Tmdb\Laravel\Facades\Tmdb;
 
@@ -1254,512 +1253,151 @@ class Movie
     }
 
     /**
-     * Process releases with no IMDB IDs by looking up movie information from various sources.
-     *
-     * Searches for IMDB IDs using multiple services in this order:
-     * 1. Local database
-     * 2. IMDb API
-     * 3. OMDb API
-     * 4. Trakt.tv
-     * 5. The Movie Database (TMDB)
-     *
-     * @param  string  $groupID  Optional group ID to filter by
-     * @param  string  $guidChar  Optional first character of GUID to filter by
-     * @param  int  $lookupIMDB  0: Skip lookup, 1: Process all, 2: Only renamed releases
-     *
-     * @throws \Exception
-     * @throws GuzzleException
+     * Process movie data for frontend display - moves heavy processing from template to backend
      */
-    public function processMovieReleases(string $groupID = '', string $guidChar = '', int $lookupIMDB = 1): void
+    public function processMovieDataForDisplay(array $movies): array
     {
-        // Skip processing if lookup is disabled
-        if ($lookupIMDB === 0) {
-            return;
+        $processedMovies = [];
+
+        foreach ($movies as $movie) {
+            $processedMovie = (array) $movie;
+
+            // Process all the comma/delimiter-separated fields that were being processed in the template
+            $processedMovie['releases'] = $this->processMovieReleases($movie);
+
+            // Process genre tags for display (genre field links are already processed in controller)
+            $processedMovie['genre_tags'] = [];
+            if (! empty($processedMovie['genre'])) {
+                // Extract original genre text from the field links for tag display
+                $genreText = strip_tags($processedMovie['genre']);
+                $processedMovie['genre_tags'] = explode(', ', $genreText);
+            }
+
+            // Languages are already processed in the controller, no need to duplicate
+
+            $processedMovies[] = $processedMovie;
         }
 
-        // Create a cache key for this query
-        $cacheKey = 'movie_releases_'.md5($groupID.$guidChar.$lookupIMDB);
-        $shortCacheTime = now()->addHours(1);
-
-        // Check if we have cached results
-        if (Cache::has($cacheKey)) {
-            $res = Cache::get($cacheKey);
-        } else {
-            // Build query to get releases without IMDB IDs
-            $query = Release::query()
-                ->select(['searchname', 'id'])
-                ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
-                ->whereNull('imdbid')
-                ->where('nzbstatus', '=', 1);
-
-            // Apply filters if provided
-            if ($groupID !== '') {
-                $query->where('groups_id', $groupID);
-            }
-
-            if ($guidChar !== '') {
-                $query->where('leftguid', $guidChar);
-            }
-
-            if ((int) $lookupIMDB === 2) {
-                $query->where('isrenamed', '=', 1);
-            }
-
-            // Execute the query with limit
-            $res = $query->limit($this->movieqty)->get();
-
-            // Cache the results
-            Cache::put($cacheKey, $res, $shortCacheTime);
-        }
-
-        $movieCount = count($res);
-        $failedIDs = []; // Track IDs that need to be marked as unidentifiable
-
-        if ($movieCount > 0) {
-            // Log the start of processing if multiple movies
-            if ($this->echooutput && $movieCount > 1) {
-                $this->colorCli->header('Processing '.$movieCount.' movie releases.');
-            }
-
-            // Loop over releases
-            foreach ($res as $arr) {
-                // Try to extract movie name and year
-                if (! $this->parseMovieSearchName($arr['searchname'])) {
-                    $failedIDs[] = $arr['id'];
-
-                    continue;
-                }
-
-                $this->currentRelID = $arr['id'];
-                $movieName = $this->formatMovieName();
-
-                // Log current lookup if output is enabled
-                if ($this->echooutput) {
-                    $this->colorCli->climate()->info('Looking up: '.$movieName);
-                }
-
-                // Try all available sources to find IMDB ID
-                $foundIMDB = $this->searchLocalDatabase($arr['id']) ||
-                             $this->searchIMDb($arr['id']) ||
-                             $this->searchOMDbAPI($arr['id']) ||
-                             $this->searchTraktTV($arr['id'], $movieName) ||
-                             $this->searchTMDB($arr['id']);
-
-                // Double-check if we actually got an IMDB ID
-                if ($foundIMDB) {
-                    // Movie was successfully updated by one of the services
-                    if ($this->echooutput) {
-                        $this->colorCli->climate()->success('Successfully updated release with IMDB ID');
-                    }
-
-                    continue;
-                } else {
-                    // Verify the release wasn't actually updated
-                    $releaseCheck = Release::query()->where('id', $arr['id'])->whereNotNull('imdbid')->exists();
-                    if ($releaseCheck) {
-                        if ($this->echooutput) {
-                            $this->colorCli->climate()->info('Release already has IMDB ID, skipping');
-                        }
-
-                        continue;
-                    }
-                }
-
-                // If we get here, all searches failed
-                $failedIDs[] = $arr['id'];
-            }
-
-            // Batch update all failed releases at once
-            if (! empty($failedIDs)) {
-                // Get searchnames for failed releases to show in output
-                if ($this->echooutput) {
-                    $failedReleases = Release::query()
-                        ->select(['id', 'searchname'])
-                        ->whereIn('id', $failedIDs)
-                        ->get();
-
-                    $this->colorCli->header('Failed to find IMDB IDs for '.count($failedIDs).' releases:');
-                    foreach ($failedReleases as $release) {
-                        $this->colorCli->climate()->error("ID: {$release->id} - {$release->searchname}");
-                    }
-                }
-
-                // Use chunk to avoid huge queries for many IDs
-                foreach (array_chunk($failedIDs, 100) as $chunk) {
-                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => 0000000]);
-                }
-            }
-        }
+        return $processedMovies;
     }
 
     /**
-     * Format current movie name with year if available.
+     * Process individual movie releases data
      */
-    private function formatMovieName(): string
+    private function processMovieReleases($movie): array
     {
-        $movieName = $this->currentTitle;
-        if ($this->currentYear !== '') {
-            $movieName .= ' ('.$this->currentYear.')';
+        $releases = [];
+
+        // Convert to array if it's an object to ensure consistent access
+        $movieData = (array) $movie;
+
+        // Split all the grouped release data - use array access instead of object notation
+        $releaseIds = ! empty($movieData['grp_release_id']) ? explode(',', $movieData['grp_release_id']) : [];
+        $releaseGuids = ! empty($movieData['grp_release_guid']) ? explode(',', $movieData['grp_release_guid']) : [];
+        $releaseNfos = ! empty($movieData['grp_release_nfoid']) ? explode(',', $movieData['grp_release_nfoid']) : [];
+        $releaseGroups = ! empty($movieData['grp_release_grpname']) ? explode(',', $movieData['grp_release_grpname']) : [];
+        $releaseNames = ! empty($movieData['grp_release_name']) ? explode('#', $movieData['grp_release_name']) : [];
+        $releasePostdates = ! empty($movieData['grp_release_postdate']) ? explode(',', $movieData['grp_release_postdate']) : [];
+        $releaseSizes = ! empty($movieData['grp_release_size']) ? explode(',', $movieData['grp_release_size']) : [];
+        $releaseTotalparts = ! empty($movieData['grp_release_totalparts']) ? explode(',', $movieData['grp_release_totalparts']) : [];
+        $releaseComments = ! empty($movieData['grp_release_comments']) ? explode(',', $movieData['grp_release_comments']) : [];
+        $releaseGrabs = ! empty($movieData['grp_release_grabs']) ? explode(',', $movieData['grp_release_grabs']) : [];
+        $releaseFailed = ! empty($movieData['grp_release_failed']) ? explode(',', $movieData['grp_release_failed']) : [];
+        $releasePasswords = ! empty($movieData['grp_release_password']) ? explode(',', $movieData['grp_release_password']) : [];
+        $releaseInnerfiles = ! empty($movieData['grp_rarinnerfilecount']) ? explode(',', $movieData['grp_rarinnerfilecount']) : [];
+        $releaseHaspreview = ! empty($movieData['grp_haspreview']) ? explode(',', $movieData['grp_haspreview']) : [];
+
+        // Build structured release data
+        $maxCount = max(
+            count($releaseIds),
+            count($releaseGuids),
+            count($releaseNames)
+        );
+
+        for ($i = 0; $i < $maxCount; $i++) {
+            $releases[] = [
+                'id' => $releaseIds[$i] ?? '',
+                'guid' => $releaseGuids[$i] ?? '',
+                'nfo_id' => $releaseNfos[$i] ?? '',
+                'group_name' => $releaseGroups[$i] ?? '',
+                'name' => $releaseNames[$i] ?? '',
+                'postdate' => $releasePostdates[$i] ?? '',
+                'size' => $releaseSizes[$i] ?? '',
+                'size_formatted' => ! empty($releaseSizes[$i]) ? $this->formatFileSize($releaseSizes[$i]) : '',
+                'totalparts' => $releaseTotalparts[$i] ?? '',
+                'comments' => $releaseComments[$i] ?? '',
+                'grabs' => $releaseGrabs[$i] ?? '',
+                'failed' => $releaseFailed[$i] ?? '',
+                'password_status' => $releasePasswords[$i] ?? '',
+                'inner_files' => $releaseInnerfiles[$i] ?? '',
+                'has_preview' => $releaseHaspreview[$i] ?? '',
+                'postdate_formatted' => ! empty($releasePostdates[$i]) ? $this->formatTimeAgo($releasePostdates[$i]) : '',
+            ];
         }
 
-        return $movieName;
+        return $releases;
     }
 
     /**
-     * Search local database for movie.
+     * Format file size for display
      */
-    private function searchLocalDatabase(int $releaseId): bool
+    private function formatFileSize($bytes): string
     {
-        $getIMDBid = $this->localIMDBSearch();
-        if ($getIMDBid === false) {
-            return false;
+        if (! is_numeric($bytes)) {
+            return $bytes;
         }
 
-        $imdbId = $this->doMovieUpdate('tt'.$getIMDBid, 'Local DB', $releaseId);
+        $bytes = (int) $bytes;
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
-        return $imdbId !== false;
+        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
-     * Search IMDb for movie.
+     * Format timestamp to time ago
      */
-    private function searchIMDb(int $releaseId): bool
+    private function formatTimeAgo($timestamp): string
     {
         try {
-            $imdbSearch = new TitleSearch($this->config);
-            foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
-                if (empty($imdbTitle->title())) {
-                    continue;
-                }
+            $date = Carbon::parse($timestamp);
 
-                // Compare title similarity
-                similar_text($imdbTitle->title(), $this->currentTitle, $percent);
-                if ($percent < self::MATCH_PERCENT) {
-                    continue;
-                }
-
-                // Compare year similarity if year is available
-                similar_text($this->currentYear, $imdbTitle->year(), $yearPercent);
-                if ($yearPercent < self::YEAR_MATCH_PERCENT) {
-                    continue;
-                }
-
-                // Found a good match, update the release
-                $getIMDBid = $imdbTitle->imdbid();
-                $imdbId = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $releaseId);
-                if ($imdbId !== false) {
-                    return true;
-                }
-            }
-        } catch (\ErrorException $e) {
-            $this->colorCli->error('Error fetching data from IMDb: '.$e->getMessage(), true);
-            Log::debug($e->getMessage());
-        }
-
-        return false;
-    }
-
-    /**
-     * Search OMDb API for movie.
-     */
-    private function searchOMDbAPI(int $releaseId): bool
-    {
-        if ($this->omdbapikey === null) {
-            return false;
-        }
-
-        $omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
-
-        try {
-            // Search with year if available, otherwise search without year
-            $buffer = $this->currentYear !== ''
-                ? $this->omdbApi->search($omdbTitle, 'movie', $this->currentYear)
-                : $this->omdbApi->search($omdbTitle, 'movie');
-
-            if (! is_object($buffer) ||
-                $buffer->message !== 'OK' ||
-                Str::contains($buffer->data->Response, 'Error:') ||
-                $buffer->data->Response !== 'True' ||
-                empty($buffer->data->Search[0]->imdbID)) {
-                return false;
-            }
-
-            $getIMDBid = $buffer->data->Search[0]->imdbID;
-            $imdbId = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $releaseId);
-
-            return $imdbId !== false;
-
+            return $date->diffForHumans();
         } catch (\Exception $e) {
-            // Log error but continue processing
-            Log::error('OMDb API error: '.$e->getMessage());
-
-            return false;
+            return $timestamp;
         }
     }
 
     /**
-     * Search Trakt.tv for movie.
-     */
-    private function searchTraktTV(int $releaseId, string $movieName): bool
-    {
-        if ($this->traktcheck === null) {
-            return false;
-        }
-
-        try {
-            $data = $this->traktTv->client->movieSummary($movieName, 'full');
-            if ($data === false || empty($data['ids']['imdb'])) {
-                return false;
-            }
-
-            $this->parseTraktTv($data);
-            $imdbId = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $releaseId);
-
-            return $imdbId !== false;
-
-        } catch (\Exception $e) {
-            Log::error('Trakt.tv error: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
-    /**
-     * Search TMDB for movie.
-     */
-    private function searchTMDB(int $releaseId): bool
-    {
-        try {
-            $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
-            if (empty($data['total_results']) || empty($data['results'])) {
-                return false;
-            }
-
-            foreach ($data['results'] as $result) {
-                // Skip results without ID or release date
-                if (empty($result['id']) || empty($result['release_date'])) {
-                    continue;
-                }
-
-                // Compare release years
-                similar_text(
-                    $this->currentYear,
-                    Carbon::parse($result['release_date'])->year,
-                    $percent
-                );
-
-                if ($percent < self::YEAR_MATCH_PERCENT) {
-                    continue;
-                }
-
-                // Try to get IMDB ID from TMDB
-                $ret = $this->fetchTMDBProperties($result['id'], true);
-                if ($ret === false || empty($ret['imdbid'])) {
-                    continue;
-                }
-
-                $imdbId = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $releaseId);
-                if ($imdbId !== false) {
-                    return true;
-                }
-            }
-
-        } catch (TmdbApiException|\ErrorException $error) {
-            Log::error('TMDB API error: '.$error->getMessage());
-        }
-
-        return false;
-    }
-
-    /**
-     * Search for a movie in the local database by title and year.
-     *
-     * @return string|false IMDB ID without 'tt' prefix if found, false otherwise
-     */
-    protected function localIMDBSearch(): string|false
-    {
-        // Skip processing if title is empty
-        if (empty($this->currentTitle)) {
-            return false;
-        }
-
-        // Create a cache key for this search
-        $cacheKey = 'local_imdb_'.md5($this->currentTitle.$this->currentYear);
-
-        // Check cache first
-        if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
-        }
-
-        // Build the base query
-        $query = MovieInfo::query()
-            ->select(['imdbid', 'title'])
-            ->where('title', 'like', '%'.$this->currentTitle.'%');
-
-        // Add year range filter if we have a year
-        if (! empty($this->currentYear)) {
-            $start = Carbon::createFromFormat('Y', $this->currentYear)->subYears(2)->year;
-            $end = Carbon::createFromFormat('Y', $this->currentYear)->addYears(2)->year;
-            $query->whereBetween('year', [$start, $end]);
-        }
-
-        // Get potential matches in a single query
-        $potentialMatches = $query->get();
-
-        // If no matches found, cache the failure and return false
-        if ($potentialMatches->isEmpty()) {
-            Cache::put($cacheKey, false, now()->addHours(6));
-
-            return false;
-        }
-
-        // Check each potential match for title similarity
-        foreach ($potentialMatches as $match) {
-            similar_text($this->currentTitle, $match['title'], $percent);
-
-            if ($percent >= self::MATCH_PERCENT) {
-                // Found a good match, cache it and return
-                Cache::put($cacheKey, $match['imdbid'], now()->addDays(7));
-
-                if ($this->echooutput) {
-                    $this->colorCli->climate()->info("Found local match: {$match['title']} ({$match['imdbid']})");
-                }
-
-                return $match['imdbid'];
-            }
-        }
-
-        // No good matches found, cache the failure
-        Cache::put($cacheKey, false, now()->addHours(6));
-
-        return false;
-    }
-
-    /**
-     * Parse a movie title and year from a release search name.
-     *
-     * This method attempts to extract a clean movie title and year from scene release names
-     * which often contain quality indicators, source information, and other metadata.
-     *
-     * @param  string  $releaseName  The raw release name to parse
-     * @return bool True if parsing was successful, false otherwise
-     */
-    protected function parseMovieSearchName(string $releaseName): bool
-    {
-        // Skip empty release names
-        if (empty(trim($releaseName))) {
-            return false;
-        }
-
-        // Create a cache key for this parsing operation
-        $cacheKey = 'parse_movie_'.md5($releaseName);
-
-        // Check if we have a cached result
-        if (Cache::has($cacheKey)) {
-            $result = Cache::get($cacheKey);
-            if (is_array($result)) {
-                $this->currentTitle = $result['title'];
-                $this->currentYear = $result['year'];
-
-                return true;
-            }
-
-            return false;
-        }
-
-        $name = $year = '';
-
-        // Common movie quality, format, and release group patterns to identify boundaries
-        $followingList = '[^\w]((1080|480|720|2160)p|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR|UHD)(Rip)?|'
-            .'BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?PROPER|RE(pack|Rip)|Sub\.?(fix|pack)|'
-            .'Unrated|WEB-?DL|WEBRip|(x|H|HEVC)[ ._-]?26[45]|xvid|AAC|REMUX)[^\w]';
-
-        // First attempt: Find pattern with year - most reliable method
-        if (preg_match('/(?P<name>[\w. -]+)[^\w](?P<year>(19|20)\d\d)/i', $releaseName, $hits)) {
-            $name = $hits['name'];
-            $year = $hits['year'];
-        }
-        // Second attempt: Look for title followed by common release identifiers
-        elseif (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $hits)) {
-            $name = $hits['name'];
-        }
-        // Third attempt: Try to match the start of the string up to a pattern
-        elseif (preg_match('/^(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $hits)) {
-            $name = $hits['name'];
-        }
-        // Fourth attempt: Check if the whole string might be a title (for simple releases)
-        elseif (strlen($releaseName) <= 100 && ! preg_match('/\.(rar|zip|avi|mkv|mp4)$/i', $releaseName)) {
-            $name = $releaseName;
-        }
-
-        // Process the name if we have one
-        if (! empty($name)) {
-            // Clean up the name by removing common patterns
-            // 1. Remove any common movie flags like 1080p, BluRay, etc.
-            $name = preg_replace('/'.$followingList.'/i', ' ', $name);
-
-            // 2. Remove content in parentheses, brackets, and periods/underscores
-            $name = preg_replace('/\(.*?\)|\[.*?\]|[._]/i', ' ', $name);
-
-            // 3. Remove scene group names (typically after a hyphen)
-            $name = preg_replace('/-[A-Z0-9].*$/i', '', $name);
-
-            // 4. Clean up multiple spaces
-            $name = trim(preg_replace('/\s{2,}/', ' ', $name));
-
-            // Validate the extracted name (at least 2 characters, not just numbers)
-            if (strlen($name) > 2 && ! preg_match('/^\d+$/', $name)) {
-                $this->currentTitle = $name;
-                $this->currentYear = $year;
-
-                // Cache the successful result
-                Cache::put($cacheKey, [
-                    'title' => $name,
-                    'year' => $year,
-                ], now()->addDays(7));
-
-                return true;
-            }
-        }
-
-        // Cache the failed result but with shorter expiration
-        Cache::put($cacheKey, false, now()->addHours(24));
-
-        return false;
-    }
-
-    /**
-     * Get IMDB genres.
+     * Get all unique genres from the movieinfo table
      */
     public function getGenres(): array
     {
-        return [
-            'Action',
-            'Adventure',
-            'Animation',
-            'Biography',
-            'Comedy',
-            'Crime',
-            'Documentary',
-            'Drama',
-            'Family',
-            'Fantasy',
-            'Film-Noir',
-            'Game-Show',
-            'History',
-            'Horror',
-            'Music',
-            'Musical',
-            'Mystery',
-            'News',
-            'Reality-TV',
-            'Romance',
-            'Sci-Fi',
-            'Sport',
-            'Talk-Show',
-            'Thriller',
-            'War',
-            'Western',
-        ];
+        $cacheKey = 'movie_genres_list';
+        $expiresAt = now()->addHours(24); // Cache for 24 hours
+
+        return Cache::remember($cacheKey, $expiresAt, function () {
+            $genres = MovieInfo::whereNotNull('genre')
+                ->where('genre', '!=', '')
+                ->pluck('genre')
+                ->flatMap(function ($genre) {
+                    return explode(', ', $genre);
+                })
+                ->map(function ($genre) {
+                    return trim($genre);
+                })
+                ->filter(function ($genre) {
+                    return ! empty($genre);
+                })
+                ->unique()
+                ->sort()
+                ->values()
+                ->toArray();
+
+            return $genres;
+        });
     }
 }
