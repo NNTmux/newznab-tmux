@@ -215,13 +215,16 @@
                                                                           <div class="d-flex align-items-center">
                                                                               <i class="fa fa-cloud-download text-muted me-2"></i>
                                                                               <div class="progress flex-grow-1" style="height: 20px;">
-                                                                                  <div class="progress-bar {if $grabstoday >= $user->role->downloadrequests}bg-danger{else}bg-success{/if}"
+                                                                                  {assign var="percentage" value="{math equation='min((x/y)*100, 100)' x=$grabstoday y=$user.role.downloadrequests format='%.0f'}"}
+                                                                                  <div class="progress-bar bg-success"
                                                                                        role="progressbar"
-                                                                                       style="width: {min(($grabstoday / $user->role->downloadrequests) * 100, 100)}%;"
+                                                                                       style="width: {if $percentage == 0}100{else}{$percentage}{/if}%;"
                                                                                        aria-valuenow="{$grabstoday}"
                                                                                        aria-valuemin="0"
-                                                                                       aria-valuemax="{$user->role->downloadrequests}">
-                                                                                      {$grabstoday} / {$user->role->downloadrequests}
+                                                                                       aria-valuemax="{$user.role.downloadrequests}">
+                                                                                  </div>
+                                                                                  <div class="position-absolute w-100 text-center" style="line-height: 20px;">
+                                                                                      <span class="fw-medium">{$grabstoday} / {$user.role.downloadrequests}</span>
                                                                                   </div>
                                                                               </div>
                                                                           </div>
