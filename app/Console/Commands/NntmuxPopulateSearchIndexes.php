@@ -146,9 +146,6 @@ class NntmuxPopulateSearchIndexes extends Command
         return $result;
     }
 
-    /**
-     * Populate ManticoreSearch releases index
-     */
     private function manticoreReleases(): int
     {
         $manticore = new ManticoreSearch;
@@ -188,18 +185,18 @@ class NntmuxPopulateSearchIndexes extends Command
             $query,
             function ($item) {
                 return [
-                    'id' => $item->id,
-                    'name' => (string) ($item->name ?? ''),
-                    'searchname' => (string) ($item->searchname ?? ''),
-                    'fromname' => (string) ($item->fromname ?? ''),
-                    'categories_id' => (int) ($item->categories_id ?? 0),
-                    'filename' => (string) ($item->filename ?? ''),
-                    'dummy' => 1,
+                    'id' => (string) $item->id,
+                    'name' => (string) ($item->name ?: ''),
+                    'searchname' => (string) ($item->searchname ?: ''),
+                    'fromname' => (string) ($item->fromname ?: ''),
+                    'categories_id' => (string) ($item->categories_id ?: '0'),
+                    'filename' => (string) ($item->filename ?: ''),
+                    'dummy' => '1',
                 ];
             }
         );
     }
-
+    
     /**
      * Populate ManticoreSearch predb index
      */
