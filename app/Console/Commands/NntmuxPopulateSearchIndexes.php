@@ -196,7 +196,7 @@ class NntmuxPopulateSearchIndexes extends Command
             }
         );
     }
-    
+
     /**
      * Populate ManticoreSearch predb index
      */
