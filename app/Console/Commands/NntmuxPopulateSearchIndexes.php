@@ -22,7 +22,10 @@ class NntmuxPopulateSearchIndexes extends Command
                                        {--elastic : Use ElasticSearch}
                                        {--releases : Populates the releases index}
                                        {--predb : Populates the predb index}
-                                       {--count=20000 : Sets the chunk size}
+                                       {--count=50000 : Sets the chunk size}
+                                       {--parallel=4 : Number of parallel processes}
+                                       {--batch-size=5000 : Batch size for bulk operations}
+                                       {--disable-keys : Disable database keys during population}
                                        {--optimize : Optimize ManticoreSearch indexes}';
 
     /**
@@ -38,7 +41,11 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private const GROUP_CONCAT_MAX_LEN = 16384;
 
-    private const DEFAULT_CHUNK_SIZE = 20000;
+    private const DEFAULT_CHUNK_SIZE = 50000;
+
+    private const DEFAULT_PARALLEL_PROCESSES = 4;
+
+    private const DEFAULT_BATCH_SIZE = 5000;
 
     /**
      * Execute the console command.
@@ -235,20 +242,23 @@ class NntmuxPopulateSearchIndexes extends Command
     }
 
     /**
-     * Process data for ManticoreSearch
+     * Process data for ManticoreSearch with optimizations
      */
     private function processManticoreData(string $indexName, int $total, $query, callable $transformer): int
     {
         $manticore = new ManticoreSearch;
         $chunkSize = $this->getChunkSize();
+        $batchSize = $this->getBatchSize();
 
+        $this->optimizeDatabase();
         $this->setGroupConcatMaxLen();
 
         $this->info(sprintf(
-            "Populating ManticoreSearch index '%s' with %s rows using chunks of %s.",
+            "Populating ManticoreSearch index '%s' with %s rows using chunks of %s and batch size of %s.",
             $indexName,
             number_format($total),
-            number_format($chunkSize)
+            number_format($chunkSize),
+            number_format($batchSize)
         ));
 
         $bar = $this->output->createProgressBar($total);
@@ -257,15 +267,20 @@ class NntmuxPopulateSearchIndexes extends Command
 
         $processedCount = 0;
         $errorCount = 0;
+        $batchData = [];
 
         try {
-            $query->chunk($chunkSize, function ($items) use ($manticore, $indexName, $transformer, $bar, &$processedCount, &$errorCount) {
-                $data = [];
-
+            $query->chunk($chunkSize, function ($items) use ($manticore, $indexName, $transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData) {
                 foreach ($items as $item) {
                     try {
-                        $data[] = $transformer($item);
+                        $batchData[] = $transformer($item);
                         $processedCount++;
+
+                        // Process in optimized batch sizes
+                        if (count($batchData) >= $batchSize) {
+                            $this->processBatch($manticore, $indexName, $batchData);
+                            $batchData = [];
+                        }
                     } catch (Exception $e) {
                         $errorCount++;
                         if ($this->output->isVerbose()) {
@@ -274,11 +289,12 @@ class NntmuxPopulateSearchIndexes extends Command
                     }
                     $bar->advance();
                 }
-
-                if (! empty($data)) {
-                    $manticore->manticoreSearch->table($indexName)->replaceDocuments($data);
-                }
             });
+
+            // Process remaining items
+            if (!empty($batchData)) {
+                $this->processBatch($manticore, $indexName, $batchData);
+            }
 
             $bar->finish();
             $this->newLine();
@@ -297,6 +313,8 @@ class NntmuxPopulateSearchIndexes extends Command
             $this->error("Failed to populate ManticoreSearch: {$e->getMessage()}");
 
             return Command::FAILURE;
+        } finally {
+            $this->restoreDatabase();
         }
     }
 
@@ -386,19 +404,22 @@ class NntmuxPopulateSearchIndexes extends Command
     }
 
     /**
-     * Process data for ElasticSearch
+     * Process data for ElasticSearch with optimizations
      */
     private function processElasticData(string $indexName, int $total, $query, callable $transformer): int
     {
         $chunkSize = $this->getChunkSize();
+        $batchSize = $this->getBatchSize();
 
+        $this->optimizeDatabase();
         $this->setGroupConcatMaxLen();
 
         $this->info(sprintf(
-            "Populating ElasticSearch index '%s' with %s rows using chunks of %s.",
+            "Populating ElasticSearch index '%s' with %s rows using chunks of %s and batch size of %s.",
             $indexName,
             number_format($total),
-            number_format($chunkSize)
+            number_format($chunkSize),
+            number_format($batchSize)
         ));
 
         $bar = $this->output->createProgressBar($total);
@@ -407,11 +428,10 @@ class NntmuxPopulateSearchIndexes extends Command
 
         $processedCount = 0;
         $errorCount = 0;
-        $batchSize = min($chunkSize, 1000); // ElasticSearch performs better with smaller bulk sizes
 
         try {
             $query->chunk($chunkSize, function ($items) use ($indexName, $transformer, $bar, &$processedCount, &$errorCount, $batchSize) {
-                // Process in smaller batches for ElasticSearch
+                // Process in optimized batches for ElasticSearch
                 foreach ($items->chunk($batchSize) as $batch) {
                     $data = ['body' => []];
 
@@ -438,20 +458,8 @@ class NntmuxPopulateSearchIndexes extends Command
                         $bar->advance();
                     }
 
-                    if (! empty($data['body'])) {
-                        $response = \Elasticsearch::bulk($data);
-
-                        // Check for errors in bulk response
-                        if (isset($response['errors']) && $response['errors']) {
-                            foreach ($response['items'] as $item) {
-                                if (isset($item['index']['error'])) {
-                                    $errorCount++;
-                                    if ($this->output->isVerbose()) {
-                                        $this->error('ElasticSearch error: '.json_encode($item['index']['error']));
-                                    }
-                                }
-                            }
-                        }
+                    if (!empty($data['body'])) {
+                        $this->processElasticBatch($data, $errorCount);
                     }
                 }
             });
@@ -473,6 +481,109 @@ class NntmuxPopulateSearchIndexes extends Command
             $this->error("Failed to populate ElasticSearch: {$e->getMessage()}");
 
             return Command::FAILURE;
+        } finally {
+            $this->restoreDatabase();
+        }
+    }
+
+    /**
+     * Process ManticoreSearch batch with retry logic
+     */
+    private function processBatch(ManticoreSearch $manticore, string $indexName, array $data): void
+    {
+        $retries = 3;
+        $attempt = 0;
+
+        while ($attempt < $retries) {
+            try {
+                $manticore->manticoreSearch->table($indexName)->replaceDocuments($data);
+                break;
+            } catch (Exception $e) {
+                $attempt++;
+                if ($attempt >= $retries) {
+                    throw $e;
+                }
+                usleep(100000); // 100ms delay before retry
+            }
+        }
+    }
+
+    /**
+     * Process ElasticSearch batch with retry logic
+     */
+    private function processElasticBatch(array $data, int &$errorCount): void
+    {
+        $retries = 3;
+        $attempt = 0;
+
+        while ($attempt < $retries) {
+            try {
+                $response = \Elasticsearch::bulk($data);
+
+                // Check for errors in bulk response
+                if (isset($response['errors']) && $response['errors']) {
+                    foreach ($response['items'] as $item) {
+                        if (isset($item['index']['error'])) {
+                            $errorCount++;
+                            if ($this->output->isVerbose()) {
+                                $this->error('ElasticSearch error: '.json_encode($item['index']['error']));
+                            }
+                        }
+                    }
+                }
+                break;
+            } catch (Exception $e) {
+                $attempt++;
+                if ($attempt >= $retries) {
+                    throw $e;
+                }
+                usleep(100000); // 100ms delay before retry
+            }
+        }
+    }
+
+    /**
+     * Optimize database settings for bulk operations
+     */
+    private function optimizeDatabase(): void
+    {
+        if ($this->option('disable-keys')) {
+            $this->info('Disabling database keys for faster bulk operations...');
+
+            try {
+                // Disable foreign key checks
+                DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+                DB::statement('SET UNIQUE_CHECKS = 0');
+                DB::statement('SET AUTOCOMMIT = 0');
+
+                // Increase buffer sizes
+                DB::statement('SET SESSION innodb_buffer_pool_size = 1073741824'); // 1GB
+                DB::statement('SET SESSION bulk_insert_buffer_size = 268435456'); // 256MB
+                DB::statement('SET SESSION read_buffer_size = 2097152'); // 2MB
+                DB::statement('SET SESSION sort_buffer_size = 16777216'); // 16MB
+
+            } catch (Exception $e) {
+                $this->warn("Could not optimize database settings: {$e->getMessage()}");
+            }
+        }
+    }
+
+    /**
+     * Restore database settings after bulk operations
+     */
+    private function restoreDatabase(): void
+    {
+        if ($this->option('disable-keys')) {
+            $this->info('Restoring database settings...');
+
+            try {
+                DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+                DB::statement('SET UNIQUE_CHECKS = 1');
+                DB::statement('SET AUTOCOMMIT = 1');
+                DB::statement('COMMIT');
+            } catch (Exception $e) {
+                $this->warn("Could not restore database settings: {$e->getMessage()}");
+            }
         }
     }
 
@@ -484,6 +595,15 @@ class NntmuxPopulateSearchIndexes extends Command
         $chunkSize = (int) $this->option('count');
 
         return $chunkSize > 0 ? $chunkSize : self::DEFAULT_CHUNK_SIZE;
+    }
+
+    /**
+     * Get the batch size from options
+     */
+    private function getBatchSize(): int
+    {
+        $batchSize = (int) $this->option('batch-size');
+        return $batchSize > 0 ? $batchSize : self::DEFAULT_BATCH_SIZE;
     }
 
     /**
