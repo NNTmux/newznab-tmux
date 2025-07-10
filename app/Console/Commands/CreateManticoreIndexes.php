@@ -74,7 +74,6 @@ class CreateManticoreIndexes extends Command
                     'fromname' => ['type' => 'text'],
                     'filename' => ['type' => 'text'],
                     'categories_id' => ['type' => 'text'],
-                    'dummy' => ['type' => 'integer', 'attribute' => true],
                 ],
             ],
             'predb_rt' => [
@@ -85,7 +84,6 @@ class CreateManticoreIndexes extends Command
                 'columns' => [
                     'title' => ['type' => 'text', 'attribute' => true],
                     'filename' => ['type' => 'text', 'attribute' => true],
-                    'dummy' => ['type' => 'integer', 'attribute' => true],
                     'source' => ['type' => 'string', 'attribute' => true],
                 ],
             ],
