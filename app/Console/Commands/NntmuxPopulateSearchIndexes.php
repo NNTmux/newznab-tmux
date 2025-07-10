@@ -292,7 +292,7 @@ class NntmuxPopulateSearchIndexes extends Command
             });
 
             // Process remaining items
-            if (!empty($batchData)) {
+            if (! empty($batchData)) {
                 $this->processBatch($manticore, $indexName, $batchData);
             }
 
@@ -458,7 +458,7 @@ class NntmuxPopulateSearchIndexes extends Command
                         $bar->advance();
                     }
 
-                    if (!empty($data['body'])) {
+                    if (! empty($data['body'])) {
                         $this->processElasticBatch($data, $errorCount);
                     }
                 }
@@ -603,6 +603,7 @@ class NntmuxPopulateSearchIndexes extends Command
     private function getBatchSize(): int
     {
         $batchSize = (int) $this->option('batch-size');
+
         return $batchSize > 0 ? $batchSize : self::DEFAULT_BATCH_SIZE;
     }
 

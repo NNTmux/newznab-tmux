@@ -8,7 +8,6 @@ use Blacklight\ManticoreSearch;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 class NntmuxOffsetPopulate extends Command
@@ -36,6 +35,7 @@ class NntmuxOffsetPopulate extends Command
     protected $description = 'Populate search indexes using offset-based parallel processing for maximum performance';
 
     private const SUPPORTED_ENGINES = ['manticore', 'elastic'];
+
     private const SUPPORTED_INDEXES = ['releases', 'predb'];
 
     /**
@@ -46,8 +46,9 @@ class NntmuxOffsetPopulate extends Command
         $engine = $this->getSelectedEngine();
         $index = $this->getSelectedIndex();
 
-        if (!$engine || !$index) {
+        if (! $engine || ! $index) {
             $this->error('You must specify both an engine (--manticore or --elastic) and an index (--releases or --predb).');
+
             return Command::FAILURE;
         }
 
@@ -70,8 +71,9 @@ class NntmuxOffsetPopulate extends Command
     private function populateIndexParallel(string $engine, string $index): int
     {
         $total = $this->getTotalRecords($index);
-        if (!$total) {
+        if (! $total) {
             $this->warn("{$index} table is empty. Nothing to do.");
+
             return Command::SUCCESS;
         }
 
@@ -79,7 +81,7 @@ class NntmuxOffsetPopulate extends Command
         $recordsPerProcess = ceil($total / $parallelProcesses);
 
         $this->info(sprintf(
-            "Processing %s records with %d parallel processes, ~%d records per process",
+            'Processing %s records with %d parallel processes, ~%d records per process',
             number_format($total),
             $parallelProcesses,
             $recordsPerProcess
@@ -101,7 +103,7 @@ class NntmuxOffsetPopulate extends Command
             $processes[] = [
                 'process' => $process,
                 'id' => $i,
-                'range' => $range
+                'range' => $range,
             ];
         }
 
@@ -112,6 +114,7 @@ class NntmuxOffsetPopulate extends Command
         $this->verifyIndexPopulation($engine, $index, $total);
 
         $this->info('All parallel processes completed successfully!');
+
         return Command::SUCCESS;
     }
 
@@ -131,7 +134,7 @@ class NntmuxOffsetPopulate extends Command
                 $ranges[] = [
                     'offset' => $offset,
                     'limit' => $limit,
-                    'worker_id' => $i
+                    'worker_id' => $i,
                 ];
             }
         }
@@ -156,7 +159,7 @@ class NntmuxOffsetPopulate extends Command
             "--limit={$limit}",
             "--worker-id={$workerId}",
             "--batch-size={$batchSize}",
-            "--memory-limit={$memoryLimit}"
+            "--memory-limit={$memoryLimit}",
         ];
 
         if ($this->option('disable-keys')) {
@@ -193,7 +196,7 @@ class NntmuxOffsetPopulate extends Command
                     continue;
                 }
 
-                if (!$process->running()) {
+                if (! $process->running()) {
                     $completedProcesses[] = $processId;
                     $completed++;
                     $bar->advance();
@@ -212,10 +215,10 @@ class NntmuxOffsetPopulate extends Command
                             $errorOutput = $result->errorOutput();
 
                             if ($output) {
-                                $this->error("Worker {$processId} output: " . substr($output, -500));
+                                $this->error("Worker {$processId} output: ".substr($output, -500));
                             }
                             if ($errorOutput) {
-                                $this->error("Worker {$processId} error: " . substr($errorOutput, -500));
+                                $this->error("Worker {$processId} error: ".substr($errorOutput, -500));
                             }
                         }
                     } catch (Exception $e) {
@@ -231,8 +234,8 @@ class NntmuxOffsetPopulate extends Command
         $bar->finish();
         $this->newLine();
 
-        if (!empty($failedProcesses)) {
-            $this->error("Failed workers: " . implode(', ', $failedProcesses));
+        if (! empty($failedProcesses)) {
+            $this->error('Failed workers: '.implode(', ', $failedProcesses));
         }
     }
 
@@ -241,7 +244,7 @@ class NntmuxOffsetPopulate extends Command
      */
     private function verifyIndexPopulation(string $engine, string $index, int $expectedTotal): void
     {
-        $this->info("Verifying index population...");
+        $this->info('Verifying index population...');
 
         if ($engine === 'elastic') {
             try {
@@ -251,19 +254,19 @@ class NntmuxOffsetPopulate extends Command
                 $stats = \Elasticsearch::indices()->stats(['index' => $index]);
                 $actualCount = $stats['indices'][$index]['total']['docs']['count'] ?? 0;
 
-                $this->info("Expected: " . number_format($expectedTotal) . " records");
-                $this->info("Actual: " . number_format($actualCount) . " records");
+                $this->info('Expected: '.number_format($expectedTotal).' records');
+                $this->info('Actual: '.number_format($actualCount).' records');
 
                 if ($actualCount >= $expectedTotal * 0.95) { // Allow for 5% tolerance
-                    $this->info("✓ Index population successful!");
+                    $this->info('✓ Index population successful!');
                 } else {
-                    $this->warn("⚠ Index population may be incomplete");
+                    $this->warn('⚠ Index population may be incomplete');
                 }
             } catch (Exception $e) {
                 $this->warn("Could not verify index population: {$e->getMessage()}");
             }
         } else {
-            $this->info("ManticoreSearch index verification not implemented yet");
+            $this->info('ManticoreSearch index verification not implemented yet');
         }
     }
 
@@ -294,8 +297,8 @@ class NntmuxOffsetPopulate extends Command
                         \Elasticsearch::deleteByQuery([
                             'index' => $index,
                             'body' => [
-                                'query' => ['match_all' => (object)[]]
-                            ]
+                                'query' => ['match_all' => (object) []],
+                            ],
                         ]);
 
                         // Force refresh to ensure deletions are visible
@@ -310,7 +313,7 @@ class NntmuxOffsetPopulate extends Command
                 }
             } catch (Exception $e) {
                 $this->warn("Could not clear ElasticSearch index: {$e->getMessage()}");
-                $this->info("Attempting to recreate index...");
+                $this->info('Attempting to recreate index...');
 
                 // Fallback: delete and recreate
                 try {
@@ -338,11 +341,11 @@ class NntmuxOffsetPopulate extends Command
                     'translog' => [
                         'durability' => 'async',
                         'sync_interval' => '30s',
-                        'flush_threshold_size' => '1gb'
-                    ]
+                        'flush_threshold_size' => '1gb',
+                    ],
                 ],
-                'mappings' => $this->getIndexMappings($indexName)
-            ]
+                'mappings' => $this->getIndexMappings($indexName),
+            ],
         ];
 
         \Elasticsearch::indices()->create($settings);
@@ -364,8 +367,8 @@ class NntmuxOffsetPopulate extends Command
                     'fromname' => ['type' => 'text', 'analyzer' => 'standard'],
                     'categories_id' => ['type' => 'integer'],
                     'filename' => ['type' => 'text', 'analyzer' => 'standard'],
-                    'postdate' => ['type' => 'date']
-                ]
+                    'postdate' => ['type' => 'date'],
+                ],
             ];
         } else {
             return [
@@ -373,8 +376,8 @@ class NntmuxOffsetPopulate extends Command
                     'id' => ['type' => 'long'],
                     'title' => ['type' => 'text', 'analyzer' => 'standard'],
                     'filename' => ['type' => 'text', 'analyzer' => 'standard'],
-                    'source' => ['type' => 'keyword']
-                ]
+                    'source' => ['type' => 'keyword'],
+                ],
             ];
         }
     }
@@ -397,6 +400,7 @@ class NntmuxOffsetPopulate extends Command
                 return $engine;
             }
         }
+
         return null;
     }
 
@@ -410,6 +414,7 @@ class NntmuxOffsetPopulate extends Command
                 return $index;
             }
         }
+
         return null;
     }
 }

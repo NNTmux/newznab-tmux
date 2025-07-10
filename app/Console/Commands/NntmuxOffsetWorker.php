@@ -54,8 +54,9 @@ class NntmuxOffsetWorker extends Command
             $engine = $this->getSelectedEngine();
             $index = $this->getSelectedIndex();
 
-            if (!$engine || !$index) {
+            if (! $engine || ! $index) {
                 $this->error('Engine and index must be specified');
+
                 return Command::FAILURE;
             }
 
@@ -69,6 +70,7 @@ class NntmuxOffsetWorker extends Command
 
         } catch (Exception $e) {
             $this->error("Worker {$workerId} failed: {$e->getMessage()}");
+
             return Command::FAILURE;
         }
     }
@@ -103,7 +105,7 @@ class NntmuxOffsetWorker extends Command
 
                         if (count($batchData) >= $batchSize) {
                             $this->processManticoreBatch($manticore, $indexName, $batchData, $workerId);
-                            $this->info("Worker {$workerId}: Inserted batch of " . count($batchData) . " records");
+                            $this->info("Worker {$workerId}: Inserted batch of ".count($batchData).' records');
                             $batchData = [];
                         }
                     } catch (Exception $e) {
@@ -114,13 +116,13 @@ class NntmuxOffsetWorker extends Command
             });
 
             // Process remaining items
-            if (!empty($batchData)) {
+            if (! empty($batchData)) {
                 $this->processManticoreBatch($manticore, $indexName, $batchData, $workerId);
-                $this->info("Worker {$workerId}: Inserted final batch of " . count($batchData) . " records");
+                $this->info("Worker {$workerId}: Inserted final batch of ".count($batchData).' records');
             }
 
         } else { // ElasticSearch
-            $query->chunk($batchSize, function ($items) use ($indexName, $transformer, &$processed, &$errors, $batchSize, $workerId) {
+            $query->chunk($batchSize, function ($items) use ($indexName, $transformer, &$processed, &$errors, $workerId) {
                 $this->info("Worker {$workerId}: Processing chunk of {$items->count()} items");
                 $data = ['body' => []];
 
@@ -143,15 +145,16 @@ class NntmuxOffsetWorker extends Command
                     }
                 }
 
-                if (!empty($data['body'])) {
+                if (! empty($data['body'])) {
                     $this->processElasticBatch($data, $workerId);
-                    $this->info("Worker {$workerId}: Inserted batch of " . (count($data['body']) / 2) . " records");
+                    $this->info("Worker {$workerId}: Inserted batch of ".(count($data['body']) / 2).' records');
                 }
             });
         }
 
         $executionTime = round(microtime(true) - $startTime, 2);
         $this->info("Worker {$workerId}: Completed processing {$processed} records with {$errors} errors in {$executionTime} seconds");
+
         return Command::SUCCESS;
     }
 
@@ -204,6 +207,7 @@ class NntmuxOffsetWorker extends Command
             } else {
                 return function ($item) {
                     $searchName = str_replace(['.', '-'], ' ', $item->searchname ?? '');
+
                     return [
                         'id' => $item->id,
                         'name' => $item->name,

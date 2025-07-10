@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Exception;
+use Illuminate\Console\Command;
 
 class NntmuxCheckIndex extends Command
 {
@@ -33,8 +33,9 @@ class NntmuxCheckIndex extends Command
         $engine = $this->getSelectedEngine();
         $index = $this->getSelectedIndex();
 
-        if (!$engine || !$index) {
+        if (! $engine || ! $index) {
             $this->error('You must specify both an engine (--manticore or --elastic) and an index (--releases or --predb).');
+
             return Command::FAILURE;
         }
 
@@ -50,6 +51,7 @@ class NntmuxCheckIndex extends Command
             return Command::SUCCESS;
         } catch (Exception $e) {
             $this->error("Error checking index: {$e->getMessage()}");
+
             return Command::FAILURE;
         }
     }
@@ -63,8 +65,9 @@ class NntmuxCheckIndex extends Command
             // Check if index exists
             $exists = \Elasticsearch::indices()->exists(['index' => $index]);
 
-            if (!$exists) {
+            if (! $exists) {
                 $this->error("ElasticSearch index '{$index}' does not exist.");
+
                 return;
             }
 
@@ -75,8 +78,8 @@ class NntmuxCheckIndex extends Command
             $docCount = $stats['indices'][$index]['total']['docs']['count'] ?? 0;
             $storeSize = $stats['indices'][$index]['total']['store']['size_in_bytes'] ?? 0;
 
-            $this->info("Document count: " . number_format($docCount));
-            $this->info("Index size: " . $this->formatBytes($storeSize));
+            $this->info('Document count: '.number_format($docCount));
+            $this->info('Index size: '.$this->formatBytes($storeSize));
 
             // Get a sample document
             if ($docCount > 0) {
@@ -84,12 +87,12 @@ class NntmuxCheckIndex extends Command
                     'index' => $index,
                     'size' => 1,
                     'body' => [
-                        'query' => ['match_all' => (object)[]]
-                    ]
+                        'query' => ['match_all' => (object) []],
+                    ],
                 ]);
 
                 if (isset($sample['hits']['hits'][0])) {
-                    $this->info("Sample document:");
+                    $this->info('Sample document:');
                     $this->info(json_encode($sample['hits']['hits'][0]['_source'], JSON_PRETTY_PRINT));
                 }
             }
@@ -109,7 +112,7 @@ class NntmuxCheckIndex extends Command
 
             // This is a basic check - you may need to adjust based on your ManticoreSearch setup
             $this->info("Checking ManticoreSearch index '{$indexName}'...");
-            $this->warn("ManticoreSearch index checking not fully implemented yet.");
+            $this->warn('ManticoreSearch index checking not fully implemented yet.');
 
         } catch (Exception $e) {
             $this->error("Error checking ManticoreSearch index: {$e->getMessage()}");
@@ -128,7 +131,7 @@ class NntmuxCheckIndex extends Command
 
         $bytes /= pow(1024, $pow);
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 
     /**
