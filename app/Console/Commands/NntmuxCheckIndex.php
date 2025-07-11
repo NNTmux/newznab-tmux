@@ -109,13 +109,130 @@ class NntmuxCheckIndex extends Command
     {
         try {
             $indexName = $index === 'releases' ? 'releases_rt' : 'predb_rt';
+            $host = config('nntmux.manticore.host', '127.0.0.1');
+            $port = config('nntmux.manticore.port', 9308);
 
-            // This is a basic check - you may need to adjust based on your ManticoreSearch setup
-            $this->info("Checking ManticoreSearch index '{$indexName}'...");
-            $this->warn('ManticoreSearch index checking not fully implemented yet.');
+            // Use HTTP API endpoint
+            $baseUrl = "http://{$host}:{$port}";
 
-        } catch (Exception $e) {
-            $this->error("Error checking ManticoreSearch index: {$e->getMessage()}");
+            // Check if table exists using HTTP API
+            $client = new \GuzzleHttp\Client([
+                'base_uri' => $baseUrl,
+                'timeout' => 10,
+                'http_errors' => false, // Don't throw on HTTP errors
+            ]);
+
+            // Use raw mode which seems to work
+            $query = "SELECT COUNT(*) FROM {$indexName}";
+
+            $response = $client->post('/sql?mode=raw', [
+                'body' => $query,
+                'headers' => [
+                    'Content-Type' => 'text/plain',
+                ],
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            $body = $response->getBody()->getContents();
+
+            if ($statusCode !== 200) {
+                $this->error("HTTP Status: {$statusCode}");
+
+                // Check if it's a table not found error
+                if (strpos($body, 'no such table') !== false ||
+                    strpos($body, 'unknown table') !== false ||
+                    strpos($body, "doesn't exist") !== false) {
+                    $this->error("ManticoreSearch table '{$indexName}' does not exist.");
+
+                    return;
+                }
+                $this->error("Response: {$body}");
+
+                return;
+            }
+
+            // Parse the JSON response
+            $jsonData = json_decode($body, true);
+            $docCount = 0;
+
+            if ($jsonData !== null && isset($jsonData['data'])) {
+                // ManticoreSearch returns data as array of arrays
+                $docCount = $jsonData['data'][0]['COUNT(*)'] ?? $jsonData['data'][0][0] ?? 0;
+            }
+
+            $this->info("ManticoreSearch table '{$indexName}' exists.");
+            $this->info('Document count: '.number_format($docCount));
+
+            // Get a sample document if there are any
+            if ($docCount > 0) {
+                $sampleQuery = "SELECT * FROM {$indexName} LIMIT 1";
+
+                $sampleResponse = $client->post('/sql?mode=raw', [
+                    'body' => $sampleQuery,
+                    'headers' => [
+                        'Content-Type' => 'text/plain',
+                    ],
+                ]);
+
+                if ($sampleResponse->getStatusCode() === 200) {
+                    $sampleBody = $sampleResponse->getBody()->getContents();
+                    $sampleJson = json_decode($sampleBody, true);
+
+                    if ($sampleJson !== null && isset($sampleJson['data'][0])) {
+                        $this->info('Sample document:');
+
+                        $document = [];
+                        $columns = $sampleJson['columns'] ?? [];
+                        $data = $sampleJson['data'][0] ?? [];
+
+                        foreach ($columns as $i => $column) {
+                            // Extract column name from the nested structure
+                            $columnName = array_keys($column)[0];
+                            $document[$columnName] = $data[$i] ?? null;
+                        }
+
+                        $this->info(json_encode($document, JSON_PRETTY_PRINT));
+                    }
+                }
+            }
+
+            // Get table structure
+            try {
+                $describeQuery = "DESCRIBE {$indexName}";
+                $describeResponse = $client->post('/sql?mode=raw', [
+                    'body' => $describeQuery,
+                    'headers' => [
+                        'Content-Type' => 'text/plain',
+                    ],
+                ]);
+
+                if ($describeResponse->getStatusCode() === 200) {
+                    $describeBody = $describeResponse->getBody()->getContents();
+                    $describeJson = json_decode($describeBody, true);
+
+                    if ($describeJson !== null && isset($describeJson['data'])) {
+                        $this->info("\nTable structure:");
+                        $this->table(
+                            ['Field', 'Type', 'Properties'],
+                            array_map(function ($row) {
+                                return [
+                                    $row['Field'] ?? $row[0] ?? '',
+                                    $row['Type'] ?? $row[1] ?? '',
+                                    $row['Properties'] ?? $row[2] ?? '',
+                                ];
+                            }, $describeJson['data'])
+                        );
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore describe errors
+            }
+
+        } catch (\Exception $e) {
+            $this->error("Error checking ManticoreSearch table: {$e->getMessage()}");
+            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+                $this->error('Response body: '.$e->getResponse()->getBody());
+            }
         }
     }
 
