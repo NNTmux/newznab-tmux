@@ -329,7 +329,7 @@ class ManticoreSearch
 
         try {
             $query = $this->search->setTable($rt_index)
-                ->option('ranker', 'bm25')
+                ->option('ranker', 'proximity_bm25')
                 ->maxMatches(10000)
                 ->limit(10000)
                 ->stripBadUtf8(true);
