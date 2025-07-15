@@ -332,7 +332,6 @@ class ManticoreSearch
                 ->option('ranker', 'sph04')
                 ->maxMatches(10000)
                 ->limit(10000)
-                ->sort('id', 'desc')
                 ->stripBadUtf8(true);
 
             if (! empty($searchArray)) {
