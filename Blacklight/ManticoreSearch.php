@@ -329,13 +329,11 @@ class ManticoreSearch
 
         try {
             $query = $this->search->setTable($rt_index)
-                ->option('ranker', 'proximity_bm25')
+                ->option('ranker', 'sph04')
                 ->maxMatches(10000)
                 ->limit(10000)
-                ->stripBadUtf8(true)
-                ->option('max_query_time', 2000) // Add timeout in milliseconds
-                ->option('retry_count', 2)       // Add retry attempts
-                ->option('retry_delay', 200);    // Add delay between retries in milliseconds
+                ->sort('id', 'desc')
+                ->stripBadUtf8(true);
 
             if (! empty($searchArray)) {
                 $searchTerms = [];
@@ -368,30 +366,7 @@ class ManticoreSearch
                     }
                 }
 
-                // For very complex queries, break them into individual terms
-                if (strlen($escapedSearch) > 100 || substr_count($escapedSearch, ' ') > 10) {
-                    try {
-                        $query->search('@@relaxed '.$searchColumns.' '.$escapedSearch);
-                    } catch (ResponseException $e) {
-                        if (strpos($e->getMessage(), 'query too complex, not enough stack') !== false) {
-                            // Fallback to a simpler query with main terms
-                            $terms = preg_split('/\s+/', $escapedSearch, -1, PREG_SPLIT_NO_EMPTY);
-                            $mainTerms = array_slice($terms, 0, 6); // Take only first 6 terms
-                            $simplifiedSearch = implode(' | ', $mainTerms); // Use OR operator
-
-                            Log::info('ManticoreSearch: Using simplified search query', [
-                                'original' => $escapedSearch,
-                                'simplified' => $simplifiedSearch,
-                            ]);
-
-                            $query->search('@@relaxed '.$searchColumns.' '.$simplifiedSearch);
-                        } else {
-                            throw $e; // Re-throw if it's a different error
-                        }
-                    }
-                } else {
-                    $query->search('@@relaxed '.$searchColumns.' '.$escapedSearch);
-                }
+                $query->search('@@relaxed '.$searchColumns.' '.$escapedSearch);
             } else {
                 return [];
             }
