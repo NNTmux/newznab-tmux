@@ -198,7 +198,6 @@ class NntmuxPopulateSearchIndexes extends Command
                     'fromname' => (string) ($item->fromname ?: ''),
                     'categories_id' => (string) ($item->categories_id ?: '0'),
                     'filename' => (string) ($item->filename ?: ''),
-                    'dummy' => '1',
                 ];
             }
         );
@@ -235,7 +234,6 @@ class NntmuxPopulateSearchIndexes extends Command
                     'title' => (string) ($item->title ?? ''),
                     'filename' => (string) ($item->filename ?? ''),
                     'source' => (string) ($item->source ?? ''),
-                    'dummy' => 1,
                 ];
             }
         );
