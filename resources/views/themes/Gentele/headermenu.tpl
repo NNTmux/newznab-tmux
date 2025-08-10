@@ -248,6 +248,12 @@
                                                         </a>
                                                     </li>
                                                     <li>
+                                                        <a class="dropdown-item" href="{{route('invitations.index')}}">
+                                                            <i class="fa fa-envelope fa-fw me-2"></i>My Invitations
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
                                                         <a class="dropdown-item" href="{{route('profileedit')}}">
                                                             <i class="fa fa-cog fa-fw me-2"></i>Account Settings
                                                         </a>

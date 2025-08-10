@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
-use App\Jobs\SendInviteEmail;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,8 +23,6 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Jrean\UserVerification\Traits\UserVerification;
-use Junaidnasir\Larainvite\Facades\Invite;
-use Junaidnasir\Larainvite\InviteTrait;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -148,7 +145,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
-    use HasRoles, InviteTrait, Notifiable, SoftDeletes, UserVerification;
+    use HasRoles, Notifiable, SoftDeletes, UserVerification;
 
     public const ERR_SIGNUP_BADUNAME = -1;
 
@@ -573,15 +570,15 @@ class User extends Authenticatable
      */
     public static function checkAndUseInvite(string $inviteCode): int
     {
-        $invite = Invitation::getInvite($inviteCode);
+        $invite = Invitation::findValidByToken($inviteCode);
         if (! $invite) {
             return -1;
         }
 
-        self::query()->where('id', $invite['users_id'])->decrement('invites');
-        Invitation::deleteInvite($inviteCode);
+        self::query()->where('id', $invite->invited_by)->decrement('invites');
+        $invite->markAsUsed(0); // Will be updated with actual user ID later
 
-        return $invite['users_id'];
+        return $invite->invited_by;
     }
 
     /**
@@ -669,11 +666,14 @@ class User extends Authenticatable
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
         $user = self::find($uid);
-        $token = Invite::invite($emailTo, $user->id);
-        $url = $serverUrl.'/register?invitecode='.$token;
 
-        Invitation::addInvite($uid, $token);
-        SendInviteEmail::dispatch($emailTo, $user, $url)->onQueue('emails');
+        // Create invitation using our custom system
+        $invitation = Invitation::createInvitation($emailTo, $user->id);
+        $url = $serverUrl.'/register?token='.$invitation->token;
+
+        // Send invitation email
+        $invitationService = app(InvitationService::class);
+        $invitationService->sendInvitationEmail($invitation);
 
         return $url;
     }

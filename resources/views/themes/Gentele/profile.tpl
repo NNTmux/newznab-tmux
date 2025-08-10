@@ -50,8 +50,8 @@
                                                                   <i class="fa fa-key me-2"></i>API & Downloads
                                                               </a>
                                                               {if ($user.id === $userdata.id || $isadmin === "true") && $site->registerstatus == 1}
-                                                                  <a href="#invites" class="list-group-item list-group-item-action">
-                                                                      <i class="fa fa-envelope me-2"></i>Invites
+                                                                  <a href="{{route('invitations.index')}}" class="list-group-item list-group-item-action">
+                                                                      <i class="fa fa-envelope me-2"></i>My Invitations
                                                                   </a>
                                                               {/if}
                                                               {if (isset($isadmin) && $isadmin === "true") && $downloadlist|@count > 0}

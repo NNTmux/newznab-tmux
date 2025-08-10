@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "25da8443105cf65d7065ce5fb0fc8604",
+    "content-hash": "10251ecba0052663a759a5be58b311d9",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3187,68 +3187,6 @@
                 "source": "https://github.com/jrean/laravel-user-verification/tree/v13.0.0"
             },
             "time": "2025-03-25T16:26:47+00:00"
-        },
-        {
-            "name": "junaidnasir/larainvite",
-            "version": "v12.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/junaidnasir/larainvite.git",
-                "reference": "b39adf46b6c0202c2da038400acb8fe8989e7592"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/b39adf46b6c0202c2da038400acb8fe8989e7592",
-                "reference": "b39adf46b6c0202c2da038400acb8fe8989e7592",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/database": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-                "illuminate/events": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-                "illuminate/support": "^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-                "php": ">=5.5.9"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^5.2|^7.0|^8.0|^9.0|^10.5"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Invite": "Junaidnasir\\Larainvite\\Facades\\Invite"
-                    },
-                    "providers": [
-                        "Junaidnasir\\Larainvite\\LaraInviteServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Junaidnasir\\Larainvite\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Junaid Nasir",
-                    "email": "contact@junaidnasir.com"
-                }
-            ],
-            "description": "Laravel Invitation package, existing users can invite others by email",
-            "homepage": "https://github.com/junaidnasir/larainvite",
-            "keywords": [
-                "Invite",
-                "invitations",
-                "laravel"
-            ],
-            "support": {
-                "issues": "https://github.com/junaidnasir/larainvite/issues",
-                "source": "https://github.com/junaidnasir/larainvite/tree/v12.0.0"
-            },
-            "time": "2025-03-12T23:26:59+00:00"
         },
         {
             "name": "kalnoy/nestedset",

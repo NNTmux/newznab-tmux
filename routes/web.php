@@ -70,6 +70,7 @@ use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
+use App\Http\Controllers\InvitationController;
 
 // Auth::routes();
 
@@ -224,5 +225,21 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
 Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'release-edit', [AdminReleasesController::class, 'edit'])->name('admin.release-edit');
 });
+
+// Invitation management routes
+Route::prefix('invitations')->name('invitations.')->group(function () {
+    Route::get('/', [InvitationController::class, 'index'])->name('index');
+    Route::get('/create', [InvitationController::class, 'create'])->name('create');
+    Route::post('/store', [InvitationController::class, 'store'])->name('store');
+    Route::post('/{id}/resend', [InvitationController::class, 'resend'])->name('resend');
+    Route::delete('/{id}', [InvitationController::class, 'destroy'])->name('destroy');
+    Route::get('/stats', [InvitationController::class, 'stats'])->name('stats');
+});
+
+// Public invitation view (no auth required)
+Route::get('/invitation/{token}', [InvitationController::class, 'show'])->name('invitation.show');
+
+// Admin invitation cleanup
+Route::post('/admin/invitations/cleanup', [InvitationController::class, 'cleanup'])->name('admin.invitations.cleanup')->middleware('role:Admin');
 
 Route::post('btcpay/webhook', [BtcPaymentController::class, 'btcPayCallback'])->name('btcpay.webhook');

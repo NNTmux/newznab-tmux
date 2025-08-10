@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Jrean\UserVerification\Traits\VerifiesUsers;
-use Junaidnasir\Larainvite\Facades\Invite;
 use Spatie\Permission\Models\Role;
 
 class RegisterController extends Controller
@@ -121,6 +120,12 @@ class RegisterController extends Controller
             $this->inviteCodeQuery = '&invitecode='.$inviteCode;
         }
 
+        // Handle invitation token from URL (for email links)
+        if ($request->has('token')) {
+            $inviteCode = $request->input('token');
+            $this->inviteCodeQuery = '&token='.$inviteCode;
+        }
+
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
@@ -157,19 +162,51 @@ class RegisterController extends Controller
                     return $this->showRegistrationForm($request, $error);
                 }
 
-                if (Invite::isAllowed($inviteCode, $email) || Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
-                    $user = $this->create(
-                        [
-                            'username' => $userName,
-                            'password' => $password,
-                            'email' => $email,
-                            'host' => $request->ip(),
-                            'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
-                            'notes' => '',
-                            'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
-                        ]
-                    );
-                    Invite::consume($inviteCode);
+                // Check invitation validity using custom system
+                $invitationValid = $this->isInvitationValid($inviteCode, $email);
+                $registrationOpen = Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE;
+
+                if ($invitationValid || $registrationOpen) {
+                    // Get invited_by from invitation if available
+                    $invitedBy = 0;
+                    $invitation = null;
+
+                    if (!empty($inviteCode)) {
+                        $invitation = Invitation::findValidByToken($inviteCode);
+                        if ($invitation) {
+                            $invitedBy = $invitation->invited_by;
+
+                            // Validate email matches invitation
+                            if (!empty($invitation->email) && $invitation->email !== $email) {
+                                $error = 'Email address does not match the invitation.';
+                                return $this->showRegistrationForm($request, $error);
+                            }
+                        }
+                    }
+
+                    $userData = [
+                        'username' => $userName,
+                        'password' => $password,
+                        'email' => $email,
+                        'host' => $request->ip(),
+                        'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
+                        'notes' => '',
+                        'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
+                    ];
+
+                    // Apply invitation metadata if available
+                    if ($invitation && $invitation->metadata) {
+                        if (isset($invitation->metadata['role'])) {
+                            $userData['roles_id'] = $invitation->metadata['role'];
+                        }
+                    }
+
+                    $user = $this->create($userData);
+
+                    // Mark invitation as used
+                    if ($invitation) {
+                        $invitation->markAsUsed($user->id);
+                    }
 
                     // Create verification message that will be shown on login page
                     $notificationMessage = 'Your Account has been created. A verification email has been sent to your email address. You will be able to log in after completing the verification process.';
@@ -186,10 +223,13 @@ class RegisterController extends Controller
 
                     return redirect('/login');
                 }
+
+                $error = 'Invalid or expired invitation token!';
                 break;
+
             case 'view':
                 // See if it is a valid invite.
-                if (($inviteCode !== null) && ! Invite::isValid($inviteCode)) {
+                if (($inviteCode !== null) && ! $this->isInvitationTokenValid($inviteCode)) {
                     $error = 'Invalid invitation token!';
                     $showRegister = 0;
                 } else {
@@ -197,6 +237,7 @@ class RegisterController extends Controller
                 }
                 break;
         }
+
         app('smarty.view')->assign(
             [
                 'username' => e($userName),
@@ -220,11 +261,23 @@ class RegisterController extends Controller
             $this->inviteCodeQuery = '&invitecode='.$inviteCode;
         }
 
+        // Handle invitation token from URL (for email links)
+        if ($request->has('token')) {
+            $inviteCode = $request->input('token');
+            $this->inviteCodeQuery = '&token='.$inviteCode;
+        }
+
         if ((int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE) {
             if (! empty($inviteCode)) {
-                if (Invite::isValid($inviteCode)) {
+                if ($this->isInvitationTokenValid($inviteCode)) {
                     $error = '';
                     $showRegister = 1;
+
+                    // Pre-fill email if invitation has one
+                    $invitation = Invitation::findValidByToken($inviteCode);
+                    if ($invitation && !empty($invitation->email)) {
+                        app('smarty.view')->assign('email', $invitation->email);
+                    }
                 } else {
                     $error = 'Invalid or expired invitation token!';
                     $showRegister = 0;
@@ -236,7 +289,7 @@ class RegisterController extends Controller
         } elseif ((int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
             $error = 'Registrations are currently closed.';
             $showRegister = 0;
-        } elseif ($request->has('invitecode')) {
+        } elseif ($request->has('invitecode') || $request->has('token')) {
             $error = 'Registration is open, you don\'t need the invite code to register.';
             $showRegister = 0;
         } else {
@@ -257,5 +310,41 @@ class RegisterController extends Controller
         $content = app('smarty.view')->fetch($theme.'/register.tpl');
         app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description', 'nocaptcha'));
         app('smarty.view')->display($theme.'/basepage.tpl');
+    }
+
+    /**
+     * Check if invitation is valid for given email
+     */
+    private function isInvitationValid(string $token, string $email): bool
+    {
+        if (empty($token)) {
+            return false;
+        }
+
+        $invitation = Invitation::findValidByToken($token);
+
+        if (!$invitation) {
+            return false;
+        }
+
+        // If invitation has specific email, validate it matches
+        if (!empty($invitation->email) && $invitation->email !== $email) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if invitation token is valid (without email check)
+     */
+    private function isInvitationTokenValid(string $token): bool
+    {
+        if (empty($token)) {
+            return false;
+        }
+
+        $invitation = Invitation::findValidByToken($token);
+        return $invitation !== null;
     }
 }
