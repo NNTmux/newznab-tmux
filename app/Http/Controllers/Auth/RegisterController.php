@@ -171,14 +171,15 @@ class RegisterController extends Controller
                     $invitedBy = 0;
                     $invitation = null;
 
-                    if (!empty($inviteCode)) {
+                    if (! empty($inviteCode)) {
                         $invitation = Invitation::findValidByToken($inviteCode);
                         if ($invitation) {
                             $invitedBy = $invitation->invited_by;
 
                             // Validate email matches invitation
-                            if (!empty($invitation->email) && $invitation->email !== $email) {
+                            if (! empty($invitation->email) && $invitation->email !== $email) {
                                 $error = 'Email address does not match the invitation.';
+
                                 return $this->showRegistrationForm($request, $error);
                             }
                         }
@@ -275,7 +276,7 @@ class RegisterController extends Controller
 
                     // Pre-fill email if invitation has one
                     $invitation = Invitation::findValidByToken($inviteCode);
-                    if ($invitation && !empty($invitation->email)) {
+                    if ($invitation && ! empty($invitation->email)) {
                         app('smarty.view')->assign('email', $invitation->email);
                     }
                 } else {
@@ -323,12 +324,12 @@ class RegisterController extends Controller
 
         $invitation = Invitation::findValidByToken($token);
 
-        if (!$invitation) {
+        if (! $invitation) {
             return false;
         }
 
         // If invitation has specific email, validate it matches
-        if (!empty($invitation->email) && $invitation->email !== $email) {
+        if (! empty($invitation->email) && $invitation->email !== $email) {
             return false;
         }
 
@@ -345,6 +346,7 @@ class RegisterController extends Controller
         }
 
         $invitation = Invitation::findValidByToken($token);
+
         return $invitation !== null;
     }
 }

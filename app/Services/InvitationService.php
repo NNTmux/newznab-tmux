@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Mail\InvitationMail;
 use App\Models\Invitation;
 use App\Models\User;
-use App\Mail\InvitationMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +22,7 @@ class InvitationService
     ): Invitation {
         // Get the user sending the invitation
         $user = User::find($invitedBy);
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User not found.');
         }
 
@@ -36,12 +36,12 @@ class InvitationService
         // Check if user has invites available (total invites - active pending invitations)
         $availableInvites = $user->invites - $activeInvitations;
         if ($availableInvites <= 0) {
-            throw new \Exception('You have no invitations available. You have ' . $activeInvitations . ' pending invitation(s). Contact an administrator if you need more invitations.');
+            throw new \Exception('You have no invitations available. You have '.$activeInvitations.' pending invitation(s). Contact an administrator if you need more invitations.');
         }
 
         // Validate email
         $validator = Validator::make(['email' => $email], [
-            'email' => 'required|email|unique:users,email'
+            'email' => 'required|email|unique:users,email',
         ]);
 
         if ($validator->fails()) {
@@ -81,7 +81,7 @@ class InvitationService
     {
         $invitation = Invitation::findOrFail($invitationId);
 
-        if (!$invitation->isValid()) {
+        if (! $invitation->isValid()) {
             throw new \Exception('Cannot resend an invalid invitation.');
         }
 
@@ -102,6 +102,7 @@ class InvitationService
         }
 
         $invitation->is_active = false;
+
         return $invitation->save();
     }
 
@@ -112,7 +113,7 @@ class InvitationService
     {
         $invitation = Invitation::findValidByToken($token);
 
-        if (!$invitation) {
+        if (! $invitation) {
             throw new \Exception('Invalid or expired invitation token.');
         }
 
@@ -158,7 +159,7 @@ class InvitationService
             ->with(['usedBy'])
             ->orderBy('created_at', 'desc');
 
-        return match($status) {
+        return match ($status) {
             'valid' => $query->valid()->paginate(15),
             'used' => $query->used()->paginate(15),
             'expired' => $query->expired()->paginate(15),
@@ -178,13 +179,14 @@ class InvitationService
     /**
      * Check if a user can send more invitations
      */
-    public function canUserSendInvitation(int $userId, int $maxInvitations = null): bool
+    public function canUserSendInvitation(int $userId, ?int $maxInvitations = null): bool
     {
         if ($maxInvitations === null) {
             return true; // No limit set
         }
 
         $sentCount = Invitation::where('invited_by', $userId)->count();
+
         return $sentCount < $maxInvitations;
     }
 
@@ -195,7 +197,7 @@ class InvitationService
     {
         $invitation = Invitation::findByToken($token);
 
-        if (!$invitation) {
+        if (! $invitation) {
             return null;
         }
 
@@ -216,7 +218,7 @@ class InvitationService
     public function getUserInvitationDetails(int $userId): array
     {
         $user = User::find($userId);
-        if (!$user) {
+        if (! $user) {
             return [];
         }
 
@@ -253,7 +255,7 @@ class InvitationService
             'expired_invitations' => $expiredInvitations,
             'cancelled_invitations' => $cancelledInvitations,
             'calculated_available' => $availableInvites,
-            'can_send_invite' => $availableInvites > 0
+            'can_send_invite' => $availableInvites > 0,
         ];
     }
 }

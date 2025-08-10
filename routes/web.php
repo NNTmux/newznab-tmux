@@ -58,6 +58,7 @@ use App\Http\Controllers\FailedReleasesController;
 use App\Http\Controllers\FileListController;
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\GetNzbController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\MusicController;
 use App\Http\Controllers\MyMoviesController;
@@ -70,7 +71,6 @@ use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
-use App\Http\Controllers\InvitationController;
 
 // Auth::routes();
 

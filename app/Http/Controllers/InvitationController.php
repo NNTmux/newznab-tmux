@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Invitation;
 use App\Services\InvitationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class InvitationController extends BasePageController
 {
@@ -137,7 +137,7 @@ class InvitationController extends BasePageController
         $request->validate([
             'email' => 'required|email|unique:users,email',
             'expiry_days' => 'sometimes|integer|min:1|max:30',
-            'role' => 'sometimes|integer|in:' . implode(',', array_keys(config('nntmux.user_roles', []))),
+            'role' => 'sometimes|integer|in:'.implode(',', array_keys(config('nntmux.user_roles', []))),
         ]);
 
         try {
@@ -156,7 +156,7 @@ class InvitationController extends BasePageController
             );
 
             return redirect()->route('invitations.index')
-                ->with('success', 'Invitation sent successfully to ' . $request->email);
+                ->with('success', 'Invitation sent successfully to '.$request->email);
 
         } catch (\Exception $e) {
             return redirect()->back()
@@ -282,6 +282,7 @@ class InvitationController extends BasePageController
     public function stats(): JsonResponse
     {
         $stats = $this->invitationService->getUserInvitationStats(auth()->id());
+
         return response()->json($stats);
     }
 
@@ -291,7 +292,7 @@ class InvitationController extends BasePageController
     public function cleanup(): JsonResponse
     {
         // Check if user is admin
-        if (!auth()->user()->hasRole('admin')) {
+        if (! auth()->user()->hasRole('admin')) {
             abort(403, 'Unauthorized');
         }
 
@@ -299,7 +300,7 @@ class InvitationController extends BasePageController
 
         return response()->json([
             'message' => "Cleaned up {$cleanedCount} expired invitations",
-            'count' => $cleanedCount
+            'count' => $cleanedCount,
         ]);
     }
 }

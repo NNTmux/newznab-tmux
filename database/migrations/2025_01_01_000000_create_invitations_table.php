@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -16,42 +16,42 @@ return new class extends Migration
             // Table exists, let's modify it to add missing columns for our custom system
             Schema::table('invitations', function (Blueprint $table) {
                 // Check and add columns that might be missing
-                if (!Schema::hasColumn('invitations', 'token')) {
+                if (! Schema::hasColumn('invitations', 'token')) {
                     $table->string('token', 64)->unique()->after('id');
                 }
 
-                if (!Schema::hasColumn('invitations', 'email')) {
+                if (! Schema::hasColumn('invitations', 'email')) {
                     $table->string('email')->after('token');
                 }
 
-                if (!Schema::hasColumn('invitations', 'invited_by')) {
+                if (! Schema::hasColumn('invitations', 'invited_by')) {
                     $table->unsignedBigInteger('invited_by')->after('email');
                     $table->index('invited_by');
                 }
 
-                if (!Schema::hasColumn('invitations', 'expires_at')) {
+                if (! Schema::hasColumn('invitations', 'expires_at')) {
                     $table->timestamp('expires_at')->after('invited_by');
                 }
 
-                if (!Schema::hasColumn('invitations', 'used_at')) {
+                if (! Schema::hasColumn('invitations', 'used_at')) {
                     $table->timestamp('used_at')->nullable()->after('expires_at');
                 }
 
-                if (!Schema::hasColumn('invitations', 'used_by')) {
+                if (! Schema::hasColumn('invitations', 'used_by')) {
                     $table->unsignedBigInteger('used_by')->nullable()->after('used_at');
                     $table->index('used_by');
                 }
 
-                if (!Schema::hasColumn('invitations', 'is_active')) {
+                if (! Schema::hasColumn('invitations', 'is_active')) {
                     $table->boolean('is_active')->default(true)->after('used_by');
                 }
 
-                if (!Schema::hasColumn('invitations', 'metadata')) {
+                if (! Schema::hasColumn('invitations', 'metadata')) {
                     $table->json('metadata')->nullable()->after('is_active');
                 }
 
                 // Add timestamps if they don't exist
-                if (!Schema::hasColumn('invitations', 'created_at')) {
+                if (! Schema::hasColumn('invitations', 'created_at')) {
                     $table->timestamps();
                 }
             });
@@ -138,7 +138,7 @@ return new class extends Migration
     {
         try {
             $indexes = DB::select("SHOW INDEX FROM `{$table}` WHERE Key_name = ?", [$indexName]);
-            if (!empty($indexes)) {
+            if (! empty($indexes)) {
                 Schema::table($table, function (Blueprint $table) use ($indexName) {
                     $table->dropIndex($indexName);
                 });

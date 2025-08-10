@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +36,7 @@ use Illuminate\Support\Str;
 class Invitation extends Model
 {
     public const DEFAULT_INVITES = 1;
+
     public const DEFAULT_INVITE_EXPIRY_DAYS = 7;
 
     /**
@@ -154,7 +154,7 @@ class Invitation extends Model
      */
     public function isUsed(): bool
     {
-        return !is_null($this->used_at);
+        return ! is_null($this->used_at);
     }
 
     /**
@@ -175,6 +175,7 @@ class Invitation extends Model
     public function markAsExpired(): bool
     {
         $this->is_active = false;
+
         return $this->save();
     }
 
@@ -237,6 +238,7 @@ class Invitation extends Model
         if ($invitation) {
             return $invitation->delete();
         }
+
         return false;
     }
 
