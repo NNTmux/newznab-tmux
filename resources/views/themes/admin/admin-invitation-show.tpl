@@ -203,20 +203,13 @@
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             {if !$invitation->used_at && $invitation->expires_at|strtotime >= $smarty.now && $invitation->is_active}
-                                <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/resend")}}">
-                                    {{csrf_field()}}
-                                    <button type="submit" class="btn btn-warning w-100">
-                                        <i class="fa fa-repeat me-2"></i>Resend Invitation
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#resendModal">
+                                    <i class="fa fa-repeat me-2"></i>Resend Invitation
+                                </button>
 
-                                <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/cancel")}}">
-                                    {{csrf_field()}}
-                                    <button type="submit" class="btn btn-danger w-100 confirm_action"
-                                            data-message="Are you sure you want to cancel this invitation?">
-                                        <i class="fa fa-times me-2"></i>Cancel Invitation
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                    <i class="fa fa-times me-2"></i>Cancel Invitation
+                                </button>
                             {/if}
 
                             <a href="{{url("/invitation/{$invitation->token}")}}"
@@ -226,6 +219,97 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modals -->
+
+<!-- Resend Invitation Modal -->
+<div class="modal fade" id="resendModal" tabindex="-1" aria-labelledby="resendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="resendModalLabel">
+                    <i class="fa fa-repeat me-2"></i>Resend Invitation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-envelope fa-3x text-info me-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-3">Resend invitation to:</h6>
+                        <div class="alert alert-info d-flex align-items-center mb-3">
+                            <i class="fa fa-envelope me-2"></i>
+                            <strong>{$invitation->email}</strong>
+                        </div>
+                        <p class="mb-2">This will send a new invitation email to the recipient with the same invitation token and expiration date.</p>
+                        <p class="mb-0 text-muted"><small><i class="fa fa-info-circle me-1"></i>The original invitation token will remain valid.</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i>Cancel
+                </button>
+                <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/resend")}}" style="display: inline;">
+                    {{csrf_field()}}
+                    <button type="submit" class="btn btn-info">
+                        <i class="fa fa-repeat me-1"></i>Resend Invitation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Invitation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelModalLabel">
+                    <i class="fa fa-exclamation-triangle me-2"></i>Cancel Invitation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-exclamation-triangle fa-3x text-danger me-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-3">You are about to cancel the invitation for:</h6>
+                        <div class="alert alert-warning d-flex align-items-center mb-3">
+                            <i class="fa fa-envelope me-2"></i>
+                            <strong>{$invitation->email}</strong>
+                        </div>
+                        <div class="alert alert-danger">
+                            <h6 class="alert-heading"><i class="fa fa-exclamation-triangle me-2"></i>Warning!</h6>
+                            <p class="mb-2">This action will permanently cancel this invitation.</p>
+                            <ul class="mb-0">
+                                <li>The recipient will no longer be able to use this invitation to register</li>
+                                <li>The invitation token will become invalid</li>
+                                <li>This action cannot be undone</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-arrow-left me-1"></i>Keep Invitation
+                </button>
+                <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/cancel")}}" style="display: inline;">
+                    {{csrf_field()}}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa fa-times me-1"></i>Cancel Invitation
+                    </button>
+                </form>
             </div>
         </div>
     </div>

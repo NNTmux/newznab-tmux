@@ -239,16 +239,14 @@ Route::prefix('invitations')->name('invitations.')->group(function () {
 // Public invitation view (no auth required)
 Route::get('/invitation/{token}', [InvitationController::class, 'show'])->name('invitation.show');
 
-// Admin invitation cleanup
-Route::post('/admin/invitations/cleanup', [InvitationController::class, 'cleanup'])->name('admin.invitations.cleanup')->middleware('role:Admin');
-
 // Admin invitation management routes
-Route::middleware(['role:Admin'])->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
+Route::middleware(['role:Admin', '2fa'])->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\AdminInvitationController::class, 'index'])->name('index');
     Route::get('/{id}', [App\Http\Controllers\Admin\AdminInvitationController::class, 'show'])->name('show');
     Route::post('/{id}/resend', [App\Http\Controllers\Admin\AdminInvitationController::class, 'resend'])->name('resend');
     Route::post('/{id}/cancel', [App\Http\Controllers\Admin\AdminInvitationController::class, 'cancel'])->name('cancel');
     Route::post('/bulk', [App\Http\Controllers\Admin\AdminInvitationController::class, 'bulkAction'])->name('bulk');
+    Route::post('/cleanup', [App\Http\Controllers\Admin\AdminInvitationController::class, 'cleanup'])->name('cleanup');
 });
 
 Route::post('btcpay/webhook', [BtcPaymentController::class, 'btcPayCallback'])->name('btcpay.webhook');

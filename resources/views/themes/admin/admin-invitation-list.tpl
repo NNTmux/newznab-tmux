@@ -3,13 +3,9 @@
         <div class="d-flex justify-content-between align-items-center">
             <h4 class="mb-0">{$title}</h4>
             <div class="d-flex gap-2">
-                <form method="POST" action="{{url("/admin/invitations/cleanup")}}" style="display: inline;">
-                    {{csrf_field()}}
-                    <button type="submit" class="btn btn-outline-warning btn-sm confirm_action"
-                            data-message="Are you sure you want to cleanup all expired invitations?">
-                        <i class="fa fa-broom me-1"></i>Cleanup Expired
-                    </button>
-                </form>
+                <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#cleanupModal">
+                    <i class="fa fa-broom me-1"></i>Cleanup Expired
+                </button>
             </div>
         </div>
     </div>
@@ -297,19 +293,16 @@
                                         <i class="fa fa-eye"></i>
                                     </a>
                                     {if !$invitation->used_at && $invitation->expires_at|strtotime >= $smarty.now && $invitation->is_active}
-                                        <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/resend")}}" style="display: inline;">
-                                            {{csrf_field()}}
-                                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Resend">
-                                                <i class="fa fa-repeat"></i>
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/cancel")}}" style="display: inline;">
-                                            {{csrf_field()}}
-                                            <button type="submit" class="btn btn-outline-danger btn-sm confirm_action"
-                                                    title="Cancel" data-message="Are you sure you want to cancel this invitation?">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-outline-warning btn-sm resend-invitation-btn"
+                                                title="Resend" data-invitation-id="{$invitation->id}"
+                                                data-invitation-email="{$invitation->email}">
+                                            <i class="fa fa-repeat"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm cancel-invitation-btn"
+                                                title="Cancel" data-invitation-id="{$invitation->id}"
+                                                data-invitation-email="{$invitation->email}">
+                                            <i class="fa fa-times"></i>
+                                        </button>
                                     {/if}
                                 </div>
                             </td>
@@ -332,6 +325,152 @@
                 <i class="fa fa-info-circle me-2"></i>No invitations found matching your criteria.
             </div>
         {/if}
+    </div>
+</div>
+
+<!-- Confirmation Modals -->
+
+<!-- Cleanup Expired Invitations Modal -->
+<div class="modal fade" id="cleanupModal" tabindex="-1" aria-labelledby="cleanupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="cleanupModalLabel">
+                    <i class="fa fa-broom me-2"></i>Cleanup Expired Invitations
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-exclamation-triangle fa-2x text-warning me-3"></i>
+                    </div>
+                    <div>
+                        <p class="mb-2"><strong>You are about to cleanup all expired invitations.</strong></p>
+                        <p class="mb-0">This action will permanently remove all expired invitation records from the database. This cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i>Cancel
+                </button>
+                <form method="POST" action="{{url("/admin/invitations/cleanup")}}" style="display: inline;">
+                    {{csrf_field()}}
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fa fa-broom me-1"></i>Cleanup Expired
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resend Invitation Modal -->
+<div class="modal fade" id="resendModal" tabindex="-1" aria-labelledby="resendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="resendModalLabel">
+                    <i class="fa fa-repeat me-2"></i>Resend Invitation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-envelope fa-2x text-info me-3"></i>
+                    </div>
+                    <div>
+                        <p class="mb-2"><strong>Resend invitation email</strong></p>
+                        <p class="mb-2">Email: <code id="resendEmail"></code></p>
+                        <p class="mb-0">This will send a new invitation email to the recipient with the same invitation token.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i>Cancel
+                </button>
+                <form method="POST" action="" id="resendForm" style="display: inline;">
+                    {{csrf_field()}}
+                    <button type="submit" class="btn btn-info">
+                        <i class="fa fa-repeat me-1"></i>Resend Invitation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Invitation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelModalLabel">
+                    <i class="fa fa-times me-2"></i>Cancel Invitation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-exclamation-triangle fa-2x text-danger me-3"></i>
+                    </div>
+                    <div>
+                        <p class="mb-2"><strong>Cancel invitation</strong></p>
+                        <p class="mb-2">Email: <code id="cancelEmail"></code></p>
+                        <p class="mb-0">This will permanently cancel the invitation. The recipient will no longer be able to use this invitation to register.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i>Keep Invitation
+                </button>
+                <form method="POST" action="" id="cancelForm" style="display: inline;">
+                    {{csrf_field()}}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa fa-times me-1"></i>Cancel Invitation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Action Confirmation Modal -->
+<div class="modal fade" id="bulkActionModal" tabindex="-1" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" id="bulkActionHeader">
+                <h5 class="modal-title" id="bulkActionModalLabel">
+                    <i class="fa fa-list me-2"></i>Bulk Action Confirmation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <i id="bulkActionIcon" class="fa fa-2x me-3"></i>
+                    </div>
+                    <div>
+                        <p class="mb-2"><strong id="bulkActionTitle"></strong></p>
+                        <p class="mb-2">Selected invitations: <span id="bulkActionCount" class="badge bg-primary"></span></p>
+                        <p class="mb-0" id="bulkActionDescription"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn" id="bulkActionConfirm">
+                    <i class="fa me-1"></i><span id="bulkActionButtonText"></span>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -370,34 +509,168 @@ document.addEventListener('DOMContentLoaded', function() {
 
     bulkAction.addEventListener('change', updateBulkSubmitState);
 
-    // Confirmation dialogs
-    document.querySelectorAll('.confirm_action').forEach(function(element) {
-        element.addEventListener('click', function(e) {
-            const message = this.getAttribute('data-message') || 'Are you sure you want to perform this action?';
-            if (!confirm(message)) {
-                e.preventDefault();
-                return false;
-            }
+    // Individual invitation actions
+    document.querySelectorAll('.resend-invitation-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const invitationId = this.getAttribute('data-invitation-id');
+            const invitationEmail = this.getAttribute('data-invitation-email');
+
+            // Set email in modal
+            document.getElementById('resendEmail').textContent = invitationEmail;
+
+            // Set form action with correct invitation ID
+            const resendForm = document.getElementById('resendForm');
+            resendForm.setAttribute('action', `/admin/invitations/${invitationId}/resend`);
+
+            // Show modal
+            const resendModal = new bootstrap.Modal(document.getElementById('resendModal'));
+            resendModal.show();
         });
     });
 
-    // Bulk form confirmation
-    document.getElementById('bulkForm').addEventListener('submit', function(e) {
-        const selectedCount = document.querySelectorAll('.invitation-checkbox:checked').length;
+    document.querySelectorAll('.cancel-invitation-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const invitationId = this.getAttribute('data-invitation-id');
+            const invitationEmail = this.getAttribute('data-invitation-email');
+
+            // Set email in modal
+            document.getElementById('cancelEmail').textContent = invitationEmail;
+
+            // Set form action with correct invitation ID
+            const cancelForm = document.getElementById('cancelForm');
+            cancelForm.setAttribute('action', `/admin/invitations/${invitationId}/cancel`);
+
+            // Show modal
+            const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+            cancelModal.show();
+        });
+    });
+
+    // Bulk action handling
+    document.getElementById('bulkSubmit').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const selectedCheckboxes = document.querySelectorAll('.invitation-checkbox:checked');
+        const selectedCount = selectedCheckboxes.length;
         const action = bulkAction.value;
 
         if (selectedCount === 0) {
-            e.preventDefault();
             alert('Please select at least one invitation.');
-            return false;
+            return;
         }
 
-        let message = `Are you sure you want to ${action} ${selectedCount} invitation(s)?`;
-        if (!confirm(message)) {
-            e.preventDefault();
-            return false;
+        if (!action) {
+            alert('Please select a bulk action.');
+            return;
         }
+
+        // Configure modal based on action
+        let modalConfig = {};
+        switch (action) {
+            case 'cancel':
+                modalConfig = {
+                    title: 'Cancel Invitations',
+                    description: 'This will permanently cancel the selected invitations. Recipients will no longer be able to use these invitations to register.',
+                    icon: 'fa-times text-danger',
+                    buttonClass: 'btn-danger',
+                    buttonText: 'Cancel Invitations',
+                    headerClass: 'bg-danger text-white'
+                };
+                break;
+            case 'resend':
+                modalConfig = {
+                    title: 'Resend Invitations',
+                    description: 'This will send new invitation emails to all selected recipients with their existing invitation tokens.',
+                    icon: 'fa-repeat text-info',
+                    buttonClass: 'btn-info',
+                    buttonText: 'Resend Invitations',
+                    headerClass: 'bg-info text-white'
+                };
+                break;
+            case 'delete':
+                modalConfig = {
+                    title: 'Delete Invitations',
+                    description: 'This will permanently delete the selected invitation records from the database. This action cannot be undone.',
+                    icon: 'fa-trash text-danger',
+                    buttonClass: 'btn-danger',
+                    buttonText: 'Delete Invitations',
+                    headerClass: 'bg-danger text-white'
+                };
+                break;
+        }
+
+        // Update modal content
+        document.getElementById('bulkActionModalLabel').innerHTML = `<i class="fa fa-list me-2"></i>${modalConfig.title}`;
+        document.getElementById('bulkActionTitle').textContent = modalConfig.title;
+        document.getElementById('bulkActionCount').textContent = selectedCount;
+        document.getElementById('bulkActionDescription').textContent = modalConfig.description;
+        document.getElementById('bulkActionIcon').className = `fa fa-2x me-3 ${modalConfig.icon.split(' ')[0]} ${modalConfig.icon.split(' ')[1]}`;
+
+        const confirmButton = document.getElementById('bulkActionConfirm');
+        confirmButton.className = `btn ${modalConfig.buttonClass}`;
+        confirmButton.innerHTML = `<i class="fa ${modalConfig.icon.split(' ')[0]} me-1"></i>${modalConfig.buttonText}`;
+
+        const modalHeader = document.getElementById('bulkActionHeader');
+        modalHeader.className = `modal-header ${modalConfig.headerClass}`;
+
+        // Set up confirmation button
+        confirmButton.onclick = function() {
+            // Submit the bulk form
+            document.getElementById('bulkForm').submit();
+        };
+
+        // Show modal
+        const bulkActionModal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
+        bulkActionModal.show();
     });
+
+    // Toast notification system
+    function showToast(message, type = 'success') {
+        // Create toast container if it doesn't exist
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastElement = document.createElement('div');
+        toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+
+        toastElement.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fa fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toastElement);
+
+        const toast = new bootstrap.Toast(toastElement, {
+            delay: 5000
+        });
+        toast.show();
+
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
+
+    // Check for success/error messages in URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('success')) {
+        showToast(decodeURIComponent(urlParams.get('success')), 'success');
+    }
+    if (urlParams.has('error')) {
+        showToast(decodeURIComponent(urlParams.get('error')), 'danger');
+    }
 });
 {/literal}
 </script>
