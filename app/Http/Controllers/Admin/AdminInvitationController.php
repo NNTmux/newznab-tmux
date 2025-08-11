@@ -6,8 +6,8 @@ use App\Http\Controllers\BasePageController;
 use App\Models\Invitation;
 use App\Models\User;
 use App\Services\InvitationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class AdminInvitationController extends BasePageController
 {
@@ -52,20 +52,20 @@ class AdminInvitationController extends BasePageController
                     break;
                 case 'cancelled':
                     $query->where('is_active', false)
-                          ->whereNull('used_at'); // Inactive but not used = cancelled
+                        ->whereNull('used_at'); // Inactive but not used = cancelled
                     break;
             }
         }
 
         if ($invited_by) {
-            $user = User::where('username', 'like', '%' . $invited_by . '%')->first();
+            $user = User::where('username', 'like', '%'.$invited_by.'%')->first();
             if ($user) {
                 $query->where('invited_by', $user->id);
             }
         }
 
         if ($email) {
-            $query->where('email', 'like', '%' . $email . '%');
+            $query->where('email', 'like', '%'.$email.'%');
         }
 
         // Apply ordering
@@ -114,8 +114,8 @@ class AdminInvitationController extends BasePageController
                 'pending' => 'Pending',
                 'used' => 'Used',
                 'expired' => 'Expired',
-                'cancelled' => 'Cancelled'
-            ]
+                'cancelled' => 'Cancelled',
+            ],
         ]);
 
         $content = $this->smarty->fetch('admin-invitation-list.tpl');
@@ -138,7 +138,7 @@ class AdminInvitationController extends BasePageController
             'today' => Invitation::whereDate('created_at', today())->count(),
             'this_week' => Invitation::whereBetween('created_at', [
                 now()->startOfWeek(),
-                now()->endOfWeek()
+                now()->endOfWeek(),
             ])->count(),
             'this_month' => Invitation::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
@@ -174,7 +174,7 @@ class AdminInvitationController extends BasePageController
 
             return redirect()->back()->with('success', 'Invitation cancelled successfully');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to cancel invitation: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to cancel invitation: '.$e->getMessage());
         }
     }
 
@@ -189,7 +189,7 @@ class AdminInvitationController extends BasePageController
 
             return redirect()->back()->with('success', 'Invitation resent successfully');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to resend invitation: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to resend invitation: '.$e->getMessage());
         }
     }
 
@@ -203,7 +203,7 @@ class AdminInvitationController extends BasePageController
 
             return redirect()->back()->with('success', "Cleaned up {$cleanedCount} expired invitations");
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to cleanup invitations: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to cleanup invitations: '.$e->getMessage());
         }
     }
 
@@ -249,6 +249,7 @@ class AdminInvitationController extends BasePageController
                         $this->invitationService->cancelInvitation($id);
                         $count++;
                     }
+
                     return redirect()->back()->with('success', "Cancelled {$count} invitations");
 
                 case 'resend':
@@ -256,18 +257,20 @@ class AdminInvitationController extends BasePageController
                         $this->invitationService->resendInvitation($id);
                         $count++;
                     }
+
                     return redirect()->back()->with('success', "Resent {$count} invitations");
 
                 case 'delete':
                     Invitation::whereIn('id', $invitationIds)->delete();
                     $count = count($invitationIds);
+
                     return redirect()->back()->with('success', "Deleted {$count} invitations");
 
                 default:
                     return redirect()->back()->with('error', 'Invalid bulk action');
             }
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Bulk action failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Bulk action failed: '.$e->getMessage());
         }
     }
 }
