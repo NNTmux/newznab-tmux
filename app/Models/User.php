@@ -225,7 +225,7 @@ class User extends Authenticatable
 
     public function invitation(): HasMany
     {
-        return $this->hasMany(Invitation::class, 'users_id');
+        return $this->hasMany(Invitation::class, 'invited_by');
     }
 
     public function failedRelease(): HasMany

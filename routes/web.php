@@ -242,4 +242,13 @@ Route::get('/invitation/{token}', [InvitationController::class, 'show'])->name('
 // Admin invitation cleanup
 Route::post('/admin/invitations/cleanup', [InvitationController::class, 'cleanup'])->name('admin.invitations.cleanup')->middleware('role:Admin');
 
+// Admin invitation management routes
+Route::middleware(['role:Admin'])->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\AdminInvitationController::class, 'index'])->name('index');
+    Route::get('/{id}', [App\Http\Controllers\Admin\AdminInvitationController::class, 'show'])->name('show');
+    Route::post('/{id}/resend', [App\Http\Controllers\Admin\AdminInvitationController::class, 'resend'])->name('resend');
+    Route::post('/{id}/cancel', [App\Http\Controllers\Admin\AdminInvitationController::class, 'cancel'])->name('cancel');
+    Route::post('/bulk', [App\Http\Controllers\Admin\AdminInvitationController::class, 'bulkAction'])->name('bulk');
+});
+
 Route::post('btcpay/webhook', [BtcPaymentController::class, 'btcPayCallback'])->name('btcpay.webhook');
