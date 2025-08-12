@@ -106,7 +106,8 @@ while ($runVar['counts']['iterations'] > 0) {
     $runVar['conncounts'] = $tOut->getUSPConnections('primary', $runVar['connections']);
 
     if ((int) $runVar['constants']['alternate_nntp'] === 1) {
-        $runVar['conncounts'] += $tOut->getUSPConnections('alternate', $runVar['connections']);
+        $alternateConnections = $tOut->getUSPConnections('alternate', $runVar['connections']);
+        $runVar['conncounts'] = array_merge($runVar['conncounts'], $alternateConnections);
     }
 
     // run queries only after time exceeded, these queries can take awhile
