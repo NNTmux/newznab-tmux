@@ -228,32 +228,39 @@
 
 <!-- Resend Invitation Modal -->
 <div class="modal fade" id="resendModal" tabindex="-1" aria-labelledby="resendModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="resendModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-info text-white border-0">
+                <h5 class="modal-title fw-bold" id="resendModalLabel">
                     <i class="fa fa-repeat me-2"></i>Resend Invitation
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fa fa-envelope fa-3x text-info me-3"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                            <i class="fa fa-envelope fa-3x text-info"></i>
+                        </div>
                     </div>
-                    <div>
-                        <h6 class="mb-3">Resend invitation to:</h6>
-                        <div class="alert alert-info d-flex align-items-center mb-3">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-3 fw-semibold">Resend invitation to:</h6>
+                        <div class="alert alert-info bg-info bg-opacity-10 border-info border-opacity-25 d-flex align-items-center mb-3">
                             <i class="fa fa-envelope me-2"></i>
                             <strong>{$invitation->email}</strong>
                         </div>
-                        <p class="mb-2">This will send a new invitation email to the recipient with the same invitation token and expiration date.</p>
-                        <p class="mb-0 text-muted"><small><i class="fa fa-info-circle me-1"></i>The original invitation token will remain valid.</small></p>
+                        <p class="text-muted mb-2">This will send a new invitation email to the recipient with the same invitation token and expiration date.</p>
+                        <div class="bg-light rounded p-3">
+                            <small class="text-muted d-flex align-items-center">
+                                <i class="fa fa-info-circle me-2 text-info"></i>
+                                The original invitation token will remain valid and functional.
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer border-0 bg-light bg-opacity-50">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="fa fa-times me-1"></i>Cancel
                 </button>
                 <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/resend")}}" style="display: inline;">
@@ -269,29 +276,33 @@
 
 <!-- Cancel Invitation Modal -->
 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="cancelModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="cancelModalLabel">
                     <i class="fa fa-exclamation-triangle me-2"></i>Cancel Invitation
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fa fa-exclamation-triangle fa-3x text-danger me-3"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3">
+                            <i class="fa fa-exclamation-triangle fa-3x text-danger"></i>
+                        </div>
                     </div>
-                    <div>
-                        <h6 class="mb-3">You are about to cancel the invitation for:</h6>
-                        <div class="alert alert-warning d-flex align-items-center mb-3">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-3 fw-semibold">You are about to cancel the invitation for:</h6>
+                        <div class="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-25 d-flex align-items-center mb-3">
                             <i class="fa fa-envelope me-2"></i>
                             <strong>{$invitation->email}</strong>
                         </div>
-                        <div class="alert alert-danger">
-                            <h6 class="alert-heading"><i class="fa fa-exclamation-triangle me-2"></i>Warning!</h6>
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25">
+                            <h6 class="alert-heading d-flex align-items-center mb-2">
+                                <i class="fa fa-exclamation-triangle me-2"></i>Warning!
+                            </h6>
                             <p class="mb-2">This action will permanently cancel this invitation.</p>
-                            <ul class="mb-0">
+                            <ul class="mb-0 small">
                                 <li>The recipient will no longer be able to use this invitation to register</li>
                                 <li>The invitation token will become invalid</li>
                                 <li>This action cannot be undone</li>
@@ -300,8 +311,8 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer border-0 bg-light bg-opacity-50">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="fa fa-arrow-left me-1"></i>Keep Invitation
                 </button>
                 <form method="POST" action="{{url("/admin/invitations/{$invitation->id}/cancel")}}" style="display: inline;">

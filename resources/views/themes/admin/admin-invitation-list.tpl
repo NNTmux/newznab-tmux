@@ -332,27 +332,35 @@
 
 <!-- Cleanup Expired Invitations Modal -->
 <div class="modal fade" id="cleanupModal" tabindex="-1" aria-labelledby="cleanupModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="cleanupModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-warning text-dark border-0">
+                <h5 class="modal-title fw-bold" id="cleanupModalLabel">
                     <i class="fa fa-broom me-2"></i>Cleanup Expired Invitations
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fa fa-exclamation-triangle fa-2x text-warning me-3"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+                            <i class="fa fa-exclamation-triangle fa-2x text-warning"></i>
+                        </div>
                     </div>
-                    <div>
-                        <p class="mb-2"><strong>You are about to cleanup all expired invitations.</strong></p>
-                        <p class="mb-0">This action will permanently remove all expired invitation records from the database. This cannot be undone.</p>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-2 fw-semibold">Are you sure you want to cleanup all expired invitations?</h6>
+                        <p class="text-muted mb-3">This action will permanently remove all expired invitation records from the database.</p>
+                        <div class="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-25">
+                            <small class="d-flex align-items-center">
+                                <i class="fa fa-info-circle me-2"></i>
+                                <strong>Note:</strong> This action cannot be undone.
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer border-0 bg-light bg-opacity-50">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="fa fa-times me-1"></i>Cancel
                 </button>
                 <form method="POST" action="{{url("/admin/invitations/cleanup")}}" style="display: inline;">
@@ -368,28 +376,30 @@
 
 <!-- Resend Invitation Modal -->
 <div class="modal fade" id="resendModal" tabindex="-1" aria-labelledby="resendModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="resendModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-info text-white border-0">
+                <h5 class="modal-title fw-bold" id="resendModalLabel">
                     <i class="fa fa-repeat me-2"></i>Resend Invitation
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fa fa-envelope fa-2x text-info me-3"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                            <i class="fa fa-envelope fa-2x text-info"></i>
+                        </div>
                     </div>
-                    <div>
-                        <p class="mb-2"><strong>Resend invitation email</strong></p>
-                        <p class="mb-2">Email: <code id="resendEmail"></code></p>
-                        <p class="mb-0">This will send a new invitation email to the recipient with the same invitation token.</p>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-2 fw-semibold">Resend invitation email</h6>
+                        <p class="text-muted mb-2">Email: <code id="resendEmail" class="bg-light px-2 py-1 rounded"></code></p>
+                        <p class="text-muted mb-0">This will send a new invitation email to the recipient with the same invitation token.</p>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer border-0 bg-light bg-opacity-50">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="fa fa-times me-1"></i>Cancel
                 </button>
                 <form method="POST" action="" id="resendForm" style="display: inline;">
@@ -405,29 +415,35 @@
 
 <!-- Cancel Invitation Modal -->
 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="cancelModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="cancelModalLabel">
                     <i class="fa fa-times me-2"></i>Cancel Invitation
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fa fa-exclamation-triangle fa-2x text-danger me-3"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3">
+                            <i class="fa fa-exclamation-triangle fa-2x text-danger"></i>
+                        </div>
                     </div>
-                    <div>
-                        <p class="mb-2"><strong>Cancel invitation</strong></p>
-                        <p class="mb-2">Email: <code id="cancelEmail"></code></p>
-                        <p class="mb-0">This will permanently cancel the invitation. The recipient will no longer be able to use this invitation to register.</p>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-2 fw-semibold">Cancel invitation</h6>
+                        <p class="text-muted mb-2">Email: <code id="cancelEmail" class="bg-light px-2 py-1 rounded"></code></p>
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25">
+                            <small>
+                                <strong>Warning:</strong> This will permanently cancel the invitation. The recipient will no longer be able to use this invitation to register.
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-1"></i>Keep Invitation
+            <div class="modal-footer border-0 bg-light bg-opacity-50">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-arrow-left me-1"></i>Keep Invitation
                 </button>
                 <form method="POST" action="" id="cancelForm" style="display: inline;">
                     {{csrf_field()}}
@@ -442,28 +458,34 @@
 
 <!-- Bulk Action Confirmation Modal -->
 <div class="modal fade" id="bulkActionModal" tabindex="-1" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" id="bulkActionHeader">
-                <h5 class="modal-title" id="bulkActionModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0" id="bulkActionHeader">
+                <h5 class="modal-title fw-bold" id="bulkActionModalLabel">
                     <i class="fa fa-list me-2"></i>Bulk Action Confirmation
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <i id="bulkActionIcon" class="fa fa-2x me-3"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle bg-opacity-10 p-3" id="bulkActionIconContainer">
+                            <i id="bulkActionIcon" class="fa fa-2x"></i>
+                        </div>
                     </div>
-                    <div>
-                        <p class="mb-2"><strong id="bulkActionTitle"></strong></p>
-                        <p class="mb-2">Selected invitations: <span id="bulkActionCount" class="badge bg-primary"></span></p>
-                        <p class="mb-0" id="bulkActionDescription"></p>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-2 fw-semibold" id="bulkActionTitle"></h6>
+                        <p class="text-muted mb-2">
+                            Selected invitations: <span id="bulkActionCount" class="badge bg-primary ms-1"></span>
+                        </p>
+                        <div class="alert bg-opacity-10 border-opacity-25" id="bulkActionAlert">
+                            <small id="bulkActionDescription"></small>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer border-0 bg-light bg-opacity-50">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="fa fa-times me-1"></i>Cancel
                 </button>
                 <button type="button" class="btn" id="bulkActionConfirm">
