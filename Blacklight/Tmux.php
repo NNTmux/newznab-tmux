@@ -111,14 +111,17 @@ class Tmux
             'sequential',
             'tmux_session',
             'run_ircscraper',
-            'alternate_nntp',
             'delaytime',
         ];
 
-        return Settings::query()
+        $constants = Settings::query()
             ->whereIn('name', $settings)
             ->pluck('value', 'name')
             ->toArray();
+
+        $constants['alternate_nntp'] = config('nntmux_nntp.use_alternate_nntp_server') ? '1' : '0';
+
+        return $constants;
     }
 
     public function getMonitorSettings(): array
@@ -343,8 +346,7 @@ class Tmux
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'missed_parts' AND TABLE_SCHEMA = %1\$s) AS missed_parts_table,
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = %1\$s) AS binaries_table,
-					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'collections' AND TABLE_SCHEMA = %1\$s) AS collections_table,
-					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'releases' AND TABLE_SCHEMA = %1\$s) AS releases,
+					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'collections' AND TABLE_SCHEMA = %1\$s) AS releases,
 					(SELECT COUNT(id) FROM usenet_groups WHERE first_record IS NOT NULL AND backfill = 1
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
 					) AS backfill_groups_days,

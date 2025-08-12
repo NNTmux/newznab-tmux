@@ -128,16 +128,16 @@ class TmuxOutput extends Tmux
             )
         );
 
-        if ($this->runVar['constants']['alternate_nntp']) {
+        if ($this->runVar['constants']['alternate_nntp'] === '1') {
             $buffer .= sprintf(
                 $this->tmpMasks[1],
                 'USP Alternate:',
                 sprintf(
-                    '%d active (%d total) - %s:%d)',
-                    $this->runVar['conncounts']['alternate']['active'],
-                    $this->runVar['conncounts']['alternate']['total'],
-                    $this->runVar['connections']['host_a'],
-                    $this->runVar['connections']['port_a']
+                    '%d active (%d total) - %s:%s',
+                    $this->runVar['conncounts']['alternate']['active'] ?? 0,
+                    $this->runVar['conncounts']['alternate']['total'] ?? 0,
+                    $this->runVar['connections']['host_a'] ?: 'N/A',
+                    $this->runVar['connections']['port_a'] ?: 'N/A'
                 )
             );
         }
@@ -515,7 +515,7 @@ class TmuxOutput extends Tmux
 
     protected function _setColourMasks(): void
     {
-        $this->_colourMasks[1] = color('%-18s')->yellow.' '.color('%-48.48s')->yellow->dark.PHP_EOL;
+        $this->_colourMasks[1] = color('%-18s')->yellow.' '.color('%-60.60s')->yellow->dark.PHP_EOL;
         $this->_colourMasks['2.0'] = color('%-20s')->magenta->dark.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
         $this->_colourMasks['2.1'] = color('%-20s')->yellow.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
         $this->_colourMasks[3] = color('%-16.16s %25.25s %25.25s')->yellow.PHP_EOL;
