@@ -1142,10 +1142,10 @@ class ProcessReleases
     private function collectionFileCheckStage6(string $where): void
     {
         DB::transaction(function () use ($where) {
-            $sql = "
+            $sql = '
                 UPDATE collections c SET filecheck = ?, totalfiles = (SELECT COUNT(b.id) FROM binaries b WHERE b.collections_id = c.id)
                 WHERE c.dateadded < NOW() - INTERVAL ? HOUR
-                AND c.filecheck IN (?, ?, 10)".$where;
+                AND c.filecheck IN (?, ?, 10)'.$where;
             DB::update($sql, [self::COLLFC_COMPPART, $this->collectionDelayTime, self::COLLFC_DEFAULT, self::COLLFC_COMPCOLL]);
         }, 10);
     }
@@ -1189,28 +1189,24 @@ class ProcessReleases
 
     /**
      * Normalize and return the group ID.
-     *
-     * @param  int|string  $groupID
-     * @return int|null
      */
-    private function normalizeGroupId(int|string $groupID): int|null
+    private function normalizeGroupId(int|string $groupID): ?int
     {
         if (is_numeric($groupID)) {
             return (int) $groupID;
         }
 
         $groupInfo = UsenetGroup::getByName($groupID);
+
         return $groupInfo !== null ? (int) $groupInfo['id'] : null;
     }
 
     /**
      * Build the SQL "where" snippet for group ID filtering.
      *
-     * @param  int|null  $groupID
      * @param  string  $alias  Table alias for the group ID column.
-     * @return string
      */
-    private function groupWhereSql(int|null $groupID, string $alias = 'c'): string
+    private function groupWhereSql(?int $groupID, string $alias = 'c'): string
     {
         return $groupID !== null ? ' AND '.$alias.'.groups_id = '.$groupID.' ' : ' ';
     }
