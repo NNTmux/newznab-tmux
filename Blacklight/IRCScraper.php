@@ -106,8 +106,8 @@ class IRCScraper extends IRCClient
             $this->_titleIgnoreRegex = (string) config('irc_settings.scrape_irc_title_ignore');
         }
 
-        $this->elasticsearch = new ElasticSearchSiteSearch();
-        $this->manticoreSearch = new ManticoreSearch();
+        $this->elasticsearch = new ElasticSearchSiteSearch;
+        $this->manticoreSearch = new ManticoreSearch;
 
         $this->_groupList = [];
         $this->_silent = $silent;
@@ -124,11 +124,11 @@ class IRCScraper extends IRCClient
         // Connect to IRC.
         if ($this->connect((string) config('irc_settings.scrape_irc_server'), (int) config('irc_settings.scrape_irc_port'), (bool) config('irc_settings.scrape_irc_tls')) === false) {
             exit(
-                'Error connecting to (' .
-                config('irc_settings.scrape_irc_server') .
-                ':' .
-                config('irc_settings.scrape_irc_port') .
-                '). Please verify your server information and try again.' .
+                'Error connecting to ('.
+                config('irc_settings.scrape_irc_server').
+                ':'.
+                config('irc_settings.scrape_irc_port').
+                '). Please verify your server information and try again.'.
                 PHP_EOL
             );
         }
@@ -140,9 +140,9 @@ class IRCScraper extends IRCClient
         // Login to IRC. Note parameter order: nick, user, real, pass.
         if ($this->login((string) config('irc_settings.scrape_irc_nickname'), (string) config('irc_settings.scrape_irc_username'), (string) config('irc_settings.scrape_irc_realname'), $password) === false) {
             exit(
-                'Error logging in to: (' .
-                config('irc_settings.scrape_irc_server') . ':' . config('irc_settings.scrape_irc_port') . ') nickname: (' . config('irc_settings.scrape_irc_nickname') .
-                '). Verify your connection information, you might also be banned from this server or there might have been a connection issue.' .
+                'Error logging in to: ('.
+                config('irc_settings.scrape_irc_server').':'.config('irc_settings.scrape_irc_port').') nickname: ('.config('irc_settings.scrape_irc_nickname').
+                '). Verify your connection information, you might also be banned from this server or there might have been a connection issue.'.
                 PHP_EOL
             );
         }
@@ -164,15 +164,15 @@ class IRCScraper extends IRCClient
         $this->joinChannels($channels);
 
         if (! $this->_silent) {
-            echo '[' .
-                date('r') .
-                '] [Scraping of IRC channels for (' .
-                config('irc_settings.scrape_irc_server') .
-                ':' .
-                config('irc_settings.scrape_irc_port') .
-                ') (' .
-                config('irc_settings.scrape_irc_nickname') .
-                ') started.]' .
+            echo '['.
+                date('r').
+                '] [Scraping of IRC channels for ('.
+                config('irc_settings.scrape_irc_server').
+                ':'.
+                config('irc_settings.scrape_irc_port').
+                ') ('.
+                config('irc_settings.scrape_irc_nickname').
+                ') started.]'.
                 PHP_EOL;
         }
 
@@ -278,7 +278,7 @@ class IRCScraper extends IRCClient
     protected function _insertNewPre(): void
     {
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $indexData = (new ElasticSearchSiteSearch())->predbIndexSearch($this->_curPre['title']);
+            $indexData = (new ElasticSearchSiteSearch)->predbIndexSearch($this->_curPre['title']);
         } else {
             $indexData = $this->manticoreSearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
         }
