@@ -128,20 +128,23 @@ class ProcessReleases
             return 0;
         }
 
-        $this->processIncompleteCollections($groupID);
-        $this->processCollectionSizes($groupID);
-        $this->deleteUnwantedCollections($groupID);
+        // Normalize group ID for internal usage
+        $gid = $this->normalizeGroupId($groupID);
+
+        $this->processIncompleteCollections($gid);
+        $this->processCollectionSizes($gid);
+        $this->deleteUnwantedCollections($gid);
 
         $totalReleasesAdded = 0;
         do {
-            $releasesCount = $this->createReleases($groupID);
+            $releasesCount = $this->createReleases($gid);
             $totalReleasesAdded += $releasesCount['added'];
 
-            $nzbFilesAdded = $this->createNZBs($groupID);
+            $nzbFilesAdded = $this->createNZBs($gid);
 
-            $this->categorizeReleases($categorize, $groupID);
+            $this->categorizeReleases($categorize, $gid);
             $this->postProcessReleases($postProcess, $nntp);
-            $this->deleteCollections($groupID);
+            $this->deleteCollections($gid);
 
             // This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
         } while (
@@ -163,9 +166,11 @@ class ProcessReleases
      */
     public function resetCategorize(string $where = ''): void
     {
-        DB::update(
-            sprintf('UPDATE releases SET categories_id = %d, iscategorized = 0 %s', Category::OTHER_MISC, $where)
-        );
+        if ($where !== '') {
+            DB::update('UPDATE releases SET categories_id = ?, iscategorized = 0 '.$where, [Category::OTHER_MISC]);
+        } else {
+            Release::query()->update(['categories_id' => Category::OTHER_MISC, 'iscategorized' => 0]);
+        }
     }
 
     /**
@@ -217,21 +222,22 @@ class ProcessReleases
             $this->colorCLI->header('Process Releases -> Attempting to find complete collections.');
         }
 
-        $where = (! empty($groupID) ? ' AND c.groups_id = '.$groupID.' ' : ' ');
+        $gid = $this->normalizeGroupId($groupID);
+        $where = $this->groupWhereSql($gid, 'c');
 
-        $this->processStuckCollections($groupID);
-        $this->collectionFileCheckStage1($groupID);
-        $this->collectionFileCheckStage2($groupID);
+        $this->processStuckCollections($gid ?? 0);
+        $this->collectionFileCheckStage1($gid ?? 0);
+        $this->collectionFileCheckStage2($gid ?? 0);
         $this->collectionFileCheckStage3($where);
         $this->collectionFileCheckStage4($where);
-        $this->collectionFileCheckStage5($groupID);
+        $this->collectionFileCheckStage5($gid ?? 0);
         $this->collectionFileCheckStage6($where);
 
         if ($this->echoCLI) {
             $countQuery = Collection::query()->where('filecheck', self::COLLFC_COMPPART);
 
-            if (! empty($groupID)) {
-                $countQuery->where('groups_id', $groupID);
+            if (! empty($gid)) {
+                $countQuery->where('groups_id', $gid);
             }
             $count = $countQuery->count('id');
 
@@ -258,24 +264,20 @@ class ProcessReleases
         }
         // Get the total size in bytes of the collection for collections where filecheck = 2.
         DB::transaction(function () use ($groupID, $startTime) {
-            $checked = DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				SET c.filesize =
-				(
-					SELECT COALESCE(SUM(b.partsize), 0)
-					FROM binaries b
-					WHERE b.collections_id = c.id
-				),
-				c.filecheck = %d
-				WHERE c.filecheck = %d
-				AND c.filesize = 0 %s',
-                    self::COLLFC_SIZED,
-                    self::COLLFC_COMPPART,
-                    (! empty($groupID) ? ' AND c.groups_id = '.$groupID : ' ')
-                )
-            );
+            $gid = $this->normalizeGroupId($groupID);
+            $where = $gid !== null ? ' AND c.groups_id = '.$gid.' ' : ' ';
+            $sql = '
+                UPDATE collections c
+                SET c.filesize =
+                (
+                    SELECT COALESCE(SUM(b.partsize), 0)
+                    FROM binaries b
+                    WHERE b.collections_id = c.id
+                ),
+                c.filecheck = ?
+                WHERE c.filecheck = ?
+                AND c.filesize = 0'.$where;
+            $checked = DB::update($sql, [self::COLLFC_SIZED, self::COLLFC_COMPPART]);
             if ($checked > 0 && $this->echoCLI) {
                 $this->colorCLI->primary(
                     $checked.' collections set to filecheck = 3(size calculated)',
@@ -299,7 +301,8 @@ class ProcessReleases
             $this->colorCLI->header('Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.');
         }
 
-        $groupID === '' ? $groupIDs = UsenetGroup::getActiveIDs() : $groupIDs = [['id' => $groupID]];
+        $gid = $this->normalizeGroupId($groupID);
+        $gid === null ? $groupIDs = UsenetGroup::getActiveIDs() : $groupIDs = [['id' => $gid]];
 
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
@@ -324,12 +327,12 @@ class ProcessReleases
                 DB::transaction(function () use (
                     $groupMinSizeSetting,
                     $minSizeSetting,
-                    $minSizeDeleted,
+                    &$minSizeDeleted,
                     $maxSizeSetting,
-                    $maxSizeDeleted,
+                    &$maxSizeDeleted,
                     $minFilesSetting,
                     $groupMinFilesSetting,
-                    $minFilesDeleted,
+                    &$minFilesDeleted,
                     $startTime
                 ) {
                     $deleteQuery = Collection::query()
@@ -568,7 +571,7 @@ class ProcessReleases
             $this->colorCLI->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
         }
 
-        $releasesQuery = Release::query()->with('category.parent')->where('nzbstatus', '=', 0);
+        $releasesQuery = Release::query()->with('category.parent')->where('nzbstatus', '=', NZB::NZB_NONE);
         if (! empty($groupID)) {
             $releasesQuery->where('releases.groups_id', $groupID);
         }
@@ -1049,51 +1052,37 @@ class ProcessReleases
     private function collectionFileCheckStage3(string $where): void
     {
         DB::transaction(static function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE binaries b
-				INNER JOIN
-				(
-					SELECT b.id
-					FROM binaries b
-					INNER JOIN collections c ON c.id = b.collections_id
-					WHERE c.filecheck = %d
-					AND b.partcheck = %d %s
-					AND b.currentparts = b.totalparts
-					GROUP BY b.id, b.totalparts
-				) r ON b.id = r.id
-				SET b.partcheck = %d',
-                    self::COLLFC_TEMPCOMP,
-                    self::FILE_INCOMPLETE,
-                    $where,
-                    self::FILE_COMPLETE
-                )
-            );
+            $sql = '
+                UPDATE binaries b
+                INNER JOIN
+                (
+                    SELECT b.id
+                    FROM binaries b
+                    INNER JOIN collections c ON c.id = b.collections_id
+                    WHERE c.filecheck = ?
+                    AND b.partcheck = ? '.$where.'
+                    AND b.currentparts = b.totalparts
+                    GROUP BY b.id, b.totalparts
+                ) r ON b.id = r.id
+                SET b.partcheck = ?';
+            DB::update($sql, [self::COLLFC_TEMPCOMP, self::FILE_INCOMPLETE, self::FILE_COMPLETE]);
         }, 10);
 
         DB::transaction(static function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE binaries b
-				INNER JOIN
-				(
-					SELECT b.id
-					FROM binaries b
-					INNER JOIN collections c ON c.id = b.collections_id
-					WHERE c.filecheck = %d
-					AND b.partcheck = %d %s
-					AND b.currentparts >= (b.totalparts + 1)
-					GROUP BY b.id, b.totalparts
-				) r ON b.id = r.id
-				SET b.partcheck = %d',
-                    self::COLLFC_ZEROPART,
-                    self::FILE_INCOMPLETE,
-                    $where,
-                    self::FILE_COMPLETE
-                )
-            );
+            $sql = '
+                UPDATE binaries b
+                INNER JOIN
+                (
+                    SELECT b.id
+                    FROM binaries b
+                    INNER JOIN collections c ON c.id = b.collections_id
+                    WHERE c.filecheck = ?
+                    AND b.partcheck = ? '.$where.'
+                    AND b.currentparts >= (b.totalparts + 1)
+                    GROUP BY b.id, b.totalparts
+                ) r ON b.id = r.id
+                SET b.partcheck = ?';
+            DB::update($sql, [self::COLLFC_ZEROPART, self::FILE_INCOMPLETE, self::FILE_COMPLETE]);
         }, 10);
     }
 
@@ -1107,24 +1096,17 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage4(string &$where): void
+    private function collectionFileCheckStage4(string $where): void
     {
         DB::transaction(static function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c INNER JOIN
-					(SELECT c.id FROM collections c
-					INNER JOIN binaries b ON c.id = b.collections_id
-					WHERE b.partcheck = 1 AND c.filecheck IN (%d, %d) %s
-					GROUP BY b.collections_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
-				r ON c.id = r.id SET filecheck = %d',
-                    self::COLLFC_TEMPCOMP,
-                    self::COLLFC_ZEROPART,
-                    $where,
-                    self::COLLFC_COMPPART
-                )
-            );
+            $sql = '
+                UPDATE collections c INNER JOIN
+                    (SELECT c.id FROM collections c
+                    INNER JOIN binaries b ON c.id = b.collections_id
+                    WHERE b.partcheck = 1 AND c.filecheck IN (?, ?) '.$where.'
+                    GROUP BY b.collections_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
+                r ON c.id = r.id SET filecheck = ?';
+            DB::update($sql, [self::COLLFC_TEMPCOMP, self::COLLFC_ZEROPART, self::COLLFC_COMPPART]);
         }, 10);
     }
 
@@ -1157,22 +1139,14 @@ class ProcessReleases
      *
      * @throws \Throwable
      */
-    private function collectionFileCheckStage6(string &$where): void
+    private function collectionFileCheckStage6(string $where): void
     {
         DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    "
-				UPDATE collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM binaries b WHERE b.collections_id = c.id)
-				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
-				AND c.filecheck IN (%d, %d, 10) %s",
-                    self::COLLFC_COMPPART,
-                    $this->collectionDelayTime,
-                    self::COLLFC_DEFAULT,
-                    self::COLLFC_COMPCOLL,
-                    $where
-                )
-            );
+            $sql = "
+                UPDATE collections c SET filecheck = ?, totalfiles = (SELECT COUNT(b.id) FROM binaries b WHERE b.collections_id = c.id)
+                WHERE c.dateadded < NOW() - INTERVAL ? HOUR
+                AND c.filecheck IN (?, ?, 10)".$where;
+            DB::update($sql, [self::COLLFC_COMPPART, $this->collectionDelayTime, self::COLLFC_DEFAULT, self::COLLFC_COMPCOLL]);
         }, 10);
     }
 
@@ -1190,8 +1164,19 @@ class ProcessReleases
         $lastRun = Settings::settingValue('last_run_time');
 
         DB::transaction(function () use ($groupID, $lastRun) {
+            $threshold = null;
+            try {
+                if (! empty($lastRun)) {
+                    $threshold = Carbon::createFromFormat('Y-m-d H:i:s', $lastRun);
+                }
+            } catch (\Throwable $e) {
+                $threshold = null;
+            }
+            if ($threshold === null) {
+                $threshold = now();
+            }
             $objQuery = Collection::query()
-                ->where('added', '<', Carbon::createFromFormat('Y-m-d H:i:s', $lastRun)->subHours($this->collectionTimeout));
+                ->where('added', '<', $threshold->subHours($this->collectionTimeout));
             if (! empty($groupID)) {
                 $objQuery->where('groups_id', $groupID);
             }
@@ -1200,5 +1185,33 @@ class ProcessReleases
                 $this->colorCLI->primary('Deleted '.$obj.' broken/stuck collections.', true);
             }
         }, 10);
+    }
+
+    /**
+     * Normalize and return the group ID.
+     *
+     * @param  int|string  $groupID
+     * @return int|null
+     */
+    private function normalizeGroupId(int|string $groupID): int|null
+    {
+        if (is_numeric($groupID)) {
+            return (int) $groupID;
+        }
+
+        $groupInfo = UsenetGroup::getByName($groupID);
+        return $groupInfo !== null ? (int) $groupInfo['id'] : null;
+    }
+
+    /**
+     * Build the SQL "where" snippet for group ID filtering.
+     *
+     * @param  int|null  $groupID
+     * @param  string  $alias  Table alias for the group ID column.
+     * @return string
+     */
+    private function groupWhereSql(int|null $groupID, string $alias = 'c'): string
+    {
+        return $groupID !== null ? ' AND '.$alias.'.groups_id = '.$groupID.' ' : ' ';
     }
 }
