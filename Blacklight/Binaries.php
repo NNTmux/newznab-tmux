@@ -2,11 +2,12 @@
 
 namespace Blacklight;
 
-use App\Models\BinaryBlacklist;
 use App\Models\Collection;
 use App\Models\MissedPart;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\BlacklistService;
+use App\Services\XrefService;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -95,9 +96,12 @@ class Binaries
      */
     protected int $_partRepairMaxTries;
 
-    /**
-     * An array of BinaryBlacklist IDs that should have their activity date updated.
-     */
+    /** Dedicated services */
+    protected XrefService $xrefService;
+
+    protected BlacklistService $blacklistService;
+
+    /** No longer used directly, kept for BC */
     protected array $_binaryBlacklistIdsToUpdate = [];
 
     protected \DateTime $startCleaning;
@@ -179,6 +183,8 @@ class Binaries
         $this->colorCli = new ColorCLI;
         $this->_nntp = new NNTP;
         $this->_collectionsCleaning = new CollectionsCleaning;
+        $this->xrefService = new XrefService;
+        $this->blacklistService = new BlacklistService;
 
         $this->messageBuffer = Settings::settingValue('maxmssgs') !== '' ?
             (int) Settings::settingValue('maxmssgs') : 20000;
@@ -223,7 +229,16 @@ class Binaries
                     __FUNCTION__,
                     'header'
                 );
-                $this->updateGroup($group, $maxHeaders);
+                try {
+                    $this->updateGroup($group, $maxHeaders);
+                } catch (\Throwable $e) {
+                    if ($this->_echoCLI) {
+                        $this->colorCli->error('Error updating group '.$group['name'].': '.$e->getMessage());
+                    }
+                    if (config('app.debug')) {
+                        Log::error('updateGroup failed for '.$group['name'].': '.$e->getMessage());
+                    }
+                }
                 $counter++;
             }
 
@@ -583,18 +598,8 @@ class Binaries
                 $headersRepaired[] = $header['Number'];
             }
 
-            /*
-             * Find part / total parts. Ignore if no part count found.
-             *
-             * \s* Trims the leading space.
-             * (?!"Usenet Index Post) ignores these types of articles, they are useless.
-             * (.+) Fetches the subject.
-             * \s+ Trims trailing space after the subject.
-             * \((\d+)\/(\d+)\) Gets the part count.
-             * No ending ($) as there are cases of subjects with extra data after the part count.
-             */
+            // Parse subject to get base name and part/total like "(12/45)"; normalize to include yEnc if missing.
             if (preg_match('/^\s*(?!"Usenet Index Post)(.+)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $header['matches'])) {
-                // Add yEnc to subjects that do not have them, but have the part number at the end of the header.
                 if (stripos($header['Subject'], 'yEnc') === false) {
                     $header['matches'][1] .= ' yEnc';
                 }
@@ -605,7 +610,7 @@ class Binaries
             }
 
             // Filter subject based on black/white list.
-            if ($this->isBlackListed($header, $this->groupMySQL['name'])) {
+            if ($this->blacklistService->isBlackListed($header, $this->groupMySQL['name'])) {
                 $this->headersBlackListed++;
 
                 continue;
@@ -620,8 +625,10 @@ class Binaries
 
         unset($headers); // Reclaim memory now that headers are split.
 
-        if (! empty($this->_binaryBlacklistIdsToUpdate)) {
-            $this->updateBlacklistUsage();
+        // Update blacklist last_activity for matched rules.
+        $ids = $this->blacklistService->getAndClearIdsToUpdate();
+        if (! empty($ids)) {
+            $this->blacklistService->updateBlacklistUsage($ids);
         }
 
         if ($this->_echoCLI && ! $partRepair) {
@@ -629,7 +636,16 @@ class Binaries
         }
 
         if (! empty($stdHeaders)) {
-            $this->storeHeaders($stdHeaders);
+            try {
+                $this->storeHeaders($stdHeaders);
+            } catch (\Throwable $e) {
+                if ($this->_echoCLI) {
+                    $this->colorCli->error('storeHeaders failed: '.$e->getMessage());
+                }
+                if (config('app.debug')) {
+                    Log::error('storeHeaders failed: '.$e->getMessage());
+                }
+            }
         }
         unset($stdHeaders);
 
@@ -728,52 +744,37 @@ class Binaries
                     // Get the current unixtime from PHP.
                     $now = now()->timestamp;
 
+                    // Fetch existing xrefs for this collection (by hash) and prepare xref fields.
                     $xrefsData = Collection::whereCollectionhash(sha1($this->header['CollectionKey']))->value('xref');
+                    $headerTokens = $this->xrefService->extractTokens($this->header['Xref'] ?? '');
+                    $newTokens = $this->xrefService->diffNewTokens($xrefsData, $this->header['Xref'] ?? '');
+                    $finalXref = implode(' ', $newTokens);
 
-                    $tempHeaderXrefs = [];
-                    foreach (explode(' ', $this->header['Xref']) as $headerXref) {
-                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $headerXref, $hit) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $hit)) {
-                            $tempHeaderXrefs[] = $hit[0];
-                        }
-                    }
-
-                    $tempXrefsData = [];
-
-                    if ($xrefsData !== null) {
-                        foreach (explode(' ', $xrefsData) as $xrefData) {
-                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $xrefData, $match1) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $xrefData, $match1)) {
-                                $tempXrefsData[] = $match1[0];
-                            }
-                        }
-                    }
-
-                    $finalXrefArray = [];
-                    foreach ($tempHeaderXrefs as $tempHeaderXref) {
-                        if (! in_array($tempHeaderXref, $tempXrefsData, false)) {
-                            $finalXrefArray[] = $tempHeaderXref;
-                        }
-                    }
-
-                    $finaXref = implode(' ', $finalXrefArray);
-
-                    $xref = sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString($finaXref));
+                    $xrefUpdateSQL = $finalXref !== ''
+                        ? sprintf('xref = CONCAT(xref, "\\n", %s ),', escapeString($finalXref))
+                        : '';
 
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
+                    // Random noise value used on duplicate update.
                     $random = random_bytes(16);
-                    $number = random_int(3, 9999999);
-                    $special = Str::random(5);
-                    $string = htmlspecialchars(str_shuffle('trusin_ @'.$number.$special), ENT_QUOTES);
 
                     $collectionID = false;
 
                     try {
-                        DB::insert(sprintf("
-							INSERT INTO collections (subject, fromname, date, xref, groups_id,
-								totalfiles, collectionhash, collection_regexes_id, dateadded)
-							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings()), 0, 255)), escapeString(mb_convert_encoding($this->header['From'], 'UTF-8', mb_list_encodings())), $unixtime, escapeString(implode(' ', $tempHeaderXrefs)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+                        DB::insert(sprintf("\n\t\t\t\t\t\tINSERT INTO collections (subject, fromname, date, xref, groups_id,\n\t\t\t\t\t\t\ttotalfiles, collectionhash, collection_regexes_id, dateadded)\n\t\t\t\t\t\tVALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())\n\t\t\t\t\t\tON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
+                            escapeString(substr(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings()), 0, 255)),
+                            escapeString(mb_convert_encoding($this->header['From'], 'UTF-8', mb_list_encodings())),
+                            $unixtime,
+                            escapeString(implode(' ', $headerTokens)),
+                            $this->groupMySQL['id'],
+                            $fileCount[3],
+                            sha1($this->header['CollectionKey']),
+                            $collMatch['id'],
+                            $xrefUpdateSQL,
+                            sodium_bin2hex($random)
+                        ));
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
@@ -803,10 +804,15 @@ class Binaries
                 $binaryID = false;
 
                 try {
-                    DB::insert(sprintf("
-						INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
-						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $hash, escapeString(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings())), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+                    DB::insert(sprintf("\n\t\t\t\t\tINSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)\n\t\t\t\t\tVALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)\n\t\t\t\t\tON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
+                        $hash,
+                        escapeString(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings())),
+                        $collectionID,
+                        $this->header['matches'][3],
+                        $fileCount[1],
+                        $this->header['Bytes'],
+                        $this->header['Bytes']
+                    ));
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {
@@ -900,7 +906,7 @@ class Binaries
             }
 
             // Break if we found non empty articles.
-            if (isset($returnArray['firstArticleNumber, lastArticleNumber'])) {
+            if (isset($returnArray['firstArticleNumber']) && isset($returnArray['lastArticleNumber'])) {
                 break;
             }
 
@@ -909,15 +915,6 @@ class Binaries
                 break;
             }
         }
-    }
-
-    /**
-     * Updates Blacklist Regex Timers in DB to reflect last usage.
-     */
-    protected function updateBlacklistUsage(): void
-    {
-        BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => now()]);
-        $this->_binaryBlacklistIdsToUpdate = [];
     }
 
     /**
@@ -1285,176 +1282,6 @@ class Binaries
     protected array $_listsFound = [];
 
     /**
-     * Get blacklist and cache it. Return if already cached.
-     */
-    protected function _retrieveBlackList(string $groupName): void
-    {
-        if (! isset($this->blackList[$groupName])) {
-            $this->blackList[$groupName] = $this->getBlacklist(true, self::OPTYPE_BLACKLIST, $groupName, true);
-        }
-        if (! isset($this->whiteList[$groupName])) {
-            $this->whiteList[$groupName] = $this->getBlacklist(true, self::OPTYPE_WHITELIST, $groupName, true);
-        }
-        $this->_listsFound[$groupName] = ($this->blackList[$groupName] || $this->whiteList[$groupName]);
-    }
-
-    /**
-     * Check if an article is blacklisted.
-     *
-     * @param  array  $msg  The article header (OVER format).
-     * @param  string  $groupName  The group name.
-     */
-    public function isBlackListed(array $msg, string $groupName): bool
-    {
-        if (! isset($this->_listsFound[$groupName])) {
-            $this->_retrieveBlackList($groupName);
-        }
-        if (! $this->_listsFound[$groupName]) {
-            return false;
-        }
-
-        $blackListed = false;
-
-        $field = [
-            self::BLACKLIST_FIELD_SUBJECT => $msg['Subject'],
-            self::BLACKLIST_FIELD_FROM => $msg['From'],
-            self::BLACKLIST_FIELD_MESSAGEID => $msg['Message-ID'],
-        ];
-
-        // Try white lists first.
-        if ($this->whiteList[$groupName]) {
-            // There are white lists for this group, so anything that doesn't match a white list should be considered black listed.
-            $blackListed = true;
-            foreach ($this->whiteList[$groupName] as $whiteList) {
-                if (preg_match('/'.$whiteList['regex'].'/i', $field[$whiteList['msgcol']])) {
-                    // This field matched a white list, so it might not be black listed.
-                    $blackListed = false;
-                    $this->_binaryBlacklistIdsToUpdate[$whiteList['id']] = $whiteList['id'];
-                    break;
-                }
-            }
-        }
-
-        // Check if the field is blacklisted.
-
-        if (! $blackListed && $this->blackList[$groupName]) {
-            foreach ($this->blackList[$groupName] as $blackList) {
-                if (preg_match('/'.$blackList->regex.'/i', $field[$blackList->msgcol])) {
-                    $blackListed = true;
-                    $this->_binaryBlacklistIdsToUpdate[$blackList->id] = $blackList->id;
-                    break;
-                }
-            }
-        }
-
-        return $blackListed;
-    }
-
-    /**
-     * Return all blacklists.
-     *
-     * @param  bool  $activeOnly  Only display active blacklists ?
-     * @param  int|string  $opType  Optional, get white or black lists (use Binaries constants).
-     * @param  string  $groupName  Optional, group.
-     * @param  bool  $groupRegex  Optional Join groups / binary blacklist using regexp for equals.
-     */
-    public function getBlacklist(bool $activeOnly = true, int|string $opType = -1, string $groupName = '', bool $groupRegex = false): array
-    {
-        $opType = match ($opType) {
-            self::OPTYPE_BLACKLIST => 'AND bb.optype = '.self::OPTYPE_BLACKLIST,
-            self::OPTYPE_WHITELIST => 'AND bb.optype = '.self::OPTYPE_WHITELIST,
-            default => '',
-        };
-
-        return DB::select(
-            sprintf(
-                '
-				SELECT
-					bb.id, bb.optype, bb.status, bb.description,
-					bb.groupname AS groupname, bb.regex, g.id AS group_id, bb.msgcol,
-					bb.last_activity as last_activity
-				FROM binaryblacklist bb
-				LEFT OUTER JOIN usenet_groups g ON g.name %s bb.groupname
-				WHERE 1=1 %s %s %s
-				ORDER BY coalesce(groupname,\'zzz\')',
-                ($groupRegex ? 'REGEXP' : '='),
-                ($activeOnly ? 'AND bb.status = 1' : ''),
-                $opType,
-                ($groupName ? ('AND g.name REGEXP '.escapeString($groupName)) : '')
-            )
-        );
-    }
-
-    /**
-     * Return a blacklist by ID.
-     *
-     * @param  int  $id  The ID of the blacklist.
-     */
-    public function getBlacklistByID(int $id)
-    {
-        return BinaryBlacklist::query()->where('id', $id)->first();
-    }
-
-    /**
-     * Delete a blacklist.
-     *
-     * @param  int  $id  The ID of the blacklist.
-     */
-    public function deleteBlacklist(int $id): void
-    {
-        BinaryBlacklist::query()->where('id', $id)->delete();
-    }
-
-    public function updateBlacklist(array $blacklistArray): void
-    {
-        BinaryBlacklist::query()->where('id', $blacklistArray['id'])->update(
-            [
-                'groupname' => $blacklistArray['groupname'] === '' ? 'null' : preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']),
-                'regex' => $blacklistArray['regex'],
-                'status' => $blacklistArray['status'],
-                'description' => $blacklistArray['description'],
-                'optype' => $blacklistArray['optype'],
-                'msgcol' => $blacklistArray['msgcol'],
-            ]
-        );
-    }
-
-    /**
-     * Adds a new blacklist from binary blacklist edit admin web page.
-     */
-    public function addBlacklist(array $blacklistArray): void
-    {
-        BinaryBlacklist::query()->insert(
-            [
-                'groupname' => $blacklistArray['groupname'] === '' ? 'null' : preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']),
-                'regex' => $blacklistArray['regex'],
-                'status' => $blacklistArray['status'],
-                'description' => $blacklistArray['description'],
-                'optype' => $blacklistArray['optype'],
-                'msgcol' => $blacklistArray['msgcol'],
-            ]
-        );
-    }
-
-    /**
-     * Delete Collections/Binaries/Parts for a Collection ID.
-     *
-     * @param  int  $collectionID  Collections table ID
-     *
-     * @note A trigger automatically deletes the parts/binaries.
-     *
-     * @throws \Throwable
-     */
-    public function delete(int $collectionID): void
-    {
-        DB::transaction(static function () use ($collectionID) {
-            DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
-        }, 10);
-
-        Collection::query()->where('id', $collectionID)->delete();
-    }
-
-    /**
      * Log / Echo message.
      *
      * @param  string  $message  Message to log.
@@ -1494,7 +1321,7 @@ class Binaries
 
     private function getFileCount($subject): array
     {
-        if (! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $subject, $fileCount)) {
+        if (! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])[\s$:]/i', $subject, $fileCount)) {
             $fileCount[1] = $fileCount[3] = 0;
         }
 

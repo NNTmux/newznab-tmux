@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
+use App\Services\BlacklistService;
 use Blacklight\Binaries;
 use Illuminate\Http\Request;
 
@@ -15,11 +16,11 @@ class AdminBlacklistController extends BasePageController
     public function index(): void
     {
         $this->setAdminPrefs();
-        $binaries = new Binaries;
+        $svc = new BlacklistService;
 
         $meta_title = $title = 'Binary Black/White List';
 
-        $binlist = $binaries->getBlacklist(false);
+        $binlist = $svc->getBlacklist(false);
         $this->smarty->assign('binlist', $binlist);
 
         $content = $this->smarty->fetch('binaryblacklist-list.tpl');
@@ -35,7 +36,7 @@ class AdminBlacklistController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $binaries = new Binaries(['Settings' => null]);
+        $svc = new BlacklistService;
         $error = '';
         $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
         $meta_title = $title = 'Binary Black/White list';
@@ -53,9 +54,9 @@ class AdminBlacklistController extends BasePageController
                 }
 
                 if (empty($request->input('id'))) {
-                    $binaries->addBlacklist($request->all());
+                    $svc->addBlacklist($request->all());
                 } else {
-                    $binaries->updateBlacklist($request->all());
+                    $svc->updateBlacklist($request->all());
                 }
 
                 return redirect()->to('admin/binaryblacklist-list');
@@ -76,7 +77,7 @@ class AdminBlacklistController extends BasePageController
             default:
                 if ($request->has('id')) {
                     $title = 'Binary Black/Whitelist Edit';
-                    $regex = $binaries->getBlacklistByID($request->input('id'));
+                    $regex = $svc->getBlacklistByID((int) $request->input('id'));
                 } else {
                     $title = 'Binary Black/Whitelist Add';
                     $regex += [
