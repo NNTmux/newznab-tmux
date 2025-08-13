@@ -62,20 +62,36 @@ class Tmux
                 break;
         }
 
-        $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec('ss -n | grep '.$connections[$ip].':'.$connections[$port].' | grep -c ESTAB'));
-        $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec('ss -n | grep -c '.$connections[$ip].':'.$connections[$port]));
+        // Initialize result structure
+        $runVar['conncounts'][$which]['active'] = '0';
+        $runVar['conncounts'][$which]['total'] = '0';
 
-        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0) {
-            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec('ss -n | grep '.$connections[$ip].':https | grep -c ESTAB'));
-            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec('ss -n | grep -c '.$connections[$ip].':https'));
+        // 1) Try exact host:port
+        if (! empty($connections[$ip]) && ! empty($connections[$port])) {
+            $needle = escapeshellarg($connections[$ip].':'.$connections[$port]);
+            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n | grep -- $needle | grep -c -- ESTAB")) ?: '0';
+            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n | grep -c -- $needle")) ?: '0';
         }
-        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0) {
-            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec('ss -n | grep '.$connections[$port].' | grep -c ESTAB'));
-            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec('ss -n | grep -c '.$connections[$port]));
+
+        // 2) Fallback to host:https
+        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0 && ! empty($connections[$ip])) {
+            $needleHttps = escapeshellarg($connections[$ip].':https');
+            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n | grep -- $needleHttps | grep -c -- ESTAB")) ?: '0';
+            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n | grep -c -- $needleHttps")) ?: '0';
         }
-        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0) {
-            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec('ss -n | grep '.$connections[$ip].' | grep -c ESTAB'));
-            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec('ss -n | grep -c '.$connections[$ip]));
+
+        // 3) Fallback to port only
+        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0 && ! empty($connections[$port])) {
+            $needlePort = escapeshellarg((string) $connections[$port]);
+            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n | grep -- $needlePort | grep -c -- ESTAB")) ?: '0';
+            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n | grep -c -- $needlePort")) ?: '0';
+        }
+
+        // 4) Fallback to host only
+        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0 && ! empty($connections[$ip])) {
+            $needleIp = escapeshellarg($connections[$ip]);
+            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n | grep -- $needleIp | grep -c -- ESTAB")) ?: '0';
+            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n | grep -c -- $needleIp")) ?: '0';
         }
 
         return $runVar['conncounts'];
