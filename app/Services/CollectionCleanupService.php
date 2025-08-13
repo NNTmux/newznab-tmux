@@ -1,0 +1,116 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Collection;
+use App\Models\Settings;
+use Blacklight\ColorCLI;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class CollectionCleanupService
+{
+    public function __construct(
+        private readonly ColorCLI $colorCLI
+    ) {
+    }
+
+    /**
+     * Deletes finished/old collections, cleans orphans, and removes collections missed after NZB creation.
+     * Mirrors the previous ProcessReleases::deleteCollections logic.
+     *
+     * @return int total deleted rows across operations (approximate)
+     */
+    public function deleteFinishedAndOrphans(bool $echoCLI): int
+    {
+        $startTime = now()->toImmutable();
+        $deletedCount = 0;
+
+        if ($echoCLI) {
+            echo $this->colorCLI->header('Process Releases -> Delete finished collections.'.PHP_EOL).
+                $this->colorCLI->primary(sprintf(
+                    'Deleting collections/binaries/parts older than %d hours.',
+                    Settings::settingValue('partretentionhours')
+                ), true);
+        }
+
+        DB::transaction(function () use (&$deletedCount, $startTime, $echoCLI) {
+            $deleted = 0;
+            $deleteQuery = Collection::query()
+                ->where('dateadded', '<', now()->subHours(Settings::settingValue('partretentionhours')))
+                ->delete();
+            if ($deleteQuery > 0) {
+                $deleted = $deleteQuery;
+                $deletedCount += $deleted;
+            }
+            $firstQuery = $fourthQuery = now();
+
+            $totalTime = $firstQuery->diffInSeconds($startTime, true);
+
+            if ($echoCLI) {
+                $this->colorCLI->primary(
+                    'Finished deleting '.$deleted.' old collections/binaries/parts in '.
+                    $totalTime.Str::plural(' second', $totalTime),
+                    true
+                );
+            }
+
+            if (random_int(0, 200) <= 1) {
+                if ($echoCLI) {
+                    echo $this->colorCLI->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
+                        $this->colorCLI->primary('Deleting orphaned collections.');
+                }
+
+                $deleted = 0;
+                $deleteQuery = Collection::query()
+                    ->whereNull('binaries.id')
+                    ->orWhereNull('parts.binaries_id')
+                    ->leftJoin('binaries', 'collections.id', '=', 'binaries.collections_id')
+                    ->leftJoin('parts', 'binaries.id', '=', 'parts.binaries_id')
+                    ->delete();
+
+                if ($deleteQuery > 0) {
+                    $deleted = $deleteQuery;
+                    $deletedCount += $deleted;
+                }
+
+                $totalTime = now()->diffInSeconds($firstQuery);
+
+                if ($echoCLI) {
+                    $this->colorCLI->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
+                }
+            }
+
+            if ($echoCLI) {
+                $this->colorCLI->primary('Deleting collections that were missed after NZB creation.', true);
+            }
+
+            $deleted = 0;
+            $collections = Collection::query()
+                ->where('releases.nzbstatus', '=', 1)
+                ->leftJoin('releases', 'releases.id', '=', 'collections.releases_id')
+                ->select('collections.id')
+                ->get();
+
+            foreach ($collections as $collection) {
+                $deleted++;
+                Collection::query()->where('id', $collection->id)->delete();
+            }
+            $deletedCount += $deleted;
+
+            $colDelTime = now()->diffInSeconds($fourthQuery, true);
+            $totalTime = $fourthQuery->diffInSeconds($startTime, true);
+
+            if ($echoCLI) {
+                $this->colorCLI->primary(
+                    'Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).
+                    PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime),
+                    true
+                );
+            }
+        }, 10);
+
+        return $deletedCount;
+    }
+}
+

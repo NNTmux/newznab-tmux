@@ -11,6 +11,8 @@ use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\CollectionCleanupService;
+use App\Services\ReleaseCreationService;
 use Blacklight\Categorize;
 use Blacklight\ColorCLI;
 use Blacklight\Genres;
@@ -67,6 +69,10 @@ class ProcessReleases
 
     public ReleaseImage $releaseImage;
 
+    // New services for better separation of concerns
+    private ReleaseCreationService $releaseCreationService;
+    private CollectionCleanupService $collectionCleanupService;
+
     /**
      * Time (hours) to wait before delete a stuck/broken collection.
      */
@@ -81,6 +87,10 @@ class ProcessReleases
         $this->releaseCleaning = new ReleaseCleaning;
         $this->releases = new Releases;
         $this->releaseImage = new ReleaseImage;
+
+        // Initialize services
+        $this->releaseCreationService = new ReleaseCreationService($this->colorCLI, $this->releaseCleaning);
+        $this->collectionCleanupService = new CollectionCleanupService($this->colorCLI);
 
         $dummy = Settings::settingValue('delaytime');
         $this->collectionDelayTime = ($dummy !== '' ? (int) $dummy : 2);
@@ -385,175 +395,8 @@ class ProcessReleases
      */
     public function createReleases(int|string $groupID): array
     {
-        $startTime = now()->toImmutable();
-
-        $categorize = new Categorize;
-        $returnCount = $duplicate = 0;
-
-        if ($this->echoCLI) {
-            $this->colorCLI->header('Process Releases -> Create releases from complete collections.');
-        }
-        $collectionsQuery = Collection::query()
-            ->where('collections.filecheck', self::COLLFC_SIZED)
-            ->where('collections.filesize', '>', 0);
-        if (! empty($groupID)) {
-            $collectionsQuery->where('collections.groups_id', $groupID);
-        }
-        $collectionsQuery->select(['collections.*', 'usenet_groups.name as gname'])
-            ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')
-            ->limit($this->releaseCreationLimit);
-        $collections = $collectionsQuery->get();
-        if ($this->echoCLI && $collections->count() > 0) {
-            $this->colorCLI->primary(\count($collections).' Collections ready to be converted to releases.', true);
-        }
-
-        foreach ($collections as $collection) {
-            $cleanRelName = mb_convert_encoding(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject), 'UTF-8', mb_list_encodings());
-            $fromName = mb_convert_encoding(
-                trim($collection->fromname, "'"), 'UTF-8', mb_list_encodings()
-            );
-
-            // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
-            // A 1% variance in size is considered the same size when the subject and poster are the same
-            $dupeCheck = Release::query()
-                ->where(['name' => $cleanRelName, 'fromname' => $fromName])
-                ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
-                ->first(['id']);
-
-            if ($dupeCheck === null) {
-                $cleanedName = $this->releaseCleaning->releaseCleaner(
-                    $collection->subject,
-                    $collection->fromname,
-                    $collection->gname
-                );
-
-                if (\is_array($cleanedName)) {
-                    $properName = $cleanedName['properlynamed'] ?? false;
-                    $preID = $cleanedName['predb'] ?? false;
-                    $cleanedName = $cleanedName['cleansubject'] ?? $cleanRelName;
-                } else {
-                    $properName = true;
-                    $preID = false;
-                }
-
-                if ($preID === false && $cleanedName !== '') {
-                    // try to match the cleaned searchname to predb title or filename here
-                    $preMatch = Predb::matchPre($cleanedName);
-                    if ($preMatch !== false) {
-                        $cleanedName = $preMatch['title'];
-                        $preID = $preMatch['predb_id'];
-                        $properName = true;
-                    }
-                }
-
-                $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
-
-                $searchName = ! empty($cleanedName) ? mb_convert_encoding($cleanedName, 'UTF-8', mb_list_encodings()) : $cleanRelName;
-
-                $releaseID = Release::insertRelease(
-                    [
-                        'name' => $cleanRelName,
-                        'searchname' => $searchName,
-                        'totalpart' => $collection->totalfiles,
-                        'groups_id' => $collection->groups_id,
-                        'guid' => Str::uuid()->toString(),
-                        'postdate' => $collection->date,
-                        'fromname' => $fromName,
-                        'size' => $collection->filesize,
-                        'categories_id' => $determinedCategory['categories_id'] ?? Category::OTHER_MISC,
-                        'isrenamed' => $properName === true ? 1 : 0,
-                        'predb_id' => $preID === false ? 0 : $preID,
-                        'nzbstatus' => NZB::NZB_NONE,
-                        'ishashed' => preg_match('/^[a-fA-F0-9]{32}\b|^[a-fA-F0-9]{40}\b|^[a-fA-F0-9]{64}\b|^[a-fA-F0-9]{96}\b|^[a-fA-F0-9]{128}\b/i', $searchName) ? 1 : 0,
-                    ]
-                );
-
-                if ($releaseID !== null) {
-                    // Update collections table to say we inserted the release.
-                    DB::transaction(static function () use ($collection, $releaseID) {
-                        Collection::query()->where('id', $collection->id)->update(['filecheck' => self::COLLFC_INSERTED, 'releases_id' => $releaseID]);
-                    }, 10);
-
-                    // Add the id of regex that matched the collection and release name to release_regexes table
-                    ReleaseRegex::insertOrIgnore([
-                        'releases_id' => $releaseID,
-                        'collection_regex_id' => $collection->collection_regexes_id,
-                        'naming_regex_id' => $cleanedName['id'] ?? 0,
-                    ]);
-
-                    if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
-                        foreach ($hits[1] as $grp) {
-                            // check if the group name is in a valid format
-                            $grpTmp = UsenetGroup::isValidGroup($grp);
-                            if ($grpTmp !== false) {
-                                // check if the group already exists in database
-                                $xrefGrpID = UsenetGroup::getIDByName($grpTmp);
-                                if ($xrefGrpID === '') {
-                                    $xrefGrpID = UsenetGroup::addGroup(
-                                        [
-                                            'name' => $grpTmp,
-                                            'description' => 'Added by Release processing',
-                                            'backfill_target' => 1,
-                                            'first_record' => 0,
-                                            'last_record' => 0,
-                                            'active' => 0,
-                                            'backfill' => 0,
-                                            'minfilestoformrelease' => '',
-                                            'minsizetoformrelease' => '',
-                                        ]
-                                    );
-                                }
-
-                                $relGroupsChk = ReleasesGroups::query()->where(
-                                    [
-                                        ['releases_id', '=', $releaseID],
-                                        ['groups_id', '=', $xrefGrpID],
-                                    ]
-                                )->first();
-
-                                if ($relGroupsChk === null) {
-                                    ReleasesGroups::query()->insert(
-                                        [
-                                            'releases_id' => $releaseID,
-                                            'groups_id' => $xrefGrpID,
-                                        ]
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                    $returnCount++;
-
-                    if ($this->echoCLI) {
-                        echo "Added $returnCount releases.\r";
-                    }
-                }
-            } else {
-                // The release was already in the DB, so delete the collection.
-                DB::transaction(static function () use ($collection) {
-                    Collection::query()->where('collectionhash', $collection->collectionhash)->delete();
-                }, 10);
-
-                $duplicate++;
-            }
-        }
-
-        $totalTime = now()->diffInSeconds($startTime, true);
-
-        if ($this->echoCLI) {
-            $this->colorCLI->primary(
-                PHP_EOL.
-                number_format($returnCount).
-                ' Releases added and '.
-                number_format($duplicate).
-                ' duplicate collections deleted in '.
-                $totalTime.Str::plural(' second', $totalTime),
-                true
-            );
-        }
-
-        return ['added' => $returnCount, 'dupes' => $duplicate];
+        // Delegate to service
+        return $this->releaseCreationService->createReleases($groupID, $this->releaseCreationLimit, $this->echoCLI);
     }
 
     /**
@@ -662,84 +505,8 @@ class ProcessReleases
      */
     public function deleteCollections($groupID): void
     {
-        $startTime = now()->toImmutable();
-
-        $deletedCount = 0;
-
-        // CBP older than retention.
-        if ($this->echoCLI) {
-            echo $this->colorCLI->header('Process Releases -> Delete finished collections.'.PHP_EOL).
-                $this->colorCLI->primary(sprintf(
-                    'Deleting collections/binaries/parts older than %d hours.',
-                    Settings::settingValue('partretentionhours')
-                ), true);
-        }
-
-        DB::transaction(function () use ($deletedCount, $startTime) {
-            $deleted = 0;
-            $deleteQuery = Collection::query()
-                ->where('dateadded', '<', now()->subHours(Settings::settingValue('partretentionhours')))
-                ->delete();
-            if ($deleteQuery > 0) {
-                $deleted = $deleteQuery;
-                $deletedCount += $deleted;
-            }
-            $firstQuery = $fourthQuery = now();
-
-            $totalTime = $firstQuery->diffInSeconds($startTime, true);
-
-            if ($this->echoCLI) {
-                $this->colorCLI->primary(
-                    'Finished deleting '.$deleted.' old collections/binaries/parts in '.
-                    $totalTime.Str::plural(' second', $totalTime),
-                    true
-                );
-            }
-
-            // Cleanup orphaned collections, binaries and parts
-            // this really shouldn't happen, but just incase - so we only run 1/200 of the time
-            if (random_int(0, 200) <= 1) {
-                // CBP collection orphaned with no binaries or parts.
-                if ($this->echoCLI) {
-                    echo $this->colorCLI->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).$this->colorCLI->primary('Deleting orphaned collections.');
-                }
-
-                $deleted = 0;
-                $deleteQuery = Collection::query()->whereNull('binaries.id')->orWhereNull('parts.binaries_id')->leftJoin('binaries', 'collections.id', '=', 'binaries.collections_id')->leftJoin('parts', 'binaries.id', '=', 'parts.binaries_id')->delete();
-
-                if ($deleteQuery > 0) {
-                    $deleted = $deleteQuery;
-                    $deletedCount += $deleted;
-                }
-
-                $totalTime = now()->diffInSeconds($firstQuery);
-
-                if ($this->echoCLI) {
-                    $this->colorCLI->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
-                }
-            }
-
-            if ($this->echoCLI) {
-                $this->colorCLI->primary('Deleting collections that were missed after NZB creation.', true);
-            }
-
-            $deleted = 0;
-            // Collections that were missing on NZB creation.
-            $collections = Collection::query()->where('releases.nzbstatus', '=', 1)->leftJoin('releases', 'releases.id', '=', 'collections.releases_id')->select('collections.id')->get();
-
-            foreach ($collections as $collection) {
-                $deleted++;
-                Collection::query()->where('id', $collection->id)->delete();
-            }
-            $deletedCount += $deleted;
-
-            $colDelTime = now()->diffInSeconds($fourthQuery, true);
-            $totalTime = $fourthQuery->diffInSeconds($startTime, true);
-
-            if ($this->echoCLI) {
-                $this->colorCLI->primary('Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime), true);
-            }
-        }, 10);
+        // Delegate to service (group filter not used in original logic)
+        $this->collectionCleanupService->deleteFinishedAndOrphans($this->echoCLI);
     }
 
     /**
