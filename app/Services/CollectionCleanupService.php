@@ -12,8 +12,7 @@ class CollectionCleanupService
 {
     public function __construct(
         private readonly ColorCLI $colorCLI
-    ) {
-    }
+    ) {}
 
     /**
      * Deletes finished/old collections, cleans orphans, and removes collections missed after NZB creation.
@@ -113,4 +112,3 @@ class CollectionCleanupService
         return $deletedCount;
     }
 }
-

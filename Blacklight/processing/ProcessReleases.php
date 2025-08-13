@@ -5,10 +5,7 @@ namespace Blacklight\processing;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\MusicInfo;
-use App\Models\Predb;
 use App\Models\Release;
-use App\Models\ReleaseRegex;
-use App\Models\ReleasesGroups;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\CollectionCleanupService;
@@ -71,6 +68,7 @@ class ProcessReleases
 
     // New services for better separation of concerns
     private ReleaseCreationService $releaseCreationService;
+
     private CollectionCleanupService $collectionCleanupService;
 
     /**

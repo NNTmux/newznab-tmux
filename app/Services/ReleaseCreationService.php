@@ -11,19 +11,18 @@ use App\Models\ReleasesGroups;
 use App\Models\UsenetGroup;
 use Blacklight\Categorize;
 use Blacklight\ColorCLI;
+use Blacklight\NZB;
+use Blacklight\processing\ProcessReleases;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Blacklight\NZB;
-use Blacklight\processing\ProcessReleases; // for constants
+use Illuminate\Support\Str; // for constants
 
 class ReleaseCreationService
 {
     public function __construct(
         private readonly ColorCLI $colorCLI,
         private readonly ReleaseCleaning $releaseCleaning
-    ) {
-    }
+    ) {}
 
     /**
      * Create releases from complete collections.
@@ -33,7 +32,7 @@ class ReleaseCreationService
     public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI): array
     {
         $startTime = now()->toImmutable();
-        $categorize = new Categorize();
+        $categorize = new Categorize;
         $returnCount = 0;
         $duplicate = 0;
 
@@ -195,4 +194,3 @@ class ReleaseCreationService
         return ['added' => $returnCount, 'dupes' => $duplicate];
     }
 }
-
