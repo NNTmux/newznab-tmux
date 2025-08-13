@@ -14,10 +14,8 @@ class IRCScraper extends IRCClient
 {
     /**
      * Regex to ignore categories.
-     *
-     * @var string|bool
      */
-    protected mixed $_categoryIgnoreRegex;
+    protected string|false $_categoryIgnoreRegex = false;
 
     /**
      * Array of current pre info.
@@ -31,10 +29,8 @@ class IRCScraper extends IRCClient
 
     /**
      * Array of ignored channels.
-     *
-     * @var array
      */
-    protected mixed $_ignoredChannels;
+    protected array $_ignoredChannels;
 
     /**
      * Is this pre nuked or un nuked?
@@ -50,12 +46,10 @@ class IRCScraper extends IRCClient
 
     /**
      * Regex to ignore PRE titles.
-     *
-     * @var string|bool
      */
-    protected mixed $_titleIgnoreRegex;
+    protected string|false $_titleIgnoreRegex = false;
 
-    protected manticoreSearch $manticoreSearch;
+    protected ManticoreSearch $manticoreSearch;
 
     private ElasticSearchSiteSearch $elasticsearch;
 
@@ -70,31 +64,15 @@ class IRCScraper extends IRCClient
     public function __construct(bool $silent, bool $debug)
     {
         if (config('irc_settings.scrape_irc_source_ignore')) {
-            $this->_ignoredChannels = unserialize(
-                config('irc_settings.scrape_irc_source_ignore'),
-                ['allowed_classes' => ['#a.b.cd.image',
-                    '#a.b.console.ps3',
-                    '#a.b.dvd',
-                    '#a.b.erotica',
-                    '#a.b.flac',
-                    '#a.b.foreign',
-                    '#a.b.games.nintendods',
-                    '#a.b.inner-sanctum',
-                    '#a.b.moovee',
-                    '#a.b.movies.divx',
-                    '#a.b.sony.psp',
-                    '#a.b.sounds.mp3.complete_cd',
-                    '#a.b.teevee',
-                    '#a.b.games.wii',
-                    '#a.b.warez',
-                    '#a.b.games.xbox360',
-                    '#pre@corrupt',
-                    '#scnzb',
-                    '#tvnzb',
-                    'srrdb',
-                ],
-                ]
-            );
+            try {
+                $ignored = unserialize(
+                    (string) config('irc_settings.scrape_irc_source_ignore'),
+                    ['allowed_classes' => false]
+                );
+                $this->_ignoredChannels = is_array($ignored) ? $ignored : [];
+            } catch (\ValueError $e) {
+                $this->_ignoredChannels = [];
+            }
         } else {
             $this->_ignoredChannels = [
                 '#a.b.cd.image' => false,
@@ -120,18 +98,16 @@ class IRCScraper extends IRCClient
             ];
         }
 
-        $this->_categoryIgnoreRegex = false;
         if (config('irc_settings.scrape_irc_category_ignore') !== '') {
-            $this->_categoryIgnoreRegex = config('irc_settings.scrape_irc_category_ignore');
+            $this->_categoryIgnoreRegex = (string) config('irc_settings.scrape_irc_category_ignore');
         }
 
-        $this->_titleIgnoreRegex = false;
         if (config('irc_settings.scrape_irc_title_ignore') !== '') {
-            $this->_titleIgnoreRegex = config('irc_settings.scrape_irc_title_ignore');
+            $this->_titleIgnoreRegex = (string) config('irc_settings.scrape_irc_title_ignore');
         }
 
-        $this->elasticsearch = new ElasticSearchSiteSearch;
-        $this->manticoreSearch = new ManticoreSearch;
+        $this->elasticsearch = new ElasticSearchSiteSearch();
+        $this->manticoreSearch = new ManticoreSearch();
 
         $this->_groupList = [];
         $this->_silent = $silent;
@@ -146,40 +122,57 @@ class IRCScraper extends IRCClient
     protected function _startScraping(): void
     {
         // Connect to IRC.
-        if ($this->connect(config('irc_settings.scrape_irc_server'), config('irc_settings.scrape_irc_port'), config('irc_settings.scrape_irc_tls')) === false) {
+        if ($this->connect((string) config('irc_settings.scrape_irc_server'), (int) config('irc_settings.scrape_irc_port'), (bool) config('irc_settings.scrape_irc_tls')) === false) {
             exit(
-                'Error connecting to ('.
-                config('irc_settings.scrape_irc_server').
-                ':'.
-                config('irc_settings.scrape_irc_port').
-                '). Please verify your server information and try again.'.
+                'Error connecting to (' .
+                config('irc_settings.scrape_irc_server') .
+                ':' .
+                config('irc_settings.scrape_irc_port') .
+                '). Please verify your server information and try again.' .
                 PHP_EOL
             );
         }
 
-        // Login to IRC.
-        if ($this->login(config('irc_settings.scrape_irc_nickname'), config('irc_settings.scrape_irc_realname'), config('irc_settings.scrape_irc_username'), config('irc_settings.scrape_irc_password')) === false) {
-            exit('Error logging in to: ('.
-                config('irc_settings.scrape_irc_server').':'.config('irc_settings.scrape_irc_port').') nickname: ('.config('irc_settings.scrape_irc_nickname').
-                '). Verify your connection information, you might also be banned from this server or there might have been a connection issue.'.
+        // Normalize password to ?string
+        $password = config('irc_settings.scrape_irc_password');
+        $password = ($password === false || $password === '' || $password === null) ? null : (string) $password;
+
+        // Login to IRC. Note parameter order: nick, user, real, pass.
+        if ($this->login((string) config('irc_settings.scrape_irc_nickname'), (string) config('irc_settings.scrape_irc_username'), (string) config('irc_settings.scrape_irc_realname'), $password) === false) {
+            exit(
+                'Error logging in to: (' .
+                config('irc_settings.scrape_irc_server') . ':' . config('irc_settings.scrape_irc_port') . ') nickname: (' . config('irc_settings.scrape_irc_nickname') .
+                '). Verify your connection information, you might also be banned from this server or there might have been a connection issue.' .
                 PHP_EOL
             );
         }
 
         // Join channels.
-        $channels = config('irc_settings.scrape_irc_channels') ? unserialize(config('irc_settings.scrape_irc_channels'), ['allowed_classes' => ['#PreNNTmux', '#nZEDbPRE']]) : ['#PreNNTmux' => null];
+        $channelsCfg = config('irc_settings.scrape_irc_channels');
+        if ($channelsCfg) {
+            try {
+                $channels = unserialize((string) $channelsCfg, ['allowed_classes' => false]);
+            } catch (\ValueError $e) {
+                $channels = ['#PreNNTmux' => null];
+            }
+            if (! is_array($channels)) {
+                $channels = ['#PreNNTmux' => null];
+            }
+        } else {
+            $channels = ['#PreNNTmux' => null];
+        }
         $this->joinChannels($channels);
 
         if (! $this->_silent) {
-            echo '['.
-                date('r').
-                '] [Scraping of IRC channels for ('.
-                config('irc_settings.scrape_irc_server').
-                ':'.
-                config('irc_settings.scrape_irc_port').
-                ') ('.
-                config('irc_settings.scrape_irc_nickname').
-                ') started.]'.
+            echo '[' .
+                date('r') .
+                '] [Scraping of IRC channels for (' .
+                config('irc_settings.scrape_irc_server') .
+                ':' .
+                config('irc_settings.scrape_irc_port') .
+                ') (' .
+                config('irc_settings.scrape_irc_nickname') .
+                ') started.]' .
                 PHP_EOL;
         }
 
@@ -254,6 +247,7 @@ class IRCScraper extends IRCClient
                         break;
                 }
                 $this->_curPre['reason'] = (isset($hits['reason']) ? substr($hits['reason'], 0, 255) : '');
+                $this->_nuked = true; // flag for output
             }
             $this->_checkForDupe();
         }
@@ -284,7 +278,7 @@ class IRCScraper extends IRCClient
     protected function _insertNewPre(): void
     {
         if (config('nntmux.elasticsearch_enabled') === true) {
-            $indexData = (new ElasticSearchSiteSearch)->predbIndexSearch($this->_curPre['title']);
+            $indexData = (new ElasticSearchSiteSearch())->predbIndexSearch($this->_curPre['title']);
         } else {
             $indexData = $this->manticoreSearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
         }
@@ -329,8 +323,8 @@ class IRCScraper extends IRCClient
         $parameters = [
             'id' => DB::connection()->getPdo()->lastInsertId(),
             'title' => $this->_curPre['title'],
-            'filename' => $this->_curPre['filename'],
-            'source' => $this->_curPre['source'],
+            'filename' => $this->_curPre['filename'] ?? null,
+            'source' => $this->_curPre['source'] ?? null,
         ];
 
         if (config('nntmux.elasticsearch_enabled') === true) {
@@ -383,8 +377,8 @@ class IRCScraper extends IRCClient
         $parameters = [
             'id' => DB::connection()->getPdo()->lastInsertId(),
             'title' => $this->_curPre['title'],
-            'filename' => $this->_curPre['filename'],
-            'source' => $this->_curPre['source'],
+            'filename' => $this->_curPre['filename'] ?? null,
+            'source' => $this->_curPre['source'] ?? null,
         ];
 
         if (config('nntmux.elasticsearch_enabled') === true) {
@@ -423,13 +417,13 @@ class IRCScraper extends IRCClient
                     default:
                         break;
                 }
-                $nukeString .= '['.$this->_curPre['reason'].'] ';
+                $nukeString .= '['.($this->_curPre['reason'] ?? '').'] ';
             }
 
             echo '['.
                 date('r').
                 ($new ? '] [ Added Pre ] [' : '] [Updated Pre] [').
-                $this->_curPre['source'].
+                ($this->_curPre['source'] ?? '').
                 '] '.
                 $nukeString.
                 '['.

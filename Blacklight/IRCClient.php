@@ -104,7 +104,7 @@ class IRCClient
     /**
      * Password when we log in.
      */
-    protected string $_password;
+    protected ?string $_password = null;
 
     /**
      * List of channels and passwords to join.
@@ -221,8 +221,8 @@ class IRCClient
 
         // Set last ping time to now.
         $this->_lastPing = time();
-        // Reset retries.
-        $this->_currentRetries = $this->_reconnectRetries;
+        // Reset retries counter.
+        $this->_currentRetries = 0;
 
         return $this->_connected();
     }
@@ -235,7 +235,7 @@ class IRCClient
      * @param  string  $realName  The real name - visible in the WhoIs.
      * @param  null  $password  The password  - some servers require a password.
      */
-    public function login(string $nickName, string $userName, string $realName, $password = null): bool
+    public function login(string $nickName, string $userName, string $realName, ?string $password = null): bool
     {
         if (! $this->_connected()) {
             echo 'ERROR: You must connect to IRC first!'.PHP_EOL;
@@ -254,7 +254,8 @@ class IRCClient
         $this->_realName = $realName;
         $this->_password = $password;
 
-        if (empty($password) && ! $this->_writeSocket('PASSWORD '.$password)) {
+        // Send PASS only if provided to avoid null-to-string deprecation and follow IRC spec.
+        if ($password !== null && $password !== '' && ! $this->_writeSocket('PASS '.$password)) {
             return false;
         }
 
@@ -271,9 +272,9 @@ class IRCClient
             $this->_readSocket();
 
             // We got pinged, reply with a pong.
-            if (preg_match('/^PING\s*:(.+?)$/', $this->_buffer, $hits)) {
+            if (preg_match('/^PING\s*:(.+?)$/', (string) $this->_buffer, $hits)) {
                 $this->_pong($hits[1]);
-            } elseif (preg_match('/^:(.*?)\s+(\d+).*?(:.+?)?$/', $this->_buffer, $hits)) {
+            } elseif (preg_match('/^:(.*?)\s+(\d+).*?(:.+?)?$/', (string) $this->_buffer, $hits)) {
                 // We found 001, which means we are logged in.
                 if ((int) $hits[2] === 1) {
                     $this->_remote_host_received = $hits[1];
@@ -287,11 +288,11 @@ class IRCClient
                     $tempPass = $userName.':'.$password;
 
                     // Check if the user has his password in this format: username/server:password
-                    if (preg_match('/^.+?\/.+?:.+?$/', $password)) {
+                    if (is_string($password) && preg_match('/^.+?\/.+?:.+?$/', $password)) {
                         $tempPass = $password;
                     }
 
-                    if ($password !== null && ! $this->_writeSocket('PASS '.$tempPass)) {
+                    if ($password !== null && $password !== '' && ! $this->_writeSocket('PASS '.$tempPass)) {
                         return false;
                     }
 
@@ -302,7 +303,7 @@ class IRCClient
                     }
                 }
                 // ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
-            } elseif (preg_match('/^ERROR\s*:/', $this->_buffer)) {
+            } elseif (preg_match('/^ERROR\s*:/', (string) $this->_buffer)) {
                 echo $this->_buffer.PHP_EOL;
 
                 return false;
@@ -338,7 +339,7 @@ class IRCClient
 
                 // Check for a channel message.
             } elseif (preg_match(
-                '/^:(?P<nickname>.+?)\!.+?\s+PRIVMSG\s+(?P<channel>#.+?)\s+:\s*(?P<message>.+?)\s*$/',
+                '/^:(?P<nickname>.+?)!.+?\s+PRIVMSG\s+(?P<channel>#.+?)\s+:\s*(?P<message>.+?)\s*$/',
                 $this->_stripControlCharacters($this->_buffer),
                 $hits
             )
@@ -382,7 +383,7 @@ class IRCClient
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -402,7 +403,7 @@ class IRCClient
     /**
      * Send PONG to a host.
      */
-    protected function _pong(string $host)
+    protected function _pong(string $host): void
     {
         if (! $this->_writeSocket('PONG '.$host)) {
             $this->_reconnect();
@@ -422,7 +423,13 @@ class IRCClient
         $pong = $this->_writeSocket('PING '.$host);
 
         // Check if there's a connection error.
-        if ($pong === false || ((time() - $this->_lastPing) > ($this->_socket_timeout / 2) && ! 0 === strpos($this->_buffer, 'PONG'))) {
+        if (
+            $pong === false
+            || (
+                (time() - $this->_lastPing) > ($this->_socket_timeout / 2)
+                && 0 !== strpos((string) $this->_buffer, 'PONG')
+            )
+        ) {
             $this->_reconnect();
         }
 
@@ -458,7 +465,11 @@ class IRCClient
         $buffer = '';
         do {
             stream_set_timeout($this->_socket, $this->_socket_timeout);
-            $buffer .= fgets($this->_socket, 1024);
+            $line = fgets($this->_socket, 1024);
+            if ($line === false) {
+                break;
+            }
+            $buffer .= $line;
         } while (! empty($buffer) && ! preg_match('/\v+$/', $buffer));
         $this->_buffer = trim($buffer);
 
@@ -514,13 +525,17 @@ class IRCClient
     {
         $this->_closeStream();
 
+        $context = $this->_remote_tls
+            ? stream_context_create(Utility::streamSslContextOptions(true))
+            : null;
+
         $socket = stream_socket_client(
             $this->_remote_socket_string,
             $error_number,
             $error_string,
             $this->_remote_connection_timeout,
             STREAM_CLIENT_CONNECT,
-            stream_context_create(Utility::streamSslContextOptions(true))
+            $context
         );
 
         if ($socket === false) {
@@ -536,6 +551,9 @@ class IRCClient
     protected function _closeStream(): void
     {
         if ($this->_socket !== null) {
+            if (\is_resource($this->_socket)) {
+                @fclose($this->_socket);
+            }
             $this->_socket = null;
         }
     }
@@ -553,7 +571,7 @@ class IRCClient
      */
     protected function _stripControlCharacters(string $text): string
     {
-        return preg_replace(
+        $result = preg_replace(
             [
                 '/(\x03(?:\d{1,2}(?:,\d{1,2})?)?)/', // Color code
                 '/\x02/', // Bold
@@ -565,5 +583,7 @@ class IRCClient
             '',
             $text
         );
+
+        return is_string($result) ? $result : $text;
     }
 }
