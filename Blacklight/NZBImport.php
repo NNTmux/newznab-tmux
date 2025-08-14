@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\BlacklistService;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -15,7 +16,7 @@ use Illuminate\Support\Str;
  */
 class NZBImport
 {
-    protected Binaries $binaries;
+    protected BlacklistService $blacklistService;
 
     protected ReleaseCleaning $releaseCleaner;
 
@@ -65,7 +66,7 @@ class NZBImport
     public function __construct(array $options = [])
     {
         $this->echoCLI = config('nntmux.echocli');
-        $this->binaries = new Binaries;
+        $this->blacklistService = new BlacklistService;
         $this->category = new Categorize;
         $this->nzb = new NZB;
         $this->releaseCleaner = new ReleaseCleaning;
@@ -262,7 +263,7 @@ class NZBImport
                 $groupArr[] = $group;
 
                 // Check if this NZB is blacklisted.
-                if ($this->binaries->isBlackListed($msg, $group)) {
+                if ($this->blacklistService->isBlackListed($msg, $group)) {
                     $isBlackListed = true;
                     break;
                 }
@@ -284,9 +285,15 @@ class NZBImport
                 }
                 $this->echoOut($errorMessage);
 
+                // Persist blacklist usage stats if we matched any rule during this NZB processing
+                $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate());
+
                 return false;
             }
         }
+
+        // After scanning all files, persist any matched whitelist/blacklist usage
+        $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate());
 
         // Sort values alphabetically but keep the keys intact
         if (\count($binary_names) > 0) {
