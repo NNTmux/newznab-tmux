@@ -97,7 +97,7 @@ class PostProcess
      */
     public function processAll($nntp): void
     {
-        $this->processAdditional($nntp);
+        $this->processAdditional();
         $this->processNfos($nntp);
         $this->processMovies();
         $this->processMusic();

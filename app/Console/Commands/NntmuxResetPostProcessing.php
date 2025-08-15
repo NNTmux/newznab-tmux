@@ -27,7 +27,7 @@ class NntmuxResetPostProcessing extends Command
      *
      * @var string
      */
-    protected $signature = 'nntmux:resetpp {--c|category=* : Reset all, multiple or single category}';
+    protected $signature = 'nntmux:resetpp {--c|category=* : Reset all, multiple or single category (music, console, movie, game, tv, adult, book, misc). Supports comma-separated and repeated options}';
 
     /**
      * The console command description.
@@ -51,9 +51,9 @@ class NntmuxResetPostProcessing extends Command
      */
     public function handle(): void
     {
-        if (empty($this->option('category'))) {
+        $raw = (array) $this->option('category');
+        if (empty($raw)) {
             $qry = Release::query()->select(['id'])->get();
-            $affected = 0;
             $total = \count($qry);
             if ($total > 0) {
                 $bar = $this->output->createProgressBar($total);
@@ -88,50 +88,119 @@ class NntmuxResetPostProcessing extends Command
                 $this->info('No releases to reset');
             }
         } else {
-            foreach ($this->option('category') as $option) {
-                $adjusted = str_replace('=', '', $option);
-                if (\in_array($adjusted, self::$allowedCategories, false)) {
-                    $this->info('Resetting postprocessing for '.$adjusted.' category');
-                    switch ($adjusted) {
-                        case 'console':
-                            $this->resetConsole();
-                            break;
-                        case 'movie':
-                            $this->resetMovies();
-                            break;
-                        case 'game':
-                            $this->resetGames();
-                            break;
-                        case 'book':
-                            $this->resetBooks();
-                            break;
-                        case 'music':
-                            $this->resetMusic();
-                            break;
-                        case 'adult':
-                            $this->resetAdult();
-                            break;
-                        case 'tv':
-                            $this->resetTv();
-                            break;
-                        case 'misc':
-                            $this->resetMisc();
-                            break;
-                    }
+            $normalized = $this->normalizeCategories($raw);
+
+            // Validate
+            $invalid = $this->invalidCategories($normalized);
+            if (! empty($invalid)) {
+                $this->error('Unknown category option(s): '.implode(', ', $invalid));
+                $this->line('Allowed: '.implode(', ', self::$allowedCategories).' (or omit --category to reset all).');
+
+                return;
+            }
+
+            // If user explicitly passed 'all', treat as full reset
+            if (in_array('all', $normalized, true) || empty($normalized)) {
+                $this->call('nntmux:resetpp'); // fall back to full reset
+
+                return;
+            }
+
+            foreach ($normalized as $adjusted) {
+                // skip 'all' since handled above
+                if ($adjusted === 'all') {
+                    continue;
+                }
+                $this->info('Resetting postprocessing for '.$adjusted.' category');
+                switch ($adjusted) {
+                    case 'console':
+                        $this->resetConsole();
+                        break;
+                    case 'movie':
+                        $this->resetMovies();
+                        break;
+                    case 'game':
+                        $this->resetGames();
+                        break;
+                    case 'book':
+                        $this->resetBooks();
+                        break;
+                    case 'music':
+                        $this->resetMusic();
+                        break;
+                    case 'adult':
+                        $this->resetAdult();
+                        break;
+                    case 'tv':
+                        $this->resetTv();
+                        break;
+                    case 'misc':
+                        $this->resetMisc();
+                        break;
                 }
             }
         }
+    }
+
+    /**
+     * Normalize raw category options into a unique, lowercased list.
+     * Handles comma-separated values, repeated options, casing, simple plurals,
+     * and values provided as key=value (e.g. category=tv or the single-dash typo -category=tv).
+     */
+    private function normalizeCategories(array $raw): array
+    {
+        $normalized = collect($raw)
+            ->flatMap(function ($opt) {
+                $opt = is_array($opt) ? implode(',', $opt) : (string) $opt;
+
+                return preg_split('/[\s,]+/', $opt, -1, PREG_SPLIT_NO_EMPTY);
+            })
+            ->map(function ($opt) {
+                $opt = trim((string) $opt);
+                // If the token contains '=', take the substring after the last '='
+                if (str_contains($opt, '=')) {
+                    $parts = explode('=', $opt);
+                    $opt = end($parts);
+                }
+                $opt = strtolower(trim($opt));
+                // normalize common plurals
+                $singular = rtrim($opt, 's');
+                if (in_array($singular, self::$allowedCategories, true)) {
+                    return $singular;
+                }
+
+                return $opt;
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        return $normalized;
+    }
+
+    /**
+     * Return invalid categories from a normalized list.
+     * Keeps 'all' as a special allowed token.
+     */
+    private function invalidCategories(array $normalized): array
+    {
+        return collect($normalized)
+            ->reject(function ($opt) {
+                return in_array($opt, self::$allowedCategories, true) || $opt === 'all';
+            })
+            ->values()
+            ->all();
     }
 
     private function resetConsole(): void
     {
         $qry = Release::query()->whereNotNull('consoleinfo_id')->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->get();
         $total = $qry->count();
-        $bar = $this->output->createProgressBar($total);
-        $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
-        $bar->start();
         if ($total > 0) {
-            $conCount = 0;
+            $bar = $this->output->createProgressBar($total);
+            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
+            $bar->start();
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -141,7 +210,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' consoleinfo_id\'s reset.');
+            $this->info(number_format($total).' consoleinfo_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }
@@ -155,7 +224,6 @@ class NntmuxResetPostProcessing extends Command
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
-            $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -166,7 +234,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' movieinfo_id\'s reset.');
+            $this->info(number_format($total).' movieinfo_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }
@@ -180,7 +248,6 @@ class NntmuxResetPostProcessing extends Command
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
-            $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -190,7 +257,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' gamesinfo_id\'s reset.');
+            $this->info(number_format($total).' gamesinfo_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }
@@ -204,7 +271,6 @@ class NntmuxResetPostProcessing extends Command
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
-            $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -214,7 +280,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' bookinfo_id\'s reset.');
+            $this->info(number_format($total).' bookinfo_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }
@@ -228,7 +294,6 @@ class NntmuxResetPostProcessing extends Command
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
-            $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -238,7 +303,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' musicinfo_id\'s reset.');
+            $this->info(number_format($total).' musicinfo_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }
@@ -252,7 +317,6 @@ class NntmuxResetPostProcessing extends Command
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
-            $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -262,7 +326,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' xxxinfo_id\'s reset.');
+            $this->info(number_format($total).' xxxinfo_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }
@@ -276,7 +340,6 @@ class NntmuxResetPostProcessing extends Command
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
-            $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -287,7 +350,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' video_id\'s reset.');
+            $this->info(number_format($total).' video_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }
@@ -301,7 +364,6 @@ class NntmuxResetPostProcessing extends Command
             $bar = $this->output->createProgressBar($total);
             $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
             $bar->start();
-            $conCount = 0;
             foreach ($qry as $releases) {
                 Release::query()->where('id', $releases->id)->update(
                     [
@@ -316,7 +378,7 @@ class NntmuxResetPostProcessing extends Command
             }
             $bar->finish();
             $this->newLine();
-            $this->info(number_format($conCount).' misc releases reset.');
+            $this->info(number_format($total).' misc releases reset.');
         } else {
             $this->info('No releases to reset');
         }
