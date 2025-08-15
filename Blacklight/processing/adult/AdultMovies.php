@@ -45,8 +45,12 @@ abstract class AdultMovies
     public function getAll(): bool|array
     {
         $results = [];
-        if ($this->_directUrl !== null) {
-            $results['title'] = $this->_title;
+
+        // Only include when present
+        if (! empty($this->_directUrl)) {
+            if (! empty($this->_title)) {
+                $results['title'] = $this->_title;
+            }
             $results['directurl'] = $this->_directUrl;
         }
 

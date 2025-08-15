@@ -66,16 +66,14 @@ class ADE extends AdultMovies
                 '#(?:streamID:\s\")(?P<streamid>[0-9A-Z]+)(?:\")#',
                 $this->_response,
                 $hits
-            )
-            ) {
+            )) {
                 $this->_res['trailers']['streamid'] = trim($hits['streamid']);
             }
             if (preg_match(
-                '#(?:BaseStreamingUrl:\s\")(?P<baseurl>[\d]+.[\d]+.[\d]+.[\d]+)(?:\")#',
+                '#(?:BaseStreamingUrl:\s\")(?P<baseurl>[\d]+\.[\d]+\.[\d]+\.[\d]+)(?:\")#',
                 $this->_response,
                 $hits
-            )
-            ) {
+            )) {
                 $this->_res['trailers']['baseurl'] = $hits['baseurl'];
             }
         }
@@ -105,9 +103,13 @@ class ADE extends AdultMovies
      */
     protected function synopsis(): array
     {
-        $ret = $this->_html->findOne('meta[name=og:description]')->content;
-        if ($ret !== false) {
-            $this->_res['synopsis'] = trim($ret);
+        // Prefer OpenGraph description, fall back to standard meta description
+        $meta = $this->_html->findOne('meta[property=og:description]');
+        if (! $meta) {
+            $meta = $this->_html->findOne('meta[name=description]');
+        }
+        if ($meta && isset($meta->content) && $meta->content !== false) {
+            $this->_res['synopsis'] = trim($meta->content);
         }
 
         return $this->_res;

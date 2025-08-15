@@ -130,13 +130,31 @@ class Hotmovies extends AdultMovies
     protected function cast(): array
     {
         $cast = [];
-        if ($this->_html->find('.stars bottom_margin')) {
-            foreach ($this->_html->find('a[title]') as $e) {
-                $e = trim($e->title);
-                $e = preg_replace('/\((.*)\)/', '', $e);
-                $cast[] = trim($e);
+
+        // Prefer scoped search within stars container to avoid unrelated links
+        if ($container = $this->_html->findOne('.stars')) {
+            foreach ($container->find('a[title]') as $e) {
+                $name = trim($e->title);
+                $name = preg_replace('/\((.*)\)/', '', $name);
+                $name = trim($name);
+                if ($name !== '') {
+                    $cast[] = $name;
+                }
             }
-            $this->_res['cast'] = $cast;
+        }
+
+        // Fallback: anchors that look like performer links
+        if (empty($cast)) {
+            foreach ($this->_html->find('a[href*="/performers/"]') as $e) {
+                $name = trim($e->plaintext);
+                if ($name !== '') {
+                    $cast[] = $name;
+                }
+            }
+        }
+
+        if (! empty($cast)) {
+            $this->_res['cast'] = array_values(array_unique($cast));
         }
 
         return $this->_res;

@@ -109,21 +109,25 @@ class AEBN extends AdultMovies
      */
     protected function cast(): array
     {
-        $this->_res = [];
+        // Do not reset the whole results array; only populate the cast key.
+        $cast = [];
         $ret = $this->_html->findOne('div.starsFull');
         if (! $ret instanceof SimpleHtmlDomNodeBlank) {
             foreach ($ret->find('span[itemprop=name]') as $star) {
-                $this->_res['cast'][] = trim($star->plaintext);
+                $cast[] = trim($star->plaintext);
             }
         } else {
             $ret = $this->_html->findOne('div.detailsLink');
             if (! $ret instanceof SimpleHtmlDomNodeBlank) {
                 foreach ($ret->find('span') as $star) {
                     if (str_contains($star->plaintext, '/More/') && str_contains($star->plaintext, '/Stars/')) {
-                        $this->_res['cast'][] = trim($star->plaintext);
+                        $cast[] = trim($star->plaintext);
                     }
                 }
             }
+        }
+        if (! empty($cast)) {
+            $this->_res['cast'] = $cast;
         }
 
         return $this->_res;
@@ -160,14 +164,19 @@ class AEBN extends AdultMovies
      */
     protected function synopsis(): array
     {
-        if ($ret = $this->_html->findOne('span[itemprop=about]')) {
-            if ($ret === null) {
-                if ($ret = $this->_html->findOne('div.movieDetailDescription')) {
-                    $this->_res['synopsis'] = preg_replace('/Description:\s/', '', $this->_res['plot']);
-                }
-            } else {
-                $this->_res['synopsis'] = trim($ret->plaintext);
-            }
+        // Prefer the modern schema attribute
+        $ret = $this->_html->findOne('span[itemprop=about]');
+        if ($ret && $ret->plaintext !== null) {
+            $this->_res['synopsis'] = trim($ret->plaintext);
+
+            return $this->_res;
+        }
+
+        // Fallback to legacy description container
+        $ret = $this->_html->findOne('div.movieDetailDescription');
+        if ($ret && $ret->plaintext !== null) {
+            $text = trim($ret->plaintext);
+            $this->_res['synopsis'] = preg_replace('/^Description:\s*/', '', $text);
         }
 
         return $this->_res;
