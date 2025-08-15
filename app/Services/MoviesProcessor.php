@@ -16,17 +16,15 @@ class MoviesProcessor
     }
 
     /**
-     * @param string $groupID
-     * @param string $guidChar
-     * @param int|string|null $processMovies 0/1/2 or '' to read from settings
+     * @param  int|string|null  $processMovies  0/1/2 or '' to read from settings
+     *
      * @throws GuzzleException
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processMovies = ''): void
     {
         $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::settingValue('lookupimdb'));
         if ($processMovies > 0) {
-            (new Movie())->processMovieReleases($groupID, $guidChar, $processMovies);
+            (new Movie)->processMovieReleases($groupID, $guidChar, $processMovies);
         }
     }
 }
-

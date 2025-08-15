@@ -17,8 +17,7 @@ class MusicProcessor
     public function process(): void
     {
         if ((int) Settings::settingValue('lookupmusic') !== 0) {
-            (new Music())->processMusicReleases();
+            (new Music)->processMusicReleases();
         }
     }
 }
-

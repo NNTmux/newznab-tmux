@@ -17,8 +17,7 @@ class XXXProcessor
     public function process(): void
     {
         if ((int) Settings::settingValue('lookupxxx') === 1) {
-            (new XXX())->processXXXReleases();
+            (new XXX)->processXXXReleases();
         }
     }
 }
-

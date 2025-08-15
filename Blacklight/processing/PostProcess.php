@@ -2,10 +2,6 @@
 
 namespace Blacklight\processing;
 
-use Blacklight\NameFixer;
-use Blacklight\Nfo;
-use Blacklight\NNTP;
-use Blacklight\processing\post\ProcessAdditional;
 use App\Services\AnimeProcessor;
 use App\Services\BooksProcessor;
 use App\Services\ConsolesProcessor;
@@ -16,6 +12,10 @@ use App\Services\NfoProcessor;
 use App\Services\Par2Processor;
 use App\Services\TvProcessor;
 use App\Services\XXXProcessor;
+use Blacklight\NameFixer;
+use Blacklight\Nfo;
+use Blacklight\NNTP;
+use Blacklight\processing\post\ProcessAdditional;
 use dariusiii\rarinfo\Par2Info;
 
 class PostProcess
@@ -42,15 +42,23 @@ class PostProcess
     private Nfo $Nfo;
 
     private Par2Processor $par2Processor;
+
     private TvProcessor $tvProcessor;
+
     private NfoProcessor $nfoProcessor;
 
     private MoviesProcessor $moviesProcessor;
+
     private MusicProcessor $musicProcessor;
+
     private BooksProcessor $booksProcessor;
+
     private ConsolesProcessor $consolesProcessor;
+
     private GamesProcessor $gamesProcessor;
+
     private AnimeProcessor $animeProcessor;
+
     private XXXProcessor $xxxProcessor;
 
     public function __construct()
@@ -212,7 +220,7 @@ class PostProcess
      */
     public function processAdditional(int|string $groupID = '', string $guidChar = ''): void
     {
-        (new ProcessAdditional())->start($groupID, $guidChar);
+        (new ProcessAdditional)->start($groupID, $guidChar);
     }
 
     /**

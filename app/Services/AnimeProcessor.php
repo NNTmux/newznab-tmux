@@ -17,8 +17,7 @@ class AnimeProcessor
     public function process(): void
     {
         if ((int) Settings::settingValue('lookupanidb') !== 0) {
-            (new AniDB())->processAnimeReleases();
+            (new AniDB)->processAnimeReleases();
         }
     }
 }
-

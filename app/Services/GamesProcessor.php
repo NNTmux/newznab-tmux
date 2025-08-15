@@ -17,8 +17,7 @@ class GamesProcessor
     public function process(): void
     {
         if ((int) Settings::settingValue('lookupgames') !== 0) {
-            (new Games())->processGamesReleases();
+            (new Games)->processGamesReleases();
         }
     }
 }
-

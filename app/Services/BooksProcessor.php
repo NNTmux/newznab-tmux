@@ -17,8 +17,7 @@ class BooksProcessor
     public function process(): void
     {
         if ((int) Settings::settingValue('lookupbooks') !== 0) {
-            (new Books())->processBookReleases();
+            (new Books)->processBookReleases();
         }
     }
 }
-

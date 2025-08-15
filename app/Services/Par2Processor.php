@@ -17,8 +17,11 @@ use Illuminate\Support\Carbon;
 class Par2Processor
 {
     private NameFixer $nameFixer;
+
     private Par2Info $par2Info;
+
     private bool $addPar2;
+
     private bool $alternateNNTP;
 
     public function __construct(NameFixer $nameFixer, Par2Info $par2Info, bool $addPar2, bool $alternateNNTP)
@@ -128,4 +131,3 @@ class Par2Processor
         return false;
     }
 }
-
