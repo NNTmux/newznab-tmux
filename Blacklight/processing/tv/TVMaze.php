@@ -267,9 +267,9 @@ class TVMaze extends TV
                 }
 
                 // Alias matches
-                if (is_array($show->akas) && !empty($show->akas)) {
+                if (is_array($show->akas) && ! empty($show->akas)) {
                     foreach ($show->akas as $aka) {
-                        if (!isset($aka['name'])) {
+                        if (! isset($aka['name'])) {
                             continue;
                         }
 

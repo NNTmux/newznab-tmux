@@ -306,6 +306,7 @@ class TMDB extends TV
                         }
                     }
                 }
+
                 return false;
             }
 

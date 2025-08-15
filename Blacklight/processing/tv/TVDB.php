@@ -2,17 +2,8 @@
 
 namespace Blacklight\processing\tv;
 
-use Blacklight\ReleaseImage;
 use Blacklight\libraries\FanartTV;
-use Blacklight\ReleaseImage as ReleaseImageAlias;
-use Blacklight\ReleaseImage as ReleaseImageClass;
-use Blacklight\ReleaseImage as ReleaseImageType;
-use Blacklight\ReleaseImage as RI;
-use Blacklight\ReleaseImage as RImage;
-use Blacklight\ReleaseImage as RelImage;
-use Blacklight\ReleaseImage as RlsImage;
-use Blacklight\ReleaseImage as Img;
-use Blacklight\ReleaseImage as PosterSaver;
+use Blacklight\ReleaseImage;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
