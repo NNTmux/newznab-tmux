@@ -82,11 +82,6 @@ class Forking
 
     private bool $processTV = false; // Should we process TV?
 
-    /**
-     * Common buffer size for async pool tasks.
-     */
-    private const ASYNC_BUFFER_SIZE = 2000000;
-
     /** Runners **/
     private BackfillRunner $backfillRunner;
 
