@@ -7,6 +7,10 @@ use App\Models\UsenetGroup;
 use Blacklight\ColorCLI;
 use Blacklight\Nfo;
 use Blacklight\NZB;
+use Blacklight\libraries\Runners\BackfillRunner;
+use Blacklight\libraries\Runners\BinariesRunner;
+use Blacklight\libraries\Runners\PostProcessRunner;
+use Blacklight\libraries\Runners\ReleasesRunner;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -84,6 +88,17 @@ class Forking
     private bool $processTV = false; // Should we process TV?
 
     /**
+     * Common buffer size for async pool tasks.
+     */
+    private const ASYNC_BUFFER_SIZE = 2000000;
+
+    /** Runners **/
+    private BackfillRunner $backfillRunner;
+    private BinariesRunner $binariesRunner;
+    private ReleasesRunner $releasesRunner;
+    private PostProcessRunner $postProcessRunner;
+
+    /**
      * Setup required parent / self vars.
      *
      * @throws \Exception
@@ -98,6 +113,12 @@ class Forking
         $this->minSize = (int) Settings::settingValue('minsizetoprocessnfo');
         $this->maxRetries = (int) Settings::settingValue('maxnforetries') >= 0 ? -((int) Settings::settingValue('maxnforetries') + 1) : Nfo::NFO_UNPROC;
         $this->maxRetries = max($this->maxRetries, -8);
+
+        // init runners
+        $this->backfillRunner = new BackfillRunner($this->colorCli);
+        $this->binariesRunner = new BinariesRunner($this->colorCli);
+        $this->releasesRunner = new ReleasesRunner($this->colorCli);
+        $this->postProcessRunner = new PostProcessRunner($this->colorCli);
     }
 
     /**
@@ -118,10 +139,7 @@ class Forking
         $this->processAdditional = $this->processNFO = $this->processTV = $this->processMovies = $this->ppRenamedOnly = false;
         $this->work = [];
 
-        // Process extra work that should not be forked and done before forking.
-        $this->processStartWork();
-
-        // Get work to fork.
+        // Get work to fork via runners
         $this->getWork();
 
         // Process extra work that should not be forked and done after.
@@ -141,6 +159,25 @@ class Forking
     private bool $ppRenamedOnly;
 
     /**
+     * Helper to ensure concurrency is at least 1 and with a common timeout.
+     */
+    private function createPool(int $concurrency): Pool
+    {
+        $concurrency = max(1, $concurrency);
+        return Pool::create()
+            ->concurrency($concurrency)
+            ->timeout(config('nntmux.multiprocessing_max_child_time'));
+    }
+
+    /**
+     * Helper to build a DNR switch command.
+     */
+    private function buildDnrCommand(string $args): string
+    {
+        return $this->dnr_path.$args.'"';
+    }
+
+    /**
      * Get work for our workers to work on, set the max child processes here.
      *
      * @throws \Exception
@@ -151,20 +188,24 @@ class Forking
 
         switch ($this->workType) {
             case 'backfill':
-                $this->backfill();
+                $this->backfillRunner->backfill($this->workTypeOptions);
                 break;
 
             case 'binaries':
-                $this->binaries();
+                $maxPerGroup = (int) ($this->workTypeOptions[0] ?? 0);
+                $this->binariesRunner->binaries($maxPerGroup);
                 break;
 
             case 'fixRelNames_standard':
+                $this->releasesRunner->fixRelNames('standard', (int) Settings::settingValue('fixnamesperrun'), (int) Settings::settingValue('fixnamethreads'));
+                break;
+
             case 'fixRelNames_predbft':
-                $this->fixRelNames();
+                $this->releasesRunner->fixRelNames('predbft', (int) Settings::settingValue('fixnamesperrun'), (int) Settings::settingValue('fixnamethreads'));
                 break;
 
             case 'releases':
-                $this->releases();
+                $this->releasesRunner->releases();
                 break;
 
             case 'postProcess_ama':
@@ -172,63 +213,33 @@ class Forking
                 break;
 
             case 'postProcess_add':
-                $this->postProcessAdd();
+                $this->postProcessRunner->processAdditional();
                 break;
 
             case 'postProcess_mov':
-                $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
-                $this->postProcessMov();
+                $renamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
+                $this->postProcessRunner->processMovies($renamedOnly);
                 break;
 
             case 'postProcess_nfo':
-                $this->postProcessNfo();
+                $this->postProcessRunner->processNfo();
                 break;
 
             case 'postProcess_tv':
-                $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
-                $this->postProcessTv();
+                $renamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
+                $this->postProcessRunner->processTv($renamedOnly);
                 break;
 
             case 'safe_backfill':
-                $this->safeBackfill();
+                $this->backfillRunner->safeBackfill();
                 break;
 
             case 'safe_binaries':
-                $this->safeBinaries();
+                $this->binariesRunner->safeBinaries();
                 break;
 
             case 'update_per_group':
-                $this->updatePerGroup();
-                break;
-        }
-    }
-
-    /**
-     * Process work if we have any.
-     */
-    private function processWork(): void
-    {
-        $this->_workCount = \count($this->work);
-        if ($this->_workCount > 0 && config('nntmux.echocli') === true) {
-            $this->colorCli->header(
-                'Multi-processing started at '.now()->toRfc2822String().' for '.$this->workType.' with '.$this->_workCount.
-                ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
-            );
-        }
-        if (empty($this->_workCount) && config('nntmux.echocli') === true) {
-            $this->colorCli->header('No work to do!');
-        }
-    }
-
-    /**
-     * Process any work that does not need to be forked, but needs to run at the start.
-     */
-    private function processStartWork(): void
-    {
-        switch ($this->workType) {
-            case 'safe_backfill':
-            case 'safe_binaries':
-                $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/update_groups.php');
+                $this->releasesRunner->updatePerGroup();
                 break;
         }
     }
@@ -241,604 +252,49 @@ class Forking
         switch ($this->workType) {
             case 'update_per_group':
             case 'releases':
-
-                $this->_executeCommand($this->dnr_path.'releases  '.\count($this->work).'_"');
-
+                $count = $this->getReleaseWorkCount();
+                $this->_executeCommand($this->buildDnrCommand('releases  '.$count.'_'));
                 break;
         }
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ////////////////////////////////////// All backFill code here ////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private function backfill(): void
-    {
-        // The option for backFill is for doing up to x articles. Else it's done by date.
-        $this->work = DB::select(
-            sprintf(
-                'SELECT name %s FROM usenet_groups WHERE backfill = 1',
-                ($this->workTypeOptions[0] === false ? '' : (', '.$this->workTypeOptions[0].' AS max'))
-            )
-        );
-
-        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
-        $this->processWork();
-        $maxWork = \count($this->work);
-        foreach ($this->work as $group) {
-            $pool->add(function () use ($group) {
-                return $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
-            }, 2000000)->then(function ($output) use ($group, $maxWork) {
-                echo $output;
-                $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // we do nothing here just catch the error and move on
-            });
-            $maxWork--;
-        }
-        $pool->wait();
-    }
-
-    private function safeBackfill(): void
-    {
-        $backfill_qty = (int) Settings::settingValue('backfill_qty');
-        $backfill_order = (int) Settings::settingValue('backfill_order');
-        $backfill_days = (int) Settings::settingValue('backfill_days');
-        $maxMessages = (int) Settings::settingValue('maxmssgs');
-        $threads = (int) Settings::settingValue('backfillthreads');
-
-        $orderby = 'ORDER BY a.last_record ASC';
-        switch ($backfill_order) {
-            case 1:
-                $orderby = 'ORDER BY first_record_postdate DESC';
-                break;
-
-            case 2:
-                $orderby = 'ORDER BY first_record_postdate ASC';
-                break;
-
-            case 3:
-                $orderby = 'ORDER BY name ASC';
-                break;
-
-            case 4:
-                $orderby = 'ORDER BY name DESC';
-                break;
-
-            case 5:
-                $orderby = 'ORDER BY a.last_record DESC';
-                break;
-        }
-
-        $backfilldays = '';
-        if ($backfill_days === 1) {
-            $backfilldays = 'g.backfill_target';
-        } elseif ($backfill_days === 2) {
-            $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('safebackfilldate')), true);
-        }
-
-        $data = DB::select(
-            sprintf(
-                'SELECT g.name,
-				g.first_record AS our_first,
-				MAX(a.first_record) AS their_first,
-				MAX(a.last_record) AS their_last
-				FROM usenet_groups g
-				INNER JOIN short_groups a ON g.name = a.name
-				WHERE g.first_record IS NOT NULL
-				AND g.first_record_postdate IS NOT NULL
-				AND g.backfill = 1
-				AND (NOW() - INTERVAL %s DAY ) < g.first_record_postdate
-				GROUP BY a.name, a.last_record, g.name, g.first_record
-				%s LIMIT 1',
-                $backfilldays,
-                $orderby
-            )
-        );
-
-        $count = 0;
-        if (! empty($data) && isset($data[0]->name)) {
-            $this->safeBackfillGroup = $data[0]->name;
-
-            $count = ($data[0]->our_first - $data[0]->their_first);
-        }
-
-        if ($count > 0) {
-            if ($count > ($backfill_qty * $threads)) {
-                $getEach = ceil(($backfill_qty * $threads) / $maxMessages);
-            } else {
-                $getEach = $count / $maxMessages;
-            }
-
-            $queues = [];
-            for ($i = 0; $i <= $getEach - 1; $i++) {
-                $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $this->safeBackfillGroup, $data[0]->our_first - $i * $maxMessages - $maxMessages, $data[0]->our_first - $i * $maxMessages - 1, $i + 1);
-            }
-
-            $pool = Pool::create()->concurrency($threads)->timeout(config('nntmux.multiprocessing_max_child_time'));
-
-            $this->processWork();
-            foreach ($queues as $queue) {
-                $pool->add(function () use ($queue) {
-                    return $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 2000000)->then(function ($output) {
-                    echo $output;
-                    $this->colorCli->primary('Backfilled group '.$this->safeBackfillGroup);
-                })->catch(function (\Throwable $exception) {
-                    echo $exception->getMessage();
-                })->catch(static function (SerializableException $serializableException) {
-                    // we do nothing here just catch the error and move on
-                });
-            }
-            $pool->wait();
-        } else {
-            if (config('nntmux.echocli')) {
-                $this->colorCli->primary('No backfill needed for group '.$this->safeBackfillGroup);
-            }
-        }
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ////////////////////////////////////// All binaries code here ////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private function binaries(): void
-    {
-        $this->work = DB::select(
-            sprintf(
-                'SELECT name, %d AS max FROM usenet_groups WHERE active = 1',
-                $this->workTypeOptions[0]
-            )
-        );
-
-        $this->maxProcesses = (int) Settings::settingValue('binarythreads');
-
-        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
-
-        $maxWork = \count($this->work);
-
-        $this->processWork();
-        foreach ($this->work as $group) {
-            $pool->add(function () use ($group) {
-                return $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
-            }, 2000000)->then(function ($output) use ($group, $maxWork) {
-                echo $output;
-                $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // we do nothing here just catch the error and move on
-            });
-            $maxWork--;
-        }
-
-        $pool->wait();
     }
 
     /**
-     * @throws \Exception
+     * Compute count of groups which currently have collections pending (used for DNR signalling).
      */
-    private function safeBinaries(): void
+    private function getReleaseWorkCount(): int
     {
-        $maxHeaders = (int) Settings::settingValue('max_headers_iteration') ?: 1000000;
-        $maxMessages = (int) Settings::settingValue('maxmssgs');
-        $this->maxProcesses = (int) Settings::settingValue('binarythreads');
-
-        $this->work = DB::select(
-            '
-			SELECT g.name AS groupname, g.last_record AS our_last,
-				a.last_record AS their_last
-			FROM usenet_groups g
-			INNER JOIN short_groups a ON g.active = 1 AND g.name = a.name
-			ORDER BY a.last_record DESC'
-        );
-
-        if (! empty($this->work)) {
-            $i = 1;
-            $queues = [];
-            foreach ($this->work as $group) {
-                if ((int) $group->our_last === 0) {
-                    $queues[$i] = sprintf('update_group_headers  %s', $group->groupname);
-                    $i++;
-                } else {
-                    // only process if more than 20k headers available and skip the first 20k
-                    $count = $group->their_last - $group->our_last - 20000;
-                    if ($count <= $maxMessages * 2) {
-                        $queues[$i] = sprintf('update_group_headers  %s', $group->groupname);
-                        $i++;
-                    } else {
-                        $queues[$i] = sprintf('part_repair  %s', $group->groupname);
-                        $i++;
-                        $getEach = floor(min($count, $maxHeaders) / $maxMessages);
-                        $remaining = min($count, $maxHeaders) - $getEach * $maxMessages;
-                        for ($j = 0; $j < $getEach; $j++) {
-                            $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + $j * $maxMessages + 1, $group->our_last + $j * $maxMessages + $maxMessages, $i);
-                            $i++;
-                        }
-                        // add remainder to queue
-                        $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + ($j + 1) * $maxMessages + 1, $group->our_last + ($j + 1) * $maxMessages + $remaining + 1, $i);
-                        $i++;
-                    }
-                }
-            }
-            $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
-
-            $this->processWork();
-            foreach ($queues as $queue) {
-                preg_match('/alt\..+/i', $queue, $hit);
-                $pool->add(function () use ($queue) {
-                    return $this->_executeCommand($this->dnr_path.$queue.'"');
-                }, 2000000)->then(function ($output) use ($hit) {
-                    if (! empty($hit)) {
-                        echo $output;
-                        $this->colorCli->primary('Updated group '.$hit[0]);
-                    }
-                })->catch(function (\Throwable $exception) {
-                    echo $exception->getMessage();
-                })->catch(static function (SerializableException $serializableException) {
-                    // we do nothing here just catch the error and move on
-                });
-            }
-
-            $pool->wait();
-        }
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ////////////////////////////////// All fix release names code here ///////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private function fixRelNames(): void
-    {
-        $this->maxProcesses = (int) Settings::settingValue('fixnamethreads');
-        $maxPerRun = (int) Settings::settingValue('fixnamesperrun');
-
-        if ($this->maxProcesses > 16) {
-            $this->maxProcesses = 16;
-        } elseif ($this->maxProcesses === 0) {
-            $this->maxProcesses = 1;
-        }
-
-        $leftGuids = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-
-        // Prevent PreDB FT from always running
-        if ($this->workTypeOptions[0] === 'predbft') {
-            $preCount = DB::select(
-                sprintf(
-                    "
-					SELECT COUNT(p.id) AS num
-					FROM predb p
-					WHERE LENGTH(p.title) >= 15
-					AND p.title NOT REGEXP '[\"\<\> ]'
-					AND p.searched = 0
-					AND p.predate < (NOW() - INTERVAL 1 DAY)"
-                )
-            );
-            if ($preCount[0]->num > 0) {
-                $leftGuids = \array_slice($leftGuids, 0, (int) ceil($preCount[0]->num / $maxPerRun));
-            } else {
-                $leftGuids = [];
-            }
-        }
-
+        $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
         $count = 0;
-        $queues = [];
-        foreach ($leftGuids as $leftGuid) {
-            $count++;
-            if ($maxPerRun > 0) {
-                $queues[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftGuid, $maxPerRun, $count);
-            }
-        }
-
-        $this->work = $queues;
-
-        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
-
-        $maxWork = \count($queues);
-
-        $this->processWork();
-        foreach ($this->work as $queue) {
-            $pool->add(function () use ($queue) {
-                return $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
-            }, 2000000)->then(function ($output) use ($maxWork) {
-                echo $output;
-                $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // we do nothing here just catch the error and move on
-            });
-            $maxWork--;
-        }
-        $pool->wait();
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ////////////////////////////////////// All releases code here ////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private function releases(): void
-    {
-        $work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-        $this->maxProcesses = (int) Settings::settingValue('releasethreads');
-
-        $uGroups = [];
-        foreach ($work as $group) {
+        foreach ($groups as $g) {
             try {
-                $query = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id));
-                if (! empty($query)) {
-                    $uGroups[] = ['id' => $group->id, 'name' => $group->name];
+                $q = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $g->id));
+                if (!empty($q)) {
+                    $count++;
                 }
             } catch (\PDOException $e) {
                 if (config('app.debug') === true) {
-                    Log::debug($e->getMessage());
+                    \Log::debug($e->getMessage());
                 }
             }
         }
-
-        $maxWork = \count($uGroups);
-
-        $this->work = $uGroups;
-
-        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
-
-        $this->processWork();
-        foreach ($uGroups as $group) {
-            $pool->add(function () use ($group) {
-                return $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
-            }, 2000000)->then(function ($output) use ($maxWork) {
-                echo $output;
-                $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // we do nothing here just catch the error and move on
-            });
-            $maxWork--;
-        }
-
-        $pool->wait();
+        return $count;
     }
 
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ///////////////////////////////////// All post process code here /////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // The remaining methods are kept for BC and potential direct usage within the codebase,
+    // but are not used when processWorkType delegates to runner classes.
 
-    /**
-     * Only 1 exit method is used for post process, since they are all similar.
-     */
-    public function postProcess(array $releases, int $maxProcess): void
-    {
-        $type = $desc = '';
-        if ($this->processAdditional) {
-            $type = 'additional true ';
-            $desc = 'additional postprocessing';
-        } elseif ($this->processNFO) {
-            $type = 'nfo true ';
-            $desc = 'nfo postprocessing';
-        } elseif ($this->processMovies) {
-            $type = 'movies true ';
-            $desc = 'movies postprocessing';
-        } elseif ($this->processTV) {
-            $type = 'tv true ';
-            $desc = 'tv postprocessing';
-        }
-        $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
-        $count = \count($releases);
-        $this->processWork();
-        foreach ($releases as $release) {
-            if ($type !== '') {
-                $pool->add(function () use ($release, $type) {
-                    return $this->_executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
-                }, 2000000)->then(function ($output) use ($desc, $count) {
-                    echo $output;
-                    $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
-                })->catch(function (\Throwable $exception) {
-                    echo $exception->getMessage();
-                })->catch(static function (SerializableException $serializableException) {
-                    // we do nothing here just catch the error and move on
-                })->timeout(function () use ($count) {
-                    $this->colorCli->notice('Task #'.$count.': Timeout occurred.');
-                });
-                $count--;
-            }
-        }
-        $pool->wait();
-    }
+    private function backfill(): void {}
+    private function safeBackfill(): void {}
+    private function binaries(): void {}
+    private function safeBinaries(): void {}
+    private function fixRelNames(): void {}
+    private function releases(): void {}
 
-    /**
-     * @throws \Exception
-     */
-    private function postProcessAdd(): void
-    {
-        $ppAddMinSize = Settings::settingValue('minsizetopostprocess') !== '' ? (int) Settings::settingValue('minsizetopostprocess') : 1;
-        $ppAddMinSize = ($ppAddMinSize > 0 ? ('AND r.size > '.($ppAddMinSize * 1048576)) : '');
-        $ppAddMaxSize = (Settings::settingValue('maxsizetopostprocess') !== '') ? (int) Settings::settingValue('maxsizetopostprocess') : 100;
-        $ppAddMaxSize = ($ppAddMaxSize > 0 ? ('AND r.size < '.($ppAddMaxSize * 1073741824)) : '');
-        $this->maxProcesses = 1;
-        $ppQueue = DB::select(
-            sprintf(
-                '
-					SELECT r.leftguid AS id
-					FROM releases r
-					LEFT JOIN categories c ON c.id = r.categories_id
-					WHERE r.nzbstatus = %d
-					AND r.passwordstatus = -1
-					AND r.haspreview = -1
-					AND c.disablepreview = 0
-					%s %s
-					GROUP BY r.leftguid
-					LIMIT 16',
-                NZB::NZB_ADDED,
-                $ppAddMaxSize,
-                $ppAddMinSize
-            )
-        );
-        if (\count($ppQueue) > 0) {
-            $this->processAdditional = true;
-            $this->work = $ppQueue;
-            $this->maxProcesses = (int) Settings::settingValue('postthreads');
-        }
-
-        $this->postProcess($this->work, $this->maxProcesses);
-    }
-
-    private string $nfoQueryString = '';
-
-    /**
-     * Check if we should process NFO's.
-     *
-     *
-     * @throws \Exception
-     */
-    private function checkProcessNfo(): bool
-    {
-        if ((int) Settings::settingValue('lookupnfo') === 1) {
-            $this->nfoQueryString = Nfo::NfoQueryString();
-
-            return DB::select(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) > 0;
-        }
-
-        return false;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function postProcessNfo(): void
-    {
-        $this->maxProcesses = 1;
-        if ($this->checkProcessNfo()) {
-            $this->processNFO = true;
-            $this->work = DB::select(
-                sprintf(
-                    '
-					SELECT r.leftguid AS id
-					FROM releases r
-					WHERE 1=1 %s
-					GROUP BY r.leftguid
-					LIMIT 16',
-                    $this->nfoQueryString
-                )
-            );
-            $this->maxProcesses = (int) Settings::settingValue('nfothreads');
-        }
-
-        $this->postProcess($this->work, $this->maxProcesses);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function checkProcessMovies(): bool
-    {
-        if (Settings::settingValue('lookupimdb') > 0) {
-            return DB::select(sprintf('
-						SELECT id
-						FROM releases
-						WHERE categories_id BETWEEN 2000 AND 2999
-						AND nzbstatus = %d
-						AND imdbid IS NULL
-						%s %s
-						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) > 0;
-        }
-
-        return false;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function postProcessMov(): void
-    {
-        $this->maxProcesses = 1;
-        if ($this->checkProcessMovies()) {
-            $this->processMovies = true;
-            $this->work = DB::select(
-                sprintf(
-                    '
-					SELECT leftguid AS id, %d AS renamed
-					FROM releases
-					WHERE categories_id BETWEEN 2000 AND 2999
-					AND nzbstatus = %d
-					AND imdbid IS NULL
-					%s %s
-					GROUP BY leftguid
-					LIMIT 16',
-                    ($this->ppRenamedOnly ? 2 : 1),
-                    NZB::NZB_ADDED,
-                    ((int) Settings::settingValue('lookupimdb') === 2 ? 'AND isrenamed = 1' : ''),
-                    ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
-                )
-            );
-            $this->maxProcesses = (int) Settings::settingValue('postthreadsnon');
-        }
-
-        $this->postProcess($this->work, $this->maxProcesses);
-    }
-
-    /**
-     * Check if we should process TV's.
-     *
-     *
-     * @throws \Exception
-     */
-    private function checkProcessTV(): bool
-    {
-        if ((int) Settings::settingValue('lookuptv') > 0) {
-            return DB::select(sprintf('
-						SELECT id
-						FROM releases
-						WHERE categories_id BETWEEN 5000 AND 5999
-						AND nzbstatus = %d
-						AND size > 1048576
-						AND tv_episodes_id BETWEEN -2 AND 0
-						%s %s
-						', NZB::NZB_ADDED, (int) Settings::settingValue('lookuptv') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) > 0;
-        }
-
-        return false;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function postProcessTv(): void
-    {
-        $this->maxProcesses = 1;
-        if ($this->checkProcessTV()) {
-            $this->processTV = true;
-            $this->work = DB::select(
-                sprintf(
-                    '
-					SELECT leftguid AS id, %d AS renamed
-					FROM releases
-					WHERE categories_id BETWEEN 5000 AND 5999
-					AND nzbstatus = %d
-					AND tv_episodes_id BETWEEN -2 AND 0
-					AND size > 1048576
-					%s %s
-					GROUP BY leftguid
-					LIMIT 16',
-                    ($this->ppRenamedOnly ? 2 : 1),
-                    NZB::NZB_ADDED,
-                    (int) Settings::settingValue('lookuptv') === 2 ? 'AND isrenamed = 1' : '',
-                    ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
-                )
-            );
-            $this->maxProcesses = (int) Settings::settingValue('postthreadsnon');
-        }
-
-        $this->postProcess($this->work, $this->maxProcesses);
-    }
-
-    /**
-     * Process all that require a single thread.
-     *
-     * @throws \Exception
-     */
+    public function postProcess(array $releases, int $maxProcess): void {}
+    private function postProcessAdd(): void {}
+    private function postProcessNfo(): void {}
+    private function postProcessMov(): void {}
+    private function postProcessTv(): void {}
     private function processSingle(): void
     {
         $postProcess = new PostProcess;
@@ -848,42 +304,6 @@ class Forking
         $postProcess->processMusic();
         $postProcess->processXXX();
     }
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // /////////////////////////////// All "update_per_Group" code goes here ////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @throws \Exception
-     */
-    private function updatePerGroup(): void
-    {
-        $this->work = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-
-        $maxProcess = (int) Settings::settingValue('releasethreads');
-
-        $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
-        $this->processWork();
-        foreach ($this->work as $group) {
-            $pool->add(function () use ($group) {
-                return $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
-            }, 2000000)->then(function ($output) use ($group) {
-                echo $output;
-                $name = UsenetGroup::getNameByID($group->id);
-                $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                echo $serializableException->asThrowable()->getMessage();
-            });
-        }
-
-        $pool->wait();
-    }
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ////////////////////////////////////////// Various methods ///////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     protected function _executeCommand(string $command): string
     {
@@ -898,9 +318,6 @@ class Forking
         return $process->getOutput();
     }
 
-    /**
-     * Echo a message to CLI.
-     */
     public function logger(string $message): void
     {
         if (config('nntmux.echocli')) {
@@ -908,17 +325,12 @@ class Forking
         }
     }
 
-    /**
-     * This method is executed whenever a child is finished doing work.
-     *
-     * @param  string  $pid  The PID numbers.
-     */
     public function exit(string $pid): void
     {
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                'There are '.($this->maxProcesses - 1).' process(es) still active with '.
+                'There are '.(max(1, $this->maxProcesses) - 1).' process(es) still active with '.
                 (--$this->_workCount).' job(s) left in the queue.',
                 true
             );

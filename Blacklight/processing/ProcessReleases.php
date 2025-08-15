@@ -756,7 +756,7 @@ class ProcessReleases
             if (! empty($groupID)) {
                 $collectionsCheck->where('collections.groups_id', $groupID);
             }
-            $collectionsCheck->groupBy('binaries.collections_id', 'collections.totalfiles', 'collections.id')
+            $collectionsCheck->groupBy(['binaries.collections_id', 'collections.totalfiles', 'collections.id'])
                 ->havingRaw('COUNT(binaries.id) IN (collections.totalfiles, collections.totalfiles+1)');
 
             Collection::query()->joinSub($collectionsCheck, 'r', function ($join) {
@@ -789,7 +789,7 @@ class ProcessReleases
             if (! empty($groupID)) {
                 $collectionsCheck->where('collections.groups_id', $groupID);
             }
-            $collectionsCheck->groupBy('collections.id');
+            $collectionsCheck->groupBy(['collections.id']);
 
             Collection::query()->joinSub($collectionsCheck, 'r', function ($join) {
                 $join->on('collections.id', '=', 'r.id');
@@ -928,28 +928,76 @@ class ProcessReleases
     {
         $lastRun = Settings::settingValue('last_run_time');
 
-        DB::transaction(function () use ($groupID, $lastRun) {
+        // Compute cutoff timestamp once.
+        $threshold = null;
+        try {
+            if (! empty($lastRun)) {
+                $threshold = \Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $lastRun);
+            }
+        } catch (\Throwable $e) {
             $threshold = null;
-            try {
-                if (! empty($lastRun)) {
-                    $threshold = Carbon::createFromFormat('Y-m-d H:i:s', $lastRun);
+        }
+        if ($threshold === null) {
+            $threshold = now();
+        }
+        $cutoff = $threshold->copy()->subHours($this->collectionTimeout);
+
+        $totalDeleted = 0;
+        $maxRetries = 5;
+
+        // Delete in small batches using a single-statement DELETE via nested subselect to avoid "record changed since last read".
+        do {
+            $affected = 0;
+            $attempt = 0;
+            do {
+                try {
+                    if (! empty($groupID)) {
+                        $affected = DB::affectingStatement(
+                            'DELETE FROM collections WHERE id IN (
+                                SELECT id FROM (
+                                    SELECT id FROM collections WHERE added < ? AND groups_id = ? ORDER BY id LIMIT 500
+                                ) AS x
+                            )',
+                            [$cutoff, $groupID]
+                        );
+                    } else {
+                        $affected = DB::affectingStatement(
+                            'DELETE FROM collections WHERE id IN (
+                                SELECT id FROM (
+                                    SELECT id FROM collections WHERE added < ? ORDER BY id LIMIT 500
+                                ) AS x
+                            )',
+                            [$cutoff]
+                        );
+                    }
+                    break; // success
+                } catch (\Throwable $e) {
+                    $attempt++;
+                    if ($attempt >= $maxRetries) {
+                        if ($this->echoCLI) {
+                            $this->colorCLI->error('Stuck collections delete failed after retries: '.$e->getMessage());
+                        }
+                        break;
+                    }
+                    // Exponential backoff to ease contention
+                    usleep(20000 * $attempt);
                 }
-            } catch (\Throwable $e) {
-                $threshold = null;
+            } while (true);
+
+            $totalDeleted += $affected;
+
+            if ($affected < 500) {
+                break;
             }
-            if ($threshold === null) {
-                $threshold = now();
-            }
-            $objQuery = Collection::query()
-                ->where('added', '<', $threshold->subHours($this->collectionTimeout));
-            if (! empty($groupID)) {
-                $objQuery->where('groups_id', $groupID);
-            }
-            $obj = $objQuery->delete();
-            if ($this->echoCLI && $obj > 0) {
-                $this->colorCLI->primary('Deleted '.$obj.' broken/stuck collections.', true);
-            }
-        }, 10);
+
+
+            // Yield briefly to reduce contention in busy systems.
+            usleep(10000);
+        } while (true);
+
+        if ($this->echoCLI && $totalDeleted > 0) {
+            $this->colorCLI->primary('Deleted '.$totalDeleted.' broken/stuck collections.', true);
+        }
     }
 
     /**

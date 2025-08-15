@@ -33,81 +33,111 @@ class CollectionCleanupService
                 ), true);
         }
 
-        DB::transaction(function () use (&$deletedCount, $startTime, $echoCLI) {
+        // Batch-delete old collections using a safe id-subselect to avoid read-then-delete races.
+        $cutoff = now()->subHours(Settings::settingValue('partretentionhours'));
+        $batchDeleted = 0;
+        $maxRetries = 5;
+        do {
+            $affected = 0;
+            $attempt = 0;
+            do {
+                try {
+                    // Delete by id list derived in a nested subquery to avoid "Record has changed since last read".
+                    $affected = DB::affectingStatement(
+                        'DELETE FROM collections WHERE id IN (
+                            SELECT id FROM (
+                                SELECT id FROM collections WHERE dateadded < ? ORDER BY id LIMIT 500
+                            ) AS x
+                        )',
+                        [$cutoff]
+                    );
+                    break; // success
+                } catch (\Throwable $e) {
+                    // Retry on lock/timeout errors
+                    $attempt++;
+                    if ($attempt >= $maxRetries) {
+                        if ($echoCLI) {
+                            $this->colorCLI->error('Cleanup delete failed after retries: '.$e->getMessage());
+                        }
+                        break;
+                    }
+                    usleep(20000 * $attempt);
+                }
+            } while (true);
+
+            $batchDeleted += $affected;
+            if ($affected < 500) {
+                break;
+            }
+            // Brief pause to reduce pressure on the lock manager in busy systems.
+            usleep(10000);
+        } while (true);
+
+        $deletedCount += $batchDeleted;
+
+        if ($echoCLI) {
+            $elapsed = now()->diffInSeconds($startTime, true);
+            $this->colorCLI->primary(
+                'Finished deleting '.$batchDeleted.' old collections/binaries/parts in '.
+                $elapsed.Str::plural(' second', $elapsed),
+                true
+            );
+        }
+
+        // Occasionally prune CBP orphans (low frequency to avoid heavy load).
+        if (random_int(0, 200) <= 1) {
+            if ($echoCLI) {
+                echo $this->colorCLI->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
+                    $this->colorCLI->primary('Deleting orphaned collections.');
+            }
+
             $deleted = 0;
+            // NOTE: This JOIN DELETE can be heavy; consider batching if it becomes an issue in practice.
             $deleteQuery = Collection::query()
-                ->where('dateadded', '<', now()->subHours(Settings::settingValue('partretentionhours')))
+                ->whereNull('binaries.id')
+                ->orWhereNull('parts.binaries_id')
+                ->leftJoin('binaries', 'collections.id', '=', 'binaries.collections_id')
+                ->leftJoin('parts', 'binaries.id', '=', 'parts.binaries_id')
                 ->delete();
+
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
                 $deletedCount += $deleted;
             }
-            $firstQuery = $fourthQuery = now();
 
-            $totalTime = $firstQuery->diffInSeconds($startTime, true);
-
-            if ($echoCLI) {
-                $this->colorCLI->primary(
-                    'Finished deleting '.$deleted.' old collections/binaries/parts in '.
-                    $totalTime.Str::plural(' second', $totalTime),
-                    true
-                );
-            }
-
-            if (random_int(0, 200) <= 1) {
-                if ($echoCLI) {
-                    echo $this->colorCLI->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
-                        $this->colorCLI->primary('Deleting orphaned collections.');
-                }
-
-                $deleted = 0;
-                $deleteQuery = Collection::query()
-                    ->whereNull('binaries.id')
-                    ->orWhereNull('parts.binaries_id')
-                    ->leftJoin('binaries', 'collections.id', '=', 'binaries.collections_id')
-                    ->leftJoin('parts', 'binaries.id', '=', 'parts.binaries_id')
-                    ->delete();
-
-                if ($deleteQuery > 0) {
-                    $deleted = $deleteQuery;
-                    $deletedCount += $deleted;
-                }
-
-                $totalTime = now()->diffInSeconds($firstQuery);
-
-                if ($echoCLI) {
-                    $this->colorCLI->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
-                }
-            }
+            $totalTime = now()->diffInSeconds($startTime);
 
             if ($echoCLI) {
-                $this->colorCLI->primary('Deleting collections that were missed after NZB creation.', true);
+                $this->colorCLI->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
             }
+        }
 
-            $deleted = 0;
-            $collections = Collection::query()
-                ->where('releases.nzbstatus', '=', 1)
-                ->leftJoin('releases', 'releases.id', '=', 'collections.releases_id')
-                ->select('collections.id')
-                ->get();
+        if ($echoCLI) {
+            $this->colorCLI->primary('Deleting collections that were missed after NZB creation.', true);
+        }
 
-            foreach ($collections as $collection) {
-                $deleted++;
-                Collection::query()->where('id', $collection->id)->delete();
-            }
-            $deletedCount += $deleted;
+        $deleted = 0;
+        $collections = Collection::query()
+            ->where('releases.nzbstatus', '=', 1)
+            ->leftJoin('releases', 'releases.id', '=', 'collections.releases_id')
+            ->select('collections.id')
+            ->get();
 
-            $colDelTime = now()->diffInSeconds($fourthQuery, true);
-            $totalTime = $fourthQuery->diffInSeconds($startTime, true);
+        foreach ($collections as $collection) {
+            $deleted++;
+            Collection::query()->where('id', $collection->id)->delete();
+        }
+        $deletedCount += $deleted;
 
-            if ($echoCLI) {
-                $this->colorCLI->primary(
-                    'Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).
-                    PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime),
-                    true
-                );
-            }
-        }, 10);
+        $totalTime = now()->diffInSeconds($startTime, true);
+
+        if ($echoCLI) {
+            $this->colorCLI->primary(
+                'Finished deleting '.$deleted.' collections missed after NZB creation in '.($totalTime).Str::plural(' second', $totalTime).
+                PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime),
+                true
+            );
+        }
 
         return $deletedCount;
     }
