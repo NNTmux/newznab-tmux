@@ -18,14 +18,28 @@ class BinariesRunner extends BaseRunner
         );
 
         $maxProcesses = (int) Settings::settingValue('binarythreads');
-        $pool = $this->createPool($maxProcesses);
 
         $count = count($work);
-        if ($count > 0) {
-            $this->headerStart('binaries', $count, $maxProcesses);
-        } else {
+        if ($count === 0) {
             $this->headerNone();
+
+            return;
         }
+
+        // Streaming mode
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($work as $group) {
+                $commands[] = PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max;
+            }
+            $this->runStreamingCommands($commands, $maxProcesses, 'binaries');
+
+            return;
+        }
+
+        $pool = $this->createPool($maxProcesses);
+
+        $this->headerStart('binaries', $count, $maxProcesses);
 
         $taskNum = $count;
         foreach ($work as $group) {
@@ -97,6 +111,17 @@ class BinariesRunner extends BaseRunner
                     }
                 }
             }
+        }
+
+        // Streaming mode
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($queues as $queue) {
+                $commands[] = $this->buildDnrCommand($queue);
+            }
+            $this->runStreamingCommands($commands, $maxProcesses, 'safe_binaries');
+
+            return;
         }
 
         $pool = $this->createPool($maxProcesses);

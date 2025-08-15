@@ -15,6 +15,7 @@ return [
     'admin_password' => env('ADMIN_PASS', 'admin'),
     'admin_email' => env('ADMIN_EMAIL', 'admin@example.com'),
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
+    'stream_fork_output' => env('STREAM_FORK_OUTPUT', false),
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'purge_inactive_users_days' => env('PURGE_INACTIVE_USERS_DAYS', 180),
     'elasticsearch_enabled' => env('ELASTICSEARCH_ENABLED', false),

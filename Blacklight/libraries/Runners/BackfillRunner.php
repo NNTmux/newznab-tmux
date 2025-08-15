@@ -19,14 +19,28 @@ class BackfillRunner extends BaseRunner
         $work = DB::select($select);
 
         $maxProcesses = (int) Settings::settingValue('backfillthreads');
-        $pool = $this->createPool($maxProcesses);
 
         $count = count($work);
-        if ($count > 0) {
-            $this->headerStart('backfill', $count, $maxProcesses);
-        } else {
+        if ($count === 0) {
             $this->headerNone();
+
+            return;
         }
+
+        // Streaming mode
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($work as $group) {
+                $commands[] = PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
+            }
+            $this->runStreamingCommands($commands, $maxProcesses, 'backfill');
+
+            return;
+        }
+
+        $pool = $this->createPool($maxProcesses);
+
+        $this->headerStart('backfill', $count, $maxProcesses);
 
         $taskNum = $count;
         foreach ($work as $group) {
@@ -116,6 +130,17 @@ class BackfillRunner extends BaseRunner
         $queues = [];
         for ($i = 0; $i <= $getEach - 1; $i++) {
             $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $groupName, $data[0]->our_first - $i * $maxMessages - $maxMessages, $data[0]->our_first - $i * $maxMessages - 1, $i + 1);
+        }
+
+        // Streaming mode
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($queues as $queue) {
+                $commands[] = $this->buildDnrCommand($queue);
+            }
+            $this->runStreamingCommands($commands, $threads, 'safe_backfill');
+
+            return;
         }
 
         $pool = $this->createPool($threads);

@@ -29,14 +29,27 @@ class ReleasesRunner extends BaseRunner
             }
         }
 
+        $count = count($uGroups);
+        if ($count === 0) {
+            $this->headerNone();
+
+            return;
+        }
+
+        // Streaming mode
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($uGroups as $group) {
+                $commands[] = $this->buildDnrCommand('releases  '.$group['id']);
+            }
+            $this->runStreamingCommands($commands, $maxProcesses, 'releases');
+
+            return;
+        }
+
         $pool = $this->createPool($maxProcesses);
 
-        $count = count($uGroups);
-        if ($count > 0) {
-            $this->headerStart('releases', $count, $maxProcesses);
-        } else {
-            $this->headerNone();
-        }
+        $this->headerStart('releases', $count, $maxProcesses);
 
         $taskNum = $count;
         foreach ($uGroups as $group) {
@@ -61,8 +74,26 @@ class ReleasesRunner extends BaseRunner
         $groups = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
         $maxProcesses = (int) Settings::settingValue('releasethreads');
 
+        $count = count($groups);
+        if ($count === 0) {
+            $this->headerNone();
+
+            return;
+        }
+
+        // Streaming mode
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($groups as $group) {
+                $commands[] = $this->buildDnrCommand('update_per_group  '.$group->id);
+            }
+            $this->runStreamingCommands($commands, $maxProcesses, 'update_per_group');
+
+            return;
+        }
+
         $pool = $this->createPool($maxProcesses);
-        $this->headerStart('update_per_group', count($groups), $maxProcesses);
+        $this->headerStart('update_per_group', $count, $maxProcesses);
 
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
@@ -107,14 +138,27 @@ class ReleasesRunner extends BaseRunner
             }
         }
 
+        $count = count($queues);
+        if ($count === 0) {
+            $this->headerNone();
+
+            return;
+        }
+
+        // Streaming mode
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($queues as $queue) {
+                $commands[] = PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'" true';
+            }
+            $this->runStreamingCommands($commands, $maxThreads, 'fixRelNames_'.$mode);
+
+            return;
+        }
+
         $pool = $this->createPool($maxThreads);
 
-        $count = count($queues);
-        if ($count > 0) {
-            $this->headerStart('fixRelNames_'.$mode, $count, $maxThreads);
-        } else {
-            $this->headerNone();
-        }
+        $this->headerStart('fixRelNames_'.$mode, $count, $maxThreads);
 
         $taskNum = $count;
         foreach ($queues as $queue) {

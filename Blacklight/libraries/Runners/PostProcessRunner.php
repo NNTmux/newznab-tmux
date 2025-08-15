@@ -17,6 +17,19 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
+        // If streaming is enabled, run commands with real-time output
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($releases as $release) {
+                // id may already be a single GUID bucket char; if not, take first char defensively
+                $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+                $commands[] = PHP_BINARY.' misc/update/postprocess.php '.$type.$char;
+            }
+            $this->runStreamingCommands($commands, $maxProcesses, $desc);
+
+            return;
+        }
+
         $pool = $this->createPool($maxProcesses);
         $count = count($releases);
         $this->headerStart('postprocess: '.$desc, $count, $maxProcesses);
