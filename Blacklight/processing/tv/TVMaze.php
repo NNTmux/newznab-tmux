@@ -39,7 +39,7 @@ class TVMaze extends TV
     /**
      * Fetch banner from site.
      */
-    public function getBanner($videoId, $siteId): bool
+    public function getBanner($videoID, $siteId): bool
     {
         return false;
     }
@@ -240,6 +240,8 @@ class TVMaze extends TV
     }
 
     /**
+     * Attempts to find the best matching show by title or aliases.
+     *
      * @return array|false
      */
     private function matchShowInfo(array $shows, $cleanName)
@@ -250,32 +252,45 @@ class TVMaze extends TV
 
         foreach ($shows as $show) {
             if ($this->checkRequiredAttr($show, 'tvmazeS')) {
-                // Check for exact title match first and then terminate if found
-                if (strtolower($show->name) === strtolower($cleanName)) {
+                // Exact title match
+                if (strcasecmp($show->name, $cleanName) === 0) {
                     $highest = $show;
+                    $highestMatch = 100;
                     break;
                 }
-                // Check each show title for similarity and then find the highest similar value
-                $matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
 
-                // If new match has a higher percentage, set as new matched title
+                // Title similarity
+                $matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
                 if ($matchPercent > $highestMatch) {
                     $highestMatch = $matchPercent;
                     $highest = $show;
                 }
 
-                // Check for show aliases and try match those too
-                if (\is_array($show->akas) && ! empty($show->akas)) {
-                    foreach ($show->akas as $key => $aka) {
-                        $matchPercent = $this->checkMatch(strtolower($aka['name']), strtolower($cleanName), $matchPercent);
-                        if ($matchPercent > $highestMatch) {
-                            $highestMatch = $matchPercent;
+                // Alias matches
+                if (is_array($show->akas) && !empty($show->akas)) {
+                    foreach ($show->akas as $aka) {
+                        if (!isset($aka['name'])) {
+                            continue;
+                        }
+
+                        // Exact alias match
+                        if (strcasecmp($aka['name'], $cleanName) === 0) {
+                            $highest = $show;
+                            $highestMatch = 100;
+                            break 2;
+                        }
+
+                        // Alias similarity
+                        $aliasPercent = $this->checkMatch(strtolower($aka['name']), strtolower($cleanName), self::MATCH_PROBABILITY);
+                        if ($aliasPercent > $highestMatch) {
+                            $highestMatch = $aliasPercent;
                             $highest = $show;
                         }
                     }
                 }
             }
         }
+
         if ($highest !== null) {
             $return = $this->formatShowInfo($highest);
         }

@@ -422,14 +422,14 @@ abstract class TV extends Videos
         $following = '[^a-z0-9]([(|\[]\w+[)|\]]\s)*?(\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080|2160)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][\-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[\-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
 
         // For names that don't start with the title.
-        if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $hits)) {
+        if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)' . $following . '/i', $relname, $hits)) {
             $showName = $hits['name'];
-        } elseif (preg_match('/^(?P<name>[\w+][\s\w\'.-]*?)'.$following.'/i', $relname, $hits)) {
+        } elseif (preg_match('/^(?P<name>[\w+][\s\w\'\.\-]*?)' . $following . '/i', $relname, $hits)) {
             // For names that start with the title.
             $showName = $hits['name'];
         }
         // If we still have any of the words in $following, remove them.
-        $showName = preg_replace('/'.$following.'/i', ' ', $showName);
+        $showName = preg_replace('/' . $following . '/i', ' ', $showName);
         // Remove leading date if present
         $showName = preg_replace('/^\d{6}/', '', $showName);
         // Remove periods, underscored, anything between parenthesis.
@@ -641,7 +641,8 @@ abstract class TV extends Videos
                 $required = ['name', 'season', 'number', 'airdate', 'summary'];
                 break;
             case 'tmdbS':
-                $required = ['id', 'original_name', 'overview', 'first_air_date', 'origin_country'];
+                // TMDB search results use 'name' for the primary title; prefer it over 'original_name'
+                $required = ['id', 'name', 'overview', 'first_air_date', 'origin_country'];
                 break;
             case 'tmdbE':
                 $required = ['name', 'season_number', 'episode_number', 'air_date', 'overview'];
@@ -650,7 +651,8 @@ abstract class TV extends Videos
                 $required = ['title', 'ids', 'overview', 'first_aired', 'airs', 'country'];
                 break;
             case 'traktE':
-                $required = ['title', 'season', 'episode', 'overview', 'first_aired'];
+                // Trakt uses 'number' for the episode number in episode summaries
+                $required = ['title', 'season', 'number', 'overview', 'first_aired'];
                 break;
         }
 

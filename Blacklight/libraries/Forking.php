@@ -221,7 +221,11 @@ class Forking
 
             case 'postProcess_tv':
                 $renamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
-                $this->postProcessRunner->processTv($renamedOnly);
+                if ($this->postProcessRunner->hasTvWork($renamedOnly)) {
+                    $this->postProcessRunner->processTv($renamedOnly);
+                } else {
+                    $this->logger('No TV work to do.');
+                }
                 break;
 
             case 'safe_backfill':

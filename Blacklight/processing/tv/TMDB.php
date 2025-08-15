@@ -243,7 +243,8 @@ class TMDB extends TV
                 foreach ($showAlternativeTitles['results'] as $aka) {
                     $highest['alternative_titles'][] = $aka['title'];
                 }
-                $highest['network'] = $show['networks'][0]['name'] ?? '';
+                // Use available network info if present
+                $highest['network'] = $highest['networks'][0]['name'] ?? '';
                 $highest['external_ids'] = $showExternalIds;
             }
             $return = $this->formatShowInfo($highest);
@@ -287,6 +288,27 @@ class TMDB extends TV
         $return = false;
 
         try {
+            if ($videoId > 0 && (int) $season === -1 && (int) $episode === -1) {
+                // Bulk fetch all episodes for all seasons and insert
+                $tvDetails = TmdbClient::getTvApi()->getTvshow($tmdbid);
+                if (\is_array($tvDetails) && ! empty($tvDetails['seasons'])) {
+                    foreach ($tvDetails['seasons'] as $seasonInfo) {
+                        if (! empty($seasonInfo['season_number']) && $seasonInfo['season_number'] > 0) {
+                            $seasonData = TmdbClient::getTvSeasonApi()->getSeason($tmdbid, $seasonInfo['season_number']);
+                            sleep(1);
+                            if (\is_array($seasonData) && ! empty($seasonData['episodes'])) {
+                                foreach ($seasonData['episodes'] as $ep) {
+                                    if ($this->checkRequiredAttr($ep, 'tmdbE')) {
+                                        $this->addEpisode($videoId, $this->formatEpisodeInfo($ep));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
             $response = TmdbClient::getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
         } catch (TmdbApiException $e) {
             return false;
@@ -308,7 +330,10 @@ class TMDB extends TV
      */
     protected function formatShowInfo($show): array
     {
-        $this->posterUrl = isset($show['poster_path']) ? 'https://image.tmdb.org/t/p'.$show['poster_path'] : '';
+        // Prefer a reasonable default size for posters if we only have a path
+        $this->posterUrl = isset($show['poster_path']) && $show['poster_path'] !== ''
+            ? 'https://image.tmdb.org/t/p/w500'.$show['poster_path']
+            : '';
 
         if (isset($show['external_ids']['imdb_id'])) {
             preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['external_ids']['imdb_id'], $imdb);

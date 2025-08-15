@@ -92,6 +92,11 @@ class ReleaseImage
      */
     public function saveImage(string $imgName, string $imgLoc, string $imgSavePath, int $imgMaxWidth = 0, int $imgMaxHeight = 0, bool $saveThumb = false): int
     {
+        // Guard against empty image locations to avoid 'Path cannot be empty'
+        if (empty($imgLoc)) {
+            return 0;
+        }
+
         $cover = $this->fetchImage($imgLoc);
 
         if ($cover === false) {

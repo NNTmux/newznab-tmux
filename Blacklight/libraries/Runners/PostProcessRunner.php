@@ -22,8 +22,9 @@ class PostProcessRunner extends BaseRunner
         $this->headerStart('postprocess: '.$desc, $count, $maxProcesses);
 
         foreach ($releases as $release) {
-            $pool->add(function () use ($release, $type) {
-                return $this->executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$release->id);
+            $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+            $pool->add(function () use ($char, $type) {
+                return $this->executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$char);
             }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$count, $desc) {
                 echo $output;
                 $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
@@ -48,7 +49,7 @@ class PostProcessRunner extends BaseRunner
         $ppAddMaxSize = ($ppAddMaxSize > 0 ? ('AND r.size < '.($ppAddMaxSize * 1073741824)) : '');
 
         $sql = '
-            SELECT r.leftguid AS id
+            SELECT DISTINCT LEFT(r.leftguid, 1) AS id
             FROM releases r
             LEFT JOIN categories c ON c.id = r.categories_id
             WHERE r.nzbstatus = '.NZB::NZB_ADDED.'
@@ -56,7 +57,6 @@ class PostProcessRunner extends BaseRunner
             AND r.haspreview = -1
             AND c.disablepreview = 0
             '.$ppAddMaxSize.' '.$ppAddMinSize.'
-            GROUP BY r.leftguid
             LIMIT 16';
         $queue = DB::select($sql);
 
@@ -82,10 +82,9 @@ class PostProcessRunner extends BaseRunner
         }
 
         $sql = '
-            SELECT r.leftguid AS id
+            SELECT DISTINCT LEFT(r.leftguid, 1) AS id
             FROM releases r
             WHERE 1=1 '.$nfoQuery.'
-            GROUP BY r.leftguid
             LIMIT 16';
         $queue = DB::select($sql);
 
@@ -120,13 +119,12 @@ class PostProcessRunner extends BaseRunner
 
         $renamedFlag = ($renamedOnly ? 2 : 1);
         $sql = '
-            SELECT leftguid AS id, '.$renamedFlag.' AS renamed
+            SELECT DISTINCT LEFT(leftguid, 1) AS id, '.$renamedFlag.' AS renamed
             FROM releases
             WHERE categories_id BETWEEN 2000 AND 2999
             AND nzbstatus = '.NZB::NZB_ADDED.'
             AND imdbid IS NULL
             '.$condLookup.' '.$condRenamedOnly.'
-            GROUP BY leftguid
             LIMIT 16';
         $queue = DB::select($sql);
 
@@ -149,10 +147,13 @@ class PostProcessRunner extends BaseRunner
             SELECT id
             FROM releases
             WHERE categories_id BETWEEN 5000 AND 5999
+            AND categories_id != 5070
             AND nzbstatus = '.NZB::NZB_ADDED.'
+            AND videos_id = 0
             AND size > 1048576
-            AND tv_episodes_id BETWEEN -2 AND 0
-            '.$condLookup.' '.$condRenamedOnly;
+            AND tv_episodes_id BETWEEN -3 AND 0
+            '.$condLookup.' '.$condRenamedOnly.'
+            LIMIT 1';
         if (count(DB::select($checkSql)) === 0) {
             $this->headerNone();
 
@@ -161,18 +162,46 @@ class PostProcessRunner extends BaseRunner
 
         $renamedFlag = ($renamedOnly ? 2 : 1);
         $sql = '
-            SELECT leftguid AS id, '.$renamedFlag.' AS renamed
+            SELECT DISTINCT LEFT(leftguid, 1) AS id, '.$renamedFlag.' AS renamed
             FROM releases
             WHERE categories_id BETWEEN 5000 AND 5999
+            AND categories_id != 5070
             AND nzbstatus = '.NZB::NZB_ADDED.'
-            AND tv_episodes_id BETWEEN -2 AND 0
+            AND videos_id = 0
+            AND tv_episodes_id BETWEEN -3 AND 0
             AND size > 1048576
             '.$condLookup.' '.$condRenamedOnly.'
-            GROUP BY leftguid
             LIMIT 16';
         $queue = DB::select($sql);
 
         $maxProcesses = (int) Settings::settingValue('postthreadsnon');
         $this->runPostProcess($queue, $maxProcesses, 'tv true ', 'tv postprocessing');
+    }
+
+    /**
+     * Lightweight check to determine if there is any TV work to process.
+     */
+    public function hasTvWork(bool $renamedOnly): bool
+    {
+        if ((int) Settings::settingValue('lookuptv') <= 0) {
+            return false;
+        }
+
+        $condLookup = ((int) Settings::settingValue('lookuptv') === 2 ? 'AND isrenamed = 1' : '');
+        $condRenamedOnly = ($renamedOnly ? 'AND isrenamed = 1' : '');
+
+        $checkSql = '
+            SELECT id
+            FROM releases
+            WHERE categories_id BETWEEN 5000 AND 5999
+            AND categories_id != 5070
+            AND nzbstatus = '.NZB::NZB_ADDED.'
+            AND videos_id = 0
+            AND size > 1048576
+            AND tv_episodes_id BETWEEN -3 AND 0
+            '.$condLookup.' '.$condRenamedOnly.'
+            LIMIT 1';
+
+        return count(DB::select($checkSql)) > 0;
     }
 }

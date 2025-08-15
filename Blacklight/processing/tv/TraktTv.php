@@ -111,7 +111,7 @@ class TraktTv extends TV
                         }
                     } else {
                         if ($this->echooutput) {
-                            $this->colorCli->climate()->info('Found local TMDB match for: '.$release['cleanname']);
+                            $this->colorCli->climate()->info('Found local TRAKT match for: '.$release['cleanname']);
                             $this->colorCli->climate()->info(' Attempting episode lookup!');
                         }
                         $traktid = $this->getSiteIDFromVideoID('trakt', $videoId);
@@ -177,7 +177,7 @@ class TraktTv extends TV
     /**
      * Fetch banner from site.
      */
-    public function getBanner($videoId, $siteId): bool
+    public function getBanner($videoID, $siteId): bool
     {
         return false;
     }
@@ -320,8 +320,9 @@ class TraktTv extends TV
         return [
             'title' => (string) $episode['title'],
             'series' => (int) $episode['season'],
-            'episode' => (int) $episode['epsiode'],
-            'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', $episode['episode']),
+            // Prefer the Trakt 'number' field for episode number, fall back to 'episode' if present
+            'episode' => (int) ($episode['number'] ?? ($episode['episode'] ?? 0)),
+            'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', ($episode['number'] ?? ($episode['episode'] ?? 0))),
             'firstaired' => Carbon::parse($episode['first_aired'], $this->localizedTZ)->format('Y-m-d'),
             'summary' => (string) $episode['overview'],
         ];

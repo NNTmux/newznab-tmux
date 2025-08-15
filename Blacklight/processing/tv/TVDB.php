@@ -2,8 +2,17 @@
 
 namespace Blacklight\processing\tv;
 
-use Blacklight\libraries\FanartTV;
 use Blacklight\ReleaseImage;
+use Blacklight\libraries\FanartTV;
+use Blacklight\ReleaseImage as ReleaseImageAlias;
+use Blacklight\ReleaseImage as ReleaseImageClass;
+use Blacklight\ReleaseImage as ReleaseImageType;
+use Blacklight\ReleaseImage as RI;
+use Blacklight\ReleaseImage as RImage;
+use Blacklight\ReleaseImage as RelImage;
+use Blacklight\ReleaseImage as RlsImage;
+use Blacklight\ReleaseImage as Img;
+use Blacklight\ReleaseImage as PosterSaver;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
@@ -133,9 +142,12 @@ class TVDB extends TV
                         $this->getPoster($videoId);
                     } else { // Check Fanart.tv for poster
                         $poster = $this->fanart->getTVFanArt($tvDbId);
-                        if ($poster) {
-                            $this->posterUrl = collect($poster['tvposter'])->sortByDesc('likes')[0]['url'];
-                            $this->getPoster($videoId);
+                        if (is_array($poster) && ! empty($poster['tvposter'])) {
+                            $best = collect($poster['tvposter'])->sortByDesc('likes')->first();
+                            if (! empty($best['url'])) {
+                                $this->posterUrl = $best['url'];
+                                $this->getPoster($videoId);
+                            }
                         }
                     }
 
@@ -252,10 +264,10 @@ class TVDB extends TV
 
                     // Check for show aliases and try match those too
                     if (! empty($show->aliases)) {
-                        foreach ($show->aliases as $key => $name) {
-                            $matchPercent = $this->checkMatch(strtolower($name), strtolower($name), $matchPercent);
-                            if ($matchPercent > $highestMatch) {
-                                $highestMatch = $matchPercent;
+                        foreach ($show->aliases as $akaIndex => $akaName) {
+                            $aliasPercent = $this->checkMatch(strtolower($akaName), strtolower($name), self::MATCH_PROBABILITY);
+                            if ($aliasPercent > $highestMatch) {
+                                $highestMatch = $aliasPercent;
                                 $highest = $show;
                             }
                         }
@@ -279,11 +291,15 @@ class TVDB extends TV
     {
         $ri = new ReleaseImage;
 
-        // Try to get the Poster
-        $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
-        // Mark it retrieved if we saved an image
-        if ($hasCover === 1) {
-            $this->setCoverFound($videoId);
+        $hasCover = 0;
+
+        // Try to get the Poster only if we have a non-empty URL
+        if (! empty($this->posterUrl)) {
+            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+            // Mark it retrieved if we saved an image
+            if ($hasCover === 1) {
+                $this->setCoverFound($videoId);
+            }
         }
 
         return $hasCover;
