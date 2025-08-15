@@ -65,6 +65,7 @@ class BinariesRunner extends BaseRunner
 
         if (empty($groups)) {
             $this->headerNone();
+
             return;
         }
 
@@ -106,7 +107,7 @@ class BinariesRunner extends BaseRunner
             $pool->add(function () use ($queue) {
                 return $this->executeCommand($this->buildDnrCommand($queue));
             }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use ($hit) {
-                if (!empty($hit)) {
+                if (! empty($hit)) {
                     echo $output;
                     $this->colorCli->primary('Updated group '.$hit[0]);
                 }

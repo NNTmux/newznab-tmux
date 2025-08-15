@@ -59,11 +59,16 @@ class BackfillRunner extends BaseRunner
 
         $orderby = 'ORDER BY a.last_record ASC';
         switch ($backfill_order) {
-            case 1: $orderby = 'ORDER BY first_record_postdate DESC'; break;
-            case 2: $orderby = 'ORDER BY first_record_postdate ASC'; break;
-            case 3: $orderby = 'ORDER BY name ASC'; break;
-            case 4: $orderby = 'ORDER BY name DESC'; break;
-            case 5: $orderby = 'ORDER BY a.last_record DESC'; break;
+            case 1: $orderby = 'ORDER BY first_record_postdate DESC';
+                break;
+            case 2: $orderby = 'ORDER BY first_record_postdate ASC';
+                break;
+            case 3: $orderby = 'ORDER BY name ASC';
+                break;
+            case 4: $orderby = 'ORDER BY name DESC';
+                break;
+            case 5: $orderby = 'ORDER BY a.last_record DESC';
+                break;
         }
 
         $backfilldays = '0';
@@ -90,7 +95,7 @@ class BackfillRunner extends BaseRunner
 
         $groupName = '';
         $count = 0;
-        if (!empty($data) && isset($data[0]->name)) {
+        if (! empty($data) && isset($data[0]->name)) {
             $groupName = $data[0]->name;
             $count = ($data[0]->our_first - $data[0]->their_first);
         }
@@ -100,6 +105,7 @@ class BackfillRunner extends BaseRunner
             if (config('nntmux.echocli') && $groupName !== '') {
                 $this->colorCli->primary('No backfill needed for group '.$groupName);
             }
+
             return;
         }
 

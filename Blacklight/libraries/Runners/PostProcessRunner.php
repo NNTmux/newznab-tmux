@@ -4,8 +4,8 @@ namespace Blacklight\libraries\Runners;
 
 use App\Models\Settings;
 use Blacklight\NZB;
-use Spatie\Async\Output\SerializableException;
 use Illuminate\Support\Facades\DB;
+use Spatie\Async\Output\SerializableException;
 
 class PostProcessRunner extends BaseRunner
 {
@@ -13,6 +13,7 @@ class PostProcessRunner extends BaseRunner
     {
         if (empty($releases)) {
             $this->headerNone();
+
             return;
         }
 
@@ -67,6 +68,7 @@ class PostProcessRunner extends BaseRunner
     {
         if ((int) Settings::settingValue('lookupnfo') !== 1) {
             $this->headerNone();
+
             return;
         }
 
@@ -75,6 +77,7 @@ class PostProcessRunner extends BaseRunner
         $checkSql = 'SELECT r.id FROM releases r WHERE 1=1 '.$nfoQuery.' LIMIT 1';
         if (count(DB::select($checkSql)) === 0) {
             $this->headerNone();
+
             return;
         }
 
@@ -94,6 +97,7 @@ class PostProcessRunner extends BaseRunner
     {
         if ((int) Settings::settingValue('lookupimdb') <= 0) {
             $this->headerNone();
+
             return;
         }
 
@@ -110,6 +114,7 @@ class PostProcessRunner extends BaseRunner
             LIMIT 1';
         if (count(DB::select($checkSql)) === 0) {
             $this->headerNone();
+
             return;
         }
 
@@ -133,6 +138,7 @@ class PostProcessRunner extends BaseRunner
     {
         if ((int) Settings::settingValue('lookuptv') <= 0) {
             $this->headerNone();
+
             return;
         }
 
@@ -149,6 +155,7 @@ class PostProcessRunner extends BaseRunner
             '.$condLookup.' '.$condRenamedOnly;
         if (count(DB::select($checkSql)) === 0) {
             $this->headerNone();
+
             return;
         }
 

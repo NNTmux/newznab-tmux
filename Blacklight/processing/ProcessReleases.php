@@ -18,7 +18,6 @@ use Blacklight\NZB;
 use Blacklight\ReleaseCleaning;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -989,7 +988,6 @@ class ProcessReleases
             if ($affected < 500) {
                 break;
             }
-
 
             // Yield briefly to reduce contention in busy systems.
             usleep(10000);

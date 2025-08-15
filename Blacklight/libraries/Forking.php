@@ -3,19 +3,14 @@
 namespace Blacklight\libraries;
 
 use App\Models\Settings;
-use App\Models\UsenetGroup;
 use Blacklight\ColorCLI;
-use Blacklight\Nfo;
-use Blacklight\NZB;
 use Blacklight\libraries\Runners\BackfillRunner;
 use Blacklight\libraries\Runners\BinariesRunner;
 use Blacklight\libraries\Runners\PostProcessRunner;
 use Blacklight\libraries\Runners\ReleasesRunner;
+use Blacklight\Nfo;
 use Blacklight\processing\PostProcess;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Spatie\Async\Output\SerializableException;
 use Spatie\Async\Pool;
 use Symfony\Component\Process\Process;
 
@@ -94,8 +89,11 @@ class Forking
 
     /** Runners **/
     private BackfillRunner $backfillRunner;
+
     private BinariesRunner $binariesRunner;
+
     private ReleasesRunner $releasesRunner;
+
     private PostProcessRunner $postProcessRunner;
 
     /**
@@ -164,6 +162,7 @@ class Forking
     private function createPool(int $concurrency): Pool
     {
         $concurrency = max(1, $concurrency);
+
         return Pool::create()
             ->concurrency($concurrency)
             ->timeout(config('nntmux.multiprocessing_max_child_time'));
@@ -268,7 +267,7 @@ class Forking
         foreach ($groups as $g) {
             try {
                 $q = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $g->id));
-                if (!empty($q)) {
+                if (! empty($q)) {
                     $count++;
                 }
             } catch (\PDOException $e) {
@@ -277,6 +276,7 @@ class Forking
                 }
             }
         }
+
         return $count;
     }
 
@@ -284,17 +284,27 @@ class Forking
     // but are not used when processWorkType delegates to runner classes.
 
     private function backfill(): void {}
+
     private function safeBackfill(): void {}
+
     private function binaries(): void {}
+
     private function safeBinaries(): void {}
+
     private function fixRelNames(): void {}
+
     private function releases(): void {}
 
     public function postProcess(array $releases, int $maxProcess): void {}
+
     private function postProcessAdd(): void {}
+
     private function postProcessNfo(): void {}
+
     private function postProcessMov(): void {}
+
     private function postProcessTv(): void {}
+
     private function processSingle(): void
     {
         $postProcess = new PostProcess;

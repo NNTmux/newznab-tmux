@@ -14,12 +14,13 @@ abstract class BaseRunner
 
     public function __construct(?ColorCLI $colorCli = null)
     {
-        $this->colorCli = $colorCli ?? new ColorCLI();
+        $this->colorCli = $colorCli ?? new ColorCLI;
     }
 
     protected function createPool(int $concurrency): Pool
     {
         $concurrency = max(1, $concurrency);
+
         return Pool::create()
             ->concurrency($concurrency)
             ->timeout(config('nntmux.multiprocessing_max_child_time'));
@@ -28,6 +29,7 @@ abstract class BaseRunner
     protected function buildDnrCommand(string $args): string
     {
         $dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
+
         return $dnr_path.$args.'"';
     }
 
@@ -40,6 +42,7 @@ abstract class BaseRunner
                 echo $buffer;
             }
         });
+
         return $process->getOutput();
     }
 
