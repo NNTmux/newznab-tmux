@@ -4,15 +4,11 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Release;
-use App\Services\TempWorkspaceService;
 use Blacklight\Categorize;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
-use Blacklight\NameFixer;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
-use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -35,8 +31,7 @@ class MediaProcessingService
         private readonly ManticoreSearch $manticore,
         private readonly ElasticSearchSiteSearch $elasticsearch,
         private readonly Categorize $categorize,
-    ) {
-    }
+    ) {}
 
     public function getVideoTime(string $videoLocation): string
     {
@@ -66,6 +61,7 @@ class MediaProcessingService
                 $numbers[2]--;
                 $numbers[3] = '99';
             }
+
             return '00:00:'.str_pad((string) $numbers[2], 2, '0', STR_PAD_LEFT).'.'.str_pad((string) $numbers[3], 2, '0', STR_PAD_LEFT);
         }
 
@@ -81,6 +77,7 @@ class MediaProcessingService
                     $hund = 99;
                 }
             }
+
             return '00:00:'.str_pad((string) $sec, 2, '0', STR_PAD_LEFT).'.'.str_pad((string) $hund, 2, '0', STR_PAD_LEFT);
         }
 
@@ -94,6 +91,7 @@ class MediaProcessingService
             $whole = (int) floor($seconds);
             $hund = (int) round(($seconds - $whole) * 100);
             $hund = min($hund, 99);
+
             return '00:00:'.str_pad((string) $whole, 2, '0', STR_PAD_LEFT).'.'.str_pad((string) $hund, 2, '0', STR_PAD_LEFT);
         }
 
@@ -112,6 +110,7 @@ class MediaProcessingService
         if ($saved) {
             Release::query()->where('guid', $guid)->update(['jpgstatus' => 1]);
         }
+
         return $saved;
     }
 
@@ -150,6 +149,7 @@ class MediaProcessingService
         if ($saved === 1) {
             return true;
         }
+
         return false;
     }
 
@@ -221,6 +221,7 @@ class MediaProcessingService
         }
         @chmod($newFile, 0764);
         Release::query()->where('guid', $guid)->update(['videostatus' => 1]);
+
         return true;
     }
 
@@ -233,9 +234,11 @@ class MediaProcessingService
             $xmlArray = $this->mediaInfo->getInfo($fileLocation, true);
             \App\Models\MediaInfo::addData($releaseId, $xmlArray);
             $this->releaseExtra->addFromXml($releaseId, $xmlArray);
+
             return true;
         } catch (\Throwable $e) {
             Log::debug($e->getMessage());
+
             return false;
         }
     }
@@ -324,4 +327,3 @@ class MediaProcessingService
         return ['info' => $retVal, 'sample' => $audVal];
     }
 }
-

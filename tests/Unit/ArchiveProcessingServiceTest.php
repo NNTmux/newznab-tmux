@@ -10,14 +10,14 @@ use PHPUnit\Framework\TestCase;
 
 class ArchiveProcessingServiceTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
     }
 
     #[WithoutErrorHandler]
-    public function testAnalyzeOkNotEncrypted(): void
+    public function test_analyze_ok_not_encrypted(): void
     {
         $ai = Mockery::mock(ArchiveInfo::class);
         $ai->shouldReceive('setData')->once()->andReturn(true);
@@ -33,7 +33,7 @@ class ArchiveProcessingServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testAnalyzeEncryptedViaSummaryFlag(): void
+    public function test_analyze_encrypted_via_summary_flag(): void
     {
         $ai = Mockery::mock(ArchiveInfo::class);
         $ai->shouldReceive('setData')->once()->andReturn(true);
@@ -48,7 +48,7 @@ class ArchiveProcessingServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testAnalyzeErrorWhenSetDataFails(): void
+    public function test_analyze_error_when_set_data_fails(): void
     {
         $ai = Mockery::mock(ArchiveInfo::class);
         $ai->shouldReceive('setData')->once()->andReturn(false);
@@ -62,7 +62,7 @@ class ArchiveProcessingServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testGettersProxyToArchiveInfo(): void
+    public function test_getters_proxy_to_archive_info(): void
     {
         $ai = Mockery::mock(ArchiveInfo::class);
         $ai->shouldReceive('getArchiveFileList')->once()->andReturn([['name' => 'file.txt']]);

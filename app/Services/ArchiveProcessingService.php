@@ -6,9 +6,7 @@ use dariusiii\rarinfo\ArchiveInfo;
 
 class ArchiveProcessingService
 {
-    public function __construct(private readonly ArchiveInfo $archiveInfo)
-    {
-    }
+    public function __construct(private readonly ArchiveInfo $archiveInfo) {}
 
     /**
      * Analyze compressed data (RAR/ZIP/etc.).
@@ -25,6 +23,7 @@ class ArchiveProcessingService
         }
         $summary = $this->archiveInfo->getSummary(true);
         $isEncrypted = ! empty($this->archiveInfo->isEncrypted) || (isset($summary['is_encrypted']) && (int) $summary['is_encrypted'] !== 0);
+
         return ['ok' => true, 'error' => null, 'summary' => $summary, 'is_encrypted' => $isEncrypted];
     }
 
@@ -52,4 +51,3 @@ class ArchiveProcessingService
         return $this->archiveInfo->extractFile($name, $destPath);
     }
 }
-

@@ -14,7 +14,7 @@ class TempWorkspaceService
     public function ensureMainTempPath(string $basePath, string $guidChar = '', string $groupID = ''): string
     {
         // Normalize separator at end
-        if (! Str::endsWith($basePath, ['/','\\'])) {
+        if (! Str::endsWith($basePath, ['/', '\\'])) {
             $basePath .= '/';
         }
 
@@ -47,6 +47,7 @@ class TempWorkspaceService
                 }
             }
         }
+
         return $tmpPath;
     }
 
@@ -103,6 +104,7 @@ class TempWorkspaceService
                     $filtered[] = $matches;
                 }
             }
+
             return $filtered;
         }
 

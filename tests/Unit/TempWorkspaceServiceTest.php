@@ -13,17 +13,18 @@ use PHPUnit\Framework\TestCase;
 class TempWorkspaceServiceTest extends TestCase
 {
     private string $base;
+
     private TempWorkspaceService $svc;
 
     protected function setUp(): void
     {
         parent::setUp();
         // Minimal Facade container for File facade
-        $container = new Container();
-        $container->instance('files', new Filesystem());
+        $container = new Container;
+        $container->instance('files', new Filesystem);
         Facade::setFacadeApplication($container);
 
-        $this->svc = new TempWorkspaceService();
+        $this->svc = new TempWorkspaceService;
         // Unique base path under system temp
         $this->base = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'twsvc_'.uniqid();
         File::makeDirectory($this->base, 0777, true, true);
@@ -39,7 +40,7 @@ class TempWorkspaceServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testEnsureMainTempPathCreatesAndNamespacesByGuidChar(): void
+    public function test_ensure_main_temp_path_creates_and_namespaces_by_guid_char(): void
     {
         $resolved = $this->svc->ensureMainTempPath($this->base, 'z', '');
         $this->assertStringEndsWith('/z/', str_replace('\\', '/', $resolved));
@@ -47,7 +48,7 @@ class TempWorkspaceServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testCreateReleaseTempFolderCreatesPerReleaseDir(): void
+    public function test_create_release_temp_folder_creates_per_release_dir(): void
     {
         $main = $this->svc->ensureMainTempPath($this->base, '', 'group42');
         $tmp = $this->svc->createReleaseTempFolder($main, 'guid-123');
@@ -56,7 +57,7 @@ class TempWorkspaceServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testListFilesWithAndWithoutPattern(): void
+    public function test_list_files_with_and_without_pattern(): void
     {
         $main = $this->svc->ensureMainTempPath($this->base, '', 'grp');
         $release = $this->svc->createReleaseTempFolder($main, 'g1');
@@ -68,7 +69,7 @@ class TempWorkspaceServiceTest extends TestCase
 
         $all = $this->svc->listFiles($release);
         $this->assertNotEmpty($all);
-        $this->assertTrue(collect($all)->every(fn($f) => method_exists($f, 'getPathname')));
+        $this->assertTrue(collect($all)->every(fn ($f) => method_exists($f, 'getPathname')));
 
         $matches = $this->svc->listFiles($release, '/.*\.txt$/i');
         $this->assertNotEmpty($matches);
@@ -81,7 +82,7 @@ class TempWorkspaceServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testClearDirectoryPreserveRoot(): void
+    public function test_clear_directory_preserve_root(): void
     {
         $main = $this->svc->ensureMainTempPath($this->base, '', 'grp2');
         File::put($main.'x.bin', 'data');
@@ -96,7 +97,7 @@ class TempWorkspaceServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testClearDirectoryDeleteRoot(): void
+    public function test_clear_directory_delete_root(): void
     {
         $main = $this->svc->ensureMainTempPath($this->base, '', 'grp3');
         File::put($main.'x.bin', 'data');

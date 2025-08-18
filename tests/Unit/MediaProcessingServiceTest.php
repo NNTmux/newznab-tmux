@@ -28,8 +28,8 @@ class MediaProcessingServiceTest extends TestCase
     {
         parent::setUp();
         // Minimal Facade container for File facade
-        $container = new Container();
-        $container->instance('files', new Filesystem());
+        $container = new Container;
+        $container->instance('files', new Filesystem);
         Facade::setFacadeApplication($container);
 
         $this->tmpDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'mps_'.uniqid().DIRECTORY_SEPARATOR;
@@ -63,16 +63,19 @@ class MediaProcessingServiceTest extends TestCase
         $manticore ??= Mockery::mock(ManticoreSearch::class);
         $elastic ??= Mockery::mock(ElasticSearchSiteSearch::class);
         $categorize ??= Mockery::mock(Categorize::class);
+
         return new MediaProcessingService($ffmpeg, $ffprobe, $mediaInfo, $releaseImage, $releaseExtra, $manticore, $elastic, $categorize);
     }
 
     #[WithoutErrorHandler]
-    public function testGetVideoTimeParsesDurationString(): void
+    public function test_get_video_time_parses_duration_string(): void
     {
         $ffprobe = Mockery::mock(FFProbe::class);
         $ffprobe->shouldReceive('isValid')->once()->andReturn(true);
-        $format = new class {
-            public function get($key) {
+        $format = new class
+        {
+            public function get($key)
+            {
                 return 'time=00:05.10 bitrate=800k';
             }
         };
@@ -83,24 +86,37 @@ class MediaProcessingServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testCreateSampleImageReturnsTrueWhenSaved(): void
+    public function test_create_sample_image_returns_true_when_saved(): void
     {
         $videoFile = $this->tmpDir.'video.avi';
         File::put($videoFile, 'fake');
 
         $ffprobe = Mockery::mock(FFProbe::class);
         $ffprobe->shouldReceive('isValid')->andReturn(true);
-        $format = new class {
-            public function get($key) { return 'time=00:03.10 bitrate=800k'; }
+        $format = new class
+        {
+            public function get($key)
+            {
+                return 'time=00:03.10 bitrate=800k';
+            }
         };
         $ffprobe->shouldReceive('format')->andReturn($format);
 
-        $frameMock = new class {
-            public function save($path) { \file_put_contents($path, 'x'); }
+        $frameMock = new class
+        {
+            public function save($path)
+            {
+                \file_put_contents($path, 'x');
+            }
         };
-        $openMock = new class($frameMock) {
+        $openMock = new class($frameMock)
+        {
             public function __construct(private $frame) {}
-            public function frame($tc) { return $this->frame; }
+
+            public function frame($tc)
+            {
+                return $this->frame;
+            }
         };
         $ffmpeg = Mockery::mock(FFMpeg::class);
         $ffmpeg->shouldReceive('open')->andReturn($openMock);
@@ -115,17 +131,17 @@ class MediaProcessingServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testAddVideoMediaInfoFalseIfFileMissing(): void
+    public function test_add_video_media_info_false_if_file_missing(): void
     {
         $svc = $this->makeService();
         $this->assertFalse($svc->addVideoMediaInfo(1, $this->tmpDir.'nope.avi'));
     }
 
     #[WithoutErrorHandler]
-    public function testAddAudioInfoAndSampleReturnsTrueWhenDisabled(): void
+    public function test_add_audio_info_and_sample_returns_true_when_disabled(): void
     {
         $svc = $this->makeService();
-        $release = new ReleaseModel();
+        $release = new ReleaseModel;
         $release->id = 1;
         $release->guid = 'g';
         $release->predb_id = 0;
