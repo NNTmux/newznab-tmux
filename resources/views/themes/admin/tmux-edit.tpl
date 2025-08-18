@@ -314,14 +314,9 @@
 		        <label for="progressive" class="form-label fw-bold">Variable Sleep Timer:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="form-check form-check-inline">
-		            <input type="radio" id="progressive_1" name="progressive" value="1" class="form-check-input" {if $site->progressive == 1}checked{/if}>
-		            <label for="progressive_1" class="form-check-label">Yes</label>
-		        </div>
-		        <div class="form-check form-check-inline">
-		            <input type="radio" id="progressive_0" name="progressive" value="0" class="form-check-input" {if $site->progressive == 0}checked{/if}>
-		            <label for="progressive_0" class="form-check-label">No</label>
-		        </div>
+		        <select id="progressive" name="progressive" class="form-select">
+		            {html_options values=$yesno_ids output=$yesno_names selected=$site->progressive}
+		        </select>
 		        <small class="text-muted">This will vary the backfill sleep depending on how many collections you have.<br/>Example: 50k collections would make sleep timer 100 seconds and 20k releases would make sleep timer 40 seconds.</small>
 		    </div>
 		</div>
@@ -411,14 +406,9 @@
         <label for="post_amazon" class="form-label fw-bold">Postprocess Amazon:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            <input type="radio" id="post_amazon_1" name="post_amazon" value="1" class="form-check-input" {if $site->post_amazon == 1}checked{/if}>
-            <label for="post_amazon_1" class="form-check-label">Yes</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input type="radio" id="post_amazon_0" name="post_amazon" value="0" class="form-check-input" {if $site->post_amazon == 0}checked{/if}>
-            <label for="post_amazon_0" class="form-check-label">No</label>
-        </div>
+        <select id="post_amazon" name="post_amazon" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->post_amazon}
+        </select>
         <small class="text-muted">Choose to do books, music and games lookups.</small>
     </div>
 </div>
@@ -442,14 +432,9 @@
         <label for="post_non" class="form-label fw-bold">Postprocess Non-Amazon:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            <input type="radio" id="post_non_1" name="post_non" value="1" class="form-check-input" {if $site->post_non == 1}checked{/if}>
-            <label for="post_non_1" class="form-check-label">Yes</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input type="radio" id="post_non_0" name="post_non" value="0" class="form-check-input" {if $site->post_non == 0}checked{/if}>
-            <label for="post_non_0" class="form-check-label">No</label>
-        </div>
+        <select id="post_non" name="post_non" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->post_non}
+        </select>
         <small class="text-muted">Choose to do movies, anime and tv lookups.</small>
     </div>
 </div>
@@ -477,9 +462,9 @@
         <label for="fix_names" class="form-label fw-bold">Fix Release Names:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="fix_names" name='fix_names' values=$yesno_ids output=$yesno_names selected=$site->fix_names separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="fix_names" name="fix_names" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->fix_names}
+        </select>
         <small class="text-muted">Choose to try to fix Releases Names using NFOs, par2 files, filenames, md5 and sha1. true/false</small>
     </div>
 </div>
@@ -569,9 +554,9 @@
         <label for="run_ircscraper" class="form-label fw-bold">Scrape Irc Channels:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="run_ircscraper" name='run_ircscraper' values=$yesno_ids output=$yesno_names selected=$site->run_ircscraper separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="run_ircscraper" name="run_ircscraper" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->run_ircscraper}
+        </select>
         <small class="text-muted">Choose to run IRCScraper on irc channels. Setting SCRAPE_IRC_C_Z_BOOL parameter to true or false in settings will toggle between the servers. The pane for this can not be created after tmux starts.</small>
     </div>
 </div>
@@ -640,9 +625,9 @@
         <label for="write_logs" class="form-label fw-bold">Logging:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="write_logs" name='write_logs' values=$yesno_ids output=$yesno_names selected=$site->write_logs separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="write_logs" name="write_logs" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->write_logs}
+        </select>
         <small class="text-muted">Set this to write each panes output to a per pane per day log file. This adds GMT date to the filename.</small>
     </div>
 </div>
@@ -657,9 +642,9 @@
         <label for="showquery" class="form-label fw-bold">Display Query Times:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="showquery" name='showquery' values=$yesno_ids output=$yesno_names selected=$site->showquery separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="showquery" name="showquery" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->showquery}
+        </select>
         <small class="text-muted">Choose to display the query times for each set of queries. true/false.</small>
     </div>
 </div>
@@ -669,9 +654,9 @@
         <label for="htop" class="form-label fw-bold">htop:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="htop" name='htop' values=$yesno_ids output=$yesno_names selected=$site->htop separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="htop" name="htop" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->htop}
+        </select>
         <small class="text-muted">htop - an interactive process viewer for Linux. The pane for this can not be created after tmux starts.</small>
     </div>
 </div>
@@ -681,9 +666,9 @@
         <label for="nmon" class="form-label fw-bold">nmon:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="nmon" name='nmon' values=$yesno_ids output=$yesno_names selected=$site->nmon separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="nmon" name="nmon" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->nmon}
+        </select>
         <small class="text-muted">nmon is short for Nigel's performance Monitor for Linux. The pane for this can not be created after tmux starts.</small>
     </div>
 </div>
@@ -693,9 +678,9 @@
         <label for="vnstat" class="form-label fw-bold">vnstat:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="vnstat" name='vnstat' values=$yesno_ids output=$yesno_names selected=$site->vnstat separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="vnstat" name="vnstat" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->vnstat}
+        </select>
         <div class="input-group mt-2">
             <span class="input-group-text"><i class="fa fa-cog"></i></span>
             <input id="vnstat_args" name="vnstat_args" class="form-control" type="text" value="{$site->vnstat_args}"/>
@@ -709,9 +694,9 @@
         <label for="tcptrack" class="form-label fw-bold">tcptrack:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="tcptrack" name='tcptrack' values=$yesno_ids output=$yesno_names selected=$site->tcptrack separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="tcptrack" name="tcptrack" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->tcptrack}
+        </select>
         <div class="input-group mt-2">
             <span class="input-group-text"><i class="fa fa-cog"></i></span>
             <input id="tcptrack_args" name="tcptrack_args" class="form-control" type="text" value="{$site->tcptrack_args}"/>
@@ -725,9 +710,9 @@
         <label for="bwmng" class="form-label fw-bold">bwm-ng:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="bwmng" name='bwmng' values=$yesno_ids output=$yesno_names selected=$site->bwmng separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="bwmng" name="bwmng" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->bwmng}
+        </select>
         <small class="text-muted">bwm-ng can be used to monitor the current bandwidth of all or some specific network interfaces or disks (or partitions). The pane for this can not be created after tmux starts.</small>
     </div>
 </div>
@@ -737,9 +722,9 @@
         <label for="mytop" class="form-label fw-bold">mytop:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="mytop" name='mytop' values=$yesno_ids output=$yesno_names selected=$site->mytop separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="mytop" name="mytop" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->mytop}
+        </select>
         <small class="text-muted">mytop - display MySQL server performance info like `top'. You will need to create ~/.mytop, an example can be found in 'perldoc mytop'. The pane for this can not be created after tmux starts.</small>
     </div>
 </div>
@@ -749,9 +734,9 @@
         <label for="redis" class="form-label fw-bold">redis:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="redis" name='redis' values=$yesno_ids output=$yesno_names selected=$site->redis separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="redis" name="redis" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->redis}
+        </select>
         <small class="text-muted">redis-stat - Monitor your redis instance statistics. The pane for this can not be created after tmux starts.</small>
     </div>
 </div>
@@ -761,9 +746,9 @@
         <label for="showprocesslist" class="form-label fw-bold">Show Process List:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="showprocesslist" name='showprocesslist' values=$yesno_ids output=$yesno_names selected=$site->showprocesslist separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="showprocesslist" name="showprocesslist" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->showprocesslist}
+        </select>
         <div class="input-group mt-2">
             <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
             <input id="processupdate" name="processupdate" class="form-control" type="text" value="{$site->processupdate}"/>
@@ -778,9 +763,9 @@
         <label for="console" class="form-label fw-bold">Console:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="console" name='console' values=$yesno_ids output=$yesno_names selected=$site->console separator='</div><div class="form-check form-check-inline">'}
-        </div>
+        <select id="console" name="console" class="form-select">
+            {html_options values=$yesno_ids output=$yesno_names selected=$site->console}
+        </select>
         <small class="text-muted">Open an empty bash shell. The pane for this can not be created after tmux starts.</small>
     </div>
 </div>
