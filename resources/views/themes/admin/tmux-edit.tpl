@@ -508,18 +508,40 @@
         <label for="fix_crap_opt" class="form-label fw-bold">Remove Crap Releases:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="form-check form-check-inline">
-            {html_radios id="fix_crap_opt" name='fix_crap_opt' onchange="enableFixCrapCustom()" values=$fix_crap_radio_names output=$fix_crap_radio_names selected=$site->fix_crap_opt separator='</div><div class="form-check form-check-inline">'}
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="fa fa-filter"></i></span>
+            <select id="fix_crap_opt" name="fix_crap_opt" class="form-select" onchange="fixCrapSyncUI()">
+                {html_options values=$fix_crap_radio_names output=$fix_crap_radio_names selected=$site->fix_crap_opt}
+            </select>
         </div>
 
-        <div class="mt-3 checkbox-grid">
-            {if $site->fix_crap_opt == "Custom"}
-                {html_checkboxes id="fix_crap" name='fix_crap' values=$fix_crap_check_names output=$fix_crap_check_names selected=explode(', ', $site->fix_crap)}
-            {else}
-                {html_checkboxes id="fix_crap" name='fix_crap' disabled="true" readonly="true" values=$fix_crap_check_names output=$fix_crap_check_names selected=explode(', ', $site->fix_crap)}
-            {/if}
+        {assign var=isCustom value=($site->fix_crap_opt == "Custom")}
+        {assign var=isAll value=($site->fix_crap_opt == "All")}
+        {assign var=isDisabled value=($site->fix_crap_opt == "Disabled")}
+        {if $isAll}
+            {assign var=fixCrapSelected value=$fix_crap_check_names}
+            {assign var=fixCrapHint value='All filters are applied.'}
+        {elseif $isDisabled}
+            {assign var=fixCrapSelected value=''}
+            {assign var=fixCrapHint value='All filters are disabled.'}
+        {else}
+            {assign var=fixCrapSelected value=explode(', ', $site->fix_crap)}
+            {assign var=fixCrapHint value='Select specific filters below.'}
+        {/if}
+
+        <div id="fix-crap-panel" class="border rounded p-3 {if !$isCustom}opacity-50{/if}">
+            <label for="fix-crap-select" class="form-label mb-2">Filters</label>
+            <select id="fix-crap-select" name="fix_crap[]" class="form-select" multiple size="8" {if !$isCustom}disabled="disabled" aria-disabled="true"{else}aria-disabled="false"{/if} data-custom-default="{$site->fix_crap}">
+                {html_options values=$fix_crap_check_names output=$fix_crap_check_names selected=$fixCrapSelected}
+            </select>
+            <div id="fix-crap-actions" class="mt-2 {if !$isCustom}d-none{/if}">
+                <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="fixCrapSelectAll()">Select all</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="fixCrapClearAll()">Clear all</button>
+            </div>
         </div>
-        <small class="text-muted">Choose to run Remove Crap Releases. You can enable all or some.</small>
+
+        <div id="fix-crap-hint" class="form-text {if $isCustom}d-none{/if}">{$fixCrapHint}</div>
+        <small class="text-muted d-block mt-1">Choose to run Remove Crap Releases. You can enable all or some.</small>
     </div>
 </div>
 
@@ -768,3 +790,102 @@
         <i class="fa fa-save me-2"></i>Save Tmux Settings
     </button>
 </div>
+
+<script>
+(function () {
+  var prevVal = null;
+  var lastCustom = new Set();
+
+  function getModeEl() { return document.getElementById('fix_crap_opt'); }
+  function getMultiEl() { return document.getElementById('fix-crap-select'); }
+  function getPanelEl() { return document.getElementById('fix-crap-panel'); }
+  function getHintEl() { return document.getElementById('fix-crap-hint'); }
+  function getActionsEl() { return document.getElementById('fix-crap-actions'); }
+  function getModeVal() { var el = getModeEl(); return el ? el.value : ''; }
+
+  function currentSelectedSet() {
+    var el = getMultiEl();
+    var set = new Set();
+    if (!el) return set;
+    Array.prototype.forEach.call(el.options, function (opt) { if (opt.selected) set.add(opt.value); });
+    return set;
+  }
+  function setSelectedFromSet(set) {
+    var el = getMultiEl();
+    if (!el) return;
+    Array.prototype.forEach.call(el.options, function (opt) { opt.selected = set.has(opt.value); });
+  }
+  function selectAllOptions() {
+    var el = getMultiEl();
+    if (!el) return;
+    Array.prototype.forEach.call(el.options, function (opt) { opt.selected = true; });
+  }
+  function clearAllOptions() {
+    var el = getMultiEl();
+    if (!el) return;
+    Array.prototype.forEach.call(el.options, function (opt) { opt.selected = false; });
+  }
+
+  function fixCrapSelectAll() { selectAllOptions(); }
+  function fixCrapClearAll() { clearAllOptions(); }
+
+  function fixCrapSyncUI() {
+    var mode = getModeVal();
+    var multi = getMultiEl();
+    var panel = getPanelEl();
+    var hint = getHintEl();
+    var actions = getActionsEl();
+    if (!multi || !panel) return;
+
+    // Persist custom selection when leaving Custom
+    if (prevVal === 'Custom' && mode !== 'Custom') {
+      lastCustom = currentSelectedSet();
+    }
+
+    if (mode === 'Custom') {
+      if (lastCustom && lastCustom.size > 0) {
+        setSelectedFromSet(lastCustom);
+      }
+      multi.removeAttribute('disabled');
+      multi.setAttribute('aria-disabled', 'false');
+      panel.classList.remove('opacity-50');
+      if (hint) hint.classList.add('d-none');
+      if (actions) actions.classList.remove('d-none');
+    } else if (mode === 'All') {
+      selectAllOptions();
+      multi.setAttribute('disabled', 'disabled');
+      multi.setAttribute('aria-disabled', 'true');
+      panel.classList.add('opacity-50');
+      if (hint) { hint.textContent = 'All filters are applied.'; hint.classList.remove('d-none'); }
+      if (actions) actions.classList.add('d-none');
+    } else { // Disabled or unknown
+      clearAllOptions();
+      multi.setAttribute('disabled', 'disabled');
+      multi.setAttribute('aria-disabled', 'true');
+      panel.classList.add('opacity-50');
+      if (hint) { hint.textContent = 'All filters are disabled.'; hint.classList.remove('d-none'); }
+      if (actions) actions.classList.add('d-none');
+    }
+
+    prevVal = mode;
+  }
+
+  // Expose helpers globally for inline handlers
+  window.fixCrapSelectAll = fixCrapSelectAll;
+  window.fixCrapClearAll = fixCrapClearAll;
+  window.fixCrapSyncUI = fixCrapSyncUI;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Seed lastCustom from server-provided defaults
+    var multi = getMultiEl();
+    if (multi) {
+      var def = multi.getAttribute('data-custom-default') || '';
+      lastCustom = new Set(def ? def.split(/,\s*/) : []);
+    }
+    prevVal = getModeVal();
+    var modeEl = getModeEl();
+    if (modeEl) modeEl.addEventListener('change', fixCrapSyncUI);
+    fixCrapSyncUI();
+  });
+})();
+</script>
