@@ -694,13 +694,11 @@ class Releases extends Release
                 }
             }
 
-            // Early return if search yielded no results
             if (empty($searchResult)) {
                 return collect();
             }
         }
 
-        // Build WHERE conditions more efficiently
         $conditions = [
             sprintf('r.passwordstatus %s', $this->showPasswords()),
         ];
@@ -716,7 +714,6 @@ class Releases extends Release
             }
         }
 
-        // Add category conditions
         $catQuery = Category::getCategorySearch($cat);
         $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
         if (! empty($catQuery) && $catQuery !== '1=1') {
@@ -737,16 +734,13 @@ class Releases extends Release
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
-        // Optimized query with selective joins and indexed columns first
+        // Optimized query: remove unused columns/joins (haspreview, jpgstatus, *_id columns, nfo/video_data/failures)
         $sql = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
-                    r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
-                    r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
-                    m.imdbid, m.tmdbid, m.traktid,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
                     cp.title AS parent_category, c.title AS sub_category,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
                     g.name AS group_name,
-                    cp.id AS categoryparentid,
+                    m.imdbid, m.tmdbid, m.traktid,
                     v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
                     tve.firstaired, tve.title, tve.series, tve.episode
             FROM releases r
@@ -764,28 +758,20 @@ class Releases extends Release
             $offset
         );
 
-        // Check cache
         $cacheKey = md5($sql);
         $cachedReleases = Cache::get($cacheKey);
         if ($cachedReleases !== null) {
             return $cachedReleases;
         }
 
-        // Execute query
         $releases = $this->fromQuery($sql);
 
-        // Add total count if results exist
         if ($releases->isNotEmpty()) {
-            // Use a more efficient count query
-            $countSql = sprintf(
-                'SELECT COUNT(*) as count FROM releases r %s',
-                $whereSql
-            );
+            $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s', $whereSql);
             $countResult = $this->fromQuery($countSql);
             $releases[0]->_totalrows = $countResult[0]->count ?? 0;
         }
 
-        // Cache results
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put($cacheKey, $releases, $expiresAt);
 
@@ -799,14 +785,12 @@ class Releases extends Release
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
-        // Generate cache key with all parameters
         $cacheKey = md5(serialize(func_get_args()).'tvSearch');
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
 
-        // Build conditions array for cleaner query building
         $conditions = [
             sprintf('r.passwordstatus %s', $this->showPasswords()),
         ];
@@ -815,7 +799,6 @@ class Releases extends Release
         $episodeJoinCondition = '';
         $needsEpisodeJoin = false;
 
-        // Process site IDs more efficiently
         if (! empty($siteIdArr)) {
             $siteConditions = [];
             foreach ($siteIdArr as $column => $id) {
@@ -825,16 +808,12 @@ class Releases extends Release
             }
 
             if (! empty($siteConditions)) {
-                // Build optimized subquery for video/episode lookup
                 $seriesFilter = ($series !== '') ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : '';
                 $episodeFilter = ($episode !== '') ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : '';
                 $airDateFilter = ($airDate !== '') ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '';
 
                 $lookupSql = sprintf(
-                    'SELECT v.id AS video_id, tve.id AS episode_id
-                    FROM videos v
-                    LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-                    WHERE (%s) %s %s %s',
+                    'SELECT v.id AS video_id, tve.id AS episode_id FROM videos v LEFT JOIN tv_episodes tve ON v.id = tve.videos_id WHERE (%s) %s %s %s',
                     implode(' OR ', $siteConditions),
                     $seriesFilter,
                     $episodeFilter,
@@ -847,7 +826,6 @@ class Releases extends Release
                     return collect();
                 }
 
-                // Collect IDs for efficient IN clauses
                 $videoIds = $results->pluck('video_id')->filter()->unique()->toArray();
                 $episodeIds = $results->pluck('episode_id')->filter()->unique()->toArray();
 
@@ -864,13 +842,9 @@ class Releases extends Release
             }
         }
 
-        // Handle name search
         $searchResult = [];
         if (! empty($name)) {
-            // Build search name with series/episode info
             $searchName = $name;
-
-            // Check if there are any valid site IDs (values > 0)
             $hasValidSiteIds = false;
             foreach ($siteIdArr as $column => $id) {
                 if ($id > 0) {
@@ -879,35 +853,24 @@ class Releases extends Release
                 }
             }
 
-            // Apply season/episode filtering when no valid site IDs are provided
             if (! $hasValidSiteIds) {
                 if (! empty($series) && (int) $series < 1900) {
                     $searchName .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
-
-                    // Add database filtering for series
                     $seriesNum = (int) preg_replace('/^s0*/i', '', $series);
                     $conditions[] = sprintf('tve.series = %d', $seriesNum);
                     $needsEpisodeJoin = true;
-
                     if (! empty($episode) && ! str_contains($episode, '/')) {
                         $searchName .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
-
-                        // Add database filtering for episode
                         $episodeNum = (int) preg_replace('/^e0*/i', '', $episode);
                         $conditions[] = sprintf('tve.episode = %d', $episodeNum);
                     }
                 } elseif (! empty($airDate)) {
                     $searchName .= ' '.str_replace(['/', '-', '.', '_'], ' ', $airDate);
-
-                    // Add database filtering for air date
                     $conditions[] = sprintf('DATE(tve.firstaired) = %s', escapeString($airDate));
                     $needsEpisodeJoin = true;
                 }
             }
 
-            // Continue with index search...
-
-            // Perform index search
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $searchResult = $this->elasticSearch->indexSearchTMA($searchName, $limit);
             } else {
@@ -924,7 +887,6 @@ class Releases extends Release
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
         }
 
-        // Add remaining conditions
         $catQuery = Category::getCategorySearch($cat, 'tv');
         $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
         if (! empty($catQuery) && $catQuery !== '1=1') {
@@ -934,45 +896,33 @@ class Releases extends Release
         if ($maxAge > 0) {
             $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
         }
-
         if ($minSize > 0) {
             $conditions[] = sprintf('r.size >= %d', $minSize);
         }
-
         if (! empty($excludedCategories)) {
             $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCategories)));
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
-        // Build optimized query with conditional joins
         $joinType = $needsEpisodeJoin ? 'INNER' : 'LEFT';
 
+        // Optimized select list – only fields required by XML (extended) and transformers
         $baseSql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
                     r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
-                    r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
-                    v.title, v.countries_id, v.started, v.tvdb, v.trakt,
-                    v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
-                    tvi.summary, tvi.publisher, tvi.image,
-                    tve.series, tve.episode, tve.se_complete, tve.title AS episode_title,
-                    tve.firstaired, tve.summary AS episode_summary,
+                    r.adddate, r.videos_id, r.tv_episodes_id,
+                    v.title, v.tvdb, v.trakt, v.imdb, v.tmdb, v.tvmaze, v.tvrage,
+                    tve.series, tve.episode, tve.firstaired,
                     cp.title AS parent_category, c.title AS sub_category,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
-                    g.name AS group_name,
-                    rn.releases_id AS nfoid,
-                    re.releases_id AS reid,
-                    df.failed as failed
+                    g.name AS group_name
             FROM releases r
             INNER JOIN categories c ON c.id = r.categories_id
             INNER JOIN root_categories cp ON cp.id = c.root_categories_id
             LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0 %s
-            LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
             %s JOIN tv_episodes tve ON r.tv_episodes_id = tve.id %s
             LEFT JOIN usenet_groups g ON g.id = r.groups_id
-            LEFT JOIN video_data re ON re.releases_id = r.id
-            LEFT JOIN release_nfos rn ON rn.releases_id = r.id
-            LEFT JOIN dnzb_failures df ON df.release_id = r.id
             %s",
             $videoJoinCondition,
             $joinType,
@@ -980,32 +930,20 @@ class Releases extends Release
             $whereSql
         );
 
-        // Final query with ordering and pagination
-        $sql = sprintf(
-            '%s ORDER BY r.postdate DESC LIMIT %d OFFSET %d',
-            $baseSql,
-            $limit,
-            $offset
-        );
-
-        // Execute query
+        $sql = sprintf('%s ORDER BY r.postdate DESC LIMIT %d OFFSET %d', $baseSql, $limit, $offset);
         $releases = $this->fromQuery($sql);
 
-        // Add total count if results exist
         if ($releases->isNotEmpty()) {
-            // Optimized count query - only join necessary tables
             $countSql = sprintf(
                 'SELECT COUNT(*) as count FROM releases r %s %s %s',
                 (! empty($videoJoinCondition) ? 'LEFT JOIN videos v ON r.videos_id = v.id AND v.type = 0' : ''),
                 ($needsEpisodeJoin ? sprintf('%s JOIN tv_episodes tve ON r.tv_episodes_id = tve.id %s', $joinType, $episodeJoinCondition) : ''),
                 $whereSql
             );
-
             $countResult = $this->fromQuery($countSql);
             $releases[0]->_totalrows = $countResult[0]->count ?? 0;
         }
 
-        // Cache results
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put($cacheKey, $releases, $expiresAt);
 
@@ -1029,23 +967,13 @@ class Releases extends Release
         }
 
         if (\count($siteSQL) > 0) {
-            // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
-                "
-				SELECT
-					v.id AS video,
-					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
-				FROM videos v
-				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s
-				GROUP BY v.id
-				LIMIT 1",
+                "\n\t\t\t\tSELECT v.id AS video, GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes FROM videos v LEFT JOIN tv_episodes tve ON v.id = tve.videos_id WHERE (%s) %s %s %s GROUP BY v.id LIMIT 1",
                 implode(' OR ', $siteSQL),
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
             );
-
             $show = $this->fromQuery($showQry);
             if ($show->isNotEmpty()) {
                 if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
@@ -1053,25 +981,21 @@ class Releases extends Release
                 } elseif (! empty($episode) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif (! empty($series) && empty($episode)) {
-                    // If $series is set but episode is not, return Season Packs and Episodes
                     $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
                 }
                 if ($show[0]->video > 0) {
                     $showSql .= ' AND r.videos_id = '.$show[0]->video;
                 }
             } else {
-                // If we were passed Site ID Info and no match was found, do not run the query
                 return [];
             }
         }
-        // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
         if (! empty($name) && $showSql === '') {
             if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
                 if (! empty($episode) && ! str_contains($episode, '/')) {
                     $name .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                 }
-                // If season is not empty but episode is, add a wildcard to the search
                 if (empty($episode)) {
                     $name .= '*';
                 }
@@ -1094,8 +1018,7 @@ class Releases extends Release
             }
         }
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s
-			%s %s %s %s %s %s',
+            'WHERE r.passwordstatus %s %s %s %s %s %s %s',
             $this->showPasswords(),
             $showSql,
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
@@ -1105,29 +1028,20 @@ class Releases extends Release
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id, r.haspreview, r.jpgstatus,
-				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
-				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name
-			FROM releases r
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
-			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT JOIN usenet_groups g ON g.id = r.groups_id
-			%s",
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                r.tv_episodes_id, v.title, v.tvdb, v.trakt, v.imdb, v.tmdb, v.tvmaze, v.tvrage,
+                tve.series, tve.episode, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
+                CONCAT(cp.title, ' > ', c.title) AS category_name, g.name AS group_name
+            FROM releases r
+            LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
+            LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+            LEFT JOIN categories c ON c.id = r.categories_id
+            LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            %s",
             $whereSql
         );
-        $sql = sprintf(
-            '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
-            $baseSql,
-            $limit,
-            $offset
-        );
+        $sql = sprintf('%s ORDER BY postdate DESC LIMIT %d OFFSET %d', $baseSql, $limit, $offset);
         $releases = Cache::get(md5($sql));
         if ($releases !== null) {
             return $releases;
@@ -1236,18 +1150,15 @@ class Releases extends Release
             }
         }
 
-        // Build WHERE conditions more efficiently
         $conditions = [
             sprintf('r.categories_id BETWEEN %d AND %d', Category::MOVIE_ROOT, Category::MOVIE_OTHER),
             sprintf('r.passwordstatus %s', $this->showPasswords()),
         ];
 
-        // Add search results condition
         if (! empty($searchResult)) {
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
         }
 
-        // Add movie ID conditions - only join movieinfo if we have movie IDs
         $needsMovieInfoJoin = false;
         if ($imDbId !== -1 && $imDbId) {
             $conditions[] = sprintf('m.imdbid = %d', $imDbId);
@@ -1262,86 +1173,57 @@ class Releases extends Release
             $needsMovieInfoJoin = true;
         }
 
-        // Add other conditions
         if (! empty($excludedCategories)) {
             $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCategories)));
         }
 
-        // Add category search condition
         $catQuery = Category::getCategorySearch($cat, 'movies');
         $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
         if (! empty($catQuery) && $catQuery !== '1=1') {
             $conditions[] = $catQuery;
         }
-
         if ($maxAge > 0) {
             $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
         }
-
         if ($minSize > 0) {
             $conditions[] = sprintf('r.size >= %d', $minSize);
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
-        // Build optimized query with conditional joins
+        // Select only fields required by XML/API transformers
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id,
                     r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
-                    r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
+                    r.adddate,
                     %s
                     cp.title AS parent_category, c.title AS sub_category,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
-                    g.name AS group_name,
-                    rn.releases_id AS nfoid
+                    g.name AS group_name
              FROM releases r
              INNER JOIN categories c ON c.id = r.categories_id
              INNER JOIN root_categories cp ON cp.id = c.root_categories_id
              %s
              LEFT JOIN usenet_groups g ON g.id = r.groups_id
-             LEFT JOIN release_nfos rn ON rn.releases_id = r.id
              %s",
-            $needsMovieInfoJoin ? 'm.imdbid, m.tmdbid, m.traktid,' : 'NULL AS imdbid, NULL AS tmdbid, NULL AS traktid,',
+            $needsMovieInfoJoin ? 'm.imdbid, m.tmdbid, m.traktid,' : 'r.imdbid, NULL AS tmdbid, NULL AS traktid,',
             $needsMovieInfoJoin ? 'INNER JOIN movieinfo m ON m.id = r.movieinfo_id' : '',
             $whereSql
         );
 
-        // Add ORDER BY and LIMIT
-        $sql = sprintf(
-            '%s ORDER BY r.postdate DESC LIMIT %d OFFSET %d',
-            $baseSql,
-            $limit,
-            $offset
-        );
-
-        // Generate cache key including all parameters for better cache hits
+        $sql = sprintf('%s ORDER BY r.postdate DESC LIMIT %d OFFSET %d', $baseSql, $limit, $offset);
         $cacheKey = md5($sql.serialize(func_get_args()));
-
-        // Check cache
-        $releases = Cache::get($cacheKey);
-        if ($releases !== null) {
+        if (($releases = Cache::get($cacheKey)) !== null) {
             return $releases;
         }
 
-        // Execute query
         $releases = $this->fromQuery($sql);
-
-        // Add total count for pagination
         if ($releases->isNotEmpty()) {
-            // Use a more efficient count query
-            $countSql = sprintf(
-                'SELECT COUNT(*) as count FROM releases r %s %s',
-                $needsMovieInfoJoin ? 'INNER JOIN movieinfo m ON m.id = r.movieinfo_id' : '',
-                $whereSql
-            );
-
+            $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s %s', $needsMovieInfoJoin ? 'INNER JOIN movieinfo m ON m.id = r.movieinfo_id' : '', $whereSql);
             $countResult = $this->fromQuery($countSql);
             $releases[0]->_totalrows = $countResult[0]->count ?? 0;
         }
-
-        // Cache results
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put($cacheKey, $releases, $expiresAt);
+        Cache::put($cacheKey, $releases, now()->addMinutes(config('nntmux.cache_expiry_medium')));
 
         return $releases;
     }
