@@ -192,8 +192,7 @@ class Games
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM gamesinfo gi
 				LEFT JOIN releases r ON gi.id = r.gamesinfo_id
-				WHERE r.nzbstatus = 1
-				AND gi.title != ''
+				WHERE gi.title != ''
 				AND gi.cover = 1
 				AND r.passwordstatus %s
 				%s %s %s %s

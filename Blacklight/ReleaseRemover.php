@@ -436,7 +436,6 @@ class ReleaseRemover
 			AND r.searchname NOT LIKE %s
 			AND r.searchname NOT LIKE %s
 			AND r.searchname NOT LIKE %s
-			AND r.nzbstatus = 1
 			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
             // Matches passwort / passworded / etc also.
             escapeString('%passwor%'),

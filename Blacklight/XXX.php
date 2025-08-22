@@ -88,8 +88,7 @@ class XXX
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM xxxinfo xxx
 				LEFT JOIN releases r ON xxx.id = r.xxxinfo_id
-				WHERE r.nzbstatus = 1
-				AND xxx.title != ''
+				WHERE xxx.title != ''
 				AND r.passwordstatus %s
 				%s %s %s %s
 				GROUP BY xxx.id
@@ -149,8 +148,7 @@ class XXX
 			LEFT OUTER JOIN categories c ON c.id = r.categories_id
 			LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
 			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
-			WHERE r.nzbstatus = 1
-			AND xxx.id IN (%s)
+			WHERE xxx.id IN (%s)
 			AND xxx.title != ''
 			AND r.passwordstatus %s
 			%s %s %s %s

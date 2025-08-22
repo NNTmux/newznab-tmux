@@ -275,8 +275,6 @@ class Release extends Model
         }
 
         $releases = self::query()
-
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
@@ -303,7 +301,6 @@ class Release extends Model
         }
 
         $releases = self::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(
                 [
                     'releases.id',

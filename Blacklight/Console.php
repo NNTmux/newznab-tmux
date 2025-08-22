@@ -157,8 +157,7 @@ class Console
 						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 					FROM consoleinfo con
 					LEFT JOIN releases r ON con.id = r.consoleinfo_id
-					WHERE r.nzbstatus = 1
-					AND con.title != ''
+					WHERE con.title != ''
 					AND con.cover = 1
 					AND r.passwordstatus %s
 					%s %s %s
@@ -726,7 +725,7 @@ class Console
      */
     public function processConsoleReleases(): void
     {
-        $query = Release::query()->select(['searchname', 'id'])->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->where('nzbstatus', '=', NZB::NZB_ADDED)->whereNull('consoleinfo_id');
+        $query = Release::query()->select(['searchname', 'id'])->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->whereNull('consoleinfo_id');
         if ($this->renamed === true) {
             $query->where('isrenamed', '=', 1);
         }

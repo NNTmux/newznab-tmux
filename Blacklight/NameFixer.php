@@ -156,9 +156,7 @@ class NameFixer
 					SELECT rel.id AS releases_id, rel.fromname
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
-					WHERE rel.nzbstatus = %d
-					AND rel.predb_id = 0',
-                NZB::NZB_ADDED
+					WHERE rel.predb_id = 0'
             );
             $cats = 2;
             $preId = true;
@@ -238,9 +236,7 @@ class NameFixer
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
-					WHERE nzbstatus = %d
-					AND predb_id = 0',
-                NZB::NZB_ADDED
+					WHERE predb_id = 0'
             );
             $cats = 2;
             $preId = true;
@@ -300,9 +296,7 @@ class NameFixer
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
-					WHERE nzbstatus = %d
-					AND predb_id = 0',
-                NZB::NZB_ADDED
+					WHERE predb_id = 0'
             );
             $cats = 2;
             $preId = true;
@@ -361,9 +355,7 @@ class NameFixer
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
-					WHERE nzbstatus = %d
-					AND predb_id = 0',
-                NZB::NZB_ADDED
+					WHERE predb_id = 0'
             );
             $cats = 2;
         } else {
@@ -420,9 +412,7 @@ class NameFixer
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
-					WHERE nzbstatus = %d
-					AND predb_id = 0',
-                NZB::NZB_ADDED
+					WHERE predb_id = 0'
             );
             $cats = 2;
         } else {
@@ -480,9 +470,7 @@ class NameFixer
                 '
 					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
 					FROM releases rel
-					WHERE rel.nzbstatus = %d
-					AND rel.predb_id = 0',
-                NZB::NZB_ADDED
+					WHERE rel.predb_id = 0'
             );
             $cats = 2;
         } else {
@@ -544,9 +532,7 @@ class NameFixer
 				FROM releases rel
 				LEFT JOIN media_infos ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
-				AND rel.nzbstatus = %d
-				AND rel.predb_id = 0',
-                NZB::NZB_ADDED
+				AND rel.predb_id = 0'
             );
             $cats = 2;
             // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
@@ -560,11 +546,9 @@ class NameFixer
 				FROM releases rel
 				LEFT JOIN media_infos ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
-				AND rel.nzbstatus = %d
 				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 				AND rel.predb_id = 0
 				AND rel.proc_uid = %d',
-                NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
                 Category::OTHER_HASHED,
@@ -605,9 +589,7 @@ class NameFixer
 				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.movie_name as movie_name
 				FROM releases rel
 				INNER JOIN media_infos rf ON rf.releases_id = rel.id
-                WHERE rel.nzbstatus = %d
-                AND rel.predb_id = 0',
-                NZB::NZB_ADDED
+                WHERE rel.predb_id = 0'
             );
             $cats = 2;
             // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
@@ -617,10 +599,8 @@ class NameFixer
 				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.movie_name as movie_name, rf.file_name as file_name
 				FROM releases rel
 				INNER JOIN media_infos rf ON rf.releases_id = rel.id
-				WHERE rel.nzbstatus = %d
-                AND rel.isrenamed = %d
+				WHERE rel.isrenamed = %d
                 AND rel.predb_id = 0',
-                NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE
             );
             if ($cats === 2) {
@@ -669,9 +649,7 @@ class NameFixer
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
 				WHERE ph.hash != \'\'
-				AND rel.nzbstatus = %d
-				AND rel.predb_id = 0',
-                NZB::NZB_ADDED
+				AND rel.predb_id = 0'
             );
             $cats = 2;
             // Otherwise check only releases we haven't renamed and checked their par2 hash_16K before in Misc categories
@@ -684,12 +662,10 @@ class NameFixer
 					IFNULL(ph.hash, \'\') AS hash
 				FROM releases rel
 				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
-				WHERE rel.nzbstatus = %d
-				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+				WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 				AND rel.predb_id = 0
 				AND ph.hash != \'\'
 				AND rel.proc_hash16k = %d',
-                NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
                 Category::OTHER_HASHED,

@@ -59,7 +59,7 @@ class AniDB
      */
     public function processAnimeReleases(): void
     {
-        $results = Release::query()->where('nzbstatus', NZB::NZB_ADDED)->whereNull('anidbid')->where('categories_id', Category::TV_ANIME)->orderByDesc('postdate')->limit($this->aniqty)->get();
+        $results = Release::query()->whereNull('anidbid')->where('categories_id', Category::TV_ANIME)->orderByDesc('postdate')->limit($this->aniqty)->get();
 
         if (\count($results) > 0) {
             $this->doRandomSleep();

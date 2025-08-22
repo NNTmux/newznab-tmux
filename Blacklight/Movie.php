@@ -184,8 +184,7 @@ class Movie
 						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 					FROM movieinfo m
 					LEFT JOIN releases r USING (imdbid)
-					WHERE r.nzbstatus = 1
-					AND m.title != ''
+					WHERE m.title != ''
 					AND m.imdbid != '0000000'
 					AND r.passwordstatus %s
 					%s %s %s %s

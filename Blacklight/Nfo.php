@@ -360,7 +360,6 @@ class Nfo
     private function buildNfoProcessingQuery(string $groupID, string $guidChar): \Illuminate\Database\Eloquent\Builder
     {
         $query = Release::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC]);
 
         if ($guidChar !== '') {
@@ -423,7 +422,6 @@ class Nfo
     private function handleFailedNfoAttempts(string $groupID, string $guidChar): void
     {
         $failedQuery = Release::query()
-            ->where('nzbstatus', NZB::NZB_ADDED)
             ->where('nfostatus', '<', $this->maxRetries)
             ->where('nfostatus', '>', self::NFO_FAILED);
 
@@ -458,7 +456,7 @@ class Nfo
 
     /**
      * Get a string like this:
-     * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
+     * "AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
      * To use in a query.
      *
      *
@@ -474,8 +472,7 @@ class Nfo
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
 
         return sprintf(
-            'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
-            NZB::NZB_ADDED,
+            'AND r.nfostatus BETWEEN %d AND %d %s %s',
             ($maxRetries < -8 ? -8 : $maxRetries),
             self::NFO_UNPROC,
             ($maxSize > 0 ? ('AND r.size < '.($maxSize * 1073741824)) : ''),

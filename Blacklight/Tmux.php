@@ -286,24 +286,23 @@ class Tmux
                 return sprintf(
                     '
 					SELECT
-					SUM(IF(nzbstatus = %d AND categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0 AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
-					SUM(IF(nzbstatus = %1$d AND categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
-					SUM(IF(nzbstatus = %1$d AND categories_id BETWEEN %d AND %d AND imdbid IS NULL,1,0)) AS processmovies,
-					SUM(IF(nzbstatus = %1$d AND categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
-					SUM(IF(nzbstatus = %1$d AND categories_id BETWEEN %d AND %d AND consoleinfo_id IS NULL,1,0)) AS processconsole,
-					SUM(IF(nzbstatus = %1$d AND categories_id IN (%s) AND bookinfo_id IS NULL,1,0)) AS processbooks,
-					SUM(IF(nzbstatus = %1$d AND categories_id = %d AND gamesinfo_id = 0,1,0)) AS processgames,
-					SUM(IF(nzbstatus = %1$d AND categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
+					SUM(IF(categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0 AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
+					SUM(IF(categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
+					SUM(IF(categories_id BETWEEN %d AND %d AND imdbid IS NULL,1,0)) AS processmovies,
+					SUM(IF(categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
+					SUM(IF(categories_id BETWEEN %d AND %d AND consoleinfo_id IS NULL,1,0)) AS processconsole,
+					SUM(IF(categories_id IN (%s) AND bookinfo_id IS NULL,1,0)) AS processbooks,
+					SUM(IF(categories_id = %d AND gamesinfo_id = 0,1,0)) AS processgames,
+					SUM(IF(categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
-					SUM(IF(nzbstatus = %1$d AND isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
+					SUM(IF(isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
 						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_par2 = %d
 							OR (ishashed = 1 AND dehashstatus BETWEEN -6 AND 0)) AND categories_id IN (%s),1,0)) AS processrenames,
 					SUM(IF(isrenamed = %d,1,0)) AS renamed,
-					SUM(IF(nzbstatus = %1$d AND nfostatus = %20$d,1,0)) AS nfo,
+					SUM(IF(nfostatus = %20$d,1,0)) AS nfo,
 					SUM(IF(predb_id > 0,1,0)) AS predb_matched,
 					COUNT(DISTINCT(predb_id)) AS distinct_predb_matched
 					FROM releases r',
-                    NZB::NZB_ADDED,
                     Category::TV_ROOT,
                     Category::TV_OTHER,
                     Category::TV_ANIME,
@@ -344,8 +343,7 @@ class Tmux
                 return "SELECT
 					(SELECT COUNT(r.id) FROM releases r
 						LEFT JOIN categories c ON c.id = r.categories_id
-						WHERE r.nzbstatus = 1
-						AND r.passwordstatus = -1
+						WHERE r.passwordstatus = -1
 						AND r.haspreview = -1
 						{$ppminString}
 						{$ppmaxString}

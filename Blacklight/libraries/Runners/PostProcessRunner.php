@@ -65,8 +65,7 @@ class PostProcessRunner extends BaseRunner
             SELECT DISTINCT LEFT(r.leftguid, 1) AS id
             FROM releases r
             LEFT JOIN categories c ON c.id = r.categories_id
-            WHERE r.nzbstatus = '.NZB::NZB_ADDED.'
-            AND r.passwordstatus = -1
+            WHERE r.passwordstatus = -1
             AND r.haspreview = -1
             AND c.disablepreview = 0
             '.$ppAddMaxSize.' '.$ppAddMinSize.'
@@ -120,7 +119,6 @@ class PostProcessRunner extends BaseRunner
             SELECT id
             FROM releases
             WHERE categories_id BETWEEN 2000 AND 2999
-            AND nzbstatus = '.NZB::NZB_ADDED.'
             AND imdbid IS NULL
             '.$condLookup.' '.$condRenamedOnly.'
             LIMIT 1';
@@ -135,7 +133,6 @@ class PostProcessRunner extends BaseRunner
             SELECT DISTINCT LEFT(leftguid, 1) AS id, '.$renamedFlag.' AS renamed
             FROM releases
             WHERE categories_id BETWEEN 2000 AND 2999
-            AND nzbstatus = '.NZB::NZB_ADDED.'
             AND imdbid IS NULL
             '.$condLookup.' '.$condRenamedOnly.'
             LIMIT 16';
@@ -161,7 +158,6 @@ class PostProcessRunner extends BaseRunner
             FROM releases
             WHERE categories_id BETWEEN 5000 AND 5999
             AND categories_id != 5070
-            AND nzbstatus = '.NZB::NZB_ADDED.'
             AND videos_id = 0
             AND size > 1048576
             AND tv_episodes_id BETWEEN -3 AND 0
@@ -179,7 +175,6 @@ class PostProcessRunner extends BaseRunner
             FROM releases
             WHERE categories_id BETWEEN 5000 AND 5999
             AND categories_id != 5070
-            AND nzbstatus = '.NZB::NZB_ADDED.'
             AND videos_id = 0
             AND tv_episodes_id BETWEEN -3 AND 0
             AND size > 1048576
@@ -208,7 +203,6 @@ class PostProcessRunner extends BaseRunner
             FROM releases
             WHERE categories_id BETWEEN 5000 AND 5999
             AND categories_id != 5070
-            AND nzbstatus = '.NZB::NZB_ADDED.'
             AND videos_id = 0
             AND size > 1048576
             AND tv_episodes_id BETWEEN -3 AND 0

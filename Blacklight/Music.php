@@ -149,8 +149,7 @@ class Music
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM musicinfo m
 				LEFT JOIN releases r ON r.musicinfo_id = m.id
-				WHERE r.nzbstatus = 1
-				AND m.title != ''
+				WHERE m.title != ''
 				AND m.cover = 1
 				AND r.passwordstatus %s
 				%s %s %s
@@ -402,11 +401,10 @@ class Music
 					SELECT searchname, id
 					FROM releases
 					WHERE musicinfo_id IS NULL
-					AND nzbstatus = %d %s
+                     %s
 					AND categories_id IN (%s, %s, %s)
 					ORDER BY postdate DESC
 					LIMIT %d',
-                NZB::NZB_ADDED,
                 $this->renamed,
                 Category::MUSIC_MP3,
                 Category::MUSIC_LOSSLESS,

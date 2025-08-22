@@ -73,12 +73,10 @@ class RSS extends ApiController
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				LEFT OUTER JOIN bookinfo bo ON bo.id = r.bookinfo_id
 				WHERE r.passwordstatus %s
-				AND r.nzbstatus = %d
 				%s %s %s %s
 				ORDER BY postdate DESC %s",
                 $cartSearch,
                 $this->releases->showPasswords(),
-                NZB::NZB_ADDED,
                 $catSearch,
                 ($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
                 ($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
@@ -115,7 +113,6 @@ class RSS extends ApiController
 				LEFT OUTER JOIN videos v ON v.id = r.videos_id
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				WHERE %s %s %s
-				AND r.nzbstatus = %d
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
@@ -133,7 +130,6 @@ class RSS extends ApiController
             ),
             (\count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-            NZB::NZB_ADDED,
             Category::TV_ROOT,
             Category::TV_OTHER,
             $this->releases->showPasswords(),
@@ -168,7 +164,6 @@ class RSS extends ApiController
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT JOIN movieinfo mi ON mi.id = r.movieinfo_id
 				WHERE %s %s
-				AND r.nzbstatus = %d
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
@@ -185,7 +180,6 @@ class RSS extends ApiController
                 'imdbid'
             ),
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            NZB::NZB_ADDED,
             Category::MOVIE_ROOT,
             Category::MOVIE_OTHER,
             $this->releases->showPasswords(),

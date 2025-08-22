@@ -70,8 +70,7 @@ class Releases extends Release
 				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, g.name AS group_name
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
-				WHERE r.nzbstatus = %d
-				AND r.passwordstatus %s
+				WHERE r.passwordstatus %s
 				%s %s %s %s %s
 				ORDER BY %s %s %s
 			) r
@@ -83,8 +82,7 @@ class Releases extends Release
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			GROUP BY r.id
-			ORDER BY %8\$s %9\$s",
-            NZB::NZB_ADDED,
+			ORDER BY %7\$s %8\$s",
             $this->showPasswords(),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
@@ -120,12 +118,10 @@ class Releases extends Release
             'SELECT COUNT(r.id) AS count
 				FROM releases r
 				%s
-				WHERE r.nzbstatus = %d
-				AND r.passwordstatus %s
+				WHERE r.passwordstatus %s
 				%s
 				%s %s %s ',
             ($groupName !== -1 ? 'LEFT JOIN usenet_groups g ON g.id = r.groups_id' : ''),
-            NZB::NZB_ADDED,
             $this->showPasswords(),
             ($groupName !== -1 ? sprintf(' AND g.name = %s', escapeString($groupName)) : ''),
             Category::getCategorySearch($cat),
@@ -192,7 +188,6 @@ class Releases extends Release
     public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '')
     {
         $query = self::query()
-            ->where('r.nzbstatus', NZB::NZB_ADDED)
             ->select(['r.searchname', 'r.guid', 'g.name as gname', DB::raw("CONCAT(cp.title,'_',c.title) AS catName")])
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
@@ -272,7 +267,6 @@ class Releases extends Release
 				LEFT JOIN categories c ON c.id = r.categories_id
 				LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 				WHERE %s %s
-				AND r.nzbstatus = %d
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				%s
@@ -280,7 +274,6 @@ class Releases extends Release
 				ORDER BY %s %s %s",
             $this->uSQL($userShows, 'videos_id'),
             (! empty($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            NZB::NZB_ADDED,
             Category::TV_ROOT,
             Category::TV_OTHER,
             $this->showPasswords(),
@@ -307,13 +300,11 @@ class Releases extends Release
                 'SELECT r.id
 				FROM releases r
 				WHERE %s %s
-				AND r.nzbstatus = %d
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				%s',
                 $this->uSQL($userShows, 'videos_id'),
                 (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
                 $this->showPasswords(),
@@ -550,7 +541,6 @@ class Releases extends Release
     ): string {
         $conditions = [
             sprintf('r.passwordstatus %s', $this->showPasswords()),
-            sprintf('r.nzbstatus = %d', NZB::NZB_ADDED),
             sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult))),
         ];
 
@@ -713,7 +703,6 @@ class Releases extends Release
         // Build WHERE conditions more efficiently
         $conditions = [
             sprintf('r.passwordstatus %s', $this->showPasswords()),
-            sprintf('r.nzbstatus = %d', NZB::NZB_ADDED),
         ];
 
         if ($maxAge > 0) {
@@ -819,7 +808,6 @@ class Releases extends Release
 
         // Build conditions array for cleaner query building
         $conditions = [
-            sprintf('r.nzbstatus = %d', NZB::NZB_ADDED),
             sprintf('r.passwordstatus %s', $this->showPasswords()),
         ];
 
@@ -1106,10 +1094,8 @@ class Releases extends Release
             }
         }
         $whereSql = sprintf(
-            'WHERE r.nzbstatus = %d
-			AND r.passwordstatus %s
+            'WHERE r.passwordstatus %s
 			%s %s %s %s %s %s',
-            NZB::NZB_ADDED,
             $this->showPasswords(),
             $showSql,
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
@@ -1183,10 +1169,8 @@ class Releases extends Release
 
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s
-			AND r.nzbstatus = %d
 			%s %s %s %s %s',
             $this->showPasswords(),
-            NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
@@ -1255,7 +1239,6 @@ class Releases extends Release
         // Build WHERE conditions more efficiently
         $conditions = [
             sprintf('r.categories_id BETWEEN %d AND %d', Category::MOVIE_ROOT, Category::MOVIE_OTHER),
-            sprintf('r.nzbstatus = %d', NZB::NZB_ADDED),
             sprintf('r.passwordstatus %s', $this->showPasswords()),
         ];
 

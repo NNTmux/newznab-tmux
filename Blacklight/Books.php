@@ -123,8 +123,7 @@ class Books
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM bookinfo boo
 				LEFT JOIN releases r ON boo.id = r.bookinfo_id
-				WHERE r.nzbstatus = 1
-				AND boo.cover = 1
+				WHERE boo.cover = 1
 				AND boo.title != ''
 				AND r.passwordstatus %s
 				%s %s %s
@@ -265,7 +264,7 @@ class Books
         if ($total > 0) {
             foreach ($bookids as $i => $iValue) {
                 $this->processBookReleasesHelper(
-                    Release::query()->where('nzbstatus', '=', NZB::NZB_ADDED)
+                    Release::query()
                         ->whereNull('bookinfo_id')
                         ->whereIn('categories_id', [$iValue])
                         ->orderByDesc('postdate')

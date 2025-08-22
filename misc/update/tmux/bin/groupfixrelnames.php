@@ -48,7 +48,6 @@ switch (true) {
 					LEFT JOIN par_hashes ph ON ph.releases_id = r.id
 
 					WHERE r.leftguid = %s
-					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
 					AND r.predb_id = 0
 					AND r.passwordstatus >= 0
@@ -74,7 +73,7 @@ switch (true) {
 					AND r.categories_id IN (%s)
 					GROUP BY r.id
 					ORDER BY r.id DESC
-					LIMIT %s", escapeString($guidChar), NZB::NZB_ADDED, NameFixer::IS_RENAMED_NONE, Nfo::NFO_UNPROC, Nfo::NFO_FOUND, NameFixer::PROC_NFO_NONE, NameFixer::PROC_FILES_NONE, NameFixer::PROC_UID_NONE, NameFixer::PROC_PAR2_NONE, NameFixer::PROC_SRR_NONE, NameFixer::PROC_HASH16K_NONE, NameFixer::PROC_CRC_NONE, Category::getCategoryOthersGroup(), $maxPerRun));
+					LIMIT %s", escapeString($guidChar), NameFixer::IS_RENAMED_NONE, Nfo::NFO_UNPROC, Nfo::NFO_FOUND, NameFixer::PROC_NFO_NONE, NameFixer::PROC_FILES_NONE, NameFixer::PROC_UID_NONE, NameFixer::PROC_PAR2_NONE, NameFixer::PROC_SRR_NONE, NameFixer::PROC_HASH16K_NONE, NameFixer::PROC_CRC_NONE, Category::getCategoryOthersGroup(), $maxPerRun));
 
         foreach ($releases as $release) {
             $nameFixer->checked++;
