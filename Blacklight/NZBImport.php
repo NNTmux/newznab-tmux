@@ -373,7 +373,6 @@ class NZBImport
                     'size' => $nzbDetails['totalSize'],
                     'categories_id' => $determinedCategory['categories_id'],
                     'isrenamed' => $renamed,
-                    'reqidstatus' => 0,
                     'predb_id' => 0,
                     'nzbstatus' => NZB::NZB_ADDED,
                     'ishashed' => 0,
