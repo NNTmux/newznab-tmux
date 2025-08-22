@@ -233,26 +233,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteUserModal = deleteUserModalEl ? new bootstrap.Modal(deleteUserModalEl) : null;
     const restoreUserModal = restoreUserModalEl ? new bootstrap.Modal(restoreUserModalEl) : null;
 
-    // Delete permanently buttons
+    const deleteUserNameEl = document.getElementById('deleteUserName');
+    const restoreUserNameEl = document.getElementById('restoreUserName');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const confirmRestoreBtn = document.getElementById('confirmRestoreBtn');
+
+    // Helper to submit bulk form via modal confirm
+    function attachBulkHandler(button, form) {
+        if (!button) return;
+        button.dataset.bulk = 'true';
+        // Make sure we don't navigate away accidentally
+        button.dataset.originalHref = button.getAttribute('href') || '';
+        button.setAttribute('href', '#');
+    }
+    function detachBulkHandler(button) {
+        if (!button || !button.dataset.bulk) return;
+        // Restore original href for single-item operations
+        if (button.dataset.originalHref !== undefined) {
+            button.setAttribute('href', button.dataset.originalHref);
+        }
+        delete button.dataset.bulk;
+        delete button.dataset.originalHref;
+    }
+
+    // Delete permanently buttons (single item)
     document.querySelectorAll('.delete-permanently').forEach(btn => {
         btn.addEventListener('click', () => {
             const userId = btn.getAttribute('data-user-id');
             const username = btn.getAttribute('data-username');
 
-            document.getElementById('deleteUserName').textContent = username;
-            document.getElementById('confirmDeleteBtn').href = '{$smarty.const.WWW_TOP}/admin/deleted-users/permanent-delete/' + userId;
+            if (deleteUserNameEl) deleteUserNameEl.textContent = username;
+            // Ensure single-item mode (remove bulk state if any)
+            detachBulkHandler(confirmDeleteBtn);
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.href = '{$smarty.const.WWW_TOP}/admin/deleted-users/permanent-delete/' + userId;
+            }
             if (deleteUserModal) deleteUserModal.show();
         });
     });
 
-    // Restore user buttons
+    // Restore user buttons (single item)
     document.querySelectorAll('.restore-user').forEach(btn => {
         btn.addEventListener('click', () => {
             const userId = btn.getAttribute('data-user-id');
             const username = btn.getAttribute('data-username');
 
-            document.getElementById('restoreUserName').textContent = username;
-            document.getElementById('confirmRestoreBtn').href = '{$smarty.const.WWW_TOP}/admin/deleted-users/restore/' + userId;
+            if (restoreUserNameEl) restoreUserNameEl.textContent = username;
+            detachBulkHandler(confirmRestoreBtn);
+            if (confirmRestoreBtn) {
+                confirmRestoreBtn.href = '{$smarty.const.WWW_TOP}/admin/deleted-users/restore/' + userId;
+            }
             if (restoreUserModal) restoreUserModal.show();
         });
     });
@@ -350,7 +380,17 @@ document.addEventListener('DOMContentLoaded', function() {
         bulkSelect.addEventListener('change', updateBulkSubmitState);
     }
 
-    // Bulk form submission handler
+    // Helper to gather usernames for selected user IDs
+    function getSelectedUsernames() {
+        const selected = getRowCheckboxes().filter(cb => cb.checked).map(cb => cb.value);
+        return selected.map(id => {
+            // Try to find a restore or delete button with matching user-id to read username
+            const btn = document.querySelector('.restore-user[data-user-id="' + id + '"]') || document.querySelector('.delete-permanently[data-user-id="' + id + '"]');
+            return btn ? btn.getAttribute('data-username') : null;
+        }).filter(Boolean);
+    }
+
+    // Intercept bulk form submission to use modals instead of window.confirm
     if (bulkForm) {
         bulkForm.addEventListener('submit', function(e) {
             const action = bulkSelect ? bulkSelect.value : '';
@@ -358,18 +398,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 return;
             }
-
             const selectedCheckboxes = getRowCheckboxes().filter(cb => cb.checked);
             if (selectedCheckboxes.length === 0) {
                 e.preventDefault();
                 alert('Please select at least one user.');
                 return;
             }
+            // We replace native confirm with bootstrap modal
+            e.preventDefault();
+            const usernames = getSelectedUsernames();
+            const multiple = usernames.length > 1;
+            if (action === 'restore') {
+                if (restoreUserNameEl) {
+                    restoreUserNameEl.textContent = multiple ? usernames.length + ' selected user(s)' : (usernames[0] || '1 user');
+                }
+                attachBulkHandler(confirmRestoreBtn, bulkForm);
+                if (restoreUserModal) restoreUserModal.show();
+            } else if (action === 'delete') {
+                if (deleteUserNameEl) {
+                    deleteUserNameEl.textContent = multiple ? usernames.length + ' selected user(s)' : (usernames[0] || '1 user');
+                }
+                attachBulkHandler(confirmDeleteBtn, bulkForm);
+                if (deleteUserModal) deleteUserModal.show();
+            }
+        });
+    }
 
-            const verb = action === 'restore' ? 'restore' : 'permanently delete';
-            const confirmation = confirm('Are you sure you want to ' + verb + ' ' + selectedCheckboxes.length + ' selected user(s)?');
-            if (!confirmation) {
+    // Confirm buttons: handle bulk mode submission
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function(e) {
+            if (this.dataset.bulk) {
                 e.preventDefault();
+                // Submit the form for bulk delete
+                if (bulkForm) bulkForm.submit();
+                // After submission (navigation imminent), clean up state just in case
+                detachBulkHandler(this);
+            }
+        });
+    }
+    if (confirmRestoreBtn) {
+        confirmRestoreBtn.addEventListener('click', function(e) {
+            if (this.dataset.bulk) {
+                e.preventDefault();
+                if (bulkForm) bulkForm.submit();
+                detachBulkHandler(this);
             }
         });
     }
