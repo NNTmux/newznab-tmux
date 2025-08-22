@@ -28,18 +28,22 @@ class RemoveInactiveAccounts implements ShouldQueue
      */
     public function handle(): void
     {
-        $purgeDays = config('nntmux.purge_inactive_users_days');
-        User::query()->where('roles_id', '=', 1)
-            ->where(function ($query) use ($purgeDays) {
-                $query->where('lastlogin', '<', now()->subDays($purgeDays))
-                    ->orWhereNull('lastlogin');
-            })
-            ->where(function ($query) use ($purgeDays) {
-                $query->where('apiaccess', '<', now()->subDays($purgeDays))
-                    ->orWhereNull('apiaccess');
-            })
-            ->get()->each(function ($user) {
-                $user->delete(); // Use soft delete instead of mass deletion
+        $purgeDays = (int) config('nntmux.purge_inactive_users_days');
+        $threshold = now()->subDays($purgeDays);
+
+        User::query()->where('roles_id', 1)->where(function ($q) use ($threshold) {
+            $q->where(function ($qq) use ($threshold) {
+                $qq->whereNotNull('lastlogin')->where('lastlogin', '<', $threshold);
+            })->orWhere(function ($qq) use ($threshold) {
+                // Only treat null lastlogin as inactive if the account is older than threshold
+                $qq->whereNull('lastlogin')->where('created_at', '<', $threshold);
             });
+        })->where(function ($q) use ($threshold) {
+            $q->where(function ($qq) use ($threshold) {
+                $qq->whereNotNull('apiaccess')->where('apiaccess', '<', $threshold);
+            })->orWhere(function ($qq) use ($threshold) {
+                $qq->whereNull('apiaccess')->where('created_at', '<', $threshold);
+            });
+        });
     }
 }
