@@ -79,9 +79,18 @@
                         <button type="submit" class="btn btn-primary" id="bulk-action-submit" disabled>Apply</button>
                     </div>
                     <div class="btn-group btn-group-sm" role="group" aria-label="Selection controls">
-                        <button type="button" class="btn btn-outline-secondary" id="select-all">Select All</button>
-                        <button type="button" class="btn btn-outline-secondary" id="deselect-all">Deselect All</button>
-                        <button type="button" class="btn btn-outline-secondary" id="invert-selection">Invert</button>
+                        <!-- Improved selection buttons -->
+                        <div class="btn-group btn-group-sm selection-toolbar" role="group" aria-label="Selection controls">
+                            <button type="button" class="btn btn-outline-primary" id="select-all" data-bs-toggle="tooltip" data-bs-title="Select every row">
+                                <i class="fas fa-check-double me-1"></i><span class="d-none d-sm-inline">Select All</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="deselect-all" data-bs-toggle="tooltip" data-bs-title="Clear selection">
+                                <i class="fas fa-ban me-1"></i><span class="d-none d-sm-inline">Clear</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" id="invert-selection" data-bs-toggle="tooltip" data-bs-title="Invert current selection">
+                                <i class="fas fa-exchange-alt me-1"></i><span class="d-none d-sm-inline">Invert</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -370,3 +379,21 @@ document.addEventListener('DOMContentLoaded', function() {
     updateBulkSubmitState();
 });
 </script>
+
+<style>
+    .selection-toolbar .btn {
+        --bs-btn-padding-y: .35rem;
+        --bs-btn-padding-x: .7rem;
+        --bs-btn-font-size: .75rem;
+        transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+    }
+    .selection-toolbar .btn i { font-size: .9rem; }
+    .selection-toolbar .btn-outline-primary:hover   { background:#0d6efd; color:#fff; }
+    .selection-toolbar .btn-outline-secondary:hover { background:#6c757d; color:#fff; }
+    .selection-toolbar .btn-outline-warning:hover   { background:#ffc107; color:#212529; }
+    .selection-toolbar .btn:focus { box-shadow: 0 0 0 .15rem rgba(13,110,253,.25); }
+    @media (max-width: 575.98px){
+        .selection-toolbar .btn span { display:none; }
+        .selection-toolbar .btn { --bs-btn-padding-x: .55rem; }
+    }
+</style>
