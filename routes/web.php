@@ -218,6 +218,7 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
 
     // Deleted Users Management Routes
     Route::match(['GET', 'POST'], 'deleted-users', [DeletedUsersController::class, 'index'])->name('admin.deleted.users.index');
+    Route::post('deleted-users/bulk', [DeletedUsersController::class, 'bulkAction'])->name('admin.deleted.users.bulk');
     Route::match(['GET', 'POST'], 'deleted-users/restore/{id}', [DeletedUsersController::class, 'restore'])->name('admin.deleted.users.restore');
     Route::match(['GET', 'POST'], 'deleted-users/permanent-delete/{id}', [DeletedUsersController::class, 'permanentDelete'])->name('admin.deleted.users.permanent-delete');
 });
@@ -240,7 +241,7 @@ Route::prefix('invitations')->name('invitations.')->group(function () {
 Route::get('/invitation/{token}', [InvitationController::class, 'show'])->name('invitation.show');
 
 // Admin invitation management routes
-Route::middleware(['role:Admin', '2fa'])->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
+Route::middleware('role:Admin', '2fa')->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\AdminInvitationController::class, 'index'])->name('index');
     Route::get('/{id}', [App\Http\Controllers\Admin\AdminInvitationController::class, 'show'])->name('show');
     Route::post('/{id}/resend', [App\Http\Controllers\Admin\AdminInvitationController::class, 'resend'])->name('resend');
