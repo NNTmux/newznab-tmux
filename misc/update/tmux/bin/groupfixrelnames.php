@@ -9,7 +9,6 @@ use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
-use Blacklight\NZB;
 use Blacklight\NZBContents;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB;

@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\UserMovie;
 use App\Models\UserSerie;
-use Blacklight\NZB;
 use Blacklight\Releases;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;

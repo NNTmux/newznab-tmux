@@ -3,7 +3,6 @@
 namespace Blacklight\libraries\Runners;
 
 use App\Models\Settings;
-use Blacklight\NZB;
 use Illuminate\Support\Facades\DB;
 use Spatie\Async\Output\SerializableException;
 

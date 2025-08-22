@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
-use Blacklight\NZB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
