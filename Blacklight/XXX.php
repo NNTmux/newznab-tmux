@@ -510,7 +510,7 @@ class XXX
     public function processXXXReleases(): void
     {
         $res = Release::query()
-            ->where(['nzbstatus' => 1, 'xxxinfo_id' => 0])
+            ->where(['xxxinfo_id' => 0])
             ->whereIn(
                 'categories_id',
                 [

@@ -451,7 +451,6 @@ class ProcessAdditional
     protected function _fetchReleases(int|string $groupID, string &$guidChar): void
     {
         $releasesQuery = Release::query()
-            ->where('releases.nzbstatus', '=', 1)
             ->where('releases.passwordstatus', '=', -1)
             ->where('releases.haspreview', '=', -1)
             ->where('categories.disablepreview', '=', 0);

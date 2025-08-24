@@ -29,7 +29,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
         $limit = $argv[2];
     }
     $colorCli->header('Scanning for releases missing previews');
-    $res = Release::query()->select('id', 'guid')->where(['nzbstatus' => 1, 'haspreview' => 1])->get()->toArray();
+    $res = Release::query()->select('id', 'guid')->where(['haspreview' => 1])->get()->toArray();
     foreach ($res as $row) {
         $nzbpath = $path2preview.$row['guid'].'_thumb.jpg';
         if (! file_exists($nzbpath)) {

@@ -24,7 +24,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $res = DB::select('SELECT r.imdbid
 								FROM releases r
 								LEFT JOIN movieinfo m ON m.imdbid = r.imdbid
-								WHERE nzbstatus = 1 AND m.cover = 1 AND adddate >  (NOW() - INTERVAL 24 HOUR) GROUP BY r.imdbid');
+								WHERE m.cover = 1 AND adddate >  (NOW() - INTERVAL 24 HOUR) GROUP BY r.imdbid');
 
     foreach ($res as $row) {
         $nzbpath = $path2cover.$row->imdbid.'-cover.jpg';

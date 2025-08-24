@@ -1288,8 +1288,7 @@ class Movie
             $query = Release::query()
                 ->select(['searchname', 'id'])
                 ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
-                ->whereNull('imdbid')
-                ->where('nzbstatus', '=', 1);
+                ->whereNull('imdbid');
 
             // Apply filters if provided
             if ($groupID !== '') {

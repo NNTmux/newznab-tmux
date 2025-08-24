@@ -23,7 +23,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $colorCli->header('Scanning for XXX UHD/HD/SD releases missing sample images');
     $res = $pdo->query(sprintf('SELECT r.id, r.guid AS guid, r.searchname AS searchname
 								FROM releases r
-								WHERE r.nzbstatus = 1 AND r.jpgstatus = 0 AND r.categories_id IN (%s, %s, %s) ORDER BY r.adddate DESC', Category::XXX_CLIPHD, Category::XXX_CLIPSD, Category::XXX_UHD));
+								WHERE r.jpgstatus = 0 AND r.categories_id IN (%s, %s, %s) ORDER BY r.adddate DESC', Category::XXX_CLIPHD, Category::XXX_CLIPSD, Category::XXX_UHD));
     foreach ($res as $row) {
         $nzbpath = $path2cover.$row['guid'].'_thumb.jpg';
         if (! file_exists($nzbpath)) {

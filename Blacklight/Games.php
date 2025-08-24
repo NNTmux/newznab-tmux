@@ -674,7 +674,6 @@ class Games
     public function processGamesReleases(): void
     {
         $query = Release::query()
-            ->where('nzbstatus', '=', 1)
             ->where('gamesinfo_id', '=', 0)
             ->where('categories_id', '=', Category::PC_GAMES);
         if ((int) Settings::settingValue('lookupgames') === 2) {

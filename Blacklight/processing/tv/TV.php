@@ -135,7 +135,7 @@ abstract class TV extends Videos
         }
 
         $qry = Release::query()
-            ->where(['nzbstatus' => 1, 'videos_id' => 0, 'tv_episodes_id' => $status])
+            ->where(['videos_id' => 0, 'tv_episodes_id' => $status])
             ->where('size', '>', 1048576)
             ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
             ->where('categories_id', '<>', Category::TV_ANIME)
