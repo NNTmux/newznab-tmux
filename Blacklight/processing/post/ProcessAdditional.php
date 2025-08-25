@@ -38,6 +38,8 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Mhor\MediaInfo\MediaInfo;
+use App\Models\MediaInfo as MediaInfoModel;
+use App\Models\ReleaseExtraFull;
 
 class ProcessAdditional
 {
@@ -495,7 +497,7 @@ class ProcessAdditional
 
         $rawResults = DB::select($finalSql, $bindings);
         // Hydrate into Release models so later code expecting model (with array access) still works.
-        $attributeArrays = array_map(static fn($row) => (array) $row, $rawResults);
+        $attributeArrays = array_map(static fn ($row) => (array) $row, $rawResults);
         $this->_releases = Release::hydrate($attributeArrays);
         $this->_totalReleases = $this->_releases->count();
     }
@@ -650,19 +652,50 @@ class ProcessAdditional
                 if ($this->_echoCLI) {
                     $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid, 'warning');
                 }
-                $this->_deleteRelease();
-
-                return false;
+                // Try repair on raw file contents (maybe unzip failed but file readable)
+                try {
+                    $rawFile = @File::get($nzbPath);
+                    if ($rawFile) {
+                        // If gz, attempt decompress ignoring errors.
+                        if (str_ends_with(strtolower($nzbPath), '.gz')) {
+                            $try = @gzdecode($rawFile);
+                            if ($try !== false) {
+                                $repaired = $this->_repairNZB($try, $nzbPath);
+                                if ($repaired !== null) {
+                                    $nzbContents = $repaired; // continue below
+                                }
+                            }
+                        } else {
+                            $repaired = $this->_repairNZB($rawFile, $nzbPath);
+                            if ($repaired !== null) {
+                                $nzbContents = $repaired;
+                            }
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+                if (! $nzbContents) {
+                    $this->_deleteRelease();
+                    return false;
+                }
             }
             // Get a list of files in the nzb.
             $this->_nzbContents = $this->_nzb->nzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
             if (\count($this->_nzbContents) === 0) {
-                if ($this->_echoCLI) {
-                    $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid, 'warning');
+                // Attempt repair if initial parse yielded no files.
+                $repaired = $this->_repairNZB($nzbContents, $nzbPath);
+                if ($repaired !== null) {
+                    $this->_nzbContents = $this->_nzb->nzbFileList($repaired, ['no-file-key' => false, 'strip-count' => true]);
                 }
-                $this->_deleteRelease();
+                if (\count($this->_nzbContents) === 0) {
+                    if ($this->_echoCLI) {
+                        $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid, 'warning');
+                    }
+                    $this->_deleteRelease();
 
-                return false;
+                    return false;
+                }
             }
             // Sort keys.
             ksort($this->_nzbContents, SORT_NATURAL);
@@ -677,9 +710,68 @@ class ProcessAdditional
         return false;
     }
 
-    protected function _deleteRelease(): void
+    /**
+     * Attempt to repair a potentially broken NZB XML string.
+     * Strategies:
+     *  - Strip illegal control characters.
+     *  - Ensure root <nzb> closing tag exists.
+     *  - Optionally wrap content if root tag missing.
+     *  - Try liberal XML parsing; return repaired content on success.
+     */
+    protected function _repairNZB(string $raw, string $originalPath): ?string
     {
-        Release::whereId($this->_release->id)->delete();
+        $original = $raw;
+        // Remove common binary / control chars except tab, newline, carriage return.
+        $fixed = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $raw);
+
+        // If missing opening <nzb ...> tag, try to wrap existing segments inside a minimal nzb root.
+        if (! str_contains(strtolower($fixed), '<nzb')) {
+            $fixed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nzb xmlns=\"http://www.newzbin.com/DTD/2003/nzb\">\n".$fixed."\n</nzb>";
+        } else {
+            // Ensure closing tag.
+            if (! preg_match('/<\/nzb>\s*$/i', $fixed)) {
+                $fixed .= "\n</nzb>";
+            }
+        }
+
+        // Try to parse using libxml recovery.
+        $opts = LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_COMPACT | LIBXML_NONET | LIBXML_NOCDATA | LIBXML_PARSEHUGE;
+        $prev = libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($fixed, 'SimpleXMLElement', $opts);
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+
+        if ($xml === false || empty($xml->file)) {
+            // Failed; return null so caller can continue normal failure path.
+            if ($this->_echoCLI) {
+                $this->_echo('NZB repair failed for GUID: '.$this->_release->guid.' ('.(count($errors)).' XML errors)', 'warning');
+            }
+            return null;
+        }
+
+        // If we get here we believe repair succeeded; optionally persist repaired version (gzipped) next to original.
+        try {
+            // Only overwrite if we actually changed content.
+            if ($fixed !== $original) {
+                // If original was gz (very likely), replace with repaired gz; else plain.
+                if (str_ends_with(strtolower($originalPath), '.gz')) {
+                    @File::put($originalPath, gzencode($fixed));
+                } else {
+                    @File::put($originalPath, $fixed);
+                }
+            }
+        } catch (\Throwable $e) {
+            if (config('app.debug') === true) {
+                Log::debug('Failed to persist repaired NZB: '.$e->getMessage());
+            }
+        }
+
+        if ($this->_echoCLI) {
+            $this->_echo('Repaired NZB for GUID: '.$this->_release->guid, 'primaryOver');
+        }
+
+        return $fixed;
     }
 
     /**
@@ -839,7 +931,7 @@ class ProcessAdditional
             // Download the article(s) from usenet.
             $fetchedBinary = $this->_nntp->getMessages($this->_releaseGroupName, $mID, $this->_alternateNNTP);
             // Treat any non-string or blank response as failure.
-            if (!is_string($fetchedBinary) || $fetchedBinary === '') {
+            if (! is_string($fetchedBinary) || $fetchedBinary === '') {
                 $fetchedBinary = false;
             }
 
@@ -1234,7 +1326,7 @@ class ProcessAdditional
             if (! empty($this->_sampleMessageIDs)) {
                 // Download it from usenet.
                 $sampleBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_sampleMessageIDs, $this->_alternateNNTP);
-                if (!is_string($sampleBinary) || $sampleBinary === '') {
+                if (! is_string($sampleBinary) || $sampleBinary === '') {
                     $sampleBinary = false;
                 }
                 if ($sampleBinary !== false) {
@@ -1279,7 +1371,7 @@ class ProcessAdditional
             if (! empty($this->_MediaInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs, $this->_alternateNNTP);
-                if (!is_string($mediaBinary) || $mediaBinary === '') {
+                if (! is_string($mediaBinary) || $mediaBinary === '') {
                     $mediaBinary = false;
                 }
                 if ($mediaBinary !== false) {
@@ -1329,7 +1421,7 @@ class ProcessAdditional
             if (! empty($this->_AudioInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs, $this->_alternateNNTP);
-                if (!is_string($audioBinary) || $audioBinary === '') {
+                if (! is_string($audioBinary) || $audioBinary === '') {
                     $audioBinary = false;
                 }
                 if ($audioBinary !== false) {
@@ -1363,7 +1455,7 @@ class ProcessAdditional
         if (! $this->_foundJPGSample && ! empty($this->_JPGMessageIDs)) {
             // Try to download it.
             $jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageIDs, $this->_alternateNNTP);
-            if (!is_string($jpgBinary) || $jpgBinary === '') {
+            if (! is_string($jpgBinary) || $jpgBinary === '') {
                 $jpgBinary = false;
             }
 
@@ -2130,5 +2222,68 @@ class ProcessAdditional
     protected function _debug(string $string): void
     {
         $this->_echo('DEBUG: '.$string, 'debug');
+    }
+
+    /**
+     * Delete the current release (used when NZB is irreparably broken).
+     * Removes DB row, related ancillary rows, search index documents, NZB and preview assets.
+     */
+    protected function _deleteRelease(): void
+    {
+        try {
+            if (!isset($this->_release) || empty($this->_release->id)) {
+                return;
+            }
+            $id = (int) $this->_release->id;
+            $guid = $this->_release->guid ?? '';
+
+            // Delete related files (NZB + media samples/images if present)
+            try {
+                $nzbPath = $this->_nzb->NZBPath($guid);
+                if ($nzbPath && File::exists($nzbPath)) {
+                    File::delete($nzbPath);
+                }
+            } catch (\Throwable $e) {
+                // ignore
+            }
+            // Remove preview assets
+            try {
+                $img = $this->_releaseImage->imgSavePath.$guid.'_thumb.jpg';
+                $jpg = $this->_releaseImage->jpgSavePath.$guid.'_thumb.jpg';
+                $vid = $this->_releaseImage->vidSavePath.$guid.'.ogv';
+                foreach ([$img, $jpg, $vid] as $f) {
+                    if ($f && File::exists($f)) {
+                        File::delete($f);
+                    }
+                }
+            } catch (\Throwable $e) {
+                // ignore
+            }
+
+            // Delete ancillary rows.
+            try { ReleaseFile::where('releases_id', $id)->delete(); } catch (\Throwable $e) {}
+            try { MediaInfoModel::where('releases_id', $id)->delete(); } catch (\Throwable $e) {}
+            try { ReleaseExtraFull::where('releases_id', $id)->delete(); } catch (\Throwable $e) {}
+
+            // Delete search index document.
+            try {
+                if (config('nntmux.elasticsearch_enabled') === true) {
+                    $this->elasticsearch->deleteRelease($id);
+                } else {
+                    $this->manticore->deleteRelease([$id]);
+                }
+            } catch (\Throwable $e) {
+                // ignore index delete failures
+            }
+
+            // Finally delete release row.
+            try { Release::where('id', $id)->delete(); } catch (\Throwable $e) {}
+
+            if ($this->_echoCLI) {
+                $this->_echo('Deleted broken release ID '.$id, 'warningOver');
+            }
+        } catch (\Throwable $e) {
+            // Last resort: swallow any exception.
+        }
     }
 }

@@ -606,4 +606,34 @@ class ElasticSearchSiteSearch
             return [];
         }
     }
+
+    public function deleteRelease(int $id): void
+    {
+        if (empty($id) || ! $this->isElasticsearchAvailable()) {
+            if (empty($id)) {
+                Log::warning('ElasticSearch: Cannot delete release without ID');
+            }
+
+            return;
+        }
+
+        try {
+            $data = [
+                'index' => 'releases',
+                'id' => $id,
+            ];
+
+            $client = $this->getClient();
+            $client->delete($data);
+
+        } catch (ElasticsearchException $e) {
+            Log::error('ElasticSearch deleteRelease error: '.$e->getMessage(), [
+                'release_id' => $id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch deleteRelease unexpected error: '.$e->getMessage(), [
+                'release_id' => $id,
+            ]);
+        }
+    }
 }
