@@ -1022,12 +1022,12 @@ class ProcessAdditional
             try {
                 if ($this->_unrarPath !== false) {
                     $unrarDir = $this->tmpPath.'unrar/';
-                    if (!File::isDirectory($unrarDir)) {
+                    if (! File::isDirectory($unrarDir)) {
                         File::makeDirectory($unrarDir, 0777, true, true);
                     }
                 }
                 $unzipDir = $this->tmpPath.'unzip/';
-                if (!File::isDirectory($unzipDir)) {
+                if (! File::isDirectory($unzipDir)) {
                     File::makeDirectory($unzipDir, 0777, true, true);
                 }
             } catch (\Throwable $e) {
@@ -1586,7 +1586,7 @@ class ProcessAdditional
         $path = $path ?: $this->tmpPath;
 
         // Attempt to (re)create the directory if it vanished (external cleanup, race condition, etc).
-        if ($path !== '' && !File::isDirectory($path)) {
+        if ($path !== '' && ! File::isDirectory($path)) {
             try {
                 File::makeDirectory($path, 0777, true, true);
             } catch (\Throwable $e) {
@@ -1598,7 +1598,7 @@ class ProcessAdditional
             $files = File::allFiles($path);
         } catch (\Throwable $e) {
             // Second chance: directory might have disappeared between existence check and allFiles call.
-            if ($path !== '' && !File::isDirectory($path)) {
+            if ($path !== '' && ! File::isDirectory($path)) {
                 try {
                     File::makeDirectory($path, 0777, true, true);
                     $files = File::allFiles($path); // retry once
@@ -2377,7 +2377,7 @@ class ProcessAdditional
             return 'gzip';
         }
         // BZIP2: 42 5A 68 (BZh)
-        if (strncmp($head4, "BZh", 3) === 0) {
+        if (strncmp($head4, 'BZh', 3) === 0) {
             return 'bzip2';
         }
         // XZ: FD 37 7A 58 5A 00
