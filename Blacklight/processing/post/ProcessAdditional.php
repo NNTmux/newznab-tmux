@@ -624,17 +624,31 @@ class ProcessAdditional
         // Per release defaults.
         $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.'/';
         if (! File::isDirectory($this->tmpPath)) {
-            if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
-                // We will try to create the main temp folder again, just in case there was a file lock or filesystem issue.
-                if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
-                    $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
+            try {
+                // Use force + recursive so concurrent processes creating the same path don't error out.
+                File::makeDirectory($this->tmpPath, 0777, true, true);
+            } catch (\Throwable $e) {
+                // If another process created it between the isDirectory check and mkdir call, ignore.
+                if (! File::isDirectory($this->tmpPath)) {
+                    // Retry once after a tiny delay (filesystem latency / NFS eventual consistency).
+                    usleep(100000); // 100ms
+                    if (! File::isDirectory($this->tmpPath)) {
+                        try {
+                            File::makeDirectory($this->tmpPath, 0777, true, true);
+                        } catch (\Throwable $e2) {
+                            if (config('app.debug') === true) {
+                                Log::warning('Unable to create directory after retry: '.$this->tmpPath.' :: '.$e2->getMessage());
+                            }
+                            $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
 
-                    return false;
+                            return false;
+                        }
+                    }
                 }
             }
         }
 
-        return true;
+        return File::isDirectory($this->tmpPath);
     }
 
     /**
@@ -1003,6 +1017,26 @@ class ProcessAdditional
             return false;
         }
 
+        // Ensure extraction target subdirectories exist if we're delegating extraction to external binaries.
+        if (! $this->_extractUsingRarInfo) {
+            try {
+                if ($this->_unrarPath !== false) {
+                    $unrarDir = $this->tmpPath.'unrar/';
+                    if (!File::isDirectory($unrarDir)) {
+                        File::makeDirectory($unrarDir, 0777, true, true);
+                    }
+                }
+                $unzipDir = $this->tmpPath.'unzip/';
+                if (!File::isDirectory($unzipDir)) {
+                    File::makeDirectory($unzipDir, 0777, true, true);
+                }
+            } catch (\Throwable $e) {
+                if (config('app.debug') === true) {
+                    Log::warning('Failed ensuring extraction subdirectories: '.$e->getMessage());
+                }
+            }
+        }
+
         // Check if the compressed file is encrypted.
         if (! empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && (int) $dataSummary['is_encrypted'] !== 0)) {
             if (config('app.debug') === true) {
@@ -1054,7 +1088,6 @@ class ProcessAdditional
                 if (! $this->_extractUsingRarInfo) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
-                    // Use the unzip command instead of 7zip
                     runCmd($this->_unzipPath.' -o "'.$fileName.'" -d "'.$this->tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
@@ -1552,13 +1585,35 @@ class ProcessAdditional
     {
         $path = $path ?: $this->tmpPath;
 
+        // Attempt to (re)create the directory if it vanished (external cleanup, race condition, etc).
+        if ($path !== '' && !File::isDirectory($path)) {
+            try {
+                File::makeDirectory($path, 0777, true, true);
+            } catch (\Throwable $e) {
+                // Ignore here; will be handled below when trying to read.
+            }
+        }
+
         try {
             $files = File::allFiles($path);
         } catch (\Throwable $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getTraceAsString());
+            // Second chance: directory might have disappeared between existence check and allFiles call.
+            if ($path !== '' && !File::isDirectory($path)) {
+                try {
+                    File::makeDirectory($path, 0777, true, true);
+                    $files = File::allFiles($path); // retry once
+                } catch (\Throwable $e2) {
+                    if (config('app.debug') === true) {
+                        Log::error($e2->getTraceAsString());
+                    }
+                    throw new \RuntimeException('ERROR: Could not open temp dir: '.$e2->getMessage());
+                }
+            } else {
+                if (config('app.debug') === true) {
+                    Log::error($e->getTraceAsString());
+                }
+                throw new \RuntimeException('ERROR: Could not open temp dir: '.$e->getMessage());
             }
-            throw new \RuntimeException('ERROR: Could not open temp dir: '.$e->getMessage());
         }
 
         if ($pattern !== '') {
@@ -2301,5 +2356,43 @@ class ProcessAdditional
         } catch (\Throwable $e) {
             // Last resort: swallow any exception.
         }
+    }
+
+    protected function _detectNonRarZipType(string $data): ?string
+    {
+        $len = strlen($data);
+        if ($len < 8) {
+            return null;
+        }
+        $head8 = substr($data, 0, 8);
+        $head6 = substr($data, 0, 6);
+        $head4 = substr($data, 0, 4);
+
+        // 7z signature: 37 7A BC AF 27 1C
+        if (strncmp($head6, "\x37\x7A\xBC\xAF\x27\x1C", 6) === 0) {
+            return '7z';
+        }
+        // GZIP: 1F 8B 08
+        if (strncmp($head4, "\x1F\x8B\x08", 3) === 0) {
+            return 'gzip';
+        }
+        // BZIP2: 42 5A 68 (BZh)
+        if (strncmp($head4, "BZh", 3) === 0) {
+            return 'bzip2';
+        }
+        // XZ: FD 37 7A 58 5A 00
+        if (strncmp($head6, "\xFD7zXZ\x00", 6) === 0) {
+            return 'xz';
+        }
+        // TAR: no fixed magic at start; look for ustar at offset 257
+        if ($len > 265 && substr($data, 257, 5) === 'ustar') {
+            return 'tar';
+        }
+        // PDF (sometimes mis-uploaded): %PDF
+        if (strncmp($head4, '%PDF', 4) === 0) {
+            return 'pdf';
+        }
+
+        return null;
     }
 }
