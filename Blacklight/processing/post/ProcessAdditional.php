@@ -355,7 +355,8 @@ class ProcessAdditional
 
         $this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
         $this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
-        $this->_supportFileRegex = '/\.(vol\d{1,3}\+\d{1,3}|par2|srs|sfv|nzb';
+        // Store only the inner fragment; delimiters appended at usage time.
+        $this->_supportFileRegex = '\\.(vol\\d{1,3}\\+\\d{1,3}|par2|srs|sfv|nzb';
         $this->_videoFileRegex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
     }
 
@@ -450,29 +451,52 @@ class ProcessAdditional
      */
     protected function _fetchReleases(int|string $groupID, string &$guidChar): void
     {
-        $releasesQuery = Release::query()
-            ->where('releases.passwordstatus', '=', -1)
-            ->where('releases.haspreview', '=', -1)
-            ->where('categories.disablepreview', '=', 0);
+        $sqlParts = [];
+        $bindings = [];
+
+        $sqlParts[] = 'SELECT r.id AS id, r.id AS releases_id, r.guid, r.name, r.size, r.groups_id, r.nfostatus, r.fromname,'.
+            ' r.completion, r.categories_id, r.searchname, r.predb_id, c.disablepreview';
+        $sqlParts[] = 'FROM releases r';
+        $sqlParts[] = 'LEFT JOIN categories c ON c.id = r.categories_id';
+        $sqlParts[] = 'WHERE r.passwordstatus = ?';
+        $bindings[] = -1; // passwordstatus
+        $sqlParts[] = 'AND r.nzbstatus = ?';
+        $bindings[] = 1; // ensure NZB file exists/ready
+        $sqlParts[] = 'AND r.haspreview = ?';
+        $bindings[] = -1; // haspreview
+        $sqlParts[] = 'AND c.disablepreview = ?';
+        $bindings[] = 0;  // categories.disablepreview
+
         if ($this->_maxSize > 0) {
-            $releasesQuery->where('releases.size', '<', (int) $this->_maxSize * 1073741824);
+            $sqlParts[] = 'AND r.size < ?';
+            $bindings[] = (int) $this->_maxSize * 1073741824; // GB to bytes
         }
         if ($this->_minSize > 0) {
-            $releasesQuery->where('releases.size', '>', (int) $this->_minSize * 1048576);
+            $sqlParts[] = 'AND r.size > ?';
+            $bindings[] = (int) $this->_minSize * 1048576; // MB to bytes
         }
         if (! empty($groupID)) {
-            $releasesQuery->where('releases.groups_id', $groupID);
+            $sqlParts[] = 'AND r.groups_id = ?';
+            $bindings[] = $groupID;
         }
         if (! empty($guidChar)) {
-            $releasesQuery->where('releases.leftguid', $guidChar);
+            $sqlParts[] = 'AND r.leftguid = ?';
+            $bindings[] = $guidChar;
         }
-        $releasesQuery->select(['releases.id', 'releases.id as releases_id', 'releases.guid', 'releases.name', 'releases.size', 'releases.groups_id', 'releases.nfostatus', 'releases.fromname', 'releases.completion', 'releases.categories_id', 'releases.searchname', 'releases.predb_id', 'categories.disablepreview'])
-            ->leftJoin('categories', 'categories.id', '=', 'releases.categories_id')
-            ->orderBy('releases.passwordstatus')
-            ->orderByDesc('releases.postdate')
-            ->limit($this->_queryLimit);
 
-        $this->_releases = $releasesQuery->get();
+        $sqlParts[] = 'ORDER BY r.passwordstatus ASC, r.postdate DESC';
+        $limit = $this->_queryLimit;
+        if ($limit <= 0) {
+            $limit = 25; // fallback safety
+        }
+        $sqlParts[] = 'LIMIT '.$limit; // limit
+
+        $finalSql = implode(' ', $sqlParts);
+
+        $rawResults = DB::select($finalSql, $bindings);
+        // Hydrate into Release models so later code expecting model (with array access) still works.
+        $attributeArrays = array_map(static fn($row) => (array) $row, $rawResults);
+        $this->_releases = Release::hydrate($attributeArrays);
         $this->_totalReleases = $this->_releases->count();
     }
 
@@ -678,7 +702,7 @@ class ProcessAdditional
         foreach ($this->_nzbContents as $this->_currentNZBFile) {
             try {
                 // Check if it's not a nfo, nzb, par2 etc...
-                if (preg_match($this->_supportFileRegex.'|nfo\b|inf\b|ofn\b)($|[ ")\]-])(?!.{20,})/i', $this->_currentNZBFile['title'])) {
+                if (preg_match('/'.$this->_supportFileRegex.'|nfo\b|inf\b|ofn\b)($|[ ")\]-])(?!.{20,})/i', $this->_currentNZBFile['title'])) {
                     continue;
                 }
 
@@ -814,7 +838,8 @@ class ProcessAdditional
 
             // Download the article(s) from usenet.
             $fetchedBinary = $this->_nntp->getMessages($this->_releaseGroupName, $mID, $this->_alternateNNTP);
-            if ($this->_nntp::isError($fetchedBinary)) {
+            // Treat any non-string or blank response as failure.
+            if (!is_string($fetchedBinary) || $fetchedBinary === '') {
                 $fetchedBinary = false;
             }
 
@@ -826,11 +851,13 @@ class ProcessAdditional
 
                 $downloaded++;
 
-                // Process the compressed file.
-                $decompressed = $this->_processCompressedData($fetchedBinary);
+                // Process the compressed file only if it's still a string.
+                if (is_string($fetchedBinary)) {
+                    $decompressed = $this->_processCompressedData($fetchedBinary);
 
-                if ($decompressed || $this->_releaseHasPassword) {
-                    break;
+                    if ($decompressed || $this->_releaseHasPassword) {
+                        break;
+                    }
                 }
             } else {
                 $failed++;
@@ -1024,7 +1051,7 @@ class ProcessAdditional
     {
         // Don't add rar/zip files to the DB.
         if (! isset($file['error']) && isset($file['source']) &&
-            ! preg_match($this->_supportFileRegex.'|part\d+|[r|z]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar)(\s*\.rar)?$/i', $file['name'])
+            ! preg_match('/'.$this->_supportFileRegex.'|part\d+|[r|z]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar)(\s*\.rar)?$/i', $file['name'])
         ) {
             // Cache the amount of files we find in the RAR or ZIP, return this to say we did find RAR or ZIP content.
             // This is so we don't download more RAR or ZIP files for no reason.
@@ -1207,17 +1234,16 @@ class ProcessAdditional
             if (! empty($this->_sampleMessageIDs)) {
                 // Download it from usenet.
                 $sampleBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_sampleMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp::isError($sampleBinary)) {
+                if (!is_string($sampleBinary) || $sampleBinary === '') {
                     $sampleBinary = false;
                 }
-
                 if ($sampleBinary !== false) {
                     if ($this->_echoCLI) {
                         $this->_echo('(sB)', 'primaryOver');
                     }
 
                     // Check if it's more than 40 bytes.
-                    if (\strlen($sampleBinary) > 40) {
+                    if (is_string($sampleBinary) && \strlen($sampleBinary) > 40) {
                         $fileLocation = $this->tmpPath.'sample_'.random_int(0, 99999).'.avi';
                         // Try to create the file.
                         File::put($fileLocation, $sampleBinary);
@@ -1253,18 +1279,16 @@ class ProcessAdditional
             if (! empty($this->_MediaInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp::isError($mediaBinary)) {
-                    // If error set it to false.
+                if (!is_string($mediaBinary) || $mediaBinary === '') {
                     $mediaBinary = false;
                 }
-
                 if ($mediaBinary !== false) {
                     if ($this->_echoCLI) {
                         $this->_echo('(mB)', 'primaryOver');
                     }
 
                     // If it's more than 40 bytes...
-                    if (\strlen($mediaBinary) > 40) {
+                    if (is_string($mediaBinary) && \strlen($mediaBinary) > 40) {
                         $fileLocation = $this->tmpPath.'media.avi';
                         // Create a file on the disk with it.
                         File::put($fileLocation, $mediaBinary);
@@ -1305,10 +1329,9 @@ class ProcessAdditional
             if (! empty($this->_AudioInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp::isError($audioBinary)) {
+                if (!is_string($audioBinary) || $audioBinary === '') {
                     $audioBinary = false;
                 }
-
                 if ($audioBinary !== false) {
                     if ($this->_echoCLI) {
                         $this->_echo('(aB)', 'primaryOver');
@@ -1340,7 +1363,7 @@ class ProcessAdditional
         if (! $this->_foundJPGSample && ! empty($this->_JPGMessageIDs)) {
             // Try to download it.
             $jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageIDs, $this->_alternateNNTP);
-            if ($this->_nntp::isError($jpgBinary)) {
+            if (!is_string($jpgBinary) || $jpgBinary === '') {
                 $jpgBinary = false;
             }
 
