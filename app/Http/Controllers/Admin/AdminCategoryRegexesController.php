@@ -109,15 +109,15 @@ class AdminCategoryRegexesController extends BasePageController
             ->whereNotNull('c.root_categories_id')
             ->orderBy('c.id')
             ->get();
-        $categories = ['category_names', 'category_ids'];
-        if (count($categories_db) !== 0) {
-            foreach ($categories_db as $category_db) {
-                $categories['category_names'] = $category_db->parent_title.' '.$category_db->title.': '.$category_db->id;
-                $categories['category_ids'] = $category_db->id;
-            }
+        // Build arrays for Smarty html_options helper. Previously only last row was kept.
+        $category_ids = [];
+        $category_names = [];
+        foreach ($categories_db as $category_db) {
+            $category_ids[] = $category_db->id;
+            $category_names[] = $category_db->parent_title . ' ' . $category_db->title . ': ' . $category_db->id;
         }
-        $this->smarty->assign('category_names', $categories['category_names']);
-        $this->smarty->assign('category_ids', $categories['category_ids']);
+        $this->smarty->assign('category_names', $category_names);
+        $this->smarty->assign('category_ids', $category_ids);
 
         $content = $this->smarty->fetch('category_regexes-edit.tpl');
         $this->smarty->assign(compact('title', 'meta_title', 'content'));
