@@ -3,8 +3,10 @@
 namespace Blacklight\processing\post;
 
 use App\Models\Category;
+use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\Predb;
 use App\Models\Release;
+use App\Models\ReleaseExtraFull;
 use App\Models\ReleaseFile;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
@@ -38,8 +40,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Mhor\MediaInfo\MediaInfo;
-use App\Models\MediaInfo as MediaInfoModel;
-use App\Models\ReleaseExtraFull;
 
 class ProcessAdditional
 {
@@ -677,6 +677,7 @@ class ProcessAdditional
                 }
                 if (! $nzbContents) {
                     $this->_deleteRelease();
+
                     return false;
                 }
             }
@@ -747,6 +748,7 @@ class ProcessAdditional
             if ($this->_echoCLI) {
                 $this->_echo('NZB repair failed for GUID: '.$this->_release->guid.' ('.(count($errors)).' XML errors)', 'warning');
             }
+
             return null;
         }
 
@@ -971,8 +973,10 @@ class ProcessAdditional
         $this->_compressedFilesChecked++;
         // Give the data to archive info, so it can check if it's a rar.
         if (! $this->_archiveInfo->setData($compressedData, true)) {
+            // Attempt to detect other common archive/container signatures for debugging purposes.
+            $otherType = $this->_detectNonRarZipType($compressedData);
             if (config('app.debug') === true) {
-                $this->_debug('Data is probably not RAR or ZIP.');
+                $this->_debug('Data is not recognized as RAR or ZIP'.($otherType !== null ? ", probable type: {$otherType}" : '.'));
             }
 
             return false;
@@ -2231,7 +2235,7 @@ class ProcessAdditional
     protected function _deleteRelease(): void
     {
         try {
-            if (!isset($this->_release) || empty($this->_release->id)) {
+            if (! isset($this->_release) || empty($this->_release->id)) {
                 return;
             }
             $id = (int) $this->_release->id;
@@ -2261,9 +2265,18 @@ class ProcessAdditional
             }
 
             // Delete ancillary rows.
-            try { ReleaseFile::where('releases_id', $id)->delete(); } catch (\Throwable $e) {}
-            try { MediaInfoModel::where('releases_id', $id)->delete(); } catch (\Throwable $e) {}
-            try { ReleaseExtraFull::where('releases_id', $id)->delete(); } catch (\Throwable $e) {}
+            try {
+                ReleaseFile::where('releases_id', $id)->delete();
+            } catch (\Throwable $e) {
+            }
+            try {
+                MediaInfoModel::where('releases_id', $id)->delete();
+            } catch (\Throwable $e) {
+            }
+            try {
+                ReleaseExtraFull::where('releases_id', $id)->delete();
+            } catch (\Throwable $e) {
+            }
 
             // Delete search index document.
             try {
@@ -2277,7 +2290,10 @@ class ProcessAdditional
             }
 
             // Finally delete release row.
-            try { Release::where('id', $id)->delete(); } catch (\Throwable $e) {}
+            try {
+                Release::where('id', $id)->delete();
+            } catch (\Throwable $e) {
+            }
 
             if ($this->_echoCLI) {
                 $this->_echo('Deleted broken release ID '.$id, 'warningOver');
