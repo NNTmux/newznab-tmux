@@ -114,7 +114,7 @@ class AdminCategoryRegexesController extends BasePageController
         $category_names = [];
         foreach ($categories_db as $category_db) {
             $category_ids[] = $category_db->id;
-            $category_names[] = $category_db->parent_title . ' ' . $category_db->title . ': ' . $category_db->id;
+            $category_names[] = $category_db->parent_title.' '.$category_db->title.': '.$category_db->id;
         }
         $this->smarty->assign('category_names', $category_names);
         $this->smarty->assign('category_ids', $category_ids);
