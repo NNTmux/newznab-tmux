@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\Predb;
 use App\Models\Release;
-use App\Models\ReleaseExtraFull;
 use App\Models\ReleaseFile;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
@@ -2326,10 +2325,6 @@ class ProcessAdditional
             }
             try {
                 MediaInfoModel::where('releases_id', $id)->delete();
-            } catch (\Throwable $e) {
-            }
-            try {
-                ReleaseExtraFull::where('releases_id', $id)->delete();
             } catch (\Throwable $e) {
             }
 
