@@ -6,8 +6,20 @@
 		    </div>
 
 		    <div class="card-body">
-		        <form action="tmux-edit?action=submit" method="post" id="tmuxForm">
-		            {{csrf_field()}}
+<form action="tmux-edit?action=submit" method="post" id="tmuxForm">
+    {{csrf_field()}}
+    <!-- Colored select states (mirrors site-edit.tpl) -->
+    <style>
+        /* Select color states */
+        #tmuxForm select.select-yes { background-color: #d1e7dd !important; border-color: #badbcc !important; color: #0f5132 !important; background-image: none !important; appearance: none; }
+        #tmuxForm select.select-no { background-color: #f8d7da !important; border-color: #f5c2c7 !important; color: #842029 !important; background-image: none !important; appearance: none; }
+        #tmuxForm select.select-other { background-color: #e2e3e5 !important; border-color: #d3d6d8 !important; color: #41464b !important; background-image: none !important; appearance: none; }
+        #tmuxForm select:focus { box-shadow: 0 0 0 .25rem rgba(13,110,253,.25); }
+    </style>
+    <!-- Coloring script moved to bottom for better performance -->
+    {literal}
+    <!-- removed heavy script block -->
+    {/literal}
 
 		            {if isset($error) && $error != ''}
 		                <div class="alert alert-danger mb-4">{$error}</div>
@@ -776,44 +788,45 @@
     </button>
 </div>
 
+</form>
+
+{literal}
 <script>
 (function () {
+  // Lightweight select coloring logic (no MutationObserver, single delegated listener)
+  function color(sel){
+    if(!sel || sel.tagName !== 'SELECT') return;
+    var opt = sel.options[sel.selectedIndex];
+    if(!opt) return;
+    var txt = (opt.text||'').trim().toLowerCase();
+    sel.classList.remove('select-yes','select-no','select-other');
+    if(['yes','enabled','on','true'].includes(txt)) sel.classList.add('select-yes');
+    else if(['no','disabled','off','false'].includes(txt)) sel.classList.add('select-no');
+    else sel.classList.add('select-other');
+  }
+  function initColoring(){
+    document.querySelectorAll('#tmuxForm select').forEach(color);
+    var form = document.getElementById('tmuxForm');
+    if(form && !form._colorBound){
+      form.addEventListener('change', function(e){ if(e.target && e.target.tagName==='SELECT') color(e.target); });
+      form._colorBound = true;
+    }
+  }
+
   var prevVal = null;
   var lastCustom = new Set();
-
   function getModeEl() { return document.getElementById('fix_crap_opt'); }
   function getMultiEl() { return document.getElementById('fix-crap-select'); }
   function getPanelEl() { return document.getElementById('fix-crap-panel'); }
   function getHintEl() { return document.getElementById('fix-crap-hint'); }
   function getActionsEl() { return document.getElementById('fix-crap-actions'); }
   function getModeVal() { var el = getModeEl(); return el ? el.value : ''; }
-
-  function currentSelectedSet() {
-    var el = getMultiEl();
-    var set = new Set();
-    if (!el) return set;
-    Array.prototype.forEach.call(el.options, function (opt) { if (opt.selected) set.add(opt.value); });
-    return set;
-  }
-  function setSelectedFromSet(set) {
-    var el = getMultiEl();
-    if (!el) return;
-    Array.prototype.forEach.call(el.options, function (opt) { opt.selected = set.has(opt.value); });
-  }
-  function selectAllOptions() {
-    var el = getMultiEl();
-    if (!el) return;
-    Array.prototype.forEach.call(el.options, function (opt) { opt.selected = true; });
-  }
-  function clearAllOptions() {
-    var el = getMultiEl();
-    if (!el) return;
-    Array.prototype.forEach.call(el.options, function (opt) { opt.selected = false; });
-  }
-
+  function currentSelectedSet() { var el = getMultiEl(); var set = new Set(); if (!el) return set; Array.prototype.forEach.call(el.options, function (opt) { if (opt.selected) set.add(opt.value); }); return set; }
+  function setSelectedFromSet(set) { var el = getMultiEl(); if (!el) return; Array.prototype.forEach.call(el.options, function (opt) { opt.selected = set.has(opt.value); }); }
+  function selectAllOptions() { var el = getMultiEl(); if (!el) return; Array.prototype.forEach.call(el.options, function (opt) { opt.selected = true; }); }
+  function clearAllOptions() { var el = getMultiEl(); if (!el) return; Array.prototype.forEach.call(el.options, function (opt) { opt.selected = false; }); }
   function fixCrapSelectAll() { selectAllOptions(); }
   function fixCrapClearAll() { clearAllOptions(); }
-
   function fixCrapSyncUI() {
     var mode = getModeVal();
     var multi = getMultiEl();
@@ -821,56 +834,30 @@
     var hint = getHintEl();
     var actions = getActionsEl();
     if (!multi || !panel) return;
-
-    // Persist custom selection when leaving Custom
-    if (prevVal === 'Custom' && mode !== 'Custom') {
-      lastCustom = currentSelectedSet();
-    }
-
+    if (prevVal === 'Custom' && mode !== 'Custom') { lastCustom = currentSelectedSet(); }
     if (mode === 'Custom') {
-      if (lastCustom && lastCustom.size > 0) {
-        setSelectedFromSet(lastCustom);
-      }
-      multi.removeAttribute('disabled');
-      multi.setAttribute('aria-disabled', 'false');
-      panel.classList.remove('opacity-50');
-      if (hint) hint.classList.add('d-none');
-      if (actions) actions.classList.remove('d-none');
+      if (lastCustom && lastCustom.size > 0) { setSelectedFromSet(lastCustom); }
+      multi.removeAttribute('disabled'); multi.setAttribute('aria-disabled', 'false'); panel.classList.remove('opacity-50'); if (hint) hint.classList.add('d-none'); if (actions) actions.classList.remove('d-none');
     } else if (mode === 'All') {
-      selectAllOptions();
-      multi.setAttribute('disabled', 'disabled');
-      multi.setAttribute('aria-disabled', 'true');
-      panel.classList.add('opacity-50');
-      if (hint) { hint.textContent = 'All filters are applied.'; hint.classList.remove('d-none'); }
-      if (actions) actions.classList.add('d-none');
-    } else { // Disabled or unknown
-      clearAllOptions();
-      multi.setAttribute('disabled', 'disabled');
-      multi.setAttribute('aria-disabled', 'true');
-      panel.classList.add('opacity-50');
-      if (hint) { hint.textContent = 'All filters are disabled.'; hint.classList.remove('d-none'); }
-      if (actions) actions.classList.add('d-none');
+      selectAllOptions(); multi.setAttribute('disabled','disabled'); multi.setAttribute('aria-disabled','true'); panel.classList.add('opacity-50'); if (hint){ hint.textContent='All filters are applied.'; hint.classList.remove('d-none'); } if (actions) actions.classList.add('d-none');
+    } else {
+      clearAllOptions(); multi.setAttribute('disabled','disabled'); multi.setAttribute('aria-disabled','true'); panel.classList.add('opacity-50'); if (hint){ hint.textContent='All filters are disabled.'; hint.classList.remove('d-none'); } if (actions) actions.classList.add('d-none');
     }
-
     prevVal = mode;
   }
-
-  // Expose helpers globally for inline handlers
   window.fixCrapSelectAll = fixCrapSelectAll;
   window.fixCrapClearAll = fixCrapClearAll;
   window.fixCrapSyncUI = fixCrapSyncUI;
-
-  document.addEventListener('DOMContentLoaded', function () {
-    // Seed lastCustom from server-provided defaults
+  document.addEventListener('DOMContentLoaded', function(){
+    // Initialize coloring first
+    initColoring();
+    // Existing fix-crap logic
     var multi = getMultiEl();
     if (multi) {
-      var def = multi.getAttribute('data-custom-default') || '';
-      lastCustom = new Set(def ? def.split(/,\s*/) : []);
+      var def = multi.getAttribute('data-custom-default') || ''; lastCustom = new Set(def ? def.split(/,\s*/) : []);
     }
-    prevVal = getModeVal();
-    var modeEl = getModeEl();
-    if (modeEl) modeEl.addEventListener('change', fixCrapSyncUI);
-    fixCrapSyncUI();
+    prevVal = getModeVal(); var modeEl = getModeEl(); if (modeEl) modeEl.addEventListener('change', fixCrapSyncUI); fixCrapSyncUI();
   });
 })();
 </script>
+{/literal}

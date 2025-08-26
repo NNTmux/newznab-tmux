@@ -7,7 +7,46 @@
 
 		    <div class="card-body">
 		        <form action="site-edit?action=submit" method="post" id="siteSettingsForm">
-		            {{csrf_field()}}
+    {{csrf_field()}}
+    <style>
+        /* Select color states */
+        #siteSettingsForm select.select-yes {
+            background-color: #d1e7dd !important; /* Bootstrap success bg */
+            border-color: #badbcc !important;
+            color: #0f5132 !important;
+        }
+        #siteSettingsForm select.select-no {
+            background-color: #f8d7da !important; /* Bootstrap danger bg */
+            border-color: #f5c2c7 !important;
+            color: #842029 !important;
+        }
+        #siteSettingsForm select.select-other {
+            background-color: #e2e3e5 !important; /* Bootstrap secondary bg */
+            border-color: #d3d6d8 !important;
+            color: #41464b !important;
+        }
+        /* Keep focus outline accessible */
+        #siteSettingsForm select:focus { box-shadow: 0 0 0 .25rem rgba(13,110,253,.25); }
+    </style>
+    <script>
+        (function(){
+            function applySelectColor(sel){
+                if(!sel || !sel.options || sel.selectedIndex < 0) return;
+                const txt = sel.options[sel.selectedIndex].text.trim().toLowerCase();
+                sel.classList.remove('select-yes','select-no','select-other');
+                if(['yes','enabled','on','true'].includes(txt)) sel.classList.add('select-yes');
+                else if(['no','disabled','off','false'].includes(txt)) sel.classList.add('select-no');
+                else sel.classList.add('select-other');
+            }
+            function init(){
+                document.querySelectorAll('#siteSettingsForm select').forEach(function(sel){
+                    applySelectColor(sel);
+                    sel.addEventListener('change', function(){ applySelectColor(sel); });
+                });
+            }
+            if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+        })();
+    </script>
 
 		            {if isset ($error) && $error != ''}
 		                <div class="alert alert-danger mb-4">{$error}</div>
@@ -263,8 +302,11 @@
 		        <label for="grabstatus" class="form-label fw-bold">Update Grabs:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="grabstatus" name='grabstatus' values=$yesno_ids output=$yesno_names selected=$site->grabstatus separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-sync"></i></span>
+		            <select id="grabstatus" name="grabstatus" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->grabstatus}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to update download counts when someone downloads a release.</small>
 		    </div>
@@ -314,8 +356,11 @@
 		        <label for="newgroupscanmethod" class="form-label fw-bold">Where to Start New Groups:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2 mb-2">
-		            {html_radios id="newgroupscanmethod" name='newgroupscanmethod' values=$yesno_ids output=$newgroupscan_names selected=$site->newgroupscanmethod separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group mb-2">
+		            <span class="input-group-text"><i class="fa fa-question-circle"></i></span>
+		            <select id="newgroupscanmethod" name="newgroupscanmethod" class="form-select">
+		                {html_options values=$yesno_ids output=$newgroupscan_names selected=$site->newgroupscanmethod}
+		            </select>
 		        </div>
 		        <div class="input-group mb-2">
 		            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
@@ -349,8 +394,11 @@
 		        <label for="disablebackfillgroup" class="form-label fw-bold">Auto Disable Groups During Backfill:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="disablebackfillgroup" name='disablebackfillgroup' values=$yesno_ids output=$yesno_names selected=$site->disablebackfillgroup separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-power-off"></i></span>
+		            <select id="disablebackfillgroup" name="disablebackfillgroup" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->disablebackfillgroup}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to disable a group automatically during backfill if the target date has been reached.</small>
 		    </div>
@@ -440,8 +488,11 @@
 		        <label for="lookupanidb" class="form-label fw-bold">Lookup AniDB:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="lookupanidb" name='lookupanidb' values=$yesno_ids output=$yesno_names selected=$site->lookupanidb separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-dragon"></i></span>
+		            <select id="lookupanidb" name="lookupanidb" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->lookupanidb}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to attempt to lookup anime information from AniDB when processing binaries.</small>
 		    </div>
@@ -467,8 +518,11 @@
 		        <label for="saveaudiopreview" class="form-label fw-bold">Save Audio Preview:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="saveaudiopreview" name='saveaudiopreview' values=$yesno_ids output=$yesno_names selected=$site->saveaudiopreview separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-music"></i></span>
+		            <select id="saveaudiopreview" name="saveaudiopreview" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->saveaudiopreview}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to save a preview of an audio release (requires deep rar inspection enabled).<br>It is advisable to specify a path to the lame binary to reduce the size of audio previews.</small>
 		    </div>
@@ -494,8 +548,11 @@
 		        <label for="lookupxxx" class="form-label fw-bold">Lookup XXX:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="lookupxxx" name='lookupxxx' values=$yesno_ids output=$yesno_names selected=$site->lookupxxx separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-video"></i></span>
+		            <select id="lookupxxx" name="lookupxxx" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->lookupxxx}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to attempt to lookup XXX information when processing binaries.</small>
 		    </div>
@@ -509,8 +566,11 @@
 		        <label for="categorizeforeign" class="form-label fw-bold">Categorize Foreign:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="categorizeforeign" name='categorizeforeign' values=$yesno_ids output=$yesno_names selected=$site->categorizeforeign separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-globe"></i></span>
+		            <select id="categorizeforeign" name="categorizeforeign" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->categorizeforeign}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to send foreign movies/tv to foreign sections or not. If set to true they will go in foreign categories.</small>
 		    </div>
@@ -521,8 +581,11 @@
 		        <label for="catwebdl" class="form-label fw-bold">Categorize WEB-DL:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="catwebdl" name='catwebdl' values=$yesno_ids output=$yesno_names selected=$site->catwebdl separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-cloud-download-alt"></i></span>
+		            <select id="catwebdl" name="catwebdl" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->catwebdl}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to send WEB-DL to the WEB-DL section or not. If set to true they will go in WEB-DL category, false will send them in HD TV. This will also make them inaccessible to Sickbeard and possibly Couchpotato.</small>
 		    </div>
@@ -537,8 +600,11 @@
 		        <label for="end" class="form-label fw-bold">Download last compressed file:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="end" name='end' values=$yesno_ids output=$yesno_names selected=$site->end separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-file-archive"></i></span>
+		            <select id="end" name="end" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->end}
+		            </select>
 		        </div>
 		        <small class="text-muted">Try to download the last rar or zip file? (This is good if most of the files are at the end.) Note: The first rar/zip is still downloaded.</small>
 		    </div>
@@ -612,8 +678,11 @@
 		        <label for="partrepair" class="form-label fw-bold">Part Repair:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="partrepair" name='partrepair' values=$yesno_ids output=$yesno_names selected=$site->partrepair separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-toolbox"></i></span>
+		            <select id="partrepair" name="partrepair" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->partrepair}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to attempt to repair parts or not, increases backfill/binaries updating time.</small>
 		    </div>
@@ -624,8 +693,11 @@
 		        <label for="safepartrepair" class="form-label fw-bold">Part Repair for Backfill Scripts:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="safepartrepair" name='safepartrepair' values=$yesno_ids output=$yesno_names selected=$site->safepartrepair separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-shield-alt"></i></span>
+		            <select id="safepartrepair" name="safepartrepair" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->safepartrepair}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to put unreceived parts into missed_parts table when running binaries(safe) or backfill scripts.</small>
 		    </div>
@@ -662,8 +734,11 @@
 		        <label for="processjpg" class="form-label fw-bold">Process JPG:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="processjpg" name='processjpg' values=$yesno_ids output=$yesno_names selected=$site->processjpg separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-image"></i></span>
+		            <select id="processjpg" name="processjpg" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->processjpg}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to attempt to retrieve a JPG file while additional post processing, these are usually on XXX releases.</small>
 		    </div>
@@ -674,8 +749,11 @@
 		        <label for="processthumbnails" class="form-label fw-bold">Process Video Thumbnails:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="processthumbnails" name='processthumbnails' values=$yesno_ids output=$yesno_names selected=$site->processthumbnails separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-file-image"></i></span>
+		            <select id="processthumbnails" name="processthumbnails" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->processthumbnails}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to attempt to process a video thumbnail image. You must have ffmpeg for this.</small>
 		    </div>
@@ -686,8 +764,11 @@
 		        <label for="processvideos" class="form-label fw-bold">Process Video Samples:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="processvideos" name='processvideos' values=$yesno_ids output=$yesno_names selected=$site->processvideos separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-film"></i></span>
+		            <select id="processvideos" name="processvideos" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->processvideos}
+		            </select>
 		        </div>
 		        <small class="text-muted">Whether to attempt to process a video sample, these videos are very short 1-3 seconds, 100KB on average, in ogg video format. You must have ffmpeg for this.</small>
 		    </div>
@@ -755,8 +836,11 @@
 		        <label for="trailers_display" class="form-label fw-bold">Fetch/Display Movie Trailers:</label>
 		    </div>
 		    <div class="col-lg-9 col-md-8">
-		        <div class="mt-2">
-		            {html_radios id="trailers_display" name='trailers_display' values=$yesno_ids output=$yesno_names selected=$site->trailers_display separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+		        <div class="input-group">
+		            <span class="input-group-text"><i class="fa fa-play-circle"></i></span>
+		            <select id="trailers_display" name="trailers_display" class="form-select">
+		                {html_options values=$yesno_ids output=$yesno_names selected=$site->trailers_display}
+		            </select>
 		        </div>
 		        <small class="text-muted">Fetch and display trailers from TraktTV (Requires API key) and/or TrailerAddict on the details page?</small>
 		    </div>
@@ -974,8 +1058,11 @@
         <label for="lookupnfo" class="form-label fw-bold">Lookup NFO:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="mt-2">
-            {html_radios id="lookupnfo" name='lookupnfo' values=$yesno_ids output=$yesno_names selected=$site->lookupnfo separator='&nbsp;&nbsp;&nbsp;' class="form-check-input"}
+        <div class="input-group">
+            <span class="input-group-text"><i class="fa fa-file-alt"></i></span>
+            <select id="lookupnfo" name="lookupnfo" class="form-select">
+                {html_options values=$yesno_ids output=$yesno_names selected=$site->lookupnfo}
+            </select>
         </div>
         <small class="text-muted">Whether to attempt to retrieve an nfo file from usenet.<br/>
             <strong>NOTE: disabling nfo lookups will disable movie lookups.</strong>
@@ -1089,8 +1176,11 @@
         <label for="showdroppedyencparts" class="form-label fw-bold">Log Dropped Headers:</label>
     </div>
     <div class="col-lg-9 col-md-8">
-        <div class="mt-2">
-            {html_radios id="showdroppedyencparts" name='showdroppedyencparts' values=$yesno_ids output=$yesno_names selected=$site->showdroppedyencparts separator='<br />'}
+        <div class="input-group">
+            <span class="input-group-text"><i class="fa fa-bug"></i></span>
+            <select id="showdroppedyencparts" name="showdroppedyencparts" class="form-select">
+                {html_options values=$yesno_ids output=$yesno_names selected=$site->showdroppedyencparts}
+            </select>
         </div>
         <small class="text-muted">For developers. Whether to log all headers that have 'yEnc' and are dropped. Logged to not_yenc/groupname.dropped.txt.</small>
     </div>
