@@ -108,6 +108,10 @@
                                     <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=email_asc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-up"></i></a>
                                     <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=email_desc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-down"></i></a>
                                 </th>
+                                <th>Role
+                                    <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=role_asc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-up"></i></a>
+                                    <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=role_desc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-down"></i></a>
+                                </th>
                                 <th>Host
                                     <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=host_asc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-up"></i></a>
                                     <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=host_desc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-down"></i></a>
@@ -124,6 +128,7 @@
                                     <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=lastlogin_asc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-up"></i></a>
                                     <a href="{$smarty.const.WWW_TOP}/admin/deleted-users?ob=lastlogin_desc{if $queryString != ''}&{$queryString}{/if}"><i class="fas fa-sort-alpha-down"></i></a>
                                 </th>
+                                <th>Status</th>
                                 <th>Options</th>
                             </tr>
                         </thead>
@@ -133,10 +138,32 @@
                                     <td class="text-center"><input type="checkbox" class="row-checkbox" name="user_ids[]" form="bulk-action-form" value="{$user->id}" aria-label="Select {$user->username}"></td>
                                     <td>{$user->username}</td>
                                     <td>{$user->email}</td>
+                                    <td>
+                                        <span class="badge bg-{if $user->roles_id == 2}danger{elseif $user->roles_id == 3}warning{elseif $user->roles_id == 4}success{else}secondary{/if} rounded-pill">{$user->rolename}</span>
+                                        {if !empty($user->rolechangedate)}
+                                            <small class="d-block text-muted mt-1" title="Role expiration date">
+                                                <i class="fa fa-calendar me-1"></i>{$user->rolechangedate}
+                                            </small>
+                                        {/if}
+                                    </td>
                                     <td>{$user->host}</td>
                                     <td>{$user->created_at|date_format:"%Y-%m-%d %H:%M"}</td>
                                     <td>{$user->deleted_at|date_format:"%Y-%m-%d %H:%M"}</td>
                                     <td>{if $user->lastlogin != ""}{$user->lastlogin|date_format:"%Y-%m-%d %H:%M"}{else}Never{/if}</td>
+                                    <td class="text-center">
+                                        <div class="mb-2">
+                                            {if $user->verified == 1}
+                                                <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Email verified"><i class="fa fa-check me-1"></i>Verified</span>
+                                            {else}
+                                                <span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Email not verified"><i class="fa fa-exclamation-triangle me-1"></i>Unverified</span>
+                                            {/if}
+                                        </div>
+                                        <div>
+                                            {if $user->apiaccess}
+                                                <span class="badge bg-info" data-bs-toggle="tooltip" data-bs-placement="top" title="{$user->apiaccess}"><i class="fa fa-key me-1"></i>API Access</span>
+                                            {/if}
+                                        </div>
+                                    </td>
                                     <td class="text-nowrap">
                                         <button type="button" class="btn btn-success btn-sm me-2 restore-user"
                                             data-user-id="{$user->id}"

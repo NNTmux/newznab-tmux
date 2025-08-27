@@ -27,6 +27,8 @@ class DeletedUsersController extends BasePageController
         $deletedTo = $request->input('deleted_to', '');
 
         $deletedUsers = User::onlyTrashed()
+            ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
+            ->select('users.*', 'roles.name as rolename')
             ->when($username !== '', fn ($q) => $q->where('username', 'like', "%$username%"))
             ->when($email !== '', fn ($q) => $q->where('email', 'like', "%$email%"))
             ->when($host !== '', fn ($q) => $q->where('host', 'like', "%$host%"))
@@ -175,7 +177,7 @@ class DeletedUsersController extends BasePageController
             'lastlogin' => 'lastlogin',
             'apiaccess' => 'apiaccess',
             'grabs' => 'grabs',
-            'role' => 'roles_id',
+            'role' => 'rolename',
             default => 'username',
         };
         $orderSort = (isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1])) ? strtolower($orderArr[1]) : 'desc';
