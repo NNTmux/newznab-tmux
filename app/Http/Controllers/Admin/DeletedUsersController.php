@@ -29,22 +29,23 @@ class DeletedUsersController extends BasePageController
         $deletedUsers = User::onlyTrashed()
             ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
             ->select('users.*', 'roles.name as rolename')
-            ->when($username !== '', fn ($q) => $q->where('username', 'like', "%$username%"))
-            ->when($email !== '', fn ($q) => $q->where('email', 'like', "%$email%"))
-            ->when($host !== '', fn ($q) => $q->where('host', 'like', "%$host%"))
+            // Qualify all columns to avoid ambiguity with joined tables
+            ->when($username !== '', fn ($q) => $q->where('users.username', 'like', "%$username%"))
+            ->when($email !== '', fn ($q) => $q->where('users.email', 'like', "%$email%"))
+            ->when($host !== '', fn ($q) => $q->where('users.host', 'like', "%$host%"))
             // Created date filters
             ->when($createdFrom !== '' || $createdTo !== '', function ($q) use ($createdFrom, $createdTo) {
                 try {
                     if ($createdFrom !== '' && $createdTo !== '') {
                         $from = Carbon::createFromFormat('Y-m-d', $createdFrom)->startOfDay();
                         $to = Carbon::createFromFormat('Y-m-d', $createdTo)->endOfDay();
-                        $q->whereBetween('created_at', [$from, $to]);
+                        $q->whereBetween('users.created_at', [$from, $to]);
                     } elseif ($createdFrom !== '') {
                         $from = Carbon::createFromFormat('Y-m-d', $createdFrom)->startOfDay();
-                        $q->where('created_at', '>=', $from);
+                        $q->where('users.created_at', '>=', $from);
                     } elseif ($createdTo !== '') {
                         $to = Carbon::createFromFormat('Y-m-d', $createdTo)->endOfDay();
-                        $q->where('created_at', '<=', $to);
+                        $q->where('users.created_at', '<=', $to);
                     }
                 } catch (\Exception $e) {
                     // ignore invalid dates
@@ -56,13 +57,13 @@ class DeletedUsersController extends BasePageController
                     if ($deletedFrom !== '' && $deletedTo !== '') {
                         $from = Carbon::createFromFormat('Y-m-d', $deletedFrom)->startOfDay();
                         $to = Carbon::createFromFormat('Y-m-d', $deletedTo)->endOfDay();
-                        $q->whereBetween('deleted_at', [$from, $to]);
+                        $q->whereBetween('users.deleted_at', [$from, $to]);
                     } elseif ($deletedFrom !== '') {
                         $from = Carbon::createFromFormat('Y-m-d', $deletedFrom)->startOfDay();
-                        $q->where('deleted_at', '>=', $from);
+                        $q->where('users.deleted_at', '>=', $from);
                     } elseif ($deletedTo !== '') {
                         $to = Carbon::createFromFormat('Y-m-d', $deletedTo)->endOfDay();
-                        $q->where('deleted_at', '<=', $to);
+                        $q->where('users.deleted_at', '<=', $to);
                     }
                 } catch (\Exception $e) {
                     // ignore invalid dates
@@ -167,20 +168,34 @@ class DeletedUsersController extends BasePageController
      */
     private function getSortOrder(string $orderBy): array
     {
-        $orderArr = explode('_', $orderBy);
-        $fieldKey = $orderArr[0] ?? 'deletedat';
-        $orderField = match ($fieldKey) {
-            'email' => 'email',
-            'host' => 'host',
-            'createdat' => 'created_at',
-            'deletedat' => 'deleted_at',
-            'lastlogin' => 'lastlogin',
-            'apiaccess' => 'apiaccess',
-            'grabs' => 'grabs',
-            'role' => 'rolename',
-            default => 'username',
-        };
-        $orderSort = (isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1])) ? strtolower($orderArr[1]) : 'desc';
+        // Accept patterns like `deleted_at_desc`, `deletedat_desc`, `username`, etc.
+        $orderBy = strtolower(trim($orderBy));
+        $orderField = 'users.deleted_at'; // sensible default
+        $orderSort = 'desc';
+
+        if (preg_match('/^(?P<field>[a-z0-9_]+?)(?:_(?P<dir>asc|desc))?$/', $orderBy, $m)) {
+            $rawField = $m['field'];
+            $normalized = str_replace(['_', '-'], '', $rawField); // normalize for mapping keys
+            $dir = $m['dir'] ?? null;
+            $map = [
+                'username' => 'users.username',
+                'email' => 'users.email',
+                'host' => 'users.host',
+                'createdat' => 'users.created_at',
+                'deletedat' => 'users.deleted_at',
+                'lastlogin' => 'users.lastlogin',
+                'apiaccess' => 'users.apiaccess',
+                'grabs' => 'users.grabs',
+                'role' => 'rolename', // alias
+                'rolename' => 'rolename',
+            ];
+            if (isset($map[$normalized])) {
+                $orderField = $map[$normalized];
+            }
+            if ($dir) {
+                $orderSort = $dir;
+            }
+        }
 
         return [$orderField, $orderSort];
     }
