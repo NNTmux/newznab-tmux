@@ -904,7 +904,7 @@ class Categorize
 
     public function isXXXOnlyFans(): bool
     {
-        if (preg_match('/OnlyFans|Only Fans|Only_Fans|Only-Fans/i', $this->releaseName) &&
+        if (preg_match('/OnlyFans|Only Fans|Only_Fans|Only-Fans|^OF\./i', $this->releaseName) &&
             preg_match('/\b(720p|1080p|2160p|HD|4K)\b/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_ONLYFANS;
 
