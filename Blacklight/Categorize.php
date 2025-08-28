@@ -909,7 +909,7 @@ class Categorize
         // Skip obvious image / photo packs unless there is a video hint
         if (
             preg_match('/\b(photo(set)?|image(set)?|pics?|wallpapers?|collection|pack)\b/i', $name) &&
-            !preg_match('/\b(mp4|mkv|mov|wmv|avi|webm|h\.?264|x264|h\.?265|x265)\b/i', $name)
+            ! preg_match('/\b(mp4|mkv|mov|wmv|avi|webm|h\.?264|x264|h\.?265|x265)\b/i', $name)
         ) {
             return false;
         }
@@ -918,6 +918,7 @@ class Categorize
         // Quality (720p/1080p/etc.) is now optional.
         if (preg_match('/\bOnly[-_ ]?Fans\b|^OF\./i', $name)) {
             $this->tmpCat = Category::XXX_ONLYFANS;
+
             return true;
         }
 
