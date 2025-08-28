@@ -904,10 +904,20 @@ class Categorize
 
     public function isXXXOnlyFans(): bool
     {
-        if (preg_match('/OnlyFans|Only Fans|Only_Fans|Only-Fans|^OF\./i', $this->releaseName) &&
-            preg_match('/\b(720p|1080p|2160p|HD|4K)\b/i', $this->releaseName)) {
-            $this->tmpCat = Category::XXX_ONLYFANS;
+        $name = $this->releaseName;
 
+        // Skip obvious image / photo packs unless there is a video hint
+        if (
+            preg_match('/\b(photo(set)?|image(set)?|pics?|wallpapers?|collection|pack)\b/i', $name) &&
+            !preg_match('/\b(mp4|mkv|mov|wmv|avi|webm|h\.?264|x264|h\.?265|x265)\b/i', $name)
+        ) {
+            return false;
+        }
+
+        // Match OnlyFans brand (OnlyFans / Only-Fans / Only_Fans / Only Fans) or legacy leading OF. token.
+        // Quality (720p/1080p/etc.) is now optional.
+        if (preg_match('/\bOnly[-_ ]?Fans\b|^OF\./i', $name)) {
+            $this->tmpCat = Category::XXX_ONLYFANS;
             return true;
         }
 
