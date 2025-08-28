@@ -728,7 +728,7 @@ class Categorize
         }
 
         // Require an explicit H.264/x264/AVC indicator
-        if (!preg_match('/\b((x|h)[\.\-_ ]?264|AVC)\b/i', $name)) {
+        if (! preg_match('/\b((x|h)[\.\-_ ]?264|AVC)\b/i', $name)) {
             return false;
         }
 
@@ -740,12 +740,13 @@ class Categorize
         // Adult site / content keywords (merged both original lists, normalized)
         $adultPattern = '/\bXXX\b|a\.b\.erotica|BangBros(?:18)?|ClubSeventeen|Cum(ming|shot)|Defloration|Err?oticax?|JoyMii|MetArt|MetArtX|Nubiles|Porn(o|lation)?|SexArt|TheLifeErotic|Tushy|Vixen|VivThomas|X-Art|JAV(?:\sUncensored)?|lesb(ians?|os?)|mastur(bation|e?bate)|nympho?|OLDER ANGELS|Brazzers|NaughtyAmerica|RealityKings|sexontv|slut|Squirt|Transsexual|WowGirls|Playboy/i';
 
-        if (!preg_match($adultPattern, $name)) {
+        if (! preg_match($adultPattern, $name)) {
             return false;
         }
 
         // (Optional) If catWebDL is false we still allow WEB-DL / WEBRip, but codec already enforced.
         $this->tmpCat = Category::XXX_X264;
+
         return true;
     }
 
@@ -1011,11 +1012,12 @@ class Categorize
         )
     /';
 
-        if (!preg_match($vrPattern, $name)) {
+        if (! preg_match($vrPattern, $name)) {
             return false;
         }
 
         $this->tmpCat = Category::XXX_VR;
+
         return true;
     }
 
@@ -2105,15 +2107,16 @@ class Categorize
 
         // Key magazine title groups used in pattern checks.
         $majorTitles = 'Bloomberg|Cosmopolitan|Economist|Elle|Esquire|FHM|Forbes|Fortune|GQ|Hustler|Life|Maxim|Mens[._ -](Health|Fitness)|National[._ -]Geographic|Newsweek|New[._ -]Yorker|Penthouse|People|Playboy|Rolling[._ -]Stone|Time|Vanity[._ -]Fair|Vogue|Wired';
-        $techGaming  = 'Android[._ -](Magazine|World)|Computer(world|active|bild)|Digital[._ -](Camera|Photography)|GameInformer|Game[._ -]?(Master|Markt|star|TM)|Maximum[._ -]PC|MacLife|MacWorld|PC[._ -](Format|Gamer|Magazine|World|Welt)|PCGames|Popular[._ -](Mechanics|Science)|T3|TechRadar|Web[._ -]Designer';
-        $lifestyle   = 'Architectural[._ -]Digest|Better[._ -]Homes[._ -]Gardens|Bon[._ -]Appetit|Brides|Car[._ -]and[._ -]Driver|Conde[._ -]Nast|Cook\'?s[._ -]Illustrated|Gardening|Golf[._ -]Digest|Good[._ -]Housekeeping|GuitarPlayer|Martha[._ -]Stewart|Motor[._ -]Trend|Mountain[._ -]Bike|Outdoor[._ -]Life|Photography|Readers[._ -]Digest|Road[._ -]and[._ -]Track|Runner\'?s[._ -]World|Top[._ -]Gear';
+        $techGaming = 'Android[._ -](Magazine|World)|Computer(world|active|bild)|Digital[._ -](Camera|Photography)|GameInformer|Game[._ -]?(Master|Markt|star|TM)|Maximum[._ -]PC|MacLife|MacWorld|PC[._ -](Format|Gamer|Magazine|World|Welt)|PCGames|Popular[._ -](Mechanics|Science)|T3|TechRadar|Web[._ -]Designer';
+        $lifestyle = 'Architectural[._ -]Digest|Better[._ -]Homes[._ -]Gardens|Bon[._ -]Appetit|Brides|Car[._ -]and[._ -]Driver|Conde[._ -]Nast|Cook\'?s[._ -]Illustrated|Gardening|Golf[._ -]Digest|Good[._ -]Housekeeping|GuitarPlayer|Martha[._ -]Stewart|Motor[._ -]Trend|Mountain[._ -]Bike|Outdoor[._ -]Life|Photography|Readers[._ -]Digest|Road[._ -]and[._ -]Track|Runner\'?s[._ -]World|Top[._ -]Gear';
 
         // Quick special publication patterns (frequency / issue markers or major/lifestyle titles preceded by date)
         if (preg_match('/[._ -](Annual|Bimonthly|Monthly|Quarterly|Special[._ -]Issue)[._ -]/i', $this->releaseName) ||
             preg_match('/\d{1,2}[._ -]?\d{4}[._ -](?:'.$majorTitles.'|'.$techGaming.'|'.$lifestyle.')/i', $this->releaseName)) {
-            if (!$this->isBookForeign()) {
+            if (! $this->isBookForeign()) {
                 $this->tmpCat = Category::BOOKS_MAGAZINES;
             }
+
             return true;
         }
 
