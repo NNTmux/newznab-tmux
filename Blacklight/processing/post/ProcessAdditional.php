@@ -358,7 +358,9 @@ class ProcessAdditional
         $this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
         // Store only the inner fragment; delimiters appended at usage time.
         $this->_supportFileRegex = '\\.(vol\\d{1,3}\\+\\d{1,3}|par2|srs|sfv|nzb';
-        $this->_videoFileRegex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
+        $this->_videoFileRegex = '\\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
+        $this->_debugDownloadFailures = (bool) config('app.debug');
+        $this->_groupUnavailable = false; // flag when NNTP group is missing
     }
 
     /**
@@ -816,7 +818,7 @@ class ProcessAdditional
                 // Check if it's a rar/zip.
                 if (! $this->_NZBHasCompressedFile &&
                     preg_match(
-                        '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
+                        '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?|7z(?:\.\d{3})?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
                         $this->_currentNZBFile['title']
                     )
                 ) {
@@ -887,6 +889,9 @@ class ProcessAdditional
      */
     protected function _processNZBCompressedFiles(bool $reverse = false): void
     {
+        if ($this->_groupUnavailable) {
+            return; // Skip if group already known unavailable.
+        }
         $this->_reverse = $reverse;
 
         if ($this->_reverse) {
@@ -912,10 +917,13 @@ class ProcessAdditional
                 $this->_echo('Skipping processing of rar '.$nzbFile['title'].' it has a password.', 'primaryOver');
                 break;
             }
+            if ($this->_groupUnavailable) {
+                break; // abort further attempts
+            }
 
             // Probably not a rar/zip.
             if (! preg_match(
-                '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
+                '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?|7z(?:\.\d{3})?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
                 $nzbFile['title']
             )
             ) {
@@ -944,9 +952,45 @@ class ProcessAdditional
             }
 
             // Download the article(s) from usenet.
-            $fetchedBinary = $this->_nntp->getMessages($this->_releaseGroupName, $mID, $this->_alternateNNTP);
+            if ($this->_debugDownloadFailures) {
+                Log::debug('Attempting compressed fetch', [
+                    'release_id' => $this->_release->id ?? null,
+                    'reverse' => $this->_reverse,
+                    'file_title' => $nzbFile['title'] ?? '',
+                    'message_ids' => $mID,
+                    'group' => $this->_releaseGroupName,
+                ]);
+            }
+            $fetchedBinary = $this->_nntp->getMessagesByMessageID($mID, $this->_alternateNNTP);
             // Treat any non-string or blank response as failure.
             if (! is_string($fetchedBinary) || $fetchedBinary === '') {
+                $errorObj = (is_object($fetchedBinary) ? $fetchedBinary : null);
+                if ($this->_debugDownloadFailures) {
+                    $errMsg = null;
+                    if ($errorObj && method_exists($errorObj, 'getMessage')) {
+                        $errMsg = $errorObj->getMessage();
+                    }
+                    Log::debug('Compressed fetch failed', [
+                        'release_id' => $this->_release->id ?? null,
+                        'file_title' => $nzbFile['title'] ?? '',
+                        'message_ids' => $mID,
+                        'group' => $this->_releaseGroupName,
+                        'error_object' => $errorObj ? get_class($errorObj) : null,
+                        'error_message' => $errMsg,
+                        'raw_type' => gettype($fetchedBinary),
+                        'length' => is_string($fetchedBinary) ? strlen($fetchedBinary) : 0,
+                    ]);
+                }
+                if ($errorObj && method_exists($errorObj, 'getMessage')) {
+                    $msg = $errorObj->getMessage();
+                    if (stripos($msg, 'No such news group') !== false || stripos($msg, 'Group not found') !== false) {
+                        $this->_groupUnavailable = true;
+                        if ($this->_echoCLI) {
+                            $this->_echo('G', 'warningOver'); // Distinct marker for missing group.
+                        }
+                        break; // Stop processing more compressed files.
+                    }
+                }
                 $fetchedBinary = false;
             }
 
@@ -988,6 +1032,50 @@ class ProcessAdditional
         if (! $this->_archiveInfo->setData($compressedData, true)) {
             // Attempt to detect other common archive/container signatures for debugging purposes.
             $otherType = $this->_detectNonRarZipType($compressedData);
+            // Removed dd($otherType) debug dump.
+            if ($otherType === '7z' && ! empty($this->_7zipPath)) {
+                // Minimal 7zip handling (fallback path when ArchiveInfo lacks 7z support)
+                try {
+                    if ($this->_echoCLI) {
+                        $this->_echo('7', 'primaryOver');
+                    }
+                    if (! $this->_extractUsingRarInfo) {
+                        $extractDir = $this->tmpPath.'un7z/';
+                        if (! File::isDirectory($extractDir)) {
+                            File::makeDirectory($extractDir, 0777, true, true);
+                        }
+                        $fileName = $this->tmpPath.uniqid('', true).'.7z';
+                        File::put($fileName, $compressedData);
+                        // Suppress most output (-bd disables progress); extraction to target dir.
+                        runCmd('"'.$this->_7zipPath.'" e -y -bd -o"'.$extractDir.'" "'.$fileName.'"');
+                        // Build file info list from extracted files.
+                        $added = false;
+                        $now = time();
+                        if (File::isDirectory($extractDir)) {
+                            foreach (File::allFiles($extractDir) as $f) {
+                                $relName = $f->getFilename();
+                                $info = [
+                                    'name' => $relName,
+                                    'size' => $f->getSize(),
+                                    'date' => $now,
+                                    'pass' => 0,
+                                    'crc32' => '',
+                                    'source' => '7z',
+                                ];
+                                $this->_addFileInfo($info);
+                                $added = true;
+                            }
+                        }
+                        File::delete($fileName);
+
+                        return $added; // We cannot continue into ArchiveInfo path.
+                    }
+                } catch (\Throwable $e) {
+                    if (config('app.debug') === true) {
+                        Log::warning('7z extraction failed: '.$e->getMessage());
+                    }
+                }
+            }
             if (config('app.debug') === true) {
                 $this->_debug('Data is not recognized as RAR or ZIP'.($otherType !== null ? ", probable type: {$otherType}" : '.'));
             }
@@ -1099,7 +1187,7 @@ class ProcessAdditional
     }
 
     /**
-     * Get a list of all files in the compressed file, add the file info to the DB.
+     * Get a list of files inside the Compressed file.
      *
      *
      * @throws Exception
@@ -1179,7 +1267,7 @@ class ProcessAdditional
     {
         // Don't add rar/zip files to the DB.
         if (! isset($file['error']) && isset($file['source']) &&
-            ! preg_match('/'.$this->_supportFileRegex.'|part\d+|[r|z]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar)(\s*\.rar)?$/i', $file['name'])
+            ! preg_match('/'.$this->_supportFileRegex.'|part\d+|[r|z]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar|7z)(\s*\.rar)?$/i', $file['name'])
         ) {
             // Cache the amount of files we find in the RAR or ZIP, return this to say we did find RAR or ZIP content.
             // This is so we don't download more RAR or ZIP files for no reason.
@@ -1234,7 +1322,7 @@ class ProcessAdditional
             $foundCompressedFile = false;
 
             // Get all the compressed files in the temp folder.
-            $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1)($|[^a-z0-9])/i');
+            $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1|7z(?:\.\d{3})?)($|[^a-z0-9])/i');
 
             if (! empty($files)) {
                 foreach ($files as $file) {
@@ -1361,8 +1449,22 @@ class ProcessAdditional
         if (! $this->_foundSample || ! $this->_foundVideo) {
             if (! empty($this->_sampleMessageIDs)) {
                 // Download it from usenet.
-                $sampleBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_sampleMessageIDs, $this->_alternateNNTP);
+                $sampleBinary = $this->_nntp->getMessagesByMessageID($this->_sampleMessageIDs, $this->_alternateNNTP);
                 if (! is_string($sampleBinary) || $sampleBinary === '') {
+                    if ($this->_debugDownloadFailures) {
+                        $errMsg = null;
+                        if (is_object($sampleBinary) && method_exists($sampleBinary, 'getMessage')) {
+                            $errMsg = $sampleBinary->getMessage();
+                        }
+                        Log::debug('Sample fetch failed', [
+                            'release_id' => $this->_release->id ?? null,
+                            'message_ids' => $this->_sampleMessageIDs,
+                            'group' => $this->_releaseGroupName,
+                            'error_object' => is_object($sampleBinary) ? get_class($sampleBinary) : null,
+                            'error_message' => $errMsg,
+                            'raw_type' => gettype($sampleBinary),
+                        ]);
+                    }
                     $sampleBinary = false;
                 }
                 if ($sampleBinary !== false) {
@@ -1406,8 +1508,22 @@ class ProcessAdditional
         if (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo) {
             if (! empty($this->_MediaInfoMessageIDs)) {
                 // Try to download it from usenet.
-                $mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs, $this->_alternateNNTP);
+                $mediaBinary = $this->_nntp->getMessagesByMessageID($this->_MediaInfoMessageIDs, $this->_alternateNNTP);
                 if (! is_string($mediaBinary) || $mediaBinary === '') {
+                    if ($this->_debugDownloadFailures) {
+                        $errMsg = null;
+                        if (is_object($mediaBinary) && method_exists($mediaBinary, 'getMessage')) {
+                            $errMsg = $mediaBinary->getMessage();
+                        }
+                        Log::debug('MediaInfo fetch failed', [
+                            'release_id' => $this->_release->id ?? null,
+                            'message_id' => $this->_MediaInfoMessageIDs,
+                            'group' => $this->_releaseGroupName,
+                            'error_object' => is_object($mediaBinary) ? get_class($mediaBinary) : null,
+                            'error_message' => $errMsg,
+                            'raw_type' => gettype($mediaBinary),
+                        ]);
+                    }
                     $mediaBinary = false;
                 }
                 if ($mediaBinary !== false) {
@@ -1456,8 +1572,22 @@ class ProcessAdditional
         if (! $this->_foundAudioInfo || ! $this->_foundAudioSample) {
             if (! empty($this->_AudioInfoMessageIDs)) {
                 // Try to download it from usenet.
-                $audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs, $this->_alternateNNTP);
+                $audioBinary = $this->_nntp->getMessagesByMessageID($this->_AudioInfoMessageIDs, $this->_alternateNNTP);
                 if (! is_string($audioBinary) || $audioBinary === '') {
+                    if ($this->_debugDownloadFailures) {
+                        $errMsg = null;
+                        if (is_object($audioBinary) && method_exists($audioBinary, 'getMessage')) {
+                            $errMsg = $audioBinary->getMessage();
+                        }
+                        Log::debug('Audio fetch failed', [
+                            'release_id' => $this->_release->id ?? null,
+                            'message_id' => $this->_AudioInfoMessageIDs,
+                            'group' => $this->_releaseGroupName,
+                            'error_object' => is_object($audioBinary) ? get_class($audioBinary) : null,
+                            'error_message' => $errMsg,
+                            'raw_type' => gettype($audioBinary),
+                        ]);
+                    }
                     $audioBinary = false;
                 }
                 if ($audioBinary !== false) {
@@ -1490,8 +1620,22 @@ class ProcessAdditional
         // Download JPG file.
         if (! $this->_foundJPGSample && ! empty($this->_JPGMessageIDs)) {
             // Try to download it.
-            $jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageIDs, $this->_alternateNNTP);
+            $jpgBinary = $this->_nntp->getMessagesByMessageID($this->_JPGMessageIDs, $this->_alternateNNTP);
             if (! is_string($jpgBinary) || $jpgBinary === '') {
+                if ($this->_debugDownloadFailures) {
+                    $errMsg = null;
+                    if (is_object($jpgBinary) && method_exists($jpgBinary, 'getMessage')) {
+                        $errMsg = $jpgBinary->getMessage();
+                    }
+                    Log::debug('JPG fetch failed', [
+                        'release_id' => $this->_release->id ?? null,
+                        'message_ids' => $this->_JPGMessageIDs,
+                        'group' => $this->_releaseGroupName,
+                        'error_object' => is_object($jpgBinary) ? get_class($jpgBinary) : null,
+                        'error_message' => $errMsg,
+                        'raw_type' => gettype($jpgBinary),
+                    ]);
+                }
                 $jpgBinary = false;
             }
 
@@ -2254,6 +2398,7 @@ class ProcessAdditional
         $this->_addedFileInfo = 0;
         $this->_totalFileInfo = 0;
         $this->_compressedFilesChecked = 0;
+        $this->_groupUnavailable = false;
     }
 
     /**
@@ -2377,10 +2522,6 @@ class ProcessAdditional
         }
         // XZ: FD 37 7A 58 5A 00
         if (strncmp($head6, "\xFD7zXZ\x00", 6) === 0) {
-            return 'xz';
-        }
-        // TAR: no fixed magic at start; look for ustar at offset 257
-        if ($len > 265 && substr($data, 257, 5) === 'ustar') {
             return 'tar';
         }
         // PDF (sometimes mis-uploaded): %PDF
@@ -2389,5 +2530,39 @@ class ProcessAdditional
         }
 
         return null;
+    }
+
+    public function processSingleGuid(string $guid): bool
+    {
+        try {
+            $release = Release::where('guid', $guid)->first();
+            if ($release === null) {
+                if ($this->_echoCLI) {
+                    $this->_echo('Release not found for GUID: '.$guid, 'warning');
+                }
+
+                return false;
+            }
+
+            // Set up single release collection.
+            $this->_releases = collect([$release]);
+            $this->_totalReleases = 1;
+
+            // Derive guid char for temp path segregation.
+            $guidChar = $release->leftguid ?? substr($release->guid, 0, 1);
+            $groupID = '';
+            $this->_setMainTempPath($guidChar, $groupID);
+
+            // Process the single release.
+            $this->_processReleases();
+
+            return true;
+        } catch (\Throwable $e) {
+            if (config('app.debug') === true) {
+                Log::error('processSingleGuid failed: '.$e->getMessage());
+            }
+
+            return false;
+        }
     }
 }
