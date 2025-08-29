@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invitation;
+use App\Models\Settings; // Added for registerstatus check
 use App\Services\InvitationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +26,33 @@ class InvitationController extends BasePageController
     public function index(Request $request): void
     {
         $this->setPreferences();
+
+        $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
+        if (! $inviteMode) {
+            // Invitations disabled: show informational message only, no queries.
+            $this->smarty->assign([
+                'invite_mode' => false,
+                'status' => null,
+                'stats' => [],
+                'invitations' => [],
+                'pagination_links' => null,
+                'csrf_token' => csrf_token(),
+            ]);
+
+            $meta_title = 'Invitations Disabled';
+            $meta_keywords = 'invitations,disabled';
+            $meta_description = 'Invitations are currently disabled on this site.';
+
+            $content = $this->smarty->fetch('invitations_index.tpl');
+            $this->smarty->assign([
+                'content' => $content,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]);
+            $this->pagerender();
+            return;
+        }
 
         $status = $request->get('status');
         $user = auth()->user();
@@ -53,6 +81,7 @@ class InvitationController extends BasePageController
         }
 
         $this->smarty->assign([
+            'invite_mode' => true,
             'invitations' => $invitationsArray,
             'stats' => $stats,
             'status' => $status,
@@ -87,6 +116,26 @@ class InvitationController extends BasePageController
     {
         $this->setPreferences();
 
+        $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
+        if (! $inviteMode) {
+            $this->smarty->assign([
+                'invite_mode' => false,
+                'csrf_token' => csrf_token(),
+            ]);
+            $meta_title = 'Invitations Disabled';
+            $meta_keywords = 'invitations,disabled';
+            $meta_description = 'Invitations are currently disabled on this site.';
+            $content = $this->smarty->fetch('invitations_create.tpl');
+            $this->smarty->assign([
+                'content' => $content,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]);
+            $this->pagerender();
+            return;
+        }
+
         $user = auth()->user();
 
         // Calculate available invites (total - active pending invitations)
@@ -97,8 +146,8 @@ class InvitationController extends BasePageController
             ->count();
 
         $availableInvites = $user->invites - $activeInvitations;
-
         $this->smarty->assign([
+            'invite_mode' => true,
             'user_roles' => config('nntmux.user_roles', []),
             'csrf_token' => csrf_token(),
             'old' => old(),
@@ -134,6 +183,10 @@ class InvitationController extends BasePageController
      */
     public function store(Request $request): RedirectResponse
     {
+        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+            return redirect()->route('invitations.index')->with('error', 'Invitations are currently disabled.');
+        }
+
         $request->validate([
             'email' => 'required|email|unique:users,email',
             'expiry_days' => 'sometimes|integer|min:1|max:30',
@@ -233,6 +286,10 @@ class InvitationController extends BasePageController
      */
     public function resend(int $id): RedirectResponse
     {
+        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+            return redirect()->route('invitations.index')->with('error', 'Invitations are currently disabled.');
+        }
+
         try {
             $invitation = Invitation::findOrFail($id);
 
@@ -257,6 +314,10 @@ class InvitationController extends BasePageController
      */
     public function destroy(int $id): RedirectResponse
     {
+        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+            return redirect()->route('invitations.index')->with('error', 'Invitations are currently disabled.');
+        }
+
         try {
             $invitation = Invitation::findOrFail($id);
 
@@ -281,6 +342,10 @@ class InvitationController extends BasePageController
      */
     public function stats(): JsonResponse
     {
+        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+            return response()->json(['message' => 'Invitations are disabled'], 404);
+        }
+
         $stats = $this->invitationService->getUserInvitationStats(auth()->id());
 
         return response()->json($stats);

@@ -1,3 +1,28 @@
+{if !$invite_mode}
+<div class="header">
+    <div class="breadcrumb-wrapper">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{$site->home_link}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{url('/profile')}">Profile</a></li>
+                <li class="breadcrumb-item"><a href="{url('/invitations')}">My Invitations</a></li>
+                <li class="breadcrumb-item active">Invitations Disabled</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<div class="container-fluid px-4 py-3">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="alert alert-warning shadow-sm">
+                <h5 class="mb-2"><i class="fa fa-ban me-2"></i>Invitations Disabled</h5>
+                <p class="mb-3">User invitations are currently disabled on this site. You cannot send new invitations at this time.</p>
+                <a href="{url('/profile')}" class="btn btn-outline-secondary"><i class="fa fa-arrow-left me-1"></i> Back to Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+{else}
 <div class="header">
     <div class="breadcrumb-wrapper">
         <nav aria-label="breadcrumb">
@@ -164,3 +189,9 @@
                             </div>
                         </form>
                     {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}

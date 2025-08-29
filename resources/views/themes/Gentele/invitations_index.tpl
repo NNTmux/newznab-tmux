@@ -1,3 +1,15 @@
+{if !$invite_mode}
+<div class="container-fluid px-4 py-3">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="alert alert-warning shadow-sm">
+                <h5 class="mb-2"><i class="fa fa-ban me-2"></i>Invitations Disabled</h5>
+                <p class="mb-0">User invitations are currently disabled on this site. If you believe this is an error, please contact an administrator.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{else}
 <div class="header">
     <div class="breadcrumb-wrapper">
         <nav aria-label="breadcrumb">
@@ -220,3 +232,4 @@
         </div>
     </div>
 </div>
+{/if}
