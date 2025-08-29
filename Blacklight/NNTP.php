@@ -620,210 +620,116 @@ class NNTP extends \Net_NNTP_Client
     }
 
     /**
-     * Download a full article, the body and the header, return an array with named keys and their
-     * associated values, optionally decode the body using yEnc.
+     * Download multiple article bodies by Message-ID only (no group selection), concatenating them.
+     * Falls back to alternate provider if enabled. Message-IDs are yEnc decoded.
      *
-     * @param  string  $groupName  The name of the group the article is in.
-     * @param  mixed  $identifier  (string)The message-ID of the article to download.
-     *                             (int) The article number.
-     * @param  bool  $yEnc  Attempt to yEnc decode the body.
-     * @return mixed On success : (array)  The article.
-     *               On failure : (object) PEAR_Error.
+     * @param  mixed  $identifiers  string|array Message-ID(s) (with or without < >)
+     * @param  bool  $alternate  Use alternate NNTP server if primary fails for any ID.
+     * @return mixed string concatenated bodies on success, PEAR_Error object on total failure.
      *
      * @throws \Exception
      */
-    public function get_Article(string $groupName, mixed $identifier, bool $yEnc = false): mixed
+    public function getMessagesByMessageID(mixed $identifiers, bool $alternate = false): mixed
     {
-        $connected = $this->_checkConnection();
+        $connected = $this->_checkConnection(false); // no need to reselect group
         if ($connected !== true) {
-            return $connected;
+            return $connected; // PEAR error passthrough
         }
 
-        // Make sure the requested group is already selected, if not select it.
-        if ($this->group() !== $groupName) {
-            // Select the group.
-            $summary = $this->selectGroup($groupName);
-            // If there was an error selecting the group, return PEAR error object.
-            if (self::isError($summary)) {
-                return $summary;
+        $body = '';
+        $aConnected = false;
+        $alt = ($alternate ? new self : null);
+
+        // Normalise to array for loop processing
+        $ids = is_array($identifiers) ? $identifiers : [$identifiers];
+
+        $loops = 0;
+        $messageSize = 0;
+        foreach ($ids as $id) {
+            if ((++$loops * $messageSize) >= 1700000000) { // prevent huge string growth
+                return $body;
             }
-        }
+            $msg = $this->_getMessageByMessageID($id);
+            if (! self::isError($msg)) {
+                $body .= $msg;
+                if ($messageSize === 0) {
+                    $messageSize = strlen($msg);
+                }
 
-        // Check if it's an article number or message-ID.
-        if (! is_numeric($identifier)) {
-            // If it's a message-ID, check if it has the required triangular brackets.
-            $identifier = $this->_formatMessageID($identifier);
-        }
-
-        // Download the article.
-        $article = $this->getArticle($identifier);
-        // If there was an error downloading the article, return a PEAR error object.
-        if (self::isError($article)) {
-            return $article;
-        }
-
-        $ret = $article;
-        // Make sure the article is an array and has more than 1 element.
-        if (\count($article) > 0) {
-            $ret = [];
-            $body = '';
-            $emptyLine = false;
-            foreach ($article as $line) {
-                // If we found the empty line it means we are done reading the header and we will start reading the body.
-                if (! $emptyLine) {
-                    if ($line === '') {
-                        $emptyLine = true;
-
-                        continue;
-                    }
-
-                    // Use the line type of the article as the array key (From, Subject, etc..).
-                    if (preg_match('/([A-Z-]+?): (.*)/i', $line, $hits)) {
-                        // If the line type takes more than 1 line, append the rest of the content to the same key.
-                        if (array_key_exists($hits[1], $ret)) {
-                            $ret[$hits[1]] .= $hits[2];
-                        } else {
-                            $ret[$hits[1]] = $hits[2];
+                continue;
+            }
+            // Primary failed, try alternate if requested
+            if ($alternate) {
+                if (! $aConnected) {
+                    $compressed = config('nntmux_nntp.compressed_headers');
+                    $aConnected = $this->_currentServer === config('nntmux_nntp.server')
+                        ? $alt->doConnect($compressed, true)
+                        : $alt->doConnect();
+                }
+                if ($aConnected === true) {
+                    $altMsg = $alt->_getMessageByMessageID($id);
+                    if ($alt->isError($altMsg)) {
+                        if ($aConnected) {
+                            $alt->doQuit();
                         }
-                    }
 
-                    // Now we have the header, so get the body from the rest of the lines.
-                } else {
-                    $body .= $line;
+                        return $body !== '' ? $body : $altMsg; // return what we have or error
+                    }
+                    $body .= $altMsg;
+                } else { // alternate connect failed
+                    return $body !== '' ? $body : $msg; // return collected or original error
                 }
+            } else { // no alternate
+                return $body !== '' ? $body : $msg;
             }
-            // Finally we decode the message using yEnc.
-            $ret['Message'] = ($yEnc ? PhpYenc::decodeIgnore($body) : $body);
         }
 
-        return $ret;
+        if ($aConnected === true) {
+            $alt->doQuit();
+        }
+
+        return $body;
     }
 
     /**
-     * Download a full article header.
+     * Internal: fetch single article body by Message-ID (yEnc decoded) without selecting a group.
+     * Accepts article numbers but these require a group; will return error if numeric passed.
      *
-     * @param  string  $groupName  The name of the group the article is in.
-     * @param  mixed  $identifier  (string) The message-ID of the article to download.
-     *                             (int)    The article number.
-     * @return mixed On success : (array)  The header.
-     *
-     * @throws \Exception
-     *                    On failure : (object) PEAR_Error.
-     */
-    public function get_Header(string $groupName, mixed $identifier): mixed
-    {
-        $connected = $this->_checkConnection();
-        if ($connected !== true) {
-            return $connected;
-        }
-
-        // Make sure the requested group is already selected, if not select it.
-        if ($this->group() !== $groupName) {
-            // Select the group.
-            $summary = $this->selectGroup($groupName);
-            // Return PEAR error object on failure.
-            if (self::isError($summary)) {
-                return $summary;
-            }
-        }
-
-        // Check if it's an article number or message-id.
-        if (! is_numeric($identifier)) {
-            // Verify we have the required triangular brackets if it is a message-id.
-            $identifier = $this->_formatMessageID($identifier);
-        }
-
-        // Download the header.
-        $header = $this->getHeader($identifier);
-        // If we failed, return PEAR error object.
-        if (self::isError($header)) {
-            return $header;
-        }
-
-        $ret = $header;
-        if (\count($header) > 0) {
-            $ret = [];
-            // Use the line types of the header as array keys (From, Subject, etc).
-            foreach ($header as $line) {
-                if (preg_match('/([A-Z-]+?): (.*)/i', $line, $hits)) {
-                    // If the line type takes more than 1 line, re-use the same array key.
-                    if (array_key_exists($hits[1], $ret)) {
-                        $ret[$hits[1]] .= $hits[2];
-                    } else {
-                        $ret[$hits[1]] = $hits[2];
-                    }
-                }
-            }
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Post an article to usenet.
-     *
-     * @param  array|string  $groups  mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
-     *                                (string) Group.  ie.: $groups = 'alt.test';
-     * @param  string  $subject  string  The subject.     ie.: $subject = 'Test article';
-     * @param  \Exception|string  $body  string  The message.     ie.: $message = 'This is only a test, please disregard.';
-     * @param  string  $from  string  The poster.      ie.: $from = '<anon@anon.com>';
-     * @param  $extra  string  Extra, separated by \r\n
-     *                ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
-     * @param  $yEnc  bool    Encode the message with yEnc?
-     * @param  $compress  bool    Compress the message with GZip?
-     * @return mixed On success : (bool)   True.
-     *               On failure : (object) PEAR_Error.
+     * @param  mixed  $identifier  Message-ID or article number.
+     * @return mixed string body on success, PEAR_Error on failure.
      *
      * @throws \Exception
      */
-    public function postArticle(array|string $groups, string $subject, \Exception|string $body, string $from, bool $yEnc = true, bool $compress = true, string $extra = ''): mixed
+    protected function _getMessageByMessageID(mixed $identifier): mixed
     {
-        if (! $this->_postingAllowed) {
-            $message = 'You do not have the right to post articles on server '.$this->_currentServer;
-
-            return $this->throwError($this->colorCli->climate()->error($message));
+        // If numeric we cannot safely fetch without group context – delegate to existing path via error.
+        if (is_numeric($identifier)) {
+            return $this->throwError('Numeric article number requires group selection');
+        }
+        $id = $this->_formatMessageID($identifier);
+        $response = $this->_sendCommand('BODY '.$id);
+        if (self::isError($response)) {
+            return $response;
+        }
+        if ($response !== NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS) {
+            return $this->_handleErrorResponse($response);
+        }
+        $body = '';
+        while (! feof($this->_socket)) {
+            $line = fgets($this->_socket, 1024);
+            if ($line === false) {
+                return $this->throwError('Failed to read line from socket.', null);
+            }
+            if ($line === ".\r\n") {
+                return \App\Extensions\util\PhpYenc::decodeIgnore($body);
+            }
+            if (str_starts_with($line, '.') && isset($line[1]) && $line[1] === '.') {
+                $line = substr($line, 1);
+            }
+            $body .= $line;
         }
 
-        $connected = $this->_checkConnection();
-        if ($connected !== true) {
-            return $connected;
-        }
-
-        // Throw errors if subject or from are more than 510 chars.
-        if (\strlen($subject) > 510) {
-            $message = 'Max length of subject is 510 chars.';
-
-            return $this->throwError($this->colorCli->climate()->error($message));
-        }
-
-        if (\strlen($from) > 510) {
-            $message = 'Max length of from is 510 chars.';
-
-            return $this->throwError($this->colorCli->climate()->error($message));
-        }
-
-        // Check if the group is string or array.
-        if (\is_array($groups)) {
-            $groups = implode(', ', $groups);
-        }
-
-        // Check if we should encode to yEnc.
-        if ($yEnc) {
-            $bin = $compress ? gzdeflate($body, 4) : $body;
-            $body = PhpYenc::encode($bin, $subject);
-            // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
-        } else {
-            $body = $this->_splitLines($body, $compress);
-        }
-
-        // From is required by NNTP servers, but parent function mail does not require it, so format it.
-        $from = 'From: '.$from;
-        // If we had extra stuff to post, format it with from.
-        if ($extra !== '') {
-            $from .= "\r\n".$extra;
-        }
-
-        return $this->mail($groups, $subject, $body, $from);
+        return $this->throwError('End of stream! Connection lost?', null);
     }
 
     /**
@@ -1050,7 +956,7 @@ class NNTP extends \Net_NNTP_Client
                 }
             }
 
-            // Append current buffer to rest of buffer.
+            // Append current buffer to rest of the buffer.
             $data .= $buffer;
 
             // Check if we have the ending (.\r\n)
@@ -1104,7 +1010,7 @@ class NNTP extends \Net_NNTP_Client
         if ($this->group() !== $groupName) {
             // Select the group.
             $summary = $this->selectGroup($groupName);
-            // If there was an error selecting the group, return PEAR error object.
+            // If there was an error selecting the group, return a PEAR error object.
             if (self::isError($summary)) {
                 return $summary;
             }
