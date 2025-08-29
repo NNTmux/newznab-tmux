@@ -81,7 +81,7 @@ class NZBImport
     /**
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function beginImport($filesToProcess, bool $useNzbName = false, bool $delete = false, bool $deleteFailed = false): bool|string
+    public function beginImport($filesToProcess, bool $useNzbName = false, bool $delete = false, bool $deleteFailed = false, int $source = 1): bool|string
     {
         // Get all the groups in the DB.
         if (! $this->getAllGroups()) {
@@ -95,8 +95,27 @@ class NZBImport
         $start = now()->toImmutable()->format('Y-m-d H:i:s');
         $nzbsImported = $nzbsSkipped = 0;
 
-        // Loop over the file names.
-        foreach ($filesToProcess as $nzbFile) {
+        // Filter files to only process NZB files
+        $nzbFiles = array_filter($filesToProcess, function ($file) {
+            return Str::endsWith($file, '.nzb') || Str::endsWith($file, '.nzb.gz');
+        });
+
+        if (empty($nzbFiles)) {
+            $this->echoOut('No NZB files found to process.');
+            if ($this->browser) {
+                return $this->retVal;
+            }
+
+            return false;
+        }
+
+        $totalFilesFiltered = count($filesToProcess) - count($nzbFiles);
+        if ($totalFilesFiltered > 0) {
+            $this->echoOut("Filtered out {$totalFilesFiltered} non-NZB files. Processing ".count($nzbFiles).' NZB files.');
+        }
+
+        // Loop over the NZB file names only.
+        foreach ($nzbFiles as $nzbFile) {
             $this->nzbGuid = '';
 
             // Check if the file is really there.
@@ -135,7 +154,7 @@ class NZBImport
                 // Try to insert the NZB details into the DB.
                 $nzbFileName = $useNzbName === true ? str_ireplace('.nzb', '', basename($nzbFile)) : '';
                 try {
-                    $inserted = $this->scanNZBFile($nzbXML, $nzbFileName);
+                    $inserted = $this->scanNZBFile($nzbXML, $nzbFileName, $source);
                 } catch (\Exception $e) {
                     $this->echoOut('ERROR: Problem inserting: '.$nzbFile);
                     $inserted = false;
@@ -162,7 +181,6 @@ class NZBImport
                         $nzbsSkipped++;
                     } else {
                         $this->updateNzbGuid();
-
                         if ($delete) {
                             // Remove the nzb file.
                             File::delete($nzbFile);
@@ -186,7 +204,7 @@ class NZBImport
             'Proccessed '.
             $nzbsImported.
             ' NZBs in '.
-            now()->diffForHumans($start).
+            now()->diffInSeconds($start, true).' seconds, '.
             $nzbsSkipped.
             ' NZBs were skipped.'
         );
