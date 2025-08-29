@@ -51,6 +51,7 @@ class InvitationController extends BasePageController
                 'meta_description' => $meta_description,
             ]);
             $this->pagerender();
+
             return;
         }
 
@@ -133,6 +134,7 @@ class InvitationController extends BasePageController
                 'meta_description' => $meta_description,
             ]);
             $this->pagerender();
+
             return;
         }
 
