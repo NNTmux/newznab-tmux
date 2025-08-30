@@ -601,7 +601,7 @@
                                                     {elseif $release.passwordstatus == 1}
                                                         <span class="badge bg-secondary">Unknown</span>
                                                     {else}
-                                                        <span class="badge bg-dark">Passworded Rar Archive</span>
+                                                        <span class="badge bg-dark">Passworded Archive</span>
                                                     {/if}
                                                 </td>
                                             </tr>
@@ -622,7 +622,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th width="140"><i class="fa fa-archive me-2 text-secondary"></i>RAR Contains</th>
+                                                <th width="140"><i class="fa fa-archive me-2 text-secondary"></i>Archive Contains</th>
                                                 <td>
                                                     <strong>Files:</strong>
                                                     <div class="mt-2">
