@@ -30,7 +30,7 @@
                 "conditions": []
             },
             {
-                "action": "vendor/bin/php-cs-fixer fix",
+                "action": "vendor/bin/pint",
                 "options": [],
                 "conditions": []
             }

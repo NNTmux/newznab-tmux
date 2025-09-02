@@ -8,6 +8,7 @@ return [
     'delete_passworded_releases' => env('DELETE_PASSWORDED_RELEASES', false),
     'delete_possible_passworded_releases' => env('DELETE_POSSIBLE_PASSWORDED_RELEASES', false),
     'extract_using_rarinfo' => env('EXTRACT_USING_RARINFO', false),
+    'fetch_last_file' => env('FETCH_LAST_FILE', true),
     'path_to_nzbs' => env('PATH_TO_NZBS', storage_path('nzb')),
     'private_profiles' => env('PRIVATE_PROFILES', true),
     'store_user_ip' => env('STORE_USER_IP', false),

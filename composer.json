@@ -29,6 +29,7 @@
         "ext-iconv": "*",
         "ext-intl": "*",
         "ext-json": "*",
+        "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-mysqlnd": "*",
         "ext-openssl": "*",
@@ -200,7 +201,6 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "check-style": "php-cs-fixer fix --dry-run --diff",
         "fix-style": "pint"
     }
 }

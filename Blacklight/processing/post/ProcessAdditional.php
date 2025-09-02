@@ -47,7 +47,7 @@ class ProcessAdditional
      *
      * @var int
      */
-    public const int maxCompressedFilesToCheck = 10;
+    public const maxCompressedFilesToCheck = 10;
 
     protected $_releases;
 
@@ -146,6 +146,10 @@ class ProcessAdditional
     protected string $_ignoreBookRegex;
 
     protected string $_videoFileRegex;
+
+    protected bool $_debugDownloadFailures; // added
+
+    protected bool $_groupUnavailable; // added
 
     /**
      * Have we created a video file for the current release?
@@ -287,7 +291,7 @@ class ProcessAdditional
         $this->_innerFileBlacklist = Settings::settingValue('innerfileblacklist') === '' ? false : Settings::settingValue('innerfileblacklist');
         $this->_maxNestedLevels = (int) Settings::settingValue('maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('maxnestedlevels');
         $this->_extractUsingRarInfo = (int) Settings::settingValue('extractusingrarinfo') !== 0;
-        $this->_fetchLastFiles = (int) Settings::settingValue('archive.fetch.end') !== 0;
+        $this->_fetchLastFiles = config('nntmux_settings.fetch_last_file');
         $this->_unrarPath = config('nntmux_settings.unrar_path');
         $this->_unzipPath = config('nntmux_settings.unzip_path');
         $this->_7zipPath = config('nntmux_settings.7zip_path');
@@ -354,10 +358,9 @@ class ProcessAdditional
 
         $this->_audioSavePath = config('nntmux_settings.covers_path').'/audiosample/';
 
-        $this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
-        $this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
-        // Store only the inner fragment; delimiters appended at usage time.
-        $this->_supportFileRegex = '\\.(vol\\d{1,3}\\+\\d{1,3}|par2|srs|sfv|nzb';
+        $this->_audioFileRegex = '\\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
+        $this->_ignoreBookRegex = '/\\b(epub|lit|mobi|pdf|sipdf|html)\\b.*\\.rar(?!.{20,})/i';
+        $this->_supportFileRegex = '\\.(?:vol\\d{1,3}\\+\\d{1,3}|par2|srs|sfv|nzb)';
         $this->_videoFileRegex = '\\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
         $this->_debugDownloadFailures = (bool) config('app.debug');
         $this->_groupUnavailable = false; // flag when NNTP group is missing
@@ -516,11 +519,16 @@ class ProcessAdditional
                 'Additional post-processing, started at: '.
                 now()->format('D M d, Y G:i a').
                 PHP_EOL.
-                'Downloaded: (xB) = yEnc article, f= Failed ;Processing: z = ZIP file, r = RAR file'.
+                'Downloaded: (xB)=yEnc article, (cB)=compressed part'.
                 PHP_EOL.
-                'Added: s = Sample image, j = JPEG image, A = Audio sample, a = Audio MediaInfo, v = Video sample'.
+                'Failures: fC#=Compressed(part #), fS=Sample, fM=Media(video), fA=Audio, fJ=JPEG, G=Missing group'.
                 PHP_EOL.
-                'Added: m = Video MediaInfo, n = NFO, ^ = File details from inside the RAR/ZIP',
+                'Processing: r=RAR, z=ZIP, 7z=7zip (names/entries), g=GZIP, b=BZIP2, x=XZ, (vRAW)=Inline video detected'.
+                PHP_EOL.
+                'Added: s=Sample image, j=JPEG image, A=Audio sample, a=Audio MediaInfo, v=Video sample'.
+                PHP_EOL.
+                'Added: m=Video MediaInfo, n=NFO, ^=Inner file details (RAR/ZIP/7z/etc)'.
+                '',
                 'header'
             );
         }
@@ -810,18 +818,12 @@ class ProcessAdditional
         $totalBookFiles = 0;
         foreach ($this->_nzbContents as $this->_currentNZBFile) {
             try {
-                // Check if it's not a nfo, nzb, par2 etc...
-                if (preg_match('/'.$this->_supportFileRegex.'|nfo\b|inf\b|ofn\b)($|[ ")\]-])(?!.{20,})/i', $this->_currentNZBFile['title'])) {
+                // Support / ignore support/nfo files
+                if (preg_match('/(?:'.$this->_supportFileRegex.'|nfo\\b|inf\\b|ofn\\b)($|[ ")]|-])(?!.{20,})/i', $this->_currentNZBFile['title'])) {
                     continue;
                 }
-
-                // Check if it's a rar/zip.
-                if (! $this->_NZBHasCompressedFile &&
-                    preg_match(
-                        '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?|7z(?:\.\d{3})?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
-                        $this->_currentNZBFile['title']
-                    )
-                ) {
+                // Compressed file detection
+                if (! $this->_NZBHasCompressedFile && preg_match('/(\\.(part\\d+|[rz]\\d+|rar|0+|0*10?|zipr\\d{2,3}|zipx?|7z(?:\\.\\d{3})?|(?:tar\\.)?(?:gz|bz2|xz))("|\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$)/i', $this->_currentNZBFile['title'])) {
                     $this->_NZBHasCompressedFile = true;
                 }
 
@@ -884,16 +886,120 @@ class ProcessAdditional
      */
     protected array $_triedCompressedMids = [];
 
+    // List entries of a 7z archive using external 7z -slt mode.
+    private function _listSevenZipEntries(string $compressedData): array
+    {
+        if (empty($this->_7zipPath)) {
+            return [];
+        }
+        try {
+            $tmpFile = $this->tmpPath.uniqid('7zlist_', true).'.7z';
+            if (File::put($tmpFile, $compressedData) === false) {
+                return [];
+            }
+            $cmd = [$this->_7zipPath, 'l', '-slt', '-ba', '-bd', $tmpFile];
+            $exit = 0;
+            $out = null;
+            $err = null;
+            $ok = $this->_execCommand($cmd, $exit, $out, $err);
+            if (! $ok || $exit !== 0 || empty($out)) {
+                // Primary structured listing failed; attempt plain listing fallback.
+                $exit2 = 0;
+                $out2 = null;
+                $err2 = null;
+                $plainCmd = [$this->_7zipPath, 'l', '-ba', '-bd', $tmpFile];
+                $plainOk = $this->_execCommand($plainCmd, $exit2, $out2, $err2);
+                File::delete($tmpFile);
+                if (! $plainOk || $exit2 !== 0 || empty($out2)) {
+                    return [];
+                }
+                $files = [];
+                $lines = preg_split('/\r?\n/', trim($out2));
+                $seen = 0;
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if ($line === '' || str_starts_with($line, '-----') || str_contains($line, '   Date   ') || str_starts_with($line, 'Scanning ') || str_starts_with($line, 'Creating archive')) {
+                        continue;
+                    }
+                    // Typical format: YYYY-MM-DD HH:MM:SS ....A    12345    678  path/filename.ext
+                    if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+\S+\s+\d+\s+\d+\s+(\S.*)$/', $line, $m)) {
+                        $name = $m[1];
+                    } elseif (preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}:\d{2}\s+\S+\s+\d+\s+\d+\s+(\S.*)$/', $line, $m)) { // Locale alt DD.MM.YYYY
+                        $name = $m[1];
+                    } else {
+                        // Fallback: extract token with extension near end if line contains a dot extension.
+                        if (preg_match('/([A-Za-z0-9_#@()\[\]\-+&., ]+\.[A-Za-z0-9]{2,8})$/', $line, $m2)) {
+                            $name = trim($m2[1]);
+                        } else {
+                            continue;
+                        }
+                    }
+                    $name = trim($name, " \t\r\n");
+                    if ($name === '' || strlen($name) > 300) {
+                        continue;
+                    }
+                    $files[] = ['name' => $name, 'size' => 0, 'encrypted' => false];
+                    if (++$seen >= 200) {
+                        break;
+                    }
+                }
+
+                return $files;
+            }
+            // Structured parsing branch.
+            $blocks = preg_split('/\n\n+/u', trim($out));
+            File::delete($tmpFile);
+            $files = [];
+            $anyEnc = false;
+            foreach ($blocks as $blk) {
+                $lines = preg_split('/\r?\n/', trim($blk));
+                $row = [];
+                foreach ($lines as $line) {
+                    $kv = explode(' = ', $line, 2);
+                    if (count($kv) === 2) {
+                        $row[$kv[0]] = $kv[1];
+                    }
+                }
+                if (empty($row['Path'])) {
+                    continue;
+                }
+                $attr = $row['Attributes'] ?? '';
+                if (str_contains($attr, 'D')) {
+                    continue;
+                } // directory
+                $enc = ($row['Encrypted'] ?? '') === '+';
+                if ($enc) {
+                    $anyEnc = true;
+                }
+                $size = isset($row['Size']) && ctype_digit($row['Size']) ? (int) $row['Size'] : 0;
+                $files[] = ['name' => $row['Path'], 'size' => $size, 'encrypted' => $enc];
+                if (count($files) >= 200) {
+                    break;
+                }
+            }
+            if ($anyEnc && isset($files[0])) {
+                $files[0]['__any_encrypted__'] = true;
+            }
+
+            return $files;
+        } catch (\Throwable $e) {
+            if (config('app.debug') === true) {
+                $this->_debug('Exception listing 7z: '.$e->getMessage());
+            }
+
+            return [];
+        }
+    }
+
     /**
      * @throws Exception
      */
     protected function _processNZBCompressedFiles(bool $reverse = false): void
     {
         if ($this->_groupUnavailable) {
-            return; // Skip if group already known unavailable.
+            return;
         }
         $this->_reverse = $reverse;
-
         if ($this->_reverse) {
             if (! krsort($this->_nzbContents)) {
                 return;
@@ -901,32 +1007,20 @@ class ProcessAdditional
         } else {
             $this->_triedCompressedMids = [];
         }
-
         $failed = $downloaded = 0;
         // Loop through the files, attempt to find if passworded and files. Starting with what not to process.
         foreach ($this->_nzbContents as $nzbFile) {
             if ($downloaded >= $this->_maximumRarSegments) {
                 break;
             }
-
             if ($failed >= $this->_maximumRarPasswordChecks) {
                 break;
             }
-
-            if ($this->_releaseHasPassword) {
-                $this->_echo('Skipping processing of rar '.$nzbFile['title'].' it has a password.', 'primaryOver');
+            if ($this->_releaseHasPassword || $this->_groupUnavailable) {
                 break;
             }
-            if ($this->_groupUnavailable) {
-                break; // abort further attempts
-            }
-
-            // Probably not a rar/zip.
-            if (! preg_match(
-                '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?|7z(?:\.\d{3})?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
-                $nzbFile['title']
-            )
-            ) {
+            // Archive detection
+            if (! preg_match('/(\\.(part\\d+|[rz]\\d+|rar|0+|0*10?|zipr\\d{2,3}|zipx?|7z(?:\\.\\d{3})?|(?:tar\\.)?(?:gz|bz2|xz))(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$)/i', $nzbFile['title'])) {
                 continue;
             }
 
@@ -1013,7 +1107,7 @@ class ProcessAdditional
             } else {
                 $failed++;
                 if ($this->_echoCLI) {
-                    $this->_echo('f('.$failed.')', 'warningOver');
+                    $this->_echo('fC'.$failed, 'warningOver');
                 }
             }
         }
@@ -1028,62 +1122,256 @@ class ProcessAdditional
     protected function _processCompressedData(string &$compressedData): bool
     {
         $this->_compressedFilesChecked++;
-        // Give the data to archive info, so it can check if it's a rar.
-        if (! $this->_archiveInfo->setData($compressedData, true)) {
-            // Attempt to detect other common archive/container signatures for debugging purposes.
-            $otherType = $this->_detectNonRarZipType($compressedData);
-            // Removed dd($otherType) debug dump.
-            if ($otherType === '7z' && ! empty($this->_7zipPath)) {
-                // Minimal 7zip handling (fallback path when ArchiveInfo lacks 7z support)
-                try {
-                    if ($this->_echoCLI) {
-                        $this->_echo('7', 'primaryOver');
+
+        $earlyType = $this->_detectNonRarZipType($compressedData);
+        if ($earlyType === '7z') {
+            $listed = [];
+            $archiveEncrypted = false;
+            if (! empty($this->_7zipPath)) {
+                $listed = $this->_listSevenZipEntries($compressedData);
+                if (! empty($listed)) {
+                    if (! empty($listed[0]['__any_encrypted__'])) {
+                        $archiveEncrypted = true;
                     }
-                    if (! $this->_extractUsingRarInfo) {
-                        $extractDir = $this->tmpPath.'un7z/';
-                        if (! File::isDirectory($extractDir)) {
-                            File::makeDirectory($extractDir, 0777, true, true);
+                    if ($archiveEncrypted) {
+                        $this->_releaseHasPassword = true;
+                        $this->_passwordStatus = Releases::PASSWD_RAR;
+
+                        return false; // don't add filenames when encrypted
+                    }
+                    $now = time();
+                    foreach ($listed as $entry) {
+                        if (! empty($entry['__any_encrypted__'])) {
+                            continue;
                         }
-                        $fileName = $this->tmpPath.uniqid('', true).'.7z';
-                        File::put($fileName, $compressedData);
-                        // Suppress most output (-bd disables progress); extraction to target dir.
-                        runCmd('"'.$this->_7zipPath.'" e -y -bd -o"'.$extractDir.'" "'.$fileName.'"');
-                        // Build file info list from extracted files.
-                        $added = false;
+                        $nm = $entry['name'];
+                        if ($nm === '' || strlen($nm) > 300) {
+                            continue;
+                        }
+                        $info = [
+                            'name' => $nm,
+                            'size' => $entry['size'] ?? 0,
+                            'date' => $now,
+                            'pass' => 0,
+                            'crc32' => '',
+                            'source' => '7z-list',
+                        ];
+                        // New filtering rule: only consider specific playable/text/image extensions
+                        // and require more than 5 letter characters in the base name (letters only, ignoring digits/punctuation).
+                        $name = $info['name'] ?? '';
+                        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                        $allowedExt = ['nfo', 'srt', 'mkv', 'mpeg', 'avi', 'jpg', 'jpeg', 'exe', 'mp4', 'mp3', 'm4a', 'flac', 'txt', 'png', 'gif', 'pdf', 'doc', 'docx', 'epub', 'cbz', 'cbr', 'djvu'];
+                        if (! in_array($ext, $allowedExt, true)) {
+                            continue; // Skip disallowed extensions (also excludes gz, xz, etc.)
+                        }
+                        $base = pathinfo($name, PATHINFO_FILENAME);
+                        $letterCount = preg_match_all('/[a-z]/i', $base, $mDummy);
+                        if ($letterCount <= 5) {
+                            continue; // Require >5 letter characters in base name
+                        }
+
+                        $this->_addFileInfo($info);
+                        if ($this->_totalFileInfo >= 50) {
+                            break;
+                        }
+                    }
+                    if ($this->_totalFileInfo > 0) {
+                        if ($this->_echoCLI) {
+                            $this->_echo('7z', 'primaryOver');
+                        }
+
+                        return true;
+                    }
+                }
+            }
+            $addedFromHeader = false;
+            try {
+                if (class_exists(__NAMESPACE__.'\\SevenZipPartialParser')) {
+                    $parser = new SevenZipPartialParser($compressedData);
+                    if ($parser->isEncrypted()) {
+                        $this->_releaseHasPassword = true;
+                        $this->_passwordStatus = Releases::PASSWD_RAR;
+
+                        return false;
+                    }
+                    $hdrNames = $parser->getFileNames();
+                    if (config('app.debug') === true && ! empty($hdrNames)) {
+                        $this->_debug('7z header names: '.substr(implode(', ', $hdrNames), 0, 300));
+                    }
+                    if ($parser->hasEncodedHeader() && empty($listed) && config('app.debug') === true) {
+                        $this->_debug('7z encoded header detected; external list unavailable or returned no entries.');
+                    }
+                    if (! empty($hdrNames) && empty($listed)) {
                         $now = time();
-                        if (File::isDirectory($extractDir)) {
-                            foreach (File::allFiles($extractDir) as $f) {
-                                $relName = $f->getFilename();
-                                $info = [
-                                    'name' => $relName,
-                                    'size' => $f->getSize(),
-                                    'date' => $now,
-                                    'pass' => 0,
-                                    'crc32' => '',
-                                    'source' => '7z',
-                                ];
-                                $this->_addFileInfo($info);
-                                $added = true;
+                        $count = 0;
+                        foreach ($hdrNames as $nm) {
+                            if ($nm === '' || strlen($nm) > 300) {
+                                continue;
+                            }
+                            $info = [
+                                'name' => $nm,
+                                'size' => 0,
+                                'date' => $now,
+                                'pass' => 0,
+                                'crc32' => '',
+                                'source' => '7z-header',
+                            ];
+                            // New filtering rule: only consider specific playable/text/image extensions
+                            // and require more than 5 letter characters in the base name (letters only, ignoring digits/punctuation).
+                            $name = $info['name'] ?? '';
+                            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                            $allowedExt = ['nfo', 'srt', 'mkv', 'mpeg', 'avi', 'jpg', 'jpeg', 'exe', 'mp4', 'mp3', 'm4a', 'flac', 'txt', 'png', 'gif', 'pdf', 'doc', 'docx', 'epub', 'cbz', 'cbr', 'djvu'];
+                            if (! in_array($ext, $allowedExt, true)) {
+                                continue; // Skip disallowed extensions (also excludes gz, xz, etc.)
+                            }
+                            $base = pathinfo($name, PATHINFO_FILENAME);
+                            $letterCount = preg_match_all('/[a-z]/i', $base, $mDummy);
+                            if ($letterCount <= 5) {
+                                continue; // Require >5 letter characters in base name
+                            }
+
+                            $this->_addFileInfo($info);
+                            $count++;
+                            if ($count >= 50) {
+                                break;
                             }
                         }
-                        File::delete($fileName);
+                        if ($this->_totalFileInfo > 0) {
+                            $addedFromHeader = true;
+                            if ($this->_echoCLI) {
+                                $this->_echo('7z', 'primaryOver');
+                            }
 
-                        return $added; // We cannot continue into ArchiveInfo path.
+                            return true;
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                if (config('app.debug') === true) {
+                    $this->_debug('7z header parse failed: '.$e->getMessage());
+                }
+            }
+            if (! $addedFromHeader && empty($listed)) {
+                $names = $this->_scanSevenZipFilenames($compressedData);
+                if (! empty($names)) {
+                    $now = time();
+                    foreach ($names as $nm) {
+                        if ($nm === '' || strlen($nm) > 300) {
+                            continue;
+                        }
+                        $info = [
+                            'name' => $nm,
+                            'size' => 0,
+                            'date' => $now,
+                            'pass' => 0,
+                            'crc32' => '',
+                            'source' => '7z-scan',
+                        ];
+                        // New filtering rule: only consider specific playable/text/image extensions
+                        // and require more than 5 letter characters in the base name (letters only, ignoring digits/punctuation).
+                        $name = $info['name'] ?? '';
+                        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                        $allowedExt = ['nfo', 'srt', 'mkv', 'mpeg', 'avi', 'jpg', 'jpeg', 'exe', 'mp4', 'mp3', 'm4a', 'flac', 'txt', 'png', 'gif', 'pdf', 'doc', 'docx', 'epub', 'cbz', 'cbr', 'djvu'];
+                        if (! in_array($ext, $allowedExt, true)) {
+                            continue; // Skip disallowed extensions (also excludes gz, xz, etc.)
+                        }
+                        $base = pathinfo($name, PATHINFO_FILENAME);
+                        $letterCount = preg_match_all('/[a-z]/i', $base, $mDummy);
+                        if ($letterCount <= 5) {
+                            continue; // Require >5 letter characters in base name
+                        }
+
+                        $this->_addFileInfo($info);
+                        if ($this->_totalFileInfo >= 50) {
+                            break;
+                        }
+                    }
+                    if ($this->_totalFileInfo > 0) {
+                        if ($this->_echoCLI) {
+                            $this->_echo('7z', 'primaryOver');
+                        }
+
+                        return true;
+                    }
+                }
+            }
+            // continue to extraction attempt below if still nothing
+        }
+        if (in_array($earlyType, ['7z', 'gzip', 'bzip2', 'xz'], true)) {
+            if (! empty($this->_7zipPath)) {
+                $extMap = ['7z' => '7z', 'gzip' => 'gz', 'bzip2' => 'bz2', 'xz' => 'xz'];
+                $markerMap = ['7z' => '7z', 'gzip' => 'g', 'bzip2' => 'b', 'xz' => 'x'];
+                $ext = $extMap[$earlyType];
+                $marker = $markerMap[$earlyType];
+                if ($this->_extractViaSevenZip($compressedData, $ext, $earlyType, $marker)) {
+                    return true;
+                }
+            }
+        }
+
+        if (! $this->_archiveInfo->setData($compressedData, true)) {
+            $otherType = $earlyType ?? $this->_detectNonRarZipType($compressedData);
+            if (in_array($otherType, ['7z', 'gzip', 'bzip2', 'xz'], true) && ! empty($this->_7zipPath)) {
+                $extMap = [
+                    '7z' => '7z',
+                    'gzip' => 'gz',
+                    'bzip2' => 'bz2',
+                    'xz' => 'xz',
+                ];
+                $markerMap = [
+                    '7z' => '7z',
+                    'gzip' => 'g',
+                    'bzip2' => 'b',
+                    'xz' => 'x',
+                ];
+                $ext = $extMap[$otherType];
+                $marker = $markerMap[$otherType];
+                if ($this->_extractViaSevenZip($compressedData, $ext, $otherType, $marker)) {
+                    return true;
+                }
+            }
+            // Standalone video (raw first segments) detection when not recognized as archive.
+            $videoType = $this->_detectStandaloneVideo($compressedData);
+            if ($videoType !== null) {
+                try {
+                    $extMap = ['avi' => 'avi', 'mkv' => 'mkv', 'mpg' => 'mpg', 'mp4' => 'mp4'];
+                    $ext = $extMap[$videoType] ?? 'dat';
+                    $fileLocation = $this->tmpPath.'inline_video_'.uniqid('', true).'.'.$ext;
+                    if (File::put($fileLocation, $compressedData) !== false) {
+                        if ($this->_echoCLI) {
+                            $this->_echo('(vRAW)', 'primaryOver');
+                        }
+                        if (! $this->_foundMediaInfo) {
+                            $this->_foundMediaInfo = $this->_getMediaInfo($fileLocation);
+                        }
+                        if (! $this->_foundSample) {
+                            $this->_foundSample = $this->_getSample($fileLocation);
+                        }
+                        if (! $this->_foundVideo) {
+                            $this->_foundVideo = $this->_getVideo($fileLocation);
+                        }
+
+                        return $this->_foundMediaInfo || $this->_foundSample || $this->_foundVideo;
                     }
                 } catch (\Throwable $e) {
                     if (config('app.debug') === true) {
-                        Log::warning('7z extraction failed: '.$e->getMessage());
+                        Log::debug('Standalone video handling failed: '.$e->getMessage());
                     }
                 }
             }
             if (config('app.debug') === true) {
-                $this->_debug('Data is not recognized as RAR or ZIP'.($otherType !== null ? ", probable type: {$otherType}" : '.'));
+                $alt = $otherType !== null ? 'Probable alternate type: '.$otherType.'.' : '';
+                $sevenZip = ! empty($this->_7zipPath) ? '' : '7zip binary NOT configured; extended formats disabled.';
+                $this->_debug(sprintf(
+                    'Unrecognized compressed data. %s %s',
+                    $alt,
+                    $sevenZip
+                ));
             }
 
             return false;
         }
 
-        // Check if there's an error.
         if ($this->_archiveInfo->error !== '') {
             if (config('app.debug') === true) {
                 $this->_debug('ArchiveInfo Error: '.$this->_archiveInfo->error);
@@ -1093,10 +1381,8 @@ class ProcessAdditional
         }
 
         try {
-            // Get a summary of the compressed file.
             $dataSummary = $this->_archiveInfo->getSummary(true);
         } catch (Exception $exception) {
-            // Log the exception and continue to next item
             if (config('app.debug') === true) {
                 Log::warning($exception->getTraceAsString());
             }
@@ -1104,7 +1390,6 @@ class ProcessAdditional
             return false;
         }
 
-        // Ensure extraction target subdirectories exist if we're delegating extraction to external binaries.
         if (! $this->_extractUsingRarInfo) {
             try {
                 if ($this->_unrarPath !== false) {
@@ -1124,7 +1409,6 @@ class ProcessAdditional
             }
         }
 
-        // Check if the compressed file is encrypted.
         if (! empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && (int) $dataSummary['is_encrypted'] !== 0)) {
             if (config('app.debug') === true) {
                 $this->_debug('ArchiveInfo: Compressed file has a password.');
@@ -1160,7 +1444,6 @@ class ProcessAdditional
                 if ($this->_echoCLI) {
                     $this->_echo('r', 'primaryOver');
                 }
-
                 if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
                     $fileName = $this->tmpPath.uniqid('', true).'.rar';
                     File::put($fileName, $compressedData);
@@ -1265,9 +1548,8 @@ class ProcessAdditional
      */
     protected function _addFileInfo(&$file): void
     {
-        // Don't add rar/zip files to the DB.
         if (! isset($file['error']) && isset($file['source']) &&
-            ! preg_match('/'.$this->_supportFileRegex.'|part\d+|[r|z]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar|7z)(\s*\.rar)?$/i', $file['name'])
+            ! preg_match('/(?:'.$this->_supportFileRegex.'|part\d+|[rz]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx?|zip|rar|7z|gz|bz2|xz)(\s*\.rar)?$/i', $file['name'])
         ) {
             // Cache the amount of files we find in the RAR or ZIP, return this to say we did find RAR or ZIP content.
             // This is so we don't download more RAR or ZIP files for no reason.
@@ -1286,7 +1568,8 @@ class ProcessAdditional
                     }
 
                     // Check for "codec spam"
-                    if (preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe$/i', $file['name'])) {
+                    // Previous pattern '/[\/\\]Codec[\/\\]Setup\.exe$/i' caused a runtime compilation error in some PCRE builds.
+                    if (preg_match('#(?:^|[\\/])Codec[\\/]Setup\.exe$#i', $file['name'])) {
                         if (config('app.debug') === true) {
                             $this->_debug('Codec spam found, setting release to potentially passworded.');
                         }
@@ -1311,19 +1594,12 @@ class ProcessAdditional
     protected function _processExtractedFiles(): void
     {
         $nestedLevels = 0;
-
-        // Go through all the files in the temp folder, look for compressed files, extract them and the nested ones.
         while ($nestedLevels < $this->_maxNestedLevels) {
-            // Break out if we checked more than x compressed files.
             if ($this->_compressedFilesChecked >= self::maxCompressedFilesToCheck) {
                 break;
             }
-
             $foundCompressedFile = false;
-
-            // Get all the compressed files in the temp folder.
-            $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1|7z(?:\.\d{3})?)($|[^a-z0-9])/i');
-
+            $files = $this->_getTempDirectoryContents('/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1|7z(?:\.\d{3})?|(?:tar\.)?(?:gz|bz2|xz))($|[^a-z0-9])/i');
             if (! empty($files)) {
                 foreach ($files as $file) {
                     // Check if the file exists.
@@ -1463,6 +1739,7 @@ class ProcessAdditional
                             'error_object' => is_object($sampleBinary) ? get_class($sampleBinary) : null,
                             'error_message' => $errMsg,
                             'raw_type' => gettype($sampleBinary),
+                            'length' => is_string($sampleBinary) ? strlen($sampleBinary) : 0,
                         ]);
                     }
                     $sampleBinary = false;
@@ -1489,7 +1766,7 @@ class ProcessAdditional
                         }
                     }
                 } elseif ($this->_echoCLI) {
-                    $this->_echo('f', 'warningOver');
+                    $this->_echo('fS', 'warningOver');
                 }
             }
         }
@@ -1553,7 +1830,7 @@ class ProcessAdditional
                         }
                     }
                 } elseif ($this->_echoCLI) {
-                    $this->_echo('f', 'warningOver');
+                    $this->_echo('fM', 'warningOver');
                 }
             }
         }
@@ -1602,7 +1879,7 @@ class ProcessAdditional
                     // Try to get media info / sample of the audio file.
                     $this->_getAudioInfo($fileLocation, $this->_AudioInfoExtension);
                 } elseif ($this->_echoCLI) {
-                    $this->_echo('f', 'warningOver');
+                    $this->_echo('fA', 'warningOver');
                 }
             }
         }
@@ -1650,8 +1927,8 @@ class ProcessAdditional
                 // Check if image exif data is jpeg
                 if (exif_imagetype($this->tmpPath.'samplepicture.jpg') === IMAGETYPE_JPEG) {
                     // Try to resize and move it.
-                    $this->_foundJPGSample = ($this->_releaseImage->saveImage($this->_release->guid.'_thumb',
-                        $this->tmpPath.'samplepicture.jpg', $this->_releaseImage->jpgSavePath, 650, 650) === 1);
+                    $this->_foundJPGSample = $this->_releaseImage->saveImage($this->_release->guid.'_thumb',
+                        $this->tmpPath.'samplepicture.jpg', $this->_releaseImage->jpgSavePath, 650, 650) === 1;
 
                     if ($this->_foundJPGSample) {
                         // Update the DB to say we got it.
@@ -1665,7 +1942,7 @@ class ProcessAdditional
                     File::delete($this->tmpPath.'samplepicture.jpg');
                 }
             } elseif ($this->_echoCLI) {
-                $this->_echo('f', 'warningOver');
+                $this->_echo('fJ', 'warningOver');
             }
         }
     }
@@ -1690,8 +1967,7 @@ class ProcessAdditional
             $updateRows += ['jpgstatus' => 1];
         }
 
-        // Get the number of files we found inside the RAR/ZIP files.
-
+        // Get the number of files we found inside the RAR/ZIPs.
         $releaseFilesCount = ReleaseFile::whereReleasesId($this->_release->id)->count('releases_id');
 
         if ($releaseFilesCount === null) {
@@ -1823,7 +2099,7 @@ class ProcessAdditional
                                     $ext = strtoupper($fileExtension);
 
                                     // Form a new search name.
-                                    if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
+                                    if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname, $Year)) {
                                         $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' ('.$Year[0].') '.$ext;
                                     } else {
                                         $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' '.$ext;
@@ -2320,14 +2596,12 @@ class ProcessAdditional
         $af = $bf = false;
         $a = preg_replace('/\d+[ ._-]?(\/|\||[o0]f)[ ._-]?\d+?(?![ ._-]\d)/i', ' ', $a['title']);
         $b = preg_replace('/\d+[ ._-]?(\/|\||[o0]f)[ ._-]?\d+?(?![ ._-]\d)/i', ' ', $b['title']);
-
-        if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $a)) {
+        if (preg_match('/\\.(part\\d+|[rz]\\d+)(\\s*\\.rar)*($|[ ")\]-])/i', $a)) {
             $af = true;
         }
-        if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $b)) {
+        if (preg_match('/\\.(part\\d+|[rz]\\d+)(\\s*\\.rar)*($|[ ")\]-])/i', $b)) {
             $bf = true;
         }
-
         if (! $af && preg_match('/\.rar($|[ ")\]-])/i', $a)) {
             $a = preg_replace('/\.rar(?:$|[ ")\]-])/i', '.*rar', $a);
             $af = true;
@@ -2336,27 +2610,21 @@ class ProcessAdditional
             $b = preg_replace('/\.rar(?:$|[ ")\]-])/i', '.*rar', $b);
             $bf = true;
         }
-
         if (! $af && ! $bf) {
             return strnatcasecmp($a, $b);
         }
-
         if (! $bf) {
             return -1;
         }
-
         if (! $af) {
             return 1;
         }
-
         if ($af && $bf) {
             return strnatcasecmp($a, $b);
         }
-
         if ($af) {
             return -1;
         }
-
         if ($bf) {
             return 1;
         }
@@ -2424,7 +2692,9 @@ class ProcessAdditional
      */
     protected function _debug(string $string): void
     {
-        $this->_echo('DEBUG: '.$string, 'debug');
+        if (config('app.env') === 'local' && config('app.debug') === true) {
+            $this->_echo('DEBUG: '.$string, 'debug');
+        }
     }
 
     /**
@@ -2498,40 +2768,276 @@ class ProcessAdditional
         }
     }
 
+    /**
+     * Detect non-RAR/ZIP archive container types we can optionally extract with 7zip.
+     * Only returns values used by _processCompressedData's earlyType handling.
+     */
     protected function _detectNonRarZipType(string $data): ?string
     {
-        $len = strlen($data);
-        if ($len < 8) {
-            return null;
-        }
-        $head8 = substr($data, 0, 8);
         $head6 = substr($data, 0, 6);
         $head4 = substr($data, 0, 4);
-
-        // 7z signature: 37 7A BC AF 27 1C
-        if (strncmp($head6, "\x37\x7A\xBC\xAF\x27\x1C", 6) === 0) {
+        // 7z signature 37 7A BC AF 27 1C with additional sanity checks.
+        if ($head6 === "\x37\x7A\xBC\xAF\x27\x1C" && $this->_isLikely7z($data)) {
             return '7z';
         }
-        // GZIP: 1F 8B 08
+        // GZIP 1F 8B 08 (check first 3 bytes)
         if (strncmp($head4, "\x1F\x8B\x08", 3) === 0) {
             return 'gzip';
         }
-        // BZIP2: 42 5A 68 (BZh)
+        // BZip2 BZh
         if (strncmp($head4, 'BZh', 3) === 0) {
             return 'bzip2';
         }
-        // XZ: FD 37 7A 58 5A 00
-        if (strncmp($head6, "\xFD7zXZ\x00", 6) === 0) {
-            return 'tar';
+        // XZ FD 37 7A 58 5A 00
+        if ($head6 === "\xFD7zXZ\x00") {
+            return 'xz';
         }
-        // PDF (sometimes mis-uploaded): %PDF
-        if (strncmp($head4, '%PDF', 4) === 0) {
+        // (Optionally detect PDF so we can skip repeated processing, but we don't extract it.)
+        if ($head4 === '%PDF') {
             return 'pdf';
         }
 
         return null;
     }
 
+    /**
+     * Heuristic validation to reduce false positives on 7z signature.
+     * 7z structure: signature (6 bytes) + version (2 bytes) + start header CRC (4 bytes) + next 8 bytes start header.
+     */
+    private function _isLikely7z(string $data): bool
+    {
+        if (strlen($data) < 32) {
+            return false; // unrealistically small for valid 7z
+        }
+        // Version bytes: major=0x00, minor commonly 0x02-0x06 (allow up to 0x09 future-proof)
+        $verMajor = ord($data[6]);
+        $verMinor = ord($data[7]);
+        if ($verMajor !== 0x00 || $verMinor < 0x02 || $verMinor > 0x09) {
+            return false;
+        }
+        // Start header CRC (bytes 8-11) should not be all 0x00 or all 0xFF
+        $crc = substr($data, 8, 4);
+        if ($crc === "\x00\x00\x00\x00" || $crc === "\xFF\xFF\xFF\xFF") {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Attempt to recover (probable) filenames from a partial 7z archive without full parsing.
+     * Strategy:
+     *  - Limit to first few MB to keep performance reasonable.
+     *  - Collapse UTF-16LE (ASCII interleaved with 0x00) to plain ASCII.
+     *  - Regex match typical filename patterns (printable chars + common extensions).
+     *  - Return unique list (case-insensitive) capped at 50.
+     */
+    private function _scanSevenZipFilenames(string $data): array
+    {
+        $slice = substr($data, 0, 8 * 1024 * 1024);
+        $converted = preg_replace('/([\x20-\x7E])\x00/', '$1', $slice);
+        if ($converted === null) {
+            $converted = $slice;
+        }
+        $converted = str_replace("\x00", ' ', $converted);
+        $exts = '7z|rar|zip|gz|bz2|xz|tar|tgz|mp4|mkv|avi|mpg|mpeg|mov|ts|wmv|flv|m4v|mp3|flac|ogg|wav|aac|aiff|ape|mka|nfo|txt|diz|pdf|epub|mobi|jpg|jpeg|png|gif|sfv|par2|exe|dll|srt|sub|idx|iso|bin|cue|mds|mdf';
+        // Fixed safe pattern (no dynamic delimiter conflicts).
+        // Optional path (0-120 allowed chars + slash) then filename (2-160 chars) + .ext
+        $regex = '~(?:[A-Za-z0-9 _.+&@#,()!-]{0,120}[\\/])?([A-Za-z0-9 _.+&@#,()!-]{2,160}\.(?:'.$exts.'))~i';
+        preg_match_all($regex, $converted, $m, PREG_SET_ORDER);
+        if (empty($m)) {
+            return [];
+        }
+        $names = [];
+        foreach ($m as $match) {
+            $candidate = $match[1];
+            $candidate = preg_replace('/ {2,}/', ' ', $candidate);
+            if ($candidate === '' || strlen($candidate) < 5) {
+                continue;
+            }
+            if (substr_count($candidate, '.') > 10) {
+                continue;
+            }
+            $candidate = trim($candidate, " .-\t\n\r");
+            $lower = strtolower($candidate);
+            if (! isset($names[$lower])) {
+                $names[$lower] = $candidate;
+                if (count($names) >= 80) {
+                    break;
+                }
+            }
+        }
+
+        return array_values($names);
+    }
+
+    /**
+     * Execute an external command capturing stdout/stderr and exit code.
+     */
+    private function _execCommand(string|array $cmd, ?int &$exitCode = null, ?string &$stdout = null, ?string &$stderr = null): bool
+    {
+        $descriptorSpec = [
+            1 => ['pipe', 'w'], // stdout
+            2 => ['pipe', 'w'], // stderr
+        ];
+        // If we have an array, pass directly to proc_open to avoid shell parsing.
+        $process = @proc_open($cmd, $descriptorSpec, $pipes, null, null, ['bypass_shell' => true]);
+        if (! \is_resource($process)) {
+            $exitCode = -1;
+
+            return false;
+        }
+        $stdout = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $exitCode = proc_close($process);
+
+        return $exitCode === 0;
+    }
+
+    private function _extractViaSevenZip(string $compressedData, string $ext, string $type, string $marker): bool
+    {
+        try {
+            if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
+                $extractDir = $this->tmpPath.'un7z/'.uniqid('', true).'/';
+                if (! File::isDirectory($extractDir)) {
+                    File::makeDirectory($extractDir, 0777, true, true);
+                }
+                $fileName = $this->tmpPath.uniqid('', true).'.'.$ext;
+                File::put($fileName, $compressedData);
+
+                $added = false;
+                $now = time();
+
+                // Build command parts (array form avoids quoting issues).
+                $cmdParts = [
+                    $this->_7zipPath,
+                    'e',
+                    '-y',
+                    '-bd',
+                    '-o'.$extractDir,
+                    $fileName,
+                ];
+                $exit = 0;
+                $out = null;
+                $err = null;
+                $ok = $this->_execCommand($cmdParts, $exit, $out, $err);
+
+                if (File::isDirectory($extractDir)) {
+                    foreach (File::allFiles($extractDir) as $f) {
+                        $info = [
+                            'name' => $f->getFilename(),
+                            'size' => $f->getSize(),
+                            'date' => $now,
+                            'pass' => 0,
+                            'crc32' => '',
+                            'source' => $type,
+                        ];
+                        // New filtering rule: only consider specific playable/text/image extensions
+                        // and require more than 5 letter characters in the base name (letters only, ignoring digits/punctuation).
+                        $name = $info['name'] ?? '';
+                        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                        $allowedExt = ['nfo', 'srt', 'mkv', 'mpeg', 'avi', 'jpg', 'jpeg', 'exe', 'mp4', 'mp3', 'm4a', 'flac', 'txt', 'png', 'gif', 'pdf', 'doc', 'docx', 'epub', 'cbz', 'cbr', 'djvu'];
+                        if (! in_array($ext, $allowedExt, true)) {
+                            continue; // Skip disallowed extensions (also excludes gz, xz, etc.)
+                        }
+                        $base = pathinfo($name, PATHINFO_FILENAME);
+                        $letterCount = preg_match_all('/[a-z]/i', $base, $mDummy);
+                        if ($letterCount <= 5) {
+                            continue; // Require >5 letter characters in base name
+                        }
+
+                        $this->_addFileInfo($info);
+                        $added = true;
+                    }
+                }
+                // Diagnostics when extraction fails or produces no files.
+                if ((! $ok || ! $added) && config('app.debug') === true) {
+                    $context = [
+                        'release_id' => $this->_release->id ?? null,
+                        'tmp_file_exists' => File::exists($fileName),
+                        'tmp_file_size' => File::exists($fileName) ? File::size($fileName) : 0,
+                        'extract_dir_exists' => File::isDirectory($extractDir),
+                        'exit_code' => $exit,
+                        'stderr_snip' => substr((string) $err, 0, 400),
+                        'stdout_snip' => substr((string) $out, 0, 200),
+                        'cmd_parts' => $cmdParts,
+                        'type' => $type,
+                    ];
+                    Log::debug('7zip extraction produced no files', $context);
+                }
+
+                // Cleanup input file always after logging.
+                File::delete($fileName);
+
+                if ($added && $this->_echoCLI) {
+                    $this->_echo($marker, 'primaryOver');
+                }
+
+                return $added;
+            }
+        } catch (\Throwable $e) {
+            if (config('app.debug') === true) {
+                Log::warning(strtoupper($type).' extraction exception: '.$e->getMessage());
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Detect if the binary blob appears to be a standalone video (not inside an archive).
+     * Used to opportunistically derive MediaInfo / previews from first-part inline uploads.
+     */
+    private function _detectStandaloneVideo(string $data): ?string
+    {
+        $len = strlen($data);
+        if ($len < 16) {
+            return null;
+        }
+        // AVI (RIFF + 'AVI ')
+        if (strncmp($data, 'RIFF', 4) === 0 && substr($data, 8, 4) === 'AVI ') {
+            return 'avi';
+        }
+        // Matroska / WebM (EBML header)
+        if (strncmp($data, "\x1A\x45\xDF\xA3", 4) === 0) {
+            return 'mkv';
+        }
+        // MPEG Program Stream (pack / sequence headers)
+        $sig4 = substr($data, 0, 4);
+        if ($sig4 === "\x00\x00\x01\xBA" || $sig4 === "\x00\x00\x01\xB3") {
+            return 'mpg';
+        }
+        // MPEG Transport Stream (0x47 sync every 188 bytes for first 5 packets)
+        if ($len >= 188 * 5) {
+            $isTs = true;
+            for ($i = 0; $i < 5; $i++) {
+                $pos = 188 * $i;
+                if (! isset($data[$pos]) || $data[$pos] !== "\x47") {
+                    $isTs = false;
+                    break;
+                }
+            }
+            if ($isTs) {
+                return 'mpg';
+            }
+        }
+        // MP4 / MOV ftyp brands
+        if ($len >= 12 && substr($data, 4, 4) === 'ftyp') {
+            $brand = substr($data, 8, 4);
+            $brands = ['isom', 'iso2', 'avc1', 'mp41', 'mp42', 'dash', 'MSNV', 'qt  ', 'M4V ', 'M4P ', 'M4B ', 'M4A '];
+            if (in_array($brand, $brands, true)) {
+                return 'mp4';
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Process only a single release by GUID (utility method).
+     */
     public function processSingleGuid(string $guid): bool
     {
         try {
@@ -2543,17 +3049,11 @@ class ProcessAdditional
 
                 return false;
             }
-
-            // Set up single release collection.
             $this->_releases = collect([$release]);
             $this->_totalReleases = 1;
-
-            // Derive guid char for temp path segregation.
             $guidChar = $release->leftguid ?? substr($release->guid, 0, 1);
             $groupID = '';
             $this->_setMainTempPath($guidChar, $groupID);
-
-            // Process the single release.
             $this->_processReleases();
 
             return true;
