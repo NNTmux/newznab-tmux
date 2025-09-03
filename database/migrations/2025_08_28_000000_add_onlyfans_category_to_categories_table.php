@@ -12,6 +12,7 @@ return new class extends Migration
      */
     public function up()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('categories')->insert([
             'id' => 6047,
             'title' => 'OnlyFans',
@@ -22,6 +23,7 @@ return new class extends Migration
             'minsizetoformrelease' => 0,
             'maxsizetoformrelease' => 0,
         ]);
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     /**
@@ -31,6 +33,8 @@ return new class extends Migration
      */
     public function down()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('categories')->where('id', 6047)->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 };
