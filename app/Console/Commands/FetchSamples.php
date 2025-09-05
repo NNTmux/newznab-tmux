@@ -28,6 +28,7 @@ class FetchSamples extends Command
         // Validate the required category option.
         if ($categoryOpt === null || trim((string) $categoryOpt) === '') {
             $this->info('Category option is empty. Provide --category with one or more numeric category IDs. Command will not run.');
+
             return self::SUCCESS;
         }
 
@@ -41,15 +42,18 @@ class FetchSamples extends Command
 
         if ($catIds->isEmpty()) {
             $this->info('Category option provided but no valid numeric IDs parsed. Command will not run.');
+
             return self::SUCCESS;
         }
 
         if ($limit < 0) {
             $this->error('Limit must be >= 0');
+
             return self::FAILURE;
         }
         if ($chunkSize < 1) {
             $this->error('Chunk size must be >= 1');
+
             return self::FAILURE;
         }
 
@@ -62,12 +66,13 @@ class FetchSamples extends Command
         $totalAll = $baseQuery->count();
         if ($totalAll === 0) {
             $this->info('No matching releases found (categories_id IN ['.implode(',', $catIds->all()).'] AND jpgstatus = 0).');
+
             return self::SUCCESS;
         }
 
         $effectiveTotal = $limit > 0 ? min($limit, $totalAll) : $totalAll;
         $this->info('Categories: ['.implode(',', $catIds->all()).']');
-        $this->info("Found {$totalAll} matching release(s). Processing {$effectiveTotal}." . ($dryRun ? ' (dry-run)' : ''));
+        $this->info("Found {$totalAll} matching release(s). Processing {$effectiveTotal}.".($dryRun ? ' (dry-run)' : ''));
 
         if ($dryRun) {
             $previewQuery = clone $baseQuery;
@@ -80,6 +85,7 @@ class FetchSamples extends Command
                 $this->line($g);
             }
             $this->info('Dry run complete.');
+
             return self::SUCCESS;
         }
 
@@ -114,7 +120,7 @@ class FetchSamples extends Command
                         }
                     } else {
                         $failed++;
-                        $this->getOutput()->writeln("\n<error>Non-zero exit code ({$exitCode}) for GUID {$guid}</error>" . ($showOutput && $subOutput !== '' ? "\n  Output: {$subOutput}" : ''));
+                        $this->getOutput()->writeln("\n<error>Non-zero exit code ({$exitCode}) for GUID {$guid}</error>".($showOutput && $subOutput !== '' ? "\n  Output: {$subOutput}" : ''));
                     }
                 } catch (\Throwable $e) {
                     $failed++;
@@ -132,6 +138,7 @@ class FetchSamples extends Command
             if ($remaining <= 0) {
                 return false; // signal chunkById to stop
             }
+
             return true; // continue chunking
         }, 'id');
 
