@@ -147,7 +147,8 @@ class DeleteReleases extends Command
                     DB::delete('DELETE FROM releases WHERE id = ?', [$releaseId]);
 
                     // Delete from search indexes
-                    ManticoreSearch::deleteRelease($releaseId);
+                    $identifiers = ['id' => $releaseId, 'g' => $release->guid];
+                    ManticoreSearch::deleteRelease($identifiers);
                     ElasticSearchSiteSearch::deleteRelease($releaseId);
 
                     $deleted++;

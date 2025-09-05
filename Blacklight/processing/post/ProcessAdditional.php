@@ -2748,7 +2748,7 @@ class ProcessAdditional
                 if (config('nntmux.elasticsearch_enabled') === true) {
                     $this->elasticsearch->deleteRelease($id);
                 } else {
-                    $this->manticore->deleteRelease([$id]);
+                    $this->manticore->deleteRelease(['i' => $id, 'g' => $guid]);
                 }
             } catch (\Throwable $e) {
                 // ignore index delete failures
