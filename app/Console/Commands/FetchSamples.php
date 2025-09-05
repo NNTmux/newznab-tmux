@@ -61,7 +61,7 @@ class FetchSamples extends Command
         $baseQuery = Release::query()
             ->whereIn('categories_id', $catIds->all())
             ->where('jpgstatus', 0)
-            ->orderBy('id');
+            ->orderBy('id', 'desc');
 
         $totalAll = $baseQuery->count();
         if ($totalAll === 0) {
