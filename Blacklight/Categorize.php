@@ -755,7 +755,7 @@ class Categorize
         $name = $this->releaseName;
 
         // Quick reject: must have a UHD indicator.
-        if (!preg_match('/\b(2160p|4k|UHD|Ultra[._ -]?HD)\b/i', $name)) {
+        if (! preg_match('/\b(2160p|4k|UHD|Ultra[._ -]?HD)\b/i', $name)) {
             return false;
         }
 
@@ -775,12 +775,14 @@ class Categorize
         // Legacy very specific scene/group pattern (retain for backward compatibility).
         if (preg_match('/XXX.+2160p[\w\-.]+M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH)/i', $name)) {
             $this->tmpCat = Category::XXX_UHD;
+
             return true;
         }
 
         // Common structured pattern: Site.YY.MM.DD.<title>.XXX?.(2160p|4k)
         if (preg_match('/\b'.$adultSites.'\.\d{2}\.\d{2}\.\d{2}\.[\w\.]+?(?:XXX\.)?(?:2160p|4k)\b/i', strtolower($name))) {
             $this->tmpCat = Category::XXX_UHD;
+
             return true;
         }
 
@@ -788,6 +790,7 @@ class Categorize
         if (preg_match('/XXX[.\-_ ].{0,80}\b(2160p|4k)\b/i', $name) ||
             preg_match('/\b(2160p|4k)\b.{0,80}XXX\b/i', $name)) {
             $this->tmpCat = Category::XXX_UHD;
+
             return true;
         }
 
@@ -795,11 +798,13 @@ class Categorize
         if (preg_match('/\b[A-Za-z][\w]+(?:\.[A-Za-z][\w]+){1,6}\.(?:XXX\.)?(2160p|4k)\b/i', $name) &&
             preg_match('/XXX|'.$adultSites.'|Porn|Sex/i', $name)) {
             $this->tmpCat = Category::XXX_UHD;
+
             return true;
         }
 
         // Fallback: adult marker + UHD indicator already confirmed.
         $this->tmpCat = Category::XXX_UHD;
+
         return true;
     }
 
@@ -1037,7 +1042,7 @@ class Categorize
 
         return false;
     }
-    
+
     public function isXxxVr(): bool
     {
         $name = $this->releaseName;
@@ -1052,8 +1057,8 @@ class Categorize
 
         // Need either a site token or a VR180/VR360 token present to proceed.
         if (
-            !preg_match('/\bVR(?:180|360)\b/i', $name) &&
-            !preg_match('/\b' . $vrSites . '\b/i', $name)
+            ! preg_match('/\bVR(?:180|360)\b/i', $name) &&
+            ! preg_match('/\b'.$vrSites.'\b/i', $name)
         ) {
             return false;
         }
@@ -1061,7 +1066,7 @@ class Categorize
         $vrPattern = '/(?ix)
             (
                 # Site / brand tokens
-                \b' . $vrSites . '\b
+                \b'.$vrSites.'\b
               | \bVR(?:180|360)\b
               | \bVR(?:180|360)[._ -]?(?:3D|H?SBS)\b
               | \.VR(?:180|360)\.(?:2560|3072|3584|3840|4096|4320)p
@@ -1076,19 +1081,20 @@ class Categorize
             )
         /';
 
-        if (!preg_match($vrPattern, $name)) {
+        if (! preg_match($vrPattern, $name)) {
             return false;
         }
 
         // If only a generic VR token matched, require either XXX or a known VR site to reduce false positives.
         if (
-            !preg_match('/\b' . $vrSites . '\b/i', $name) &&
-            !preg_match('/\bXXX\b/i', $name)
+            ! preg_match('/\b'.$vrSites.'\b/i', $name) &&
+            ! preg_match('/\bXXX\b/i', $name)
         ) {
             return false;
         }
 
         $this->tmpCat = Category::XXX_VR;
+
         return true;
     }
 
