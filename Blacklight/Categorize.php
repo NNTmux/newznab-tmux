@@ -713,7 +713,7 @@ class Categorize
     public function isXxx(): bool
     {
         return match (true) {
-            $this->isXXXOnlyFans(), $this->isXxxClipHD(), $this->isXxxVr(), $this->isXxxPack(), $this->isXxxClipSD(), $this->isXxxSD(), $this->isXxxUHD(), $this->catWebDL && $this->isXxxWEBDL(), $this->isXxx264(), $this->isXxxXvid(), $this->isXxxImageset(), $this->isXxxWMV(), $this->isXxxDVD(), $this->isXxxOther() => true,
+            $this->isXXXOnlyFans(), $this->isXxxVr(), $this->isXxxClipHD(), $this->isXxxPack(), $this->isXxxClipSD(), $this->isXxxSD(), $this->isXxxUHD(), $this->catWebDL && $this->isXxxWEBDL(), $this->isXxx264(), $this->isXxxXvid(), $this->isXxxImageset(), $this->isXxxWMV(), $this->isXxxDVD(), $this->isXxxOther() => true,
             default => false,
         };
     }
@@ -752,13 +752,55 @@ class Categorize
 
     public function isXxxUHD(): bool
     {
-        if (preg_match('/XXX.+(2160p)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH))/i', $this->releaseName)) {
-            $this->tmpCat = Category::XXX_UHD;
+        $name = $this->releaseName;
 
+        // Quick reject: must have a UHD indicator.
+        if (!preg_match('/\b(2160p|4k|UHD|Ultra[._ -]?HD)\b/i', $name)) {
+            return false;
+        }
+
+        // Known adult site / brand tokens (lowercase for consistency).
+        $adultSites = '(mypervyfamily|mywifeshotfriend|clubsweethearts|brazzers|bangbros|bangbros18|realitykings|naughtyamerica|vixen|tushy|blacked|deeper|sexart|metartx?|joymii|vivthomas|thelifeerotic|defloration|nubiles|familystrokes|passion-?hd|evilangel|dorcelclub|private|hustler)';
+
+        // Adult markers: XXX, site names, or common explicit genre words.
+        $hasAdultMarker =
+            preg_match('/\bXXX\b/i', $name) ||
+            preg_match('/\b'.$adultSites.'\b/i', strtolower($name)) ||
+            preg_match('/\b(Hardcore|Porn|Sex|Anal|Creampie|MILF|Lesbian|Teen|Interracial)\b/i', $name);
+
+        if (! $hasAdultMarker) {
+            return false;
+        }
+
+        // Legacy very specific scene/group pattern (retain for backward compatibility).
+        if (preg_match('/XXX.+2160p[\w\-.]+M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|WRB|NBQ|FETiSH)/i', $name)) {
+            $this->tmpCat = Category::XXX_UHD;
             return true;
         }
 
-        return false;
+        // Common structured pattern: Site.YY.MM.DD.<title>.XXX?.(2160p|4k)
+        if (preg_match('/\b'.$adultSites.'\.\d{2}\.\d{2}\.\d{2}\.[\w\.]+?(?:XXX\.)?(?:2160p|4k)\b/i', strtolower($name))) {
+            $this->tmpCat = Category::XXX_UHD;
+            return true;
+        }
+
+        // Order‑independent XXX + UHD proximity (allow some text in between).
+        if (preg_match('/XXX[.\-_ ].{0,80}\b(2160p|4k)\b/i', $name) ||
+            preg_match('/\b(2160p|4k)\b.{0,80}XXX\b/i', $name)) {
+            $this->tmpCat = Category::XXX_UHD;
+            return true;
+        }
+
+        // Performer / descriptive titles ending in UHD (e.g. model.scene.title.XXX.2160p.*)
+        if (preg_match('/\b[A-Za-z][\w]+(?:\.[A-Za-z][\w]+){1,6}\.(?:XXX\.)?(2160p|4k)\b/i', $name) &&
+            preg_match('/XXX|'.$adultSites.'|Porn|Sex/i', $name)) {
+            $this->tmpCat = Category::XXX_UHD;
+            return true;
+        }
+
+        // Fallback: adult marker + UHD indicator already confirmed.
+        $this->tmpCat = Category::XXX_UHD;
+        return true;
     }
 
     public function isXxxClipHD(): bool
@@ -995,40 +1037,58 @@ class Categorize
 
         return false;
     }
-
+    
     public function isXxxVr(): bool
     {
         $name = $this->releaseName;
 
-        // Quick reject: no literal 'vr' (case‑insensitive) substring at all
+        // Fast reject: no 'vr' substring at all.
         if (stripos($name, 'vr') === false) {
             return false;
         }
 
-        // Strict VR tokens / devices / site signatures with boundaries
-        $vrPattern = '/(?ix)
-        (?:                           # Any of these alternatives:
-            \bVR(?:180|360)\b
-          | \b(?:180x180_3dh)\b
-          | \b(?:4K|5K|8K)[._ ]VR\b
-          | \.VR(?:180|360)\.(?:3584|3840|3072)p
-          | \b(?:GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax|Reverb|RiftS|SexLikeReal)\b
-          | \bSLR(?:_[A-Z]+)?\b
-          | ^SLR.+(?:VR|LR[_-]180|3072p)
-          | ^REQUEST\.SLR
-          | \b(?:VirtualReal|Virtual(?:Taboo|Porn))\b
-          | \bVR(?:Hush|Cosplay|Spy|Conk|Porn|Latina|Bangers|KM|Mansion|Intimacy|Doomed|Allure)\b
-          | \b(?:BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR(?:Fetish)?|HoloGirlsVR|SexBabesVR|NaughtyAmericaVR|WetVR|XSinsVR|VRCosplayX|BIBIVR)\b
-          | \[VR\][.\s]Pack
-        )
-    /';
+        // Maintain a central list of recognized VR adult site / brand tokens.
+        $vrSites = '(?:SexBabesVR|LittleCapriceVR|VRoomed|TonightsGirlfriend|NaughtyAmericaVR|BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR(?:Fetish)?|HoloGirlsVR|WetVR|XSinsVR|VRCosplayX|BIBIVR|SLR|SexLikeReal)';
 
-        if (! preg_match($vrPattern, $name)) {
+        // Need either a site token or a VR180/VR360 token present to proceed.
+        if (
+            !preg_match('/\bVR(?:180|360)\b/i', $name) &&
+            !preg_match('/\b' . $vrSites . '\b/i', $name)
+        ) {
+            return false;
+        }
+
+        $vrPattern = '/(?ix)
+            (
+                # Site / brand tokens
+                \b' . $vrSites . '\b
+              | \bVR(?:180|360)\b
+              | \bVR(?:180|360)[._ -]?(?:3D|H?SBS)\b
+              | \.VR(?:180|360)\.(?:2560|3072|3584|3840|4096|4320)p
+              | \bVR(?:180|360)\b.*\b(?:2560|3072|3360|3480|3584|3840|3968|4096|4320)p\b
+              | \b(?:2560|3072|3360|3480|3584|3840|3968|4096|4320)p\b.*\bVR(?:180|360)\b
+              | \b(?:5K|6K|7K|8K)\b.*\bVR\b
+              | \b180x180_3dh\b
+              | \b(?:GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax|Reverb|RiftS)\b
+              | ^SLR.+(?:VR|LR[_-]180|3072p)
+              | ^REQUEST\.SLR
+              | \[VR\][.\s]Pack
+            )
+        /';
+
+        if (!preg_match($vrPattern, $name)) {
+            return false;
+        }
+
+        // If only a generic VR token matched, require either XXX or a known VR site to reduce false positives.
+        if (
+            !preg_match('/\b' . $vrSites . '\b/i', $name) &&
+            !preg_match('/\bXXX\b/i', $name)
+        ) {
             return false;
         }
 
         $this->tmpCat = Category::XXX_VR;
-
         return true;
     }
 
