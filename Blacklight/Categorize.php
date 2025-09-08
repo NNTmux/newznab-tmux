@@ -1057,8 +1057,8 @@ class Categorize
 
         // Require either a site token or explicit VR180/VR360 first
         if (
-            !preg_match('!(?i)\bVR(?:180|360)\b!', $name) &&
-            !preg_match('!(?i)\b' . $vrSites . '\b!', $name)
+            ! preg_match('!(?i)\bVR(?:180|360)\b!', $name) &&
+            ! preg_match('!(?i)\b'.$vrSites.'\b!', $name)
         ) {
             return false;
         }
@@ -1066,7 +1066,7 @@ class Categorize
         // Main VR feature pattern (extended mode with ! delimiter to avoid / conflicts)
         $vrPattern = '!(?xi)
             (
-                  \b' . $vrSites . '\b
+                  \b'.$vrSites.'\b
                 | \bVR(?:180|360)\b
                 | \bVR(?:180|360)[._ -]?(?:3D|H?SBS)\b
                 | \b(?:5K|6K|7K|8K)\b .* \bVR\b
@@ -1080,19 +1080,20 @@ class Categorize
             )
         !';
 
-        if (!preg_match($vrPattern, $name)) {
+        if (! preg_match($vrPattern, $name)) {
             return false;
         }
 
         // If only generic VR tokens matched, enforce XXX or known site to cut false positives
         if (
-            !preg_match('!(?i)\b' . $vrSites . '\b!', $name) &&
-            !preg_match('!(?i)\bXXX\b!', $name)
+            ! preg_match('!(?i)\b'.$vrSites.'\b!', $name) &&
+            ! preg_match('!(?i)\bXXX\b!', $name)
         ) {
             return false;
         }
 
         $this->tmpCat = Category::XXX_VR;
+
         return true;
     }
 
