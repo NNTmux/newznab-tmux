@@ -1047,54 +1047,52 @@ class Categorize
     {
         $name = $this->releaseName;
 
-        // Fast reject: no 'vr' substring at all.
+        // Fast reject: must contain 'vr'
         if (stripos($name, 'vr') === false) {
             return false;
         }
 
-        // Maintain a central list of recognized VR adult site / brand tokens.
+        // Recognized VR sites
         $vrSites = '(?:SexBabesVR|LittleCapriceVR|VRoomed|TonightsGirlfriend|NaughtyAmericaVR|BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR(?:Fetish)?|HoloGirlsVR|WetVR|XSinsVR|VRCosplayX|BIBIVR|SLR|SexLikeReal)';
 
-        // Need either a site token or a VR180/VR360 token present to proceed.
+        // Require either a site token or explicit VR180/VR360 first
         if (
-            ! preg_match('/\bVR(?:180|360)\b/i', $name) &&
-            ! preg_match('/\b'.$vrSites.'\b/i', $name)
+            !preg_match('!(?i)\bVR(?:180|360)\b!', $name) &&
+            !preg_match('!(?i)\b' . $vrSites . '\b!', $name)
         ) {
             return false;
         }
 
-        $vrPattern = '/(?ix)
+        // Main VR feature pattern (extended mode with ! delimiter to avoid / conflicts)
+        $vrPattern = '!(?xi)
             (
-                # Site / brand tokens
-                \b'.$vrSites.'\b
-              | \bVR(?:180|360)\b
-              | \bVR(?:180|360)[._ -]?(?:3D|H?SBS)\b
-              | \.VR(?:180|360)\.(?:2560|3072|3584|3840|4096|4320)p
-              | \bVR(?:180|360)\b.*\b(?:2560|3072|3360|3480|3584|3840|3968|4096|4320)p\b
-              | \b(?:2560|3072|3360|3480|3584|3840|3968|4096|4320)p\b.*\bVR(?:180|360)\b
-              | \b(?:5K|6K|7K|8K)\b.*\bVR\b
-              | \b180x180_3dh\b
-              | \b(?:GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax|Reverb|RiftS)\b
-              | ^SLR.+(?:VR|LR[_-]180|3072p)
-              | ^REQUEST\.SLR
-              | \[VR\][.\s]Pack
+                  \b' . $vrSites . '\b
+                | \bVR(?:180|360)\b
+                | \bVR(?:180|360)[._ -]?(?:3D|H?SBS)\b
+                | \b(?:5K|6K|7K|8K)\b .* \bVR\b
+                | \bVR\b .* \b(?:2560|3072|3360|3480|3584|3840|3968|4096|4320)p\b
+                | \b(?:2560|3072|3360|3480|3584|3840|3968|4096|4320)p\b .* \bVR\b
+                | \b180x180_3dh\b
+                | \b(?:GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax|Reverb|RiftS)\b
+                | ^SLR.+(?:VR|LR[_-]180|3072p)
+                | ^REQUEST\.SLR
+                | \[VR\][.\s]Pack
             )
-        /';
+        !';
 
-        if (! preg_match($vrPattern, $name)) {
+        if (!preg_match($vrPattern, $name)) {
             return false;
         }
 
-        // If only a generic VR token matched, require either XXX or a known VR site to reduce false positives.
+        // If only generic VR tokens matched, enforce XXX or known site to cut false positives
         if (
-            ! preg_match('/\b'.$vrSites.'\b/i', $name) &&
-            ! preg_match('/\bXXX\b/i', $name)
+            !preg_match('!(?i)\b' . $vrSites . '\b!', $name) &&
+            !preg_match('!(?i)\bXXX\b!', $name)
         ) {
             return false;
         }
 
         $this->tmpCat = Category::XXX_VR;
-
         return true;
     }
 
