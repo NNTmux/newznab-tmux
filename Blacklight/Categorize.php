@@ -1053,7 +1053,7 @@ class Categorize
         }
 
         // Recognized VR sites
-        $vrSites = '(?:SexBabesVR|LittleCapriceVR|VRoomed|TonightsGirlfriend|NaughtyAmericaVR|BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR(?:Fetish)?|HoloGirlsVR|WetVR|XSinsVR|VRCosplayX|BIBIVR|SLR|SexLikeReal)';
+        $vrSites = '(?:SexBabesVR|LittleCapriceVR|VRoomed|VRMagic|TonightsGirlfriend|NaughtyAmericaVR|BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR(?:Fetish)?|HoloGirlsVR|WetVR|XSinsVR|VRCosplayX|BIBIVR|SLR|SexLikeReal)';
 
         // Require either a site token or explicit VR180/VR360 first
         if (
