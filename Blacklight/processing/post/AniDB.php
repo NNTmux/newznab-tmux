@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Blacklight\processing\post;
 
 use App\Models\AnidbEpisode;
@@ -14,40 +16,38 @@ use Blacklight\PopulateAniDB as PaDb;
 class AniDB
 {
     private const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
-
     private const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
 
-    /**
-     * @var bool Whether to echo messages to CLI
-     */
+    /** @var bool Whether to echo messages to CLI */
     public bool $echooutput;
 
     public PaDb $padb;
 
-    /**
-     * @var int number of AniDB releases to process
-     */
+    /** @var int number of AniDB releases to process */
     private int $aniqty;
 
-    /**
-     * @var int|null The status of the release being processed
-     */
+    /** @var int|null The status of the release being processed */
     private ?int $status;
 
     protected ColorCLI $colorCli;
+
+    /**
+     * Simple cache of looked up titles -> anidbid to reduce repeat queries within one run.
+     * @var array<string,int>
+     */
+    private array $titleCache = [];
 
     /**
      * @throws \Exception
      */
     public function __construct()
     {
-        $this->echooutput = config('nntmux.echocli');
+        $this->echooutput = (bool) config('nntmux.echocli');
         $this->padb = new PaDb;
         $this->colorCli = new ColorCLI;
 
         $quantity = (int) Settings::settingValue('maxanidbprocessed');
-        $this->aniqty = $quantity ?? 100;
-
+        $this->aniqty = $quantity > 0 ? $quantity : 100;
         $this->status = null;
     }
 
@@ -58,48 +58,44 @@ class AniDB
      */
     public function processAnimeReleases(): void
     {
-        $results = Release::query()->whereNull('anidbid')->where('categories_id', Category::TV_ANIME)->orderByDesc('postdate')->limit($this->aniqty)->get();
+        $results = Release::query()
+            ->whereNull('anidbid')
+            ->where('categories_id', Category::TV_ANIME)
+            ->orderByDesc('postdate')
+            ->limit($this->aniqty)
+            ->get();
 
-        if (\count($results) > 0) {
+        if ($results->count() > 0) {
+            // Honor AniDB API cooldown before starting a batch.
             $this->doRandomSleep();
 
             foreach ($results as $release) {
                 $matched = $this->matchAnimeRelease($release);
                 if ($matched === false) {
+                    // Persist status so we do not keep retrying hopeless releases immediately.
                     Release::query()->where('id', $release->id)->update(['anidbid' => $this->status]);
                 }
             }
         } else {
-            $this->colorCli->info('No anidb releases to  process.');
+            $this->colorCli->info('No anidb releases to process.');
         }
     }
 
     /**
-     * Retrieves a list of Anime titles, optionally filtered by starting character and title.
+     * Retrieves episode info if present.
      */
-    private function checkAniDBInfo($anidbId, int $episode = -1): array
+    private function checkAniDBInfo(int $anidbId, int $episode = -1): array
     {
-        $result = AnidbEpisode::query()->where(
-            [
-                'anidbid' => $anidbId,
-                'episode_no' => $episode,
-            ]
-        )->select([
-            'anidbid',
-            'episode_no',
-            'airdate',
-            'episode_title',
-        ])->first();
-        if (! empty($result)) {
-            return $result->toArray();
+        $q = AnidbEpisode::query()->where(['anidbid' => $anidbId]);
+        if ($episode >= 0) {
+            $q->where('episode_no', $episode);
         }
-
-        return [];
+        $result = $q->select(['anidbid', 'episode_no', 'airdate', 'episode_title'])->first();
+        return $result ? $result->toArray() : [];
     }
 
     /**
      * Sleeps between 10 and 15 seconds for AniDB API cooldown.
-     *
      *
      * @throws \Exception
      */
@@ -110,56 +106,108 @@ class AniDB
 
     /**
      * Extracts anime title and episode info from release searchname.
-     *
-     * @return array $hits
+     * Returns ['title' => string, 'epno' => int] on success else empty array.
      */
     private function extractTitleEpisode(string $cleanName = ''): array
     {
-        $cleanName = str_replace('_', ' ', $cleanName);
+        // Normalize common separators
+        $s = str_replace(['_', '.'], ' ', $cleanName);
+        $s = preg_replace('/\s+/', ' ', (string) $s);
+        $s = trim((string) $s);
 
-        if (preg_match(
-            '/(^|.*\")(\[[a-zA-Z\.\!?-]+\][\s_]*)?(\[BD\][\s_]*)?(\[\d{3,4}[ip]\][\s_]*)?(?P<title>[\w\s_.+!?\'\-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?([ _]\-[ _]|([ ._-]Epi?(sode)?[ ._-]?0?)?[ ._-]?|[ ._-]Vol\.|[ ._-]E)(?P<epno>\d{1,3}|Movie|OVA|Complete Series)(v\d|-\d+)?[\-_. ].*[\[\(\"]/i',
-            $cleanName,
-            $hits
-        )
-        ) {
-            $hits['epno'] = (int) $hits['epno'];
-            if (\in_array($hits['epno'], ['Movie', 'OVA'], false)) {
-                $hits['epno'] = 1;
-            }
-        } elseif (preg_match(
-            '/^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(\[BD\])?(\[\d{3,4}[ip]\])?(?P<title>[\w\s_.+!?\'\-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?\s*[\(\[](BD|\d{3,4}[ipx])/i',
-            $cleanName,
-            $hits
-        )
-        ) {
-            $hits['epno'] = 1;
-        } elseif (preg_match('#^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(?P<title>[\w -]+)?\s+-\s+(?P<epno>\d+)\s*(\[\d+p\])?$#', $cleanName, $hits)) {
-            $hits['epno'] = (int) $hits['epno'];
-        } else {
+        // Strip leading group tags like [Group]
+        $s = preg_replace('/^(?:\[[^\]]+\]\s*)+/', '', $s);
+        $s = trim((string) $s);
+
+        $title = '';
+        $ep = -1;
+
+        // 1) Look for " - NNN" first
+        if (preg_match('/\s-\s*(\d{1,3})\b/', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $ep = (int) $m[1][0];
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+
+        // 2) If not found, look for " E0*NNN"
+        if ($ep < 0 && preg_match('/\sE0*(\d{1,3})\b/i', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $ep = (int) $m[1][0];
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+
+        // 3) Keywords Movie/OVA/Complete Series
+        if ($ep < 0 && preg_match('/\b(Movie|OVA|Complete Series)\b/i', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $kind = strtolower($m[1][0]);
+            $ep = match ($kind) {
+                'movie', 'ova' => 1,
+                'complete series' => 0,
+                default => -1,
+            };
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+
+        // 4) BD/resolution releases: pick title before next bracket token
+        if ($ep < 0 && preg_match('/\[(?:BD|\d{3,4}[ipx])\]/i', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $ep = 1;
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+
+        $title = $this->cleanTitle((string) $title);
+
+        if ($title === '' || $ep < 0) {
             $this->status = self::PROC_EXTFAIL;
+            return [];
         }
 
-        if (! empty($hits['title'])) {
-            $hits['title'] = trim(str_replace(['_', '.'], ' ', $hits['title']));
-        }
-
-        return $hits;
+        return ['title' => $title, 'epno' => $ep];
     }
 
     /**
-     * Retrieves the AniDB ID for a given anime title.
+     * Strip stray separators or tokens accidentally captured at the end of title.
      */
-    private function getAnidbByName(string $searchName = ''): mixed
+    private function cleanTitle(string $title): string
     {
-        return AnidbTitle::query()->where('title', 'like', '%'.$searchName.'%')->select(['anidbid', 'title'])->first();
+        // Remove trailing "- 123", trailing dash, trailing E/E0/Episode tokens, and trailing Vol.
+        $patterns = [
+            '/\s*-\s*\d+\s*$/i',
+            '/\s*-\s*$/',
+            '/\s+E(?:pi(?:sode)?)?\s*0?\s*$/i',
+            '/\s+Vol\.?\s*$/i',
+        ];
+        $title = preg_replace($patterns, '', $title);
+        return trim((string) $title);
     }
 
     /**
-     * Matches the anime release to AniDB Info
-     * If no info is available locally the AniDB API is invoked.
-     *
-     *
+     * Retrieve AniDB title row (id + title) by name attempt exact then partial.
+     */
+    private function getAnidbByName(string $searchName = ''): ?AnidbTitle
+    {
+        if ($searchName === '') {
+            return null;
+        }
+
+        $key = strtolower($searchName);
+        if (isset($this->titleCache[$key])) {
+            return AnidbTitle::query()->select(['anidbid', 'title'])->where('anidbid', $this->titleCache[$key])->first();
+        }
+
+        // Exact (case-insensitive) first
+        $exact = AnidbTitle::query()->whereRaw('LOWER(title) = ?', [$key])->select(['anidbid', 'title'])->first();
+        if ($exact) {
+            $this->titleCache[$key] = (int) $exact->anidbid;
+            return $exact;
+        }
+
+        // Partial fallback
+        $partial = AnidbTitle::query()->where('title', 'like', '%'.$searchName.'%')->select(['anidbid', 'title'])->first();
+        if ($partial) {
+            $this->titleCache[$key] = (int) $partial->anidbid;
+        }
+        return $partial;
+    }
+
+    /**
+     * Matches the anime release to AniDB Info; fetches remotely if needed.
      *
      * @throws \Exception
      */
@@ -168,69 +216,74 @@ class AniDB
         $matched = false;
         $type = 'Local';
 
-        // clean up the release name to ensure we get a good chance at getting a valid title
-        $cleanArr = $this->extractTitleEpisode($release->searchname);
+        $cleanArr = $this->extractTitleEpisode((string) $release->searchname);
+        if (empty($cleanArr)) {
+            return false;
+        }
 
-        if (isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
-            $this->colorCli->climate()->info('Looking Up:
-                     Title: '.$cleanArr['title'].
-                '    Episode: '.$cleanArr['epno']);
+        $title = $cleanArr['title'];
+        $epno = $cleanArr['epno'];
 
-            // get anidb number for the title of the name
-            $anidbId = $this->getAnidbByName($cleanArr['title']);
+        // We ignore episode number 0 (Complete Series) for matching episodes but still link the title.
+        if ($this->echooutput) {
+            $this->colorCli->climate()->info('Looking Up: Title: '.$title.' Episode: '.$epno);
+        }
 
-            if ($anidbId === false) {
-                $tmpName = preg_replace('/\s/', '%', $cleanArr['title']);
-                $anidbId = $this->getAnidbByName($tmpName);
+        $anidbTitle = $this->getAnidbByName($title);
+        if (!$anidbTitle) {
+            // Try with spaces replaced by % for broader matching
+            $tmpName = preg_replace('/\s+/', '%', $title);
+            $anidbTitle = $this->getAnidbByName($tmpName);
+        }
+
+        if ($anidbTitle && is_numeric($anidbTitle->anidbid) && (int) $anidbTitle->anidbid > 0) {
+            $anidbId = (int) $anidbTitle->anidbid;
+
+            $episodeInfo = ($epno > 0) ? $this->checkAniDBInfo($anidbId, $epno) : [];
+
+            if (empty($episodeInfo) && $this->shouldUpdateInfo($anidbId)) {
+                // Fetch remote info
+                $this->padb->populateTable('info', $anidbId);
+                $this->doRandomSleep();
+                $episodeInfo = ($epno > 0) ? $this->checkAniDBInfo($anidbId, $epno) : [];
+                $type = 'Remote';
             }
 
-            if (! empty($anidbId) && is_numeric($anidbId->anidbid) && $anidbId->anidbid > 0) {
-                $updatedAni = $this->checkAniDBInfo($anidbId->anidbid, $cleanArr['epno']);
-                if (empty($updatedAni)) {
-                    if (! empty($this->updateTimeCheck($anidbId->anidbid))) {
-                        $this->padb->populateTable('info', $anidbId->anidbid);
-                        $this->doRandomSleep();
-                        $updatedAni = $this->checkAniDBInfo($anidbId->anidbid);
-                        $type = 'Remote';
-                    } else {
-                        echo PHP_EOL.
-                            $this->colorCli->info('This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.').
-                            PHP_EOL;
-                    }
-                }
+            $episodeTitle = $episodeInfo['episode_title'] ?? 'Unknown';
+            $this->updateRelease($anidbId, (int) $release->id);
 
-                $episodeTitle = $updatedAni['episode_title'] ?? 'Unknown';
-
-                $this->updateRelease($anidbId->anidbid, $release->id);
-
-                $this->colorCli->headerOver('Matched '.$type.' AniDB ID: ').
-                    $this->colorCli->primary($anidbId->anidbid).
-                    $this->colorCli->alternateOver('   Title: ').
-                    $this->colorCli->primary($anidbId->title).
-                    $this->colorCli->alternateOver('   Episode #: ').
-                    $this->colorCli->primary($cleanArr['epno']).
-                    $this->colorCli->alternateOver('   Episode Title: ').
-                    $this->colorCli->primary($episodeTitle);
-
-                $matched = true;
-            } else {
-                $this->status = self::PROC_NOMATCH;
+            if ($this->echooutput) {
+                $this->colorCli->headerOver('Matched '.$type.' AniDB ID: ')
+                    ->primary((string) $anidbId)
+                    ->alternateOver('   Title: ')
+                    ->primary($anidbTitle->title)
+                    ->alternateOver('   Episode #: ')
+                    ->primary((string) $epno)
+                    ->alternateOver('   Episode Title: ')
+                    ->primary($episodeTitle);
             }
+            $matched = true;
+        } else {
+            $this->status = self::PROC_NOMATCH;
         }
 
         return $matched;
     }
 
-    private function updateRelease($anidbId, $relId): void
+    private function updateRelease(int $anidbId, int $relId): void
     {
         Release::query()->where('id', $relId)->update(['anidbid' => $anidbId]);
     }
 
     /**
-     * Checks if the AniDB ID has been updated in the last week.
+     * Determine if we should attempt a remote AniDB info fetch (missing or stale > 1 week).
      */
-    private function updateTimeCheck($anidbId): mixed
+    private function shouldUpdateInfo(int $anidbId): bool
     {
-        return AnidbInfo::query()->where('updated', '<', now()->subWeek())->where('anidbid', $anidbId)->select('anidbid')->first();
+        $info = AnidbInfo::query()->where('anidbid', $anidbId)->first(['updated']);
+        if ($info === null) {
+            return true; // no info yet
+        }
+        return $info->updated < now()->subWeek();
     }
 }
