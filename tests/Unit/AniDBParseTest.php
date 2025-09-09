@@ -14,6 +14,7 @@ class AniDBParseTest extends TestCase
     private function makeAniDBInstance(): object
     {
         $rc = new ReflectionClass(\Blacklight\processing\post\AniDB::class);
+
         return $rc->newInstanceWithoutConstructor();
     }
 
@@ -23,6 +24,7 @@ class AniDBParseTest extends TestCase
         $rm->setAccessible(true);
         /** @var array $result */
         $result = $rm->invoke($instance, $name);
+
         return $result;
     }
 
@@ -32,6 +34,7 @@ class AniDBParseTest extends TestCase
         $rp->setAccessible(true);
         /** @var int|null $status */
         $status = $rp->getValue($instance);
+
         return $status;
     }
 
@@ -110,4 +113,3 @@ class AniDBParseTest extends TestCase
         $this->assertSame(-1, $status, 'Expected PROC_EXTFAIL (-1) status for invalid extraction');
     }
 }
-

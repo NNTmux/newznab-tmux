@@ -16,6 +16,7 @@ use Blacklight\PopulateAniDB as PaDb;
 class AniDB
 {
     private const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
+
     private const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
 
     /** @var bool Whether to echo messages to CLI */
@@ -33,6 +34,7 @@ class AniDB
 
     /**
      * Simple cache of looked up titles -> anidbid to reduce repeat queries within one run.
+     *
      * @var array<string,int>
      */
     private array $titleCache = [];
@@ -91,6 +93,7 @@ class AniDB
             $q->where('episode_no', $episode);
         }
         $result = $q->select(['anidbid', 'episode_no', 'airdate', 'episode_title'])->first();
+
         return $result ? $result->toArray() : [];
     }
 
@@ -155,6 +158,7 @@ class AniDB
 
         if ($title === '' || $ep < 0) {
             $this->status = self::PROC_EXTFAIL;
+
             return [];
         }
 
@@ -174,6 +178,7 @@ class AniDB
             '/\s+Vol\.?\s*$/i',
         ];
         $title = preg_replace($patterns, '', $title);
+
         return trim((string) $title);
     }
 
@@ -195,6 +200,7 @@ class AniDB
         $exact = AnidbTitle::query()->whereRaw('LOWER(title) = ?', [$key])->select(['anidbid', 'title'])->first();
         if ($exact) {
             $this->titleCache[$key] = (int) $exact->anidbid;
+
             return $exact;
         }
 
@@ -203,6 +209,7 @@ class AniDB
         if ($partial) {
             $this->titleCache[$key] = (int) $partial->anidbid;
         }
+
         return $partial;
     }
 
@@ -230,7 +237,7 @@ class AniDB
         }
 
         $anidbTitle = $this->getAnidbByName($title);
-        if (!$anidbTitle) {
+        if (! $anidbTitle) {
             // Try with spaces replaced by % for broader matching
             $tmpName = preg_replace('/\s+/', '%', $title);
             $anidbTitle = $this->getAnidbByName($tmpName);
@@ -284,6 +291,7 @@ class AniDB
         if ($info === null) {
             return true; // no info yet
         }
+
         return $info->updated < now()->subWeek();
     }
 }
