@@ -241,10 +241,6 @@ class TVMaze extends TV
 
     /**
      * Attempts to find the best matching show by title or aliases.
-     *
-     * @param  array  $shows
-     * @param string $cleanName
-     * @return array|false
      */
     private function matchShowInfo(array $shows, string $cleanName): false|array
     {
