@@ -294,19 +294,19 @@ class TraktTv extends TV
 
         return [
             'type' => parent::TYPE_TV,
-            'title' => (string) $show['title'],
-            'summary' => (string) $show['overview'],
+            'title' => $show['title'],
+            'summary' => $show['overview'],
             'started' => Carbon::parse($show['first_aired'], $this->localizedTZ)->format('Y-m-d'),
-            'publisher' => (string) $show['network'],
-            'country' => (string) $show['country'],
+            'publisher' => $show['network'],
+            'country' => $show['country'],
             'source' => parent::SOURCE_TRAKT,
             'imdb' => $imdb['imdbid'] ?? 0,
             'tvdb' => $show['ids']['tvdb'] ?? 0,
-            'trakt' => (int) $show['ids']['trakt'],
+            'trakt' => $show['ids']['trakt'],
             'tvrage' => $show['ids']['tvrage'] ?? 0,
             'tvmaze' => 0,
             'tmdb' => $show['ids']['tmdb'] ?? 0,
-            'aliases' => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
+            'aliases' => isset($show['aliases']) && ! empty($show['aliases']) ? $show['aliases'] : '',
             'localzone' => $this->localizedTZ,
         ];
     }

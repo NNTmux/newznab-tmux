@@ -342,19 +342,19 @@ class TMDB extends TV
 
         return [
             'type' => parent::TYPE_TV,
-            'title' => (string) $show['name'],
-            'summary' => (string) $show['overview'],
-            'started' => (string) $show['first_air_date'],
-            'publisher' => isset($show['network']) ? (string) $show['network'] : '',
+            'title' => $show['name'],
+            'summary' => $show['overview'],
+            'started' => $show['first_air_date'],
+            'publisher' => $show['network'] ?? '',
             'country' => $show['origin_country'][0] ?? '',
             'source' => parent::SOURCE_TMDB,
-            'imdb' => isset($imdb['imdbid']) ? (int) $imdb['imdbid'] : 0,
-            'tvdb' => isset($show['external_ids']['tvdb_id']) ? (int) $show['external_ids']['tvdb_id'] : 0,
+            'imdb' => $imdb['imdbid'] ?? 0,
+            'tvdb' => $show['external_ids']['tvdb_id'] ?? 0,
             'trakt' => 0,
-            'tvrage' => isset($show['external_ids']['tvrage_id']) ? (int) $show['external_ids']['tvrage_id'] : 0,
+            'tvrage' => $show['external_ids']['tvrage_id'] ?? 0,
             'tvmaze' => 0,
-            'tmdb' => (int) $show['id'],
-            'aliases' => ! empty($show['alternative_titles']) ? (array) $show['alternative_titles'] : '',
+            'tmdb' => $show['id'],
+            'aliases' => ! empty($show['alternative_titles']) ? $show['alternative_titles'] : '',
             'localzone' => "''",
         ];
     }

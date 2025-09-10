@@ -392,14 +392,14 @@ class TVDB extends TV
 
         return [
             'type' => parent::TYPE_TV,
-            'title' => (string) $show->name,
-            'summary' => (string) $show->overview,
+            'title' => $show->name,
+            'summary' => $show->overview,
             'started' => $show->first_air_time,
             'publisher' => $imdbId->originalNetwork->name ?? '',
             'poster' => $this->posterUrl,
             'source' => parent::SOURCE_TVDB,
-            'imdb' => (int) ($imdb['imdbid'] ?? 0),
-            'tvdb' => (int) $show->tvdb_id,
+            'imdb' => $imdb['imdbid'] ?? 0,
+            'tvdb' => $show->tvdb_id,
             'trakt' => 0,
             'tvrage' => 0,
             'tvmaze' => 0,
