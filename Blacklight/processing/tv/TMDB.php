@@ -56,7 +56,7 @@ class TMDB extends TV
             $this->titleCache = [];
 
             foreach ($res as $row) {
-                $tmdbid = false;
+                $siteId = false;
                 $this->posterUrl = '';
 
                 // Clean the show name for better match probability
@@ -98,12 +98,12 @@ class TMDB extends TV
                             $dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tmdbShow['tvdb']);
                             if ($dupeCheck === false) {
                                 $videoId = $this->add($tmdbShow);
-                                $tmdbid = $tmdbShow['tmdb'];
+                                $siteId = $tmdbShow['tmdb'];
                             } else {
                                 $videoId = $dupeCheck;
                                 // Update any missing fields and add site IDs
                                 $this->update($videoId, $tmdbShow);
-                                $tmdbid = $this->getSiteIDFromVideoID('tmdb', $videoId);
+                                $siteId = $this->getSiteIDFromVideoID('tmdb', $videoId);
                             }
                         }
                     } else {
@@ -111,14 +111,14 @@ class TMDB extends TV
                             $this->colorCli->climate()->info('Found local TMDB match for: '.$release['cleanname']);
                             $this->colorCli->climate()->info('.  Attempting episode lookup!');
                         }
-                        $tmdbid = $this->getSiteIDFromVideoID('tmdb', $videoId);
+                        $siteId = $this->getSiteIDFromVideoID('tmdb', $videoId);
                     }
 
-                    if (is_numeric($videoId) && $videoId > 0 && is_numeric($tmdbid) && $tmdbid > 0) {
+                    if (is_numeric($videoId) && $videoId > 0 && is_numeric($siteId) && $siteId > 0) {
                         // Now that we have valid video and tmdb ids, try to get the poster
                         $this->getPoster($videoId);
 
-                        $seasonNo = preg_replace('/^S0*/i', '', $release['season']);
+                        $seriesNo = preg_replace('/^S0*/i', '', $release['season']);
                         $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
 
                         if ($episodeNo === 'all') {
@@ -131,17 +131,17 @@ class TMDB extends TV
 
                         // Download all episodes if new show to reduce API usage
                         if ($this->countEpsByVideoID($videoId) === false) {
-                            $this->getEpisodeInfo($tmdbid, -1, -1, '', $videoId);
+                            $this->getEpisodeInfo($siteId, -1, -1, '', $videoId);
                         }
 
                         // Check if we have the episode for this video ID
-                        $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
+                        $episode = $this->getBySeasonEp($videoId, $seriesNo, $episodeNo, $release['airdate']);
 
                         if ($episode === false) {
                             // Send the request for the episode to TMDB
                             $tmdbEpisode = $this->getEpisodeInfo(
-                                $tmdbid,
-                                $seasonNo,
+                                $siteId,
+                                $seriesNo,
                                 $episodeNo,
                                 $release['airdate']
                             );
@@ -283,21 +283,21 @@ class TMDB extends TV
      *
      * @return array|false
      */
-    protected function getEpisodeInfo(int|string $tmdbid, int|string $season, int|string $episode, string $airdate = '', int $videoId = 0): bool|array
+    protected function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, string $airdate = '', int $videoId = 0): bool|array
     {
         $return = false;
 
         try {
-            if ($videoId > 0 && (int) $season === -1 && (int) $episode === -1) {
+            if ($videoId > 0 && (int) $series === -1 && (int) $episode === -1) {
                 // Bulk fetch all episodes for all seasons and insert
-                $tvDetails = TmdbClient::getTvApi()->getTvshow($tmdbid);
+                $tvDetails = TmdbClient::getTvApi()->getTvshow($siteId);
                 if (\is_array($tvDetails) && ! empty($tvDetails['seasons'])) {
-                    foreach ($tvDetails['seasons'] as $seasonInfo) {
-                        if (! empty($seasonInfo['season_number']) && $seasonInfo['season_number'] > 0) {
-                            $seasonData = TmdbClient::getTvSeasonApi()->getSeason($tmdbid, $seasonInfo['season_number']);
+                    foreach ($tvDetails['seasons'] as $seriesInfo) {
+                        if (! empty($seriesInfo['season_number']) && $seriesInfo['season_number'] > 0) {
+                            $seriesData = TmdbClient::getTvSeasonApi()->getSeason($siteId, $seriesInfo['season_number']);
                             sleep(1);
-                            if (\is_array($seasonData) && ! empty($seasonData['episodes'])) {
-                                foreach ($seasonData['episodes'] as $ep) {
+                            if (\is_array($seriesData) && ! empty($seriesData['episodes'])) {
+                                foreach ($seriesData['episodes'] as $ep) {
                                     if ($this->checkRequiredAttr($ep, 'tmdbE')) {
                                         $this->addEpisode($videoId, $this->formatEpisodeInfo($ep));
                                     }
@@ -310,7 +310,7 @@ class TMDB extends TV
                 return false;
             }
 
-            $response = TmdbClient::getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
+            $response = TmdbClient::getTvEpisodeApi()->getEpisode($siteId, $series, $episode);
         } catch (TmdbApiException $e) {
             return false;
         }
