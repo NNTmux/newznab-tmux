@@ -595,16 +595,16 @@
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
-            "version": "2.1.9",
+            "version": "2.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/canihavesomecoffee/theTVDbAPI.git",
-                "reference": "676925986ee80d7a18cda6a482b6c92e5d7afe94"
+                "reference": "ffe617a2a52695bdc8d2c173c6247f9e2cc54736"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/676925986ee80d7a18cda6a482b6c92e5d7afe94",
-                "reference": "676925986ee80d7a18cda6a482b6c92e5d7afe94",
+                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/ffe617a2a52695bdc8d2c173c6247f9e2cc54736",
+                "reference": "ffe617a2a52695bdc8d2c173c6247f9e2cc54736",
                 "shasum": ""
             },
             "require": {
@@ -638,9 +638,9 @@
             "description": "PHP implementation for the 4th version of the TheTVDb API.",
             "support": {
                 "issues": "https://github.com/canihavesomecoffee/theTVDbAPI/issues",
-                "source": "https://github.com/canihavesomecoffee/theTVDbAPI/tree/2.1.9"
+                "source": "https://github.com/canihavesomecoffee/theTVDbAPI/tree/2.1.10"
             },
-            "time": "2023-10-03T22:01:09+00:00"
+            "time": "2025-09-10T10:06:49+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -1098,16 +1098,16 @@
         },
         {
             "name": "dariusiii/tv-maze-php-api",
-            "version": "2.0.2.1",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "21d67d8e0c502cdea083de10a8b66287ab8f2ca7"
+                "reference": "a379cbd6c8a89cbce42c2e7b80167356dbc836d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/21d67d8e0c502cdea083de10a8b66287ab8f2ca7",
-                "reference": "21d67d8e0c502cdea083de10a8b66287ab8f2ca7",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/a379cbd6c8a89cbce42c2e7b80167356dbc836d6",
+                "reference": "a379cbd6c8a89cbce42c2e7b80167356dbc836d6",
                 "shasum": ""
             },
             "type": "library",
@@ -1131,9 +1131,9 @@
             ],
             "description": "TVMaze-API-Wrapper",
             "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.2.1"
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.3"
             },
-            "time": "2024-08-07T12:30:13+00:00"
+            "time": "2025-09-08T20:31:55+00:00"
         },
         {
             "name": "dasprid/enum",
@@ -15784,16 +15784,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.87.1",
+            "version": "v3.87.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "2f5170365e2a422d0c5421f9c8818b2c078105f6"
+                "reference": "da5f0a7858c79b56fc0b8c36d3efcfe5f37f0992"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/2f5170365e2a422d0c5421f9c8818b2c078105f6",
-                "reference": "2f5170365e2a422d0c5421f9c8818b2c078105f6",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/da5f0a7858c79b56fc0b8c36d3efcfe5f37f0992",
+                "reference": "da5f0a7858c79b56fc0b8c36d3efcfe5f37f0992",
                 "shasum": ""
             },
             "require": {
@@ -15876,7 +15876,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.87.1"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.87.2"
             },
             "funding": [
                 {
@@ -15884,7 +15884,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-02T15:27:36+00:00"
+            "time": "2025-09-10T09:51:40+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -16045,16 +16045,16 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "6.5.1",
+            "version": "6.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jsonrainbow/json-schema.git",
-                "reference": "b5ab21e431594897e5bb86343c01f140ba862c26"
+                "reference": "ac0d369c09653cf7af561f6d91a705bc617a87b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/b5ab21e431594897e5bb86343c01f140ba862c26",
-                "reference": "b5ab21e431594897e5bb86343c01f140ba862c26",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/ac0d369c09653cf7af561f6d91a705bc617a87b8",
+                "reference": "ac0d369c09653cf7af561f6d91a705bc617a87b8",
                 "shasum": ""
             },
             "require": {
@@ -16114,22 +16114,22 @@
             ],
             "support": {
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
-                "source": "https://github.com/jsonrainbow/json-schema/tree/6.5.1"
+                "source": "https://github.com/jsonrainbow/json-schema/tree/6.5.2"
             },
-            "time": "2025-08-29T10:58:11+00:00"
+            "time": "2025-09-09T09:42:27+00:00"
         },
         {
             "name": "larastan/larastan",
-            "version": "v3.6.1",
+            "version": "v3.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "3c223047e374befd1b64959784685d6ecccf66aa"
+                "reference": "6b7d28a2762a4b69f0f064e1e5b7358af11f04e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/3c223047e374befd1b64959784685d6ecccf66aa",
-                "reference": "3c223047e374befd1b64959784685d6ecccf66aa",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/6b7d28a2762a4b69f0f064e1e5b7358af11f04e4",
+                "reference": "6b7d28a2762a4b69f0f064e1e5b7358af11f04e4",
                 "shasum": ""
             },
             "require": {
@@ -16197,7 +16197,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v3.6.1"
+                "source": "https://github.com/larastan/larastan/tree/v3.7.0"
             },
             "funding": [
                 {
@@ -16205,7 +16205,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-25T07:24:56+00:00"
+            "time": "2025-09-09T15:17:27+00:00"
         },
         {
             "name": "laravel/pint",
@@ -16971,16 +16971,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "12.3.6",
+            "version": "12.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "da2cdaff87220fa641e7652364281b736e4347e0"
+                "reference": "bbede0f5593dad37af3be6a6f8e6ae1885e8a0a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/da2cdaff87220fa641e7652364281b736e4347e0",
-                "reference": "da2cdaff87220fa641e7652364281b736e4347e0",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/bbede0f5593dad37af3be6a6f8e6ae1885e8a0a9",
+                "reference": "bbede0f5593dad37af3be6a6f8e6ae1885e8a0a9",
                 "shasum": ""
             },
             "require": {
@@ -17036,7 +17036,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.3.6"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.3.7"
             },
             "funding": [
                 {
@@ -17056,7 +17056,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-02T05:23:14+00:00"
+            "time": "2025-09-10T09:59:06+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
