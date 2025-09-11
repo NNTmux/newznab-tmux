@@ -1098,16 +1098,16 @@
         },
         {
             "name": "dariusiii/tv-maze-php-api",
-            "version": "2.0.3",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "a379cbd6c8a89cbce42c2e7b80167356dbc836d6"
+                "reference": "f6a44228d24c2dde8487356dac74ca619ed94459"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/a379cbd6c8a89cbce42c2e7b80167356dbc836d6",
-                "reference": "a379cbd6c8a89cbce42c2e7b80167356dbc836d6",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/f6a44228d24c2dde8487356dac74ca619ed94459",
+                "reference": "f6a44228d24c2dde8487356dac74ca619ed94459",
                 "shasum": ""
             },
             "type": "library",
@@ -1131,9 +1131,9 @@
             ],
             "description": "TVMaze-API-Wrapper",
             "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.3"
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.4"
             },
-            "time": "2025-09-08T20:31:55+00:00"
+            "time": "2025-09-10T20:12:32+00:00"
         },
         {
             "name": "dasprid/enum",
@@ -16120,16 +16120,16 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v3.7.0",
+            "version": "v3.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "6b7d28a2762a4b69f0f064e1e5b7358af11f04e4"
+                "reference": "2e653fd19585a825e283b42f38378b21ae481cc7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/6b7d28a2762a4b69f0f064e1e5b7358af11f04e4",
-                "reference": "6b7d28a2762a4b69f0f064e1e5b7358af11f04e4",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/2e653fd19585a825e283b42f38378b21ae481cc7",
+                "reference": "2e653fd19585a825e283b42f38378b21ae481cc7",
                 "shasum": ""
             },
             "require": {
@@ -16143,7 +16143,7 @@
                 "illuminate/pipeline": "^11.44.2 || ^12.4.1",
                 "illuminate/support": "^11.44.2 || ^12.4.1",
                 "php": "^8.2",
-                "phpstan/phpstan": "^2.1.11"
+                "phpstan/phpstan": "^2.1.23"
             },
             "require-dev": {
                 "doctrine/coding-standard": "^13",
@@ -16197,7 +16197,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v3.7.0"
+                "source": "https://github.com/larastan/larastan/tree/v3.7.1"
             },
             "funding": [
                 {
@@ -16205,7 +16205,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-09T15:17:27+00:00"
+            "time": "2025-09-10T19:42:11+00:00"
         },
         {
             "name": "laravel/pint",
@@ -17305,16 +17305,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.3.8",
+            "version": "12.3.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "9d68c1b41fc21aac106c71cde4669fe7b99fca10"
+                "reference": "bcaadc492e1424a6ebdd997259b7b3e788e895c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/9d68c1b41fc21aac106c71cde4669fe7b99fca10",
-                "reference": "9d68c1b41fc21aac106c71cde4669fe7b99fca10",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/bcaadc492e1424a6ebdd997259b7b3e788e895c0",
+                "reference": "bcaadc492e1424a6ebdd997259b7b3e788e895c0",
                 "shasum": ""
             },
             "require": {
@@ -17328,7 +17328,7 @@
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.3",
-                "phpunit/php-code-coverage": "^12.3.6",
+                "phpunit/php-code-coverage": "^12.3.7",
                 "phpunit/php-file-iterator": "^6.0.0",
                 "phpunit/php-invoker": "^6.0.0",
                 "phpunit/php-text-template": "^5.0.0",
@@ -17382,7 +17382,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.3.8"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.3.9"
             },
             "funding": [
                 {
@@ -17406,7 +17406,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-03T06:25:17+00:00"
+            "time": "2025-09-11T06:22:47+00:00"
         },
         {
             "name": "react/cache",
