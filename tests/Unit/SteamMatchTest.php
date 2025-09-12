@@ -13,6 +13,7 @@ class SteamMatchTest extends TestCase
         $ref = new ReflectionClass($obj);
         $m = $ref->getMethod($method);
         $m->setAccessible(true);
+
         return $m->invokeArgs($obj, $args);
     }
 
@@ -22,6 +23,7 @@ class SteamMatchTest extends TestCase
         $ref = new ReflectionClass(Steam::class);
         /** @var Steam $inst */
         $inst = $ref->newInstanceWithoutConstructor();
+
         return $inst;
     }
 

@@ -186,7 +186,7 @@ class Steam
 
             if ($results instanceof \Traversable || $results instanceof \Countable) {
                 foreach ($results as $result) {
-                    if (!isset($result['name'], $result['appid'])) {
+                    if (! isset($result['name'], $result['appid'])) {
                         // When Scout returns model instances
                         $name = $result->name ?? null;
                         $appid = $result->appid ?? null;
@@ -339,7 +339,7 @@ class Steam
             if ($v === '') {
                 continue;
             }
-            if (!in_array(mb_strtolower($v), array_map('mb_strtolower', $unique), true)) {
+            if (! in_array(mb_strtolower($v), array_map('mb_strtolower', $unique), true)) {
                 $unique[] = $v;
             }
         }
@@ -433,9 +433,9 @@ class Steam
             'razor1911', 'codex', 'plaza', 'fl t', 'flt', 'reloaded', 'empress', 'skidrow', 'goldberg', 'dodi', 'kaos',
             'onlinefix', 'gog-galaxy', 'pc', 'x86', 'x64', 'x32', 'x86-64', 'win', 'windows', 'launcher', 'preinstall',
             'ultimate', 'definitive', 'complete', 'remastered', 'game of the year', 'goty', 'deluxe', 'edition', 'bundle',
-            'soundtrack', 'ost', 'demo', 'alpha', 'beta', 'playtest', 'prologue', 'teaser', 'public test', 'test server'
+            'soundtrack', 'ost', 'demo', 'alpha', 'beta', 'playtest', 'prologue', 'teaser', 'public test', 'test server',
         ];
-        $noisePattern = '/\b(' . implode('|', array_map(static fn($w) => preg_quote($w, '/'), $noise)) . ')\b/u';
+        $noisePattern = '/\b('.implode('|', array_map(static fn ($w) => preg_quote($w, '/'), $noise)).')\b/u';
         $s = preg_replace($noisePattern, ' ', $s);
 
         // Remove any leftover non-alnum (keep spaces), then collapse whitespace
@@ -446,7 +446,7 @@ class Steam
         if ($dropStopWords) {
             $tokens = $this->tokenize($s);
             $stop = $this->stopWords();
-            $tokens = array_values(array_filter($tokens, static fn($t) => $t !== '' && !in_array($t, $stop, true)));
+            $tokens = array_values(array_filter($tokens, static fn ($t) => $t !== '' && ! in_array($t, $stop, true)));
             $s = implode(' ', $tokens);
         }
 
@@ -468,6 +468,7 @@ class Steam
         $s = preg_replace('/\s*-\s*(repack|rip|iso|multi|proper|gog|steamrip|update|dlc|incl|fitgirl|elamigos|razor1911|codex|plaza|flt|reloaded|empress|skidrow|goldberg|dodi|kaos|onlinefix)\b.*/iu', '', $s);
         // Remove "Edition" style suffixes
         $s = preg_replace('/\b(ultimate|definitive|complete|remastered|game\s*of\s*the\s*year|goty|deluxe)\s+edition\b.*/iu', '', $s);
+
         return trim($s ?? '');
     }
 
@@ -483,18 +484,19 @@ class Steam
             if ($p === '') {
                 continue;
             }
-            if (!isset($seen[$p])) {
+            if (! isset($seen[$p])) {
                 $seen[$p] = true;
                 $out[] = $p;
             }
         }
+
         return $out;
     }
 
     private function stopWords(): array
     {
         return [
-            'the', 'a', 'an', 'and', 'or', 'of', 'for', 'to', 'in', 'on', 'with', 'at', 'by', 'from'
+            'the', 'a', 'an', 'and', 'or', 'of', 'for', 'to', 'in', 'on', 'with', 'at', 'by', 'from',
         ];
     }
 
@@ -505,11 +507,12 @@ class Steam
     {
         $map = [
             'xviii' => '18', 'xvii' => '17', 'xvi' => '16', 'xv' => '15', 'xiv' => '14', 'xiii' => '13', 'xii' => '12', 'xi' => '11',
-            'xx' => '20', 'xix' => '19', 'x' => '10', 'ix' => '9', 'viii' => '8', 'vii' => '7', 'vi' => '6', 'v' => '5', 'iv' => '4', 'iii' => '3', 'ii' => '2', 'i' => '1'
+            'xx' => '20', 'xix' => '19', 'x' => '10', 'ix' => '9', 'viii' => '8', 'vii' => '7', 'vi' => '6', 'v' => '5', 'iv' => '4', 'iii' => '3', 'ii' => '2', 'i' => '1',
         ];
         foreach ($map as $roman => $arabic) {
-            $s = preg_replace('/\b' . $roman . '\b/u', $arabic, $s);
+            $s = preg_replace('/\b'.$roman.'\b/u', $arabic, $s);
         }
+
         return $s;
     }
 
@@ -522,6 +525,7 @@ class Steam
         if ($term === '') {
             return '%';
         }
+
         return '%'.$term.'%';
     }
 }
