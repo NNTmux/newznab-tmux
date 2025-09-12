@@ -30,8 +30,13 @@ class Games
 {
     protected const GAME_MATCH_PERCENTAGE = 85;
 
+    // Expanded to cover many popular scene/p2p groups and tag forms.
+    protected const SCENE_GROUPS = [
+        'CODEX', 'PLAZA', 'GOG', 'CPY', 'HOODLUM', 'EMPRESS', 'RUNE', 'TENOKE', 'FLT', 'RELOADED', 'SKIDROW', 'PROPHET', 'RAZOR1911', 'CORE', 'REFLEX', 'P2P', 'GOLDBERG', 'DARKSIDERS', 'TINYISO', 'DOGE', 'ANOMALY', 'ELAMIGOS', 'FITGIRL', 'DODI', 'XATAB', 'GOG-GAMES', 'BLG',
+    ];
+
     protected const GAMES_TITLE_PARSE_REGEX =
-        '#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\(?('.
+        '#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|Elamigos|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\?('.
         '(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?'.
         '(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
 
@@ -68,7 +73,7 @@ class Games
 
     protected Client $giantBomb;
 
-    protected int $igdbSleep;
+    protected $igdbSleep;
 
     protected ColorCLI $colorCli;
 
@@ -121,21 +126,21 @@ class Games
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;
+            $normQuery = $this->normalizeForMatch($title);
             foreach ($results as $result) {
-                // If we have an exact string match set best match and break out
-                if ($result['title'] === $title) {
+                $candidate = is_array($result) ? ($result['title'] ?? '') : ($result->title ?? '');
+                if ($candidate === '') {
+                    continue;
+                }
+                // Exact match fast-path.
+                if ($candidate === $title) {
                     $bestMatch = $result;
                     break;
                 }
-                similar_text(strtolower($result['title']), strtolower($title), $percent);
-                // If similar_text reports an exact match set best match and break out
-                if ((int) $percent === 100) {
+                $score = $this->computeSimilarity($normQuery, $this->normalizeForMatch($candidate));
+                if ($score >= self::GAME_MATCH_PERCENTAGE && $score > $bestMatchPct) {
                     $bestMatch = $result;
-                    break;
-                }
-                if ($percent >= self::GAME_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
-                    $bestMatch = $result;
-                    $bestMatchPct = $percent;
+                    $bestMatchPct = $score;
                 }
             }
         }
@@ -186,27 +191,14 @@ class Games
         }
         $order = $this->getGamesOrder($orderBy);
         $gamesSql =
-            sprintf(
-                "
-				SELECT SQL_CALC_FOUND_ROWS gi.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM gamesinfo gi
-				LEFT JOIN releases r ON gi.id = r.gamesinfo_id
-				WHERE gi.title != ''
-				AND gi.cover = 1
-				AND r.passwordstatus %s
-				%s %s %s %s
-				GROUP BY gi.id
-				ORDER BY %s %s %s",
-                (new Releases)->showPasswords(),
-                $browseBy,
-                $catsrch,
-                $maxAge,
-                $exccatlist,
-                $order[0],
-                $order[1],
-                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-            );
+            "\n\t\t\t\tSELECT SQL_CALC_FOUND_ROWS gi.id,\n\t\t\t\t\tGROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id\n\t\t\t\tFROM gamesinfo gi\n\t\t\t\tLEFT JOIN releases r ON gi.id = r.gamesinfo_id\n\t\t\t\tWHERE gi.title != ''\n\t\t\t\tAND gi.cover = 1\n\t\t\t\tAND r.passwordstatus "
+            .(new Releases)->showPasswords().
+            $browseBy.
+            $catsrch.
+            $maxAge.
+            $exccatlist.
+            ' GROUP BY gi.id ORDER BY '.($order[0]).' '.($order[1]).
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $gamesCache = Cache::get(md5($gamesSql.$page));
         if ($gamesCache !== null) {
@@ -224,28 +216,7 @@ class Games
             }
         }
         $returnSql =
-            sprintf(
-                '
-				SELECT
-					r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed,
-				gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id,
-				rn.releases_id AS nfoid
-				FROM releases r
-				LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-				INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id
-				WHERE gi.id IN (%s)
-				AND r.id IN (%s)
-				%s
-				GROUP BY gi.id
-				ORDER BY %s %s',
-                (\is_array($gameIDs) ? implode(',', $gameIDs) : -1),
-                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                $catsrch,
-                $order[0],
-                $order[1]
-            );
+            'SELECT\n\t\t\t\tr.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed,\n\t\t\t\tgi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id,\n\t\t\t\trn.releases_id AS nfoid\n\t\t\t\tFROM releases r\n\t\t\t\tLEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id\n\t\t\t\tLEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id\n\t\t\t\tLEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id\n\t\t\t\tINNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id\n\t\t\t\tWHERE gi.id IN ('.(\is_array($gameIDs) ? implode(',', $gameIDs) : -1).')\n\t\t\t\tAND r.id IN ('.(\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1).')\n\t\t\t\t'.$catsrch.'\n\t\t\t\tGROUP BY gi.id\n\t\t\t\tORDER BY '.($order[0]).' '.($order[1]);
         $return = Cache::get(md5($returnSql.$page));
         if ($return !== null) {
             return $return;
@@ -413,11 +384,12 @@ class Games
                     $result = $this->giantBomb->search($gameInfo['title'], 'Game');
                     if (! \is_object($result)) {
                         $bestMatchPct = 0;
+                        $normQuery = $this->normalizeForMatch($gameInfo['title']);
                         foreach ($result as $res) {
-                            similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
-                            if ($percent1 >= self::GAME_MATCH_PERCENTAGE && $percent1 > $bestMatchPct) {
+                            $score1 = $this->computeSimilarity($normQuery, $this->normalizeForMatch($res->name));
+                            if ($score1 >= self::GAME_MATCH_PERCENTAGE && $score1 > $bestMatchPct) {
                                 $bestMatch = $res->id;
-                                $bestMatchPct = $percent1;
+                                $bestMatchPct = $score1;
                             }
                         }
 
@@ -485,11 +457,12 @@ class Games
                     $result = Game::where('name', $gameInfo['title'])->get();
                     if (! empty($result)) {
                         $bestMatchPct = 0;
+                        $normQuery = $this->normalizeForMatch($gameInfo['title']);
                         foreach ($result as $res) {
-                            similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
-                            if ($percent1 >= self::GAME_MATCH_PERCENTAGE && $percent1 > $bestMatchPct) {
+                            $score1 = $this->computeSimilarity($normQuery, $this->normalizeForMatch($res->name));
+                            if ($score1 >= self::GAME_MATCH_PERCENTAGE && $score1 > $bestMatchPct) {
                                 $bestMatch = $res->id;
-                                $bestMatchPct = $percent1;
+                                $bestMatchPct = $score1;
                             }
                         }
                         if ($bestMatch !== false) {
@@ -738,26 +711,137 @@ class Games
      */
     public function parseTitle(string $releaseName): bool|array
     {
-        // Get name of the game from name of release.
-        if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releaseName), $hits)) {
-            // Replace dots, underscores, colons, or brackets with spaces.
-            $result = [];
-            $result['title'] = str_replace(' RF ', ' ', preg_replace('/(\-|\:|\.|_|\%20|\[|\])/', ' ', $hits['title']));
-            // Replace any foreign words at the end of the release
-            $result['title'] = preg_replace('/(brazilian|chinese|croatian|danish|deutsch|dutch|english|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)$/i', '', $result['title']);
-            // Remove PC ISO) ( from the beginning bad regex from Games category?
-            $result['title'] = preg_replace('/^(PC\sISO\)\s\()/i', '', $result['title']);
-            // Finally remove multiple spaces and trim leading spaces.
-            $result['title'] = trim(preg_replace('/\s{2,}/', ' ', $result['title']));
-            if (empty($result['title'])) {
-                return false;
-            }
-            $result['release'] = $releaseName;
+        // Normalize separators and strip common surrounding tags first.
+        $name = (string) $releaseName;
 
-            return array_map('trim', $result);
+        // Remove simple file extensions at the end.
+        $name = (string) preg_replace('/\.(zip|rar|7z|iso|nfo|sfv|exe|mkv|mp4|avi)$/i', '', $name);
+        $name = str_replace('%20', ' ', $name);
+
+        // Remove leading bracketed tag like [GROUP] or [PC]
+        $name = (string) preg_replace('/^\[[^]]+\]\s*/', '', $name);
+
+        // Remove "PC ISO) (" artifact
+        $name = (string) preg_replace('/^(PC\s*ISO\)\s*\()/i', '', $name);
+
+        // Remove common bracketed/parenthesized tags (languages, qualities, platforms, versions)
+        $name = (string) preg_replace('/\[[^]]{1,80}\]|\([^)]{1,80}\)/', ' ', $name);
+
+        // Remove edition and extra tags
+        $name = (string) preg_replace(
+            '/\b(Game\s+of\s+the\s+Year|GOTY|Definitive Edition|Deluxe Edition|Ultimate Edition|Complete Edition|Remastered|HD Remaster|Directors? Cut|Anniversary Edition)\b/i',
+            ' ',
+            $name
+        );
+
+        // Remove update/patch followed by version numbers like 1.2.3
+        $name = (string) preg_replace('/\b(Update|Patch|Hotfix)\b[\s._-]*v?\d+(?:\.\d+){1,}\b/i', ' ', $name);
+
+        // Remove MULTI tokens
+        $name = (string) preg_replace('/\bMULTI\d+|MULTi\d+\b/i', ' ', $name);
+
+        // Remove general dotted version tokens anywhere: v1.0.1436.28 or 1.7.29
+        $name = (string) preg_replace('/(?:^|[\s._-])v\d+(?:[\s._-]\d+){1,}(?=$|[\s._-])/i', ' ', $name);
+        // Remove multi-part numeric sequences (>=3 parts) like 1.7.29 or 1_2_3
+        $name = (string) preg_replace('/(?:^|[\s._-])\d+(?:[\s._-]\d+){2,}(?=$|[\s._-])/', ' ', $name);
+
+        // Remove other common release tags
+        $name = (string) preg_replace('/\b(Incl(?:uding)?\s+DLCs?|DLCs?|PROPER|REPACK|RIP|ISO|CRACK(?:FIX)?|BETA|ALPHA)\b/i', ' ', $name);
+        // Remove standalone update/patch/hotfix noise
+        $name = (string) preg_replace('/\b(Update|Patch|Hotfix)\b/i', ' ', $name);
+
+        // Remove scene group suffix like "- CODEX" or "- EMPRESS"
+        $groupAlternation = implode('|', array_map('preg_quote', self::SCENE_GROUPS));
+        $name = (string) preg_replace('/\s*-\s*(?:'.$groupAlternation.'|[A-Z0-9]{2,})\s*$/i', '', $name);
+
+        // Replace separators with spaces.
+        $name = (string) preg_replace('/[._+]+/', ' ', $name);
+
+        // Second pass: remove edition tokens now that separators are normalized
+        $name = (string) preg_replace(
+            '/\b(Game\s+of\s+the\s+Year|GOTY|Definitive Edition|Deluxe Edition|Ultimate Edition|Complete Edition|Remastered|HD Remaster|Directors? Cut|Anniversary Edition)\b/i',
+            ' ',
+            $name
+        );
+        // Remove leftover standalone tokens
+        $name = (string) preg_replace('/\b(Incl|Including|DLC|DLCs)\b/i', ' ', $name);
+
+        // Token-based cleanup for version sequences while preserving single numbers
+        $tokens = preg_split('/\s+/', trim($name)) ?: [];
+        $filtered = [];
+        $i = 0;
+        $tcount = \count($tokens);
+        while ($i < $tcount) {
+            $tok = $tokens[$i];
+            if (preg_match('/^v?\d+$/i', $tok)) {
+                $j = $i + 1;
+                $numRun = 0;
+                while ($j < $tcount && preg_match('/^\d+$/', $tokens[$j])) {
+                    $numRun++;
+                    $j++;
+                }
+                $startsWithV = preg_match('/^v\d+$/i', $tok) === 1;
+                if (($startsWithV && $numRun >= 1) || (! $startsWithV && $numRun >= 2)) {
+                    // Skip this version run
+                    $i = $j;
+
+                    continue;
+                }
+                // Not a version run: keep the single number token
+                $filtered[] = $tok;
+                $i++;
+
+                continue;
+            }
+            $filtered[] = $tok;
+            $i++;
+        }
+        $name = implode(' ', $filtered);
+
+        // Remove spaced-out version sequences like `v1 0 1436 28` or `1 7 29`
+        $name = (string) preg_replace('/(?:^|\s)v\d+(?:\s+\d+){1,}(?=$|\s)/i', ' ', $name);
+        $name = (string) preg_replace('/(?:^|\s)\d+(?:\s+\d+){2,}(?=$|\s)/', ' ', $name);
+
+        // Collapse multiple spaces and trim hyphens used as separators
+        $name = (string) preg_replace('/\s{2,}/', ' ', $name);
+        $name = trim($name, " \t\n\r\0\x0B-_");
+
+        // Special fix carried over from previous implementation.
+        $name = str_replace(' RF ', ' ', $name);
+
+        // Final aggressive cleanup: strip lingering multi-part version sequences if any remain
+        for ($i = 0; $i < 2; $i++) {
+            $name = (string) preg_replace('/(?:^|\s)v\d+(?:\s+\d+){1,}(?=$|\s)/i', ' ', $name);
+            $name = (string) preg_replace('/(?:^|\s)\d+(?:\s+\d+){2,}(?=$|\s)/', ' ', $name);
+            $name = (string) preg_replace('/\b[vV]\d+(?:[ ._-]\d+){1,}\b/', ' ', $name);
+            $name = (string) preg_replace('/\b\d+(?:[ ._-]\d+){2,}\b/', ' ', $name);
+            $name = (string) preg_replace('/\s{2,}/', ' ', $name);
+            $name = trim($name, " \t\n\r\0\x0B-_");
         }
 
-        return false;
+        // Final cleanup: if empty, fallback to legacy regex
+        if ($name === '') {
+            if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releaseName), $hits)) {
+                $result = [];
+                $result['title'] = str_replace(' RF ', ' ', preg_replace('/(?:[-:._]|%20|[\[\]])/', ' ', $hits['title']));
+                $result['title'] = preg_replace('/(brazilian|chinese|croatian|danish|deutsch|dutch|english|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)$/i', '', $result['title']);
+                $result['title'] = preg_replace('/^(PC\sISO\)\s\()/i', '', $result['title']);
+                $result['title'] = trim(preg_replace('/\s{2,}/', ' ', $result['title']));
+                if (empty($result['title'])) {
+                    return false;
+                }
+                $result['release'] = $releaseName;
+
+                return array_map('trim', $result);
+            }
+
+            return false;
+        }
+
+        return [
+            'title' => $name,
+            'release' => $releaseName,
+        ];
     }
 
     /**
@@ -812,5 +896,44 @@ class Games
         }
 
         return $genreName;
+    }
+
+    // --- Helpers for improved matching ---
+
+    private function normalizeForMatch(string $title): string
+    {
+        $t = mb_strtolower($title);
+        // strip scene groups at end
+        $groupAlternation = implode('|', array_map('preg_quote', self::SCENE_GROUPS));
+        $t = (string) preg_replace('/\s*-\s*(?:'.$groupAlternation.'|[A-Z0-9]{2,})\s*$/i', '', $t);
+        // remove edition tokens and common noise
+        $t = (string) preg_replace('/\b(game of the year|goty|definitive edition|deluxe edition|ultimate edition|complete edition|remastered|hd remaster|directors? cut|anniversary edition|update|patch|hotfix|incl(?:uding)? dlcs?|dlcs?|repack|rip|iso|crack(?:fix)?|beta|alpha)\b/i', ' ', $t);
+        // remove languages/platform tokens
+        $t = (string) preg_replace('/\b(pc|gog|steam|x64|x86|win64|win32|mult[iy]?\d*|eng|english|fr|french|de|german|es|spanish|it|italian|pt|ptbr|portuguese|ru|russian|pl|polish|tr|turkish|nl|dutch|se|swedish|no|norwegian|da|danish|fi|finnish|jp|japanese|cn|chs|cht|ko|korean)\b/i', ' ', $t);
+        // remove punctuation
+        $t = (string) preg_replace('/[^a-z0-9]+/i', ' ', $t);
+        $t = trim(preg_replace('/\s{2,}/', ' ', $t));
+
+        return $t;
+    }
+
+    private function computeSimilarity(string $a, string $b): float
+    {
+        if ($a === $b) {
+            return 100.0;
+        }
+        $percent = 0.0;
+        similar_text($a, $b, $percent);
+        // Try a Levenshtein-based score as well if possible
+        $levScore = 0.0;
+        $len = max(strlen($a), strlen($b));
+        if ($len > 0) {
+            $dist = levenshtein($a, $b);
+            if ($dist >= 0) {
+                $levScore = (1 - ($dist / $len)) * 100.0;
+            }
+        }
+
+        return max($percent, $levScore);
     }
 }
