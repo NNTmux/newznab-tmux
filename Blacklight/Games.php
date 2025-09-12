@@ -191,7 +191,7 @@ class Games
         }
         $order = $this->getGamesOrder($orderBy);
         $gamesSql =
-            "\n\t\t\t\tSELECT SQL_CALC_FOUND_ROWS gi.id,\n\t\t\t\t\tGROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id\n\t\t\t\tFROM gamesinfo gi\n\t\t\t\tLEFT JOIN releases r ON gi.id = r.gamesinfo_id\n\t\t\t\tWHERE gi.title != ''\n\t\t\t\tAND gi.cover = 1\n\t\t\t\tAND r.passwordstatus "
+            "SELECT SQL_CALC_FOUND_ROWS gi.id, GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id FROM gamesinfo gi LEFT JOIN releases r ON gi.id = r.gamesinfo_id WHERE gi.title != '' AND gi.cover = 1 AND r.passwordstatus "
             .(new Releases)->showPasswords().
             $browseBy.
             $catsrch.
@@ -216,7 +216,7 @@ class Games
             }
         }
         $returnSql =
-            'SELECT\n\t\t\t\tr.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed,\n\t\t\t\tgi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id,\n\t\t\t\trn.releases_id AS nfoid\n\t\t\t\tFROM releases r\n\t\t\t\tLEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id\n\t\t\t\tLEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id\n\t\t\t\tLEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id\n\t\t\t\tINNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id\n\t\t\t\tWHERE gi.id IN ('.(\is_array($gameIDs) ? implode(',', $gameIDs) : -1).')\n\t\t\t\tAND r.id IN ('.(\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1).')\n\t\t\t\t'.$catsrch.'\n\t\t\t\tGROUP BY gi.id\n\t\t\t\tORDER BY '.($order[0]).' '.($order[1]);
+            'SELECT r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed, gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id, rn.releases_id AS nfoid FROM releases r LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id WHERE gi.id IN ('.(\is_array($gameIDs) ? implode(',', $gameIDs) : -1).') AND r.id IN ('.(\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1).')'.$catsrch.' GROUP BY gi.id ORDER BY '.($order[0]).' '.($order[1]);
         $return = Cache::get(md5($returnSql.$page));
         if ($return !== null) {
             return $return;
