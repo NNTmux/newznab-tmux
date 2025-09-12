@@ -89,4 +89,3 @@ class CategorizePcGameTest extends TestCase
         return (int) $rp->getValue($instance);
     }
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 require __DIR__.'/../vendor/autoload.php';
 
 use Blacklight\Categorize;
@@ -30,4 +31,3 @@ foreach ($samples as $name) {
     $res = $c->isPCGame();
     echo ($res ? 'MATCH' : 'NO-MATCH')."\t$name\n";
 }
-
