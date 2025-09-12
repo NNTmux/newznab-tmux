@@ -260,14 +260,15 @@ class AniDB
             $this->updateRelease($anidbId, (int) $release->id);
 
             if ($this->echooutput) {
-                $this->colorCli->headerOver('Matched '.$type.' AniDB ID: ')
-                    ->primary((string) $anidbId)
-                    ->alternateOver('   Title: ')
-                    ->primary($anidbTitle->title)
-                    ->alternateOver('   Episode #: ')
-                    ->primary((string) $epno)
-                    ->alternateOver('   Episode Title: ')
-                    ->primary($episodeTitle);
+                // Break chained calls into sequential ones; methods return void and are not chainable.
+                $this->colorCli->headerOver('Matched '.$type.' AniDB ID: ');
+                $this->colorCli->primary((string) $anidbId);
+                $this->colorCli->alternateOver('   Title: ');
+                $this->colorCli->primary($anidbTitle->title);
+                $this->colorCli->alternateOver('   Episode #: ');
+                $this->colorCli->primary((string) $epno);
+                $this->colorCli->alternateOver('   Episode Title: ');
+                $this->colorCli->primary($episodeTitle);
             }
             $matched = true;
         } else {
