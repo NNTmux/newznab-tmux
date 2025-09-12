@@ -695,7 +695,22 @@ class Categorize
             return false;
         }
 
-        if (preg_match('/[^a-z0-9](0x0007|ALiAS|ElAmigos|BACKLASH|BAT|CLONECD|CPY|FAS(DOX|iSO)|FLT([._ -]|COGENT)|FLT(DOX)?|PC GAMES?|\(?(Game([sz])|GAME([SZ]))\)? ?(\(([Cc])\))|GENESIS|-GOG|-HATRED|HI2U|INLAWS|JAGUAR|MAZE|MONEY|OUTLAWS|PPTCLASSiCS|PC Game|PROPHET|RAiN|Razor1911|RELOADED|DEViANCE|PLAZA|RiTUELYPOGEiOS|[rR][iI][pP]-[uU][nN][lL][eE][aA][sS][hH][eE][dD]|Steam(\b)?Rip|SKIDROW|TiNYiSO|CODEX|SiMPLEX)[^a-z0-9]?/', $this->releaseName)) {
+        // Guard: avoid misclassifying console or Mac releases as PC games.
+        $consoleOrMac = '/\b(PS5|PS4|PS3|PlayStation|PS(Vita|V)\b|Xbox\s?(Series|One|360)|XBOX(ONE|360|SERIES|SX|SS)?|XSX|XSS|XBSX|NSW|Switch|WiiU|Wii|3DS|NDS|PSP|PSV(ita)?|GameCube|NGC|CUSA\d{5}|XCI|NSP|PKG)\b/i';
+        if (preg_match($consoleOrMac, $this->releaseName) || preg_match('/\b(Mac\s?OS\s?X|macOS)\b/i', $this->releaseName)) {
+            return false;
+        }
+
+        // Expanded PC game markers: common scene/p2p groups and tags seen in 2020-2025.
+        $pcGroups = '(?:0x0007|ALiAS|ANOMALY|BACKLASH|BAT|CODEX|CPY|DARKS(?:iDERS|IDERS)|DEViANCE|DOGE|DODI|ELAMIGOS|EMPRESS|FITGIRL|FAS(?:DOX|iSO)|FLT(?:[._ -]|COGENT|DOX)?|GOG(?:-GAMES)?|GOLDBERG|HI2U|HOODLUM|INLAWS|JAGUAR|MAZE|MONEY|OUTLAWS|PLAZA|PROPHET|RAZOR1911|RAiN|RELOADED|RUNE|SiMPLEX|SKIDROW|TENOKE|TiNYiSO|UNLEASHED|P2P)';
+
+        // Additional PC-only keywords.
+        $pcKeywords = '(?:PC[ _.-]?GAMES?|\[(?:PC)\]|\(PC\)|Steam(?:[ ._-]?Rip|\b)|GOG(?:\b|[ ._-])|Retail\s*PC|DRM-?Free|Win(All|32|64)\b|Windows(?:\s?10|\s?11)?\b|Repack)';
+
+        // Build a combined pattern ensuring start/end or non-word boundaries to avoid partial matches.
+        $pattern = '/(?:(?:^|[\s\._-])(?:'.$pcGroups.')(?:$|[\s\._-])|'.$pcKeywords.')/i';
+
+        if (preg_match($pattern, $this->releaseName)) {
             $this->tmpCat = Category::PC_GAMES;
 
             return true;
@@ -1435,8 +1450,8 @@ class Categorize
         // First check if the release name suggests Nintendo Wii content
         if (preg_match('/(?:^|[^a-zA-Z0-9])(?:Wii|Nintendo\s+Wii)|\b(?:Wii)\b|[\._-]Wii[\._-]|Nintendo[\._-]Wii/i', $this->releaseName)) {
             // Verify with region codes, game-specific markers, or known Wii release groups
-            if (preg_match('/\b(?:ANTiDOTE|APATHY|ALMoST|AMBITION|Allstars|BAHAMUT|BiOSHOCK|Caravan|CLiiCHE|DMZ|DNi|DRYB|EUR?|GAME|GCN|GCP|HaZMaT|iCON|JAP|JPN|KOR|LaKiTu|LoCAL|LOADER|MARVEL|MULTi|NAGGERS|OneUp|NTSC|PAL|PLAYME|PONS|PROMiNENT|ProCiSiON|PROPER|QwiiF|RANT|REV0|Scrubbed|SUNSHiNE|SUSHi|TMD|USA?|VORTEX|WBFS|WiiERD|ZARD|ZER0)\b/i', $this->releaseName) ||
-                preg_match('/\b(?:ISO|WBFS|CSO|NKit|RVZ|NAND|WAD|IOS\d+|cIOS|MODCHIP|Homebrew|DOLPHIN|vWii)\b/i', $this->releaseName) ||
+            if (preg_match('/\b(?:ANTiDOTE|APATHY|ALMoST|AMBITION|Allstars|BAHAMUT|BiOSHOCK|Caravan|CLiiCHE|DMZ|DNi|DRYB|EUR?|GAME|GC|GCP|HaZMaT|iCON|JAP|JPN|KOR|LaKiTu|LoCAL|LOADER|MARVEL|MULTi|NAGGERS|OneUp|NTSC|PAL|PLAYME|PONS|PROMiNENT|ProCiSiON|PROPER|QwiiF|RANT|REV0|Scrubbed|SUNSHiNE|SUSHi|TMD|USA?|VORTEX|WBFS|WIIERD|ZARD|ZER0)\b/i', $this->releaseName) ||
+                preg_match('/\b(?:ISO|WBFS|CSO|NKit|RVZ|NAND|WAD|IOS\d+|cIOS|MODCHIP|Homebrew|DOLPHIN|vWii|Virtual[._ -]Console)\b/i', $this->releaseName) ||
                 preg_match('/\[Wii\]|\(Wii\)|Nintendo\.Wii|Wii\.Game|RVZ-[A-Z0-9]+|WII-\w+|READNFO|WiiGamerZ|Wii-Backup/i', $this->releaseName)) {
                 $this->tmpCat = Category::GAME_WII;
 
@@ -1589,9 +1604,9 @@ class Categorize
 
         // First check if the release name suggests retro/other console content
         if (preg_match('/(?:^|[^a-zA-Z0-9])(?:PS[1X]|PS2|SNES|NES|SEGA(?:\s+(?:Genesis|CD|Saturn|32X|Master\s+System))?|GB[AC]?|GameBoy(?:\s+(?:Advance|Color))?|Game\s*Boy(?:\s+(?:Advance|Color))?|Dreamcast|Saturn|Atari(?:\s+(?:Jaguar|2600|5200|7800|Lynx))?|3DO|Neo\s*Geo|N64|Nintendo\s*64|PCEngine|TurboGrafx|Intellivision|Colecovision)|\b(?:PS[1X]|PS2|SNES|NES|MAME|N64)\b|[\._-](?:PS[1X]|PS2|SNES|NES|N64)[\._-]/i', $this->releaseName)) {
-            // Verify with region codes, game-specific markers, or known retro release patterns
-            if (preg_match('/\b(?:EUR?|FR|GAME|HOL|ISO|JP|JPN|NL|NTSC|PAL|KS|USA?|ROMS?(et)?|ROM\s+Collection|RIP|Full\s+Set|Redump|No\s+Intro|TOSEC|GoodSet|EverDrive|Collection|Classics|Anthology|Trilogy|Compilation|Complete|Rev\s+[A-Z])\b/i', $this->releaseName) ||
-                preg_match('/\b(?:BIOS|Beetle|RetroArch|Emulator|MultiDisc|Arcade|OpenEmu|RetroPie|Recalbox|Lakka|Batocera|Hyperspin|LaunchBox|MAME|Collection|Goodset|Trurip|Verified|ReDump|PROPER|iNTERNAL|Venom|Caravan|WRG)\b/i', $this->releaseName) ||
+            // Verify with region codes, version indicators, or other game-specific markers
+            if (preg_match('/\b(?:EUR?|FR|GAME|HOL|ISO|JP|JPN|NL|NTSC|PAL|KS|USA?)[\)\_]/i', $this->releaseName) ||
+                preg_match('/\b(?:ROMs?(et)?|ROM\s+Collection|RIP|Full\s+Set|Redump|No\s+Intro|TOSEC|GoodSet|EverDrive|Collection|Classics|Anthology|Trilogy|Compilation|Complete|Rev\s+[A-Z])\b/i', $this->releaseName) ||
                 preg_match('/\(([CP]|\d{2,})\)|\.(bin|chd|cue|gcm|gdi|iso|img|mdf|nrg|z64|v64|n64|md|smc|smd|fig|gb|gbc|gba|nes|sfc|gen)$/i', $this->releaseName)) {
                 $this->tmpCat = Category::GAME_OTHER;
 
@@ -1740,7 +1755,7 @@ class Categorize
             return true;
         }
 
-        // Legacy detection for backward compatibility
+        // Legacy pattern for backward compatibility
         if (preg_match('/(720P|x264)\-(19|20)\d\d\-[a-z0-9]{1,12}/i', $this->releaseName) ||
             preg_match('/[a-z0-9]{1,12}-(19|20)\d\d-(720P|x264)/i', $this->releaseName)) {
             if ($this->isMusicForeign()) {
@@ -2038,7 +2053,7 @@ class Categorize
         $fullLanguages = 'arabic|brazilian|bulgarian|cantonese|chinese|croatian|czech|danish|deutsch|dutch|estonian|'.
                          'finnish|flemish|french|german|greek|hebrew|hungarian|icelandic|italian|japanese|korean|'.
                          'latin|mandarin|nordic|norwegian|polish|portuguese|romanian|russian|serbian|slovenian|'.
-                         'spanish|swedish|thai|turkish|ukrainian|vietnamese';
+                         'spanish|spanisch|swedish|thai|turkish|ukrainian|vietnamese';
 
         // Common language codes and abbreviations
         $langCodes = 'ar|bg|cn|cs|cz|da|de|dk|el|es|et|fi|fr|ger|gr|heb|hr|hu|hun|is|it|ita|jp|kr|ko|lt|lv|'.
