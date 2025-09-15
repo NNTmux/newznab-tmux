@@ -41,4 +41,44 @@ class ForumPolicy extends \TeamTeaTime\Forum\Policies\ForumPolicy
     {
         return $user->hasRole('Admin');
     }
+
+    public function deleteCategories($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
+
+    public function deletePosts($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
+
+    public function deleteThreads($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
+
+    public function restorePosts($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
+
+    public function restoreThreads($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
+
+    public function purgePosts($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
+
+    public function purgeThreads($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
+
+    public function deleteThrashedPosts($user): bool
+    {
+        return $user->hasRole('Admin');
+    }
 }
