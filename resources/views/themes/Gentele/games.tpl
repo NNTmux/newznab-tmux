@@ -82,13 +82,6 @@
 
 							                                            <!-- External Links Badges -->
 							                                            <div class="d-flex flex-wrap gap-1 mb-2 external-links">
-							                                                {if $result->classused == "GiantBomb"}
-							                                                    <a target="_blank" href="{$site->dereferrer_link}{$result->url}"
-							                                                       title="View GiantBomb page" class="badge bg-secondary text-white text-decoration-none badge-link" rel="giantbomb">
-							                                                       <i class="fa fa-gamepad me-1"></i>GiantBomb
-							                                                    </a>
-							                                                {/if}
-
 							                                                {if $result->classused == "Steam"}
 							                                                    <a target="_blank" href="{$site->dereferrer_link}{$result->url|escape:"htmlall"}"
 							                                                       title="View Steam page" class="badge bg-secondary text-white text-decoration-none badge-link" rel="steam">
