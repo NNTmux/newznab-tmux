@@ -7,11 +7,6 @@ use App\Models\GamesInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
-use DBorsatto\GiantBomb\Client;
-use DBorsatto\GiantBomb\Configuration;
-use DBorsatto\GiantBomb\Exception\ApiCallerException;
-use DBorsatto\GiantBomb\Exception\ModelException;
-use DBorsatto\GiantBomb\Exception\SdkException;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -69,10 +64,6 @@ class Games
 
     public string $catWhere;
 
-    protected Configuration $config;
-
-    protected Client $giantBomb;
-
     protected $igdbSleep;
 
     protected ColorCLI $colorCli;
@@ -86,20 +77,13 @@ class Games
     public function __construct()
     {
         $this->echoOutput = config('nntmux.echocli');
-
         $this->colorCli = new ColorCLI;
-
-        $this->publicKey = config('nntmux_api.giantbomb_api_key');
         $this->gameQty = Settings::settingValue('maxgamesprocessed') !== '' ? (int) Settings::settingValue('maxgamesprocessed') : 150;
         $this->imgSavePath = config('nntmux_settings.covers_path').'/games/';
         $this->renamed = (int) Settings::settingValue('lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
         $this->maxHitRequest = false;
         $this->catWhere = 'AND categories_id = '.Category::PC_GAMES.' ';
-        if ($this->publicKey !== '') {
-            $this->config = new Configuration($this->publicKey);
-            $this->giantBomb = new Client($this->config);
-        }
     }
 
     /**
@@ -321,7 +305,7 @@ class Games
 
         $game = [];
 
-        // Process Steam first before GiantBomb as Steam has more details
+        // Process Steam first as Steam has more details
         $this->_gameResults = false;
         $genreName = '';
         $this->_getGame = new Steam(['DB' => null]);
@@ -372,79 +356,6 @@ class Games
                 if (! empty($this->_gameResults['genres'])) {
                     $genres = $this->_gameResults['genres'];
                     $genreName = $this->_matchGenre($genres);
-                }
-            }
-        }
-
-        if (! empty($this->publicKey)) {
-            if ($steamGameID === false || $this->_gameResults === false) {
-                $bestMatch = false;
-                $this->_classUsed = 'GiantBomb';
-                try {
-                    $result = $this->giantBomb->search($gameInfo['title'], 'Game');
-                    if (! \is_object($result)) {
-                        $bestMatchPct = 0;
-                        $normQuery = $this->normalizeForMatch($gameInfo['title']);
-                        foreach ($result as $res) {
-                            $score1 = $this->computeSimilarity($normQuery, $this->normalizeForMatch($res->name));
-                            if ($score1 >= self::GAME_MATCH_PERCENTAGE && $score1 > $bestMatchPct) {
-                                $bestMatch = $res->id;
-                                $bestMatchPct = $score1;
-                            }
-                        }
-
-                        if ($bestMatch !== false) {
-                            $this->_gameResults = $this->giantBomb->findWithResourceID('Game', '3030-'.$bestMatch);
-
-                            if (! empty($this->_gameResults->image['medium_url'])) {
-                                $game['coverurl'] = (string) $this->_gameResults->image['medium_url'];
-                            }
-
-                            if (! empty($this->_gameResults->image['screen_url'])) {
-                                $game['backdropurl'] = (string) $this->_gameResults->image['screen_url'];
-                            }
-
-                            $game['title'] = (string) $this->_gameResults->get('name');
-                            $game['asin'] = $this->_gameResults->get('id');
-                            if (! empty($this->_gameResults->get('site_detail_url'))) {
-                                $game['url'] = (string) $this->_gameResults->get('site_detail_url');
-                            } else {
-                                $game['url'] = '';
-                            }
-
-                            if ($this->_gameResults->get('publishers') !== '') {
-                                $game['publisher'] = $this->_gameResults->publishers[0]['name'] ?? 'Unknown';
-                            } else {
-                                $game['publisher'] = 'Unknown';
-                            }
-
-                            if (! empty($this->_gameResults->original_game_rating[0]['name'])) {
-                                $game['esrb'] = $this->_gameResults->original_game_rating[0]['name'] ?? 'Not Rated';
-                            } else {
-                                $game['esrb'] = 'Not Rated';
-                            }
-
-                            if ($this->_gameResults->original_release_date !== '' && strtotime($this->_gameResults->original_release_date !== false)) {
-                                $dateReleased = $this->_gameResults->original_release_date;
-                                $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : now();
-                                $game['releasedate'] = (string) $date->format('Y-m-d');
-                            }
-
-                            if ($this->_gameResults->deck !== '') {
-                                $game['review'] = (string) $this->_gameResults->deck;
-                            }
-                        } else {
-                            $this->colorCli->notice('GiantBomb returned no valid results');
-
-                            return false;
-                        }
-                    } else {
-                        $this->colorCli->notice('GiantBomb found no valid results');
-
-                        return false;
-                    }
-                } catch (ApiCallerException $e) {
-                    return false;
                 }
             }
         }

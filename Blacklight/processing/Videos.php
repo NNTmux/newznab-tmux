@@ -95,6 +95,10 @@ abstract class Videos
      */
     protected function getVideoIDFromSiteID(string $siteColumn, int $siteID): bool|int
     {
+        if ($siteID === 0) {
+            return false;
+        }
+        
         $result = false;
         if (\in_array($siteColumn, self::$sites, false)) {
             $result = Video::query()->where($siteColumn, $siteID)->first();
