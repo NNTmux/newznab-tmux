@@ -763,7 +763,7 @@ class Binaries
                     $collectionID = false;
 
                     try {
-                        DB::insert(sprintf("\n\t\t\t\t\t\tINSERT INTO collections (subject, fromname, date, xref, groups_id,\n\t\t\t\t\t\t\ttotalfiles, collectionhash, collection_regexes_id, dateadded)\n\t\t\t\t\t\tVALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())\n\t\t\t\t\t\tON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
+                        DB::insert(sprintf("INSERT INTO collections (subject, fromname, date, xref, groups_id,totalfiles, collectionhash, collection_regexes_id, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW()) ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
                             escapeString(substr(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings()), 0, 255)),
                             escapeString(mb_convert_encoding($this->header['From'], 'UTF-8', mb_list_encodings())),
                             $unixtime,
@@ -804,7 +804,7 @@ class Binaries
                 $binaryID = false;
 
                 try {
-                    DB::insert(sprintf("\n\t\t\t\t\tINSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)\n\t\t\t\t\tVALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)\n\t\t\t\t\tON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
+                    DB::insert(sprintf("INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d) ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
                         $hash,
                         escapeString(mb_convert_encoding($this->header['matches'][1], 'UTF-8', mb_list_encodings())),
                         $collectionID,
@@ -863,13 +863,21 @@ class Binaries
         $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning, true);
         $binariesQuery = $binariesCheck = 'INSERT INTO binaries (id, partsize, currentparts) VALUES ';
         foreach ($binariesUpdate as $binaryID => $binary) {
-            $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
+            // Only queue an update if we actually accumulated additional size/parts beyond the first inserted part.
+            if (($binary['Size'] ?? 0) > 0 || ($binary['Parts'] ?? 0) > 0) {
+                $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
+            }
         }
         $binariesEnd = ' ON DUPLICATE KEY UPDATE partsize = VALUES(partsize) + partsize, currentparts = VALUES(currentparts) + currentparts';
-        $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
+        // If nothing was appended (no multi-part binaries needing updates), skip executing the binaries query.
+        if ($binariesQuery === $binariesCheck) {
+            $binariesQuery = '';
+        } else {
+            $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
+        }
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) || $this->runQuery($binariesQuery)) {
+        if ($binariesQuery === '' || $this->runQuery($binariesQuery)) {
             if (\strlen($partsQuery) === \strlen($partsCheck) || $this->runQuery(rtrim($partsQuery, ','))) {
                 DB::commit();
             } else {
