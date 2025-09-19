@@ -98,7 +98,7 @@ abstract class Videos
         if ($siteID === 0) {
             return false;
         }
-        
+
         $result = false;
         if (\in_array($siteColumn, self::$sites, false)) {
             $result = Video::query()->where($siteColumn, $siteID)->first();
