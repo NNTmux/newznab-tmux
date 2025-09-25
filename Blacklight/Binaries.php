@@ -724,8 +724,12 @@ class Binaries
         $batchCollectionHashes = [];
 
         // Defensive defaults when called directly in tests/harness.
-        if (!isset($this->headersNotInserted)) { $this->headersNotInserted = []; }
-        if (!isset($this->headersReceived)) { $this->headersReceived = []; }
+        if (! isset($this->headersNotInserted)) {
+            $this->headersNotInserted = [];
+        }
+        if (! isset($this->headersReceived)) {
+            $this->headersReceived = [];
+        }
 
         // Generate a batch marker to enable targeted cleanup on rollback.
         $batchNoise = bin2hex(random_bytes(8));
@@ -922,7 +926,9 @@ class Binaries
                     break;
                 }
                 // Successful flush: track part numbers inserted in this chunk
-                foreach ($parts as $r) { $insertedPartNumbers[] = $r['number']; }
+                foreach ($parts as $r) {
+                    $insertedPartNumbers[] = $r['number'];
+                }
                 $parts = [];
             }
         }
@@ -934,7 +940,9 @@ class Binaries
             if (! $this->flushPartsChunk($parts)) {
                 $hadErrors = true;
             } else {
-                foreach ($parts as $r) { $insertedPartNumbers[] = $r['number']; }
+                foreach ($parts as $r) {
+                    $insertedPartNumbers[] = $r['number'];
+                }
             }
         }
 
@@ -1009,25 +1017,25 @@ class Binaries
                 DB::rollBack();
                 // Safety cleanup: remove any rows created for this batch in case rollback did not apply (e.g., driver quirks)
                 try {
-                    if (!empty($insertedPartNumbers)) {
+                    if (! empty($insertedPartNumbers)) {
                         $nums = $insertedPartNumbers;
                         $ph = implode(',', array_fill(0, count($nums), '?'));
                         DB::statement('DELETE FROM parts WHERE number IN ('.$ph.')', $nums);
                     }
-                    if (!empty($insertedBinaryIds)) {
+                    if (! empty($insertedBinaryIds)) {
                         $ids = array_keys($insertedBinaryIds);
                         $phb = implode(',', array_fill(0, count($ids), '?'));
                         DB::statement('DELETE FROM binaries WHERE id IN ('.$phb.')', $ids);
                     }
                     $allCollectionIds = array_values(array_unique(array_map('intval', $collectionIDs)));
-                    if (!empty($insertedCollectionIds) || !empty($allCollectionIds)) {
-                        $ids = !empty($insertedCollectionIds) ? array_keys($insertedCollectionIds) : $allCollectionIds;
+                    if (! empty($insertedCollectionIds) || ! empty($allCollectionIds)) {
+                        $ids = ! empty($insertedCollectionIds) ? array_keys($insertedCollectionIds) : $allCollectionIds;
                         $phc = implode(',', array_fill(0, count($ids), '?'));
                         // Remove parts and binaries referencing these collections, then the collections
                         DB::statement('DELETE FROM parts WHERE binaries_id IN (SELECT id FROM binaries WHERE collections_id IN ('.$phc.'))', $ids);
                         DB::statement('DELETE FROM binaries WHERE collections_id IN ('.$phc.')', $ids);
                         DB::statement('DELETE FROM collections WHERE id IN ('.$phc.')', $ids);
-                    } elseif (!empty($batchCollectionHashes)) {
+                    } elseif (! empty($batchCollectionHashes)) {
                         $hashes = array_keys($batchCollectionHashes);
                         $phh = implode(',', array_fill(0, count($hashes), '?'));
                         DB::statement('DELETE FROM parts WHERE binaries_id IN (SELECT id FROM binaries WHERE collections_id IN (SELECT id FROM collections WHERE collectionhash IN ('.$phh.')))', $hashes);
@@ -1063,24 +1071,24 @@ class Binaries
         } catch (\Throwable $e) {
             DB::rollBack();
             try {
-                if (!empty($insertedPartNumbers)) {
+                if (! empty($insertedPartNumbers)) {
                     $nums = $insertedPartNumbers;
                     $ph = implode(',', array_fill(0, count($nums), '?'));
                     DB::statement('DELETE FROM parts WHERE number IN ('.$ph.')', $nums);
                 }
-                if (!empty($insertedBinaryIds)) {
+                if (! empty($insertedBinaryIds)) {
                     $ids = array_keys($insertedBinaryIds);
                     $phb = implode(',', array_fill(0, count($ids), '?'));
                     DB::statement('DELETE FROM binaries WHERE id IN ('.$phb.')', $ids);
                 }
                 $allCollectionIds = array_values(array_unique(array_map('intval', $collectionIDs)));
-                if (!empty($insertedCollectionIds) || !empty($allCollectionIds)) {
-                    $ids = !empty($insertedCollectionIds) ? array_keys($insertedCollectionIds) : $allCollectionIds;
+                if (! empty($insertedCollectionIds) || ! empty($allCollectionIds)) {
+                    $ids = ! empty($insertedCollectionIds) ? array_keys($insertedCollectionIds) : $allCollectionIds;
                     $phc = implode(',', array_fill(0, count($ids), '?'));
                     DB::statement('DELETE FROM parts WHERE binaries_id IN (SELECT id FROM binaries WHERE collections_id IN ('.$phc.'))', $ids);
                     DB::statement('DELETE FROM binaries WHERE collections_id IN ('.$phc.')', $ids);
                     DB::statement('DELETE FROM collections WHERE id IN ('.$phc.')', $ids);
-                } elseif (!empty($batchCollectionHashes)) {
+                } elseif (! empty($batchCollectionHashes)) {
                     $hashes = array_keys($batchCollectionHashes);
                     $phh = implode(',', array_fill(0, count($hashes), '?'));
                     DB::statement('DELETE FROM parts WHERE binaries_id IN (SELECT id FROM binaries WHERE collections_id IN (SELECT id FROM collections WHERE collectionhash IN ('.$phh.')))', $hashes);

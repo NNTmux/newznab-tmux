@@ -132,4 +132,3 @@ class BinariesStoreHeadersMixedTest extends TestCase
         $this->assertEquals([4001, 4002, 4003, 4004, 4005], $missed, 'All headers should be marked missed after mixed rollback');
     }
 }
-

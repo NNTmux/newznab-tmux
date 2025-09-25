@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\DB;
 class TestBinariesHarness extends Binaries
 {
     public bool $failPartsInsert = false;
+
     public ?int $failAfterFlushCount = null; // fail after N successful flushes
+
     private int $flushCount = 0;
 
     protected mixed $_collectionsCleaning; // override parent type
@@ -77,6 +79,7 @@ class TestBinariesHarness extends Binaries
                     DB::insert('INSERT INTO missed_parts (numberid, groups_id, attempts) VALUES (?, ?, 1)', [$num, $group['id']]);
                 }
             }
+
             return;
         }
 
