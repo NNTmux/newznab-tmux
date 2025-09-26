@@ -372,19 +372,25 @@ class IRCScraper extends IRCClient
         $query .= 'title = '.escapeString($this->_curPre['title']);
         $query .= ' WHERE title = '.escapeString($this->_curPre['title']);
 
+        // Execute the update and then fetch the affected row ID by title.
         DB::update($query);
 
-        $parameters = [
-            'id' => DB::connection()->getPdo()->lastInsertId(),
-            'title' => $this->_curPre['title'],
-            'filename' => $this->_curPre['filename'] ?? null,
-            'source' => $this->_curPre['source'] ?? null,
-        ];
+        // Look up the predb row ID by title for indexing backends.
+        $predbId = Predb::query()->where('title', $this->_curPre['title'])->value('id');
 
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            $this->elasticsearch->updatePreDb($parameters);
-        } else {
-            $this->manticoreSearch->updatePreDb($parameters);
+        if (! empty($predbId)) {
+            $parameters = [
+                'id' => $predbId,
+                'title' => $this->_curPre['title'],
+                'filename' => $this->_curPre['filename'] ?? null,
+                'source' => $this->_curPre['source'] ?? null,
+            ];
+
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $this->elasticsearch->updatePreDb($parameters);
+            } else {
+                $this->manticoreSearch->updatePreDb($parameters);
+            }
         }
 
         $this->_doEcho(false);
