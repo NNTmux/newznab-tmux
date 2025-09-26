@@ -327,76 +327,94 @@ class ManticoreSearch
             return $cached;
         }
 
-        try {
-            $query = $this->search->setTable($rt_index)
-                ->option('ranker', 'sph04')
-                ->maxMatches(10000)
-                ->limit(10000)
-                ->sort('id', 'desc')
-                ->stripBadUtf8(true);
-
-            if (! empty($searchArray)) {
-                $searchTerms = [];
-                foreach ($searchArray as $key => $value) {
-                    if (! empty($value)) {
-                        $escapedValue = self::escapeString($value);
-                        if (! empty($escapedValue)) {
-                            $searchTerms[] = '@@relaxed @'.$key.' '.$escapedValue;
-                        }
+        // Build query string once so we can retry if needed
+        $searchExpr = null;
+        if (! empty($searchArray)) {
+            $terms = [];
+            foreach ($searchArray as $key => $value) {
+                if (! empty($value)) {
+                    $escapedValue = self::escapeString($value);
+                    if (! empty($escapedValue)) {
+                        $terms[] = '@@relaxed @'.$key.' '.$escapedValue;
                     }
                 }
-
-                if (! empty($searchTerms)) {
-                    $query->search(implode(' ', $searchTerms));
-                } else {
-                    return [];
-                }
-            } elseif (! empty($searchString)) {
-                $escapedSearch = self::escapeString($searchString);
-                if (empty($escapedSearch)) {
-                    return [];
-                }
-
-                $searchColumns = '';
-                if (! empty($column)) {
-                    if (count($column) > 1) {
-                        $searchColumns = '@('.implode(',', $column).')';
-                    } else {
-                        $searchColumns = '@'.$column[0];
-                    }
-                }
-
-                $query->search('@@relaxed '.$searchColumns.' '.$escapedSearch);
+            }
+            if (! empty($terms)) {
+                $searchExpr = implode(' ', $terms);
             } else {
                 return [];
             }
-
-            $results = $query->get();
-            $resultIds = [];
-            $resultData = [];
-
-            foreach ($results as $doc) {
-                $resultIds[] = $doc->getId();
-                $resultData[] = $doc->getData();
+        } elseif (! empty($searchString)) {
+            $escapedSearch = self::escapeString($searchString);
+            if (empty($escapedSearch)) {
+                return [];
             }
 
-            $result = [
-                'id' => $resultIds,
-                'data' => $resultData,
-            ];
+            $searchColumns = '';
+            if (! empty($column)) {
+                if (count($column) > 1) {
+                    $searchColumns = '@('.implode(',', $column).')';
+                } else {
+                    $searchColumns = '@'.$column[0];
+                }
+            }
 
-            // Cache results for 5 minutes
-            Cache::put($cacheKey, $result, now()->addMinutes(5));
-
-            return $result;
-
-        } catch (ResponseException $e) {
-            Log::error('ManticoreSearch searchIndexes ResponseException: '.$e->getMessage(), [
-                'index' => $rt_index,
-                'search' => $searchString,
-            ]);
-
+            $searchExpr = '@@relaxed '.$searchColumns.' '.$escapedSearch;
+        } else {
             return [];
+        }
+
+        // Avoid explicit sort for predb_rt to prevent Manticore's "too many sort-by attributes" error
+        $avoidSortForIndex = ($rt_index === 'predb_rt');
+
+        try {
+            // Use a fresh Search instance for every query to avoid parameter accumulation across calls
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($rt_index)
+                ->option('ranker', 'sph04')
+                ->maxMatches(10000)
+                ->limit(10000)
+                ->stripBadUtf8(true)
+                ->search($searchExpr);
+
+            if (! $avoidSortForIndex) {
+                $query->sort('id', 'desc');
+            }
+
+            $results = $query->get();
+        } catch (ResponseException $e) {
+            // If we hit Manticore's "too many sort-by attributes" limit, retry once without explicit sorting
+            if (stripos($e->getMessage(), 'too many sort-by attributes') !== false) {
+                try {
+                    $query = (new Search($this->manticoreSearch))
+                        ->setTable($rt_index)
+                        ->option('ranker', 'sph04')
+                        ->maxMatches(10000)
+                        ->limit(10000)
+                        ->stripBadUtf8(true)
+                        ->search($searchExpr);
+
+                    $results = $query->get();
+
+                    Log::warning('ManticoreSearch: Retried search without sorting due to sort-by attributes limit', [
+                        'index' => $rt_index,
+                    ]);
+                } catch (ResponseException $e2) {
+                    Log::error('ManticoreSearch searchIndexes ResponseException after retry: '.$e2->getMessage(), [
+                        'index' => $rt_index,
+                        'search' => $searchString,
+                    ]);
+
+                    return [];
+                }
+            } else {
+                Log::error('ManticoreSearch searchIndexes ResponseException: '.$e->getMessage(), [
+                    'index' => $rt_index,
+                    'search' => $searchString,
+                ]);
+
+                return [];
+            }
         } catch (RuntimeException $e) {
             Log::error('ManticoreSearch searchIndexes RuntimeException: '.$e->getMessage(), [
                 'index' => $rt_index,
@@ -412,5 +430,23 @@ class ManticoreSearch
 
             return [];
         }
+
+        // Parse results and cache
+        $resultIds = [];
+        $resultData = [];
+        foreach ($results as $doc) {
+            $resultIds[] = $doc->getId();
+            $resultData[] = $doc->getData();
+        }
+
+        $result = [
+            'id' => $resultIds,
+            'data' => $resultData,
+        ];
+
+        // Cache results for 5 minutes
+        Cache::put($cacheKey, $result, now()->addMinutes(5));
+
+        return $result;
     }
 }
