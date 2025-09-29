@@ -1426,14 +1426,26 @@ class ProcessAdditional
                 if (preg_match(NameFixer::PREDB_REGEX, $rarFileName[0], $hit)) {
                     $preCheck = Predb::whereTitle($hit[0])->first();
                     $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                    (new NameFixer)->updateRelease($this->_release, $preCheck->title ?? ucwords($hit[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
+                    $candidate = $preCheck->title ?? ucwords($hit[0], '.');
+                    $candidate = $this->normalizeCandidateTitle($candidate);
+                    if ($this->isPlausibleReleaseTitle($candidate)) {
+                        (new NameFixer)->updateRelease($this->_release, $candidate, 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
+                    } elseif (config('app.debug') === true) {
+                        $this->_debug('RarInfo: Ignored low-quality candidate "'.$candidate.'" from inner file name.');
+                    }
                 } elseif (! empty($dataSummary['archives']) && ! empty($dataSummary['archives'][$rarFileName[0]]['file_list'])) {
                     $archiveData = $dataSummary['archives'][$rarFileName[0]]['file_list'];
                     $archiveFileName = Arr::pluck($archiveData, 'name');
                     if (preg_match(NameFixer::PREDB_REGEX, $archiveFileName[0], $match2)) {
                         $preCheck = Predb::whereTitle($match2[0])->first();
                         $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                        (new NameFixer)->updateRelease($this->_release, $preCheck->title ?? ucwords($match2[0], '.'), 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
+                        $candidate = $preCheck->title ?? ucwords($match2[0], '.');
+                        $candidate = $this->normalizeCandidateTitle($candidate);
+                        if ($this->isPlausibleReleaseTitle($candidate)) {
+                            (new NameFixer)->updateRelease($this->_release, $candidate, 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
+                        } elseif (config('app.debug') === true) {
+                            $this->_debug('RarInfo: Ignored low-quality candidate "'.$candidate.'" from nested archive file name.');
+                        }
                     }
                 }
             }
@@ -1911,6 +1923,7 @@ class ProcessAdditional
                         'error_object' => is_object($jpgBinary) ? get_class($jpgBinary) : null,
                         'error_message' => $errMsg,
                         'raw_type' => gettype($jpgBinary),
+                        'length' => is_string($jpgBinary) ? strlen($jpgBinary) : 0,
                     ]);
                 }
                 $jpgBinary = false;
@@ -3064,5 +3077,54 @@ class ProcessAdditional
 
             return false;
         }
+    }
+
+    /**
+     * Normalize a candidate title by stripping trailing part/vol/rNN tokens and trivial suffixes.
+     */
+    private function normalizeCandidateTitle(string $title): string
+    {
+        $t = trim($title);
+        // Remove common trailing segment markers like .part01, .vol12+3, -r12, r12
+        $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
+        // Collapse multiple spaces/underscores
+        $t = preg_replace('/[\s_]+/', ' ', $t) ?? $t;
+        // Trim stray punctuation
+        return trim($t, " .-_\t\r\n");
+    }
+
+    /**
+     * Heuristic filter to avoid poor RarInfo-based renames (e.g., short or generic names).
+     */
+    private function isPlausibleReleaseTitle(string $title): bool
+    {
+        $t = trim($title);
+        if ($t === '') {
+            return false;
+        }
+        // Minimum length and token count
+        if (strlen($t) < 12) {
+            return false;
+        }
+        $wordCount = preg_match_all('/[A-Za-z0-9]{3,}/', $t);
+        if ($wordCount < 2) {
+            return false;
+        }
+        // Reject if it still ends with a segment marker
+        if (preg_match('/(?:^|[.\-_ ])(?:part|vol|r)\d+(?:\+\d+)?$/i', $t)) {
+            return false;
+        }
+        // Acceptance criteria
+        $hasGroupSuffix = (bool) preg_match('/-[A-Za-z0-9]{2,}$/', $t);
+        $hasYear = (bool) preg_match('/\b(19|20)\d{2}\b/', $t);
+        $hasQuality = (bool) preg_match('/\b(480p|720p|1080p|2160p|4k|webrip|web[ .-]?dl|bluray|bdrip|dvdrip|hdtv|hdrip|xvid|x264|x265|hevc|h\.?264|ts|cam|r5|proper|repack)\b/i', $t);
+        $hasTV = (bool) preg_match('/\bS\d{1,2}[Eex]\d{1,3}\b/i', $t);
+        $hasXXX = (bool) preg_match('/\bXXX\b/i', $t);
+
+        if ($hasGroupSuffix || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX) {
+            return true;
+        }
+
+        return false;
     }
 }
