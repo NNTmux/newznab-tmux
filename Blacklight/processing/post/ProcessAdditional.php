@@ -3089,6 +3089,7 @@ class ProcessAdditional
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
         // Collapse multiple spaces/underscores
         $t = preg_replace('/[\s_]+/', ' ', $t) ?? $t;
+
         // Trim stray punctuation
         return trim($t, " .-_\t\r\n");
     }
