@@ -6,10 +6,8 @@ use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\User;
-use Blacklight\Contents;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -171,6 +169,7 @@ class BasePageController extends Controller
             'meta_title' => 'Admin Home',
             'meta_description' => 'Admin home page',
         ]);
+
         return $this->adminrender();
     }
 }

@@ -21,7 +21,7 @@ class GetNzbController extends BasePageController
         $this->setPreferences();
 
         // If guid is passed as URL parameter, merge it into request as 'id'
-        if ($guid !== null && !$request->has('id')) {
+        if ($guid !== null && ! $request->has('id')) {
             $request->merge(['id' => $guid]);
         }
 

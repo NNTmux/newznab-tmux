@@ -80,6 +80,7 @@ class MovieController extends BasePageController
 
         // Return the appropriate view
         $viewName = $request->has('imdb') ? 'movies.viewmoviefull' : 'movies.index';
+
         return view($viewName, $this->viewData);
     }
 

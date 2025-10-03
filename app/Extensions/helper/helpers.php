@@ -419,7 +419,7 @@ if (! function_exists('getReleaseCover')) {
     /**
      * Get the cover image URL for a release based on its type and ID
      *
-     * @param object $release The release object
+     * @param  object  $release  The release object
      * @return string|null The cover image URL or null if no cover exists
      */
     function getReleaseCover($release): ?string
@@ -429,25 +429,25 @@ if (! function_exists('getReleaseCover')) {
         $coverId = null;
 
         // Determine cover type and ID based on category
-        if (!empty($release->imdbid) && $release->imdbid > 0) {
+        if (! empty($release->imdbid) && $release->imdbid > 0) {
             $coverType = 'movies';
             $coverId = str_pad($release->imdbid, 7, '0', STR_PAD_LEFT);
-        } elseif (!empty($release->musicinfo_id)) {
+        } elseif (! empty($release->musicinfo_id)) {
             $coverType = 'music';
             $coverId = $release->musicinfo_id;
-        } elseif (!empty($release->consoleinfo_id)) {
+        } elseif (! empty($release->consoleinfo_id)) {
             $coverType = 'console';
             $coverId = $release->consoleinfo_id;
-        } elseif (!empty($release->bookinfo_id)) {
+        } elseif (! empty($release->bookinfo_id)) {
             $coverType = 'book';
             $coverId = $release->bookinfo_id;
-        } elseif (!empty($release->gamesinfo_id)) {
+        } elseif (! empty($release->gamesinfo_id)) {
             $coverType = 'games';
             $coverId = $release->gamesinfo_id;
-        } elseif (!empty($release->xxxinfo_id)) {
+        } elseif (! empty($release->xxxinfo_id)) {
             $coverType = 'xxx';
             $coverId = $release->xxxinfo_id;
-        } elseif (!empty($release->anidbid)) {
+        } elseif (! empty($release->anidbid)) {
             $coverType = 'anime';
             $coverId = $release->anidbid;
         }

@@ -1,13 +1,14 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * Smarty to Blade Migration Helper Script
  *
  * This script helps convert Smarty template files to Blade templates
  * Usage: php migrate-templates.php [template-file.tpl]
  */
-
-function convertSmartyToBlade($smartyContent) {
+function convertSmartyToBlade($smartyContent)
+{
     $bladeContent = $smartyContent;
 
     // Convert comments
@@ -50,7 +51,7 @@ if ($argc < 2) {
 
 $inputFile = $argv[1];
 
-if (!file_exists($inputFile)) {
+if (! file_exists($inputFile)) {
     echo "Error: File not found: $inputFile\n";
     exit(1);
 }
@@ -67,12 +68,12 @@ $outputFile = str_replace('/themes/shared/', '/shared/', $outputFile);
 echo "Converting: $inputFile\n";
 echo "To: $outputFile\n";
 echo "\nPreview of converted content:\n";
-echo str_repeat('-', 80) . "\n";
-echo substr($bladeContent, 0, 500) . "...\n";
-echo str_repeat('-', 80) . "\n";
+echo str_repeat('-', 80)."\n";
+echo substr($bladeContent, 0, 500)."...\n";
+echo str_repeat('-', 80)."\n";
 
 echo "\nDo you want to save this conversion? (y/n): ";
-$handle = fopen("php://stdin", "r");
+$handle = fopen('php://stdin', 'r');
 $line = fgets($handle);
 if (trim($line) != 'y') {
     echo "Cancelled.\n";
@@ -81,7 +82,7 @@ if (trim($line) != 'y') {
 
 // Create directory if it doesn't exist
 $outputDir = dirname($outputFile);
-if (!is_dir($outputDir)) {
+if (! is_dir($outputDir)) {
     mkdir($outputDir, 0755, true);
 }
 
@@ -92,4 +93,3 @@ echo "Common manual adjustments:\n";
 echo "  - Array access: \$arr['key'] instead of \$arr.key\n";
 echo "  - Complex expressions may need refinement\n";
 echo "  - Bootstrap classes should be converted to TailwindCSS\n";
-
