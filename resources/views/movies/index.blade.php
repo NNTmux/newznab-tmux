@@ -93,23 +93,23 @@
                     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="flex flex-col md:flex-row">
                             <!-- Movie Poster -->
-                            <div class="md:w-48 flex-shrink-0">
+                            <div class="flex-shrink-0">
                                 @if($guid)
                                     <a href="{{ url('/details/' . $guid) }}" class="block">
                                         @if(isset($result->cover) && $result->cover)
-                                            <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-full h-64 md:h-full object-cover">
+                                            <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded" style="width: 192px; height: 288px;">
                                         @else
-                                            <div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center">
-                                                <i class="fas fa-film text-gray-400 text-4xl"></i>
+                                            <div class="w-48 h-72 bg-gray-200 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
+                                                <i class="fas fa-film text-gray-400 text-3xl"></i>
                                             </div>
                                         @endif
                                     </a>
                                 @else
                                     @if(isset($result->cover) && $result->cover)
-                                        <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-full h-64 md:h-full object-cover">
+                                        <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded" style="width: 192px; height: 288px;">
                                     @else
-                                        <div class="w-full h-64 md:h-full bg-gray-200 flex items-center justify-center">
-                                            <i class="fas fa-film text-gray-400 text-4xl"></i>
+                                        <div class="w-48 h-72 bg-gray-200 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
+                                            <i class="fas fa-film text-gray-400 text-3xl"></i>
                                         </div>
                                     @endif
                                 @endif
@@ -119,8 +119,8 @@
                             <div class="flex-1 p-4">
                                 <div class="flex justify-between items-start mb-2">
                                     <div class="flex-1">
-                                        @if($guid)
-                                            <a href="{{ url('/details/' . $guid) }}" class="hover:text-blue-600">
+                                        @if(isset($result->imdbid) && $result->imdbid)
+                                            <a href="{{ route('movie.view', ['imdbid' => $result->imdbid]) }}" class="hover:text-blue-600">
                                                 <h3 class="text-xl font-bold text-gray-900">{{ $result->title }}</h3>
                                             </a>
                                         @else
@@ -136,9 +136,23 @@
                                                     <i class="fas fa-star mr-1"></i> {{ $result->rating }}
                                                 </span>
                                             @endif
+                                        </div>
+
+                                        <!-- External Links -->
+                                        <div class="flex items-center gap-3 mt-2 text-xs">
                                             @if(isset($result->imdbid) && $result->imdbid)
-                                                <a href="https://www.imdb.com/title/tt{{ $result->imdbid }}" target="_blank" class="text-blue-600 hover:text-blue-800">
+                                                <a href="https://www.imdb.com/title/tt{{ $result->imdbid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition">
                                                     <i class="fab fa-imdb mr-1"></i> IMDb
+                                                </a>
+                                            @endif
+                                            @if(isset($result->tmdbid) && $result->tmdbid)
+                                                <a href="https://www.themoviedb.org/movie/{{ $result->tmdbid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition">
+                                                    <i class="fas fa-film mr-1"></i> TMDb
+                                                </a>
+                                            @endif
+                                            @if(isset($result->traktid) && $result->traktid)
+                                                <a href="https://trakt.tv/movies/{{ $result->traktid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition">
+                                                    <i class="fas fa-heart mr-1"></i> Trakt
                                                 </a>
                                             @endif
                                         </div>
@@ -146,7 +160,7 @@
                                 </div>
 
                                 @if(isset($result->plot) && $result->plot)
-                                    <p class="text-gray-700 text-sm mt-2 line-clamp-3">{{ $result->plot }}</p>
+                                    <p class="text-gray-700 text-sm mt-3 line-clamp-3">{{ $result->plot }}</p>
                                 @endif
 
                                 <div class="mt-3 flex flex-wrap gap-2 text-xs">
@@ -157,7 +171,7 @@
                                     @endif
                                 </div>
 
-                                <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                     @if(isset($result->director) && $result->director)
                                         <div class="text-gray-600">
                                             <strong>Director:</strong> {!! $result->director !!}
@@ -165,7 +179,7 @@
                                     @endif
                                 </div>
 
-                                <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                     @if(isset($result->actors) && $result->actors)
                                         <div class="text-gray-600">
                                             <strong>Actors:</strong> {!! $result->actors !!}
@@ -173,12 +187,78 @@
                                     @endif
                                 </div>
 
+                                <!-- Release Information -->
                                 @if($guid)
-                                    <div class="mt-4">
-                                        <a href="{{ url('/details/' . $guid) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            <i class="fas fa-info-circle mr-2"></i> View Details
-                                        </a>
-                                    </div>
+                                    @php
+                                        $releaseNames = isset($result->grp_release_name) ? explode('#', $result->grp_release_name) : [];
+                                        $releaseSizes = isset($result->grp_release_size) ? explode(',', $result->grp_release_size) : [];
+                                        $releaseGuids = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid) : [];
+                                        $releasePostDates = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate) : [];
+                                        $releaseAddDates = isset($result->grp_release_adddate) ? explode(',', $result->grp_release_adddate) : [];
+
+                                        // Limit to maximum 2 releases
+                                        $maxReleases = 2;
+                                        $totalReleases = count($releaseNames);
+                                        $releaseNames = array_slice($releaseNames, 0, $maxReleases);
+                                        $releaseSizes = array_slice($releaseSizes, 0, $maxReleases);
+                                        $releaseGuids = array_slice($releaseGuids, 0, $maxReleases);
+                                        $releasePostDates = array_slice($releasePostDates, 0, $maxReleases);
+                                        $releaseAddDates = array_slice($releaseAddDates, 0, $maxReleases);
+                                    @endphp
+
+                                    @if(!empty($releaseNames[0]))
+                                        <div class="mt-4 pt-4 border-t border-gray-200">
+                                            <h4 class="text-sm font-semibold text-gray-700 mb-2">
+                                                Available Releases
+                                                @if($totalReleases > $maxReleases)
+                                                    <span class="text-xs font-normal text-gray-500">(Showing {{ $maxReleases }} of {{ $totalReleases }})</span>
+                                                @endif
+                                            </h4>
+                                            <div class="space-y-2">
+                                                @foreach($releaseNames as $index => $releaseName)
+                                                    @if($releaseName && isset($releaseGuids[$index]))
+                                                        <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+                                                                <div class="flex-1 min-w-0">
+                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 hover:text-blue-600 font-medium block truncate" title="{{ $releaseName }}">
+                                                                        {{ $releaseName }}
+                                                                    </a>
+                                                                    <div class="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
+                                                                        @if(isset($releaseSizes[$index]))
+                                                                            <span>
+                                                                                <i class="fas fa-hdd mr-1"></i>{{ number_format($releaseSizes[$index] / 1073741824, 2) }} GB
+                                                                            </span>
+                                                                        @endif
+                                                                        @if(isset($releasePostDates[$index]))
+                                                                            <span>
+                                                                                <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($releasePostDates[$index])->format('M d, Y') }}
+                                                                            </span>
+                                                                        @endif
+                                                                        @if(isset($releaseAddDates[$index]))
+                                                                            <span>
+                                                                                <i class="fas fa-plus-circle mr-1"></i>Added: {{ \Carbon\Carbon::parse($releaseAddDates[$index])->diffForHumans() }}
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex gap-2 flex-shrink-0">
+                                                                    <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 transition">
+                                                                        <i class="fas fa-download mr-1"></i> Download
+                                                                    </a>
+                                                                    <button onclick="addToCart('{{ $releaseGuids[$index] }}')" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition">
+                                                                        <i class="fas fa-shopping-cart mr-1"></i> Cart
+                                                                    </button>
+                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-gray-600 text-white text-xs font-medium rounded hover:bg-gray-700 transition">
+                                                                        <i class="fas fa-info-circle mr-1"></i> Details
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -198,5 +278,32 @@
         </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+function addToCart(guid) {
+    fetch('{{ url("/cart/add") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ id: guid })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Release added to cart successfully!');
+        } else {
+            alert('Failed to add release to cart: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding to cart');
+    });
+}
+</script>
+@endpush
 @endsection
 

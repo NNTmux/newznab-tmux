@@ -46,6 +46,19 @@ class MovieController extends BasePageController
             $result['director'] = makeFieldLinks($result, 'director', 'movies');
             $result['languages'] = explode(', ', $result['language']);
 
+            // Add cover image URL
+            if (! empty($result['imdbid'])) {
+                $coverId = str_pad($result['imdbid'], 7, '0', STR_PAD_LEFT);
+                $coverFile = storage_path("covers/movies/{$coverId}-cover.jpg");
+                if (file_exists($coverFile)) {
+                    $result['cover'] = asset("storage/covers/movies/{$coverId}-cover.jpg");
+                } else {
+                    $result['cover'] = asset('assets/images/no-cover.png');
+                }
+            } else {
+                $result['cover'] = asset('assets/images/no-cover.png');
+            }
+
             return $result;
         });
 
@@ -82,6 +95,108 @@ class MovieController extends BasePageController
         $viewName = $request->has('imdb') ? 'movies.viewmoviefull' : 'movies.index';
 
         return view($viewName, $this->viewData);
+    }
+
+    /**
+     * Show a single movie with all its releases
+     *
+     * @throws \Exception
+     */
+    public function showMovie(Request $request, string $imdbid)
+    {
+        $this->setPreferences();
+        $movie = new Movie(['Settings' => $this->settings]);
+
+        // Get movie info
+        $movieInfo = $movie->getMovieInfo($imdbid);
+
+        if (! $movieInfo) {
+            return redirect()->route('Movies')->with('error', 'Movie not found');
+        }
+
+        // Get all releases for this movie
+        $rslt = $movie->getMovieRange(1, [], 0, 1000, '', -1, $this->userdata->categoryexclusions);
+
+        // Filter to only this movie's IMDB ID
+        $movieData = collect($rslt)->firstWhere('imdbid', $imdbid);
+
+        if (! $movieData) {
+            return redirect()->route('Movies')->with('error', 'No releases found for this movie');
+        }
+
+        // Process movie data - ensure we handle both objects and arrays
+        if (is_object($movieInfo)) {
+            // If it's an Eloquent model, use toArray()
+            if (method_exists($movieInfo, 'toArray')) {
+                $movieArray = $movieInfo->toArray();
+            } else {
+                $movieArray = get_object_vars($movieInfo);
+            }
+        } else {
+            $movieArray = $movieInfo;
+        }
+
+        // Ensure we have at least the basic fields
+        if (empty($movieArray['title'])) {
+            $movieArray['title'] = 'Unknown Title';
+        }
+        if (empty($movieArray['imdbid'])) {
+            $movieArray['imdbid'] = $imdbid;
+        }
+
+        // Only process fields if they exist and are not empty
+        if (! empty($movieArray['genre'])) {
+            $movieArray['genre'] = makeFieldLinks($movieArray, 'genre', 'movies');
+        }
+        if (! empty($movieArray['actors'])) {
+            $movieArray['actors'] = makeFieldLinks($movieArray, 'actors', 'movies');
+        }
+        if (! empty($movieArray['director'])) {
+            $movieArray['director'] = makeFieldLinks($movieArray, 'director', 'movies');
+        }
+
+        // Add cover image URL
+        if (! empty($imdbid)) {
+            $coverId = str_pad($imdbid, 7, '0', STR_PAD_LEFT);
+            $coverFile = storage_path("covers/movies/{$coverId}-cover.jpg");
+            if (file_exists($coverFile)) {
+                $movieArray['cover'] = asset("storage/covers/movies/{$coverId}-cover.jpg");
+            } else {
+                $movieArray['cover'] = asset('assets/images/no-cover.png');
+            }
+        } else {
+            $movieArray['cover'] = asset('assets/images/no-cover.png');
+        }
+
+        // Process all releases
+        $releaseNames = isset($movieData->grp_release_name) ? explode('#', $movieData->grp_release_name) : [];
+        $releaseSizes = isset($movieData->grp_release_size) ? explode(',', $movieData->grp_release_size) : [];
+        $releaseGuids = isset($movieData->grp_release_guid) ? explode(',', $movieData->grp_release_guid) : [];
+        $releasePostDates = isset($movieData->grp_release_postdate) ? explode(',', $movieData->grp_release_postdate) : [];
+        $releaseAddDates = isset($movieData->grp_release_adddate) ? explode(',', $movieData->grp_release_adddate) : [];
+
+        $releases = [];
+        foreach ($releaseNames as $index => $releaseName) {
+            if ($releaseName && isset($releaseGuids[$index])) {
+                $releases[] = [
+                    'name' => $releaseName,
+                    'guid' => $releaseGuids[$index],
+                    'size' => $releaseSizes[$index] ?? 0,
+                    'postdate' => $releasePostDates[$index] ?? null,
+                    'adddate' => $releaseAddDates[$index] ?? null,
+                ];
+            }
+        }
+
+        $this->viewData = array_merge($this->viewData, [
+            'movie' => $movieArray,
+            'releases' => $releases,
+            'meta_title' => ($movieArray['title'] ?? 'Movie').' - Movie Details',
+            'meta_keywords' => 'movie,details,releases',
+            'meta_description' => 'View all releases for '.($movieArray['title'] ?? 'this movie'),
+        ]);
+
+        return view('movies.viewmoviefull', $this->viewData);
     }
 
     /**

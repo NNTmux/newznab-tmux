@@ -119,6 +119,7 @@ Route::middleware('isVerified')->group(function () {
 
     Route::middleware('clearance')->group(function () {
         Route::match(['GET', 'POST'], 'Games', [GamesController::class, 'show'])->name('Games');
+        Route::match(['GET', 'POST'], 'movie/{imdbid}', [MovieController::class, 'showMovie'])->name('movie.view');
         Route::match(['GET', 'POST'], 'Movies/{id?}', [MovieController::class, 'showMovies'])->name('Movies');
         Route::match(['GET', 'POST'], 'movie', [MovieController::class, 'showMovies'])->name('movie');
         Route::match(['GET', 'POST'], 'movietrailers', [MovieController::class, 'showTrailer'])->name('movietrailers');
