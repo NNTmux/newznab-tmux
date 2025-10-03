@@ -13,19 +13,20 @@ class CartController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index()
     {
         $this->setPreferences();
-        $meta_title = 'My Download Basket';
-        $meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
-        $meta_description = 'Manage Your Download Basket';
 
         $results = UsersRelease::getCart(Auth::id());
-        $this->smarty->assign('results', $results);
 
-        $content = $this->smarty->fetch('cart.tpl');
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
+        $this->viewData = array_merge($this->viewData, [
+            'results' => $results,
+            'meta_title' => 'My Download Basket',
+            'meta_keywords' => 'search,add,to,cart,download,basket,nzb,description,details',
+            'meta_description' => 'Manage Your Download Basket',
+        ]);
+
+        return view('cart.index', $this->viewData);
     }
 
     /**

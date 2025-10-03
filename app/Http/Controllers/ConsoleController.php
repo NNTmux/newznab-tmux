@@ -13,7 +13,7 @@ class ConsoleController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request, string $id = ''): void
+    public function show(Request $request, string $id = '')
     {
         $this->setPreferences();
         if ($id === 'WiiVare') {
@@ -43,10 +43,6 @@ class ConsoleController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $this->smarty->assign('catlist', $ctmp);
-        $this->smarty->assign('category', $category);
-        $this->smarty->assign('categorytitle', $id);
-
         $ordering = $console->getConsoleOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
@@ -69,10 +65,7 @@ class ConsoleController extends BasePageController
         }
 
         $platform = ($request->has('platform') && ! empty($request->input('platform'))) ? stripslashes($request->input('platform')) : '';
-        $this->smarty->assign('platform', $platform);
-
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
-        $this->smarty->assign('title', $title);
 
         $genres = $gen->getGenres(Genres::CONSOLE_TYPE, true);
         $tmpgnr = [];
@@ -80,35 +73,35 @@ class ConsoleController extends BasePageController
             $tmpgnr[$gn->id] = $gn->title;
         }
         $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
-        $this->smarty->assign('genres', $genres);
-        $this->smarty->assign('genre', $genre);
 
         if ((int) $category === -1) {
-            $this->smarty->assign('catname', 'All');
+            $catname = 'All';
         } else {
             $cdata = Category::find($category);
             if ($cdata !== null) {
-                $this->smarty->assign('catname', $cdata);
+                $catname = $cdata;
             } else {
-                $this->smarty->assign('catname', 'All');
+                $catname = 'All';
             }
         }
 
-        $this->smarty->assign(
-            [
-                'resultsadd' => $consoles,
-                'results' => $results,
-                'covgroup' => 'console',
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, [
+            'catlist' => $ctmp,
+            'category' => $category,
+            'categorytitle' => $id,
+            'platform' => $platform,
+            'title' => $title,
+            'genres' => $genres,
+            'genre' => $genre,
+            'catname' => $catname,
+            'resultsadd' => $consoles,
+            'results' => $results,
+            'covgroup' => 'console',
+            'meta_title' => 'Browse Console',
+            'meta_keywords' => 'browse,nzb,console,games,description,details',
+            'meta_description' => 'Browse for Console Games',
+        ]);
 
-        $meta_title = 'Browse Console';
-        $meta_keywords = 'browse,nzb,console,games,description,details';
-        $meta_description = 'Browse for Console Games';
-        $content = $this->smarty->fetch('console.tpl');
-
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-
-        $this->pagerender();
+        return view('console.index', $this->viewData);
     }
 }

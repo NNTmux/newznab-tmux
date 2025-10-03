@@ -13,14 +13,10 @@ class SeriesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request, string $id = ''): void
+    public function index(Request $request, string $id = '')
     {
         $this->setPreferences();
         $releases = new Releases;
-        $title = 'Series';
-        $meta_title = 'View TV Series';
-        $meta_keywords = 'view,series,tv,show,description,details';
-        $meta_description = 'View TV Series';
 
         if ($id && ctype_digit($id)) {
             $category = -1;
@@ -38,10 +34,17 @@ class SeriesController extends BasePageController
 
             $show = Video::getByVideoID($id);
 
+            $nodata = '';
+            $seasons = [];
+            $myshows = null;
+            $seriestitles = '';
+            $seriessummary = '';
+            $seriescountry = '';
+
             if (! $show) {
-                $this->smarty->assign('nodata', 'No video information for this series.');
+                $nodata = 'No video information for this series.';
             } elseif (! $rel) {
-                $this->smarty->assign('nodata', 'No releases for this series.');
+                $nodata = 'No releases for this series.';
             } else {
                 $myshows = UserSerie::getShow($this->userdata->id, $show['id']);
 
@@ -59,49 +62,42 @@ class SeriesController extends BasePageController
                     $series[$r->series][$r->episode][] = $r;
                 }
 
-                $this->smarty->assign('seasons', Arr::sortRecursive($series));
-                $this->smarty->assign('show', $show);
-                $this->smarty->assign('myshows', $myshows);
+                $seasons = Arr::sortRecursive($series);
 
                 // get series name(s), description, country and genre
-                $seriestitles = $seriessummary = $seriescountry = [];
-                $seriestitles[] = $show['title'];
+                $seriestitlesArray = $seriessummaryArray = $seriescountryArray = [];
+                $seriestitlesArray[] = $show['title'];
 
                 if (! empty($show['summary'])) {
-                    $seriessummary[] = $show['summary'];
+                    $seriessummaryArray[] = $show['summary'];
                 }
 
                 if (! empty($show['countries_id'])) {
-                    $seriescountry[] = $show['countries_id'];
+                    $seriescountryArray[] = $show['countries_id'];
                 }
 
-                $seriestitles = implode('/', array_map('trim', $seriestitles));
-                $this->smarty->assign('seriestitles', $seriestitles);
-                $this->smarty->assign('seriessummary', $seriessummary ? array_shift($seriessummary) : '');
-                $this->smarty->assign('seriescountry', $seriescountry ? array_shift($seriescountry) : '');
-
-                $title = 'Series';
-                $meta_title = 'View TV Series';
-                $meta_keywords = 'view,series,tv,show,description,details';
-                $meta_description = 'View TV Series';
-
-                if ($category !== -1) {
-                    $catid = $category;
-                } else {
-                    $catid = '';
-                }
-                $this->smarty->assign('category', $catid);
-                $this->smarty->assign('nodata', '');
+                $seriestitles = implode('/', array_map('trim', $seriestitlesArray));
+                $seriessummary = $seriessummaryArray ? array_shift($seriessummaryArray) : '';
+                $seriescountry = $seriescountryArray ? array_shift($seriescountryArray) : '';
             }
-            $content = $this->smarty->fetch('viewseries.tpl');
-            $this->smarty->assign([
-                'title' => $title,
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
+
+            $catid = $category !== -1 ? $category : '';
+
+            $this->viewData = array_merge($this->viewData, [
+                'seasons' => $seasons,
+                'show' => $show,
+                'myshows' => $myshows,
+                'seriestitles' => $seriestitles,
+                'seriessummary' => $seriessummary,
+                'seriescountry' => $seriescountry,
+                'category' => $catid,
+                'nodata' => $nodata,
+                'meta_title' => 'View TV Series',
+                'meta_keywords' => 'view,series,tv,show,description,details',
+                'meta_description' => 'View TV Series',
             ]);
-            $this->pagerender();
+
+            return view('series.viewseries', $this->viewData);
         } else {
             $letter = ($id && preg_match('/^(0\-9|[A-Z])$/i', $id)) ? $id : '0-9';
 
@@ -112,11 +108,6 @@ class SeriesController extends BasePageController
             }
 
             $masterserieslist = Video::getSeriesList($this->userdata->id, $letter, $showname);
-
-            $title = 'Series List';
-            $meta_title = 'View Series List';
-            $meta_keywords = 'view,series,tv,show,description,details';
-            $meta_description = 'View Series List';
 
             $serieslist = [];
             foreach ($masterserieslist as $s) {
@@ -130,15 +121,17 @@ class SeriesController extends BasePageController
             }
             ksort($serieslist);
 
-            $this->smarty->assign('serieslist', $serieslist);
-            $this->smarty->assign('seriesrange', range('A', 'Z'));
-            $this->smarty->assign('seriesletter', $letter);
-            $this->smarty->assign('showname', $showname);
+            $this->viewData = array_merge($this->viewData, [
+                'serieslist' => $serieslist,
+                'seriesrange' => range('A', 'Z'),
+                'seriesletter' => $letter,
+                'showname' => $showname,
+                'meta_title' => 'View Series List',
+                'meta_keywords' => 'view,series,tv,show,description,details',
+                'meta_description' => 'View Series List',
+            ]);
 
-            $content = $this->smarty->fetch('viewserieslist.tpl');
-
-            $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
-            $this->pagerender();
+            return view('series.viewserieslist', $this->viewData);
         }
     }
 }

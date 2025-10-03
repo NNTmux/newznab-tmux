@@ -72,6 +72,12 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
 
+// Serve cover images from storage - Must be public (no auth required)
+Route::get('/covers/{type}/{filename}', [App\Http\Controllers\CoverController::class, 'show'])
+    ->where('type', 'anime|audio|audiosample|book|console|games|movies|music|preview|sample|tvrage|video|xxx')
+    ->where('filename', '.*')
+    ->name('covers.show');
+
 // Auth::routes();
 
 Route::match(['GET', 'POST'], '/', [ContentController::class, 'show'])->name('home');

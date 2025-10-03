@@ -73,8 +73,17 @@
         <i class="fas fa-bars"></i>
     </button>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 99999; max-width: 350px; pointer-events: none;">
+        <!-- Toast notifications will be dynamically inserted here -->
+    </div>
+
     <!-- Scripts -->
     <script src="{{ asset('assets/js/all-js.js') }}"></script>
+
+    <!-- Toast Notifications (must load before other scripts) -->
+    @include('partials.toast-notifications')
+
     @stack('scripts')
 
     <script>

@@ -206,21 +206,22 @@ function addToCart(guid) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({ id: guid })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Release added to cart successfully!');
+            window.showToast('Added to cart successfully!', 'success');
         } else {
-            alert('Failed to add release to cart: ' + (data.message || 'Unknown error'));
+            window.showToast('Failed to add to cart', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while adding to cart');
+        window.showToast('An error occurred', 'error');
     });
 }
 </script>

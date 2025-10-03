@@ -30,12 +30,12 @@
                     <div class="flex-1">
                         <h2 class="text-xl font-bold text-gray-800 mb-3">{{ $release->searchname }}</h2>
                         <div class="flex flex-wrap gap-2">
-                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition inline-flex items-center">
+                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition inline-flex items-center" onclick="showToast('Downloading NZB...', 'success')">
                                 <i class="fas fa-download mr-2"></i> Download NZB
                             </a>
-                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-flex items-center">
-                                <i class="fas fa-shopping-basket mr-2"></i> Add to Cart
-                            </button>
+                            <a href="#" class="add-to-cart px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-flex items-center" data-guid="{{ $release->guid }}">
+                                <i class="icon_cart fas fa-shopping-basket mr-2"></i> Add to Cart
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -648,4 +648,8 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+@include('partials.cart-script')
+@endpush
 

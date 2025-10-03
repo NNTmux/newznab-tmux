@@ -46,18 +46,8 @@ class MovieController extends BasePageController
             $result['director'] = makeFieldLinks($result, 'director', 'movies');
             $result['languages'] = explode(', ', $result['language']);
 
-            // Add cover image URL
-            if (! empty($result['imdbid'])) {
-                $coverId = str_pad($result['imdbid'], 7, '0', STR_PAD_LEFT);
-                $coverFile = storage_path("covers/movies/{$coverId}-cover.jpg");
-                if (file_exists($coverFile)) {
-                    $result['cover'] = asset("storage/covers/movies/{$coverId}-cover.jpg");
-                } else {
-                    $result['cover'] = asset('assets/images/no-cover.png');
-                }
-            } else {
-                $result['cover'] = asset('assets/images/no-cover.png');
-            }
+            // Add cover image URL using helper function
+            $result['cover'] = getReleaseCover($result);
 
             return $result;
         });
@@ -155,18 +145,8 @@ class MovieController extends BasePageController
             $movieArray['director'] = makeFieldLinks($movieArray, 'director', 'movies');
         }
 
-        // Add cover image URL
-        if (! empty($imdbid)) {
-            $coverId = str_pad($imdbid, 7, '0', STR_PAD_LEFT);
-            $coverFile = storage_path("covers/movies/{$coverId}-cover.jpg");
-            if (file_exists($coverFile)) {
-                $movieArray['cover'] = asset("storage/covers/movies/{$coverId}-cover.jpg");
-            } else {
-                $movieArray['cover'] = asset('assets/images/no-cover.png');
-            }
-        } else {
-            $movieArray['cover'] = asset('assets/images/no-cover.png');
-        }
+        // Add cover image URL using helper function
+        $movieArray['cover'] = getReleaseCover($movieArray);
 
         // Process all releases
         $releaseNames = isset($movieData->grp_release_name) ? explode('#', $movieData->grp_release_name) : [];

@@ -1,0 +1,180 @@
+@extends('layouts.main')
+
+@section('content')
+<div class="bg-white rounded-lg shadow-sm">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+            <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+                <i class="fa fa-tv mr-3 text-blue-600"></i>TV Series
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ol class="flex items-center space-x-2 text-sm text-gray-600">
+                    <li><a href="{{ url($site->home_link ?? '/') }}" class="hover:text-blue-600">Home</a></li>
+                    <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
+                    <li class="text-gray-500">TV Series List</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="px-6 py-4">
+        <!-- Alphabet navigation -->
+        <div class="mb-4">
+            <div class="flex items-center flex-wrap gap-2">
+                <span class="font-semibold mr-2">Jump to:</span>
+                <div class="flex gap-1">
+                    <a href="{{ url('/series/0-9') }}" class="px-3 py-1 rounded {{ $seriesletter == '0-9' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">0-9</a>
+                    @foreach($seriesrange as $range)
+                        <a href="{{ url('/series/' . $range) }}" class="px-3 py-1 rounded {{ $range == $seriesletter ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">{{ $range }}</a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- Action buttons and search -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div class="flex gap-2">
+                <a class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center" href="{{ route('myshows') }}" title="List my watched shows">
+                    <i class="fa fa-list mr-2"></i>My Shows
+                </a>
+                <a class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center" href="{{ url('/myshows/browse') }}" title="Browse your shows">
+                    <i class="fa fa-search mr-2"></i>Find My Shows
+                </a>
+            </div>
+
+            <!-- Search form -->
+            <form method="get" action="{{ url('/series') }}" class="flex gap-2">
+                <input class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       type="text"
+                       name="title"
+                       value="{{ $showname ?? '' }}"
+                       placeholder="Search series">
+                <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" type="submit" title="Search series">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Series list -->
+        @if(count($serieslist) > 0)
+            <div class="overflow-x-auto">
+                @foreach($serieslist as $sletter => $series)
+                    <div class="mb-6">
+                        <div class="bg-gray-100 px-4 py-2 rounded-t-lg">
+                            <h4 class="text-xl font-bold text-gray-800 flex items-center">
+                                <i class="fa fa-bookmark mr-2 text-blue-600"></i>{{ $sletter }}
+                            </h4>
+                        </div>
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:120px">Network</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:120px">Country</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:140px">Actions</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:200px">External Links</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach($series as $s)
+                                    @php
+                                        $sData = is_object($s) ? get_object_vars($s) : $s;
+                                    @endphp
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3">
+                                            <div class="mb-1">
+                                                <a class="font-semibold text-blue-600 hover:text-blue-800"
+                                                   title="View series details"
+                                                   href="{{ url('/series/' . $sData['id']) }}">
+                                                    {{ $sData['title'] ?? '' }}
+                                                </a>
+                                            </div>
+                                            @if(!empty($sData['prevdate']))
+                                                <span class="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                                                    <i class="fa fa-calendar mr-1"></i>Last: {{ $sData['previnfo'] ?? '' }} aired {{ \Carbon\Carbon::parse($sData['prevdate'])->format('M d, Y') }}
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            @if(!empty($sData['publisher']))
+                                                <span class="inline-block px-2 py-1 text-xs bg-gray-200 text-gray-800 rounded">{{ $sData['publisher'] }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            @if(!empty($sData['countries_id']))
+                                                <span class="inline-block px-2 py-1 text-xs bg-gray-200 text-gray-800 rounded">{{ $sData['countries_id'] }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            @if(!empty($sData['userseriesid']))
+                                                <div class="flex justify-center gap-1">
+                                                    <a href="{{ url('/myshows?action=edit&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                                       class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
+                                                       title="Edit this show">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                    <a href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                                       class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                                                       title="Remove from My Shows">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <a href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                                   class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm inline-flex items-center"
+                                                   title="Add to My Shows">
+                                                    <i class="fa fa-plus mr-1"></i>Add
+                                                </a>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex justify-center gap-2">
+                                                <a class="px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-sm"
+                                                   title="View series details"
+                                                   href="{{ url('/series/' . $sData['id']) }}">
+                                                    <i class="fa fa-tv"></i>
+                                                </a>
+
+                                                @if($sData['id'] > 0)
+                                                    @if(!empty($sData['tvdb']) && $sData['tvdb'] > 0)
+                                                        <a class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs"
+                                                           title="View at TVDB" target="_blank"
+                                                           href="{{ $site->dereferrer_link }}http://thetvdb.com/?tab=series&id={{ $sData['tvdb'] }}">
+                                                            TVDB
+                                                        </a>
+                                                    @endif
+                                                    @if(!empty($sData['tvmaze']) && $sData['tvmaze'] > 0)
+                                                        <a class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs"
+                                                           title="View at TVMaze" target="_blank"
+                                                           href="{{ $site->dereferrer_link }}http://tvmaze.com/shows/{{ $sData['tvmaze'] }}">
+                                                            TVMaze
+                                                        </a>
+                                                    @endif
+                                                    @if(!empty($sData['trakt']) && $sData['trakt'] > 0)
+                                                        <a class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs"
+                                                           title="View at Trakt" target="_blank"
+                                                           href="{{ $site->dereferrer_link }}http://www.trakt.tv/shows/{{ $sData['trakt'] }}">
+                                                            Trakt
+                                                        </a>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-800">
+                <i class="fa fa-info-circle mr-2"></i>
+                No series found. Try a different search or letter.
+            </div>
+        @endif
+    </div>
+</div>
+@endsection
+

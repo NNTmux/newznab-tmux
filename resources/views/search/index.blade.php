@@ -30,13 +30,27 @@
                     <option value="">All Categories</option>
                     @if(isset($parentcatlist))
                         @foreach($parentcatlist as $parentcat)
-                            <optgroup label="{{ $parentcat->title }}">
-                                @foreach($parentcat->categories as $subcat)
-                                    <option value="{{ $subcat->id }}" {{ request('t') == $subcat->id ? 'selected' : '' }}>
-                                        {{ $subcat->title }}
+                            @php
+                                $parentTitle = is_object($parentcat) ? $parentcat->title : ($parentcat['title'] ?? 'Category');
+                                $subcategories = is_object($parentcat) ? $parentcat->categories : ($parentcat['categories'] ?? []);
+                            @endphp
+                            <optgroup label="{{ $parentTitle }}">
+                                @foreach($subcategories as $subcat)
+                                    @php
+                                        $subcatId = is_object($subcat) ? $subcat->id : ($subcat['id'] ?? '');
+                                        $subcatTitle = is_object($subcat) ? $subcat->title : ($subcat['title'] ?? '');
+                                    @endphp
+                                    <option value="{{ $subcatId }}" {{ request('t') == $subcatId ? 'selected' : '' }}>
+                                        {{ $subcatTitle }}
                                     </option>
                                 @endforeach
                             </optgroup>
+                        @endforeach
+                    @elseif(isset($catlist))
+                        @foreach($catlist as $catId => $catTitle)
+                            <option value="{{ $catId }}" {{ request('t') == $catId ? 'selected' : '' }}>
+                                {{ $catTitle }}
+                            </option>
                         @endforeach
                     @endif
                 </select>
@@ -101,15 +115,17 @@
     </form>
 
     <!-- Search Results -->
-    @if(isset($results) && $results->count() > 0)
+    @if(isset($results) && ((is_array($results) && count($results) > 0) || (is_object($results) && $results->count() > 0)))
         <div>
             <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-xl font-bold text-gray-800">
-                    Search Results ({{ $results->total() }} found)
+                    Search Results ({{ is_object($results) ? $results->total() : count($results) }} found)
                 </h2>
-                <div class="text-sm text-gray-600">
-                    Page {{ $results->currentPage() }} of {{ $results->lastPage() }}
-                </div>
+                @if(is_object($results))
+                    <div class="text-sm text-gray-600">
+                        Page {{ $results->currentPage() }} of {{ $results->lastPage() }}
+                    </div>
+                @endif
             </div>
 
             <div class="space-y-3">
@@ -145,9 +161,11 @@
             </div>
 
             <!-- Pagination -->
-            <div class="mt-6">
-                {{ $results->appends(request()->query())->links() }}
-            </div>
+            @if(is_object($results) && method_exists($results, 'links'))
+                <div class="mt-6">
+                    {{ $results->appends(request()->query())->links() }}
+                </div>
+            @endif
         </div>
     @elseif(request()->has('search'))
         <div class="text-center py-12">

@@ -12,14 +12,10 @@ class SearchController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function search(Request $request): void
+    public function search(Request $request)
     {
         $this->setPreferences();
         $releases = new Releases;
-
-        $meta_title = 'Search Nzbs';
-        $meta_keywords = 'search,nzb,description,details';
-        $meta_description = 'Search for Nzbs';
 
         $results = [];
 
@@ -33,26 +29,26 @@ class SearchController extends BasePageController
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $this->smarty->assign(
-            [
-                'subject' => '', 'search' => '', 'category' => [0], 'covgroup' => '',
-            ]
-        );
+        $subject = '';
+        $search = '';
+        $id = '';
+        $category = [0];
+        $lastvisit = $this->userdata->lastlogin;
 
         if ($searchType === 'basic' && $request->missing('searchadvr') && ($request->has('id') || $request->has('subject') || $request->has('search'))) {
             $searchString = [];
             switch (true) {
                 case $request->filled('subject'):
                     $searchString['searchname'] = (string) $request->input('subject') ?? [];
-                    $this->smarty->assign('subject', $searchString['searchname']);
+                    $subject = $searchString['searchname'];
                     break;
                 case $request->filled('id'):
                     $searchString['searchname'] = (string) $request->input('id') ?? [];
-                    $this->smarty->assign('id', $searchString['searchname']);
+                    $id = $searchString['searchname'];
                     break;
                 case $request->filled('search'):
                     $searchString['searchname'] = (string) $request->input('search') ?? [];
-                    $this->smarty->assign('search', $searchString['searchname']);
+                    $search = $searchString['searchname'];
                     break;
                 default:
                     $searchString['searchname'] = '';
@@ -62,10 +58,10 @@ class SearchController extends BasePageController
             if ($request->has('t')) {
                 $categoryID = explode(',', $request->input('t'));
             }
+
+            $orderByUrls = [];
             foreach ($releases->getBrowseOrdering() as $orderType) {
-                $this->smarty->assign(
-                    'orderby'.$orderType,
-                    url('/search?search='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType));
+                $orderByUrls['orderby'.$orderType] = url('/search?search='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&ob='.$orderType);
             }
 
             $rslt = $releases->search(
@@ -84,13 +80,9 @@ class SearchController extends BasePageController
                 $categoryID);
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
-
-            $this->smarty->assign(
-                [
-                    'lastvisit' => $this->userdata->lastlogin,
-                    'category' => $categoryID,
-                ]
-            );
+            $category = $categoryID;
+        } else {
+            $orderByUrls = [];
         }
 
         $searchVars = [
@@ -116,9 +108,6 @@ class SearchController extends BasePageController
         $searchVars['selectedcat'] = $searchVars['searchadvcat'];
         $searchVars['selectedsizefrom'] = $searchVars['searchadvsizefrom'];
         $searchVars['selectedsizeto'] = $searchVars['searchadvsizeto'];
-        foreach ($searchVars as $searchVarKey => $searchVar) {
-            $this->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
-        }
 
         if ($searchType !== 'basic' && $request->missing('id') && $request->missing('subject') && $request->anyFilled(['searchadvr', 'searchadvsubject', 'searchadvfilename', 'searchadvposter'])) {
             $orderByString = '';
@@ -127,11 +116,9 @@ class SearchController extends BasePageController
             }
             $orderByString = ltrim($orderByString, '&');
 
+            $orderByUrls = [];
             foreach ($ordering as $orderType) {
-                $this->smarty->assign(
-                    'orderby'.$orderType,
-                    url('/search?'.$orderByString.'&search_type=adv&ob='.$orderType
-                    ));
+                $orderByUrls['orderby'.$orderType] = url('/search?'.$orderByString.'&search_type=adv&ob='.$orderType);
             }
 
             $searchArr = [
@@ -158,29 +145,28 @@ class SearchController extends BasePageController
             );
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
-
-            $this->smarty->assign(
-                [
-                    'lastvisit' => $this->userdata->lastlogin,
-                ]
-            );
         }
 
-        $this->smarty->assign(
-            [
-                'sizelist' => [
-                    -1 => '--Select--', 1 => '100MB', 2 => '250MB', 3 => '500MB', 4 => '1GB', 5 => '2GB',
-                    6 => '3GB', 7 => '4GB', 8 => '8GB', 9 => '16GB', 10 => '32GB', 11 => '64GB',
-                ],
-                'results' => $results,
-                'sadvanced' => $searchType !== 'basic',
-                'grouplist' => UsenetGroup::getGroupsForSelect(),
-                'catlist' => Category::getForSelect(),
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, $searchVars, $orderByUrls, [
+            'subject' => $subject,
+            'search' => $search,
+            'id' => $id,
+            'category' => $category,
+            'covgroup' => '',
+            'lastvisit' => $lastvisit,
+            'sizelist' => [
+                -1 => '--Select--', 1 => '100MB', 2 => '250MB', 3 => '500MB', 4 => '1GB', 5 => '2GB',
+                6 => '3GB', 7 => '4GB', 8 => '8GB', 9 => '16GB', 10 => '32GB', 11 => '64GB',
+            ],
+            'results' => $results,
+            'sadvanced' => $searchType !== 'basic',
+            'grouplist' => UsenetGroup::getGroupsForSelect(),
+            'catlist' => Category::getForSelect(),
+            'meta_title' => 'Search Nzbs',
+            'meta_keywords' => 'search,nzb,description,details',
+            'meta_description' => 'Search for Nzbs',
+        ]);
 
-        $content = $this->smarty->fetch('search.tpl');
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
+        return view('search.index', $this->viewData);
     }
 }

@@ -166,11 +166,14 @@
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-1">
-                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm" title="Download NZB">
+                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm" title="Download NZB" onclick="showToast('Downloading NZB...', 'success')">
                                             <i class="fa fa-download"></i>
                                         </a>
                                         <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm" title="View Details">
                                             <i class="fa fa-info"></i>
+                                        </a>
+                                        <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
+                                            <i class="icon_cart fa fa-shopping-basket"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -196,6 +199,7 @@
 
 @push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Select all checkbox functionality
     document.getElementById('chkSelectAll')?.addEventListener('change', function() {
         const checkboxes = document.querySelectorAll('.chkRelease');
@@ -206,33 +210,103 @@
     document.querySelector('.nzb_multi_operations_download')?.addEventListener('click', function() {
         const selected = Array.from(document.querySelectorAll('.chkRelease:checked')).map(cb => cb.value);
         if (selected.length === 0) {
-            alert('Please select at least one release');
+            showToast('Please select at least one release', 'error');
             return;
         }
-        // Implement multi-download logic
+        // Download all selected NZBs
         selected.forEach(guid => {
             window.open('/getnzb/' + guid, '_blank');
         });
+        showToast(`Downloading ${selected.length} NZB${selected.length > 1 ? 's' : ''}...`, 'success');
     });
 
     // Multi-operations cart
     document.querySelector('.nzb_multi_operations_cart')?.addEventListener('click', function() {
         const selected = Array.from(document.querySelectorAll('.chkRelease:checked')).map(cb => cb.value);
         if (selected.length === 0) {
-            alert('Please select at least one release');
+            showToast('Please select at least one release', 'error');
             return;
         }
-        // Implement cart logic via AJAX
+        // Add to cart via AJAX
         fetch('/cart/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({ releases: selected })
+            body: JSON.stringify({ id: selected.join(',') })
         }).then(response => response.json())
-          .then(data => alert(data.message || 'Added to cart'));
+          .then(data => {
+              if (data.success) {
+                  showToast(data.message || `Added ${selected.length} item${selected.length > 1 ? 's' : ''} to cart`, 'success');
+              } else {
+                  showToast('Failed to add items to cart', 'error');
+              }
+          })
+          .catch(error => {
+              showToast('An error occurred', 'error');
+          });
     });
+
+    // Individual add to cart buttons
+    document.addEventListener('click', function(e) {
+        const cartBtn = e.target.closest('.add-to-cart');
+
+        if (cartBtn) {
+            e.preventDefault();
+
+            const guid = cartBtn.dataset.guid;
+            const iconElement = cartBtn.querySelector('.icon_cart');
+
+            if (!guid) {
+                console.error('No GUID found for cart item');
+                return;
+            }
+
+            // Prevent double-clicking
+            if (iconElement && iconElement.classList.contains('icon_cart_clicked')) {
+                return;
+            }
+
+            // Send AJAX request to add item to cart
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ id: guid })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Visual feedback
+                    if (iconElement) {
+                        iconElement.classList.remove('fa-shopping-basket');
+                        iconElement.classList.add('fa-check', 'icon_cart_clicked');
+
+                        // Reset icon after 2 seconds
+                        setTimeout(() => {
+                            iconElement.classList.remove('fa-check', 'icon_cart_clicked');
+                            iconElement.classList.add('fa-shopping-basket');
+                        }, 2000);
+                    }
+
+                    // Show success notification
+                    showToast('Added to cart successfully!', 'success');
+                } else {
+                    showToast('Failed to add item to cart', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                showToast('An error occurred', 'error');
+            });
+        }
+    });
+});
 </script>
 @endpush
 @endsection

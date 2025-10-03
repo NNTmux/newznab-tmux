@@ -419,49 +419,64 @@ if (! function_exists('getReleaseCover')) {
     /**
      * Get the cover image URL for a release based on its type and ID
      *
-     * @param  object  $release  The release object
-     * @return string|null The cover image URL or null if no cover exists
+     * @param  object|array  $release  The release object or array
+     * @return string The cover image URL or placeholder if no cover exists
      */
-    function getReleaseCover($release): ?string
+    function getReleaseCover($release): string
     {
-        $coverPath = null;
         $coverType = null;
         $coverId = null;
 
-        // Determine cover type and ID based on category
-        if (! empty($release->imdbid) && $release->imdbid > 0) {
-            $coverType = 'movies';
-            $coverId = str_pad($release->imdbid, 7, '0', STR_PAD_LEFT);
-        } elseif (! empty($release->musicinfo_id)) {
-            $coverType = 'music';
-            $coverId = $release->musicinfo_id;
-        } elseif (! empty($release->consoleinfo_id)) {
-            $coverType = 'console';
-            $coverId = $release->consoleinfo_id;
-        } elseif (! empty($release->bookinfo_id)) {
-            $coverType = 'book';
-            $coverId = $release->bookinfo_id;
-        } elseif (! empty($release->gamesinfo_id)) {
-            $coverType = 'games';
-            $coverId = $release->gamesinfo_id;
-        } elseif (! empty($release->xxxinfo_id)) {
-            $coverType = 'xxx';
-            $coverId = $release->xxxinfo_id;
-        } elseif (! empty($release->anidbid)) {
-            $coverType = 'anime';
-            $coverId = $release->anidbid;
-        }
-
-        // Check if cover file exists
-        if ($coverType && $coverId) {
-            $coverFile = storage_path("covers/{$coverType}/{$coverId}-cover.jpg");
-            if (file_exists($coverFile)) {
-                // Return URL to access the cover image
-                return asset("storage/covers/{$coverType}/{$coverId}-cover.jpg");
+        // Helper function to get value from object or array
+        $getValue = function ($data, $key) {
+            if (is_array($data)) {
+                return $data[$key] ?? null;
+            } elseif (is_object($data)) {
+                return $data->$key ?? null;
             }
+
+            return null;
+        };
+
+        // Determine cover type and ID based on category
+        $imdbid = $getValue($release, 'imdbid');
+        $musicinfo_id = $getValue($release, 'musicinfo_id');
+        $consoleinfo_id = $getValue($release, 'consoleinfo_id');
+        $bookinfo_id = $getValue($release, 'bookinfo_id');
+        $gamesinfo_id = $getValue($release, 'gamesinfo_id');
+        $xxxinfo_id = $getValue($release, 'xxxinfo_id');
+        $anidbid = $getValue($release, 'anidbid');
+
+        if (! empty($imdbid) && $imdbid > 0) {
+            $coverType = 'movies';
+            $coverId = str_pad($imdbid, 7, '0', STR_PAD_LEFT);
+        } elseif (! empty($musicinfo_id)) {
+            $coverType = 'music';
+            $coverId = $musicinfo_id;
+        } elseif (! empty($consoleinfo_id)) {
+            $coverType = 'console';
+            $coverId = $consoleinfo_id;
+        } elseif (! empty($bookinfo_id)) {
+            $coverType = 'book';
+            $coverId = $bookinfo_id;
+        } elseif (! empty($gamesinfo_id)) {
+            $coverType = 'games';
+            $coverId = $gamesinfo_id;
+        } elseif (! empty($xxxinfo_id)) {
+            $coverType = 'xxx';
+            $coverId = $xxxinfo_id;
+        } elseif (! empty($anidbid)) {
+            $coverType = 'anime';
+            $coverId = $anidbid;
         }
 
-        // Return placeholder image if no cover found
+        // Return the cover URL if we have a type and ID
+        // The CoverController will handle serving the file or returning a placeholder
+        if ($coverType && $coverId) {
+            return url("/covers/{$coverType}/{$coverId}-cover.jpg");
+        }
+
+        // Return placeholder image if no cover type/ID found
         return asset('assets/images/no-cover.png');
     }
 }
