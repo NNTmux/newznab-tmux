@@ -32,8 +32,6 @@ class BasePageController extends Controller
      */
     public string $page = '';
 
-    public string $page_template = '';
-
     public User $userdata;
 
     /**
@@ -42,9 +40,9 @@ class BasePageController extends Controller
     protected string $theme = 'Gentele';
 
     /**
-     * @var \Illuminate\Foundation\Application|mixed
+     * View data array for Blade templates
      */
-    public mixed $smarty;
+    protected array $viewData = [];
 
     /**
      * BasePageController constructor.
@@ -56,13 +54,12 @@ class BasePageController extends Controller
         $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release', 'reset', 'showLinkRequestForm');
         // Buffer settings/DB connection.
         $this->settings = new Settings;
-        $this->smarty = app('smarty.view');
 
-        foreach (Arr::get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
-            $this->smarty->addPluginsDir($plugins);
-        }
-
-        $this->smarty->assign('serverroot', url('/'));
+        // Initialize view data
+        $this->viewData = [
+            'serverroot' => url('/'),
+            'site' => $this->settings,
+        ];
     }
 
     public function paginate($query, $totalCount, $items, $page, $path, $reqQuery): LengthAwarePaginator
@@ -79,30 +76,22 @@ class BasePageController extends Controller
             $this->userdata = User::find(Auth::id());
             $this->setUserPreferences();
         } else {
-            // Tell Smarty which directories to use for templates
-            $this->smarty->setTemplateDir([
-                'user' => config('ytake-laravel-smarty.template_path').'/Gentele',
-                'shared' => config('ytake-laravel-smarty.template_path').'/shared',
-                'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
+            $this->viewData = array_merge($this->viewData, [
+                'isadmin' => false,
+                'ismod' => false,
+                'loggedin' => false,
             ]);
-
-            $this->smarty->assign(
-                [
-                    'isadmin' => false,
-                    'ismod' => false,
-                    'loggedin' => false,
-                ]
-            );
         }
 
-        $this->smarty->assign(
-            [
-                'theme' => 'Gentele',
-                'site' => $this->settings,
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, [
+            'theme' => 'Gentele',
+            'site' => $this->settings,
+        ]);
     }
 
+    /**
+     * Check if request is POST.
+     */
     public function isPostBack(Request $request): bool
     {
         return $request->isMethod('POST');
@@ -122,13 +111,8 @@ class BasePageController extends Controller
         return view('errors.404');
     }
 
-    public function render(): void
-    {
-        $this->smarty->display($this->page_template);
-    }
-
     /**
-     * @throws \Exception
+     *  Set user preferences.
      */
     protected function setUserPreferences(): void
     {
@@ -139,45 +123,16 @@ class BasePageController extends Controller
             event(new UserLoggedIn($this->userdata));
         }
 
-        $this->smarty->assign('userdata', $this->userdata);
-        $this->smarty->assign('loggedin', 'true');
-
-        if ($this->userdata->hasRole('Admin')) {
-            $this->smarty->assign('isadmin', 'true');
-        }
-
-        if ($this->userdata->hasRole('Moderator')) {
-            $this->smarty->assign('ismod', 'true');
-        }
-
-        // Tell Smarty which directories to use for templates
-        $this->smarty->setTemplateDir([
-            'user' => config('ytake-laravel-smarty.template_path').'/Gentele',
-            'shared' => config('ytake-laravel-smarty.template_path').'/shared',
-            'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
-        ]);
-
-        $role = $this->userdata->roles_id ?? User::ROLE_USER;
-
-        $content = new Contents;
         $parentcatlist = Category::getForMenu($this->userdata->categoryexclusions);
 
-        $this->smarty->assign('parentcatlist', $parentcatlist);
-        $this->smarty->assign('catClass', Category::class);
-
-        if (\request()->has('t')) {
-            $this->smarty->assign('header_menu_cat', \request()->input('t'));
-        } else {
-            $this->smarty->assign('header_menu_cat', '');
-        }
-        $header_menu = $this->smarty->fetch('headermenu.tpl');
-        $this->smarty->assign('header_menu', $header_menu);
-        $notification = $this->smarty->fetch('notification.tpl');
-        $this->smarty->assign('notification', $notification);
-        $sidebar = $this->smarty->fetch('sidebar.tpl');
-        $this->smarty->assign('sidebar', $sidebar);
-        $footer = $this->smarty->fetch('footer.tpl');
-        $this->smarty->assign('footer', $footer);
+        $this->viewData = array_merge($this->viewData, [
+            'userdata' => $this->userdata,
+            'loggedin' => true,
+            'isadmin' => $this->userdata->hasRole('Admin'),
+            'ismod' => $this->userdata->hasRole('Moderator'),
+            'parentcatlist' => $parentcatlist,
+            'header_menu_cat' => request()->input('t', ''),
+        ]);
     }
 
     /**
@@ -185,26 +140,15 @@ class BasePageController extends Controller
      */
     public function setAdminPrefs(): void
     {
-        // Tell Smarty which directories to use for templates
-        $this->smarty->setTemplateDir(
-            [
-                'admin' => config('ytake-laravel-smarty.template_path').'/admin',
-                'shared' => config('ytake-laravel-smarty.template_path').'/shared',
-                'default' => config('ytake-laravel-smarty.template_path').'/admin',
-            ]
-        );
-
-        $this->smarty->assign('catClass', Category::class);
+        $this->viewData['catClass'] = Category::class;
     }
 
     /**
-     * Output the page.
+     * Output the page using Blade views.
      */
-    public function pagerender(): void
+    public function pagerender(): View
     {
-        $this->page_template = 'basepage.tpl';
-
-        $this->render();
+        return view('layouts.main', $this->viewData);
     }
 
     /**
@@ -212,26 +156,21 @@ class BasePageController extends Controller
      *
      * @throws \Exception
      */
-    public function adminrender(): void
+    public function adminrender(): View
     {
-        $admin_menu = $this->smarty->fetch('adminmenu.tpl');
-        $this->smarty->assign('admin_menu', $admin_menu);
-
-        $this->page_template = 'baseadminpage.tpl';
-
-        $this->render();
+        return view('layouts.admin', $this->viewData);
     }
 
     /**
      * @throws \Exception
      */
-    public function adminBasePage(): void
+    public function adminBasePage(): View
     {
         $this->setAdminPrefs();
-        $this->smarty->assign([
+        $this->viewData = array_merge($this->viewData, [
             'meta_title' => 'Admin Home',
             'meta_description' => 'Admin home page',
         ]);
-        $this->adminrender();
+        return $this->adminrender();
     }
 }

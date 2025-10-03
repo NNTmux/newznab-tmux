@@ -239,22 +239,10 @@ class RegisterController extends Controller
                 break;
         }
 
-        app('smarty.view')->assign(
-            [
-                'username' => e($userName),
-                'password' => e($password),
-                'password_confirmation' => e($confirmPassword),
-                'email' => e($email),
-                'invitecode' => e($inviteCode),
-                'invite_code_query' => e($this->inviteCodeQuery),
-                'showregister' => $showRegister,
-            ]
-        );
-
         return $this->showRegistrationForm($request, $error, $showRegister);
     }
 
-    public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0): void
+    public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0)
     {
         $inviteCode = '';
         if ($request->has('invitecode')) {
@@ -268,6 +256,8 @@ class RegisterController extends Controller
             $this->inviteCodeQuery = '&token='.$inviteCode;
         }
 
+        $emailFromInvite = '';
+
         if ((int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE) {
             if (! empty($inviteCode)) {
                 if ($this->isInvitationTokenValid($inviteCode)) {
@@ -277,7 +267,7 @@ class RegisterController extends Controller
                     // Pre-fill email if invitation has one
                     $invitation = Invitation::findValidByToken($inviteCode);
                     if ($invitation && ! empty($invitation->email)) {
-                        app('smarty.view')->assign('email', $invitation->email);
+                        $emailFromInvite = $invitation->email;
                     }
                 } else {
                     $error = 'Invalid or expired invitation token!';
@@ -297,20 +287,13 @@ class RegisterController extends Controller
             $showRegister = 1;
         }
 
-        app('smarty.view')->assign('showregister', $showRegister);
-        app('smarty.view')->assign('error', $error);
-        app('smarty.view')->assign('invite_code_query', $this->inviteCodeQuery);
-        $theme = 'Gentele';
-
-        $nocaptcha = config('settings.nocaptcha_enabled');
-
-        $meta_title = 'Register';
-        $meta_keywords = 'register,signup,registration';
-        $meta_description = 'Register';
-
-        $content = app('smarty.view')->fetch($theme.'/register.tpl');
-        app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description', 'nocaptcha'));
-        app('smarty.view')->display($theme.'/basepage.tpl');
+        return view('auth.register')->with([
+            'showregister' => $showRegister,
+            'error' => $error,
+            'email' => $emailFromInvite,
+            'invite_code_query' => $this->inviteCodeQuery,
+            'invitecode' => $inviteCode,
+        ]);
     }
 
     /**

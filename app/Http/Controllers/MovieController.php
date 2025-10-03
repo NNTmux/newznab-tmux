@@ -11,7 +11,7 @@ class MovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function showMovies(Request $request, string $id = ''): void
+    public function showMovies(Request $request, string $id = '')
     {
         $this->setPreferences();
         $movie = new Movie(['Settings' => $this->settings]);
@@ -26,14 +26,7 @@ class MovieController extends BasePageController
             $category = $cat->id ?? Category::MOVIE_ROOT;
         }
 
-        $this->smarty->assign('cpapi', $this->userdata->cp_api);
-        $this->smarty->assign('cpurl', $this->userdata->cp_url);
-
         $catarray = $category !== -1 ? [$category] : [];
-
-        $this->smarty->assign('catlist', $moviecats);
-        $this->smarty->assign('category', $category);
-        $this->smarty->assign('categorytitle', $id);
 
         $page = $request->input('page', 1);
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
@@ -56,38 +49,42 @@ class MovieController extends BasePageController
             return $result;
         });
 
-        $this->smarty->assign('title', stripslashes($request->input('title', '')));
-        $this->smarty->assign('actors', stripslashes($request->input('actors', '')));
-        $this->smarty->assign('director', stripslashes($request->input('director', '')));
-        $this->smarty->assign('ratings', range(1, 9));
-        $this->smarty->assign('rating', $request->input('rating', ''));
-        $this->smarty->assign('genres', $movie->getGenres());
-        $this->smarty->assign('genre', $request->input('genre', ''));
         $years = range(1903, now()->addYear()->year);
         rsort($years);
-        $this->smarty->assign('years', $years);
-        $this->smarty->assign('year', $request->input('year', ''));
 
         $catname = $category === -1 ? 'All' : Category::find($category) ?? 'All';
-        $this->smarty->assign('catname', $catname);
 
-        $this->smarty->assign([
+        $this->viewData = array_merge($this->viewData, [
+            'cpapi' => $this->userdata->cp_api,
+            'cpurl' => $this->userdata->cp_url,
+            'catlist' => $moviecats,
+            'category' => $category,
+            'categorytitle' => $id,
+            'title' => stripslashes($request->input('title', '')),
+            'actors' => stripslashes($request->input('actors', '')),
+            'director' => stripslashes($request->input('director', '')),
+            'ratings' => range(1, 9),
+            'rating' => $request->input('rating', ''),
+            'genres' => $movie->getGenres(),
+            'genre' => $request->input('genre', ''),
+            'years' => $years,
+            'year' => $request->input('year', ''),
+            'catname' => $catname,
             'resultsadd' => $movies,
             'results' => $results,
             'covgroup' => 'movies',
+            'meta_title' => 'Browse Movies',
+            'meta_keywords' => 'browse,nzb,description,details',
+            'meta_description' => 'Browse for Movies',
         ]);
 
-        $meta_title = 'Browse Movies';
-        $meta_keywords = 'browse,nzb,description,details';
-        $meta_description = 'Browse for Movies';
-
-        $content = $request->has('imdb') ? $this->smarty->fetch('viewmoviefull.tpl') : $this->smarty->fetch('movies.tpl');
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
+        // Return the appropriate view
+        $viewName = $request->has('imdb') ? 'movies.viewmoviefull' : 'movies.index';
+        return view($viewName, $this->viewData);
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|void
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
      */
     public function showTrailer(Request $request)
     {
@@ -100,28 +97,28 @@ class MovieController extends BasePageController
                 return response()->json(['message' => 'There is no trailer for this movie.'], 404);
             }
 
-            $this->smarty->assign('movie', $mov);
+            $modal = $request->has('modal');
 
-            $title = 'Info for '.$mov['title'];
-            $meta_title = '';
-            $meta_keywords = '';
-            $meta_description = '';
-            $this->smarty->registerPlugin('modifier', 'ss', 'stripslashes');
+            $viewData = [
+                'movie' => $mov,
+            ];
 
-            $modal = false;
-            if ($request->has('modal')) {
-                $modal = true;
-                $this->smarty->assign('modal', true);
-            }
-
-            $content = $this->smarty->fetch('viewmovietrailer.tpl');
-
+            // Return different views for modal vs full page
             if ($modal) {
-                echo $content;
-            } else {
-                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
-                $this->pagerender();
+                return view('movies.trailer-modal', $viewData);
             }
+
+            $this->viewData = array_merge($this->viewData, [
+                'movie' => $mov,
+                'title' => 'Info for '.$mov['title'],
+                'meta_title' => '',
+                'meta_keywords' => '',
+                'meta_description' => '',
+            ]);
+
+            return view('movies.viewmovietrailer', $this->viewData);
         }
+
+        return response()->json(['message' => 'Invalid movie ID.'], 400);
     }
 }

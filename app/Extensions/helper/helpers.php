@@ -413,34 +413,86 @@ if (! function_exists('release_flag')) {
 
         return '';
     }
-    if (! function_exists('sanitize')) {
-        function sanitize(array|string $phrases, array $doNotSanitize = []): string
-        {
-            if (! is_array($phrases)) {
-                $wordArray = explode(' ', str_replace('.', ' ', $phrases));
-            } else {
-                $wordArray = $phrases;
-            }
+}
 
-            $keywords = [];
-            $tempWords = [];
-            foreach ($wordArray as $words) {
-                $words = preg_split('/\s+/', $words);
-                foreach ($words as $st) {
-                    if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
-                        $str = $st;
-                    } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
-                        $str = $st;
-                    } else {
-                        $str = Sanitizer::escape($st, $doNotSanitize);
-                    }
-                    $tempWords[] = $str;
-                }
+if (! function_exists('getReleaseCover')) {
+    /**
+     * Get the cover image URL for a release based on its type and ID
+     *
+     * @param object $release The release object
+     * @return string|null The cover image URL or null if no cover exists
+     */
+    function getReleaseCover($release): ?string
+    {
+        $coverPath = null;
+        $coverType = null;
+        $coverId = null;
 
-                $keywords = $tempWords;
-            }
-
-            return implode(' ', $keywords);
+        // Determine cover type and ID based on category
+        if (!empty($release->imdbid) && $release->imdbid > 0) {
+            $coverType = 'movies';
+            $coverId = str_pad($release->imdbid, 7, '0', STR_PAD_LEFT);
+        } elseif (!empty($release->musicinfo_id)) {
+            $coverType = 'music';
+            $coverId = $release->musicinfo_id;
+        } elseif (!empty($release->consoleinfo_id)) {
+            $coverType = 'console';
+            $coverId = $release->consoleinfo_id;
+        } elseif (!empty($release->bookinfo_id)) {
+            $coverType = 'book';
+            $coverId = $release->bookinfo_id;
+        } elseif (!empty($release->gamesinfo_id)) {
+            $coverType = 'games';
+            $coverId = $release->gamesinfo_id;
+        } elseif (!empty($release->xxxinfo_id)) {
+            $coverType = 'xxx';
+            $coverId = $release->xxxinfo_id;
+        } elseif (!empty($release->anidbid)) {
+            $coverType = 'anime';
+            $coverId = $release->anidbid;
         }
+
+        // Check if cover file exists
+        if ($coverType && $coverId) {
+            $coverFile = storage_path("covers/{$coverType}/{$coverId}-cover.jpg");
+            if (file_exists($coverFile)) {
+                // Return URL to access the cover image
+                return asset("storage/covers/{$coverType}/{$coverId}-cover.jpg");
+            }
+        }
+
+        // Return placeholder image if no cover found
+        return asset('assets/images/no-cover.png');
+    }
+}
+
+if (! function_exists('sanitize')) {
+    function sanitize(array|string $phrases, array $doNotSanitize = []): string
+    {
+        if (! is_array($phrases)) {
+            $wordArray = explode(' ', str_replace('.', ' ', $phrases));
+        } else {
+            $wordArray = $phrases;
+        }
+
+        $keywords = [];
+        $tempWords = [];
+        foreach ($wordArray as $words) {
+            $words = preg_split('/\s+/', $words);
+            foreach ($words as $st) {
+                if (Str::startsWith($st, ['!', '+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
+                    $str = $st;
+                } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
+                    $str = $st;
+                } else {
+                    $str = Sanitizer::escape($st, $doNotSanitize);
+                }
+                $tempWords[] = $str;
+            }
+
+            $keywords = $tempWords;
+        }
+
+        return implode(' ', $keywords);
     }
 }

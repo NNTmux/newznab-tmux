@@ -107,6 +107,7 @@ Route::middleware('isVerified')->group(function () {
     });
 
     Route::match(['GET', 'POST'], 'details/{guid}', [DetailsController::class, 'show'])->name('details');
+    Route::match(['GET', 'POST'], 'getnzb/{guid}', [GetNzbController::class, 'getNzb'])->name('getnzb.guid');
     Route::match(['GET', 'POST'], 'getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
     Route::match(['GET', 'POST'], 'rsshelp', [RssController::class, 'showRssDesc'])->name('rsshelp');
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');

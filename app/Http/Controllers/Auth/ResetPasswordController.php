@@ -41,61 +41,40 @@ class ResetPasswordController extends Controller
     /**
      * @throws \Exception
      */
-    public function reset(Request $request): void
+    public function reset(Request $request)
     {
-        $error = '';
-        $confirmed = '';
-        $onscreen = '';
         if ($request->missing('guid')) {
-            $error = 'No reset code provided.';
+            return redirect()->route('password.request')->withErrors(['error' => 'No reset code provided.']);
         }
 
-        if ($error === '') {
-            $ret = User::getByPassResetGuid($request->input('guid'));
-            if ($ret === null) {
-                $error = 'Bad reset code provided.';
-            } else {
-                // Check if user is soft deleted
-                $user = User::withTrashed()->find($ret['id']);
-                if ($user && $user->trashed()) {
-                    $error = 'This account has been deactivated.';
-                } else {
-                    //
-                    // reset the password, inform the user, send out the email
-                    //
-                    User::updatePassResetGuid($ret['id'], '');
-                    $newpass = User::generatePassword();
-                    User::updatePassword($ret['id'], $newpass);
-
-                    $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
-                    SendPasswordResetEmail::dispatch($ret, $newpass);
-                    $confirmed = true;
-                }
-            }
+        $ret = User::getByPassResetGuid($request->input('guid'));
+        if ($ret === null) {
+            return redirect()->route('password.request')->withErrors(['error' => 'Bad reset code provided.']);
         }
 
-        $theme = 'Gentele';
+        // Check if user is soft deleted
+        $user = User::withTrashed()->find($ret['id']);
+        if ($user && $user->trashed()) {
+            return redirect()->route('password.request')->withErrors(['error' => 'This account has been deactivated.']);
+        }
 
-        $title = 'Forgotten Password';
-        $meta_title = 'Forgotten Password';
-        $meta_keywords = 'forgotten,password,signup,registration';
-        $meta_description = 'Forgotten Password';
+        // Reset the password, inform the user, send out the email
+        User::updatePassResetGuid($ret['id'], '');
+        $newpass = User::generatePassword();
+        User::updatePassword($ret['id'], $newpass);
 
-        $content = app('smarty.view')->fetch($theme.'/forgottenpassword.tpl');
+        SendPasswordResetEmail::dispatch($ret, $newpass);
 
-        app('smarty.view')->assign(
-            [
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-                'email' => $ret['email'] ?? '',
-                'confirmed' => $confirmed,
-                'error' => $error,
-                'notice' => $onscreen,
-            ]
-        );
-        app('smarty.view')->display($theme.'/basepage.tpl');
+        return redirect()->route('login')
+            ->with('message', 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.')
+            ->with('message_type', 'success');
+    }
+
+    public function showResetForm(Request $request, $token = null)
+    {
+        return view('auth.passwords.reset')->with([
+            'token' => $token,
+            'email' => $request->email
+        ]);
     }
 }

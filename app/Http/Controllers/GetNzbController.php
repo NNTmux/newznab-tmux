@@ -16,9 +16,14 @@ class GetNzbController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function getNzb(Request $request)
+    public function getNzb(Request $request, $guid = null)
     {
         $this->setPreferences();
+
+        // If guid is passed as URL parameter, merge it into request as 'id'
+        if ($guid !== null && !$request->has('id')) {
+            $request->merge(['id' => $guid]);
+        }
 
         // Page is accessible only by the rss token, or logged in users.
         if ($request->user()) {

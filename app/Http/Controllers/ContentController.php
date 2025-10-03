@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ContentController extends BasePageController
 {
     /**
-     * @return \Illuminate\Http\JsonResponse|void
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
@@ -31,7 +31,7 @@ class ContentController extends BasePageController
          *
          * Admins and mods should be the only ones to see admin content.
          */
-        $this->smarty->assign('admin', (($role === 2 || $role === 4) ? 'true' : 'false'));
+        $isAdmin = ($role === 2 || $role === 4);
 
         $contentId = 0;
         if ($request->has('id')) {
@@ -45,20 +45,20 @@ class ContentController extends BasePageController
 
         if ($contentId === 0 && $contentPage === 'content') {
             $content = $contents->getAllButFront();
-            $this->smarty->assign('front', false);
+            $isFront = false;
             $meta_title = 'Contents page';
             $meta_keywords = 'contents';
             $meta_description = 'This is the contents page.';
         } elseif ($contentId !== 0 && $contentPage !== false) {
             $content = [$contents->getByID($contentId, $role)];
-            $this->smarty->assign('front', false);
+            $isFront = false;
             $meta_title = 'Contents page';
             $meta_keywords = 'contents';
             $meta_description = 'This is the contents page.';
         } else {
             $content = $contents->getFrontPage();
             $index = $contents->getIndex();
-            $this->smarty->assign('front', true);
+            $isFront = true;
             $meta_title = $index->title ?? 'Contents page';
             $meta_keywords = $index->metakeyword ?? 'contents';
             $meta_description = $index->metadescription ?? 'This is the contents page.';
@@ -68,10 +68,15 @@ class ContentController extends BasePageController
             return response()->json(['message' => 'There is nothing to see here, no content provided.'], 404);
         }
 
-        $this->smarty->assign('content', $content);
+        $this->viewData = array_merge($this->viewData, [
+            'content' => $content,
+            'admin' => $isAdmin,
+            'front' => $isFront,
+            'meta_title' => $meta_title,
+            'meta_keywords' => $meta_keywords,
+            'meta_description' => $meta_description,
+        ]);
 
-        $content = $this->smarty->fetch('content.tpl');
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
+        return view('content.index', $this->viewData);
     }
 }

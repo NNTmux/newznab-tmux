@@ -126,36 +126,38 @@ class DetailsController extends BasePageController
 
             $releasefiles = ReleaseFile::getReleaseFiles($data['id']);
 
-            $this->smarty->assign('releasefiles', $releasefiles);
-            $this->smarty->assign('release', $data);
-            $this->smarty->assign('reVideo', $reVideo);
-            $this->smarty->assign('reAudio', $reAudio);
-            $this->smarty->assign('reSubs', $reSubs);
-            $this->smarty->assign('nfo', $nfo);
-            $this->smarty->assign('show', $showInfo);
-            $this->smarty->assign('movie', $mov);
-            $this->smarty->assign('xxx', $xxx);
-            $this->smarty->assign('anidb', $AniDBAPIArray);
-            $this->smarty->assign('music', $mus);
-            $this->smarty->assign('con', $con);
-            $this->smarty->assign('game', $game);
-            $this->smarty->assign('book', $book);
-            $this->smarty->assign('predb', $pre);
-            $this->smarty->assign('comments', $comments);
-            $this->smarty->assign('searchname', getSimilarName($data['searchname']));
-            $this->smarty->assign('similars', $similars !== false ? $similars : []);
-            $this->smarty->assign('privateprofiles', config('nntmux_settings.private_profiles'));
-            $this->smarty->assign('failed', $failed);
-            $this->smarty->assign('regex', $releaseRegex);
-            $this->smarty->assign('downloadedby', $downloadedBy);
+            $this->viewData = array_merge($this->viewData, [
+                'releasefiles' => $releasefiles,
+                'release' => $data,
+                'reVideo' => $reVideo,
+                'reAudio' => $reAudio,
+                'reSubs' => $reSubs,
+                'nfo' => $nfo,
+                'show' => $showInfo,
+                'movie' => $mov,
+                'xxx' => $xxx,
+                'anidb' => $AniDBAPIArray,
+                'music' => $mus,
+                'con' => $con,
+                'game' => $game,
+                'book' => $book,
+                'predb' => $pre,
+                'comments' => $comments,
+                'files' => $releasefiles,
+                'searchname' => getSimilarName($data['searchname']),
+                'similars' => $similars !== false ? $similars : [],
+                'privateprofiles' => config('nntmux_settings.private_profiles'),
+                'failed' => $failed,
+                'regex' => $releaseRegex,
+                'downloadedby' => $downloadedBy,
+                'meta_title' => 'View NZB',
+                'meta_keywords' => 'view,nzb,description,details',
+                'meta_description' => 'View NZB for '.$data['searchname'],
+            ]);
 
-            $meta_title = 'View NZB';
-            $meta_keywords = 'view,nzb,description,details';
-            $meta_description = 'View NZB for'.$data['searchname'];
-
-            $content = $this->smarty->fetch('viewnzb.tpl');
-            $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-            $this->pagerender();
+            return view('details.index', $this->viewData);
         }
+
+        return redirect()->back()->with('error', 'Release not found');
     }
 }
