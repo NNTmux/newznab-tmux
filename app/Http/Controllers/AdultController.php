@@ -12,7 +12,7 @@ class AdultController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request, string $id = ''): void
+    public function show(Request $request, string $id = '')
     {
         $this->setPreferences();
         $adult = new XXX;
@@ -37,10 +37,6 @@ class AdultController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $this->smarty->assign('catlist', $mtmp);
-        $this->smarty->assign('category', $category);
-        $this->smarty->assign('categorytitle', $id);
-
         $ordering = $adult->getXXXOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
@@ -58,54 +54,51 @@ class AdultController extends BasePageController
         }
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
-        $this->smarty->assign('title', stripslashes($title));
 
         $actors = ($request->has('actors') && ! empty($request->input('actors'))) ? stripslashes($request->input('actors')) : '';
-        $this->smarty->assign('actors', $actors);
 
         $director = ($request->has('director') && ! empty($request->input('director'))) ? stripslashes($request->input('director')) : '';
-        $this->smarty->assign('director', $director);
 
         $genres = $adult->getAllGenres(true);
         $genre = ($request->has('genre') && \in_array($request->input('genre'), $genres, false)) ? $request->input('genre') : '';
-        $this->smarty->assign('genres', $genres);
-        $this->smarty->assign('genre', $genre);
 
-        $browseby_link = '&amp;title='.$title.'&amp;actors='.$actors.'&amp;director='.$director.'&amp;genre='.$genre;
+        $browseby_link = '&title='.$title.'&actors='.$actors.'&director='.$director.'&genre='.$genre;
 
         if ((int) $category === -1) {
-            $this->smarty->assign('catname', 'All');
+            $catname = 'All';
         } else {
             $cdata = Category::find($category);
             if ($cdata !== null) {
-                $this->smarty->assign('catname', $cdata);
+                $catname = $cdata->title;
             } else {
-                $this->smarty->assign('catname', 'All');
+                $catname = 'All';
             }
         }
 
+        // Build order by URLs
+        $orderByUrls = [];
         foreach ($ordering as $ordertype) {
-            $this->smarty->assign('orderby'.$ordertype, url('/xxx?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0'));
+            $orderByUrls['orderby'.$ordertype] = url('/XXX/' . ($id ?: 'All') . '?t='.$category.$browseby_link.'&ob='.$ordertype.'&offset=0');
         }
 
-        $this->smarty->assign(
-            [
-                'resultsadd' => $movies,
-                'results' => $results,
-                'covgroup' => 'xxx',
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, [
+            'catlist' => $mtmp,
+            'category' => $category,
+            'categorytitle' => $id,
+            'catname' => $catname,
+            'title' => stripslashes($title),
+            'actors' => $actors,
+            'director' => $director,
+            'genres' => $genres,
+            'genre' => $genre,
+            'resultsadd' => $movies,
+            'results' => $results,
+            'covgroup' => 'xxx',
+            'meta_title' => 'Browse XXX',
+            'meta_keywords' => 'browse,xxx,nzb,description,details',
+            'meta_description' => 'Browse for XXX Movies',
+        ], $orderByUrls);
 
-        $meta_title = 'Browse XXX';
-        $meta_keywords = 'browse,xxx,nzb,description,details';
-        $meta_description = 'Browse for XXX Movies';
-
-        if ($request->has('id')) {
-            $content = $this->smarty->fetch('viewxxxfull.tpl');
-        } else {
-            $content = $this->smarty->fetch('xxx.tpl');
-        }
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
+        return view('xxx.index', $this->viewData);
     }
 }

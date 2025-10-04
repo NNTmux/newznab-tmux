@@ -12,7 +12,7 @@ class GamesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request): void
+    public function show(Request $request)
     {
         $this->setPreferences();
         $games = new Games(['Settings' => $this->settings]);
@@ -31,9 +31,6 @@ class GamesController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $this->smarty->assign('catlist', $ctmp);
-        $this->smarty->assign('category', $category);
-
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $ordering = $games->getGamesOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
@@ -42,7 +39,6 @@ class GamesController extends BasePageController
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
-        $this->smarty->assign('title', $title);
 
         $genres = $gen->getGenres(Genres::GAME_TYPE, true);
         $tmpgnr = [];
@@ -53,35 +49,42 @@ class GamesController extends BasePageController
         $years = range(1903, date('Y') + 1);
         rsort($years);
         $year = ($request->has('year') && \in_array($request->input('year'), $years, false)) ? $request->input('year') : '';
-        $this->smarty->assign('years', $years);
-        $this->smarty->assign('year', $year);
 
         $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
-        $this->smarty->assign('genres', $genres);
-        $this->smarty->assign('genre', $genre);
 
         if ((int) $category === -1) {
-            $this->smarty->assign('catname', 'All');
+            $catname = 'All';
         } else {
             $cdata = Category::find($category);
             if ($cdata !== null) {
-                $this->smarty->assign('catname', $cdata);
+                $catname = $cdata->title;
             } else {
-                $this->smarty->assign('catname', 'All');
+                $catname = 'All';
             }
         }
 
-        $this->smarty->assign('results', $results);
-        $this->smarty->assign('covgroup', 'games');
+        // Build order by URLs
+        $orderByUrls = [];
+        foreach ($ordering as $orderType) {
+            $orderByUrls['orderby'.$orderType] = url('Games?ob='.$orderType);
+        }
 
-        $meta_title = 'Browse Games';
-        $meta_keywords = 'browse,nzb,games,description,details';
-        $meta_description = 'Browse for Games';
+        $this->viewData = array_merge($this->viewData, [
+            'catlist' => $ctmp,
+            'category' => $category,
+            'catname' => $catname,
+            'title' => $title,
+            'genres' => $genres,
+            'genre' => $genre,
+            'years' => $years,
+            'year' => $year,
+            'results' => $results,
+            'covgroup' => 'games',
+            'meta_title' => 'Browse Games',
+            'meta_keywords' => 'browse,nzb,games,description,details',
+            'meta_description' => 'Browse for Games',
+        ], $orderByUrls);
 
-        $content = $this->smarty->fetch('games.tpl');
-        $this->smarty->assign(
-            compact('content', 'meta_title', 'meta_keywords', 'meta_description')
-        );
-        $this->pagerender();
+        return view('games.index', $this->viewData);
     }
 }

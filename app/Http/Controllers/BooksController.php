@@ -12,7 +12,7 @@ class BooksController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request, string $id = ''): void
+    public function index(Request $request, string $id = '')
     {
         $this->setPreferences();
         $book = new Books(['Settings' => $this->settings]);
@@ -39,10 +39,6 @@ class BooksController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $this->smarty->assign('catlist', $btmp);
-        $this->smarty->assign('category', $category);
-        $this->smarty->assign('categorytitle', $id);
-
         $ordering = $book->getBookOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
@@ -64,42 +60,43 @@ class BooksController extends BasePageController
         }
 
         $author = ($request->has('author') && ! empty($request->input('author'))) ? stripslashes($request->input('author')) : '';
-        $this->smarty->assign('author', $author);
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
-        $this->smarty->assign('title', $title);
 
-        $browseby_link = '&amp;title='.$title.'&amp;author='.$author;
+        $browseby_link = '&title='.$title.'&author='.$author;
 
         if ((int) $category === -1) {
-            $this->smarty->assign('catname', 'All');
+            $catname = 'All';
         } else {
             $cdata = Category::find($category);
             if ($cdata !== null) {
-                $this->smarty->assign('catname', $cdata);
+                $catname = $cdata->title;
             } else {
-                $this->smarty->assign('catname', 'All');
+                $catname = 'All';
             }
         }
 
+        // Build order by URLs
+        $orderByUrls = [];
         foreach ($ordering as $ordertype) {
-            $this->smarty->assign('orderby'.$ordertype, url('/books?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0'));
+            $orderByUrls['orderby'.$ordertype] = url('/Books/' . ($id ?: 'All') . '?t='.$category.$browseby_link.'&ob='.$ordertype.'&offset=0');
         }
 
-        $this->smarty->assign(
-            [
-                'resultsadd' => $books,
-                'results' => $results,
-                'covgroup' => 'books',
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, [
+            'catlist' => $btmp,
+            'category' => $category,
+            'categorytitle' => $id,
+            'catname' => $catname,
+            'author' => $author,
+            'title' => $title,
+            'resultsadd' => $books,
+            'results' => $results,
+            'covgroup' => 'books',
+            'meta_title' => 'Browse Books',
+            'meta_keywords' => 'browse,nzb,books,description,details',
+            'meta_description' => 'Browse for Books',
+        ], $orderByUrls);
 
-        $meta_title = 'Browse Books';
-        $meta_keywords = 'browse,nzb,books,description,details';
-        $meta_description = 'Browse for Books';
-        $content = $this->smarty->fetch('books.tpl');
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-
-        $this->pagerender();
+        return view('books.index', $this->viewData);
     }
 }

@@ -13,7 +13,7 @@ class MusicController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request, string $id = ''): void
+    public function show(Request $request, string $id = '')
     {
         $this->setPreferences();
         $music = new Music(['Settings' => $this->settings]);
@@ -41,10 +41,6 @@ class MusicController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $this->smarty->assign('catlist', $mtmp);
-        $this->smarty->assign('category', $category);
-        $this->smarty->assign('categorytitle', $id);
-
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $ordering = $music->getMusicOrdering();
@@ -55,10 +51,8 @@ class MusicController extends BasePageController
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $artist = ($request->has('artist') && ! empty($request->input('artist'))) ? stripslashes($request->input('artist')) : '';
-        $this->smarty->assign('artist', $artist);
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
-        $this->smarty->assign('title', $title);
 
         $genres = $gen->getGenres(Genres::MUSIC_TYPE, true);
         $tmpgnr = [];
@@ -73,42 +67,47 @@ class MusicController extends BasePageController
         }
 
         $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
-        $this->smarty->assign('genres', $genres);
-        $this->smarty->assign('genre', $genre);
 
         $years = range(1950, date('Y') + 1);
         rsort($years);
         $year = ($request->has('year') && \in_array($request->input('year'), $years, false)) ? $request->input('year') : '';
-        $this->smarty->assign('years', $years);
-        $this->smarty->assign('year', $year);
 
         if ((int) $category === -1) {
-            $this->smarty->assign('catname', 'All');
+            $catname = 'All';
         } else {
             $cdata = Category::find($category);
             if ($cdata !== null) {
-                $this->smarty->assign('catname', $cdata);
+                $catname = $cdata->title;
             } else {
-                $this->smarty->assign('catname', 'All');
+                $catname = 'All';
             }
         }
 
-        $this->smarty->assign(
-            [
-                'resultsadd' => $musics,
-                'results' => $results,
-                'covgroup' => 'music',
-            ]
-        );
+        // Build order by URLs
+        $orderByUrls = [];
+        foreach ($ordering as $orderType) {
+            $orderByUrls['orderby'.$orderType] = url('music/' . ($id ?: 'All') . '?ob='.$orderType);
+        }
 
-        $meta_title = 'Browse Albums';
-        $meta_keywords = 'browse,nzb,albums,description,details';
-        $meta_description = 'Browse for Albums';
+        $this->viewData = array_merge($this->viewData, [
+            'catlist' => $mtmp,
+            'category' => $category,
+            'categorytitle' => $id,
+            'catname' => $catname,
+            'artist' => $artist,
+            'title' => $title,
+            'genres' => $genres,
+            'genre' => $genre,
+            'years' => $years,
+            'year' => $year,
+            'resultsadd' => $musics,
+            'results' => $results,
+            'covgroup' => 'music',
+            'meta_title' => 'Browse Albums',
+            'meta_keywords' => 'browse,nzb,albums,description,details',
+            'meta_description' => 'Browse for Albums',
+        ], $orderByUrls);
 
-        $content = $this->smarty->fetch('music.tpl');
-
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-
-        $this->pagerender();
+        return view('music.index', $this->viewData);
     }
 }
