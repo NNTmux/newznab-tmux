@@ -13,7 +13,7 @@ class AdminBlacklistController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index()
     {
         $this->setAdminPrefs();
         $svc = new BlacklistService;
@@ -21,11 +21,14 @@ class AdminBlacklistController extends BasePageController
         $meta_title = $title = 'Binary Black/White List';
 
         $binlist = $svc->getBlacklist(false);
-        $this->smarty->assign('binlist', $binlist);
 
-        $content = $this->smarty->fetch('binaryblacklist-list.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        $this->viewData = array_merge($this->viewData, [
+            'binlist' => $binlist,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
+
+        return view('admin.binaryblacklist-list', $this->viewData);
     }
 
     /**
@@ -89,25 +92,23 @@ class AdminBlacklistController extends BasePageController
                 break;
         }
 
-        $this->smarty->assign(
-            [
-                'error' => $error,
-                'regex' => $regex,
-                'status_ids' => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE],
-                'status_names' => ['Yes', 'No'],
-                'optype_ids' => [1, 2],
-                'optype_names' => ['Black', 'White'],
-                'msgcol_ids' => [
-                    Binaries::BLACKLIST_FIELD_SUBJECT,
-                    Binaries::BLACKLIST_FIELD_FROM,
-                    Binaries::BLACKLIST_FIELD_MESSAGEID,
-                ],
-                'msgcol_names' => ['Subject', 'Poster', 'MessageId'],
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, [
+            'error' => $error,
+            'regex' => (object) $regex,
+            'status_ids' => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE],
+            'status_names' => ['Yes', 'No'],
+            'optype_ids' => [1, 2],
+            'optype_names' => ['Black', 'White'],
+            'msgcol_ids' => [
+                Binaries::BLACKLIST_FIELD_SUBJECT,
+                Binaries::BLACKLIST_FIELD_FROM,
+                Binaries::BLACKLIST_FIELD_MESSAGEID,
+            ],
+            'msgcol_names' => ['Subject', 'Poster', 'MessageId'],
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
 
-        $content = $this->smarty->fetch('binaryblacklist-edit.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        return view('admin.binaryblacklist-edit', $this->viewData);
     }
 }

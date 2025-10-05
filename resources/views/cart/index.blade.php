@@ -14,10 +14,6 @@
     </div>
 
     <div class="px-6 py-4">
-        <!-- Test Modal Button (remove after testing) -->
-        <button id="test-modal-btn" class="mb-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
-            Test Modal (Click Me)
-        </button>
 
         <!-- RSS Feed Alert -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start">
@@ -56,7 +52,9 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left" style="width: 30px">
-                                    <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+                                    </label>
                                 </th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Added</th>
@@ -142,7 +140,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@push('styles')
 <style>
 /* Confirmation Modal Styles */
 .confirmation-modal {
@@ -258,7 +256,9 @@
     }
 }
 </style>
+@endpush
 
+@push('scripts')
 <script>
 console.log('Script tag loaded');
 
@@ -335,31 +335,49 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('keydown', escHandler);
     }
 
-    // Check all checkbox
+    // Check all checkbox functionality
     const checkAll = document.getElementById('check-all');
     const checkboxes = document.querySelectorAll('.cart-checkbox');
 
-    // Test modal button
-    const testModalBtn = document.getElementById('test-modal-btn');
-    if (testModalBtn) {
-        testModalBtn.addEventListener('click', function() {
-            console.log('Test button clicked!');
-            showConfirmation(
-                'This is a <strong>test modal</strong>. If you can see this, the modal is working correctly!',
-                function() {
-                    alert('You clicked the Delete button!');
-                }
-            );
+    console.log('Check-all element:', checkAll);
+    console.log('Found checkboxes:', checkboxes.length);
+
+    // Function to update the check-all checkbox state
+    function updateCheckAllState() {
+        if (!checkAll || checkboxes.length === 0) return;
+
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        checkAll.checked = checkedCount === checkboxes.length;
+        checkAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+        console.log('Check-all state updated:', { checkedCount, total: checkboxes.length, checked: checkAll.checked });
+    }
+
+    // Handle check-all checkbox change
+    if (checkAll) {
+        console.log('Setting up check-all listener');
+
+        checkAll.addEventListener('change', function() {
+            console.log('Check-all changed, new state:', this.checked);
+            const isChecked = this.checked;
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+
+            console.log('Updated all checkboxes to:', isChecked);
         });
     }
 
-    if (checkAll) {
-        checkAll.addEventListener('change', function() {
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
+    // Handle individual checkbox changes
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            console.log('Individual checkbox changed');
+            updateCheckAllState();
         });
-    }
+    });
+
+    // Initialize the check-all state on page load
+    updateCheckAllState();
 
     // Download selected
     document.querySelectorAll('.nzb_multi_operations_download_cart').forEach(btn => {

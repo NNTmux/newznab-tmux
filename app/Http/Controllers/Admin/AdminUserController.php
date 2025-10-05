@@ -17,7 +17,7 @@ class AdminUserController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function index(Request $request): void
+    public function index(Request $request)
     {
         $this->setAdminPrefs();
 
@@ -64,30 +64,29 @@ class AdminUserController extends BasePageController
             $user->country_code = $position ? $position->countryCode : null;
         }
 
-        $this->smarty->assign(
-            [
-                'username' => $variables['username'],
-                'email' => $variables['email'],
-                'host' => $variables['host'],
-                'role' => $variables['role'],
-                'role_ids' => array_keys($roles),
-                'role_names' => $roles,
-                'userlist' => $results,
-            ]
-        );
-
+        // Build order by URLs
+        $orderByUrls = [];
         foreach ($ordering as $orderType) {
-            $this->smarty->assign('orderby'.$orderType, url('admin/user-list?ob='.$orderType));
+            $orderByUrls['orderby'.$orderType] = url('admin/user-list?ob='.$orderType);
         }
 
-        $content = $this->smarty->fetch('user-list.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
+        $this->viewData = array_merge($this->viewData, [
+            'username' => $variables['username'],
+            'email' => $variables['email'],
+            'host' => $variables['host'],
+            'role' => $variables['role'],
+            'role_ids' => array_keys($roles),
+            'role_names' => $roles,
+            'userlist' => $results,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ], $orderByUrls);
 
-        $this->adminrender();
+        return view('admin.user-list', $this->viewData);
     }
 
     /**
-     * @return RedirectResponse|void
+     * @return RedirectResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
@@ -123,6 +122,8 @@ class AdminUserController extends BasePageController
             }
         }
 
+        $error = null;
+
         switch ($action) {
             case 'add':
                 $user += [
@@ -136,7 +137,6 @@ class AdminUserController extends BasePageController
                     'gameview' => 0,
                     'bookview' => 0,
                 ];
-                $this->smarty->assign('user', $user);
                 break;
             case 'submit':
                 if (empty($request->input('id'))) {
@@ -147,7 +147,6 @@ class AdminUserController extends BasePageController
                         }
                     }
                     $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'), false);
-                    $this->smarty->assign('role', $request->input('role'));
                 } else {
                     $editedUser = User::find($request->input('id'));
                     $ret = User::updateUser($editedUser->id, $request->input('username'), $request->input('email'), $request->input('grabs'), $request->input('role'), $request->input('notes'), $request->input('invites'), ($request->has('movieview') ? 1 : 0), ($request->has('musicview') ? 1 : 0), ($request->has('gameview') ? 1 : 0), ($request->has('xxxview') ? 1 : 0), ($request->has('consoleview') ? 1 : 0), ($request->has('bookview') ? 1 : 0));
@@ -169,22 +168,22 @@ class AdminUserController extends BasePageController
 
                 switch ($ret) {
                     case User::ERR_SIGNUP_BADUNAME:
-                        $this->smarty->assign('error', 'Bad username. Try a better one.');
+                        $error = 'Bad username. Try a better one.';
                         break;
                     case User::ERR_SIGNUP_BADPASS:
-                        $this->smarty->assign('error', 'Bad password. Try a longer one.');
+                        $error = 'Bad password. Try a longer one.';
                         break;
                     case User::ERR_SIGNUP_BADEMAIL:
-                        $this->smarty->assign('error', 'Bad email.');
+                        $error = 'Bad email.';
                         break;
                     case User::ERR_SIGNUP_UNAMEINUSE:
-                        $this->smarty->assign('error', 'Username in use.');
+                        $error = 'Username in use.';
                         break;
                     case User::ERR_SIGNUP_EMAILINUSE:
-                        $this->smarty->assign('error', 'Email in use.');
+                        $error = 'Email in use.';
                         break;
                     default:
-                        $this->smarty->assign('error', 'Unknown save error.');
+                        $error = 'Unknown save error.';
                         break;
                 }
                 $user += [
@@ -194,7 +193,6 @@ class AdminUserController extends BasePageController
                     'role' => $request->input('role'),
                     'notes' => $request->input('notes'),
                 ];
-                $this->smarty->assign('user', $user);
                 break;
             case 'view':
             default:
@@ -202,25 +200,23 @@ class AdminUserController extends BasePageController
                     $title = 'User Edit';
                     $id = $request->input('id');
                     $user = User::find($id);
-
-                    $this->smarty->assign('user', $user);
                 }
 
                 break;
         }
 
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['Yes', 'No']);
+        $this->viewData = array_merge($this->viewData, [
+            'yesno_ids' => [1, 0],
+            'yesno_names' => ['Yes', 'No'],
+            'role_ids' => array_keys($roles),
+            'role_names' => $roles,
+            'user' => $user,
+            'error' => $error,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
 
-        $this->smarty->assign('role_ids', array_keys($roles));
-        $this->smarty->assign('role_names', $roles);
-        $this->smarty->assign('user', $user);
-
-        $content = $this->smarty->fetch('user-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.user-edit', $this->viewData);
     }
 
     public function destroy(Request $request): RedirectResponse

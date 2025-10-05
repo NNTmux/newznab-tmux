@@ -11,7 +11,7 @@ class AdminTmuxController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function edit(Request $request): void
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
 
@@ -21,51 +21,50 @@ class AdminTmuxController extends BasePageController
         switch ($action) {
             case 'submit':
                 Settings::settingsUpdate($request->all());
-                $meta_title = $title = 'Tmux Settings Edit';
-                $this->smarty->assign('site', $this->settings);
-                break;
+
+                return redirect()->to('admin/tmux-edit')->with('success', 'Tmux settings updated successfully');
 
             case 'view':
             default:
-                $meta_title = $title = 'Tmux Settings Edit';
-                $this->smarty->assign('site', $this->settings);
                 break;
         }
 
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['yes', 'no']);
+        $meta_title = $title = 'Tmux Settings Edit';
 
-        $this->smarty->assign('backfill_ids', [0, 4, 1]);
-        $this->smarty->assign('backfill_names', ['Disabled', 'Safe', 'All']);
-        $this->smarty->assign('backfill_group_ids', [1, 2, 3, 4, 5, 6]);
-        $this->smarty->assign('backfill_group', ['Newest', 'Oldest', 'Alphabetical', 'Alphabetical - Reverse', 'Most Posts', 'Fewest Posts']);
-        $this->smarty->assign('backfill_days', ['Days per Group', 'Safe Backfill day']);
-        $this->smarty->assign('backfill_days_ids', [1, 2]);
-        $this->smarty->assign('dehash_ids', [0, 1]);
-        $this->smarty->assign('dehash_names', ['Disabled', 'Enabled']);
-        $this->smarty->assign('import_ids', [0, 1, 2]);
-        $this->smarty->assign('import_names', ['Disabled', 'Import - Do Not Use Filenames', 'Import - Use Filenames']);
-        $this->smarty->assign('releases_ids', [0, 1]);
-        $this->smarty->assign('releases_names', ['Disabled', 'Update Releases']);
-        $this->smarty->assign('post_ids', [0, 1, 2, 3]);
-        $this->smarty->assign('post_names', ['Disabled', 'PostProcess Additional', 'PostProcess NFOs', 'All']);
-        $this->smarty->assign('fix_crap_radio_ids', ['Disabled', 'All', 'Custom']);
-        $this->smarty->assign('fix_crap_radio_names', ['Disabled', 'All', 'Custom']);
-        $this->smarty->assign('fix_crap_check_ids', ['blacklist', 'blfiles', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'huge', 'nzb', 'codec']);
-        $this->smarty->assign('fix_crap_check_names', ['blacklist', 'blfiles', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'huge', 'nzb', 'codec']);
-        $this->smarty->assign('sequential_ids', [0, 1]);
-        $this->smarty->assign('sequential_names', ['Disabled', 'Enabled']);
-        $this->smarty->assign('binaries_ids', [0, 1]);
-        $this->smarty->assign('binaries_names', ['Disabled', 'Enabled']);
-        $this->smarty->assign('lookup_reqids_ids', [0, 1, 2]);
-        $this->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded']);
-        $this->smarty->assign('predb_ids', [0, 1]);
-        $this->smarty->assign('predb_names', ['Disabled', 'Enabled']);
+        $this->viewData = array_merge($this->viewData, [
+            'site' => $this->settings,
+            'yesno_ids' => [1, 0],
+            'yesno_names' => ['yes', 'no'],
+            'backfill_ids' => [0, 4, 1],
+            'backfill_names' => ['Disabled', 'Safe', 'All'],
+            'backfill_group_ids' => [1, 2, 3, 4, 5, 6],
+            'backfill_group' => ['Newest', 'Oldest', 'Alphabetical', 'Alphabetical - Reverse', 'Most Posts', 'Fewest Posts'],
+            'backfill_days' => ['Days per Group', 'Safe Backfill day'],
+            'backfill_days_ids' => [1, 2],
+            'dehash_ids' => [0, 1],
+            'dehash_names' => ['Disabled', 'Enabled'],
+            'import_ids' => [0, 1, 2],
+            'import_names' => ['Disabled', 'Import - Do Not Use Filenames', 'Import - Use Filenames'],
+            'releases_ids' => [0, 1],
+            'releases_names' => ['Disabled', 'Update Releases'],
+            'post_ids' => [0, 1, 2, 3],
+            'post_names' => ['Disabled', 'PostProcess Additional', 'PostProcess NFOs', 'All'],
+            'fix_crap_radio_ids' => ['Disabled', 'All', 'Custom'],
+            'fix_crap_radio_names' => ['Disabled', 'All', 'Custom'],
+            'fix_crap_check_ids' => ['blacklist', 'blfiles', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'huge', 'nzb', 'codec'],
+            'fix_crap_check_names' => ['blacklist', 'blfiles', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'huge', 'nzb', 'codec'],
+            'sequential_ids' => [0, 1],
+            'sequential_names' => ['Disabled', 'Enabled'],
+            'binaries_ids' => [0, 1],
+            'binaries_names' => ['Disabled', 'Enabled'],
+            'lookup_reqids_ids' => [0, 1, 2],
+            'lookup_reqids_names' => ['Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'],
+            'predb_ids' => [0, 1],
+            'predb_names' => ['Disabled', 'Enabled'],
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
 
-        $content = $this->smarty->fetch('tmux-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.tmux-edit', $this->viewData);
     }
 }

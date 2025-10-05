@@ -80,7 +80,7 @@ class DeletedUsersController extends BasePageController
         $qsParams = $request->except(['ob', 'page']);
         $queryString = http_build_query(array_filter($qsParams, fn ($v) => $v !== '' && $v !== null));
 
-        $this->smarty->assign([
+        $this->viewData = array_merge($this->viewData, [
             'deletedusers' => $deletedUsers,
             'username' => $username,
             'email' => $email,
@@ -90,18 +90,14 @@ class DeletedUsersController extends BasePageController
             'created_to' => $createdTo,
             'deleted_from' => $deletedFrom,
             'deleted_to' => $deletedTo,
-            'csrf_token' => csrf_token(),
             'queryString' => $queryString,
+            'meta_title' => 'Deleted Users',
+            'meta_keywords' => 'view,deleted,users,softdeleted',
+            'meta_description' => 'View and restore soft-deleted user accounts',
+            'title' => 'Deleted Users',
         ]);
 
-        $meta_title = 'Deleted Users';
-        $meta_keywords = 'view,deleted,users,softdeleted';
-        $meta_description = 'View and restore soft-deleted user accounts';
-
-        $content = $this->smarty->fetch('deleted_users.tpl');
-        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
-
-        $this->adminrender();
+        return view('admin.deleted-users', $this->viewData);
     }
 
     /**

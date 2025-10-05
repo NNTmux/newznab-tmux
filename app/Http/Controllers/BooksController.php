@@ -79,7 +79,7 @@ class BooksController extends BasePageController
         // Build order by URLs
         $orderByUrls = [];
         foreach ($ordering as $ordertype) {
-            $orderByUrls['orderby'.$ordertype] = url('/Books/' . ($id ?: 'All') . '?t='.$category.$browseby_link.'&ob='.$ordertype.'&offset=0');
+            $orderByUrls['orderby'.$ordertype] = url('/Books/'.($id ?: 'All').'?t='.$category.$browseby_link.'&ob='.$ordertype.'&offset=0');
         }
 
         $this->viewData = array_merge($this->viewData, [

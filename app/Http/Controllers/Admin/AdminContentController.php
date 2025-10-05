@@ -13,23 +13,22 @@ class AdminContentController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index()
     {
         $this->setAdminPrefs();
         $contentList = (new Contents)->getAll();
-        $this->smarty->assign('contentlist', $contentList);
 
-        $meta_title = 'Content List';
+        $this->viewData = array_merge($this->viewData, [
+            'contentlist' => $contentList,
+            'meta_title' => 'Content List',
+            'title' => 'Content List',
+        ]);
 
-        $content = $this->smarty->fetch('content-list.tpl');
-
-        $this->smarty->assign(compact('meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.content-list', $this->viewData);
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      *
      * @throws \Exception
      */
@@ -73,7 +72,6 @@ class AdminContentController extends BasePageController
                 }
 
                 return redirect('admin/content-add?id='.$returnid);
-                break;
 
             case 'view':
             default:
@@ -86,25 +84,22 @@ class AdminContentController extends BasePageController
                 break;
         }
 
-        $this->smarty->assign('status_ids', [1, 0]);
-        $this->smarty->assign('status_names', ['Enabled', 'Disabled']);
-
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['Yes', 'No']);
-
         $contenttypelist = [1 => 'Useful Link', 2 => 'Article', 3 => 'Homepage'];
-        $this->smarty->assign('contenttypelist', $contenttypelist);
-
-        $this->smarty->assign('content', $content);
-
         $rolelist = [1 => 'Everyone', 2 => 'Logged in Users', 3 => 'Admins'];
-        $this->smarty->assign('rolelist', $rolelist);
 
-        $content = $this->smarty->fetch('content-add.tpl');
+        $this->viewData = array_merge($this->viewData, [
+            'status_ids' => [1, 0],
+            'status_names' => ['Enabled', 'Disabled'],
+            'yesno_ids' => [1, 0],
+            'yesno_names' => ['Yes', 'No'],
+            'contenttypelist' => $contenttypelist,
+            'content' => $content,
+            'rolelist' => $rolelist,
+            'meta_title' => $meta_title,
+            'title' => $meta_title,
+        ]);
 
-        $this->smarty->assign(compact('meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.content-add', $this->viewData);
     }
 
     public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application

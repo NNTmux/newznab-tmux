@@ -12,7 +12,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request): void
+    public function index(Request $request)
     {
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
@@ -24,15 +24,19 @@ class AdminReleaseNamingRegexesController extends BasePageController
             $group = $request->input('group');
         }
         $regex = $regexes->getRegex($group);
-        $this->smarty->assign('regex', $regex);
 
-        $content = $this->smarty->fetch('release_naming_regexes-list.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        $this->viewData = array_merge($this->viewData, [
+            'group' => $group,
+            'regex' => $regex,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
+
+        return view('admin.release-naming-regexes-list', $this->viewData);
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
@@ -43,16 +47,19 @@ class AdminReleaseNamingRegexesController extends BasePageController
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';
+        $error = '';
+        $regex = ['id' => '', 'group_regex' => '', 'regex' => '', 'description' => '', 'ordinal' => '', 'status' => 1];
+        $meta_title = $title = 'Release Naming Regex';
 
         switch ($action) {
             case 'submit':
                 if (empty($request->input('group_regex'))) {
-                    $this->smarty->assign('error', 'Group regex must not be empty!');
+                    $error = 'Group regex must not be empty!';
                     break;
                 }
 
                 if (empty($request->input('regex'))) {
-                    $this->smarty->assign('error', 'Regex cannot be empty');
+                    $error = 'Regex cannot be empty';
                     break;
                 }
 
@@ -61,7 +68,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
                 }
 
                 if (! is_numeric($request->input('ordinal')) || $request->input('ordinal') < 0) {
-                    $this->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
+                    $error = 'Ordinal must be a number, 0 or higher.';
                     break;
                 }
 
@@ -72,7 +79,6 @@ class AdminReleaseNamingRegexesController extends BasePageController
                 }
 
                 return redirect()->to('admin/release_naming_regexes-list');
-                break;
 
             case 'view':
             default:
@@ -87,21 +93,22 @@ class AdminReleaseNamingRegexesController extends BasePageController
                 break;
         }
 
-        $this->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE]);
-        $this->smarty->assign('status_names', ['Yes', 'No']);
-        $this->smarty->assign('regex', $regex);
+        $this->viewData = array_merge($this->viewData, [
+            'error' => $error,
+            'regex' => (object) $regex,
+            'status_ids' => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE],
+            'status_names' => ['Yes', 'No'],
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
 
-        $content = $this->smarty->fetch('release_naming_regexes-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.release-naming-regexes-edit', $this->viewData);
     }
 
     /**
      * @throws \Exception
      */
-    public function testRegex(Request $request): void
+    public function testRegex(Request $request)
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Release Naming Regex Test';
@@ -110,14 +117,22 @@ class AdminReleaseNamingRegexesController extends BasePageController
         $regex = trim($request->has('regex') && ! empty($request->input('regex')) ? $request->input('regex') : '');
         $showLimit = ($request->has('showlimit') && is_numeric($request->input('showlimit')) ? $request->input('showlimit') : 250);
         $queryLimit = ($request->has('querylimit') && is_numeric($request->input('querylimit')) ? $request->input('querylimit') : 100000);
-        $this->smarty->assign(['group' => $group, 'regex' => $regex, 'showlimit' => $showLimit, 'querylimit' => $queryLimit]);
 
+        $data = null;
         if ($group && $regex) {
-            $this->smarty->assign('data', (new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit));
+            $data = (new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit);
         }
 
-        $content = $this->smarty->fetch('release_naming_regexes-test.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        $this->viewData = array_merge($this->viewData, [
+            'group' => $group,
+            'regex' => $regex,
+            'showlimit' => $showLimit,
+            'querylimit' => $queryLimit,
+            'data' => $data,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
+
+        return view('admin.release-naming-regexes-test', $this->viewData);
     }
 }

@@ -9,8 +9,8 @@ class AdminPageController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index()
     {
-        $this->adminBasePage();
+        return $this->adminBasePage();
     }
 }

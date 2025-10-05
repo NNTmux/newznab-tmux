@@ -11,7 +11,7 @@ class AdminRoleController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index()
     {
         $this->setAdminPrefs();
 
@@ -20,19 +20,19 @@ class AdminRoleController extends BasePageController
         // get the user roles
         $userroles = Role::cursor()->remember();
 
-        $this->smarty->assign('userroles', $userroles);
+        $this->viewData = array_merge($this->viewData, [
+            'userroles' => $userroles,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
 
-        $content = $this->smarty->fetch('role-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.role-list', $this->viewData);
     }
 
     /**
      * @throws \Exception
      */
-    public function create(Request $request): void
+    public function create(Request $request)
     {
         $this->setAdminPrefs();
 
@@ -91,35 +91,35 @@ class AdminRoleController extends BasePageController
                 if ((int) $request->input('viewother') === 1) {
                     $role->givePermissionTo('view other');
                 }
-                redirect()->to('admin/role-list')->sendHeaders();
-                break;
+
+                return redirect()->to('admin/role-list');
             case 'view':
             default:
                 $meta_title = $title = 'Add User Role';
-                $role = [
-                ];
-
+                $role = [];
                 break;
         }
 
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['Yes', 'No']);
+        $this->viewData = array_merge($this->viewData, [
+            'yesno_ids' => [1, 0],
+            'yesno_names' => ['Yes', 'No'],
+            'title' => $title,
+            'meta_title' => $meta_title,
+            'role' => $role,
+        ]);
 
-        $content = $this->smarty->fetch('role-add.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content', 'role'));
-
-        $this->adminrender();
+        return view('admin.role-add', $this->viewData);
     }
 
     /**
      * @throws \Exception
      */
-    public function edit(Request $request): void
+    public function edit(Request $request)
     {
         $this->setAdminPrefs();
 
         $meta_title = $title = 'User Roles';
+        $role = null;
 
         // Get the user roles.
         $userRoles = Role::cursor()->remember();
@@ -209,28 +209,26 @@ class AdminRoleController extends BasePageController
                     $role->revokePermissionTo('view other');
                 }
 
-                $this->smarty->assign('role', $role);
-                redirect()->to('admin/role-list')->sendHeaders();
-                break;
+                return redirect()->to('admin/role-list');
 
             case 'view':
             default:
                 if ($request->has('id')) {
                     $meta_title = $title = 'User Roles Edit';
                     $role = Role::findById($request->input('id'));
-                    $this->smarty->assign('role', $role);
                 }
                 break;
         }
 
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['Yes', 'No']);
+        $this->viewData = array_merge($this->viewData, [
+            'yesno_ids' => [1, 0],
+            'yesno_names' => ['Yes', 'No'],
+            'title' => $title,
+            'meta_title' => $meta_title,
+            'role' => $role,
+        ]);
 
-        $content = $this->smarty->fetch('role-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.role-edit', $this->viewData);
     }
 
     public function destroy(Request $request): \Illuminate\Http\RedirectResponse

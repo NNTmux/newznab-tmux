@@ -86,7 +86,7 @@ class MusicController extends BasePageController
         // Build order by URLs
         $orderByUrls = [];
         foreach ($ordering as $orderType) {
-            $orderByUrls['orderby'.$orderType] = url('music/' . ($id ?: 'All') . '?ob='.$orderType);
+            $orderByUrls['orderby'.$orderType] = url('music/'.($id ?: 'All').'?ob='.$orderType);
         }
 
         $this->viewData = array_merge($this->viewData, [

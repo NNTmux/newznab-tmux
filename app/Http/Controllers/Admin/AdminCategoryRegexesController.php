@@ -12,7 +12,7 @@ class AdminCategoryRegexesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request): void
+    public function index(Request $request)
     {
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'category_regexes']);
@@ -22,22 +22,18 @@ class AdminCategoryRegexesController extends BasePageController
         $group = $request->has('group') && ! empty($request->input('group')) ? $request->input('group') : '';
         $regex = $regexes->getRegex($group);
 
-        $this->smarty->assign(
-            [
-                'group' => $group,
-                'regex' => $regex,
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, [
+            'group' => $group,
+            'regex' => $regex,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
 
-        $content = $this->smarty->fetch('category_regexes-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.category-regexes-list', $this->viewData);
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
@@ -56,24 +52,26 @@ class AdminCategoryRegexesController extends BasePageController
             'description' => '',
             'ordinal' => '',
             'categories_id' => '',
-            'status' => 1, ];
+            'status' => 1,
+        ];
 
-        $this->smarty->assign('regex', $regex);
+        $error = '';
+        $meta_title = $title = 'Category Regex';
 
         switch ($action) {
             case 'submit':
                 if (empty($request->input('group_regex'))) {
-                    $this->smarty->assign('error', 'Group regex must not be empty!');
+                    $error = 'Group regex must not be empty!';
                     break;
                 }
 
                 if (empty($request->input('regex'))) {
-                    $this->smarty->assign('error', 'Regex cannot be empty');
+                    $error = 'Regex cannot be empty';
                     break;
                 }
 
                 if (! is_numeric($request->input('ordinal')) || $request->input('ordinal') < 0) {
-                    $this->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
+                    $error = 'Ordinal must be a number, 0 or higher.';
                     break;
                 }
 
@@ -83,8 +81,7 @@ class AdminCategoryRegexesController extends BasePageController
                     $regexes->updateRegex($request->all());
                 }
 
-                return redirect()->to('admin/category_regexes-list');
-                break;
+                return redirect()->to('admin/category-regexes-list');
 
             case 'view':
             default:
@@ -95,12 +92,8 @@ class AdminCategoryRegexesController extends BasePageController
                 } else {
                     $meta_title = $title = 'Category Regex Add';
                 }
-                $this->smarty->assign('regex', $regex);
                 break;
         }
-
-        $this->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE]);
-        $this->smarty->assign('status_names', ['Yes', 'No']);
 
         $categories_db = Category::query()
             ->select(['c.id', 'c.title', 'cp.title as parent_title'])
@@ -109,18 +102,25 @@ class AdminCategoryRegexesController extends BasePageController
             ->whereNotNull('c.root_categories_id')
             ->orderBy('c.id')
             ->get();
-        // Build arrays for Smarty html_options helper. Previously only last row was kept.
+
         $category_ids = [];
         $category_names = [];
         foreach ($categories_db as $category_db) {
             $category_ids[] = $category_db->id;
             $category_names[] = $category_db->parent_title.' '.$category_db->title.': '.$category_db->id;
         }
-        $this->smarty->assign('category_names', $category_names);
-        $this->smarty->assign('category_ids', $category_ids);
 
-        $content = $this->smarty->fetch('category_regexes-edit.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        $this->viewData = array_merge($this->viewData, [
+            'error' => $error,
+            'regex' => (object) $regex,
+            'status_ids' => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE],
+            'status_names' => ['Yes', 'No'],
+            'category_ids' => $category_ids,
+            'category_names' => $category_names,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
+
+        return view('admin.category-regexes-edit', $this->viewData);
     }
 }

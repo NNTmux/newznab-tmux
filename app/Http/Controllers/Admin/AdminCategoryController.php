@@ -11,23 +11,24 @@ class AdminCategoryController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index()
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Category List';
 
         $categorylist = Category::getFlat();
 
-        $this->smarty->assign('categorylist', $categorylist);
+        $this->viewData = array_merge($this->viewData, [
+            'categorylist' => $categorylist,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
 
-        $content = $this->smarty->fetch('category-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        return view('admin.category-list', $this->viewData);
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
@@ -50,29 +51,25 @@ class AdminCategoryController extends BasePageController
                 );
 
                 return redirect()->to('admin/category-list');
-                break;
             case 'view':
             default:
+                $category = null;
+                $title = 'Category Edit';
                 if ($request->has('id')) {
-                    $this->title = 'Category Edit';
                     $id = $request->input('id');
-                    $cat = Category::find($id);
-                    $this->smarty->assign('category', $cat);
+                    $category = Category::find($id);
                 }
                 break;
         }
 
-        $this->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE, Category::STATUS_DISABLED]);
-        $this->smarty->assign('status_names', ['Yes', 'No', 'Disabled']);
+        $this->viewData = array_merge($this->viewData, [
+            'category' => $category,
+            'status_ids' => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE, Category::STATUS_DISABLED],
+            'status_names' => ['Yes', 'No', 'Disabled'],
+            'title' => $title,
+            'meta_title' => 'View/Edit categories',
+        ]);
 
-        $content = $this->smarty->fetch('category-edit.tpl');
-
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => 'View/Edit categories',
-            ]
-        );
-        $this->adminrender();
+        return view('admin.category-edit', $this->viewData);
     }
 }
