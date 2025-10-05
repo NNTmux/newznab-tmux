@@ -1,3 +1,73 @@
+/* Import FontAwesome */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+/* Import other necessary libraries */
+@import 'animate.css/animate.min.css';
+@import 'datatables/media/css/jquery.dataTables.min.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom styles for proper spacing and button alignment */
+.btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border rounded-md font-semibold text-sm transition-colors duration-150;
+}
+
+.btn i {
+    @apply mr-2;
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700;
+}
+
+.btn-secondary {
+    @apply bg-gray-600 text-white border-gray-600 hover:bg-gray-700;
+}
+
+.btn-success {
+    @apply bg-green-600 text-white border-green-600 hover:bg-green-700;
+}
+
+.btn-danger {
+    @apply bg-red-600 text-white border-red-600 hover:bg-red-700;
+}
+
+.btn-warning {
+    @apply bg-yellow-500 text-white border-yellow-500 hover:bg-yellow-600;
+}
+
+.btn-info {
+    @apply bg-cyan-600 text-white border-cyan-600 hover:bg-cyan-700;
+}
+
+.btn-sm {
+    @apply px-3 py-1 text-xs;
+}
+
+.btn-lg {
+    @apply px-6 py-3 text-base;
+}
+
+/* Button group spacing */
+.btn-group {
+    @apply inline-flex space-x-2;
+}
+
+/* Icon spacing */
+.fas, .far, .fab, .fa {
+    @apply inline-block;
+    min-width: 1em;
+    text-align: center;
+}
+
+/* Table action buttons */
+.table-actions {
+    @apply flex items-center gap-2;
+}
+
+.table-actions .btn {
+    @apply flex-shrink-0;
+}
+

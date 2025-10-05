@@ -10,7 +10,6 @@
     <meta name="description" content="{{ $meta_description ?? 'Admin panel' }}">
 
     <!-- Styles -->
-    <link href="{{ asset('assets/css/all-css.css') }}" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
@@ -72,7 +71,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/js/all-js.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

@@ -8,7 +8,6 @@
     <title>{{ config('app.name') }}</title>
 
     <!-- Styles -->
-    <link href="{{ asset('assets/css/all-css.css') }}" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
@@ -16,7 +15,6 @@
     @yield('content')
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/js/all-js.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
