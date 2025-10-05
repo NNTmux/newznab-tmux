@@ -46,7 +46,8 @@ class DetailsController extends BasePageController
                 ReleaseComment::addComment($data['id'], $data['gid'], $request->input('txtAddComment'), $this->userdata->id, $request->ip());
             }
 
-            $nfo = ReleaseNfo::getReleaseNfo($data['id']);
+            $nfoData = ReleaseNfo::getReleaseNfo($data['id']);
+            $nfo = $nfoData ? $nfoData->nfo : null;
             $reVideo = $re->getVideo($data['id']);
             $reAudio = $re->getAudio($data['id']);
             $reSubs = $re->getSubs($data['id']);

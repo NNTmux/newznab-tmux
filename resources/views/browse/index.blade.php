@@ -104,6 +104,11 @@
                 </div>
             </div>
 
+            <!-- Top Pagination -->
+            <div class="px-6 py-3 bg-gray-50 border-b border-gray-200">
+                {{ $results->links() }}
+            </div>
+
             <!-- Results Table -->
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -139,8 +144,16 @@
                                                     <button type="button"
                                                             class="preview-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition cursor-pointer"
                                                             data-guid="{{ $result->guid }}"
-                                                            title="View sample image">
+                                                            title="View preview image">
                                                         <i class="fas fa-image mr-1"></i> Preview
+                                                    </button>
+                                                @endif
+                                                @if(isset($result->jpgstatus) && $result->jpgstatus == 1)
+                                                    <button type="button"
+                                                            class="sample-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition cursor-pointer"
+                                                            data-guid="{{ $result->guid }}"
+                                                            title="View sample image">
+                                                        <i class="fas fa-images mr-1"></i> Sample
                                                     </button>
                                                 @endif
                                                 @if(isset($result->reid) && $result->reid != null)
@@ -201,8 +214,8 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200">
+            <!-- Bottom Pagination -->
+            <div class="px-6 py-3 bg-gray-50 border-t border-gray-200">
                 {{ $results->links() }}
             </div>
         </form>
@@ -214,12 +227,15 @@
         </div>
     @endif
 
-    <!-- Preview Image Modal -->
+    <!-- Preview/Sample Image Modal -->
     <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
         <div class="relative max-w-4xl w-full">
             <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
                 <i class="fas fa-times"></i>
             </button>
+            <div class="text-center mb-2">
+                <h3 id="previewTitle" class="text-white text-lg font-semibold"></h3>
+            </div>
             <img id="previewImage" src="" alt="Preview" class="max-w-full max-h-[90vh] mx-auto rounded-lg shadow-2xl">
             <div class="text-center mt-4">
                 <p id="previewError" class="text-red-400 hidden"></p>
@@ -257,23 +273,28 @@ function closePreviewModal() {
     modal.classList.add('hidden');
 }
 
-function showPreviewImage(guid) {
+function showPreviewImage(guid, type = 'preview') {
     const modal = document.getElementById('previewModal');
     const img = document.getElementById('previewImage');
     const error = document.getElementById('previewError');
+    const title = document.getElementById('previewTitle');
 
     // Show modal
     modal.style.display = 'flex';
     modal.classList.remove('hidden');
 
-    // Set image source - preview images are stored as {guid}.jpg in storage/covers/preview/
-    const previewUrl = '/covers/preview/' + guid + '.jpg';
+    // Set title based on type
+    title.textContent = type === 'sample' ? 'Sample Image' : 'Preview Image';
 
-    img.src = previewUrl;
+    // Set image source - images are stored as {guid}.jpg in storage/covers/{type}/
+    const imageUrl = '/covers/' + type + '/' + guid + '.jpg';
+
+    img.src = imageUrl;
     error.classList.add('hidden');
+    img.style.display = 'block';
 
     img.onerror = function() {
-        error.textContent = 'Preview image not available';
+        error.textContent = (type === 'sample' ? 'Sample' : 'Preview') + ' image not available';
         error.classList.remove('hidden');
         img.style.display = 'none';
     };
@@ -486,13 +507,20 @@ function showMediainfo(releaseId) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Preview badge click handlers
+    // Preview and Sample badge click handlers
     document.addEventListener('click', function(e) {
         const previewBadge = e.target.closest('.preview-badge');
         if (previewBadge) {
             e.preventDefault();
             const guid = previewBadge.dataset.guid;
-            showPreviewImage(guid);
+            showPreviewImage(guid, 'preview');
+        }
+
+        const sampleBadge = e.target.closest('.sample-badge');
+        if (sampleBadge) {
+            e.preventDefault();
+            const guid = sampleBadge.dataset.guid;
+            showPreviewImage(guid, 'sample');
         }
 
         // Mediainfo badge click handlers

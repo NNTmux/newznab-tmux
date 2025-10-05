@@ -42,26 +42,49 @@
             </div>
 
             <!-- Sample/Preview Images -->
-            @if(isset($release->haspreview) && $release->haspreview == 1)
+            @php
+                $hasPreviewImage = isset($release->haspreview) && $release->haspreview == 1;
+                $hasSampleImage = isset($release->jpgstatus) && $release->jpgstatus == 1;
+            @endphp
+
+            @if($hasPreviewImage || $hasSampleImage)
                 <div class="border-b border-gray-200 pb-4">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                        <i class="fas fa-images mr-2 text-purple-600"></i> Sample Images
+                        <i class="fas fa-images mr-2 text-purple-600"></i>
+                        @if($hasPreviewImage && $hasSampleImage)
+                            Preview & Sample Images
+                        @elseif($hasPreviewImage)
+                            Preview Image
+                        @else
+                            Sample Image
+                        @endif
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <!-- Preview image -->
-                        <a href="{{ url('/covers/preview/' . $release->guid . '.jpg') }}" target="_blank" class="block">
-                            <img src="{{ url('/covers/preview/' . $release->guid . '.jpg') }}"
-                                 alt="Preview"
-                                 class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
-                                 onerror="this.parentElement.style.display='none'">
-                        </a>
-                        <!-- Sample image (if exists) -->
-                        <a href="{{ url('/covers/sample/' . $release->guid . '.jpg') }}" target="_blank" class="block">
-                            <img src="{{ url('/covers/sample/' . $release->guid . '.jpg') }}"
-                                 alt="Sample"
-                                 class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
-                                 onerror="this.parentElement.style.display='none'">
-                        </a>
+                        @if($hasPreviewImage)
+                            <!-- Preview image -->
+                            <div>
+                                <a href="{{ url('/covers/preview/' . $release->guid . '.jpg') }}" target="_blank" class="block">
+                                    <img src="{{ url('/covers/preview/' . $release->guid . '.jpg') }}"
+                                         alt="Preview"
+                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+                                         loading="lazy">
+                                </a>
+                                <p class="text-xs text-gray-500 mt-1 text-center">Preview</p>
+                            </div>
+                        @endif
+
+                        @if($hasSampleImage)
+                            <!-- Sample image -->
+                            <div>
+                                <a href="{{ url('/covers/sample/' . $release->guid . '.jpg') }}" target="_blank" class="block">
+                                    <img src="{{ url('/covers/sample/' . $release->guid . '.jpg') }}"
+                                         alt="Sample"
+                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+                                         loading="lazy">
+                                </a>
+                                <p class="text-xs text-gray-500 mt-1 text-center">Sample</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             @endif

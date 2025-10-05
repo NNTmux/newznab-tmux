@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useBootstrapFive();
+        Paginator::useTailwind();
         $smarty = app('smarty.view');
         view()->share('smarty', $smarty);
         Gate::define('viewPulse', function (User $user) {
