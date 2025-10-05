@@ -10,18 +10,11 @@ class AdminFailedReleasesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index()
     {
-        $this->setAdminPrefs();
+        $title = 'Failed Releases List';
+        $releaselist = Release::getFailedRange();
 
-        $meta_title = $title = 'Failed Releases List';
-
-        $frellist = Release::getFailedRange();
-        $this->smarty->assign('releaselist', $frellist);
-
-        $content = $this->smarty->fetch('failrel-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        return view('admin.failrel-list', compact('title', 'releaselist'));
     }
 }

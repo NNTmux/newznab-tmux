@@ -47,7 +47,7 @@
         </button>
         <div id="releases-menu" class="hidden mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/release-list') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Release List</a>
-            <a href="{{ url('/admin/failed-releases') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Failed Releases</a>
+            <a href="{{ url('/admin/failrel-list') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Failed Releases</a>
             <a href="{{ url('/admin/category-list') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Categories</a>
         </div>
     </div>
@@ -79,6 +79,23 @@
             <a href="{{ url('/admin/category_regexes-list') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Category Regexes</a>
             <a href="{{ url('/admin/collection_regexes-list') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Collection Regexes</a>
             <a href="{{ url('/admin/release_naming_regexes-list') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Release Naming Regexes</a>
+        </div>
+    </div>
+
+    <!-- Groups -->
+    <div class="mb-4">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 hover:text-white transition" onclick="toggleAdminSubmenu('groups-menu')">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-server"></i>
+                <span>Groups Management</span>
+            </div>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" id="groups-menu-icon"></i>
+        </button>
+        <div id="groups-menu" class="hidden mt-2 ml-6 space-y-1">
+            <a href="{{ url('/admin/group-list') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">All Groups</a>
+            <a href="{{ url('/admin/group-list-active') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Active Groups</a>
+            <a href="{{ url('/admin/group-list-inactive') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Inactive Groups</a>
+            <a href="{{ url('/admin/group-bulk') }}" class="block py-2 px-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition">Bulk Add Groups</a>
         </div>
     </div>
 

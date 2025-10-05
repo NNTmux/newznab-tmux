@@ -11,66 +11,42 @@ class AdminGroupController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request): void
+    public function index(Request $request)
     {
-        $this->setAdminPrefs();
+        $groupname = $request->input('groupname') ?? '';
+        $grouplist = UsenetGroup::getGroupsRange($groupname);
+        $title = 'Group List';
 
-        $groupName = $request->input('groupname') ?? '';
-
-        $this->smarty->assign(
-            [
-                'groupname' => $groupName,
-                'grouplist' => UsenetGroup::getGroupsRange($groupName),
-            ]
-        );
-
-        $meta_title = $title = 'Group List';
-        $content = $this->smarty->fetch('group-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.group-list', compact('title', 'groupname', 'grouplist'));
     }
 
     /**
      * @throws \Exception
      */
-    public function createBulk(Request $request): void
+    public function createBulk(Request $request)
     {
-        $this->setAdminPrefs();
-
         // set the current action
         $action = $request->input('action') ?? 'view';
+        $groupmsglist = '';
 
         if ($action === 'submit') {
             if ($request->has('groupfilter') && ! empty($request->input('groupfilter'))) {
-                $msgs = UsenetGroup::addBulk($request->input('groupfilter'), $request->input('active'), $request->input('backfill'));
+                $groupmsglist = UsenetGroup::addBulk($request->input('groupfilter'), $request->input('active'), $request->input('backfill'));
             }
-        } else {
-            $msgs = '';
         }
 
-        $this->smarty->assign('groupmsglist', $msgs);
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['Yes', 'No']);
+        $title = 'Bulk Add Newsgroups';
 
-        $meta_title = $title = 'Bulk Add Newsgroups';
-        $content = $this->smarty->fetch('group-bulk.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.group-bulk', compact('title', 'groupmsglist'));
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
     public function edit(Request $request)
     {
-        $this->setAdminPrefs();
-
         // Set the current action.
         $action = $request->input('action') ?? 'view';
 
@@ -105,82 +81,51 @@ class AdminGroupController extends BasePageController
 
             case 'view':
             default:
-                $meta_title = $title = 'Group Edit';
+                $title = 'Group Edit';
                 if ($request->has('id')) {
-                    $meta_title = $title = 'Newsgroup Edit';
+                    $title = 'Newsgroup Edit';
                     $id = $request->input('id');
                     $group = UsenetGroup::getGroupByID($id);
                 } else {
-                    $meta_title = $title = 'Newsgroup Add';
+                    $title = 'Newsgroup Add';
                 }
                 break;
         }
 
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['Yes', 'No']);
-
-        $this->smarty->assign('group', $group);
-
-        $content = $this->smarty->fetch('group-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.group-edit', compact('title', 'group'));
     }
 
     /**
      * @throws \Exception
      */
-    public function active(Request $request): void
+    public function active(Request $request)
     {
-        $this->setAdminPrefs();
         $gname = '';
         if (! empty($request->input('groupname'))) {
             $gname = $request->input('groupname');
         }
 
         $groupname = ! empty($request->input('groupname')) ? $request->input('groupname') : '';
-
-        $this->smarty->assign('groupname', $groupname);
-
         $grouplist = UsenetGroup::getGroupsRange($gname, true);
+        $title = 'Active Groups';
 
-        $this->smarty->assign('grouplist', $grouplist);
-
-        $meta_title = $title = 'Group List';
-
-        $content = $this->smarty->fetch('group-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.group-list', compact('title', 'groupname', 'grouplist'));
     }
 
     /**
      * @throws \Exception
      */
-    public function inactive(Request $request): void
+    public function inactive(Request $request)
     {
-        $this->setAdminPrefs();
         $gname = '';
         if (! empty($request->input('groupname'))) {
             $gname = $request->input('groupname');
         }
 
         $groupname = ! empty($request->input('groupname')) ? $request->input('groupname') : '';
-
-        $this->smarty->assign('groupname', $groupname);
-
         $grouplist = UsenetGroup::getGroupsRange($gname, false);
+        $title = 'Inactive Groups';
 
-        $this->smarty->assign('grouplist', $grouplist);
-
-        $meta_title = $title = 'Group List';
-
-        $content = $this->smarty->fetch('group-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.group-list', compact('title', 'groupname', 'grouplist'));
     }
 }
