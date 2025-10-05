@@ -91,51 +91,37 @@ class RssController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function showRssDesc(): void
+    public function showRssDesc()
     {
         $this->setPreferences();
         $rss = new RSS;
 
-        $title = 'Rss Info';
-        $meta_title = 'Rss Nzb Info';
-        $meta_keywords = 'view,nzb,description,details,rss,atom';
-        $meta_description = 'View information about NNTmux RSS Feeds.';
-
         $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
         $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
 
-        if ($firstShow !== null) {
-            $this->smarty->assign('show', $firstShow->videos_id);
-        } else {
-            $this->smarty->assign('show', 1);
-        }
-
-        if ($firstAni !== null) {
-            $this->smarty->assign('anidb', $firstAni->anidbid);
-        } else {
-            $this->smarty->assign('anidb', 1);
-        }
+        $show = ($firstShow !== null) ? $firstShow->videos_id : 1;
+        $anidb = ($firstAni !== null) ? $firstAni->anidbid : 1;
 
         $catExclusions = $this->userdata->categoryexclusions ?? [];
 
-        $this->smarty->assign(
-            [
-                'categorylist' => Category::getCategories(true, $catExclusions),
-                'parentcategorylist' => Category::getForMenu($catExclusions),
-            ]
-        );
+        $this->viewData = array_merge($this->viewData, [
+            'show' => $show,
+            'anidb' => $anidb,
+            'categorylist' => Category::getCategories(true, $catExclusions),
+            'parentcategorylist' => Category::getForMenu($catExclusions),
+            'title' => 'Rss Info',
+            'meta_title' => 'Rss Nzb Info',
+            'meta_keywords' => 'view,nzb,description,details,rss,atom',
+            'meta_description' => 'View information about NNTmux RSS Feeds.',
+        ]);
 
-        $content = $this->smarty->fetch('rssdesc.tpl');
-        $this->smarty->assign(
-            compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description')
-        );
-        $this->pagerender();
+        return view('rss.rssdesc', $this->viewData);
     }
 
     /**
      * @throws \Throwable
      */
-    public function cartRss(Request $request): JsonResponse|array
+    public function cartRss(Request $request)
     {
         $rss = new RSS;
         $offset = 0;
@@ -161,7 +147,7 @@ class RssController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function categoryFeedRss(Request $request): JsonResponse|array
+    public function categoryFeedRss(Request $request)
     {
         $rss = new RSS;
         $offset = 0;
