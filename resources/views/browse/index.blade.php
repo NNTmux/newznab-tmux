@@ -132,8 +132,26 @@
                                         @if($result->cover ?? false)
                                             <img src="{{ $result->cover }}" class="w-12 h-16 object-cover rounded mr-3" alt="Cover">
                                         @endif
-                                        <div>
-                                            <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 hover:text-blue-800 font-medium">{{ $result->searchname }}</a>
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 hover:text-blue-800 font-medium">{{ $result->searchname }}</a>
+                                                @if(isset($result->haspreview) && $result->haspreview == 1)
+                                                    <button type="button"
+                                                            class="preview-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition cursor-pointer"
+                                                            data-guid="{{ $result->guid }}"
+                                                            title="View sample image">
+                                                        <i class="fas fa-image mr-1"></i> Preview
+                                                    </button>
+                                                @endif
+                                                @if(isset($result->reid) && $result->reid != null)
+                                                    <button type="button"
+                                                            class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition cursor-pointer"
+                                                            data-release-id="{{ $result->id }}"
+                                                            title="View media info">
+                                                        <i class="fas fa-info-circle mr-1"></i> Media Info
+                                                    </button>
+                                                @endif
+                                            </div>
                                             <div class="text-xs text-gray-500 mt-1">
                                                 @if($result->group_name)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-700">
@@ -195,11 +213,318 @@
             <p class="text-gray-500">Try adjusting your search criteria or browse other categories.</p>
         </div>
     @endif
+
+    <!-- Preview Image Modal -->
+    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+        <div class="relative max-w-4xl w-full">
+            <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <img id="previewImage" src="" alt="Preview" class="max-w-full max-h-[90vh] mx-auto rounded-lg shadow-2xl">
+            <div class="text-center mt-4">
+                <p id="previewError" class="text-red-400 hidden"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MediaInfo Modal -->
+    <div id="mediainfoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+        <div class="relative max-w-4xl w-full bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-info-circle mr-2 text-blue-600"></i> Media Information
+                </h3>
+                <button type="button" onclick="closeMediainfoModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="mediainfoContent" class="p-6 overflow-y-auto" style="max-height: calc(90vh - 80px);">
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
+                    <p class="text-gray-600 mt-2">Loading media information...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
+function closePreviewModal() {
+    const modal = document.getElementById('previewModal');
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+}
+
+function showPreviewImage(guid) {
+    const modal = document.getElementById('previewModal');
+    const img = document.getElementById('previewImage');
+    const error = document.getElementById('previewError');
+
+    // Show modal
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+
+    // Set image source - preview images are stored as {guid}.jpg in storage/covers/preview/
+    const previewUrl = '/covers/preview/' + guid + '.jpg';
+
+    img.src = previewUrl;
+    error.classList.add('hidden');
+
+    img.onerror = function() {
+        error.textContent = 'Preview image not available';
+        error.classList.remove('hidden');
+        img.style.display = 'none';
+    };
+
+    img.onload = function() {
+        img.style.display = 'block';
+    };
+}
+
+function closeMediainfoModal() {
+    const modal = document.getElementById('mediainfoModal');
+    modal.style.display = 'none';
+}
+
+function showMediainfo(releaseId) {
+    let modal = document.getElementById('mediainfoModal');
+
+    // If modal doesn't have body as parent, move it there
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+
+    const content = document.getElementById('mediainfoContent');
+
+    // Show modal with loading state
+    modal.style.display = 'flex';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.zIndex = '99999';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+
+    content.innerHTML = `
+        <div class="text-center py-8">
+            <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
+            <p class="text-gray-600 mt-2">Loading media information...</p>
+        </div>
+    `;
+
+    // Fetch mediainfo data
+    const apiUrl = '/api/release/' + releaseId + '/mediainfo';
+
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load media information');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.video && !data.audio && !data.subs) {
+                content.innerHTML = '<p class="text-center text-gray-500 py-8">No media information available</p>';
+                return;
+            }
+
+            let html = '<div class="space-y-6">';
+
+            // Video information
+            if (data.video) {
+                html += `
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+                        <h4 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-video mr-2 text-blue-600"></i> Video Information
+                        </h4>
+                        <dl class="grid grid-cols-2 gap-3">
+                `;
+
+                if (data.video.containerformat) {
+                    html += `
+                        <div>
+                            <dt class="text-xs font-medium text-gray-600">Container</dt>
+                            <dd class="text-sm text-gray-900">${data.video.containerformat}</dd>
+                        </div>
+                    `;
+                }
+                if (data.video.videocodec) {
+                    html += `
+                        <div>
+                            <dt class="text-xs font-medium text-gray-600">Codec</dt>
+                            <dd class="text-sm text-gray-900">${data.video.videocodec}</dd>
+                        </div>
+                    `;
+                }
+                if (data.video.videowidth && data.video.videoheight) {
+                    html += `
+                        <div>
+                            <dt class="text-xs font-medium text-gray-600">Resolution</dt>
+                            <dd class="text-sm text-gray-900">${data.video.videowidth}x${data.video.videoheight}</dd>
+                        </div>
+                    `;
+                }
+                if (data.video.videoaspect) {
+                    html += `
+                        <div>
+                            <dt class="text-xs font-medium text-gray-600">Aspect Ratio</dt>
+                            <dd class="text-sm text-gray-900">${data.video.videoaspect}</dd>
+                        </div>
+                    `;
+                }
+                if (data.video.videoframerate) {
+                    html += `
+                        <div>
+                            <dt class="text-xs font-medium text-gray-600">Frame Rate</dt>
+                            <dd class="text-sm text-gray-900">${data.video.videoframerate} fps</dd>
+                        </div>
+                    `;
+                }
+                if (data.video.videoduration) {
+                    // videoduration is in milliseconds, convert to minutes
+                    const durationMs = parseInt(data.video.videoduration);
+                    if (!isNaN(durationMs) && durationMs > 0) {
+                        const minutes = Math.round(durationMs / 1000 / 60);
+                        html += `
+                            <div>
+                                <dt class="text-xs font-medium text-gray-600">Duration</dt>
+                                <dd class="text-sm text-gray-900">${minutes} minutes</dd>
+                            </div>
+                        `;
+                    }
+                }
+
+                html += '</dl></div>';
+            }
+
+            // Audio information
+            if (data.audio && data.audio.length > 0) {
+                html += `
+                    <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-4">
+                        <h4 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-volume-up mr-2 text-green-600"></i> Audio Information
+                        </h4>
+                `;
+
+                data.audio.forEach((audio, index) => {
+                    if (index > 0) html += '<hr class="my-3 border-gray-200">';
+                    html += '<dl class="grid grid-cols-2 gap-3">';
+
+                    if (audio.audioformat) {
+                        html += `
+                            <div>
+                                <dt class="text-xs font-medium text-gray-600">Format</dt>
+                                <dd class="text-sm text-gray-900">${audio.audioformat}</dd>
+                            </div>
+                        `;
+                    }
+                    if (audio.audiochannels) {
+                        html += `
+                            <div>
+                                <dt class="text-xs font-medium text-gray-600">Channels</dt>
+                                <dd class="text-sm text-gray-900">${audio.audiochannels}</dd>
+                            </div>
+                        `;
+                    }
+                    if (audio.audiobitrate) {
+                        html += `
+                            <div>
+                                <dt class="text-xs font-medium text-gray-600">Bit Rate</dt>
+                                <dd class="text-sm text-gray-900">${audio.audiobitrate}</dd>
+                            </div>
+                        `;
+                    }
+                    if (audio.audiolanguage) {
+                        html += `
+                            <div>
+                                <dt class="text-xs font-medium text-gray-600">Language</dt>
+                                <dd class="text-sm text-gray-900">${audio.audiolanguage}</dd>
+                            </div>
+                        `;
+                    }
+                    if (audio.audiosamplerate) {
+                        html += `
+                            <div>
+                                <dt class="text-xs font-medium text-gray-600">Sample Rate</dt>
+                                <dd class="text-sm text-gray-900">${audio.audiosamplerate}</dd>
+                            </div>
+                        `;
+                    }
+
+                    html += '</dl>';
+                });
+
+                html += '</div>';
+            }
+
+            // Subtitle information
+            if (data.subs) {
+                html += `
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4">
+                        <h4 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-closed-captioning mr-2 text-purple-600"></i> Subtitles
+                        </h4>
+                        <p class="text-sm text-gray-900">${data.subs}</p>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+        })
+        .catch(error => {
+            content.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-exclamation-circle text-3xl text-red-600"></i>
+                    <p class="text-red-600 mt-2">${error.message}</p>
+                </div>
+            `;
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Preview badge click handlers
+    document.addEventListener('click', function(e) {
+        const previewBadge = e.target.closest('.preview-badge');
+        if (previewBadge) {
+            e.preventDefault();
+            const guid = previewBadge.dataset.guid;
+            showPreviewImage(guid);
+        }
+
+        // Mediainfo badge click handlers
+        const mediainfoBadge = e.target.closest('.mediainfo-badge');
+        if (mediainfoBadge) {
+            e.preventDefault();
+            const releaseId = mediainfoBadge.dataset.releaseId;
+            showMediainfo(releaseId);
+        }
+    });
+
+    // Close modal on background click
+    document.getElementById('previewModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePreviewModal();
+        }
+    });
+
+    document.getElementById('mediainfoModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeMediainfoModal();
+        }
+    });
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePreviewModal();
+            closeMediainfoModal();
+        }
+    });
+
     // Select all checkbox functionality
     document.getElementById('chkSelectAll')?.addEventListener('change', function() {
         const checkboxes = document.querySelectorAll('.chkRelease');
@@ -309,5 +634,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-@endsection
 

@@ -43,6 +43,21 @@ Route::prefix('inform')->middleware('auth:api')->group(function () {
     Route::post('release', [ApiInformController::class, 'release']);
 });
 
+// Mediainfo endpoint (no auth required for internal use)
+Route::get('release/{id}/mediainfo', function ($id) {
+    $releaseExtra = new \Blacklight\ReleaseExtra();
+
+    $video = $releaseExtra->getVideo($id);
+    $audio = $releaseExtra->getAudio($id);
+    $subs = $releaseExtra->getSubs($id);
+
+    return response()->json([
+        'video' => $video ?: null,
+        'audio' => $audio ?: null,
+        'subs' => $subs ? $subs->subs : null,
+    ]);
+});
+
 Route::fallback(function () {
     return response()->json(['message' => 'Not Found!'], 404);
 });

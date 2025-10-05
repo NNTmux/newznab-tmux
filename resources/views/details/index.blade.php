@@ -41,6 +41,31 @@
                 </div>
             </div>
 
+            <!-- Sample/Preview Images -->
+            @if(isset($release->haspreview) && $release->haspreview == 1)
+                <div class="border-b border-gray-200 pb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-images mr-2 text-purple-600"></i> Sample Images
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Preview image -->
+                        <a href="{{ url('/covers/preview/' . $release->guid . '.jpg') }}" target="_blank" class="block">
+                            <img src="{{ url('/covers/preview/' . $release->guid . '.jpg') }}"
+                                 alt="Preview"
+                                 class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+                                 onerror="this.parentElement.style.display='none'">
+                        </a>
+                        <!-- Sample image (if exists) -->
+                        <a href="{{ url('/covers/sample/' . $release->guid . '.jpg') }}" target="_blank" class="block">
+                            <img src="{{ url('/covers/sample/' . $release->guid . '.jpg') }}"
+                                 alt="Sample"
+                                 class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+                                 onerror="this.parentElement.style.display='none'">
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <!-- Movie Information -->
             @if(!empty($movie))
                 @php
@@ -437,71 +462,146 @@
 
             <!-- Video/Audio Metadata -->
             @if(!empty($reVideo) || !empty($reAudio) || !empty($reSubs))
-                <div class="bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-6">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-photo-video mr-2 text-gray-600"></i> Media Information
+                        <i class="fas fa-photo-video mr-2 text-blue-600"></i> Media Information
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        @if(!empty($reVideo))
-                            <div class="bg-white rounded-lg p-3">
-                                <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                                    <i class="fas fa-video mr-2 text-blue-500"></i> Video
-                                </h4>
-                                @foreach($reVideo as $video)
-                                    <div class="text-xs space-y-1">
-                                        @if(!empty($video->videocodec))
-                                            <p><span class="text-gray-600">Codec:</span> <span class="font-medium">{{ $video->videocodec }}</span></p>
-                                        @endif
-                                        @if(!empty($video->videowidth) && !empty($video->videoheight))
-                                            <p><span class="text-gray-600">Resolution:</span> <span class="font-medium">{{ $video->videowidth }}x{{ $video->videoheight }}</span></p>
-                                        @endif
-                                        @if(!empty($video->videoaspect))
-                                            <p><span class="text-gray-600">Aspect:</span> <span class="font-medium">{{ $video->videoaspect }}</span></p>
-                                        @endif
-                                        @if(!empty($video->videoduration))
-                                            <p><span class="text-gray-600">Duration:</span> <span class="font-medium">{{ $video->videoduration }}</span></p>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
 
-                        @if(!empty($reAudio))
-                            <div class="bg-white rounded-lg p-3">
-                                <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                                    <i class="fas fa-volume-up mr-2 text-green-500"></i> Audio
-                                </h4>
-                                @foreach($reAudio as $audio)
-                                    <div class="text-xs space-y-1">
-                                        @if(!empty($audio->audiocodec))
-                                            <p><span class="text-gray-600">Codec:</span> <span class="font-medium">{{ $audio->audiocodec }}</span></p>
+                    @if(!empty($reVideo))
+                        <div class="mb-6">
+                            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-video mr-2 text-blue-500"></i> Video Details
+                            </h4>
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <dl class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    @if(!empty($reVideo['containerformat']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Container Format</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['containerformat'] }}</dd>
+                                        </div>
+                                    @endif
+                                    @if(!empty($reVideo['videocodec']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Video Codec</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videocodec'] }}</dd>
+                                        </div>
+                                    @endif
+                                    @if(!empty($reVideo['videoformat']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Video Format</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videoformat'] }}</dd>
+                                        </div>
+                                    @endif
+                                    @if(!empty($reVideo['videowidth']) && !empty($reVideo['videoheight']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Resolution</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videowidth'] }}x{{ $reVideo['videoheight'] }}</dd>
+                                        </div>
+                                    @endif
+                                    @if(!empty($reVideo['videoaspect']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Aspect Ratio</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videoaspect'] }}</dd>
+                                        </div>
+                                    @endif
+                                    @if(!empty($reVideo['videoframerate']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Frame Rate</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videoframerate'] }} fps</dd>
+                                        </div>
+                                    @endif
+                                    @if(!empty($reVideo['videoduration']))
+                                        @php
+                                            $durationMs = intval($reVideo['videoduration']);
+                                            $durationMinutes = $durationMs > 0 ? round($durationMs / 1000 / 60) : 0;
+                                        @endphp
+                                        @if($durationMinutes > 0)
+                                            <div>
+                                                <dt class="text-xs font-medium text-gray-600 mb-1">Duration</dt>
+                                                <dd class="text-sm text-gray-900 font-semibold">{{ $durationMinutes }} minutes</dd>
+                                            </div>
                                         @endif
-                                        @if(!empty($audio->audiochannels))
-                                            <p><span class="text-gray-600">Channels:</span> <span class="font-medium">{{ $audio->audiochannels }}</span></p>
-                                        @endif
-                                        @if(!empty($audio->audiolanguage))
-                                            <p><span class="text-gray-600">Language:</span> <span class="font-medium">{{ $audio->audiolanguage }}</span></p>
-                                        @endif
-                                    </div>
-                                @endforeach
+                                    @endif
+                                    @if(!empty($reVideo['overallbitrate']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Bit Rate</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['overallbitrate'] }}</dd>
+                                        </div>
+                                    @endif
+                                    @if(!empty($reVideo['videolibrary']))
+                                        <div>
+                                            <dt class="text-xs font-medium text-gray-600 mb-1">Encoder Library</dt>
+                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videolibrary'] }}</dd>
+                                        </div>
+                                    @endif
+                                </dl>
                             </div>
-                        @endif
+                        </div>
+                    @endif
 
-                        @if(!empty($reSubs))
-                            <div class="bg-white rounded-lg p-3">
-                                <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                                    <i class="fas fa-closed-captioning mr-2 text-purple-500"></i> Subtitles
-                                </h4>
-                                <div class="text-xs space-y-1">
-                                    @foreach($reSubs as $sub)
-                                        @if(!empty($sub->subslanguage))
-                                            <p class="font-medium">{{ $sub->subslanguage }}</p>
+                    @if(!empty($reAudio))
+                        <div class="mb-6">
+                            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-volume-up mr-2 text-green-500"></i> Audio Details
+                            </h4>
+                            @foreach($reAudio as $index => $audio)
+                                <div class="bg-white rounded-lg p-4 shadow-sm {{ $index > 0 ? 'mt-3' : '' }}">
+                                    @if(count($reAudio) > 1)
+                                        <p class="text-xs font-semibold text-gray-500 mb-2">Track {{ $index + 1 }}</p>
+                                    @endif
+                                    <dl class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        @if(!empty($audio['audioformat']))
+                                            <div>
+                                                <dt class="text-xs font-medium text-gray-600 mb-1">Audio Format</dt>
+                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audioformat'] }}</dd>
+                                            </div>
                                         @endif
-                                    @endforeach
+                                        @if(!empty($audio['audiocodec']))
+                                            <div>
+                                                <dt class="text-xs font-medium text-gray-600 mb-1">Codec</dt>
+                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiocodec'] }}</dd>
+                                            </div>
+                                        @endif
+                                        @if(!empty($audio['audiochannels']))
+                                            <div>
+                                                <dt class="text-xs font-medium text-gray-600 mb-1">Channels</dt>
+                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiochannels'] }}</dd>
+                                            </div>
+                                        @endif
+                                        @if(!empty($audio['audiobitrate']))
+                                            <div>
+                                                <dt class="text-xs font-medium text-gray-600 mb-1">Bit Rate</dt>
+                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiobitrate'] }}</dd>
+                                            </div>
+                                        @endif
+                                        @if(!empty($audio['audiolanguage']))
+                                            <div>
+                                                <dt class="text-xs font-medium text-gray-600 mb-1">Language</dt>
+                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiolanguage'] }}</dd>
+                                            </div>
+                                        @endif
+                                        @if(!empty($audio['audiosamplerate']))
+                                            <div>
+                                                <dt class="text-xs font-medium text-gray-600 mb-1">Sample Rate</dt>
+                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiosamplerate'] }} Hz</dd>
+                                            </div>
+                                        @endif
+                                    </dl>
                                 </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if(!empty($reSubs))
+                        <div>
+                            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-closed-captioning mr-2 text-purple-500"></i> Subtitles
+                            </h4>
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <p class="text-sm text-gray-900 font-semibold">{{ $reSubs->subs }}</p>
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
             @endif
 
