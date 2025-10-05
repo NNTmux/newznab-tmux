@@ -148,6 +148,7 @@ Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
     Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');
     Route::match(['GET', 'POST'], 'filelist/{guid}', [FileListController::class, 'show'])->name('filelist');
+    Route::get('api/release/{guid}/filelist', [\App\Http\Controllers\Api\FileListApiController::class, 'getFileList'])->name('api.filelist');
     Route::match(['GET', 'POST'], 'series/{id?}', [SeriesController::class, 'index'])->name('series');
     Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
     Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');

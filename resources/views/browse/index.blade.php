@@ -187,7 +187,16 @@
                                     {{ $result->size_formatted ?? number_format($result->size / 1073741824, 2) . ' GB' }}
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    {{ $result->totalpart ?? 0 }}
+                                    @if($result->totalpart > 0)
+                                        <button type="button"
+                                                class="filelist-badge text-blue-600 hover:text-blue-800 font-medium cursor-pointer hover:underline"
+                                                data-guid="{{ $result->guid }}"
+                                                title="View file list">
+                                            {{ $result->totalpart ?? 0 }}
+                                        </button>
+                                    @else
+                                        {{ $result->totalpart ?? 0 }}
+                                    @endif
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
                                     <div class="flex items-center gap-2">
@@ -262,6 +271,26 @@
             </div>
         </div>
     </div>
+
+    <!-- File List Modal -->
+    <div id="filelistModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+        <div class="relative max-w-4xl w-full bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-file-archive mr-2 text-green-600"></i> File List
+                </h3>
+                <button type="button" onclick="closeFilelistModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="filelistContent" class="p-6 overflow-y-auto" style="max-height: calc(90vh - 80px);">
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-3xl text-green-600"></i>
+                    <p class="text-gray-600 mt-2">Loading file list...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -279,16 +308,11 @@ function showPreviewImage(guid, type = 'preview') {
     const error = document.getElementById('previewError');
     const title = document.getElementById('previewTitle');
 
-    // Show modal
     modal.style.display = 'flex';
     modal.classList.remove('hidden');
-
-    // Set title based on type
     title.textContent = type === 'sample' ? 'Sample Image' : 'Preview Image';
 
-    // Set image source - images are stored as {guid}.jpg in storage/covers/{type}/
     const imageUrl = '/covers/' + type + '/' + guid + '.jpg';
-
     img.src = imageUrl;
     error.classList.add('hidden');
     img.style.display = 'block';
@@ -308,6 +332,116 @@ function closeMediainfoModal() {
     const modal = document.getElementById('mediainfoModal');
     modal.style.display = 'none';
 }
+
+function closeFilelistModal() {
+    const modal = document.getElementById('filelistModal');
+    modal.style.display = 'none';
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showFilelist(guid) {
+    let modal = document.getElementById('filelistModal');
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+
+    const content = document.getElementById('filelistContent');
+    modal.style.display = 'flex';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.zIndex = '99999';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+
+    content.innerHTML = `
+        <div class="text-center py-8">
+            <i class="fas fa-spinner fa-spin text-3xl text-green-600"></i>
+            <p class="text-gray-600 mt-2">Loading file list...</p>
+        </div>
+    `;
+
+    const apiUrl = '/api/release/' + guid + '/filelist';
+
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load file list');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.files || data.files.length === 0) {
+                content.innerHTML = '<p class="text-center text-gray-500 py-8">No files available</p>';
+                return;
+            }
+
+            let html = '<div class="space-y-4">';
+            html += `
+                <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-4 mb-4">
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">${escapeHtml(data.release.searchname)}</h4>
+                    <p class="text-sm text-gray-600">Total Files: ${data.total}</p>
+                </div>
+            `;
+
+            html += `
+                <div class="overflow-hidden rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">File Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Size</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+            data.files.forEach((file, index) => {
+                const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                const fileName = file.title || file.name || 'Unknown';
+                const fileSize = file.size ? formatFileSize(file.size) : 'N/A';
+
+                html += `
+                    <tr class="${rowClass} hover:bg-gray-100">
+                        <td class="px-4 py-3 text-sm text-gray-900 break-all">${escapeHtml(fileName)}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">${fileSize}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            html += '</div>';
+            content.innerHTML = html;
+        })
+        .catch(error => {
+            content.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-exclamation-circle text-3xl text-red-600"></i>
+                    <p class="text-red-600 mt-2">${error.message}</p>
+                </div>
+            `;
+        });
+}
+
 
 function showMediainfo(releaseId) {
     let modal = document.getElementById('mediainfoModal');
@@ -530,6 +664,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const releaseId = mediainfoBadge.dataset.releaseId;
             showMediainfo(releaseId);
         }
+
+        // File list badge click handlers
+        const filelistBadge = e.target.closest('.filelist-badge');
+        if (filelistBadge) {
+            e.preventDefault();
+            const guid = filelistBadge.dataset.guid;
+            showFilelist(guid);
+        }
     });
 
     // Close modal on background click
@@ -545,11 +687,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    document.getElementById('filelistModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeFilelistModal();
+        }
+    });
+
     // Close modal on ESC key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closePreviewModal();
             closeMediainfoModal();
+            closeFilelistModal();
         }
     });
 
@@ -558,15 +707,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.chkRelease');
         checkboxes.forEach(checkbox => checkbox.checked = this.checked);
     });
-
     // Multi-operations download
     document.querySelector('.nzb_multi_operations_download')?.addEventListener('click', function() {
         const selected = Array.from(document.querySelectorAll('.chkRelease:checked')).map(cb => cb.value);
         if (selected.length === 0) {
-            showToast('Please select at least one release', 'error');
             return;
         }
-        // Download all selected NZBs
         selected.forEach(guid => {
             window.open('/getnzb/' + guid, '_blank');
         });
