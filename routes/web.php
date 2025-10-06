@@ -161,6 +161,7 @@ Route::middleware('isVerified')->group(function () {
     // Custom 2FA routes that redirect to profile page
     Route::post('profileedit/enable2fa', [PasswordSecurityController::class, 'enable2fa'])->name('profileedit.enable2fa');
     Route::post('profileedit/disable2fa', [PasswordSecurityController::class, 'disable2fa'])->name('profileedit.disable2fa');
+    Route::post('profileedit/cancel2fa', [PasswordSecurityController::class, 'cancelSetup'])->name('profileedit.cancel2fa');
     Route::post('profile-security/disable-2fa', [ProfileSecurityController::class, 'disable2fa'])->name('profile.security.disable2fa');
 });
 

@@ -116,8 +116,8 @@
                             </label>
                         </div>
 
-                        @if(Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500 transition">
+                        @if(Route::has('forgottenpassword'))
+                            <a href="{{ route('forgottenpassword') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500 transition">
                                 Forgot password?
                             </a>
                         @endif
@@ -147,11 +147,19 @@
             <!-- Card Footer -->
             <div class="px-8 py-4 bg-gray-50 border-t border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm">
-                    @if(Route::has('register'))
-                        <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-500 font-medium transition">
-                            <i class="fas fa-user-plus mr-1"></i> Create an account
-                        </a>
-                    @endif
+                    <div class="flex flex-col sm:flex-row gap-3 items-center">
+                        @if(Route::has('register'))
+                            <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-500 font-medium transition">
+                                <i class="fas fa-user-plus mr-1"></i> Create an account
+                            </a>
+                        @endif
+
+                        @if(Route::has('contact-us'))
+                            <a href="{{ route('contact-us') }}" class="text-blue-600 hover:text-blue-500 font-medium transition">
+                                <i class="fas fa-envelope mr-1"></i> Contact Us
+                            </a>
+                        @endif
+                    </div>
 
                     <a href="{{ url('/') }}" class="text-gray-600 hover:text-gray-900 transition">
                         <i class="fas fa-home mr-1"></i> Back to home

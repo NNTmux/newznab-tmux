@@ -32,7 +32,7 @@
                 @endif
 
                 <!-- Error Messages -->
-                @if($errors->any())
+                @if(isset($errors) && $errors->any())
                     <div class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200">
                         <div class="flex items-start">
                             <i class="fas fa-exclamation-circle text-red-600 mr-3 mt-0.5"></i>
@@ -48,7 +48,7 @@
                 @endif
 
                 <!-- Reset Form -->
-                <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
+                <form method="POST" action="{{ route('forgottenpassword') }}" class="space-y-6">
                     @csrf
 
                     <!-- Email Field -->
@@ -67,13 +67,13 @@
                                 value="{{ old('email') }}"
                                 required
                                 autofocus
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('email') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ isset($errors) && $errors->has('email') ? 'border-red-500' : '' }}"
                                 placeholder="your@email.com"
                             >
                         </div>
-                        @error('email')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        @if(isset($errors) && $errors->has('email'))
+                            <p class="mt-2 text-sm text-red-600">{{ $errors->first('email') }}</p>
+                        @endif
                     </div>
 
                     <!-- Submit Button -->

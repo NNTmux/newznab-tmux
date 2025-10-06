@@ -145,20 +145,6 @@
                 </div>
             </div>
 
-            <!-- 2FA Section -->
-            @if($google2fa_url)
-                <div class="border-t border-gray-200 pt-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Two-Factor Authentication</h3>
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <p class="text-sm text-gray-700 mb-4">Scan this QR code with your authenticator app to enable 2FA:</p>
-                        <div class="flex justify-center">
-                            {!! $google2fa_url !!}
-                        </div>
-                        <p class="text-xs text-gray-600 mt-4 text-center">After scanning, visit the 2FA settings page to complete setup</p>
-                    </div>
-                </div>
-            @endif
-
             <!-- Actions -->
             <div class="border-t border-gray-200 pt-6 flex items-center justify-between">
                 <a href="{{ route('profile') }}" class="px-6 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition">
@@ -176,6 +162,116 @@
                 </div>
             </div>
         </form>
+
+        <!-- 2FA Section (Outside main form) -->
+        <div class="p-6 border-t border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-shield-alt mr-2 text-blue-600"></i>Two-Factor Authentication (2FA)
+            </h3>
+
+            @if($user->passwordSecurity()->exists() && $user->passwordSecurity->google2fa_enable)
+                <!-- 2FA is Enabled -->
+                <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-600 text-xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <h4 class="text-green-800 font-semibold mb-1">Two-Factor Authentication is Active</h4>
+                            <p class="text-green-700 text-sm mb-4">Your account is protected with an additional layer of security. You'll need your authenticator app to log in.</p>
+
+                            <form method="POST" action="{{ route('profileedit.disable2fa') }}" class="inline">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
+                                        onclick="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')">
+                                    <i class="fas fa-times-circle mr-2"></i>Disable 2FA
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @elseif($user->passwordSecurity()->exists() && !$user->passwordSecurity->google2fa_enable)
+                <!-- 2FA Setup Started but Not Enabled -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-blue-600 text-xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <h4 class="text-blue-800 font-semibold mb-2">Complete Your 2FA Setup</h4>
+                            <p class="text-blue-700 text-sm mb-4">Follow these steps to enable two-factor authentication:</p>
+
+                            <ol class="list-decimal list-inside space-y-2 text-sm text-blue-700 mb-4">
+                                <li>Install an authenticator app (Google Authenticator, Authy, or similar)</li>
+                                <li>Scan the QR code below with your authenticator app</li>
+                                <li>Enter the 6-digit code from your app to verify</li>
+                            </ol>
+
+                            <div class="bg-white rounded-lg p-4 mb-4 flex justify-center">
+                                <img src="{{ $google2fa_url }}" alt="2FA QR Code">
+                            </div>
+
+                            <p class="text-xs text-blue-600 mb-4">
+                                <strong>Secret Key (manual entry):</strong>
+                                <code class="bg-white px-2 py-1 rounded">{{ $user->passwordSecurity->google2fa_secret }}</code>
+                            </p>
+
+
+                            <form method="POST" action="{{ route('enable2fa') }}" class="space-y-3">
+                                @csrf
+                                <div>
+                                    <label for="one_time_password" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Enter Verification Code
+                                    </label>
+                                    <input type="text"
+                                           id="one_time_password"
+                                           name="one_time_password"
+                                           placeholder="Enter 6-digit code"
+                                           maxlength="6"
+                                           required
+                                           class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest">
+                                </div>
+                                <div class="flex gap-2">
+                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">
+                                        <i class="fas fa-check mr-2"></i>Verify and Enable 2FA
+                                    </button>
+                                </div>
+                            </form>
+
+                            <form method="POST" action="{{ route('profileedit.cancel2fa') }}" class="mt-2">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition">
+                                    <i class="fas fa-times mr-2"></i>Cancel Setup
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <!-- 2FA Not Set Up -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <h4 class="text-yellow-800 font-semibold mb-1">Two-Factor Authentication is Disabled</h4>
+                            <p class="text-yellow-700 text-sm mb-4">Add an extra layer of security to your account by enabling two-factor authentication.</p>
+
+                            <form method="POST" action="{{ route('generate2faSecret') }}">
+                                @csrf
+                                <input type="hidden" name="from_profile" value="1">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                                    <i class="fas fa-shield-alt mr-2"></i>Enable Two-Factor Authentication
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-xs text-gray-600">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    <strong>What is 2FA?</strong> Two-Factor Authentication adds an extra layer of security by requiring both your password and a code from your phone to log in.
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

@@ -52,6 +52,11 @@ class PasswordSecurityController extends Controller
             ]
         );
 
+        // Check if request is from profile page
+        if ($request->has('from_profile') || $request->headers->get('referer') && str_contains($request->headers->get('referer'), 'profileedit')) {
+            return redirect()->to('profileedit#security')->with('success_2fa', 'Secret Key is generated, Please scan the QR code and verify to Enable 2FA');
+        }
+
         return redirect()->to('2fa')->with('success', 'Secret Key is generated, Please verify Code to Enable 2FA');
     }
 
@@ -83,6 +88,20 @@ class PasswordSecurityController extends Controller
         }
 
         return redirect()->to('2fa')->with('error', 'Invalid Verification Code, Please try again.');
+    }
+
+    public function cancelSetup(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Only allow canceling if 2FA is not yet enabled
+        if ($user->passwordSecurity()->exists() && ! $user->passwordSecurity->google2fa_enable) {
+            $user->passwordSecurity()->delete();
+
+            return redirect()->to('profileedit#security')->with('success_2fa', '2FA setup has been cancelled.');
+        }
+
+        return redirect()->to('profileedit#security')->with('error_2fa', 'Unable to cancel 2FA setup.');
     }
 
     public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
@@ -279,8 +298,6 @@ class PasswordSecurityController extends Controller
     public function showEnable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
     {
         $user = $request->user();
-        $success = $request->session()->get('success');
-        $error = $request->session()->get('error');
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
@@ -291,7 +308,12 @@ class PasswordSecurityController extends Controller
             );
         }
 
-        return view('themes.Gentele.2fa_enable', compact('user', 'google2fa_url', 'success', 'error'));
+        $data = [
+            'user' => $user,
+            'google2fa_url' => $google2fa_url,
+        ];
+
+        return view('auth.2fa')->with('data', $data);
     }
 
     /**
@@ -300,9 +322,21 @@ class PasswordSecurityController extends Controller
     public function showDisable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
     {
         $user = $request->user();
-        $success = $request->session()->get('success');
-        $error = $request->session()->get('error');
 
-        return view('themes.Gentele.2fa_disable', compact('user', 'success', 'error'));
+        $google2fa_url = '';
+        if ($user->passwordSecurity()->exists()) {
+            $google2fa_url = \Google2FA::getQRCodeInline(
+                config('app.name'),
+                $user->email,
+                $user->passwordSecurity->google2fa_secret
+            );
+        }
+
+        $data = [
+            'user' => $user,
+            'google2fa_url' => $google2fa_url,
+        ];
+
+        return view('auth.2fa')->with('data', $data);
     }
 }
