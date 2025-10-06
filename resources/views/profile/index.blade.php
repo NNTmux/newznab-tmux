@@ -200,10 +200,6 @@
                                         <label class="block text-sm font-medium text-gray-700 mb-2">API Token</label>
                                         <code class="block text-xs bg-gray-800 text-green-400 p-3 rounded break-all">{{ $user->api_token }}</code>
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">RSS Token</label>
-                                        <code class="block text-xs bg-gray-800 text-green-400 p-3 rounded break-all">{{ $user->rsstoken }}</code>
-                                    </div>
                                 </div>
                             @endif
                         </div>
