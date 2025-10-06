@@ -57,6 +57,11 @@
                                 <i class="fas fa-heart mr-2"></i> View on Trakt
                             </a>
                         @endif
+                        @if(!empty($movie['imdbid'] ?? null) && auth()->check())
+                            <a href="{{ url('/mymovies?id=add&imdb=' . $movie['imdbid'] . '&from=' . urlencode(request()->fullUrl())) }}" class="flex items-center justify-center px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition">
+                                <i class="fas fa-plus-circle mr-2"></i> Add to My Movies
+                            </a>
+                        @endif
                     </div>
                 </div>
 
