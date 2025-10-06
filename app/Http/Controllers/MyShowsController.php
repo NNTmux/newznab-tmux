@@ -18,9 +18,9 @@ class MyShowsController extends BasePageController
         $videoId = $request->input('id') ?? '';
 
         if ($request->has('from')) {
-            $this->smarty->assign('from', url($request->input('from')));
+            $this->viewData['from'] = url($request->input('from'));
         } else {
-            $this->smarty->assign('from', url('/myshows'));
+            $this->viewData['from'] = url('/myshows');
         }
 
         switch ($action) {
@@ -69,18 +69,15 @@ class MyShowsController extends BasePageController
                     }
                     $categories[$c['id']] = $c['title'];
                 }
-                $this->smarty->assign('type', 'add');
-                $this->smarty->assign('cat_ids', array_keys($categories));
-                $this->smarty->assign('cat_names', $categories);
-                $this->smarty->assign('cat_selected', []);
-                $this->smarty->assign('video', $videoId);
-                $this->smarty->assign('show', $show);
-                $content = $this->smarty->fetch('myshows-add.tpl');
-                $this->smarty->assign([
-                    'content' => $content,
-                ]);
-                $this->pagerender();
-                break;
+                $this->viewData['type'] = 'add';
+                $this->viewData['cat_ids'] = array_keys($categories);
+                $this->viewData['cat_names'] = $categories;
+                $this->viewData['cat_selected'] = [];
+                $this->viewData['video'] = $videoId;
+                $this->viewData['show'] = $show;
+                $this->viewData['content'] = view('themes/Gentele/myshows-add', $this->viewData)->render();
+                return $this->pagerender();
+
             case 'edit':
             case 'doedit':
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
@@ -105,18 +102,15 @@ class MyShowsController extends BasePageController
                     $categories[$c['id']] = $c['title'];
                 }
 
-                $this->smarty->assign('type', 'edit');
-                $this->smarty->assign('cat_ids', array_keys($categories));
-                $this->smarty->assign('cat_names', $categories);
-                $this->smarty->assign('cat_selected', explode('|', $show['categories']));
-                $this->smarty->assign('video', $videoId);
-                $this->smarty->assign('show', $show);
-                $content = $this->smarty->fetch('myshows-add.tpl');
-                $this->smarty->assign([
-                    'content' => $content,
-                ]);
-                $this->pagerender();
-                break;
+                $this->viewData['type'] = 'edit';
+                $this->viewData['cat_ids'] = array_keys($categories);
+                $this->viewData['cat_names'] = $categories;
+                $this->viewData['cat_selected'] = explode('|', $show['categories']);
+                $this->viewData['video'] = $videoId;
+                $this->viewData['show'] = $show;
+                $this->viewData['content'] = view('themes/Gentele/myshows-add', $this->viewData)->render();
+                return $this->pagerender();
+
             default:
 
                 $title = 'My Shows';
@@ -150,19 +144,20 @@ class MyShowsController extends BasePageController
                         $results[$showk] = $show;
                     }
                 }
-                $this->smarty->assign('shows', $results);
-
-                $content = $this->smarty->fetch('myshows.tpl');
-                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
-                $this->pagerender();
-                break;
+                $this->viewData['shows'] = $results;
+                $this->viewData['content'] = view('themes/Gentele/myshows', $this->viewData)->render();
+                $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
+                return $this->pagerender();
         }
+
+        // Fallback return in case no case matches
+        return redirect()->to('/myshows');
     }
 
     /**
      * @throws \Exception
      */
-    public function browse(Request $request): void
+    public function browse(Request $request)
     {
         $this->setPreferences();
         $title = 'Browse My Shows';
@@ -183,26 +178,19 @@ class MyShowsController extends BasePageController
         $rslt = $releases->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
-        $this->smarty->assign('covgroup', '');
+        $this->viewData['covgroup'] = '';
 
         foreach ($ordering as $ordertype) {
-            $this->smarty->assign('orderby'.$ordertype, url('/myshows/browse?ob='.$ordertype.'&amp;offset=0'));
+            $this->viewData['orderby'.$ordertype] = url('/myshows/browse?ob='.$ordertype.'&amp;offset=0');
         }
 
-        $this->smarty->assign('lastvisit', $this->userdata->lastlogin);
+        $this->viewData['lastvisit'] = $this->userdata->lastlogin;
+        $this->viewData['results'] = $results;
+        $this->viewData['resultsadd'] = $rslt;
+        $this->viewData['shows'] = true;
+        $this->viewData['content'] = view('themes/Gentele/browse', $this->viewData)->render();
+        $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
-        $this->smarty->assign(['results' => $results, 'resultsadd' => $rslt]);
-
-        $this->smarty->assign('shows', true);
-
-        $content = $this->smarty->fetch('browse.tpl');
-        $this->smarty->assign([
-            'content' => $content,
-            'title' => $title,
-            'meta_title' => $meta_title,
-            'meta_keywords' => $meta_keywords,
-            'meta_description' => $meta_description,
-        ]);
-        $this->pagerender();
+        return $this->pagerender();
     }
 }
