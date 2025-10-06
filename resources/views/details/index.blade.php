@@ -78,12 +78,12 @@
                         @if($hasPreviewImage)
                             <!-- Preview image -->
                             <div>
-                                <a href="{{ url('/covers/preview/' . $release->guid . '.jpg') }}" target="_blank" class="block">
+                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/preview/' . $release->guid . '.jpg') }}', 'Preview Image')">
                                     <img src="{{ url('/covers/preview/' . $release->guid . '.jpg') }}"
                                          alt="Preview"
-                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
                                          loading="lazy">
-                                </a>
+                                </div>
                                 <p class="text-xs text-gray-500 mt-1 text-center">Preview</p>
                             </div>
                         @endif
@@ -91,12 +91,12 @@
                         @if($hasSampleImage)
                             <!-- Sample image -->
                             <div>
-                                <a href="{{ url('/covers/sample/' . $release->guid . '.jpg') }}" target="_blank" class="block">
+                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/sample/' . $release->guid . '.jpg') }}', 'Sample Image')">
                                     <img src="{{ url('/covers/sample/' . $release->guid . '.jpg') }}"
                                          alt="Sample"
-                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
                                          loading="lazy">
-                                </a>
+                                </div>
                                 <p class="text-xs text-gray-500 mt-1 text-center">Sample</p>
                             </div>
                         @endif
@@ -787,7 +787,59 @@
 </div>
 @endsection
 
+<!-- Image Modal -->
+<div id="imageModal" class="fixed inset-0 bg-transparent hidden items-center justify-center p-4" style="z-index: 9999; backdrop-filter: blur(10px);">
+    <div class="relative max-w-7xl w-full h-full flex items-center justify-center">
+        <button type="button" onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-10 bg-black bg-opacity-70 rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="text-center">
+            <h3 id="imageModalTitle" class="text-white text-xl font-semibold mb-4 drop-shadow-lg"></h3>
+            <img id="imageModalImage" src="" alt="Image" class="max-w-full max-h-[85vh] mx-auto rounded-lg shadow-2xl">
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 @include('partials.cart-script')
+
+<script>
+function openImageModal(imageUrl, title) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('imageModalImage');
+    const modalTitle = document.getElementById('imageModalTitle');
+
+    modalImage.src = imageUrl;
+    modalTitle.textContent = title;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+
+    // Restore body scroll
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside the image
+document.getElementById('imageModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeImageModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeImageModal();
+    }
+});
+</script>
 @endpush
 
