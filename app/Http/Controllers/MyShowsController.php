@@ -76,6 +76,7 @@ class MyShowsController extends BasePageController
                 $this->viewData['video'] = $videoId;
                 $this->viewData['show'] = $show;
                 $this->viewData['content'] = view('themes/Gentele/myshows-add', $this->viewData)->render();
+
                 return $this->pagerender();
 
             case 'edit':
@@ -109,6 +110,7 @@ class MyShowsController extends BasePageController
                 $this->viewData['video'] = $videoId;
                 $this->viewData['show'] = $show;
                 $this->viewData['content'] = view('themes/Gentele/myshows-add', $this->viewData)->render();
+
                 return $this->pagerender();
 
             default:
@@ -147,6 +149,7 @@ class MyShowsController extends BasePageController
                 $this->viewData['shows'] = $results;
                 $this->viewData['content'] = view('themes/Gentele/myshows', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
+
                 return $this->pagerender();
         }
 
