@@ -18,7 +18,6 @@ class ApiHelpController extends BasePageController
      */
     public function index(): View
     {
-        $this->setPreferences();
         $this->setAdminPrefs();
 
         $this->viewData['title'] = 'Api Help';
@@ -35,7 +34,6 @@ class ApiHelpController extends BasePageController
      */
     public function apiv2(): View
     {
-        $this->setPreferences();
         $this->setAdminPrefs();
 
         $this->viewData['title'] = 'Api V2 Help';

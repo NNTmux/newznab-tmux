@@ -15,8 +15,6 @@ class CartController extends BasePageController
      */
     public function index()
     {
-        $this->setPreferences();
-
         $results = UsersRelease::getCart(Auth::id());
 
         $this->viewData = array_merge($this->viewData, [
@@ -34,7 +32,6 @@ class CartController extends BasePageController
      */
     public function store(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
-        $this->setPreferences();
         $guids = explode(',', $request->input('id'));
 
         $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
@@ -70,7 +67,6 @@ class CartController extends BasePageController
      */
     public function destroy(array|string $id): RedirectResponse
     {
-        $this->setPreferences();
         $ids = null;
         if (! empty($id) && ! \is_array($id)) {
             $ids = explode(',', $id);

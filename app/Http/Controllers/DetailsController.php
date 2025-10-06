@@ -27,8 +27,6 @@ class DetailsController extends BasePageController
 {
     public function show(Request $request, string $guid)
     {
-        $this->setPreferences();
-
         if ($guid !== null) {
             $releases = new Releases;
             $re = new ReleaseExtra;

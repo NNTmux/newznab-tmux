@@ -156,6 +156,13 @@
                                                         <i class="fas fa-images mr-1"></i> Sample
                                                     </button>
                                                 @endif
+                                                @if(isset($result->videos_id) && $result->videos_id > 0)
+                                                    <a href="{{ url('/series/' . $result->videos_id) }}"
+                                                       class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 hover:bg-indigo-200 transition"
+                                                       title="View full series">
+                                                        <i class="fas fa-tv mr-1"></i> View Series
+                                                    </a>
+                                                @endif
                                                 @if(isset($result->reid) && $result->reid != null)
                                                     <button type="button"
                                                             class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition cursor-pointer"

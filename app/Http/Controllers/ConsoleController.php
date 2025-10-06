@@ -15,7 +15,6 @@ class ConsoleController extends BasePageController
      */
     public function show(Request $request, string $id = '')
     {
-        $this->setPreferences();
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
         }

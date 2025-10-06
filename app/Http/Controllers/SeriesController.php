@@ -15,7 +15,6 @@ class SeriesController extends BasePageController
      */
     public function index(Request $request, string $id = '')
     {
-        $this->setPreferences();
         $releases = new Releases;
 
         if ($id && ctype_digit($id)) {

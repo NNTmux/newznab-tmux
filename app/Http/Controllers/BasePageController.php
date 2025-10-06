@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\UserLoggedIn;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\User;
@@ -50,6 +49,7 @@ class BasePageController extends Controller
     public function __construct()
     {
         $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release', 'reset', 'showLinkRequestForm');
+
         // Buffer settings/DB connection.
         $this->settings = new Settings;
 
@@ -58,33 +58,21 @@ class BasePageController extends Controller
             'serverroot' => url('/'),
             'site' => $this->settings,
         ];
+
+        // Initialize userdata property for controllers that need it
+        $this->middleware(function ($request, $next) {
+            if (Auth::check()) {
+                $this->userdata = User::find(Auth::id());
+                $this->userdata->categoryexclusions = User::getCategoryExclusionById(Auth::id());
+            }
+
+            return $next($request);
+        });
     }
 
     public function paginate($query, $totalCount, $items, $page, $path, $reqQuery): LengthAwarePaginator
     {
         return new LengthAwarePaginator($query, $totalCount, $items, $page, ['path' => $path, 'query' => $reqQuery]);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function setPreferences(): void
-    {
-        if (Auth::check()) {
-            $this->userdata = User::find(Auth::id());
-            $this->setUserPreferences();
-        } else {
-            $this->viewData = array_merge($this->viewData, [
-                'isadmin' => false,
-                'ismod' => false,
-                'loggedin' => false,
-            ]);
-        }
-
-        $this->viewData = array_merge($this->viewData, [
-            'theme' => 'Gentele',
-            'site' => $this->settings,
-        ]);
     }
 
     /**
@@ -107,30 +95,6 @@ class BasePageController extends Controller
         }
 
         return view('errors.404');
-    }
-
-    /**
-     *  Set user preferences.
-     */
-    protected function setUserPreferences(): void
-    {
-        $this->userdata->categoryexclusions = User::getCategoryExclusionById(Auth::id());
-
-        // Update last login every 15 mins.
-        if (now()->subHours(3) > $this->userdata->lastlogin) {
-            event(new UserLoggedIn($this->userdata));
-        }
-
-        $parentcatlist = Category::getForMenu($this->userdata->categoryexclusions);
-
-        $this->viewData = array_merge($this->viewData, [
-            'userdata' => $this->userdata,
-            'loggedin' => true,
-            'isadmin' => $this->userdata->hasRole('Admin'),
-            'ismod' => $this->userdata->hasRole('Moderator'),
-            'parentcatlist' => $parentcatlist,
-            'header_menu_cat' => request()->input('t', ''),
-        ]);
     }
 
     /**

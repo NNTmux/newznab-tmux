@@ -14,7 +14,6 @@ class ContentController extends BasePageController
      */
     public function show(Request $request)
     {
-        $this->setPreferences();
         $contents = new Contents;
 
         $role = $this->userdata->role ?? 0;

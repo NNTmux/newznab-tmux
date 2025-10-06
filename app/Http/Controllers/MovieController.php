@@ -13,7 +13,6 @@ class MovieController extends BasePageController
      */
     public function showMovies(Request $request, string $id = '')
     {
-        $this->setPreferences();
         $movie = new Movie(['Settings' => $this->settings]);
 
         $moviecats = Category::getChildren(Category::MOVIE_ROOT)->map(function ($mcat) {
@@ -94,7 +93,6 @@ class MovieController extends BasePageController
      */
     public function showMovie(Request $request, string $imdbid)
     {
-        $this->setPreferences();
         $movie = new Movie(['Settings' => $this->settings]);
 
         // Get movie info

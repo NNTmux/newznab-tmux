@@ -13,7 +13,6 @@ class MyShowsController extends BasePageController
 {
     public function show(Request $request)
     {
-        $this->setPreferences();
         $action = $request->input('action') ?? '';
         $videoId = $request->input('id') ?? '';
 
@@ -162,7 +161,6 @@ class MyShowsController extends BasePageController
      */
     public function browse(Request $request)
     {
-        $this->setPreferences();
         $title = 'Browse My Shows';
         $meta_title = 'My Shows';
         $meta_keywords = 'search,add,to,cart,nzb,description,details';

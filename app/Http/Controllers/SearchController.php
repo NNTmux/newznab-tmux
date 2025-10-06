@@ -14,7 +14,6 @@ class SearchController extends BasePageController
      */
     public function search(Request $request)
     {
-        $this->setPreferences();
         $releases = new Releases;
 
         $results = [];

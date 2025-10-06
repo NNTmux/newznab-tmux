@@ -14,8 +14,6 @@ class NfoController extends BasePageController
      */
     public function showNfo(Request $request, string $id = ''): void
     {
-        $this->setPreferences();
-
         if ($id) {
             $rel = Release::getByGuid($id);
 

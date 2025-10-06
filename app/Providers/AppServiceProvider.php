@@ -18,8 +18,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useTailwind();
-        $smarty = app('smarty.view');
-        view()->share('smarty', $smarty);
+
+        // Share global data with all views using View Composer
+        view()->composer('*', \App\View\Composers\GlobalDataComposer::class);
+
         Gate::define('viewPulse', function (User $user) {
             return $user->hasRole('Admin');
         });

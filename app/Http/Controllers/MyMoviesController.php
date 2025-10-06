@@ -13,7 +13,6 @@ class MyMoviesController extends BasePageController
 {
     public function show(Request $request)
     {
-        $this->setPreferences();
         $mv = new Movie;
 
         $action = $request->input('id') ?? '';

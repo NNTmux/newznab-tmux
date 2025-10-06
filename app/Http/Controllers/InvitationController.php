@@ -26,7 +26,6 @@ class InvitationController extends BasePageController
      */
     public function index(Request $request): View
     {
-        $this->setPreferences();
 
         $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
         $status = $request->get('status');
@@ -89,7 +88,6 @@ class InvitationController extends BasePageController
      */
     public function create(): View
     {
-        $this->setPreferences();
 
         $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
 
@@ -172,10 +170,6 @@ class InvitationController extends BasePageController
      */
     public function show(string $token): View
     {
-        // For public invitation page, we need to handle both logged in and guest users
-        if (auth()->check()) {
-            $this->setPreferences();
-        }
 
         $preview = $this->invitationService->getInvitationPreview($token);
 

@@ -12,8 +12,6 @@ class ContactUsController extends BasePageController
      */
     public function contact(ContactContactURequest $request)
     {
-        $this->setPreferences();
-
         if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
             $this->validate($request, [
                 'g-recaptcha-response' => 'required|captcha',
@@ -49,7 +47,6 @@ class ContactUsController extends BasePageController
      */
     public function showContactForm(string $msg = '')
     {
-        $this->setPreferences();
         $title = 'Contact '.config('app.name');
         $meta_title = 'Contact '.config('app.name');
         $meta_keywords = 'contact us,contact,get in touch,email';

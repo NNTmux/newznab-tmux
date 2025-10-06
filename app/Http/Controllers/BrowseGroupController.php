@@ -12,8 +12,6 @@ class BrowseGroupController extends BasePageController
      */
     public function show(Request $request): void
     {
-        $this->setPreferences();
-
         // Get the search term from the request
         $search = $request->get('search', '') ?? '';
 

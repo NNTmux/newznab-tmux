@@ -14,7 +14,6 @@ class AdultController extends BasePageController
      */
     public function show(Request $request, string $id = '')
     {
-        $this->setPreferences();
         $adult = new XXX;
 
         $moviecats = Category::getChildren(Category::XXX_ROOT);

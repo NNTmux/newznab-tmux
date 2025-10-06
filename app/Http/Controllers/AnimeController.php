@@ -36,7 +36,6 @@ class AnimeController extends BasePageController
      */
     public function showAnime(Request $request): void
     {
-        $this->setPreferences();
 
         if ($request->has('id') && ctype_digit($request->input('id'))) {
             // force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
@@ -84,7 +83,6 @@ class AnimeController extends BasePageController
      */
     public function showList(Request $request): void
     {
-        $this->setPreferences();
         $letter = ($request->has('id') && preg_match('/^(0\-9|[A-Z])$/i', $request->input('id'))) ? $request->input('id') : '0-9';
 
         $animeTitle = ($request->has('title') && ! empty($request->input('title'))) ? $request->input('title') : '';

@@ -24,7 +24,6 @@ class ProfileController extends BasePageController
      */
     public function show(Request $request)
     {
-        $this->setPreferences();
 
         $userID = $this->userdata->id;
         $privileged = $this->userdata->hasRole('Admin') || $this->userdata->hasRole('Moderator');
@@ -88,7 +87,6 @@ class ProfileController extends BasePageController
      */
     public function edit(Request $request)
     {
-        $this->setPreferences();
 
         $action = $request->input('action') ?? 'view';
 
@@ -286,7 +284,6 @@ class ProfileController extends BasePageController
      */
     public function destroy(Request $request): Application|View|Factory|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        $this->setPreferences();
         $userId = $request->input('id');
 
         if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {

@@ -12,7 +12,6 @@ class FileListController extends BasePageController
      */
     public function show(string $guid): void
     {
-        $this->setPreferences();
         $nzb = new NZB;
 
         if ($guid !== null) {

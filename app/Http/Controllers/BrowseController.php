@@ -14,7 +14,6 @@ class BrowseController extends BasePageController
      */
     public function index(Request $request)
     {
-        $this->setPreferences();
         $releases = new Releases;
 
         $ordering = $releases->getBrowseOrdering();
@@ -49,7 +48,6 @@ class BrowseController extends BasePageController
      */
     public function show(Request $request, string $parentCategory, string $id = 'All')
     {
-        $this->setPreferences();
         $releases = new Releases;
 
         $parentId = RootCategory::query()->where('title', $parentCategory)->value('id');
@@ -134,7 +132,6 @@ class BrowseController extends BasePageController
      */
     public function group(Request $request)
     {
-        $this->setPreferences();
         $releases = new Releases;
         if ($request->has('g')) {
             $group = $request->input('g');
