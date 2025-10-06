@@ -52,12 +52,20 @@
 
                     @if(session('error'))
                         <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                            {{ session('error') }}
+                            @if(is_array(session('error')))
+                                @foreach(session('error') as $error)
+                                    <div>{{ $error }}</div>
+                                @endforeach
+                            @else
+                                {{ session('error') }}
+                            @endif
                         </div>
                     @endif
 
                     @yield('content')
-                    {!! $content ?? '' !!}
+                    @if(isset($content) && is_string($content))
+                        {!! $content !!}
+                    @endif
                 </div>
             </main>
 
