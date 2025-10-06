@@ -32,15 +32,12 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      *
      * @throws \Exception
      */
     public function edit(Request $request)
     {
-        $this->setAdminPrefs();
-        $meta_title = $title = 'Release Edit';
-
         // Set the current action.
         $action = ($request->input('action') ?? 'view');
 
@@ -64,28 +61,29 @@ class AdminReleasesController extends BasePageController
                 );
 
                 $release = Release::getByGuid($request->input('guid'));
-                $this->smarty->assign('release', $release);
 
-                return redirect('details/'.$release['guid']);
+                return redirect('details/'.$release['guid'])->with('success', 'Release updated successfully');
                 break;
 
             case 'view':
             default:
                 $id = $request->input('id');
                 $release = Release::getByGuid($id);
-                $this->smarty->assign('release', $release);
                 break;
         }
 
-        $this->smarty->assign('yesno_ids', [1, 0]);
-        $this->smarty->assign('yesno_names', ['Yes', 'No']);
-        $this->smarty->assign('catlist', Category::getForSelect(false));
+        $yesno_ids = [1, 0];
+        $yesno_names = ['Yes', 'No'];
+        $catlist = Category::getForSelect(false);
 
-        $content = $this->smarty->fetch('release-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.release-edit', [
+            'release' => $release,
+            'yesno_ids' => $yesno_ids,
+            'yesno_names' => $yesno_names,
+            'catlist' => $catlist,
+            'title' => 'Release Edit',
+            'meta_title' => 'Release Edit'
+        ]);
     }
 
     public function destroy($id): RedirectResponse
