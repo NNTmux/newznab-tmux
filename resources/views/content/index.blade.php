@@ -6,23 +6,27 @@
         <!-- Front Page Content -->
         <div class="px-6 py-8">
             @if(is_array($content) && count($content) > 0)
-                @foreach($content as $item)
-                    <article class="prose max-w-none">
-                        @if(isset($item->title))
-                            <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $item->title }}</h1>
-                        @endif
+                <div class="space-y-6">
+                    @foreach($content as $item)
+                        <article class="bg-white rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+                            <div class="prose max-w-none">
+                                @if(isset($item->title))
+                                    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $item->title }}</h1>
+                                @endif
 
-                        @if(isset($item->body))
-                            <div class="text-gray-700 leading-relaxed">
-                                {!! $item->body !!}
+                                @if(isset($item->body))
+                                    <div class="text-gray-700 leading-relaxed">
+                                        {!! html_entity_decode(trim($item->body, '\'"')) !!}
+                                    </div>
+                                @endif
+
+                                @if(isset($item->metadescription))
+                                    <p class="mt-4 text-gray-600 italic">{{ $item->metadescription }}</p>
+                                @endif
                             </div>
-                        @endif
-
-                        @if(isset($item->metadescription))
-                            <p class="mt-4 text-gray-600 italic">{{ $item->metadescription }}</p>
-                        @endif
-                    </article>
-                @endforeach
+                        </article>
+                    @endforeach
+                </div>
             @else
                 <div class="text-center py-12">
                     <i class="fas fa-file-alt text-6xl text-gray-300 mb-4"></i>
