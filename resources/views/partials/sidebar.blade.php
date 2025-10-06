@@ -96,6 +96,10 @@
                 <i class="fa fa-hands-helping fa-fw mr-2"></i>
                 <span>API V2</span>
             </a>
+            <a href="{{ route('contact-us') }}" class="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded transition">
+                <i class="fa fa-envelope fa-fw mr-2"></i>
+                <span>Contact Us</span>
+            </a>
         </div>
     </div>
 

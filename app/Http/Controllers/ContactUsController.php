@@ -41,20 +41,18 @@ class ContactUsController extends BasePageController
     }
 
     /**
-     * @return void
+     * @return \Illuminate\View\View
      *
      * @throws \Exception
      */
     public function showContactForm(string $msg = '')
     {
-        $title = 'Contact '.config('app.name');
-        $meta_title = 'Contact '.config('app.name');
-        $meta_keywords = 'contact us,contact,get in touch,email';
-        $meta_description = 'Contact us at '.config('app.name').' and submit your feedback';
-        $content = $this->smarty->fetch('contact.tpl');
-
-        $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description', 'msg'));
-
-        $this->pagerender();
+        return view('contact', [
+            'title' => 'Contact '.config('app.name'),
+            'meta_title' => 'Contact '.config('app.name'),
+            'meta_keywords' => 'contact us,contact,get in touch,email',
+            'meta_description' => 'Contact us at '.config('app.name').' and submit your feedback',
+            'msg' => $msg,
+        ]);
     }
 }
