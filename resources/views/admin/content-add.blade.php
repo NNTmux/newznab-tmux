@@ -53,9 +53,9 @@
                     </label>
                     <textarea id="body"
                               name="body"
-                              rows="10"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ is_array($content) ? ($content['body'] ?? '') : ($content->body ?? '') }}</textarea>
-                    <p class="mt-1 text-sm text-gray-500">HTML is allowed</p>
+                              rows="15"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ is_array($content) ? trim(($content['body'] ?? ''), '\'"') : trim(($content->body ?? ''), '\'"') }}</textarea>
+                    <p class="mt-1 text-sm text-gray-500">Use the rich text editor to format your content</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -165,5 +165,86 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<!-- TinyMCE 8 (Latest Version) -->
+<script src="https://cdn.tiny.cloud/1/{{ config('tinymce.api_key', 'no-api-key') }}/tinymce/8/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+tinymce.init({
+    selector: '#body',
+    height: 500,
+    menubar: true,
+    plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+    ],
+    toolbar: 'undo redo | blocks fontfamily fontsize | ' +
+        'bold italic underline strikethrough | forecolor backcolor | ' +
+        'alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist outdent indent | ' +
+        'link image media table emoticons | ' +
+        'removeformat code fullscreen | help',
+    toolbar_mode: 'sliding',
+    content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
+    branding: false,
+    promotion: false,
+    resize: true,
+    statusbar: true,
+    elementpath: true,
+    images_upload_url: false,
+    automatic_uploads: false,
+    file_picker_types: 'image',
+    /* Font options */
+    font_family_formats: 'Arial=arial,helvetica,sans-serif; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,geneva,sans-serif',
+    font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
+    /* Enable automatic link creation */
+    autolink_pattern: /^(https?:\/\/|www\.|(?!www\.)[a-z0-9\-]+\.[a-z]{2,13})/i,
+    link_default_protocol: 'https',
+    link_assume_external_targets: true,
+    /* Link target options */
+    link_target_list: [
+        {title: 'None', value: ''},
+        {title: 'New window', value: '_blank'},
+        {title: 'Same window', value: '_self'}
+    ],
+    /* Block formats */
+    block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Blockquote=blockquote',
+    /* Content filtering - allow all HTML */
+    valid_elements: '*[*]',
+    extended_valid_elements: '*[*]',
+    valid_children: '+body[style]',
+    /* Paste settings */
+    paste_as_text: false,
+    paste_block_drop: false,
+    paste_data_images: true,
+    paste_retain_style_properties: 'all',
+    /* Image settings */
+    image_advtab: true,
+    image_caption: true,
+    image_description: true,
+    image_dimensions: true,
+    image_title: true,
+    /* Table settings */
+    table_default_attributes: {
+        border: '1'
+    },
+    table_default_styles: {
+        'border-collapse': 'collapse',
+        'width': '100%'
+    },
+    table_responsive_width: true,
+    /* Auto-save */
+    setup: function(editor) {
+        editor.on('change', function() {
+            editor.save();
+        });
+        editor.on('blur', function() {
+            editor.save();
+        });
+    }
+});
+</script>
+@endpush
 @endsection
 
