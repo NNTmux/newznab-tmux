@@ -20,9 +20,9 @@ class MyMoviesController extends BasePageController
         $imdbid = $request->input('imdb') ?? '';
 
         if ($request->has('from')) {
-            $this->smarty->assign('from', url($request->input('from')));
+            $this->viewData['from'] = url($request->input('from'));
         } else {
-            $this->smarty->assign('from', url('/mymovies'));
+            $this->viewData['from'] = url('/mymovies');
         }
 
         switch ($action) {
@@ -70,16 +70,15 @@ class MyMoviesController extends BasePageController
                     }
                     $categories[$c['id']] = $c['title'];
                 }
-                $this->smarty->assign('type', 'add');
-                $this->smarty->assign('cat_ids', array_keys($categories));
-                $this->smarty->assign('cat_names', $categories);
-                $this->smarty->assign('cat_selected', []);
-                $this->smarty->assign('imdbid', $imdbid);
-                $this->smarty->assign('movie', $movie);
-                $content = $this->smarty->fetch('mymovies-add.tpl');
-                $this->smarty->assign('content', $content);
-                $this->pagerender();
-                break;
+                $this->viewData['type'] = 'add';
+                $this->viewData['cat_ids'] = array_keys($categories);
+                $this->viewData['cat_names'] = $categories;
+                $this->viewData['cat_selected'] = [];
+                $this->viewData['imdbid'] = $imdbid;
+                $this->viewData['movie'] = $movie;
+                $this->viewData['content'] = view('themes/Gentele/mymovies-add', $this->viewData)->render();
+                return $this->pagerender();
+
             case 'edit':
             case 'doedit':
                 $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
@@ -104,16 +103,15 @@ class MyMoviesController extends BasePageController
                     $categories[$c['id']] = $c['title'];
                 }
 
-                $this->smarty->assign('type', 'edit');
-                $this->smarty->assign('cat_ids', array_keys($categories));
-                $this->smarty->assign('cat_names', $categories);
-                $this->smarty->assign('cat_selected', explode('|', $movie['categories']));
-                $this->smarty->assign('imdbid', $imdbid);
-                $this->smarty->assign('movie', $movie);
-                $content = $this->smarty->fetch('mymovies-add.tpl');
-                $this->smarty->assign('content', $content);
-                $this->pagerender();
-                break;
+                $this->viewData['type'] = 'edit';
+                $this->viewData['cat_ids'] = array_keys($categories);
+                $this->viewData['cat_names'] = $categories;
+                $this->viewData['cat_selected'] = explode('|', $movie['categories']);
+                $this->viewData['imdbid'] = $imdbid;
+                $this->viewData['movie'] = $movie;
+                $this->viewData['content'] = view('themes/Gentele/mymovies-add', $this->viewData)->render();
+                return $this->pagerender();
+
             case 'browse':
 
                 $title = 'Browse My Movies';
@@ -148,22 +146,19 @@ class MyMoviesController extends BasePageController
 
                 $results = $mv->getMovieRange($page, $movie['categoryNames'], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, $this->userdata->categoryexclusions);
 
-                $this->smarty->assign('covgroup', '');
+                $this->viewData['covgroup'] = '';
 
                 foreach ($ordering as $ordertype) {
-                    $this->smarty->assign('orderby'.$ordertype, url('/mymovies/browse?ob='.$ordertype.'&amp;offset=0'));
+                    $this->viewData['orderby'.$ordertype] = url('/mymovies/browse?ob='.$ordertype.'&amp;offset=0');
                 }
 
-                $this->smarty->assign('lastvisit', $this->userdata->lastlogin);
+                $this->viewData['lastvisit'] = $this->userdata->lastlogin;
+                $this->viewData['results'] = $results;
+                $this->viewData['movies'] = true;
+                $this->viewData['content'] = view('themes/Gentele/browse', $this->viewData)->render();
+                $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
+                return $this->pagerender();
 
-                $this->smarty->assign('results', $results);
-
-                $this->smarty->assign('movies', true);
-
-                $content = $this->smarty->fetch('browse.tpl');
-                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
-                $this->pagerender();
-                break;
             default:
 
                 $title = 'My Movies';
@@ -195,12 +190,13 @@ class MyMoviesController extends BasePageController
 
                     $results[$moviek] = $movie;
                 }
-                $this->smarty->assign('movies', $results);
-
-                $content = $this->smarty->fetch('mymovies.tpl');
-                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
-                $this->pagerender();
-                break;
+                $this->viewData['movies'] = $results;
+                $this->viewData['content'] = view('themes/Gentele/mymovies', $this->viewData)->render();
+                $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
+                return $this->pagerender();
         }
+
+        // Fallback return in case no case matches
+        return redirect()->to('/mymovies');
     }
 }

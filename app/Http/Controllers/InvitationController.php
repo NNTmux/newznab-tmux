@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invitation;
-use App\Models\Settings; // Added for registerstatus check
+use App\Models\Settings;
 use App\Services\InvitationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class InvitationController extends BasePageController
 {
@@ -23,45 +24,38 @@ class InvitationController extends BasePageController
     /**
      * Display a listing of the user's invitations
      */
-    public function index(Request $request): void
+    public function index(Request $request): View
     {
         $this->setPreferences();
 
         $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
+        $status = $request->get('status');
+
+        $this->viewData['meta_title'] = 'My Invitations';
+        $this->viewData['meta_keywords'] = 'invitations,invite,users,manage';
+        $this->viewData['meta_description'] = 'Manage your sent invitations and send new invitations to friends';
+        $this->viewData['status'] = $status;
+
         if (! $inviteMode) {
             // Invitations disabled: show informational message only, no queries.
-            $this->smarty->assign([
-                'invite_mode' => false,
-                'status' => null,
-                'stats' => [],
-                'invitations' => [],
-                'pagination_links' => null,
-                'csrf_token' => csrf_token(),
-            ]);
+            $this->viewData['invite_mode'] = false;
+            $this->viewData['stats'] = [];
+            $this->viewData['invitations'] = [];
+            $this->viewData['pagination_links'] = null;
 
-            $meta_title = 'Invitations Disabled';
-            $meta_keywords = 'invitations,disabled';
-            $meta_description = 'Invitations are currently disabled on this site.';
+            $this->viewData['meta_title'] = 'Invitations Disabled';
+            $this->viewData['meta_keywords'] = 'invitations,disabled';
+            $this->viewData['meta_description'] = 'Invitations are currently disabled on this site.';
 
-            $content = $this->smarty->fetch('invitations_index.tpl');
-            $this->smarty->assign([
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]);
-            $this->pagerender();
-
-            return;
+            return view('invitations.index', $this->viewData);
         }
 
-        $status = $request->get('status');
         $user = auth()->user();
 
         $invitations = $this->invitationService->getUserInvitations($user->id, $status);
         $stats = $this->invitationService->getUserInvitationStats($user->id);
 
-        // Convert paginated results to array for Smarty
+        // Convert paginated results to array for Blade
         $invitationsArray = [];
         foreach ($invitations as $invitation) {
             $invitationData = $invitation->toArray();
@@ -71,7 +65,7 @@ class InvitationController extends BasePageController
                 $invitationData['used_by_user'] = $invitation->usedBy->toArray();
             }
 
-            // Convert timestamps for Smarty
+            // Convert timestamps
             $invitationData['created_at'] = strtotime($invitation->created_at);
             $invitationData['expires_at'] = strtotime($invitation->expires_at);
             if ($invitation->used_at) {
@@ -81,61 +75,35 @@ class InvitationController extends BasePageController
             $invitationsArray[] = $invitationData;
         }
 
-        $this->smarty->assign([
-            'invite_mode' => true,
-            'invitations' => $invitationsArray,
-            'stats' => $stats,
-            'status' => $status,
-            'pagination_links' => $invitations->links(),
-            'csrf_token' => csrf_token(),
-        ]);
+        $this->viewData['invite_mode'] = true;
+        $this->viewData['invitations'] = $invitationsArray;
+        $this->viewData['stats'] = $stats;
+        $this->viewData['status'] = $status;
+        $this->viewData['pagination_links'] = $invitations->links();
 
-        // Set meta information
-        $meta_title = 'My Invitations';
-        $meta_keywords = 'invitations,invite,users,manage';
-        $meta_description = 'Manage your sent invitations and send new invitations to friends';
-
-        // Fetch the template content
-        $content = $this->smarty->fetch('invitations_index.tpl');
-
-        // Assign content and meta data for final rendering
-        $this->smarty->assign([
-            'content' => $content,
-            'meta_title' => $meta_title,
-            'meta_keywords' => $meta_keywords,
-            'meta_description' => $meta_description,
-        ]);
-
-        // Render the page with proper styling
-        $this->pagerender();
+        return view('invitations.index', $this->viewData);
     }
 
     /**
      * Show the form for creating a new invitation
      */
-    public function create(): void
+    public function create(): View
     {
         $this->setPreferences();
 
         $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
-        if (! $inviteMode) {
-            $this->smarty->assign([
-                'invite_mode' => false,
-                'csrf_token' => csrf_token(),
-            ]);
-            $meta_title = 'Invitations Disabled';
-            $meta_keywords = 'invitations,disabled';
-            $meta_description = 'Invitations are currently disabled on this site.';
-            $content = $this->smarty->fetch('invitations_create.tpl');
-            $this->smarty->assign([
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]);
-            $this->pagerender();
 
-            return;
+        $this->viewData['meta_title'] = 'Send New Invitation';
+        $this->viewData['meta_keywords'] = 'invitation,invite,send,new,user';
+        $this->viewData['meta_description'] = 'Send a new invitation to invite someone to join the site';
+
+        if (! $inviteMode) {
+            $this->viewData['invite_mode'] = false;
+            $this->viewData['meta_title'] = 'Invitations Disabled';
+            $this->viewData['meta_keywords'] = 'invitations,disabled';
+            $this->viewData['meta_description'] = 'Invitations are currently disabled on this site.';
+
+            return view('invitations.create', $this->viewData);
         }
 
         $user = auth()->user();
@@ -148,36 +116,15 @@ class InvitationController extends BasePageController
             ->count();
 
         $availableInvites = $user->invites - $activeInvitations;
-        $this->smarty->assign([
-            'invite_mode' => true,
-            'user_roles' => config('nntmux.user_roles', []),
-            'csrf_token' => csrf_token(),
-            'old' => old(),
-            'errors' => session('errors') ? session('errors')->getBag('default')->getMessages() : [],
-            'user_invites_left' => $availableInvites,
-            'user_invites_total' => $user->invites,
-            'user_invites_pending' => $activeInvitations,
-            'can_send_invites' => $availableInvites > 0,
-        ]);
 
-        // Set meta information
-        $meta_title = 'Send New Invitation';
-        $meta_keywords = 'invitation,invite,send,new,user';
-        $meta_description = 'Send a new invitation to invite someone to join the site';
+        $this->viewData['invite_mode'] = true;
+        $this->viewData['user_roles'] = config('nntmux.user_roles', []);
+        $this->viewData['user_invites_left'] = $availableInvites;
+        $this->viewData['user_invites_total'] = $user->invites;
+        $this->viewData['user_invites_pending'] = $activeInvitations;
+        $this->viewData['can_send_invites'] = $availableInvites > 0;
 
-        // Fetch the template content
-        $content = $this->smarty->fetch('invitations_create.tpl');
-
-        // Assign content and meta data for final rendering
-        $this->smarty->assign([
-            'content' => $content,
-            'meta_title' => $meta_title,
-            'meta_keywords' => $meta_keywords,
-            'meta_description' => $meta_description,
-        ]);
-
-        // Render the page with proper styling
-        $this->pagerender();
+        return view('invitations.create', $this->viewData);
     }
 
     /**
@@ -223,31 +170,16 @@ class InvitationController extends BasePageController
     /**
      * Display the specified invitation
      */
-    public function show(string $token): void
+    public function show(string $token): View
     {
         // For public invitation page, we need to handle both logged in and guest users
         if (auth()->check()) {
             $this->setPreferences();
-        } else {
-            // Set up basic Smarty configuration for guests
-            $this->smarty->setTemplateDir([
-                'user' => config('ytake-laravel-smarty.template_path').'/Gentele',
-                'shared' => config('ytake-laravel-smarty.template_path').'/shared',
-                'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
-            ]);
-
-            $this->smarty->assign([
-                'isadmin' => false,
-                'ismod' => false,
-                'loggedin' => false,
-                'theme' => 'Gentele',
-                'site' => $this->settings,
-            ]);
         }
 
         $preview = $this->invitationService->getInvitationPreview($token);
 
-        // Convert timestamps for Smarty
+        // Convert timestamps
         if ($preview && isset($preview['expires_at'])) {
             $preview['expires_at'] = strtotime($preview['expires_at']);
         }
@@ -258,29 +190,15 @@ class InvitationController extends BasePageController
             $preview['role_name'] = $roles[$preview['metadata']['role']] ?? 'Default';
         }
 
-        $this->smarty->assign([
-            'preview' => $preview,
-            'token' => $token,
-        ]);
+        $this->viewData['preview'] = $preview;
+        $this->viewData['token'] = $token;
 
         // Set meta information
-        $meta_title = $preview ? 'Invitation to Join' : 'Invalid Invitation';
-        $meta_keywords = 'invitation,join,register,signup';
-        $meta_description = $preview ? 'You have been invited to join our community' : 'This invitation link is invalid or expired';
+        $this->viewData['meta_title'] = $preview ? 'Invitation to Join' : 'Invalid Invitation';
+        $this->viewData['meta_keywords'] = 'invitation,join,register,signup';
+        $this->viewData['meta_description'] = $preview ? 'You have been invited to join our community' : 'This invitation link is invalid or expired';
 
-        // Fetch the template content
-        $content = $this->smarty->fetch('invitations_show.tpl');
-
-        // Assign content and meta data for final rendering
-        $this->smarty->assign([
-            'content' => $content,
-            'meta_title' => $meta_title,
-            'meta_keywords' => $meta_keywords,
-            'meta_description' => $meta_description,
-        ]);
-
-        // Render the page with proper styling
-        $this->pagerender();
+        return view('invitations.show', $this->viewData);
     }
 
     /**
@@ -371,3 +289,4 @@ class InvitationController extends BasePageController
         ]);
     }
 }
+
