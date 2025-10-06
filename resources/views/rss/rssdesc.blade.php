@@ -25,39 +25,39 @@
 
         <h4 class="mb-3"><i class="fa fa-cog me-2 text-secondary"></i>RSS Configuration Options</h4>
         <div class="table-responsive">
-            <table class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered" style="table-layout: fixed;">
                 <thead class="table-light">
                     <tr>
-                        <th>Parameter</th>
-                        <th>Description</th>
-                        <th>Example</th>
+                        <th style="width: 20%; padding-right: 2rem;">Parameter</th>
+                        <th style="width: 50%; padding-left: 2rem; padding-right: 2rem;">Description</th>
+                        <th style="width: 30%; padding-left: 2rem;">Example</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><code>api_token</code></td>
-                        <td>Add this to your feed URL to allow NZB downloads without logging in</td>
-                        <td><code>&amp;api_token={{ $userdata->api_token ?? 'YOUR_TOKEN' }}</code></td>
+                        <td style="padding-right: 2rem;"><code>api_token</code></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">Add this to your feed URL to allow NZB downloads without logging in</td>
+                        <td style="padding-left: 2rem;"><code>&amp;api_token={{ $userdata->api_token ?? 'YOUR_TOKEN' }}</code></td>
                     </tr>
                     <tr>
-                        <td><code>del=1</code></td>
-                        <td>Remove NZB from your cart after download</td>
-                        <td><code>&amp;del=1</code></td>
+                        <td style="padding-right: 2rem;"><code>del=1</code></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">Remove NZB from your cart after download</td>
+                        <td style="padding-left: 2rem;"><code>&amp;del=1</code></td>
                     </tr>
                     <tr>
-                        <td><code>dl=1</code></td>
-                        <td>Change the default link to download an NZB</td>
-                        <td><code>&amp;dl=1</code></td>
+                        <td style="padding-right: 2rem;"><code>dl=1</code></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">Change the default link to download an NZB</td>
+                        <td style="padding-left: 2rem;"><code>&amp;dl=1</code></td>
                     </tr>
                     <tr>
-                        <td><code>num=50</code></td>
-                        <td>Change the number of results returned (default: 25, max: 100)</td>
-                        <td><code>&amp;num=50</code></td>
+                        <td style="padding-right: 2rem;"><code>num=50</code></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">Change the number of results returned (default: 25, max: 100)</td>
+                        <td style="padding-left: 2rem;"><code>&amp;num=50</code></td>
                     </tr>
                     <tr>
-                        <td><code>airdate=20</code></td>
-                        <td>Return TV shows only aired in the last x days (default: all)</td>
-                        <td><code>&amp;airdate=20</code></td>
+                        <td style="padding-right: 2rem;"><code>airdate=20</code></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">Return TV shows only aired in the last x days (default: all)</td>
+                        <td style="padding-left: 2rem;"><code>&amp;airdate=20</code></td>
                     </tr>
                 </tbody>
             </table>
