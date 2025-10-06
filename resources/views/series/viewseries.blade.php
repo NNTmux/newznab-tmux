@@ -147,7 +147,7 @@
                                                     </a>
                                                     <div class="text-xs text-gray-500 mt-1">
                                                         <span class="mr-3">
-                                                            <i class="fa fa-hdd-o mr-1"></i>{{ \App\Support\Helpers::formatBytes($release->size) }}
+                                                            <i class="fa fa-hdd-o mr-1"></i>{{ formatBytes($release->size) }}
                                                         </span>
                                                         <span>
                                                             <i class="fa fa-clock-o mr-1"></i>{{ \Carbon\Carbon::parse($release->postdate)->diffForHumans() }}

@@ -57,6 +57,7 @@
                     @endif
 
                     @yield('content')
+                    {!! $content ?? '' !!}
                 </div>
             </main>
 

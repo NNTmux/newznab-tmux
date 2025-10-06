@@ -511,3 +511,22 @@ if (! function_exists('sanitize')) {
         return implode(' ', $keywords);
     }
 }
+
+if (! function_exists('formatBytes')) {
+    /**
+     * Format bytes into human-readable file size.
+     *
+     * @param  int|float|null  $bytes
+     */
+    function formatBytes($bytes = 0): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max((int) $bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, 2).' '.$units[$pow];
+    }
+}

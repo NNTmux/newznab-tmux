@@ -64,10 +64,11 @@ class Releases extends Release
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid,
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+				m.imdbid, m.tmdbid, m.traktid,
 				tve.title, tve.firstaired
 			FROM
 			(
-				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, g.name AS group_name
+				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, g.name AS group_name, r.movieinfo_id
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				WHERE r.passwordstatus %s
@@ -78,6 +79,7 @@ class Releases extends Release
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT OUTER JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
@@ -98,7 +100,7 @@ class Releases extends Release
         if ($releases !== null) {
             return $releases;
         }
-        $sql = $this->fromQuery($qry);
+        $sql = DB::select($qry);
         if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;

@@ -212,7 +212,7 @@
                                     </div>
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-1">
+                                    <div class="flex items-center gap-1 flex-wrap">
                                         <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm" title="Download NZB" onclick="showToast('Downloading NZB...', 'success')">
                                             <i class="fa fa-download"></i>
                                         </a>
@@ -222,6 +222,14 @@
                                         <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
                                             <i class="icon_cart fa fa-shopping-basket"></i>
                                         </a>
+                                        @if(!empty($result->imdbid) && $result->imdbid != '0' && $result->imdbid != 0 && $result->imdbid != '0000000')
+                                            <a href="{{ url('/mymovies?id=add&imdb=' . $result->imdbid) }}"
+                                               class="px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition text-sm"
+                                               style="background-color: #9333ea; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; text-decoration: none; display: inline-block;"
+                                               title="Add to My Movies">
+                                                <i class="fa fa-film" style="color: white;"></i>
+                                            </a>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

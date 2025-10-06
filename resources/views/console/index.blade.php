@@ -178,7 +178,7 @@
 
                                                 <div class="flex items-center text-sm">
                                                     <i class="fa fa-hdd-o text-gray-400 mr-2"></i>
-                                                    <span class="px-2 py-1 bg-gray-600 text-white text-xs rounded">{{ \App\Support\Helpers::formatBytes($result->size) }}</span>
+                                                    <span class="px-2 py-1 bg-gray-600 text-white text-xs rounded">{{ formatBytes($result->size) }}</span>
                                                 </div>
                                             </div>
 
