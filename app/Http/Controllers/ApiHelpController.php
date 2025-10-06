@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ApiHelpController extends BasePageController
 {
@@ -14,32 +16,34 @@ class ApiHelpController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(): void
+    public function index(): View
     {
         $this->setPreferences();
-        $title = 'Api Help';
-        $meta_title = 'Api Help Topics';
-        $meta_keywords = 'view,nzb,api,details,help,json,rss,atom';
-        $meta_description = 'View description of the site Nzb Api.';
+        $this->setAdminPrefs();
 
-        $content = $this->smarty->fetch('apidesc.tpl');
-        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
+        $this->viewData['title'] = 'Api Help';
+        $this->viewData['meta_title'] = 'Api Help Topics';
+        $this->viewData['meta_keywords'] = 'view,nzb,api,details,help,json,rss,atom';
+        $this->viewData['meta_description'] = 'View description of the site Nzb Api.';
+        $this->viewData['catClass'] = Category::class;
+
+        return view('apidesc', $this->viewData);
     }
 
     /**
      * @throws \Exception
      */
-    public function apiv2(): void
+    public function apiv2(): View
     {
         $this->setPreferences();
-        $title = 'Api V2 Help';
-        $meta_title = 'Api V2 Help Topics';
-        $meta_keywords = 'view,nzb,api,details,help,json,rss,atom';
-        $meta_description = 'View description of the site Nzb version 2 Api.';
+        $this->setAdminPrefs();
 
-        $content = $this->smarty->fetch('apiv2desc.tpl');
-        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
-        $this->pagerender();
+        $this->viewData['title'] = 'Api V2 Help';
+        $this->viewData['meta_title'] = 'Api V2 Help Topics';
+        $this->viewData['meta_keywords'] = 'view,nzb,api,details,help,json,rss,atom';
+        $this->viewData['meta_description'] = 'View description of the site Nzb version 2 Api.';
+        $this->viewData['catClass'] = Category::class;
+
+        return view('apiv2desc', $this->viewData);
     }
 }
