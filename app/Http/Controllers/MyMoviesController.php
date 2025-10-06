@@ -77,6 +77,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['imdbid'] = $imdbid;
                 $this->viewData['movie'] = $movie;
                 $this->viewData['content'] = view('themes/Gentele/mymovies-add', $this->viewData)->render();
+
                 return $this->pagerender();
 
             case 'edit':
@@ -110,6 +111,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['imdbid'] = $imdbid;
                 $this->viewData['movie'] = $movie;
                 $this->viewData['content'] = view('themes/Gentele/mymovies-add', $this->viewData)->render();
+
                 return $this->pagerender();
 
             case 'browse':
@@ -157,6 +159,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['movies'] = true;
                 $this->viewData['content'] = view('themes/Gentele/browse', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
+
                 return $this->pagerender();
 
             default:
@@ -193,6 +196,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['movies'] = $results;
                 $this->viewData['content'] = view('themes/Gentele/mymovies', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
+
                 return $this->pagerender();
         }
 
