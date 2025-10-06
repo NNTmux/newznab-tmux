@@ -237,10 +237,18 @@
                                             @foreach($releases as $release)
                                                 <div class="flex items-center justify-between bg-gray-50 rounded p-3 hover:bg-gray-100">
                                                     <div class="flex-1">
-                                                        <a href="{{ url('/details/' . $release->guid) }}"
-                                                           class="text-blue-600 hover:text-blue-800 font-medium">
-                                                            {{ $release->searchname }}
-                                                        </a>
+                                                        <div class="flex items-center gap-2 flex-wrap">
+                                                            <a href="{{ url('/details/' . $release->guid) }}"
+                                                               class="text-blue-600 hover:text-blue-800 font-medium">
+                                                                {{ $release->searchname }}
+                                                            </a>
+                                                            @if(!empty($release->failed) && $release->failed > 0)
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800"
+                                                                      title="{{ $release->failed }} user(s) reported download failure">
+                                                                    <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $release->failed }})
+                                                                </span>
+                                                            @endif
+                                                        </div>
                                                         <div class="text-xs text-gray-500 mt-1">
                                                             <span class="mr-3">
                                                                 <i class="fa fa-hdd-o mr-1"></i>{{ formatBytes($release->size) }}

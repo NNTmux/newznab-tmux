@@ -103,7 +103,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
                 @foreach($resultsadd as $result)
                     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                        <a href="{{ url('/details/' . $result->guid) }}" class="block">
+                        <a href="{{ url('/details/' . $result->guid) }}" class="block relative">
                             @if(!empty($result->cover))
                                 <img src="{{ url('/covers/music/' . $result->cover) }}"
                                      alt="{{ $result->artist ?? '' }} - {{ $result->title ?? '' }}"
@@ -112,6 +112,13 @@
                             @else
                                 <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                                     <i class="fa fa-music text-4xl text-gray-400"></i>
+                                </div>
+                            @endif
+                            @if(!empty($result->failed) && $result->failed > 0)
+                                <div class="absolute top-2 right-2">
+                                    <span class="px-2 py-1 bg-red-600 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed }} user(s) reported download failure">
+                                        <i class="fa fa-exclamation-triangle mr-1"></i>Failed
+                                    </span>
                                 </div>
                             @endif
                             <div class="p-3">

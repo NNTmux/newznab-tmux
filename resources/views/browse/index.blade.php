@@ -140,6 +140,12 @@
                                         <div class="flex-1">
                                             <div class="flex items-center gap-2 flex-wrap">
                                                 <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 hover:text-blue-800 font-medium">{{ $result->searchname }}</a>
+                                                @if(!empty($result->failed) && $result->failed > 0)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800"
+                                                          title="{{ $result->failed }} user(s) reported download failure">
+                                                        <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed }})
+                                                    </span>
+                                                @endif
                                                 @if(isset($result->haspreview) && $result->haspreview == 1)
                                                     <button type="button"
                                                             class="preview-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition cursor-pointer"

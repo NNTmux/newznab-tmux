@@ -28,7 +28,15 @@
 
                     <!-- Title and Actions -->
                     <div class="flex-1">
-                        <h2 class="text-xl font-bold text-gray-800 mb-3">{{ $release->searchname }}</h2>
+                        <div class="mb-3">
+                            <h2 class="text-xl font-bold text-gray-800 mb-2">{{ $release->searchname }}</h2>
+                            @if(!empty($failed) && $failed > 0)
+                                <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-100 text-red-800 border border-red-200">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    <span>{{ $failed }} user{{ $failed > 1 ? 's' : '' }} reported download failure</span>
+                                </div>
+                            @endif
+                        </div>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition inline-flex items-center" onclick="showToast('Downloading NZB...', 'success')">
                                 <i class="fas fa-download mr-2"></i> Download NZB

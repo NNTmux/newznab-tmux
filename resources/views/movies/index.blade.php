@@ -127,6 +127,19 @@
                                             <h3 class="text-xl font-bold text-gray-900">{{ $result->title }}</h3>
                                         @endif
 
+                                        @if(!empty($result->grp_release_failed))
+                                            @php
+                                                $failedCounts = array_filter(explode(',', $result->grp_release_failed));
+                                                $totalFailed = array_sum($failedCounts);
+                                            @endphp
+                                            @if($totalFailed > 0)
+                                                <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 mt-1">
+                                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                    <span>{{ $totalFailed }} failed report{{ $totalFailed > 1 ? 's' : '' }}</span>
+                                                </div>
+                                            @endif
+                                        @endif
+
                                         <div class="flex items-center gap-4 mt-1 text-sm text-gray-600">
                                             @if(isset($result->year) && $result->year)
                                                 <span><i class="fas fa-calendar mr-1"></i> {{ $result->year }}</span>
