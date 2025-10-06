@@ -80,6 +80,41 @@ class SeriesController extends BasePageController
                 $seriescountry = $seriescountryArray ? array_shift($seriescountryArray) : '';
             }
 
+            // Calculate statistics
+            $episodeCount = 0;
+            $seasonCount = count($seasons);
+            $totalSeasonsAvailable = $seasonCount;
+
+            // Get first and last aired dates from TV episodes
+            $firstEpisodeAired = null;
+            $lastEpisodeAired = null;
+            $totalSeasonsAired = 0;
+            $totalEpisodesAired = 0;
+
+            if (!empty($show['id'])) {
+                $episodeStats = \App\Models\TvEpisode::query()
+                    ->where('videos_id', $show['id'])
+                    ->whereNotNull('firstaired')
+                    ->where('firstaired', '!=', '')
+                    ->selectRaw('MIN(firstaired) as first_aired, MAX(firstaired) as last_aired, COUNT(DISTINCT series) as total_seasons, COUNT(*) as total_episodes')
+                    ->first();
+
+                if ($episodeStats) {
+                    if (!empty($episodeStats->first_aired) && $episodeStats->first_aired != '0000-00-00') {
+                        $firstEpisodeAired = \Carbon\Carbon::parse($episodeStats->first_aired);
+                    }
+                    if (!empty($episodeStats->last_aired) && $episodeStats->last_aired != '0000-00-00') {
+                        $lastEpisodeAired = \Carbon\Carbon::parse($episodeStats->last_aired);
+                    }
+                    $totalSeasonsAired = $episodeStats->total_seasons ?? 0;
+                    $totalEpisodesAired = $episodeStats->total_episodes ?? 0;
+                }
+            }
+
+            foreach ($seasons as $seasonNum => $episodes) {
+                $episodeCount += count($episodes);
+            }
+
             $catid = $category !== -1 ? $category : '';
 
             $this->viewData = array_merge($this->viewData, [
@@ -91,6 +126,13 @@ class SeriesController extends BasePageController
                 'seriescountry' => $seriescountry,
                 'category' => $catid,
                 'nodata' => $nodata,
+                'episodeCount' => $episodeCount,
+                'seasonCount' => $seasonCount,
+                'firstEpisodeAired' => $firstEpisodeAired,
+                'lastEpisodeAired' => $lastEpisodeAired,
+                'totalSeasonsAvailable' => $totalSeasonsAvailable,
+                'totalSeasonsAired' => $totalSeasonsAired,
+                'totalEpisodesAired' => $totalEpisodesAired,
                 'meta_title' => 'View TV Series',
                 'meta_keywords' => 'view,series,tv,show,description,details',
                 'meta_description' => 'View TV Series',
