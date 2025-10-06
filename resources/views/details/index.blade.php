@@ -44,6 +44,13 @@
                             <a href="#" class="add-to-cart px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-flex items-center" data-guid="{{ $release->guid }}">
                                 <i class="icon_cart fas fa-shopping-basket mr-2"></i> Add to Cart
                             </a>
+                            @auth
+                                @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator'))
+                                    <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition inline-flex items-center" title="Edit Release">
+                                        <i class="fas fa-edit mr-2"></i> Edit Release
+                                    </a>
+                                @endif
+                            @endauth
                         </div>
                     </div>
                 </div>
