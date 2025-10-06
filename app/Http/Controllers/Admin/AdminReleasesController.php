@@ -82,7 +82,7 @@ class AdminReleasesController extends BasePageController
             'yesno_names' => $yesno_names,
             'catlist' => $catlist,
             'title' => 'Release Edit',
-            'meta_title' => 'Release Edit'
+            'meta_title' => 'Release Edit',
         ]);
     }
 
