@@ -91,7 +91,7 @@ class SeriesController extends BasePageController
             $totalSeasonsAired = 0;
             $totalEpisodesAired = 0;
 
-            if (!empty($show['id'])) {
+            if (! empty($show['id'])) {
                 $episodeStats = \App\Models\TvEpisode::query()
                     ->where('videos_id', $show['id'])
                     ->whereNotNull('firstaired')
@@ -100,10 +100,10 @@ class SeriesController extends BasePageController
                     ->first();
 
                 if ($episodeStats) {
-                    if (!empty($episodeStats->first_aired) && $episodeStats->first_aired != '0000-00-00') {
+                    if (! empty($episodeStats->first_aired) && $episodeStats->first_aired != '0000-00-00') {
                         $firstEpisodeAired = \Carbon\Carbon::parse($episodeStats->first_aired);
                     }
-                    if (!empty($episodeStats->last_aired) && $episodeStats->last_aired != '0000-00-00') {
+                    if (! empty($episodeStats->last_aired) && $episodeStats->last_aired != '0000-00-00') {
                         $lastEpisodeAired = \Carbon\Carbon::parse($episodeStats->last_aired);
                     }
                     $totalSeasonsAired = $episodeStats->total_seasons ?? 0;
