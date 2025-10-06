@@ -88,15 +88,21 @@
                             <h6 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                                 <i class="fa fa-align-left mr-2 text-gray-600"></i>Overview
                             </h6>
-                            <div class="flex gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
                                 @if(!empty($show['image']) && $show['image'] != 0)
-                                    <div class="flex-shrink-0">
-                                        <img class="w-20 h-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                                    <div class="lg:col-span-1">
+                                        <img class="w-full h-auto rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
                                              alt="{{ $seriestitles ?? '' }} Poster"
                                              src="{{ url('/covers/tvshows/' . $show['id'] . '.jpg') }}"/>
                                     </div>
+                                    <div class="lg:col-span-3">
+                                        <p class="text-gray-700 leading-relaxed">{{ $seriessummary }}</p>
+                                    </div>
+                                @else
+                                    <div class="lg:col-span-4">
+                                        <p class="text-gray-700 leading-relaxed">{{ $seriessummary }}</p>
+                                    </div>
                                 @endif
-                                <p class="text-gray-700 leading-relaxed flex-1">{{ $seriessummary }}</p>
                             </div>
                         </div>
                     @endif
