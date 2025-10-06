@@ -197,65 +197,128 @@
                 </div>
             </div>
 
-            <!-- Episodes by Season -->
+            <!-- Episodes by Season - Tabbed Interface -->
             @if(!empty($seasons))
-                @foreach($seasons as $seasonNumber => $episodes)
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm mb-4">
-                        <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                            <h5 class="text-lg font-semibold text-gray-800">
-                                <i class="fa fa-folder-open mr-2 text-blue-600"></i>
-                                Season {{ $seasonNumber }}
-                            </h5>
-                        </div>
-                        <div class="p-4">
-                            @foreach($episodes as $episodeNumber => $releases)
-                                <div class="mb-4 pb-4 border-b border-gray-200 last:border-b-0">
-                                    <h6 class="font-semibold text-gray-700 mb-2">
-                                        Episode {{ $episodeNumber }}
-                                    </h6>
-                                    <div class="space-y-2">
-                                        @foreach($releases as $release)
-                                            <div class="flex items-center justify-between bg-gray-50 rounded p-3 hover:bg-gray-100">
-                                                <div class="flex-1">
-                                                    <a href="{{ url('/details/' . $release->guid) }}"
-                                                       class="text-blue-600 hover:text-blue-800 font-medium">
-                                                        {{ $release->searchname }}
-                                                    </a>
-                                                    <div class="text-xs text-gray-500 mt-1">
-                                                        <span class="mr-3">
-                                                            <i class="fa fa-hdd-o mr-1"></i>{{ formatBytes($release->size) }}
-                                                        </span>
-                                                        <span>
-                                                            <i class="fa fa-clock-o mr-1"></i>{{ \Carbon\Carbon::parse($release->postdate)->diffForHumans() }}
-                                                        </span>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                        <h5 class="text-lg font-semibold text-gray-800">
+                            <i class="fa fa-list mr-2 text-blue-600"></i>
+                            Episodes & Releases
+                        </h5>
+                    </div>
+
+                    <!-- Season Tabs -->
+                    <div class="border-b border-gray-200">
+                        <nav class="flex flex-wrap -mb-px px-4" aria-label="Tabs">
+                            @foreach($seasons as $seasonNumber => $episodes)
+                                <button type="button"
+                                        class="season-tab whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200 {{ $loop->first ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}"
+                                        data-season="{{ $seasonNumber }}"
+                                        onclick="switchSeason({{ $seasonNumber }})">
+                                    Season {{ $seasonNumber }}
+                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs {{ $loop->first ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600' }}">
+                                        {{ count($episodes) }}
+                                    </span>
+                                </button>
+                            @endforeach
+                        </nav>
+                    </div>
+
+                    <!-- Season Content -->
+                    <div class="p-4">
+                        @foreach($seasons as $seasonNumber => $episodes)
+                            <div class="season-content {{ $loop->first ? '' : 'hidden' }}" data-season="{{ $seasonNumber }}">
+                                @foreach($episodes as $episodeNumber => $releases)
+                                    <div class="mb-4 pb-4 border-b border-gray-200 last:border-b-0">
+                                        <h6 class="font-semibold text-gray-700 mb-2">
+                                            Episode {{ $episodeNumber }}
+                                        </h6>
+                                        <div class="space-y-2">
+                                            @foreach($releases as $release)
+                                                <div class="flex items-center justify-between bg-gray-50 rounded p-3 hover:bg-gray-100">
+                                                    <div class="flex-1">
+                                                        <a href="{{ url('/details/' . $release->guid) }}"
+                                                           class="text-blue-600 hover:text-blue-800 font-medium">
+                                                            {{ $release->searchname }}
+                                                        </a>
+                                                        <div class="text-xs text-gray-500 mt-1">
+                                                            <span class="mr-3">
+                                                                <i class="fa fa-hdd-o mr-1"></i>{{ formatBytes($release->size) }}
+                                                            </span>
+                                                            <span>
+                                                                <i class="fa fa-clock-o mr-1"></i>{{ \Carbon\Carbon::parse($release->postdate)->diffForHumans() }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex gap-2">
+                                                        <a href="{{ url('/getnzb?id=' . $release->guid) }}"
+                                                           class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                                                           title="Download NZB"
+                                                           onclick="showToast('Downloading NZB...', 'success')">
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                        <a href="{{ url('/details/' . $release->guid) }}"
+                                                           class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                                                           title="View Details">
+                                                            <i class="fa fa-info-circle"></i>
+                                                        </a>
+                                                        <a href="#" class="add-to-cart px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
+                                                           data-guid="{{ $release->guid }}"
+                                                           title="Add to cart">
+                                                            <i class="icon_cart fa fa-shopping-basket"></i>
+                                                        </a>
                                                     </div>
                                                 </div>
-                                                <div class="flex gap-2">
-                                                    <a href="{{ url('/getnzb?id=' . $release->guid) }}"
-                                                       class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                                                       title="Download NZB"
-                                                       onclick="showToast('Downloading NZB...', 'success')">
-                                                        <i class="fa fa-download"></i>
-                                                    </a>
-                                                    <a href="{{ url('/details/' . $release->guid) }}"
-                                                       class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                                                       title="View Details">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </a>
-                                                    <a href="#" class="add-to-cart px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
-                                                       data-guid="{{ $release->guid }}"
-                                                       title="Add to cart">
-                                                        <i class="icon_cart fa fa-shopping-basket"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        @endforeach
+
+<script>
+function switchSeason(seasonNumber) {
+    // Hide all season content
+    document.querySelectorAll('.season-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+
+    // Remove active styling from all tabs
+    document.querySelectorAll('.season-tab').forEach(tab => {
+        tab.classList.remove('border-blue-500', 'text-blue-600');
+        tab.classList.add('border-transparent', 'text-gray-500');
+
+        // Update badge styling
+        const badge = tab.querySelector('span');
+        if (badge) {
+            badge.classList.remove('bg-blue-100', 'text-blue-800');
+            badge.classList.add('bg-gray-100', 'text-gray-600');
+        }
+    });
+
+    // Show selected season content
+    const selectedContent = document.querySelector(`.season-content[data-season="${seasonNumber}"]`);
+    if (selectedContent) {
+        selectedContent.classList.remove('hidden');
+    }
+
+    // Add active styling to selected tab
+    const selectedTab = document.querySelector(`.season-tab[data-season="${seasonNumber}"]`);
+    if (selectedTab) {
+        selectedTab.classList.remove('border-transparent', 'text-gray-500');
+        selectedTab.classList.add('border-blue-500', 'text-blue-600');
+
+        // Update badge styling
+        const badge = selectedTab.querySelector('span');
+        if (badge) {
+            badge.classList.remove('bg-gray-100', 'text-gray-600');
+            badge.classList.add('bg-blue-100', 'text-blue-800');
+        }
+    }
+}
+</script>
+                                            @endforeach
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
+                                @endforeach
+                            </div>
+                        @endforeach
                     </div>
-                @endforeach
+                </div>
             @else
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800">
                     <i class="fa fa-info-circle mr-2"></i>
