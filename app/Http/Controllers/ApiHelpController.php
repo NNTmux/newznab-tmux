@@ -26,7 +26,7 @@ class ApiHelpController extends BasePageController
         $this->viewData['meta_description'] = 'View description of the site Nzb Api.';
         $this->viewData['catClass'] = Category::class;
 
-        return view('apidesc', $this->viewData);
+        return view('api.apidesc', $this->viewData);
     }
 
     /**
@@ -42,6 +42,6 @@ class ApiHelpController extends BasePageController
         $this->viewData['meta_description'] = 'View description of the site Nzb version 2 Api.';
         $this->viewData['catClass'] = Category::class;
 
-        return view('apiv2desc', $this->viewData);
+        return view('api.apiv2desc', $this->viewData);
     }
 }

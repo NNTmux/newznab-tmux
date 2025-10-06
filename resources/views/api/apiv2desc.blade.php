@@ -25,25 +25,25 @@
         <h4 class="mb-3"><i class="fa fa-plug me-2 text-secondary"></i>Available Functions</h4>
 
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" style="table-layout: fixed;">
                 <thead class="table-light">
                     <tr>
-                        <th>Function</th>
-                        <th>Description</th>
-                        <th>Example</th>
+                        <th style="width: 15%; padding-right: 2rem;">Function</th>
+                        <th style="width: 50%; padding-left: 2rem; padding-right: 2rem;">Description</th>
+                        <th style="width: 35%; padding-left: 2rem;">Example</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>Capabilities</strong></td>
-                        <td>
+                        <td style="padding-right: 2rem;"><strong>Capabilities</strong></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">
                             Reports the capabilities of the server. Includes information about the server name,
                             available search categories and version number of the nntmux being used.
                             <div class="text-muted small mt-1">
                                 <i class="fa fa-info-circle me-1"></i>No credentials required
                             </div>
                         </td>
-                        <td>
+                        <td style="padding-left: 2rem;">
                             <a href="{{ url('/api/v2/capabilities') }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fa fa-external-link-alt me-1"></i>
                                 <code>capabilities</code>
@@ -51,12 +51,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Search</strong></td>
-                        <td>
+                        <td style="padding-right: 2rem;"><strong>Search</strong></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">
                             Returns a list of NZBs matching a query. You can filter by site category by including
                             a comma separated list of categories.
                         </td>
-                        <td>
+                        <td style="padding-left: 2rem;">
                             <div class="d-flex flex-column gap-2">
                                 @if($loggedin ?? false)
                                 <a href="{{ url('/api/v2/search?id=linux&api_token=' . $userdata->api_token) }}" class="btn btn-sm btn-outline-primary">
@@ -72,8 +72,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>TV Search</strong></td>
-                        <td>
+                        <td style="padding-right: 2rem;"><strong>TV Search</strong></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">
                             Returns a list of NZBs matching a query, category, TVRageID, season or episode.
                             <div class="mt-2">
                                 <span class="badge bg-info text-white">ID OPTIONS</span>
@@ -103,8 +103,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Movies</strong></td>
-                        <td>
+                        <td style="padding-right: 2rem;"><strong>Movies</strong></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">
                             Returns a list of NZBs matching a query, an ID (IMDB, TMDB, or Trakt) and optionally a category.
                             <div class="mt-2">
                                 <span class="badge bg-info text-white">ID OPTIONS</span>
@@ -131,9 +131,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Details</strong></td>
-                        <td>Returns detailed information about an NZB.</td>
-                        <td>
+                        <td style="padding-right: 2rem;"><strong>Details</strong></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">Returns detailed information about an NZB.</td>
+                        <td style="padding-left: 2rem;">
                             @if($loggedin ?? false)
                             <a href="{{ url('/api/v2/details?id=9ca52909ba9b9e5e6758d815fef4ecda&api_token=' . $userdata->api_token) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fa fa-external-link-alt me-1"></i>
@@ -143,9 +143,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><strong>Get NZB</strong></td>
-                        <td>Downloads the NZB file associated with an ID.</td>
-                        <td>
+                        <td style="padding-right: 2rem;"><strong>Get NZB</strong></td>
+                        <td style="padding-left: 2rem; padding-right: 2rem;">Downloads the NZB file associated with an ID.</td>
+                        <td style="padding-left: 2rem;">
                             @if($loggedin ?? false)
                             <a href="{{ url('/api/v2/getnzb?id=9ca52909ba9b9e5e6758d815fef4ecda&api_token=' . $userdata->api_token) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fa fa-external-link-alt me-1"></i>
