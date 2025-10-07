@@ -14,7 +14,7 @@ class AdminReleasesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request): void
+    public function index(Request $request)
     {
         $this->setAdminPrefs();
 
@@ -22,13 +22,12 @@ class AdminReleasesController extends BasePageController
 
         $page = $request->input('page', 1);
         $releaseList = Release::getReleasesRange($page);
-        $this->smarty->assign('releaselist', $releaseList);
 
-        $content = $this->smarty->fetch('release-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.release-list', [
+            'releaselist' => $releaseList,
+            'title' => $title,
+            'meta_title' => $meta_title,
+        ]);
     }
 
     /**
