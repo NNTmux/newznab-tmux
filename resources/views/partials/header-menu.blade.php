@@ -101,12 +101,12 @@
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
-                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 rounded-md shadow-lg z-50" style="display: none;">
-                                    <a href="{{ url('/browse/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">{{ $parentcat['title'] }}</a>
+                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-md shadow-lg z-50" style="display: none;">
+                                    <a href="{{ url('/browse/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">{{ $parentcat['title'] }}</a>
                                     @if(isset($parentcat['categories']) && count($parentcat['categories']) > 0)
-                                        <div class="border-t border-gray-700"></div>
+                                        <div class="border-t border-gray-700 dark:border-gray-600"></div>
                                         @foreach($parentcat['categories'] as $subcat)
-                                            <a href="{{ url('/browse/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">{{ $subcat['title'] }}</a>
+                                            <a href="{{ url('/browse/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">{{ $subcat['title'] }}</a>
                                         @endforeach
                                     @endif
                                 </div>
