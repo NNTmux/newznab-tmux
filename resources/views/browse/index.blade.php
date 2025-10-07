@@ -177,6 +177,14 @@
                                                         <i class="fas fa-info-circle mr-1"></i> Media Info
                                                     </button>
                                                 @endif
+                                                @if(isset($result->nfostatus) && $result->nfostatus == 1)
+                                                    <button type="button"
+                                                            class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition cursor-pointer"
+                                                            data-guid="{{ $result->guid }}"
+                                                            title="View NFO file">
+                                                        <i class="fas fa-file-alt mr-1"></i> NFO
+                                                    </button>
+                                                @endif
                                             </div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                 @if($result->group_name)
@@ -311,6 +319,9 @@
             </div>
         </div>
     </div>
+
+    <!-- NFO Modal -->
+    @include('partials.nfo-modal')
 </div>
 @endsection
 

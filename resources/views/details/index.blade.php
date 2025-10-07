@@ -44,6 +44,11 @@
                             <a href="#" class="add-to-cart px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition inline-flex items-center" data-guid="{{ $release->guid }}">
                                 <i class="icon_cart fas fa-shopping-basket mr-2"></i> Add to Cart
                             </a>
+                            @if(isset($release->nfostatus) && $release->nfostatus == 1)
+                                <button type="button" class="nfo-badge px-4 py-2 bg-yellow-600 dark:bg-yellow-700 text-white rounded-lg hover:bg-yellow-700 dark:hover:bg-yellow-800 transition inline-flex items-center" data-guid="{{ $release->guid }}" title="View NFO file">
+                                    <i class="fas fa-file-alt mr-2"></i> View NFO
+                                </button>
+                            @endif
                             @auth
                                 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator'))
                                     <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition inline-flex items-center" title="Edit Release">
@@ -799,6 +804,9 @@
         </div>
     </div>
 </div>
+
+<!-- NFO Modal -->
+@include('partials.nfo-modal')
 
 @push('scripts')
 @include('partials.cart-script')

@@ -12,7 +12,7 @@ class NfoController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function showNfo(Request $request, string $id = ''): void
+    public function showNfo(Request $request, string $id = '')
     {
         if ($id) {
             $rel = Release::getByGuid($id);
@@ -26,31 +26,31 @@ class NfoController extends BasePageController
             if ($nfo !== null) {
                 $nfo['nfoUTF'] = Utility::cp437toUTF($nfo['nfo']);
 
-                $this->smarty->assign('rel', $rel);
-                $this->smarty->assign('nfo', $nfo);
-
-                $title = 'NFO File';
-                $meta_title = 'View Nfo';
-                $meta_keywords = 'view,nzb,nfo,description,details';
-                $meta_description = 'View Nfo File';
-
-                $modal = false;
-                if ($request->has('modal')) {
-                    $modal = true;
-                    $this->smarty->assign('modal', true);
-                }
-
-                $content = $this->smarty->fetch('viewnfo.tpl');
+                $modal = $request->has('modal');
 
                 if ($modal) {
-                    echo $content;
+                    // Return just the NFO content for modal display
+                    return view('nfo.view', [
+                        'rel' => $rel,
+                        'nfo' => $nfo,
+                        'modal' => true,
+                    ]);
                 } else {
-                    $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
-                    $this->pagerender();
+                    // Return full page view
+                    return view('nfo.view', [
+                        'rel' => $rel,
+                        'nfo' => $nfo,
+                        'modal' => false,
+                        'meta_title' => 'View NFO - '.$rel['searchname'],
+                        'meta_keywords' => 'view,nzb,nfo,description,details',
+                        'meta_description' => 'View NFO File for '.$rel['searchname'],
+                    ]);
                 }
             } else {
                 abort(404, 'NFO does not exist');
             }
         }
+
+        abort(404, 'Invalid request');
     }
 }
