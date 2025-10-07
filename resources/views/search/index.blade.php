@@ -17,7 +17,7 @@
                        id="search"
                        name="search"
                        value="{{ request('search') }}"
-                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                        placeholder="Enter search terms...">
             </div>
 
@@ -26,7 +26,7 @@
                 <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
                 <select id="category"
                         name="t"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     <option value="">All Categories</option>
                     @if(isset($parentcatlist))
                         @foreach($parentcatlist as $parentcat)
@@ -65,35 +65,35 @@
                     <div>
                         <label for="group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Usenet Group</label>
                         <input type="text" id="group" name="group" value="{{ request('group') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                placeholder="e.g., alt.binaries.teevee">
                     </div>
 
                     <div>
                         <label for="minage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Age (days)</label>
                         <input type="number" id="minage" name="minage" value="{{ request('minage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
 
                     <div>
                         <label for="maxage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Age (days)</label>
                         <input type="number" id="maxage" name="maxage" value="{{ request('maxage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
 
                     <div>
                         <label for="minsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Size (MB)</label>
                         <input type="number" id="minsize" name="minsize" value="{{ request('minsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
 
                     <div>
                         <label for="maxsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Size (MB)</label>
                         <input type="number" id="maxsize" name="maxsize" value="{{ request('maxsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
                 </div>
