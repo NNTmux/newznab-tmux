@@ -75,7 +75,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['cat_selected'] = [];
                 $this->viewData['imdbid'] = $imdbid;
                 $this->viewData['movie'] = $movie;
-                $this->viewData['content'] = view('themes/Gentele/mymovies-add', $this->viewData)->render();
+                $this->viewData['content'] = view('mymovies.add', $this->viewData)->render();
 
                 return $this->pagerender();
 
@@ -109,7 +109,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['cat_selected'] = explode('|', $movie['categories']);
                 $this->viewData['imdbid'] = $imdbid;
                 $this->viewData['movie'] = $movie;
-                $this->viewData['content'] = view('themes/Gentele/mymovies-add', $this->viewData)->render();
+                $this->viewData['content'] = view('mymovies.add', $this->viewData)->render();
 
                 return $this->pagerender();
 
@@ -156,7 +156,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['lastvisit'] = $this->userdata->lastlogin;
                 $this->viewData['results'] = $results;
                 $this->viewData['movies'] = true;
-                $this->viewData['content'] = view('themes/Gentele/browse', $this->viewData)->render();
+                $this->viewData['content'] = view('browse', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
                 return $this->pagerender();
@@ -193,7 +193,7 @@ class MyMoviesController extends BasePageController
                     $results[$moviek] = $movie;
                 }
                 $this->viewData['movies'] = $results;
-                $this->viewData['content'] = view('themes/Gentele/mymovies', $this->viewData)->render();
+                $this->viewData['content'] = view('mymovies.index', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
                 return $this->pagerender();

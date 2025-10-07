@@ -12,7 +12,7 @@
         background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
     }
     .category-badge {
-        background: linear-gradient(135deg, #ddd6fe 0%, #fce7f3 100%);
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     }
     .empty-state-bg {
         background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
@@ -78,7 +78,7 @@
     <!-- Action Buttons -->
     <div class="flex flex-wrap gap-3 mb-6">
         <a class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
-           href="{{ route('series') }}"
+           href="{{ url('/browse/TV') }}"
            title="View available TV series">
             <i class="fa fa-list mr-2"></i>Browse All Series
         </a>
@@ -145,7 +145,7 @@
                                 </td>
                                 <td class="px-8 py-5">
                                     @if(!empty($show['categoryNames']))
-                                        <span class="inline-flex items-center px-3 py-1.5 category-badge text-purple-800 text-xs font-semibold rounded-full border border-purple-200">
+                                        <span class="inline-flex items-center px-3 py-1.5 category-badge text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
                                             <i class="fa fa-folder-open mr-1.5"></i>{{ e($show['categoryNames']) }}
                                         </span>
                                     @else
@@ -203,7 +203,7 @@
                                     </a>
                                     <div class="mt-1.5">
                                         @if(!empty($show['categoryNames']))
-                                            <span class="inline-flex items-center px-2 py-1 category-badge text-purple-800 text-xs font-semibold rounded-full border border-purple-200">
+                                            <span class="inline-flex items-center px-2 py-1 category-badge text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
                                                 <i class="fa fa-folder-open mr-1"></i>{{ e($show['categoryNames']) }}
                                             </span>
                                         @else
@@ -248,7 +248,7 @@
                 <p class="text-gray-600 mb-6 max-w-md mx-auto">
                     You haven't bookmarked any TV series yet. Start building your collection by browsing our series library.
                 </p>
-                <a href="{{ route('series') }}"
+                <a href="{{ url('/browse/TV') }}"
                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
                     <i class="fa fa-search mr-2"></i>Browse Series Library
                 </a>
@@ -259,7 +259,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
     // Confirm before removing shows
     document.querySelectorAll('.confirm_action').forEach(element => {
         element.addEventListener('click', function(e) {

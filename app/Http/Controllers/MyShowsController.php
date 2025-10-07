@@ -74,7 +74,7 @@ class MyShowsController extends BasePageController
                 $this->viewData['cat_selected'] = [];
                 $this->viewData['video'] = $videoId;
                 $this->viewData['show'] = $show;
-                $this->viewData['content'] = view('themes/Gentele/myshows-add', $this->viewData)->render();
+                $this->viewData['content'] = view('myshows.add', $this->viewData)->render();
 
                 return $this->pagerender();
 
@@ -108,7 +108,7 @@ class MyShowsController extends BasePageController
                 $this->viewData['cat_selected'] = explode('|', $show['categories']);
                 $this->viewData['video'] = $videoId;
                 $this->viewData['show'] = $show;
-                $this->viewData['content'] = view('themes/Gentele/myshows-add', $this->viewData)->render();
+                $this->viewData['content'] = view('myshows.add', $this->viewData)->render();
 
                 return $this->pagerender();
 
@@ -146,7 +146,7 @@ class MyShowsController extends BasePageController
                     }
                 }
                 $this->viewData['shows'] = $results;
-                $this->viewData['content'] = view('themes/Gentele/myshows', $this->viewData)->render();
+                $this->viewData['content'] = view('myshows.index', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
                 return $this->pagerender();
@@ -174,7 +174,7 @@ class MyShowsController extends BasePageController
         $offset = ($page - 1) * config('nntmux.items_per_page');
         $ordering = $releases->getBrowseOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
-        $browseCount = $shows->count();
+        $browseCount = $shows ? $shows->count() : 0;
 
         $rslt = $releases->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
@@ -189,7 +189,7 @@ class MyShowsController extends BasePageController
         $this->viewData['results'] = $results;
         $this->viewData['resultsadd'] = $rslt;
         $this->viewData['shows'] = true;
-        $this->viewData['content'] = view('themes/Gentele/browse', $this->viewData)->render();
+        $this->viewData['content'] = view('browse', $this->viewData)->render();
         $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
         return $this->pagerender();
