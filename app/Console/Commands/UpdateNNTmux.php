@@ -258,6 +258,10 @@ class UpdateNNTmux extends Command
      */
     private function performMaintenanceTasks(): void
     {
+        // Clear view cache
+        $this->info('🧹 Clearing view cache...');
+        $this->call('view:clear');
+
         // Merge environment variables
         $this->info('⚙️ Merging environment configuration...');
         $this->mergeEnvironmentConfig();
