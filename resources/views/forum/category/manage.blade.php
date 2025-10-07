@@ -31,7 +31,7 @@
 
     <script type="text/x-template" id="draggable-category-list-template">
         <draggable tag="ul" class="list-group" :list="categories" group="categories" :invertSwap="true" :emptyInsertThreshold="14">
-            <li class="bg-white px-3 py-2 rounded-sm border" v-for="category in categories" :data-id="category.id" :key="category.id">
+            <li class="bg-white dark:bg-gray-800 px-3 py-2 rounded-sm border" v-for="category in categories" :data-id="category.id" :key="category.id">
                 <a class="float-right bg-red-500 text-white px-3 py-2 text-sm rounded ml-2" :href="`${category.route}#modal=delete-category`">{{ trans('forum::general.delete') }}</a>
                 <a class="float-right text-blue-500 underline px-3 py-2 text-sm ml-2" :href="`${category.route}#modal=edit-category`">{{ trans('forum::general.edit') }}</a>
                 <strong :style="{ color: category.color }">@{{ category.title }}</strong>

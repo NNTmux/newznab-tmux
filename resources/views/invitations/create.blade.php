@@ -6,18 +6,18 @@
     <nav class="flex" aria-label="breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ $site->home_link }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Home</a>
+                <a href="{{ $site->home_link }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
             </li>
             <li>
                 <div class="flex items-center">
                     <svg class="w-3 h-3 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                    <a href="{{ url('/profile') }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Profile</a>
+                    <a href="{{ url('/profile') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Profile</a>
                 </div>
             </li>
             <li>
                 <div class="flex items-center">
                     <svg class="w-3 h-3 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                    <a href="{{ url('/invitations') }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">My Invitations</a>
+                    <a href="{{ url('/invitations') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">My Invitations</a>
                 </div>
             </li>
             <li aria-current="page">
@@ -35,7 +35,7 @@
             <i class="fa fa-ban mr-2"></i>Invitations Disabled
         </h5>
         <p class="mb-3">User invitations are currently disabled on this site. You cannot send new invitations at this time.</p>
-        <a href="{{ url('/profile') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+        <a href="{{ url('/profile') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
             <i class="fa fa-arrow-left mr-1"></i> Back to Profile
         </a>
     </div>
@@ -45,18 +45,18 @@
     <nav class="flex" aria-label="breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ $site->home_link }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Home</a>
+                <a href="{{ $site->home_link }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
             </li>
             <li>
                 <div class="flex items-center">
                     <svg class="w-3 h-3 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                    <a href="{{ url('/profile') }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Profile</a>
+                    <a href="{{ url('/profile') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Profile</a>
                 </div>
             </li>
             <li>
                 <div class="flex items-center">
                     <svg class="w-3 h-3 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                    <a href="{{ url('/invitations') }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">My Invitations</a>
+                    <a href="{{ url('/invitations') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">My Invitations</a>
                 </div>
             </li>
             <li aria-current="page">
@@ -70,9 +70,9 @@
 </div>
 
 <div class="max-w-4xl mx-auto px-4 py-3">
-    <div class="bg-white rounded-lg shadow-sm dark:bg-gray-800">
-        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
-            <h5 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:bg-gray-800">
+        <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
+            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i class="fa fa-paper-plane mr-2"></i>Send New Invitation
             </h5>
             <div class="flex items-center gap-3">
@@ -80,7 +80,7 @@
                     <i class="fa fa-envelope mr-1"></i>
                     {{ $user_invites_left }} invites left
                 </div>
-                <a href="{{ url('/invitations') }}" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
+                <a href="{{ url('/invitations') }}" class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
                     <i class="fas fa-arrow-left mr-1"></i> Back to Invitations
                 </a>
             </div>
@@ -111,10 +111,10 @@
                     <h5 class="text-lg font-semibold mb-2">No Invitations Available</h5>
                     <p class="mb-4">You have used all of your available invitations. You cannot send new invitations at this time.</p>
                     <div class="flex gap-2 justify-center">
-                        <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             <i class="fa fa-arrow-left mr-1"></i> Back to My Invitations
                         </a>
-                        <a href="{{ url('/contact') }}" class="inline-flex items-center px-4 py-2 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                        <a href="{{ url('/contact') }}" class="inline-flex items-center px-4 py-2 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                             <i class="fa fa-envelope mr-1"></i> Contact Support
                         </a>
                     </div>
@@ -136,11 +136,11 @@
                             </div>
 
                             <div class="mb-6">
-                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
                                     <i class="fa fa-envelope mr-1"></i>Email Address <span class="text-red-600">*</span>
                                 </label>
                                 <input type="email"
-                                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('email') border-red-500 @enderror"
+                                       class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('email') border-red-500 @enderror"
                                        id="email"
                                        name="email"
                                        value="{{ old('email') }}"
@@ -155,10 +155,10 @@
                             </div>
 
                             <div class="mb-6">
-                                <label for="expiry_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label for="expiry_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
                                     <i class="fa fa-clock-o mr-1"></i>Expiry Period
                                 </label>
-                                <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('expiry_days') border-red-500 @enderror"
+                                <select class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('expiry_days') border-red-500 @enderror"
                                         id="expiry_days"
                                         name="expiry_days">
                                     <option value="1" @selected(old('expiry_days') == '1')>1 Day</option>
@@ -177,10 +177,10 @@
 
                             @if(isset($user_roles) && !empty($user_roles))
                                 <div class="mb-6">
-                                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
                                         <i class="fa fa-user-tag mr-1"></i>Default Role <small class="text-gray-500 dark:text-gray-400">(Optional)</small>
                                     </label>
-                                    <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('role') border-red-500 @enderror"
+                                    <select class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('role') border-red-500 @enderror"
                                             id="role"
                                             name="role">
                                         <option value="">Use System Default</option>
@@ -215,10 +215,10 @@
                             </div>
 
                             <div class="flex flex-col sm:flex-row gap-2 justify-end">
-                                <a href="{{ url('/invitations') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
+                                <a href="{{ url('/invitations') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
                                     <i class="fa fa-times mr-1"></i>Cancel
                                 </a>
-                                <button type="submit" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <button type="submit" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     <i class="fas fa-paper-plane mr-1"></i> Send Invitation
                                 </button>
                             </div>

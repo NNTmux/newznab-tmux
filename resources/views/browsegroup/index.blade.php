@@ -3,18 +3,18 @@
     <nav aria-label="breadcrumb">
         <ol class="flex items-center space-x-2 text-sm">
             <li>
-                <a href="{{ url($site->home_link) }}" class="text-gray-600 hover:text-blue-600 transition-colors">
+                <a href="{{ url($site->home_link) }}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors">
                     Home
                 </a>
             </li>
             <li class="text-gray-400">/</li>
             <li>
-                <a href="{{ url('/browse') }}" class="text-gray-600 hover:text-blue-600 transition-colors">
+                <a href="{{ url('/browse') }}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors">
                     Browse
                 </a>
             </li>
             <li class="text-gray-400">/</li>
-            <li class="text-gray-900 font-medium">Groups</li>
+            <li class="text-gray-900 dark:text-gray-100 font-medium">Groups</li>
         </ol>
     </nav>
 </div>
@@ -22,8 +22,8 @@
 {!! $site->adbrowse ?? '' !!}
 
 <!-- Search Filter -->
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-    <div class="p-4 bg-gray-50 border-b border-gray-200">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+    <div class="p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
         <form method="get" action="{{ url('/browsegroup') }}">
             <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
                 <div class="flex-1">
@@ -36,7 +36,7 @@
                             name="search"
                             value="{{ $search ?? '' }}"
                             placeholder="Search group names..."
-                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         />
                     </div>
                 </div>
@@ -56,9 +56,9 @@
 </div>
 
 @if(isset($results) && count($results) > 0)
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Header -->
-        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
             <h5 class="text-lg font-semibold text-gray-900">Browse Groups</h5>
             <div class="flex items-center">
                 {{ $results->onEachSide(3)->links() }}
@@ -81,14 +81,14 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                     @foreach($results as $result)
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <a
                                     href="{{ url('/browse/group?g=' . $result->name) }}"
                                     title="Browse releases from {{ str_replace('alt.binaries', 'a.b', $result->name) }}"
-                                    class="font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                                    class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                                 >
                                     {{ str_replace('alt.binaries', 'a.b', $result->name) }}
                                 </a>
@@ -109,7 +109,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
                 <div class="text-sm text-gray-600">
                     <span class="font-medium">Found {{ $results->total() }} groups</span>

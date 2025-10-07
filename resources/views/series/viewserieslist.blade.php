@@ -1,11 +1,11 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
     <!-- Header -->
     <div class="px-6 py-4 border-b border-gray-200">
         <div class="flex justify-between items-center">
-            <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 flex items-center">
                 <i class="fa fa-tv mr-3 text-blue-600"></i>TV Series
             </h3>
             <nav aria-label="breadcrumb">
@@ -24,9 +24,9 @@
             <div class="flex items-center flex-wrap gap-2">
                 <span class="font-semibold mr-2">Jump to:</span>
                 <div class="flex gap-1">
-                    <a href="{{ url('/series/0-9') }}" class="px-3 py-1 rounded {{ $seriesletter == '0-9' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">0-9</a>
+                    <a href="{{ url('/series/0-9') }}" class="px-3 py-1 rounded {{ $seriesletter == '0-9' ? 'bg-blue-600 dark:bg-blue-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300' }}">0-9</a>
                     @foreach($seriesrange as $range)
-                        <a href="{{ url('/series/' . $range) }}" class="px-3 py-1 rounded {{ $range == $seriesletter ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">{{ $range }}</a>
+                        <a href="{{ url('/series/' . $range) }}" class="px-3 py-1 rounded {{ $range == $seriesletter ? 'bg-blue-600 dark:bg-blue-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300' }}">{{ $range }}</a>
                     @endforeach
                 </div>
             </div>
@@ -35,22 +35,22 @@
         <!-- Action buttons and search -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
             <div class="flex gap-2">
-                <a class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-flex items-center" href="{{ route('myshows') }}" title="List my watched shows">
+                <a class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 inline-flex items-center" href="{{ route('myshows') }}" title="List my watched shows">
                     <i class="fa fa-list mr-2"></i>My Shows
                 </a>
-                <a class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 inline-flex items-center" href="{{ url('/myshows/browse') }}" title="Browse your shows">
+                <a class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 inline-flex items-center" href="{{ url('/myshows/browse') }}" title="Browse your shows">
                     <i class="fa fa-search mr-2"></i>Find My Shows
                 </a>
             </div>
 
             <!-- Search form -->
             <form method="get" action="{{ url('/series') }}" class="flex gap-2">
-                <input class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <input class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                        type="text"
                        name="title"
                        value="{{ $showname ?? '' }}"
                        placeholder="Search series">
-                <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" type="submit" title="Search series">
+                <button class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700" type="submit" title="Search series">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
@@ -61,12 +61,12 @@
             <div class="overflow-x-auto">
                 @foreach($serieslist as $sletter => $series)
                     <div class="mb-6">
-                        <div class="bg-gray-100 px-4 py-2 rounded-t-lg">
-                            <h4 class="text-xl font-bold text-gray-800 flex items-center">
+                        <div class="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-t-lg">
+                            <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200 flex items-center">
                                 <i class="fa fa-bookmark mr-2 text-blue-600"></i>{{ $sletter }}
                             </h4>
                         </div>
-                        <table class="min-w-full bg-white border border-gray-200">
+                        <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
@@ -84,7 +84,7 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-4 py-3">
                                             <div class="mb-1">
-                                                <a class="font-semibold text-blue-600 hover:text-blue-800"
+                                                <a class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800"
                                                    title="View series details"
                                                    href="{{ url('/series/' . $sData['id']) }}">
                                                     {{ $sData['title'] ?? '' }}
@@ -98,12 +98,12 @@
                                         </td>
                                         <td class="px-4 py-3 text-center">
                                             @if(!empty($sData['publisher']))
-                                                <span class="inline-block px-2 py-1 text-xs bg-gray-200 text-gray-800 rounded">{{ $sData['publisher'] }}</span>
+                                                <span class="inline-block px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded">{{ $sData['publisher'] }}</span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 text-center">
                                             @if(!empty($sData['countries_id']))
-                                                <span class="inline-block px-2 py-1 text-xs bg-gray-200 text-gray-800 rounded">{{ $sData['countries_id'] }}</span>
+                                                <span class="inline-block px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded">{{ $sData['countries_id'] }}</span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 text-center">
@@ -115,14 +115,14 @@
                                                         <i class="fa fa-edit"></i>
                                                     </a>
                                                     <a href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                                       class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                                                       class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm"
                                                        title="Remove from My Shows">
                                                         <i class="fa fa-trash"></i>
                                                     </a>
                                                 </div>
                                             @else
                                                 <a href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                                   class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm inline-flex items-center"
+                                                   class="px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm inline-flex items-center"
                                                    title="Add to My Shows">
                                                     <i class="fa fa-plus mr-1"></i>Add
                                                 </a>
@@ -138,21 +138,21 @@
 
                                                 @if($sData['id'] > 0)
                                                     @if(!empty($sData['tvdb']) && $sData['tvdb'] > 0)
-                                                        <a class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs"
+                                                        <a class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:bg-gray-700 text-xs"
                                                            title="View at TVDB" target="_blank"
                                                            href="{{ $site->dereferrer_link }}http://thetvdb.com/?tab=series&id={{ $sData['tvdb'] }}">
                                                             TVDB
                                                         </a>
                                                     @endif
                                                     @if(!empty($sData['tvmaze']) && $sData['tvmaze'] > 0)
-                                                        <a class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs"
+                                                        <a class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:bg-gray-700 text-xs"
                                                            title="View at TVMaze" target="_blank"
                                                            href="{{ $site->dereferrer_link }}http://tvmaze.com/shows/{{ $sData['tvmaze'] }}">
                                                             TVMaze
                                                         </a>
                                                     @endif
                                                     @if(!empty($sData['trakt']) && $sData['trakt'] > 0)
-                                                        <a class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs"
+                                                        <a class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:bg-gray-700 text-xs"
                                                            title="View at Trakt" target="_blank"
                                                            href="{{ $site->dereferrer_link }}http://www.trakt.tv/shows/{{ $sData['trakt'] }}">
                                                             Trakt

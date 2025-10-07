@@ -2,55 +2,55 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
                     <i class="fa fa-users mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ url('admin/user-edit?action=add') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('admin/user-edit?action=add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                     <i class="fa fa-plus mr-2"></i>Add New User
                 </a>
             </div>
         </div>
 
         <!-- Search Filters -->
-        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
             <form method="get" action="{{ url('admin/user-list') }}">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
-                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
                         <input type="text"
                                id="username"
                                name="username"
                                value="{{ $username ?? '' }}"
                                placeholder="Filter by username"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                         <input type="text"
                                id="email"
                                name="email"
                                value="{{ $email ?? '' }}"
                                placeholder="Filter by email"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="host" class="block text-sm font-medium text-gray-700 mb-1">Host/IP</label>
+                        <label for="host" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Host/IP</label>
                         <input type="text"
                                id="host"
                                name="host"
                                value="{{ $host ?? '' }}"
                                placeholder="Filter by host"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
                         <select id="role"
                                 name="role"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="">All Roles</option>
                             @foreach($role_ids ?? [] as $index => $roleId)
                                 <option value="{{ $roleId }}" {{ ($role ?? '') == $roleId ? 'selected' : '' }}>
@@ -61,10 +61,10 @@
                     </div>
                 </div>
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
                         <i class="fa fa-search mr-2"></i>Filter
                     </button>
-                    <a href="{{ url('admin/user-list') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    <a href="{{ url('admin/user-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300">
                         <i class="fa fa-times mr-2"></i>Clear
                     </a>
                 </div>
@@ -114,7 +114,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         @foreach($userlist as $user)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->id }}</td>
@@ -152,7 +152,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex gap-2">
                                         <a href="{{ url('admin/user-edit?id=' . $user->id) }}"
-                                           class="text-blue-600 hover:text-blue-900"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900"
                                            title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </a>
@@ -190,7 +190,7 @@
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fa fa-users text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No users found</h3>
                 <p class="text-gray-500">Try adjusting your search filters or add a new user.</p>
             </div>
         @endif

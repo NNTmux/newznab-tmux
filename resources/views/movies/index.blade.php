@@ -1,13 +1,13 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200">
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                 </li>
@@ -22,16 +22,16 @@
     </div>
 
     <!-- Movies Filter Section -->
-    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+    <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
         <form method="get" action="{{ route('Movies') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input type="text" id="title" name="title" value="{{ $title ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                    <input type="text" id="title" name="title" value="{{ $title ?? '' }}" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label for="genre" class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
-                    <select id="genre" name="genre" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="genre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Genre</label>
+                    <select id="genre" name="genre" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">All</option>
                         @if(isset($genres))
                             @foreach($genres as $gen)
@@ -41,8 +41,8 @@
                     </select>
                 </div>
                 <div>
-                    <label for="year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                    <select id="year" name="year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                    <select id="year" name="year" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">All</option>
                         @if(isset($years))
                             @foreach($years as $yr)
@@ -52,8 +52,8 @@
                     </select>
                 </div>
                 <div>
-                    <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                    <select id="rating" name="rating" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="rating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rating</label>
+                    <select id="rating" name="rating" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">All</option>
                         @if(isset($ratings))
                             @foreach($ratings as $rate)
@@ -64,7 +64,7 @@
                 </div>
             </div>
             <div class="flex justify-end">
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <i class="fas fa-search mr-2"></i> Search
                 </button>
             </div>
@@ -76,7 +76,7 @@
         <div class="px-6 py-4">
             <!-- Results Summary and Pagination -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-4 pb-4 border-b border-gray-200">
-                <div class="text-sm text-gray-700 mb-3 sm:mb-0">
+                <div class="text-sm text-gray-700 dark:text-gray-300 mb-3 sm:mb-0">
                     Showing {{ $results->firstItem() }} to {{ $results->lastItem() }} of {{ $results->total() }} movies
                 </div>
                 <div>
@@ -90,7 +90,7 @@
                         // Get the first GUID from the comma-separated list
                         $guid = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid)[0] : null;
                     @endphp
-                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="flex flex-col md:flex-row">
                             <!-- Movie Poster -->
                             <div class="flex-shrink-0">
@@ -99,7 +99,7 @@
                                         @if(isset($result->cover) && $result->cover)
                                             <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded" style="width: 192px; height: 288px;">
                                         @else
-                                            <div class="w-48 h-72 bg-gray-200 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
+                                            <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
                                                 <i class="fas fa-film text-gray-400 text-3xl"></i>
                                             </div>
                                         @endif
@@ -108,7 +108,7 @@
                                     @if(isset($result->cover) && $result->cover)
                                         <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded" style="width: 192px; height: 288px;">
                                     @else
-                                        <div class="w-48 h-72 bg-gray-200 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
+                                        <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
                                             <i class="fas fa-film text-gray-400 text-3xl"></i>
                                         </div>
                                     @endif
@@ -173,7 +173,7 @@
                                 </div>
 
                                 @if(isset($result->plot) && $result->plot)
-                                    <p class="text-gray-700 text-sm mt-3 line-clamp-3">{{ $result->plot }}</p>
+                                    <p class="text-gray-700 dark:text-gray-300 text-sm mt-3 line-clamp-3">{{ $result->plot }}</p>
                                 @endif
 
                                 <div class="mt-3 flex flex-wrap gap-2 text-xs">
@@ -221,7 +221,7 @@
 
                                     @if(!empty($releaseNames[0]))
                                         <div class="mt-4 pt-4 border-t border-gray-200">
-                                            <h4 class="text-sm font-semibold text-gray-700 mb-2">
+                                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                 Available Releases
                                                 @if($totalReleases > $maxReleases)
                                                     <span class="text-xs font-normal text-gray-500">(Showing {{ $maxReleases }} of {{ $totalReleases }})</span>
@@ -230,10 +230,10 @@
                                             <div class="space-y-2">
                                                 @foreach($releaseNames as $index => $releaseName)
                                                     @if($releaseName && isset($releaseGuids[$index]))
-                                                        <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200">
                                                             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                                                                 <div class="flex-1 min-w-0">
-                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 hover:text-blue-600 font-medium block truncate" title="{{ $releaseName }}">
+                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $releaseName }}">
                                                                         {{ $releaseName }}
                                                                     </a>
                                                                     <div class="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
@@ -255,10 +255,10 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="flex gap-2 flex-shrink-0">
-                                                                    <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 transition">
+                                                                    <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-green-600 dark:bg-green-700 text-white text-xs font-medium rounded hover:bg-green-700 dark:hover:bg-green-800 transition">
                                                                         <i class="fas fa-download mr-1"></i> Download
                                                                     </a>
-                                                                    <button onclick="addToCart('{{ $releaseGuids[$index] }}')" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition">
+                                                                    <button onclick="addToCart('{{ $releaseGuids[$index] }}')" class="inline-flex items-center px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs font-medium rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition">
                                                                         <i class="fas fa-shopping-cart mr-1"></i> Cart
                                                                     </button>
                                                                     <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-gray-600 text-white text-xs font-medium rounded hover:bg-gray-700 transition">
@@ -287,7 +287,7 @@
     @else
         <div class="px-6 py-12 text-center">
             <i class="fas fa-film text-gray-400 text-5xl mb-4"></i>
-            <p class="text-gray-600 text-lg">No movies found.</p>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">No movies found.</p>
         </div>
     @endif
 </div>

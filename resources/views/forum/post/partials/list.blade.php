@@ -1,7 +1,7 @@
 <div @if (! $post->trashed())id="post-{{ $post->sequence }}"@endif
-    class="bg-white border mb-2 rounded-md {{ $post->trashed() || $thread->trashed() ? 'opacity-50' : '' }}"
+    class="bg-white dark:bg-gray-800 border mb-2 rounded-md {{ $post->trashed() || $thread->trashed() ? 'opacity-50' : '' }}"
     :class="{ 'border-blue-500': selectedPosts.includes({{ $post->id }}) }">
-    <div class="bg-gray-100 border-b px-4 py-2 flex justify-between flex-row-reverse rounded-t-md">
+    <div class="bg-gray-100 dark:bg-gray-800 border-b px-4 py-2 flex justify-between flex-row-reverse rounded-t-md">
         @if (! isset($single) || ! $single)
             <span class="float-end">
                 <a href="{{ Forum::route('thread.show', $post) }}" class="text-blue-500">#{{ $post->sequence }}</a>

@@ -1,27 +1,27 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
     @if($front)
         <!-- Front Page Content -->
         <div class="px-6 py-8">
             @if(is_array($content) && count($content) > 0)
                 <div class="space-y-6">
                     @foreach($content as $item)
-                        <article class="bg-white rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+                        <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-200">
                             <div class="prose max-w-none">
                                 @if(isset($item->title))
-                                    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $item->title }}</h1>
+                                    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ $item->title }}</h1>
                                 @endif
 
                                 @if(isset($item->body))
-                                    <div class="text-gray-700 leading-relaxed">
+                                    <div class="text-gray-700 dark:text-gray-300 leading-relaxed">
                                         {!! html_entity_decode(trim($item->body, '\'"')) !!}
                                     </div>
                                 @endif
 
                                 @if(isset($item->metadescription))
-                                    <p class="mt-4 text-gray-600 italic">{{ $item->metadescription }}</p>
+                                    <p class="mt-4 text-gray-600 dark:text-gray-400 italic">{{ $item->metadescription }}</p>
                                 @endif
                             </div>
                         </article>
@@ -30,7 +30,7 @@
             @else
                 <div class="text-center py-12">
                     <i class="fas fa-file-alt text-6xl text-gray-300 mb-4"></i>
-                    <h3 class="text-xl font-medium text-gray-700 mb-2">No Content Available</h3>
+                    <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No Content Available</h3>
                     <p class="text-gray-500">There is no content to display at this time.</p>
                 </div>
             @endif
@@ -39,7 +39,7 @@
         <!-- Content List Page -->
         <div class="px-6 py-6">
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">Content</h1>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Content</h1>
                 <p class="text-gray-600">Browse our content pages</p>
             </div>
 
@@ -47,18 +47,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($content as $item)
                         @if($item)
-                            <div class="bg-gray-50 rounded-lg p-6 hover:shadow-md transition">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-3">
-                                    <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="hover:text-blue-600 transition">
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 hover:shadow-md transition">
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                                    <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="hover:text-blue-600 dark:text-blue-400 transition">
                                         {{ $item->title ?? 'Untitled' }}
                                     </a>
                                 </h3>
 
                                 @if(isset($item->metadescription))
-                                    <p class="text-gray-600 mb-4">{{ Str::limit($item->metadescription, 150) }}</p>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-4">{{ Str::limit($item->metadescription, 150) }}</p>
                                 @endif
 
-                                <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                                <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
                                     Read More <i class="fas fa-arrow-right ml-2"></i>
                                 </a>
                             </div>
@@ -68,7 +68,7 @@
             @else
                 <div class="text-center py-12">
                     <i class="fas fa-file-alt text-6xl text-gray-300 mb-4"></i>
-                    <h3 class="text-xl font-medium text-gray-700 mb-2">No Content Available</h3>
+                    <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No Content Available</h3>
                     <p class="text-gray-500">There is no content to display at this time.</p>
                 </div>
             @endif

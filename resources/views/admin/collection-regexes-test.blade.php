@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
                     <i class="fa fa-flask mr-2"></i>{{ $title ?? 'Collection Regex Test' }}
                 </h1>
-                <a href="{{ url('/admin/collection_regexes-list') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                <a href="{{ url('/admin/collection_regexes-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
                     <i class="fa fa-arrow-left mr-2"></i>Back to List
                 </a>
             </div>
@@ -30,13 +30,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <!-- Group Field -->
                 <div>
-                    <label for="group" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Group: <span class="text-red-500">*</span>
                     </label>
                     <input type="text"
                            id="group"
                            name="group"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $group }}"
                            placeholder="alt.binaries.teevee"
                            required>
@@ -47,13 +47,13 @@
 
                 <!-- Limit Field -->
                 <div>
-                    <label for="limit" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Limit:
                     </label>
                     <input type="number"
                            id="limit"
                            name="limit"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $limit }}"
                            min="1"
                            max="1000">
@@ -65,12 +65,12 @@
 
             <!-- Regex Field -->
             <div class="mb-6">
-                <label for="regex" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="regex" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Regex: <span class="text-red-500">*</span>
                 </label>
                 <textarea id="regex"
                           name="regex"
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
                           rows="4"
                           required
                           placeholder="/^(?P<name>.*?)([\. ]S\d{1,3}[\. ]?E\d{1,3})/i">{{ $regex }}</textarea>
@@ -80,7 +80,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                 <i class="fa fa-play mr-2"></i>Test Regex
             </button>
         </form>
@@ -88,7 +88,7 @@
         <!-- Results Section -->
         @if($data)
             <div class="px-6 py-6 border-t border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     <i class="fa fa-chart-bar mr-2"></i>Test Results:
                 </h2>
 
@@ -102,7 +102,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-64">Match</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                                 @foreach($data as $row)
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">

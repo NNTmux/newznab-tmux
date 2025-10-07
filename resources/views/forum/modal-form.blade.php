@@ -1,6 +1,6 @@
 <div tabindex="-1" role="dialog" data-modal="{{ $key }}" class="fixed top-0 left-0 w-full h-full hidden z-10 items-center justify-center">
     <div class="fixed top-0 left-0 w-full h-full bg-black/25" data-close-modal></div>
-    <div class="relative bg-white rounded-md max-w-screen-sm w-full m-2" role="document">
+    <div class="relative bg-white dark:bg-gray-800 rounded-md max-w-screen-sm w-full m-2" role="document">
         <div class="">
             <div class="border-b px-4 py-3 flex justify-between">
                 <h5 class="text-xl font-medium flex items-center gap-1">{!! $title !!}</h5>

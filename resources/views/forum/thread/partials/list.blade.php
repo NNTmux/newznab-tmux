@@ -1,4 +1,4 @@
-<div class="bg-white  {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border border-blue-500': selectedThreads.includes({{ $thread->id }}) }">
+<div class="bg-white dark:bg-gray-800  {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border border-blue-500': selectedThreads.includes({{ $thread->id }}) }">
     <div class="flex flex-col md:items-start md:flex-row md:justify-between md:gap-4 p-4">
         <div class="md:w-3/6 text-center md:text-left">
             <span class="lead">

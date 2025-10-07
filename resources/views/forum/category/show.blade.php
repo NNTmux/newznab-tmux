@@ -67,7 +67,7 @@
                     @can ('manageThreads', $category)
                             <div class="fixed bottom-0 right-0 m-2" style="z-index: 1000;">
                                 <transition name="fade">
-                                    <div class="bg-white shadow-sm rounded-md" v-if="selectedThreads.length">
+                                    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-md" v-if="selectedThreads.length">
                                         <div class="border-b text-center py-2 px-4">
                                             {{ trans('forum::general.with_selection') }}
                                         </div>

@@ -3,15 +3,15 @@
 @section('content')
 <div class="space-y-6">
     <!-- Welcome Section -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Admin Dashboard</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Admin Dashboard</h2>
         <p class="text-gray-600">Welcome to the administration panel</p>
     </div>
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Releases -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Total Releases</p>
@@ -29,7 +29,7 @@
         </div>
 
         <!-- Active Users -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Active Users</p>
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Active Groups -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Active Groups</p>
@@ -65,7 +65,7 @@
         </div>
 
         <!-- Failed Releases -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Failed Releases</p>
@@ -76,7 +76,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{{ url('/admin/failed-releases') }}" class="text-sm text-blue-600 hover:text-blue-800">
+                <a href="{{ url('/admin/failed-releases') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800">
                     View failed releases <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -86,8 +86,8 @@
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- System Status -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">System Status</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">System Status</h3>
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="text-gray-600">Database</span>
@@ -115,14 +115,14 @@
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Recent Activity</h3>
             <div class="space-y-3">
                 @if(isset($recent_activity) && count($recent_activity) > 0)
                     @foreach($recent_activity as $activity)
                         <div class="flex items-start">
                             <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                                <i class="fas fa-{{ $activity->icon ?? 'info' }} text-blue-600 text-sm"></i>
+                                <i class="fas fa-{{ $activity->icon ?? 'info' }} text-blue-600 dark:text-blue-400 text-sm"></i>
                             </div>
                             <div class="flex-1">
                                 <p class="text-sm text-gray-800">{{ $activity->message }}</p>
@@ -138,22 +138,22 @@
     </div>
 
     <!-- Quick Links -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Links</h3>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ url('/admin/user-list') }}" class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
-                <i class="fas fa-users text-3xl text-blue-600 mb-2"></i>
+            <a href="{{ url('/admin/user-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
+                <i class="fas fa-users text-3xl text-blue-600 dark:text-blue-400 mb-2"></i>
                 <span class="text-sm font-medium text-gray-700">Manage Users</span>
             </a>
-            <a href="{{ url('/admin/release-list') }}" class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+            <a href="{{ url('/admin/release-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
                 <i class="fas fa-download text-3xl text-green-600 mb-2"></i>
                 <span class="text-sm font-medium text-gray-700">Manage Releases</span>
             </a>
-            <a href="{{ url('/admin/category-list') }}" class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+            <a href="{{ url('/admin/category-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
                 <i class="fas fa-folder text-3xl text-purple-600 mb-2"></i>
                 <span class="text-sm font-medium text-gray-700">Categories</span>
             </a>
-            <a href="{{ url('/admin/site-edit') }}" class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+            <a href="{{ url('/admin/site-edit') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
                 <i class="fas fa-cog text-3xl text-orange-600 mb-2"></i>
                 <span class="text-sm font-medium text-gray-700">Settings</span>
             </a>

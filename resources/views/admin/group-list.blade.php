@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-full px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex flex-wrap justify-between items-center gap-3">
@@ -10,7 +10,7 @@
                     <i class="fa fa-users mr-2"></i>{{ $title ?? 'Group List' }}
                 </h1>
                 <div class="flex flex-wrap gap-2">
-                    <a href="{{ url('/admin/group-list-active') }}" class="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                    <a href="{{ url('/admin/group-list-active') }}" class="px-3 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded-lg hover:bg-blue-700">
                         <i class="fa fa-check-circle mr-1"></i>Active Groups
                     </a>
                     <a href="{{ url('/admin/group-list-inactive') }}" class="px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700">
@@ -19,7 +19,7 @@
                     <a href="{{ url('/admin/group-list') }}" class="px-3 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
                         <i class="fa fa-list mr-1"></i>All Groups
                     </a>
-                    <a href="{{ url('/admin/group-bulk') }}" class="px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">
+                    <a href="{{ url('/admin/group-bulk') }}" class="px-3 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded-lg hover:bg-green-700">
                         <i class="fa fa-plus-circle mr-1"></i>Bulk Add
                     </a>
                 </div>
@@ -45,7 +45,7 @@
 
         @if($grouplist && $grouplist->count() > 0)
             <!-- Search and Actions Bar -->
-            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <!-- Search Form -->
                     <div>
@@ -59,10 +59,10 @@
                                            type="text"
                                            name="groupname"
                                            value="{{ $groupname ?? '' }}"
-                                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                            placeholder="Search for group...">
                                 </div>
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                                     Go
                                 </button>
                             </div>
@@ -84,7 +84,7 @@
                             </button>
                             <button type="button"
                                     onclick="showPurgeAllModal()"
-                                    class="px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700">
+                                    class="px-3 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700">
                                 <i class="fa fa-trash mr-1"></i> Purge All
                             </button>
                         </div>
@@ -110,11 +110,11 @@
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         @foreach($grouplist as $group)
                             <tr id="grouprow-{{ $group->id }}" class="hover:bg-gray-50">
                                 <td class="px-6 py-4">
-                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-blue-600 hover:text-blue-800">
+                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800">
                                         {{ str_replace('alt.binaries', 'a.b', $group->name) }}
                                     </a>
                                     @if($group->description)
@@ -141,7 +141,7 @@
                                     @else
                                         <button type="button"
                                                 onclick="ajax_group_status({{ $group->id }}, 1)"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200">
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
                                             <i class="fa fa-times-circle mr-1"></i>Inactive
                                         </button>
                                     @endif
@@ -156,13 +156,13 @@
                                     @else
                                         <button type="button"
                                                 onclick="ajax_backfill_status({{ $group->id }}, 1)"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200">
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
                                             <i class="fa fa-times-circle mr-1"></i>Disabled
                                         </button>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800">
                                         {{ $group->num_releases ?? 0 }}
                                     </span>
                                 </td>
@@ -170,7 +170,7 @@
                                     @if(empty($group->minfilestoformrelease))
                                         <span class="text-gray-400">n/a</span>
                                     @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800">
                                             {{ $group->minfilestoformrelease }}
                                         </span>
                                     @endif
@@ -179,20 +179,20 @@
                                     @if(empty($group->minsizetoformrelease))
                                         <span class="text-gray-400">n/a</span>
                                     @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800">
                                             {{ human_filesize($group->minsizetoformrelease) }}
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800">
                                         {{ $group->backfill_target }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center" id="groupdel-{{ $group->id }}">
                                     <div class="flex gap-1 justify-center">
                                         <a href="{{ url('/admin/group-edit?id=' . $group->id) }}"
-                                           class="text-blue-600 hover:text-blue-900"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900"
                                            title="Edit this group">
                                             <i class="fa fa-pencil"></i>
                                         </a>
@@ -223,7 +223,7 @@
             </div>
 
             <!-- Footer -->
-            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50">
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600">
                         Showing {{ $grouplist->count() }} of {{ $grouplist->total() }} groups
@@ -236,9 +236,9 @@
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fa fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No groups available</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No groups available</h3>
                 <p class="text-gray-500 mb-4">No groups have been added yet.</p>
-                <a href="{{ url('/admin/group-bulk') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                <a href="{{ url('/admin/group-bulk') }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700">
                     <i class="fa fa-plus-circle mr-2"></i>Add Groups
                 </a>
             </div>
@@ -250,17 +250,17 @@
 <div id="resetAllModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Reset All Groups</h3>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset All Groups</h3>
             <p class="text-sm text-red-600 mb-2">
                 <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to reset all groups?
             </p>
-            <p class="text-sm text-gray-600 mb-4">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will reset the article pointers for all groups back to their current state.
             </p>
             <div class="flex justify-end gap-3">
                 <button type="button"
                         onclick="hideResetAllModal()"
-                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     Cancel
                 </button>
                 <button type="button"
@@ -277,22 +277,22 @@
 <div id="purgeAllModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Purge All Groups</h3>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Purge All Groups</h3>
             <p class="text-sm text-red-600 mb-2">
                 <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to purge all groups?
             </p>
-            <p class="text-sm text-gray-600 mb-4">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will delete all releases and binaries for all groups. This action cannot be undone!
             </p>
             <div class="flex justify-end gap-3">
                 <button type="button"
                         onclick="hidePurgeAllModal()"
-                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     Cancel
                 </button>
                 <button type="button"
                         onclick="ajax_group_purge_all()"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700">
                     Purge All
                 </button>
             </div>

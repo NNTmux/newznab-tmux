@@ -40,7 +40,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.23.2/vuedraggable.umd.min.js"></script>
 </head>
 <body class="bg-gray-100">
-    <nav class="v-navbar bg-white shadow py-4">
+    <nav class="v-navbar bg-white dark:bg-gray-800 shadow py-4">
         <div class="container mx-auto px-4 md:flex md:items-center md:gap-4">
             <div class="flex justify-between items-center">
                 <a class="text-lg" href="{{ url('/') }}">{{config('app.name')}} Home &nbsp;</a>
@@ -80,7 +80,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </a>
-                            <div class="border absolute left-0 bg-white rounded-md w-44 divide-y" :class="{ hidden: isUserDropdownCollapsed }" aria-labelledby="navbarDropdownMenuLink">
+                            <div class="border absolute left-0 bg-white dark:bg-gray-800 rounded-md w-44 divide-y" :class="{ hidden: isUserDropdownCollapsed }" aria-labelledby="navbarDropdownMenuLink">
                                 <a class="block px-4 py-2" href="{{ url('/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     Log out
                                 </a>

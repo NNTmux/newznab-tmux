@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
                     <i class="fa fa-edit mr-2"></i>{{ $title ?? 'Binary Black/Whitelist Edit' }}
                 </h1>
-                <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
                     <i class="fa fa-arrow-left mr-2"></i>Back to List
                 </a>
             </div>
@@ -32,7 +32,7 @@
 
             <!-- Group Name -->
             <div class="mb-6">
-                <label for="groupname" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="groupname" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Group Name: <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
@@ -42,7 +42,7 @@
                     <input type="text"
                            id="groupname"
                            name="groupname"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ htmlspecialchars($regex->groupname ?? '') }}"
                            required>
                 </div>
@@ -53,7 +53,7 @@
 
             <!-- Regex -->
             <div class="mb-6">
-                <label for="regex" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="regex" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Regex: <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
@@ -62,7 +62,7 @@
                     </div>
                     <textarea id="regex"
                               name="regex"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
                               rows="4"
                               required>{{ htmlspecialchars($regex->regex ?? '') }}</textarea>
                 </div>
@@ -73,7 +73,7 @@
 
             <!-- Description -->
             <div class="mb-6">
-                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Description:
                 </label>
                 <div class="relative">
@@ -82,7 +82,7 @@
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               rows="3">{{ htmlspecialchars($regex->description ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -92,17 +92,17 @@
 
             <!-- Message Field -->
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Message Field:
                 </label>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                     @foreach($msgcol_ids as $i => $id)
                         <div class="flex items-center {{ $loop->last ? '' : 'mb-3' }}">
                             <input type="radio"
                                    name="msgcol"
                                    id="msgcol{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                                    {{ ($regex->msgcol ?? 1) == $id ? 'checked' : '' }}>
                             <label for="msgcol{{ $id }}" class="ml-3 text-sm text-gray-700">
                                 {{ $msgcol_names[$i] }}
@@ -117,17 +117,17 @@
 
             <!-- Status -->
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Status:
                 </label>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                     @foreach($status_ids as $i => $id)
                         <div class="flex items-center {{ $loop->last ? '' : 'mb-3' }}">
                             <input type="radio"
                                    name="status"
                                    id="status{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                                    {{ ($regex->status ?? 1) == $id ? 'checked' : '' }}>
                             <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700">
                                 {{ $status_names[$i] }}
@@ -142,17 +142,17 @@
 
             <!-- Type -->
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Type:
                 </label>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                     @foreach($optype_ids as $i => $id)
                         <div class="flex items-center {{ $loop->last ? '' : 'mb-3' }}">
                             <input type="radio"
                                    name="optype"
                                    id="optype{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                                    {{ ($regex->optype ?? 1) == $id ? 'checked' : '' }}>
                             <label for="optype{{ $id }}" class="ml-3 text-sm text-gray-700">
                                 {{ $optype_names[$i] }}
@@ -167,12 +167,12 @@
         </form>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50">
             <div class="flex justify-between">
-                <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     <i class="fa fa-times mr-2"></i>Cancel
                 </a>
-                <button type="submit" form="blacklistForm" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                <button type="submit" form="blacklistForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700">
                     <i class="fa fa-save mr-2"></i>Save Changes
                 </button>
             </div>

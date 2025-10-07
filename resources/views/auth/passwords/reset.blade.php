@@ -6,7 +6,7 @@
         <!-- Logo and Title -->
         <div class="text-center">
             <a href="{{ url('/') }}" class="inline-flex items-center justify-center mb-4">
-                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                <div class="w-16 h-16 bg-blue-600 dark:bg-blue-700 rounded-full flex items-center justify-center shadow-lg">
                     <i class="fas fa-file-download text-3xl text-white"></i>
                 </div>
             </a>
@@ -19,7 +19,7 @@
         </div>
 
         <!-- Reset Password Card -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
             <div class="px-8 py-6">
                 <!-- Error Messages -->
                 @if($errors->any())
@@ -45,7 +45,7 @@
 
                     <!-- Email Field (readonly) -->
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Email Address
                         </label>
                         <div class="relative">
@@ -60,14 +60,14 @@
                                 required
                                 autofocus
                                 readonly
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                             >
                         </div>
                     </div>
 
                     <!-- New Password Field -->
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             New Password
                         </label>
                         <div class="relative">
@@ -79,7 +79,7 @@
                                 type="password"
                                 name="password"
                                 required
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('password') border-red-500 @enderror"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('password') border-red-500 @enderror"
                                 placeholder="Enter your new password"
                             >
                         </div>
@@ -91,7 +91,7 @@
 
                     <!-- Confirm Password Field -->
                     <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Confirm New Password
                         </label>
                         <div class="relative">
@@ -103,7 +103,7 @@
                                 type="password"
                                 name="password_confirmation"
                                 required
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                 placeholder="Confirm your new password"
                             >
                         </div>
@@ -113,7 +113,7 @@
                     <div class="pt-2">
                         <button
                             type="submit"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
                         >
                             <i class="fas fa-check-circle mr-2"></i>
                             Reset Password
@@ -123,9 +123,9 @@
             </div>
 
             <!-- Card Footer -->
-            <div class="px-8 py-4 bg-gray-50 border-t border-gray-200">
+            <div class="px-8 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200">
                 <div class="flex justify-center items-center text-sm">
-                    <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-500 font-medium transition">
+                    <a href="{{ route('login') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 font-medium transition">
                         <i class="fas fa-arrow-left mr-1"></i> Back to login
                     </a>
                 </div>

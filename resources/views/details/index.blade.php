@@ -1,9 +1,9 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm p-6">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">Release Details</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Release Details</h1>
         <nav class="text-sm text-gray-600">
             <a href="{{ url('/') }}" class="hover:text-blue-600">Home</a>
             <i class="fas fa-chevron-right mx-2 text-xs"></i>
@@ -15,7 +15,7 @@
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Cover Image and Title -->
-            <div class="border-b border-gray-200 pb-4">
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
                 <div class="flex gap-4 mb-4">
                     <!-- Cover Image -->
                     <div class="flex-shrink-0">
@@ -29,7 +29,7 @@
                     <!-- Title and Actions -->
                     <div class="flex-1">
                         <div class="mb-3">
-                            <h2 class="text-xl font-bold text-gray-800 mb-2">{{ $release->searchname }}</h2>
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ $release->searchname }}</h2>
                             @if(!empty($failed) && $failed > 0)
                                 <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-100 text-red-800 border border-red-200">
                                     <i class="fas fa-exclamation-triangle mr-2"></i>
@@ -38,10 +38,10 @@
                             @endif
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition inline-flex items-center" onclick="showToast('Downloading NZB...', 'success')">
+                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition inline-flex items-center" onclick="showToast('Downloading NZB...', 'success')">
                                 <i class="fas fa-download mr-2"></i> Download NZB
                             </a>
-                            <a href="#" class="add-to-cart px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-flex items-center" data-guid="{{ $release->guid }}">
+                            <a href="#" class="add-to-cart px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition inline-flex items-center" data-guid="{{ $release->guid }}">
                                 <i class="icon_cart fas fa-shopping-basket mr-2"></i> Add to Cart
                             </a>
                             @auth
@@ -63,8 +63,8 @@
             @endphp
 
             @if($hasPreviewImage || $hasSampleImage)
-                <div class="border-b border-gray-200 pb-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
                         <i class="fas fa-images mr-2 text-purple-600"></i>
                         @if($hasPreviewImage && $hasSampleImage)
                             Preview & Sample Images
@@ -120,14 +120,14 @@
                     $movieTrailer = $movieData['trailer'] ?? ($movie->trailer ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-film mr-2 text-blue-600"></i> Movie Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($movieTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $movieTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $movieTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($movieYear))
@@ -139,7 +139,7 @@
                         @if(!empty($movieTagline))
                             <div class="md:col-span-2">
                                 <dt class="text-sm font-medium text-gray-600">Tagline</dt>
-                                <dd class="mt-1 text-sm text-gray-700 italic">"{{ $movieTagline }}"</dd>
+                                <dd class="mt-1 text-sm text-gray-700 dark:text-gray-300 italic">"{{ $movieTagline }}"</dd>
                             </div>
                         @endif
                         @if(!empty($movieRating))
@@ -156,7 +156,7 @@
                         @if(!empty($moviePlot))
                             <div class="md:col-span-2">
                                 <dt class="text-sm font-medium text-gray-600">Plot Synopsis</dt>
-                                <dd class="mt-1 text-sm text-gray-700 leading-relaxed">{{ $moviePlot }}</dd>
+                                <dd class="mt-1 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ $moviePlot }}</dd>
                             </div>
                         @endif
                         @if(!empty($movieGenre))
@@ -186,7 +186,7 @@
                     </div>
                     @if(!empty($movieTrailer))
                         <div class="mt-4">
-                            <h4 class="text-sm font-medium text-gray-600 mb-2">Trailer</h4>
+                            <h4 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Trailer</h4>
                             <div class="aspect-video">
                                 {!! $movieTrailer !!}
                             </div>
@@ -204,14 +204,14 @@
                     $showTvdb = $showData['tvdb'] ?? ($show->tvdb ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-tv mr-2 text-purple-600"></i> TV Show Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($showTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Show Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $showTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $showTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($showStarted))
@@ -224,7 +224,7 @@
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">TVDB</dt>
                                 <dd class="mt-1">
-                                    <a href="https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800">
+                                    <a href="https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800">
                                         View on TVDB <i class="fas fa-external-link-alt text-xs"></i>
                                     </a>
                                 </dd>
@@ -243,14 +243,14 @@
                     $xxxActors = $xxxData['actors'] ?? ($xxx->actors ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-red-50 to-pink-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i> Adult Content Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($xxxTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $xxxTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $xxxTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($xxxGenre))
@@ -280,14 +280,14 @@
                     $musicGenres = $musicData['genres'] ?? ($music->genres ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-music mr-2 text-green-600"></i> Music Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($musicTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Album</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $musicTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $musicTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($musicArtist))
@@ -328,14 +328,14 @@
                     $gameGenres = $gameData['genres'] ?? ($game->genres ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-gamepad mr-2 text-orange-600"></i> Game Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($gameTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $gameTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $gameTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($gamePublisher))
@@ -369,14 +369,14 @@
                     $conReleaseDate = $conData['releasedate'] ?? ($con->releasedate ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-gamepad mr-2 text-indigo-600"></i> Console Game Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($conTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $conTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $conTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($conPublisher))
@@ -406,14 +406,14 @@
                     $bookOverview = $bookData['overview'] ?? ($book->overview ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-book mr-2 text-amber-600"></i> Book Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($bookTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $bookTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $bookTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($bookAuthor))
@@ -455,14 +455,14 @@
                     $anidbDescription = $anidbData['description'] ?? ($anidb->description ?? null);
                 @endphp
                 <div class="bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-dragon mr-2 text-pink-600"></i> Anime Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($anidbTitle))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $anidbTitle }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $anidbTitle }}</dd>
                             </div>
                         @endif
                         @if(!empty($anidbType))
@@ -501,51 +501,51 @@
             <!-- Video/Audio Metadata -->
             @if(!empty($reVideo) || !empty($reAudio) || !empty($reSubs))
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-photo-video mr-2 text-blue-600"></i> Media Information
                     </h3>
 
                     @if(!empty($reVideo))
                         <div class="mb-6">
-                            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                            <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                                 <i class="fas fa-video mr-2 text-blue-500"></i> Video Details
                             </h4>
-                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
                                 <dl class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     @if(!empty($reVideo['containerformat']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Container Format</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['containerformat'] }}</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Container Format</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['containerformat'] }}</dd>
                                         </div>
                                     @endif
                                     @if(!empty($reVideo['videocodec']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Video Codec</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videocodec'] }}</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Video Codec</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videocodec'] }}</dd>
                                         </div>
                                     @endif
                                     @if(!empty($reVideo['videoformat']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Video Format</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videoformat'] }}</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Video Format</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videoformat'] }}</dd>
                                         </div>
                                     @endif
                                     @if(!empty($reVideo['videowidth']) && !empty($reVideo['videoheight']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Resolution</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videowidth'] }}x{{ $reVideo['videoheight'] }}</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Resolution</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videowidth'] }}x{{ $reVideo['videoheight'] }}</dd>
                                         </div>
                                     @endif
                                     @if(!empty($reVideo['videoaspect']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Aspect Ratio</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videoaspect'] }}</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Aspect Ratio</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videoaspect'] }}</dd>
                                         </div>
                                     @endif
                                     @if(!empty($reVideo['videoframerate']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Frame Rate</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videoframerate'] }} fps</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Frame Rate</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videoframerate'] }} fps</dd>
                                         </div>
                                     @endif
                                     @if(!empty($reVideo['videoduration']))
@@ -555,21 +555,21 @@
                                         @endphp
                                         @if($durationMinutes > 0)
                                             <div>
-                                                <dt class="text-xs font-medium text-gray-600 mb-1">Duration</dt>
-                                                <dd class="text-sm text-gray-900 font-semibold">{{ $durationMinutes }} minutes</dd>
+                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Duration</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $durationMinutes }} minutes</dd>
                                             </div>
                                         @endif
                                     @endif
                                     @if(!empty($reVideo['overallbitrate']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Bit Rate</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['overallbitrate'] }}</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Bit Rate</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['overallbitrate'] }}</dd>
                                         </div>
                                     @endif
                                     @if(!empty($reVideo['videolibrary']))
                                         <div>
-                                            <dt class="text-xs font-medium text-gray-600 mb-1">Encoder Library</dt>
-                                            <dd class="text-sm text-gray-900 font-semibold">{{ $reVideo['videolibrary'] }}</dd>
+                                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Encoder Library</dt>
+                                            <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reVideo['videolibrary'] }}</dd>
                                         </div>
                                     @endif
                                 </dl>
@@ -579,49 +579,49 @@
 
                     @if(!empty($reAudio))
                         <div class="mb-6">
-                            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                            <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                                 <i class="fas fa-volume-up mr-2 text-green-500"></i> Audio Details
                             </h4>
                             @foreach($reAudio as $index => $audio)
-                                <div class="bg-white rounded-lg p-4 shadow-sm {{ $index > 0 ? 'mt-3' : '' }}">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm {{ $index > 0 ? 'mt-3' : '' }}">
                                     @if(count($reAudio) > 1)
                                         <p class="text-xs font-semibold text-gray-500 mb-2">Track {{ $index + 1 }}</p>
                                     @endif
                                     <dl class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         @if(!empty($audio['audioformat']))
                                             <div>
-                                                <dt class="text-xs font-medium text-gray-600 mb-1">Audio Format</dt>
-                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audioformat'] }}</dd>
+                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Audio Format</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audioformat'] }}</dd>
                                             </div>
                                         @endif
                                         @if(!empty($audio['audiocodec']))
                                             <div>
-                                                <dt class="text-xs font-medium text-gray-600 mb-1">Codec</dt>
-                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiocodec'] }}</dd>
+                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Codec</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiocodec'] }}</dd>
                                             </div>
                                         @endif
                                         @if(!empty($audio['audiochannels']))
                                             <div>
-                                                <dt class="text-xs font-medium text-gray-600 mb-1">Channels</dt>
-                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiochannels'] }}</dd>
+                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Channels</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiochannels'] }}</dd>
                                             </div>
                                         @endif
                                         @if(!empty($audio['audiobitrate']))
                                             <div>
-                                                <dt class="text-xs font-medium text-gray-600 mb-1">Bit Rate</dt>
-                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiobitrate'] }}</dd>
+                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Bit Rate</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiobitrate'] }}</dd>
                                             </div>
                                         @endif
                                         @if(!empty($audio['audiolanguage']))
                                             <div>
-                                                <dt class="text-xs font-medium text-gray-600 mb-1">Language</dt>
-                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiolanguage'] }}</dd>
+                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Language</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiolanguage'] }}</dd>
                                             </div>
                                         @endif
                                         @if(!empty($audio['audiosamplerate']))
                                             <div>
-                                                <dt class="text-xs font-medium text-gray-600 mb-1">Sample Rate</dt>
-                                                <dd class="text-sm text-gray-900 font-semibold">{{ $audio['audiosamplerate'] }} Hz</dd>
+                                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Sample Rate</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $audio['audiosamplerate'] }} Hz</dd>
                                             </div>
                                         @endif
                                     </dl>
@@ -632,11 +632,11 @@
 
                     @if(!empty($reSubs))
                         <div>
-                            <h4 class="text-md font-semibold text-gray-700 mb-3 flex items-center">
+                            <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                                 <i class="fas fa-closed-captioning mr-2 text-purple-500"></i> Subtitles
                             </h4>
-                            <div class="bg-white rounded-lg p-4 shadow-sm">
-                                <p class="text-sm text-gray-900 font-semibold">{{ $reSubs->subs }}</p>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+                                <p class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reSubs->subs }}</p>
                             </div>
                         </div>
                     @endif
@@ -646,14 +646,14 @@
             <!-- PreDB Information -->
             @if(!empty($predb) && is_array($predb))
                 <div class="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-database mr-2 text-cyan-600"></i> PreDB Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($predb['title']))
                             <div>
                                 <dt class="text-sm font-medium text-gray-600">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $predb['title'] }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-mono">{{ $predb['title'] }}</dd>
                             </div>
                         @endif
                         @if(!empty($predb['source']))
@@ -681,7 +681,7 @@
             <!-- NFO -->
             @if($nfo ?? false)
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">NFO</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">NFO</h3>
                     <div class="bg-black text-green-400 p-4 rounded-lg overflow-x-auto font-mono text-sm">
                         <pre>{{ $nfo }}</pre>
                     </div>
@@ -691,8 +691,8 @@
             <!-- File List -->
             @if(isset($files) && count($files) > 0)
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Files ({{ count($files) }})</h3>
-                    <div class="bg-gray-50 rounded-lg overflow-hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Files ({{ count($files) }})</h3>
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-100">
                                 <tr>
@@ -715,14 +715,14 @@
 
             <!-- Comments -->
             <div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-3">Comments</h3>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Comments</h3>
                 @if(isset($comments) && count($comments) > 0)
                     <div class="space-y-3">
                         @foreach($comments as $comment)
-                            <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                                 <div class="flex items-start justify-between mb-2">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                        <div class="w-10 h-10 bg-blue-600 dark:bg-blue-700 rounded-full flex items-center justify-center text-white font-bold mr-3">
                                             {{ strtoupper(substr($comment->username, 0, 1)) }}
                                         </div>
                                         <div>
@@ -743,8 +743,8 @@
 
         <!-- Sidebar -->
         <div class="lg:col-span-1">
-            <div class="bg-gray-50 rounded-lg p-4 sticky top-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Information</h3>
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 sticky top-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Information</h3>
                 <dl class="space-y-3">
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Category</dt>
@@ -774,7 +774,7 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500">IMDB</dt>
                             <dd class="mt-1">
-                                <a href="https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800">
+                                <a href="https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800">
                                     View on IMDB <i class="fas fa-external-link-alt text-xs"></i>
                                 </a>
                             </dd>

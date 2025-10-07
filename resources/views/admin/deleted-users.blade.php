@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
@@ -16,74 +16,74 @@
         </div>
 
         <!-- Search Filters -->
-        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
             <form method="get" action="{{ url('admin/deleted-users') }}">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
                         <input type="text"
                                id="username"
                                name="username"
                                value="{{ $username ?? '' }}"
                                placeholder="Filter by username"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                         <input type="text"
                                id="email"
                                name="email"
                                value="{{ $email ?? '' }}"
                                placeholder="Filter by email"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="host" class="block text-sm font-medium text-gray-700 mb-1">Host/IP</label>
+                        <label for="host" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Host/IP</label>
                         <input type="text"
                                id="host"
                                name="host"
                                value="{{ $host ?? '' }}"
                                placeholder="Filter by host"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="created_from" class="block text-sm font-medium text-gray-700 mb-1">Created From</label>
+                        <label for="created_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Created From</label>
                         <input type="date"
                                id="created_from"
                                name="created_from"
                                value="{{ $created_from ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="created_to" class="block text-sm font-medium text-gray-700 mb-1">Created To</label>
+                        <label for="created_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Created To</label>
                         <input type="date"
                                id="created_to"
                                name="created_to"
                                value="{{ $created_to ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="deleted_from" class="block text-sm font-medium text-gray-700 mb-1">Deleted From</label>
+                        <label for="deleted_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deleted From</label>
                         <input type="date"
                                id="deleted_from"
                                name="deleted_from"
                                value="{{ $deleted_from ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="deleted_to" class="block text-sm font-medium text-gray-700 mb-1">Deleted To</label>
+                        <label for="deleted_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deleted To</label>
                         <input type="date"
                                id="deleted_to"
                                name="deleted_to"
                                value="{{ $deleted_to ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
                         <i class="fa fa-search mr-2"></i>Filter
                     </button>
-                    <a href="{{ url('admin/deleted-users') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    <a href="{{ url('admin/deleted-users') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300">
                         <i class="fa fa-times mr-2"></i>Clear
                     </a>
                 </div>
@@ -111,16 +111,16 @@
         @if(count($deletedusers) > 0)
             <form method="post" action="{{ url('admin/deleted-users/bulk') }}" id="bulkActionForm">
                 @csrf
-                <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700">Bulk Actions:</label>
-                        <select name="action" id="bulkAction" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <select name="action" id="bulkAction" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select Action</option>
                             <option value="restore">Restore Selected</option>
                             <option value="delete">Permanently Delete Selected</option>
                         </select>
                         <button type="submit"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700"
                                 onclick="return confirmBulkAction()">
                             <i class="fa fa-check mr-2"></i>Apply
                         </button>
@@ -132,7 +132,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left">
-                                    <input type="checkbox" id="selectAll" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <input type="checkbox" id="selectAll" class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <a href="{{ url('admin/deleted-users?ob=username_' . ($orderby == 'username_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700">
@@ -171,18 +171,18 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             @foreach($deletedusers as $user)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" class="user-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" class="user-checkbox h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">{{ $user->username }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $user->email }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800">
                                             {{ $user->rolename ?? 'N/A' }}
                                         </span>
                                     </td>
@@ -223,7 +223,7 @@
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fa fa-trash-restore text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No deleted users found</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No deleted users found</h3>
                 <p class="text-gray-500">There are no soft-deleted users matching your filters.</p>
             </div>
         @endif

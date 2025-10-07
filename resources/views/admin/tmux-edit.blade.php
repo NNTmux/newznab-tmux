@@ -12,7 +12,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <h1 class="text-2xl font-semibold text-gray-800">
@@ -37,12 +37,12 @@
 
             <div class="space-y-8">
                 <!-- Tmux - How It Works -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Tmux - How It Works</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Tmux - How It Works</h2>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <p class="text-sm text-gray-700 mb-2">Tmux is a screen multiplexer and at least version 1.6 is required. It is used here to allow multiple windows per session and multiple panes per window.</p>
-                        <p class="text-sm text-gray-700 mb-2">Each script is run in its own shell environment. It is not looped, but allowed to run once and then exit. This notifies tmux that the pane is dead and can then be respawned with another iteration of the script in a new shell environment.</p>
-                        <p class="text-sm text-gray-700 mb-2">This allows for scripts that crash to be restarted without user intervention.</p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Tmux is a screen multiplexer and at least version 1.6 is required. It is used here to allow multiple windows per session and multiple panes per window.</p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Each script is run in its own shell environment. It is not looped, but allowed to run once and then exit. This notifies tmux that the pane is dead and can then be respawned with another iteration of the script in a new shell environment.</p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">This allows for scripts that crash to be restarted without user intervention.</p>
                         <div class="bg-yellow-50 border border-yellow-300 rounded p-3 mt-3">
                             <p class="text-sm font-medium text-yellow-800"><i class="fa fa-exclamation-triangle mr-2"></i>NOTICE:</p>
                             <p class="text-sm text-yellow-700">If "Save Tmux Settings" is the last thing you did on this page, refreshing will save the current form values again, not reload from database.</p>
@@ -51,8 +51,8 @@
                 </div>
 
                 <!-- Monitor Settings -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Monitor Settings</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Monitor Settings</h2>
                     <div class="space-y-4">
                         <x-form.group label="Tmux Scripts Running" for="running" help="Shutdown switch. When on, scripts run; when off, all scripts are terminated.">
                             <x-select id="running" name="running" class="w-full">
@@ -67,7 +67,7 @@
                         <x-form.group label="Monitor Loop Timer" for="monitor_delay" help="Time between query refreshes. Lower = more frequent DB queries.">
                             <div class="flex gap-2">
                                 <x-input id="monitor_delay" name="monitor_delay" type="number" value="{{ $site->monitor_delay ?? 300 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
@@ -78,8 +78,8 @@
                 </div>
 
                 <!-- Sequential Settings -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Sequential Settings</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Sequential Settings</h2>
                     <div class="space-y-4">
                         <x-form.group label="Run Sequential" for="sequential" help="Sequential runs update_binaries, backfill and update releases sequentially.">
                             <x-select id="sequential" name="sequential" class="w-full">
@@ -94,7 +94,7 @@
                         <x-form.group label="Sequential Sleep Timer" for="seq_timer">
                             <div class="flex gap-2">
                                 <x-input id="seq_timer" name="seq_timer" type="number" value="{{ $site->seq_timer ?? 60 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
@@ -105,8 +105,8 @@
                 </div>
 
                 <!-- Update Binaries Settings -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Update Binaries Settings</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Update Binaries Settings</h2>
                     <div class="space-y-4">
                         <x-form.group label="Update Binaries" for="binaries" help="Gets from your last_record to now.">
                             <x-select id="binaries" name="binaries" class="w-full">
@@ -121,22 +121,22 @@
                         <x-form.group label="Update Binaries Sleep Timer" for="bins_timer">
                             <div class="flex gap-2">
                                 <x-input id="bins_timer" name="bins_timer" type="number" value="{{ $site->bins_timer ?? 10 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
                         <x-form.group label="Binaries Kill Timer" for="bins_kill_timer" help="Time allowed to run with no updates.">
                             <div class="flex gap-2">
                                 <x-input id="bins_kill_timer" name="bins_kill_timer" type="number" value="{{ $site->bins_kill_timer ?? 30 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">minutes</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">minutes</span>
                             </div>
                         </x-form.group>
                     </div>
                 </div>
 
                 <!-- Backfill Settings -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Backfill Settings</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Backfill Settings</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <x-form.group label="Backfill Mode" for="backfill">
@@ -181,7 +181,7 @@
                         <x-form.group label="Backfill Sleep Timer" for="back_timer">
                             <div class="flex gap-2">
                                 <x-input id="back_timer" name="back_timer" type="number" value="{{ $site->back_timer ?? 300 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
@@ -198,8 +198,8 @@
                 </div>
 
                 <!-- Update Releases Settings -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Update Releases Settings</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Update Releases Settings</h2>
                     <div class="space-y-4">
                         <x-form.group label="Update Releases" for="releases" help="Create releases. Only turn off when you only want to post process.">
                             <x-select id="releases" name="releases" class="w-full">
@@ -214,15 +214,15 @@
                         <x-form.group label="Update Releases Sleep Timer" for="rel_timer">
                             <div class="flex gap-2">
                                 <x-input id="rel_timer" name="rel_timer" type="number" value="{{ $site->rel_timer ?? 15 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
                     </div>
                 </div>
 
                 <!-- Postprocessing Settings -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Postprocessing Settings</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Postprocessing Settings</h2>
                     <div class="space-y-4">
                         <x-form.group label="Postprocess Additional" for="post" help="Deep rar inspection, preview/sample creation, NFO processing.">
                             <x-select id="post" name="post" class="w-full">
@@ -237,14 +237,14 @@
                         <x-form.group label="Postprocess Additional Sleep Timer" for="post_timer">
                             <div class="flex gap-2">
                                 <x-input id="post_timer" name="post_timer" type="number" value="{{ $site->post_timer ?? 300 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
                         <x-form.group label="Postprocess Kill Timer" for="post_kill_timer" help="Time allowed with no screen updates.">
                             <div class="flex gap-2">
                                 <x-input id="post_kill_timer" name="post_kill_timer" type="number" value="{{ $site->post_kill_timer ?? 300 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
@@ -261,7 +261,7 @@
                         <x-form.group label="Postprocess Amazon Sleep Timer" for="post_timer_amazon">
                             <div class="flex gap-2">
                                 <x-input id="post_timer_amazon" name="post_timer_amazon" type="number" value="{{ $site->post_timer_amazon ?? 300 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
@@ -278,15 +278,15 @@
                         <x-form.group label="Postprocess Non-Amazon Sleep Timer" for="post_timer_non">
                             <div class="flex gap-2">
                                 <x-input id="post_timer_non" name="post_timer_non" type="number" value="{{ $site->post_timer_non ?? 300 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
                     </div>
                 </div>
 
                 <!-- Fix Release Names -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Fix Release Names</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Fix Release Names</h2>
                     <div class="space-y-4">
                         <x-form.group label="Fix Release Names" for="fix_names" help="Fix release names using NFOs, par2 files, filenames, md5 and sha1.">
                             <x-select id="fix_names" name="fix_names" class="w-full">
@@ -301,15 +301,15 @@
                         <x-form.group label="Fix Release Names Sleep Timer" for="fix_timer">
                             <div class="flex gap-2">
                                 <x-input id="fix_timer" name="fix_timer" type="number" value="{{ $site->fix_timer ?? 60 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
                     </div>
                 </div>
 
                 <!-- Remove Crap Releases -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Remove Crap Releases</h2>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Remove Crap Releases</h2>
                     <div class="space-y-4">
                         <x-form.group label="Remove Crap Releases" for="fix_crap_opt" help="Remove passworded and other junk releases.">
                             <x-select id="fix_crap_opt" name="fix_crap_opt" class="w-full">
@@ -324,7 +324,7 @@
                         <x-form.group label="Remove Crap Sleep Timer" for="crap_timer">
                             <div class="flex gap-2">
                                 <x-input id="crap_timer" name="crap_timer" type="number" value="{{ $site->crap_timer ?? 300 }}" class="flex-1" />
-                                <span class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">seconds</span>
+                                <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
                     </div>

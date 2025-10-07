@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
@@ -46,12 +46,12 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         @foreach($releaselist as $release)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $release->id }}</td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="text-gray-900 font-medium max-w-md truncate" title="{{ $release->searchname }}">
+                                    <div class="text-gray-900 dark:text-gray-100 font-medium max-w-md truncate" title="{{ $release->searchname }}">
                                         {{ $release->searchname }}
                                     </div>
                                     <div class="text-gray-500 text-xs mt-1 max-w-md truncate" title="{{ $release->name }}">
@@ -81,7 +81,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex gap-2">
                                         <a href="{{ url('/details/' . $release->guid) }}"
-                                           class="text-blue-600 hover:text-blue-900"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900"
                                            title="View Details"
                                            target="_blank">
                                             <i class="fa fa-eye"></i>
@@ -112,7 +112,7 @@
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fa fa-list text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No releases found</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No releases found</h3>
                 <p class="text-gray-500">No releases are currently available in the system.</p>
             </div>
         @endif

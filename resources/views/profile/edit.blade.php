@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <h1 class="text-2xl font-bold text-gray-800">Edit Profile</h1>
-            <p class="text-gray-600 mt-1">Update your account settings and preferences</p>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">Update your account settings and preferences</p>
         </div>
 
         <!-- Messages -->
@@ -35,9 +35,9 @@
 
             <!-- Email -->
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
                 <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror">
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror">
                 @error('email')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -45,9 +45,9 @@
 
             <!-- Password -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">New Password (leave blank to keep current)</label>
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password (leave blank to keep current)</label>
                 <input type="password" name="password" id="password"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror">
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror">
                 <p class="mt-1 text-xs text-gray-500">Must contain at least 8 characters, including uppercase, lowercase, numbers and special characters</p>
                 @error('password')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -56,98 +56,98 @@
 
             <!-- Confirm Password -->
             <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
                 <input type="password" name="password_confirmation" id="password_confirmation"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <!-- View Preferences -->
-            <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Cover View Preferences</h3>
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Cover View Preferences</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="movieview" value="1" {{ $user->movieview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Movie Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="musicview" value="1" {{ $user->musicview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Music Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="consoleview" value="1" {{ $user->consoleview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Console Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="gameview" value="1" {{ $user->gameview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Game Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="bookview" value="1" {{ $user->bookview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Book Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="xxxview" value="1" {{ $user->xxxview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">XXX Covers</span>
                     </label>
                 </div>
             </div>
 
             <!-- Category Permissions -->
-            <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Category Permissions</h3>
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Category Permissions</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="viewmovies" value="1" {{ $user->movieview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Movies</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewtv" value="1" {{ $user->can('view tv') ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">TV</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewaudio" value="1" {{ $user->musicview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Audio</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewpc" value="1" {{ $user->gameview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">PC</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewconsole" value="1" {{ $user->consoleview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Console</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewbooks" value="1" {{ $user->bookview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Books</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewadult" value="1" {{ $user->xxxview ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Adult</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewother" value="1" {{ $user->can('view other') ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700">Other</span>
                     </label>
                 </div>
             </div>
 
             <!-- Actions -->
-            <div class="border-t border-gray-200 pt-6 flex items-center justify-between">
-                <a href="{{ route('profile') }}" class="px-6 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition">
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex items-center justify-between">
+                <a href="{{ route('profile') }}" class="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 transition">
                     Cancel
                 </a>
                 <div class="flex space-x-2">
@@ -156,7 +156,7 @@
                        onclick="return confirm('Are you sure you want to generate a new API key?')">
                         <i class="fas fa-key mr-2"></i>New API Key
                     </a>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">
                         <i class="fas fa-save mr-2"></i>Save Changes
                     </button>
                 </div>
@@ -165,7 +165,7 @@
 
         <!-- 2FA Section (Outside main form) -->
         <div class="p-6 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
                 <i class="fas fa-shield-alt mr-2 text-blue-600"></i>Two-Factor Authentication (2FA)
             </h3>
 
@@ -181,7 +181,7 @@
                             <form method="POST" action="{{ route('profileedit.disable2fa') }}" class="inline">
                                 @csrf
                                 <button type="submit"
-                                        class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
+                                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition"
                                         onclick="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')">
                                     <i class="fas fa-times-circle mr-2"></i>Disable 2FA
                                 </button>
@@ -193,7 +193,7 @@
                 <!-- 2FA Setup Started but Not Enabled -->
                 <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
                     <div class="flex items-start">
-                        <i class="fas fa-info-circle text-blue-600 text-xl mr-3 mt-1"></i>
+                        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mr-3 mt-1"></i>
                         <div class="flex-1">
                             <h4 class="text-blue-800 font-semibold mb-2">Complete Your 2FA Setup</h4>
                             <p class="text-blue-700 text-sm mb-4">Follow these steps to enable two-factor authentication:</p>
@@ -204,20 +204,20 @@
                                 <li>Enter the 6-digit code from your app to verify</li>
                             </ol>
 
-                            <div class="bg-white rounded-lg p-4 mb-4 flex justify-center">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 flex justify-center">
                                 <img src="{{ $google2fa_url }}" alt="2FA QR Code">
                             </div>
 
-                            <p class="text-xs text-blue-600 mb-4">
+                            <p class="text-xs text-blue-600 dark:text-blue-400 mb-4">
                                 <strong>Secret Key (manual entry):</strong>
-                                <code class="bg-white px-2 py-1 rounded">{{ $user->passwordSecurity->google2fa_secret }}</code>
+                                <code class="bg-white dark:bg-gray-800 px-2 py-1 rounded">{{ $user->passwordSecurity->google2fa_secret }}</code>
                             </p>
 
 
                             <form method="POST" action="{{ route('enable2fa') }}" class="space-y-3">
                                 @csrf
                                 <div>
-                                    <label for="one_time_password" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label for="one_time_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Enter Verification Code
                                     </label>
                                     <input type="text"
@@ -226,10 +226,10 @@
                                            placeholder="Enter 6-digit code"
                                            maxlength="6"
                                            required
-                                           class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest">
+                                           class="w-full md:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest">
                                 </div>
                                 <div class="flex gap-2">
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">
+                                    <button type="submit" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
                                         <i class="fas fa-check mr-2"></i>Verify and Enable 2FA
                                     </button>
                                 </div>
@@ -256,7 +256,7 @@
                             <form method="POST" action="{{ route('generate2faSecret') }}">
                                 @csrf
                                 <input type="hidden" name="from_profile" value="1">
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">
                                     <i class="fas fa-shield-alt mr-2"></i>Enable Two-Factor Authentication
                                 </button>
                             </form>
@@ -265,7 +265,7 @@
                 </div>
             @endif
 
-            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+            <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                 <p class="text-xs text-gray-600">
                     <i class="fas fa-info-circle mr-1"></i>
                     <strong>What is 2FA?</strong> Two-Factor Authentication adds an extra layer of security by requiring both your password and a code from your phone to log in.

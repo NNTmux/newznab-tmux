@@ -19,27 +19,27 @@
 }
 
 .btn-primary {
-    @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700;
+    @apply bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800;
 }
 
 .btn-secondary {
-    @apply bg-gray-600 text-white border-gray-600 hover:bg-gray-700;
+    @apply bg-gray-600 dark:bg-gray-700 text-white border-gray-600 dark:border-gray-700 hover:bg-gray-700 dark:hover:bg-gray-800;
 }
 
 .btn-success {
-    @apply bg-green-600 text-white border-green-600 hover:bg-green-700;
+    @apply bg-green-600 dark:bg-green-700 text-white border-green-600 dark:border-green-700 hover:bg-green-700 dark:hover:bg-green-800;
 }
 
 .btn-danger {
-    @apply bg-red-600 text-white border-red-600 hover:bg-red-700;
+    @apply bg-red-600 dark:bg-red-700 text-white border-red-600 dark:border-red-700 hover:bg-red-700 dark:hover:bg-red-800;
 }
 
 .btn-warning {
-    @apply bg-yellow-500 text-white border-yellow-500 hover:bg-yellow-600;
+    @apply bg-yellow-500 dark:bg-yellow-600 text-white border-yellow-500 dark:border-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-700;
 }
 
 .btn-info {
-    @apply bg-cyan-600 text-white border-cyan-600 hover:bg-cyan-700;
+    @apply bg-cyan-600 dark:bg-cyan-700 text-white border-cyan-600 dark:border-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-800;
 }
 
 .btn-sm {

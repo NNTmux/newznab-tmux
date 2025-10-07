@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
                     <i class="fa fa-file-alt mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ url('admin/content-add?action=add') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('admin/content-add?action=add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                     <i class="fa fa-plus mr-2"></i>Add New Content
                 </a>
             </div>
@@ -31,7 +31,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         @foreach($contentlist as $item)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->id }}</td>
@@ -40,7 +40,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     @if(!empty($item->url))
-                                        <a href="{{ $item->url }}" target="_blank" class="text-blue-600 hover:text-blue-800">
+                                        <a href="{{ $item->url }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">
                                             {{ Str::limit($item->url, 30) }}
                                         </a>
                                     @else
@@ -90,7 +90,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex gap-2">
                                         <a href="{{ url('admin/content-add?id=' . $item->id) }}"
-                                           class="text-blue-600 hover:text-blue-900"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900"
                                            title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </a>
@@ -110,7 +110,7 @@
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fa fa-file-alt text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No content found</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No content found</h3>
                 <p class="text-gray-500">Create your first content to get started.</p>
             </div>
         @endif

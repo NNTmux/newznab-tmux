@@ -4,29 +4,29 @@
 <!-- Breadcrumb -->
 <nav class="mb-4 text-sm" aria-label="breadcrumb">
     <ol class="flex items-center space-x-2">
-        <li><a href="{{ url('/') }}" class="text-blue-600 hover:text-blue-800">Home</a></li>
+        <li><a href="{{ url('/') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">Home</a></li>
         <li class="text-gray-400">/</li>
-        <li><a href="#" class="text-blue-600 hover:text-blue-800">Profile</a></li>
+        <li><a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">Profile</a></li>
         <li class="text-gray-400">/</li>
         <li class="text-gray-600">{{ $user->username }}</li>
     </ol>
 </nav>
 
-<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         <!-- Profile Header -->
-        <div class="bg-gray-50 border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+        <div class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
             <h1 class="text-xl font-semibold text-gray-800">
                 <i class="fas fa-user mr-2"></i>User Profile
             </h1>
             <div class="flex gap-2">
                 @if(($isadmin ?? false) || !$publicview)
-                    <a href="{{ route('profileedit') }}" class="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">
+                    <a href="{{ route('profileedit') }}" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded hover:bg-green-700 dark:hover:bg-green-800 transition">
                         <i class="fa fa-edit mr-1"></i>Edit Profile
                     </a>
                 @endif
                 @if(!($isadmin ?? false) && !$publicview)
                     <a href="{{ url('profile_delete?id=' . $user->id) }}"
-                       class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
+                       class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded hover:bg-red-700 dark:hover:bg-red-800 transition"
                        onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
                         <i class="fa fa-trash mr-1"></i>Delete Account
                     </a>
@@ -42,7 +42,7 @@
                     <div class="flex justify-center mb-6">
                         <img src="{{ Gravatar::get($user->email, ['size' => 120, 'default' => 'mp']) }}"
                              alt="{{ $user->username }}"
-                             class="w-30 h-30 rounded-full border-4 border-gray-200 shadow-lg">
+                             class="w-30 h-30 rounded-full border-4 border-gray-200 dark:border-gray-700 shadow-lg">
                     </div>
 
                     <!-- Tab Navigation -->
@@ -50,19 +50,19 @@
                         <a href="#general" class="tab-link flex items-center px-4 py-3 bg-blue-50 text-blue-700 rounded-lg font-medium">
                             <i class="fa fa-info-circle mr-3"></i>General Information
                         </a>
-                        <a href="#preferences" class="tab-link flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <a href="#preferences" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
                             <i class="fa fa-sliders-h mr-3"></i>UI Preferences
                         </a>
-                        <a href="#api" class="tab-link flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <a href="#api" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
                             <i class="fa fa-key mr-3"></i>API & Downloads
                         </a>
                         @if(($user->id === auth()->id() || ($isadmin ?? false)) && config('nntmux.registerstatus') == 1)
-                            <a href="{{ route('invitations.index') }}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg">
+                            <a href="{{ route('invitations.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
                                 <i class="fa fa-envelope mr-3"></i>My Invitations
                             </a>
                         @endif
                         @if(($isadmin ?? false) && isset($downloadlist) && count($downloadlist) > 0)
-                            <a href="#downloads" class="tab-link flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg">
+                            <a href="#downloads" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
                                 <i class="fa fa-download mr-3"></i>Recent Downloads
                             </a>
                         @endif
@@ -73,34 +73,34 @@
                 <div class="lg:col-span-3">
                     <!-- General Information Tab -->
                     <div id="general" class="tab-content">
-                        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-info-circle text-blue-600 mr-2"></i>
+                                <i class="fa fa-info-circle text-blue-600 dark:text-blue-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">General Information</h2>
                             </div>
                             <div class="space-y-4">
-                                <div class="flex border-b border-gray-200 pb-3">
+                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Username</div>
                                     <div class="w-2/3 font-medium">{{ $user->username }}</div>
                                 </div>
 
                                 @if(($isadmin ?? false) || !$publicview)
-                                    <div class="flex border-b border-gray-200 pb-3">
+                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                         <div class="w-1/3 text-gray-600">Email</div>
                                         <div class="w-2/3 font-medium">{{ $user->email }}</div>
                                     </div>
                                 @endif
 
-                                <div class="flex border-b border-gray-200 pb-3">
+                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Registered</div>
                                     <div class="w-2/3">
                                         <i class="fa fa-calendar text-gray-400 mr-2"></i>
                                         {{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y') }}
-                                        <span class="ml-2 px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">{{ \Carbon\Carbon::parse($user->created_at)->diffForHumans() }}</span>
+                                        <span class="ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">{{ \Carbon\Carbon::parse($user->created_at)->diffForHumans() }}</span>
                                     </div>
                                 </div>
 
-                                <div class="flex border-b border-gray-200 pb-3">
+                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Role</div>
                                     <div class="w-2/3">
                                         <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
@@ -109,16 +109,16 @@
                                     </div>
                                 </div>
 
-                                <div class="flex border-b border-gray-200 pb-3">
+                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Last Login</div>
                                     <div class="w-2/3">{{ \Carbon\Carbon::parse($user->lastlogin)->diffForHumans() }}</div>
                                 </div>
 
                                 @if($userinvitedby)
-                                    <div class="flex border-b border-gray-200 pb-3">
+                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                         <div class="w-1/3 text-gray-600">Invited By</div>
                                         <div class="w-2/3">
-                                            <a href="{{ url('/profile?id=' . $userinvitedby->id) }}" class="text-blue-600 hover:text-blue-800">
+                                            <a href="{{ url('/profile?id=' . $userinvitedby->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">
                                                 {{ $userinvitedby->username }}
                                             </a>
                                         </div>
@@ -135,9 +135,9 @@
 
                     <!-- UI Preferences Tab -->
                     <div id="preferences" class="tab-content" style="display: none;">
-                        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-sliders-h text-blue-600 mr-2"></i>
+                                <i class="fa fa-sliders-h text-blue-600 dark:text-blue-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">UI Preferences</h2>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
@@ -171,25 +171,25 @@
 
                     <!-- API & Downloads Tab -->
                     <div id="api" class="tab-content" style="display: none;">
-                        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-key text-blue-600 mr-2"></i>
+                                <i class="fa fa-key text-blue-600 dark:text-blue-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">API & Downloads</h2>
                             </div>
 
                             <!-- Stats -->
                             <div class="grid grid-cols-3 gap-4 mb-6">
-                                <div class="bg-white rounded-lg p-4 text-center shadow">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow">
                                     <div class="text-3xl font-bold text-blue-600">{{ $user->grabs ?? 0 }}</div>
-                                    <div class="text-sm text-gray-600 mt-1">Total Grabs</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Grabs</div>
                                 </div>
-                                <div class="bg-white rounded-lg p-4 text-center shadow">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow">
                                     <div class="text-3xl font-bold text-green-600">{{ $grabstoday ?? 0 }}</div>
-                                    <div class="text-sm text-gray-600 mt-1">Today</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Today</div>
                                 </div>
-                                <div class="bg-white rounded-lg p-4 text-center shadow">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow">
                                     <div class="text-3xl font-bold text-purple-600">{{ $apirequests ?? 0 }}</div>
-                                    <div class="text-sm text-gray-600 mt-1">API Requests</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">API Requests</div>
                                 </div>
                             </div>
 
@@ -197,7 +197,7 @@
                                 <!-- API Keys -->
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">API Token</label>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Token</label>
                                         <code class="block text-xs bg-gray-800 text-green-400 p-3 rounded break-all">{{ $user->api_token }}</code>
                                     </div>
                                 </div>
@@ -208,15 +208,15 @@
                     <!-- Recent Downloads Tab -->
                     @if(($isadmin ?? false) && isset($downloadlist) && count($downloadlist) > 0)
                         <div id="downloads" class="tab-content" style="display: none;">
-                            <div class="bg-gray-50 rounded-lg p-6">
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
                                 <div class="flex items-center mb-4">
-                                    <i class="fa fa-download text-blue-600 mr-2"></i>
+                                    <i class="fa fa-download text-blue-600 dark:text-blue-400 mr-2"></i>
                                     <h2 class="text-lg font-semibold">Recent Downloads</h2>
                                 </div>
                                 <div class="space-y-2">
                                     @foreach($downloadlist->take(20) as $download)
-                                        <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-                                            <a href="{{ url('/details/' . $download->guid) }}" class="text-blue-600 hover:text-blue-800 flex-1 truncate">
+                                        <div class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
+                                            <a href="{{ url('/details/' . $download->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex-1 truncate">
                                                 {{ $download->searchname }}
                                             </a>
                                             <span class="text-sm text-gray-500 ml-4">{{ \Carbon\Carbon::parse($download->created_at)->diffForHumans() }}</span>

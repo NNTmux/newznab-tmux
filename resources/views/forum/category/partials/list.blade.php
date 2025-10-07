@@ -1,5 +1,5 @@
 <div class="my-4">
-    <div class="bg-white shadow rounded-md relative">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-md relative">
         <div class="flex flex-col md:items-start md:flex-row md:justify-between md:gap-4 p-4">
             <div class="md:w-3/6 text-center md:text-left">
                 <h5 class="text-lg">
@@ -39,7 +39,7 @@
     @if ($category->children->count() > 0)
         <div class="subcategories">
             @foreach ($category->children as $subcategory)
-                <div class="bg-white -mt-1 shadow rounded-b-md">
+                <div class="bg-white dark:bg-gray-800 -mt-1 shadow rounded-b-md">
                     <div class="flex flex-col md:items-start md:flex-row md:justify-between md:gap-4 p-4">
                         <div class="md:w-3/6 text-center md:text-left">
                             <a href="{{ Forum::route('category.show', $subcategory) }}" style="color: {{ $subcategory->color }};">{{ $subcategory->title }}</a>

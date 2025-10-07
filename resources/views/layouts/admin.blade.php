@@ -13,7 +13,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="bg-gray-100 font-sans antialiased">
+<body class="bg-gray-100 dark:bg-gray-800 font-sans antialiased">
     <div class="min-h-screen flex">
         <!-- Admin Sidebar -->
         <aside class="hidden md:flex md:flex-col w-64 bg-gray-900 text-white">
@@ -32,11 +32,11 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col">
             <!-- Top Bar -->
-            <header class="bg-white shadow-sm border-b border-gray-200">
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200">
                 <div class="flex items-center justify-between px-6 py-4">
                     <h1 class="text-2xl font-semibold text-gray-800">{{ $page_title ?? 'Admin Dashboard' }}</h1>
                     <div class="flex items-center space-x-4">
-                        <a href="{{ url('/') }}" class="text-gray-600 hover:text-gray-900">
+                        <a href="{{ url('/') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900">
                             <i class="fas fa-home mr-1"></i> Back to Site
                         </a>
                         <a href="{{ route('logout') }}"

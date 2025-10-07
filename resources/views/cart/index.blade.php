@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200">
         <nav aria-label="breadcrumb">
@@ -17,13 +17,13 @@
 
         <!-- RSS Feed Alert -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start">
-            <i class="fa fa-rss-square text-blue-600 text-2xl mr-4 mt-1"></i>
+            <i class="fa fa-rss-square text-blue-600 dark:text-blue-400 text-2xl mr-4 mt-1"></i>
             <div>
                 <strong class="text-blue-900">RSS Feed</strong>
                 <p class="text-blue-800 mt-1">
                     Your download basket can also be accessed via an
                     <a href="{{ url('/rss/cart?dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token . '&del=1') }}"
-                       class="text-blue-600 hover:text-blue-800 underline">RSS feed</a>.
+                       class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline">RSS feed</a>.
                     Some NZB downloaders can read this feed and automatically start downloading.
                 </p>
             </div>
@@ -31,16 +31,16 @@
 
         @if(count($results) > 0)
             <!-- Cart Items -->
-            <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
-                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <h5 class="text-lg font-semibold text-gray-800">My Download Basket</h5>
                     <div class="flex items-center gap-2">
                         <small class="text-gray-600">With Selected:</small>
                         <div class="flex gap-1">
-                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm" title="Download NZBs">
+                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm" title="Download NZBs">
                                 <i class="fa fa-cloud-download"></i>
                             </button>
-                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm" title="Delete from cart">
+                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
@@ -73,7 +73,7 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <a href="{{ url('/details/' . $result->release->guid) }}"
-                                           class="text-blue-600 hover:text-blue-800 font-semibold">
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold">
                                             {{ $result->release->searchname }}
                                         </a>
                                     </td>
@@ -86,12 +86,12 @@
                                     <td class="px-4 py-3">
                                         <div class="flex justify-end gap-2">
                                             <a href="{{ url('/getnzb?id=' . $result->release->guid) }}"
-                                               class="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
+                                               class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 text-sm"
                                                title="Download NZB">
                                                 <i class="fa fa-cloud-download"></i>
                                             </a>
                                             <a href="{{ url('/details/' . $result->release->guid) }}"
-                                               class="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
+                                               class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 text-sm"
                                                title="View details">
                                                 <i class="fa fa-info-circle"></i>
                                             </a>
@@ -110,15 +110,15 @@
                     </table>
                 </div>
 
-                <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <span class="text-gray-600">Found {{ count($results) }} items in your basket</span>
                     <div class="flex items-center gap-2">
                         <small class="text-gray-600">With Selected:</small>
                         <div class="flex gap-1">
-                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm" title="Download NZBs">
+                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm" title="Download NZBs">
                                 <i class="fa fa-cloud-download"></i>
                             </button>
-                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm" title="Delete from cart">
+                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
@@ -129,9 +129,9 @@
             <!-- Empty Cart -->
             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
                 <i class="fa fa-shopping-basket text-yellow-600 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">Your basket is empty</h3>
-                <p class="text-gray-600 mb-4">Add some releases to your download basket to get started.</p>
-                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Your basket is empty</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Add some releases to your download basket to get started.</p>
+                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                     <i class="fa fa-search mr-2"></i> Browse Releases
                 </a>
             </div>

@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
                     <i class="fa fa-user-shield mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ url('admin/role-add') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('admin/role-add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                     <i class="fa fa-plus mr-2"></i>Add New Role
                 </a>
             </div>
@@ -31,7 +31,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         @foreach($userroles as $role)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $role->id }}</td>
@@ -48,7 +48,7 @@
                                             <i class="fa fa-check mr-1"></i>Yes
                                         </span>
                                     @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800">
                                             No
                                         </span>
                                     @endif
@@ -56,7 +56,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex gap-2">
                                         <a href="{{ url('admin/role-edit?id=' . $role->id) }}"
-                                           class="text-blue-600 hover:text-blue-900"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900"
                                            title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </a>
@@ -76,7 +76,7 @@
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fa fa-user-shield text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No roles found</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No roles found</h3>
                 <p class="text-gray-500">Create your first role to get started.</p>
             </div>
         @endif

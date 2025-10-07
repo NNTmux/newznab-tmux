@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200">
         <nav aria-label="breadcrumb">
@@ -19,48 +19,48 @@
 
     <div class="px-6 py-4">
         <!-- Search Filters -->
-        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-6">
             <form method="get" action="{{ url('/XXX/' . ($categorytitle ?: 'All')) }}">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Title Filter -->
                     <div>
-                        <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
                         <input type="text"
                                id="title"
                                name="title"
                                value="{{ $title ?? '' }}"
                                placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Actors Filter -->
                     <div>
-                        <label for="actors" class="block text-sm font-medium text-gray-700 mb-1">Actors</label>
+                        <label for="actors" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Actors</label>
                         <input type="text"
                                id="actors"
                                name="actors"
                                value="{{ $actors ?? '' }}"
                                placeholder="Search by actors"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Director Filter -->
                     <div>
-                        <label for="director" class="block text-sm font-medium text-gray-700 mb-1">Director</label>
+                        <label for="director" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Director</label>
                         <input type="text"
                                id="director"
                                name="director"
                                value="{{ $director ?? '' }}"
                                placeholder="Search by director"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Genre Filter -->
                     <div>
-                        <label for="genre" class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+                        <label for="genre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Genre</label>
                         <select id="genre"
                                 name="genre"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="">All Genres</option>
                             @foreach($genres ?? [] as $g)
                                 <option value="{{ $g }}" {{ ($genre ?? '') == $g ? 'selected' : '' }}>
@@ -72,10 +72,10 @@
                 </div>
 
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
                         <i class="fa fa-search mr-2"></i>Search
                     </button>
-                    <a href="{{ url('/XXX/' . ($categorytitle ?: 'All')) }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    <a href="{{ url('/XXX/' . ($categorytitle ?: 'All')) }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300">
                         <i class="fa fa-times mr-2"></i>Clear
                     </a>
                 </div>
@@ -97,7 +97,7 @@
             <!-- XXX Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
                 @foreach($resultsadd as $result)
-                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
                         <a href="{{ url('/details/' . $result->guid) }}" class="block relative">
                             @if(!empty($result->cover))
                                 <img src="{{ url('/covers/xxx/' . $result->cover) }}"
@@ -105,19 +105,19 @@
                                      class="w-full h-48 object-cover"
                                      onerror="this.src='{{ url('/images/no-cover.png') }}'">
                             @else
-                                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                     <i class="fa fa-film text-4xl text-gray-400"></i>
                                 </div>
                             @endif
                             @if(!empty($result->failed) && $result->failed > 0)
                                 <div class="absolute top-2 right-2">
-                                    <span class="px-2 py-1 bg-red-600 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed }} user(s) reported download failure">
+                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed }} user(s) reported download failure">
                                         <i class="fa fa-exclamation-triangle mr-1"></i>Failed
                                     </span>
                                 </div>
                             @endif
                             <div class="p-3">
-                                <h3 class="font-semibold text-sm text-gray-800 line-clamp-2 mb-1" title="{{ $result->title ?? $result->searchname }}">
+                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1" title="{{ $result->title ?? $result->searchname }}">
                                     {{ $result->title ?? $result->searchname }}
                                 </h3>
                                 @if(!empty($result->releasedate))
@@ -126,12 +126,12 @@
                                     <p class="text-xs text-gray-500">{{ $result->year }}</p>
                                 @endif
                                 @if(!empty($result->genre))
-                                    <div class="text-xs text-blue-600 mt-1 line-clamp-1">
+                                    <div class="text-xs text-blue-600 dark:text-blue-400 mt-1 line-clamp-1">
                                         {!! $result->genre !!}
                                     </div>
                                 @endif
                                 @if(!empty($result->director))
-                                    <div class="text-xs text-gray-600 mt-1 line-clamp-1" title="Director">
+                                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-1" title="Director">
                                         <i class="fa fa-user-circle mr-1"></i>{!! $result->director !!}
                                     </div>
                                 @endif
@@ -139,12 +139,12 @@
                         </a>
                         <div class="px-3 pb-3 flex gap-1">
                             <a href="{{ url('/getnzb?id=' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 text-center"
+                               class="flex-1 px-2 py-1 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800 text-center"
                                title="Download NZB">
                                 <i class="fa fa-download"></i>
                             </a>
                             <a href="{{ url('/details/' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 text-center"
+                               class="flex-1 px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-center"
                                title="View Details">
                                 <i class="fa fa-info-circle"></i>
                             </a>
@@ -161,9 +161,9 @@
             <!-- No Results -->
             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
                 <i class="fa fa-film text-yellow-600 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">No content found</h3>
-                <p class="text-gray-600 mb-4">Try adjusting your search filters or browse all content.</p>
-                <a href="{{ url('/XXX/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No content found</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all content.</p>
+                <a href="{{ url('/XXX/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                     <i class="fa fa-film mr-2"></i> Browse All XXX
                 </a>
             </div>

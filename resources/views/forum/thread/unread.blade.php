@@ -11,7 +11,7 @@
                 @endforeach
             </div>
         @else
-            <div class="bg-white shadow rounded text-gray-500 text-center py-4">
+            <div class="bg-white dark:bg-gray-800 shadow rounded text-gray-500 text-center py-4">
                 {{ trans('forum::threads.none_found') }}
             </div>
         @endif

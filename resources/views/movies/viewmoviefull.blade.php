@@ -1,20 +1,20 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200">
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
+                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                 </li>
                 <li>
                     <div class="flex items-center">
                         <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <a href="{{ route('Movies') }}" class="text-gray-700 hover:text-blue-600">Movies</a>
+                        <a href="{{ route('Movies') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600">Movies</a>
                     </div>
                 </li>
                 <li>
@@ -35,7 +35,7 @@
                     @if(!empty($movie['cover'] ?? null))
                         <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] ?? 'Movie' }}" class="w-full rounded-lg shadow-lg">
                     @else
-                        <div class="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <div class="w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                             <i class="fas fa-film text-gray-400 text-6xl"></i>
                         </div>
                     @endif
@@ -67,10 +67,10 @@
 
                 <!-- Movie Details -->
                 <div class="lg:col-span-2">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $movie['title'] ?? 'Unknown Title' }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ $movie['title'] ?? 'Unknown Title' }}</h1>
 
                     @if(!empty($movie['tagline'] ?? null))
-                        <p class="text-lg text-gray-600 italic mb-4">"{{ $movie['tagline'] }}"</p>
+                        <p class="text-lg text-gray-600 dark:text-gray-400 italic mb-4">"{{ $movie['tagline'] }}"</p>
                     @endif
 
                     @if(!empty($movie['rating'] ?? null))
@@ -79,42 +79,42 @@
                                 <i class="fas fa-star"></i>
                             </span>
                             <span class="text-2xl font-semibold text-gray-900">{{ $movie['rating'] }}</span>
-                            <span class="text-gray-600 ml-2">/ 10</span>
+                            <span class="text-gray-600 dark:text-gray-400 ml-2">/ 10</span>
                         </div>
                     @endif
 
                     <div class="space-y-3 mb-6">
                         @if(!empty($movie['year'] ?? null))
                             <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Year:</span>
+                                <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Year:</span>
                                 <span class="text-gray-600">{{ $movie['year'] }}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['genre'] ?? null))
                             <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Genre:</span>
+                                <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Genre:</span>
                                 <span class="text-gray-600">{!! $movie['genre'] !!}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['director'] ?? null))
                             <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Director:</span>
+                                <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Director:</span>
                                 <span class="text-gray-600">{!! $movie['director'] !!}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['actors'] ?? null))
                             <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Cast:</span>
+                                <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Cast:</span>
                                 <span class="text-gray-600">{!! $movie['actors'] !!}</span>
                             </div>
                         @endif
 
                         @if(!empty($movie['language'] ?? null))
                             <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Language:</span>
+                                <span class="font-semibold text-gray-700 dark:text-gray-300 w-32">Language:</span>
                                 <span class="text-gray-600">{{ $movie['language'] }}</span>
                             </div>
                         @endif
@@ -122,15 +122,15 @@
 
                     @if(!empty($movie['plot'] ?? null))
                         <div class="mb-6">
-                            <h2 class="text-xl font-semibold text-gray-900 mb-2">Plot Synopsis</h2>
-                            <p class="text-gray-700 leading-relaxed">{{ $movie['plot'] }}</p>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Plot Synopsis</h2>
+                            <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ $movie['plot'] }}</p>
                         </div>
                     @endif
 
                     <!-- Trailer -->
                     @if(!empty($movie['trailer'] ?? null))
                         <div class="mb-6">
-                            <h2 class="text-xl font-semibold text-gray-900 mb-2">Trailer</h2>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Trailer</h2>
                             <div class="aspect-video">
                                 {!! $movie['trailer'] !!}
                             </div>
@@ -142,17 +142,17 @@
             <!-- All Available Releases -->
             @if(isset($releases) && count($releases) > 0)
                 <div class="mt-8 pt-8 border-t border-gray-200">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                         Available Releases
                         <span class="text-lg font-normal text-gray-500">({{ count($releases) }} total)</span>
                     </h2>
 
                     <div class="space-y-3">
                         @foreach($releases as $release)
-                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition">
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition">
                                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                                     <div class="flex-1 min-w-0">
-                                        <a href="{{ url('/details/' . $release['guid']) }}" class="text-base text-gray-800 hover:text-blue-600 font-medium block truncate" title="{{ $release['name'] }}">
+                                        <a href="{{ url('/details/' . $release['guid']) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $release['name'] }}">
                                             {{ $release['name'] }}
                                         </a>
                                         <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
@@ -172,10 +172,10 @@
                                         </div>
                                     </div>
                                     <div class="flex gap-2 flex-shrink-0">
-                                        <a href="{{ url('/getnzb/' . $release['guid']) }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+                                        <a href="{{ url('/getnzb/' . $release['guid']) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
                                             <i class="fas fa-download mr-2"></i> Download
                                         </a>
-                                        <button onclick="addToCart('{{ $release['guid'] }}')" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                                        <button onclick="addToCart('{{ $release['guid'] }}')" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">
                                             <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
                                         </button>
                                         <a href="{{ url('/details/' . $release['guid']) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
@@ -191,7 +191,7 @@
                 <div class="mt-8 pt-8 border-t border-gray-200">
                     <div class="text-center py-8">
                         <i class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
-                        <p class="text-gray-600 text-lg">No releases available for this movie.</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-lg">No releases available for this movie.</p>
                     </div>
                 </div>
             @endif
@@ -199,7 +199,7 @@
     @else
         <div class="px-6 py-12 text-center">
             <i class="fas fa-exclamation-circle text-gray-400 text-5xl mb-4"></i>
-            <p class="text-gray-600 text-lg">Movie details not available.</p>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">Movie details not available.</p>
         </div>
     @endif
 </div>

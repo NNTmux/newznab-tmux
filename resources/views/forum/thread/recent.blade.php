@@ -11,7 +11,7 @@
                 @endforeach
             </div>
         @else
-            <div class="bg-white my-3">
+            <div class="bg-white dark:bg-gray-800 my-3">
                 <div class="card-body text-center text-muted">
                     {{ trans('forum::threads.none_found') }}
                 </div>

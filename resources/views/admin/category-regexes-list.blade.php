@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="max-w-full px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
                     <i class="fa fa-folder-open mr-2"></i>{{ $title ?? 'Category Regex List' }}
                 </h1>
-                <a href="{{ url('/admin/category-regexes-edit') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('/admin/category-regexes-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                     <i class="fa fa-plus mr-2"></i>Add New Regex
                 </a>
             </div>
@@ -34,10 +34,10 @@
         <div id="message" class="px-6"></div>
 
         <!-- Search Form -->
-        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
             <form name="groupsearch" action="" method="get" class="max-w-md">
                 @csrf
-                <label for="group" class="block text-sm font-medium text-gray-700 mb-2">Search by Group:</label>
+                <label for="group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search by Group:</label>
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -47,10 +47,10 @@
                                type="text"
                                name="group"
                                value="{{ $group }}"
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                placeholder="Search a group...">
                     </div>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" type="submit">
+                    <button class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700" type="submit">
                         Search
                     </button>
                 </div>
@@ -80,7 +80,7 @@
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         @foreach($regex as $row)
                             <tr id="row-{{ $row->id }}" class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-semibold text-gray-900">{{ $row->id }}</td>
@@ -94,7 +94,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <div class="max-w-[200px] break-words">
-                                        <code class="bg-gray-100 px-2 py-1 rounded text-xs break-all" title="{{ htmlspecialchars($row->regex) }}">
+                                        <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-xs break-all" title="{{ htmlspecialchars($row->regex) }}">
                                             {{ htmlspecialchars($row->regex) }}
                                         </code>
                                     </div>
@@ -112,14 +112,14 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800">
                                         <i class="fa fa-folder-open mr-1"></i>{{ $row->categories_id }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                     <div class="flex gap-2 justify-center">
                                         <a href="{{ url('/admin/category_regexes-edit?id=' . $row->id) }}"
-                                           class="text-blue-600 hover:text-blue-900"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900"
                                            title="Edit this regex">
                                             <i class="fa fa-edit"></i>
                                         </a>
@@ -146,16 +146,16 @@
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fa fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No regex patterns found</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No regex patterns found</h3>
                 <p class="text-gray-500 mb-4">Try a different search term or add a new regex.</p>
-                <a href="{{ url('/admin/category-regexes-edit') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('/admin/category-regexes-edit') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                     <i class="fa fa-plus mr-2"></i>Add New Regex
                 </a>
             </div>
         @endif
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50">
             <div class="flex justify-between items-center">
                 <span class="text-sm text-gray-600">
                     @if($regex && method_exists($regex, 'total'))
@@ -166,7 +166,7 @@
                         No entries
                     @endif
                 </span>
-                <a href="{{ url('/admin/category_regexes-edit') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                <a href="{{ url('/admin/category_regexes-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 text-sm">
                     <i class="fa fa-plus mr-2"></i>Add New Regex
                 </a>
             </div>

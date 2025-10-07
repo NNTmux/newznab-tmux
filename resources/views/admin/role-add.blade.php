@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <h1 class="text-2xl font-semibold text-gray-800">
@@ -18,68 +18,68 @@
             <div class="space-y-6">
                 <!-- Role Name -->
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Role Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text"
                            id="name"
                            name="name"
                            required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- API Requests -->
                     <div>
-                        <label for="apirequests" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="apirequests" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             API Requests per Day
                         </label>
                         <input type="number"
                                id="apirequests"
                                name="apirequests"
                                value="0"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Download Requests -->
                     <div>
-                        <label for="downloadrequests" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="downloadrequests" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Download Requests per Day
                         </label>
                         <input type="number"
                                id="downloadrequests"
                                name="downloadrequests"
                                value="0"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Default Invites -->
                     <div>
-                        <label for="defaultinvites" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="defaultinvites" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Default Invites
                         </label>
                         <input type="number"
                                id="defaultinvites"
                                name="defaultinvites"
                                value="0"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Rate Limit -->
                     <div>
-                        <label for="rate_limit" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="rate_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Rate Limit (requests per minute)
                         </label>
                         <input type="number"
                                id="rate_limit"
                                name="rate_limit"
                                value="60"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Donation -->
                     <div>
-                        <label for="donation" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="donation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Donation Amount
                         </label>
                         <input type="number"
@@ -87,25 +87,25 @@
                                name="donation"
                                value="0"
                                step="0.01"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <!-- Add Years -->
                     <div>
-                        <label for="addyears" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="addyears" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Add Years (role duration)
                         </label>
                         <input type="number"
                                id="addyears"
                                name="addyears"
                                value="0"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 
                 <!-- Permissions -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                         Permissions
                     </label>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -114,7 +114,7 @@
                                    id="canpreview"
                                    name="canpreview"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="canpreview" class="ml-2 text-sm text-gray-700">Can Preview</label>
                         </div>
                         <div class="flex items-center">
@@ -122,7 +122,7 @@
                                    id="hideads"
                                    name="hideads"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="hideads" class="ml-2 text-sm text-gray-700">Hide Ads</label>
                         </div>
                         <div class="flex items-center">
@@ -130,7 +130,7 @@
                                    id="editrelease"
                                    name="editrelease"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="editrelease" class="ml-2 text-sm text-gray-700">Edit Release</label>
                         </div>
                         <div class="flex items-center">
@@ -138,7 +138,7 @@
                                    id="viewconsole"
                                    name="viewconsole"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewconsole" class="ml-2 text-sm text-gray-700">View Console</label>
                         </div>
                         <div class="flex items-center">
@@ -146,7 +146,7 @@
                                    id="viewmovies"
                                    name="viewmovies"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewmovies" class="ml-2 text-sm text-gray-700">View Movies</label>
                         </div>
                         <div class="flex items-center">
@@ -154,7 +154,7 @@
                                    id="viewaudio"
                                    name="viewaudio"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewaudio" class="ml-2 text-sm text-gray-700">View Audio</label>
                         </div>
                         <div class="flex items-center">
@@ -162,7 +162,7 @@
                                    id="viewpc"
                                    name="viewpc"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewpc" class="ml-2 text-sm text-gray-700">View PC</label>
                         </div>
                         <div class="flex items-center">
@@ -170,7 +170,7 @@
                                    id="viewtv"
                                    name="viewtv"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewtv" class="ml-2 text-sm text-gray-700">View TV</label>
                         </div>
                         <div class="flex items-center">
@@ -178,7 +178,7 @@
                                    id="viewadult"
                                    name="viewadult"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewadult" class="ml-2 text-sm text-gray-700">View Adult</label>
                         </div>
                         <div class="flex items-center">
@@ -186,7 +186,7 @@
                                    id="viewbooks"
                                    name="viewbooks"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewbooks" class="ml-2 text-sm text-gray-700">View Books</label>
                         </div>
                         <div class="flex items-center">
@@ -194,7 +194,7 @@
                                    id="viewother"
                                    name="viewother"
                                    value="1"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="viewother" class="ml-2 text-sm text-gray-700">View Other</label>
                         </div>
                     </div>
@@ -202,10 +202,10 @@
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
                         <i class="fa fa-save mr-2"></i>Create Role
                     </button>
-                    <a href="{{ url('admin/role-list') }}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                    <a href="{{ url('admin/role-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                         <i class="fa fa-times mr-2"></i>Cancel
                     </a>
                 </div>

@@ -15,12 +15,12 @@
     <nav class="flex" aria-label="breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ $site->home_link }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Home</a>
+                <a href="{{ $site->home_link }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
             </li>
             <li>
                 <div class="flex items-center">
                     <svg class="w-3 h-3 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                    <a href="{{ url('/profile') }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Profile</a>
+                    <a href="{{ url('/profile') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Profile</a>
                 </div>
             </li>
             <li aria-current="page">
@@ -34,12 +34,12 @@
 </div>
 
 <div class="px-4 py-3">
-    <div class="bg-white rounded-lg shadow-sm mb-4 dark:bg-gray-800">
-        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
-            <h5 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-4 dark:bg-gray-800">
+        <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
+            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i class="fa fa-envelope mr-2"></i>My Invitations
             </h5>
-            <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <i class="fas fa-plus mr-1"></i> Send New Invitation
             </a>
         </div>
@@ -58,13 +58,13 @@
 
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-blue-600 text-white rounded-lg shadow dark:bg-blue-700">
+                <div class="bg-blue-600 dark:bg-blue-700 text-white rounded-lg shadow dark:bg-blue-700">
                     <div class="p-4 text-center">
                         <h4 class="text-3xl font-bold mb-1">{{ $stats['total'] ?? 0 }}</h4>
                         <small class="text-blue-100">Total Sent</small>
                     </div>
                 </div>
-                <div class="bg-green-600 text-white rounded-lg shadow dark:bg-green-700">
+                <div class="bg-green-600 dark:bg-green-700 text-white rounded-lg shadow dark:bg-green-700">
                     <div class="p-4 text-center">
                         <h4 class="text-3xl font-bold mb-1">{{ $stats['used'] ?? 0 }}</h4>
                         <small class="text-green-100">Accepted</small>
@@ -76,7 +76,7 @@
                         <small class="text-yellow-100">Pending</small>
                     </div>
                 </div>
-                <div class="bg-red-600 text-white rounded-lg shadow dark:bg-red-700">
+                <div class="bg-red-600 dark:bg-red-700 text-white rounded-lg shadow dark:bg-red-700">
                     <div class="p-4 text-center">
                         <h4 class="text-3xl font-bold mb-1">{{ $stats['expired'] ?? 0 }}</h4>
                         <small class="text-red-100">Expired</small>
@@ -85,18 +85,18 @@
             </div>
 
             <!-- Filter Tabs -->
-            <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
+            <div class="border-b border-gray-200 dark:border-gray-700 dark:border-gray-700 mb-4">
                 <nav class="flex flex-wrap -mb-px" aria-label="Tabs">
-                    <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ empty($status) ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ empty($status) ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-list mr-1"></i>All
                     </a>
-                    <a href="{{ url('/invitations?status=pending') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'pending' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations?status=pending') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'pending' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-clock-o mr-1"></i>Pending
                     </a>
-                    <a href="{{ url('/invitations?status=used') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'used' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations?status=used') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'used' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-check mr-1"></i>Accepted
                     </a>
-                    <a href="{{ url('/invitations?status=expired') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'expired' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations?status=expired') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'expired' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-times mr-1"></i>Expired
                     </a>
                 </nav>
@@ -107,7 +107,7 @@
                 @if($loop->first)
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-900 dark:bg-gray-700">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                                     <i class="fa fa-envelope mr-1"></i>Email
@@ -132,13 +132,13 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                 @endif
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <i class="fa fa-envelope text-gray-400 mr-2"></i>
-                                        <span class="text-sm text-gray-900 dark:text-gray-100">{{ $invitation['email'] }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ $invitation['email'] }}</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -151,7 +151,7 @@
                                             <i class="fa fa-times mr-1"></i>Expired
                                         </span>
                                     @elseif(!$invitation['is_active'])
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 dark:bg-gray-700 dark:text-gray-300">
                                             <i class="fa fa-ban mr-1"></i>Cancelled
                                         </span>
                                     @else
@@ -163,14 +163,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <i class="fa fa-calendar text-gray-400 mr-2"></i>
-                                        <span class="text-sm text-gray-900 dark:text-gray-100">{{ date('M j, Y', $invitation['created_at']) }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ date('M j, Y', $invitation['created_at']) }}</span>
                                         <small class="text-xs text-gray-500 ml-1 dark:text-gray-400">{{ date('H:i', $invitation['created_at']) }}</small>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <i class="fa fa-clock-o text-gray-400 mr-2"></i>
-                                        <span class="text-sm text-gray-900 dark:text-gray-100">{{ date('M j, Y', $invitation['expires_at']) }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ date('M j, Y', $invitation['expires_at']) }}</span>
                                         <small class="text-xs text-gray-500 ml-1 dark:text-gray-400">{{ date('H:i', $invitation['expires_at']) }}</small>
                                     </div>
                                 </td>
@@ -178,7 +178,7 @@
                                     @if(isset($invitation['used_by_user']))
                                         <div class="flex items-center">
                                             <i class="fa fa-user text-gray-400 mr-2"></i>
-                                            <span class="text-sm text-gray-900 dark:text-gray-100">{{ $invitation['used_by_user']['username'] ?? $invitation['used_by_user']['email'] }}</span>
+                                            <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ $invitation['used_by_user']['username'] ?? $invitation['used_by_user']['email'] }}</span>
                                         </div>
                                     @else
                                         <span class="text-gray-500 dark:text-gray-400">-</span>
@@ -188,7 +188,7 @@
                                     @if($invitation['used_at'])
                                         <div class="flex items-center">
                                             <i class="fa fa-check text-gray-400 mr-2"></i>
-                                            <span class="text-sm text-gray-900 dark:text-gray-100">{{ date('M j, Y', $invitation['used_at']) }}</span>
+                                            <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ date('M j, Y', $invitation['used_at']) }}</span>
                                             <small class="text-xs text-gray-500 ml-1 dark:text-gray-400">{{ date('H:i', $invitation['used_at']) }}</small>
                                         </div>
                                     @else
@@ -200,14 +200,14 @@
                                         <div class="flex items-center space-x-2">
                                             <form method="POST" action="{{ url('/invitations/' . $invitation['id'] . '/resend') }}" class="inline">
                                                 @csrf
-                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" title="Resend Invitation">
+                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" title="Resend Invitation">
                                                     <i class="fas fa-paper-plane"></i>
                                                 </button>
                                             </form>
                                             <form method="POST" action="{{ url('/invitations/' . $invitation['id']) }}" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-red-300 rounded text-xs font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:text-red-400 dark:border-red-600 dark:hover:bg-gray-600" title="Cancel Invitation"
+                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-red-300 rounded text-xs font-medium text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:text-red-400 dark:border-red-600 dark:hover:bg-gray-600" title="Cancel Invitation"
                                                         onclick="return confirm('Are you sure you want to cancel this invitation?')">
                                                     <i class="fas fa-times"></i>
                                                 </button>
@@ -234,7 +234,7 @@
                     <i class="fa fa-info-circle text-4xl mb-3"></i>
                     <h5 class="text-lg font-semibold mb-2">No Invitations Found</h5>
                     <p class="mb-4">You haven't sent any invitations yet.</p>
-                    <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <i class="fas fa-plus mr-1"></i> Send Your First Invitation
                     </a>
                 </div>

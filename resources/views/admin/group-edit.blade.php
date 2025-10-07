@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
                     <i class="fa fa-edit mr-2"></i>{{ $title ?? 'Group Edit' }}
                 </h1>
-                <a href="{{ url('/admin/group-list') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                <a href="{{ url('/admin/group-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
                     <i class="fa fa-arrow-left mr-2"></i>Back to Groups
                 </a>
             </div>
@@ -32,7 +32,7 @@
 
             <!-- Group Name -->
             <div class="mb-6">
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Group Name:
                 </label>
                 <div class="relative">
@@ -42,7 +42,7 @@
                     <input type="text"
                            id="name"
                            name="name"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $group['name'] ?? '' }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -52,7 +52,7 @@
 
             <!-- Description -->
             <div class="mb-6">
-                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Description:
                 </label>
                 <div class="relative">
@@ -61,7 +61,7 @@
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               rows="3">{{ $group['description'] ?? '' }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -71,7 +71,7 @@
 
             <!-- Backfill Days -->
             <div class="mb-6">
-                <label for="backfill_target" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="backfill_target" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Backfill Days:
                 </label>
                 <div class="relative">
@@ -81,7 +81,7 @@
                     <input type="number"
                            id="backfill_target"
                            name="backfill_target"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $group['backfill_target'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -91,7 +91,7 @@
 
             <!-- Minimum Files -->
             <div class="mb-6">
-                <label for="minfilestoformrelease" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="minfilestoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Minimum Files To Form Release:
                 </label>
                 <div class="relative">
@@ -101,7 +101,7 @@
                     <input type="number"
                            id="minfilestoformrelease"
                            name="minfilestoformrelease"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $group['minfilestoformrelease'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -111,7 +111,7 @@
 
             <!-- Minimum Size -->
             <div class="mb-6">
-                <label for="minsizetoformrelease" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="minsizetoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Minimum File Size (bytes):
                 </label>
                 <div class="relative">
@@ -121,7 +121,7 @@
                     <input type="number"
                            id="minsizetoformrelease"
                            name="minsizetoformrelease"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $group['minsizetoformrelease'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -131,7 +131,7 @@
 
             <!-- First Record -->
             <div class="mb-6">
-                <label for="first_record" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="first_record" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     First Record ID:
                 </label>
                 <div class="relative">
@@ -141,7 +141,7 @@
                     <input type="number"
                            id="first_record"
                            name="first_record"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $group['first_record'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -151,7 +151,7 @@
 
             <!-- Last Record -->
             <div class="mb-6">
-                <label for="last_record" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="last_record" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Last Record ID:
                 </label>
                 <div class="relative">
@@ -161,7 +161,7 @@
                     <input type="number"
                            id="last_record"
                            name="last_record"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            value="{{ $group['last_record'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -171,14 +171,14 @@
 
             <!-- Active Status -->
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Active:</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Active:</label>
                 <div class="flex items-center gap-6">
                     <div class="flex items-center">
                         <input type="radio"
                                id="active_1"
                                name="active"
                                value="1"
-                               class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                               class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                                {{ (isset($group['active']) && $group['active'] == 1) ? 'checked' : '' }}>
                         <label for="active_1" class="ml-2 text-sm text-gray-700">Yes</label>
                     </div>
@@ -187,7 +187,7 @@
                                id="active_0"
                                name="active"
                                value="0"
-                               class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                               class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                                {{ (isset($group['active']) && $group['active'] == 0) ? 'checked' : '' }}>
                         <label for="active_0" class="ml-2 text-sm text-gray-700">No</label>
                     </div>
@@ -199,14 +199,14 @@
 
             <!-- Backfill Status -->
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Backfill:</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Backfill:</label>
                 <div class="flex items-center gap-6">
                     <div class="flex items-center">
                         <input type="radio"
                                id="backfill_1"
                                name="backfill"
                                value="1"
-                               class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                               class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                                {{ (isset($group['backfill']) && $group['backfill'] == 1) ? 'checked' : '' }}>
                         <label for="backfill_1" class="ml-2 text-sm text-gray-700">Yes</label>
                     </div>
@@ -215,7 +215,7 @@
                                id="backfill_0"
                                name="backfill"
                                value="0"
-                               class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                               class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                                {{ (isset($group['backfill']) && $group['backfill'] == 0) ? 'checked' : '' }}>
                         <label for="backfill_0" class="ml-2 text-sm text-gray-700">No</label>
                     </div>
@@ -227,16 +227,16 @@
         </form>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50">
             <div class="flex justify-between">
                 <button type="button"
                         onclick="window.location='{{ url('/admin/group-list') }}'"
-                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     <i class="fa fa-times mr-2"></i>Cancel
                 </button>
                 <button type="submit"
                         form="groupForm"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700">
                     <i class="fa fa-save mr-2"></i>Save Changes
                 </button>
             </div>
