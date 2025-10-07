@@ -39,30 +39,6 @@
                             <i class="fas fa-film text-gray-400 text-6xl"></i>
                         </div>
                     @endif
-
-                    <!-- External Links -->
-                    <div class="mt-4 space-y-2">
-                        @if(!empty($movie['imdbid'] ?? null))
-                            <a href="https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="flex items-center justify-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
-                                <i class="fab fa-imdb mr-2 text-xl"></i> View on IMDb
-                            </a>
-                        @endif
-                        @if(!empty($movie['tmdbid'] ?? null))
-                            <a href="https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="flex items-center justify-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
-                                <i class="fas fa-film mr-2"></i> View on TMDb
-                            </a>
-                        @endif
-                        @if(!empty($movie['traktid'] ?? null))
-                            <a href="https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" class="flex items-center justify-center px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
-                                <i class="fas fa-heart mr-2"></i> View on Trakt
-                            </a>
-                        @endif
-                        @if(!empty($movie['imdbid'] ?? null) && auth()->check())
-                            <a href="{{ url('/mymovies?id=add&imdb=' . $movie['imdbid'] . '&from=' . urlencode(request()->fullUrl())) }}" class="flex items-center justify-center px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition">
-                                <i class="fas fa-plus-circle mr-2"></i> Add to My Movies
-                            </a>
-                        @endif
-                    </div>
                 </div>
 
                 <!-- Movie Details -->
@@ -126,6 +102,33 @@
                             <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ $movie['plot'] }}</p>
                         </div>
                     @endif
+
+                    <!-- External Links -->
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">External Links</h2>
+                        <div class="flex flex-wrap gap-3">
+                            @if(!empty($movie['imdbid'] ?? null))
+                                <a href="https://www.imdb.com/title/tt{{ $movie['imdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
+                                    <i class="fab fa-imdb mr-2 text-xl"></i> View on IMDb
+                                </a>
+                            @endif
+                            @if(!empty($movie['tmdbid'] ?? null))
+                                <a href="https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
+                                    <i class="fas fa-film mr-2"></i> View on TMDb
+                                </a>
+                            @endif
+                            @if(!empty($movie['traktid'] ?? null))
+                                <a href="https://trakt.tv/movies/{{ $movie['traktid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
+                                    <i class="fas fa-heart mr-2"></i> View on Trakt
+                                </a>
+                            @endif
+                            @if(!empty($movie['imdbid'] ?? null) && auth()->check())
+                                <a href="{{ url('/mymovies?id=add&imdb=' . $movie['imdbid'] . '&from=' . urlencode(request()->fullUrl())) }}" class="inline-flex items-center px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition">
+                                    <i class="fas fa-plus-circle mr-2"></i> Add to My Movies
+                                </a>
+                            @endif
+                        </div>
+                    </div>
 
                     <!-- Trailer -->
                     @if(!empty($movie['trailer'] ?? null))
