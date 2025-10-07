@@ -9,6 +9,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark Mode Text Readability Fixes */
+@layer base {
+    /* Ensure dark backgrounds have light text */
+    .dark {
+        color-scheme: dark;
+    }
+
+    /* Fix text-gray-700, text-gray-800, text-gray-900 in dark mode */
+    .dark .text-gray-700:not([class*="dark:text-"]) {
+        color: rgb(209 213 219) !important; /* gray-300 */
+    }
+
+    .dark .text-gray-800:not([class*="dark:text-"]) {
+        color: rgb(229 231 235) !important; /* gray-200 */
+    }
+
+    .dark .text-gray-900:not([class*="dark:text-"]) {
+        color: rgb(243 244 246) !important; /* gray-100 */
+    }
+
+    /* Ensure labels are readable in dark mode */
+    .dark label:not([class*="dark:text-"]) {
+        color: rgb(209 213 219) !important; /* gray-300 */
+    }
+
+    /* Fix table headers in dark mode */
+    .dark th:not([class*="dark:text-"]) {
+        color: rgb(209 213 219) !important; /* gray-300 */
+    }
+
+    /* Fix table cells in dark mode */
+    .dark td:not([class*="dark:text-"]) {
+        color: rgb(229 231 235) !important; /* gray-200 */
+    }
+
+    /* Ensure headings are visible in dark mode */
+    .dark h1:not([class*="dark:text-"]),
+    .dark h2:not([class*="dark:text-"]),
+    .dark h3:not([class*="dark:text-"]),
+    .dark h4:not([class*="dark:text-"]),
+    .dark h5:not([class*="dark:text-"]),
+    .dark h6:not([class*="dark:text-"]) {
+        color: rgb(243 244 246) !important; /* gray-100 */
+    }
+
+    /* Fix select elements in dark mode */
+    .dark select:not([class*="dark:text-"]),
+    .dark input:not([class*="dark:text-"]),
+    .dark textarea:not([class*="dark:text-"]) {
+        color: rgb(243 244 246) !important; /* gray-100 */
+    }
+}
+
 /* Custom styles for proper spacing and button alignment */
 .btn {
     @apply inline-flex items-center justify-center px-4 py-2 border rounded-md font-semibold text-sm transition-colors duration-150;
