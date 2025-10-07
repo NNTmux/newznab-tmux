@@ -11,72 +11,72 @@
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Releases -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500 mb-1">Total Releases</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ number_format($stats['releases'] ?? 0) }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Releases</p>
+                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['releases'] ?? 0) }}</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-download text-2xl text-blue-600"></i>
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-download text-2xl text-blue-600 dark:text-blue-400"></i>
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-green-600">
+                <span class="text-sm text-green-600 dark:text-green-400">
                     <i class="fas fa-arrow-up"></i> {{ number_format($stats['releases_today'] ?? 0) }} today
                 </span>
             </div>
         </div>
 
         <!-- Active Users -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500 mb-1">Active Users</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ number_format($stats['users'] ?? 0) }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Active Users</p>
+                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['users'] ?? 0) }}</p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-users text-2xl text-green-600"></i>
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-2xl text-green-600 dark:text-green-400"></i>
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-blue-600">
+                <span class="text-sm text-blue-600 dark:text-blue-400">
                     <i class="fas fa-user-plus"></i> {{ $stats['users_today'] ?? 0 }} registered today
                 </span>
             </div>
         </div>
 
         <!-- Active Groups -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500 mb-1">Active Groups</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ number_format($stats['groups'] ?? 0) }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Active Groups</p>
+                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['groups'] ?? 0) }}</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-layer-group text-2xl text-purple-600"></i>
+                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-layer-group text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-gray-600">
+                <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $stats['active_groups'] ?? 0 }} currently active
                 </span>
             </div>
         </div>
 
         <!-- Failed Releases -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500 mb-1">Failed Releases</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ number_format($stats['failed'] ?? 0) }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Failed Releases</p>
+                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['failed'] ?? 0) }}</p>
                 </div>
-                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-600 dark:text-red-400"></i>
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{{ url('/admin/failed-releases') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800">
+                <a href="{{ url('/admin/failed-releases') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                     View failed releases <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -86,18 +86,18 @@
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- System Status -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">System Status</h3>
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-600">Database</span>
-                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    <span class="text-gray-600 dark:text-gray-400">Database</span>
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
                         <i class="fas fa-check-circle"></i> Connected
                     </span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-600">Cache</span>
-                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    <span class="text-gray-600 dark:text-gray-400">Cache</span>
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
                         <i class="fas fa-check-circle"></i> Active
                     </span>
                 </div>
