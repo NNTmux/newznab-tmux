@@ -1,158 +1,217 @@
 @extends('layouts.admin')
 
-@section('title', $title ?? 'Group List')
-
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">{{ $title }}</h4>
-            <div class="d-flex gap-2">
-                <a href="{{ url('/admin/group-list-active') }}" class="btn btn-sm btn-outline-primary">
-                    <i class="fa fa-check-circle me-2"></i>Active Groups
-                </a>
-                <a href="{{ url('/admin/group-list-inactive') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa fa-times-circle me-2"></i>Inactive Groups
-                </a>
-                <a href="{{ url('/admin/group-list') }}" class="btn btn-sm btn-outline-info">
-                    <i class="fa fa-list me-2"></i>All Groups
-                </a>
-                <a href="{{ url('/admin/group-bulk') }}" class="btn btn-sm btn-success">
-                    <i class="fa fa-plus-circle me-2"></i>Bulk Add
-                </a>
+<div class="max-w-full px-4 py-6">
+    <div class="bg-white rounded-lg shadow-sm">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex flex-wrap justify-between items-center gap-3">
+                <h1 class="text-2xl font-semibold text-gray-800">
+                    <i class="fa fa-users mr-2"></i>{{ $title ?? 'Group List' }}
+                </h1>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ url('/admin/group-list-active') }}" class="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                        <i class="fa fa-check-circle mr-1"></i>Active Groups
+                    </a>
+                    <a href="{{ url('/admin/group-list-inactive') }}" class="px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700">
+                        <i class="fa fa-times-circle mr-1"></i>Inactive Groups
+                    </a>
+                    <a href="{{ url('/admin/group-list') }}" class="px-3 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
+                        <i class="fa fa-list mr-1"></i>All Groups
+                    </a>
+                    <a href="{{ url('/admin/group-bulk') }}" class="px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">
+                        <i class="fa fa-plus-circle mr-1"></i>Bulk Add
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="card-body">
-        <div class="alert alert-info mb-4">
-            <i class="fa fa-info-circle me-2"></i>
-            Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
-            Backfill works independently of active.
+        <!-- Info Alert -->
+        <div class="px-6 py-4 bg-blue-50 border-b border-blue-100">
+            <div class="flex">
+                <i class="fa fa-info-circle text-blue-500 text-xl mr-3"></i>
+                <p class="text-sm text-blue-700">
+                    Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
+                    Backfill works independently of active.
+                </p>
+            </div>
         </div>
 
         @if(isset($msg) && $msg != '')
-            <div class="alert alert-success" id="message">{{ $msg }}</div>
+            <div class="mx-6 mt-4 p-4 bg-green-50 border border-green-200 rounded-lg" id="message">
+                <p class="text-green-800">{{ $msg }}</p>
+            </div>
         @endif
 
         @if($grouplist && $grouplist->count() > 0)
-            <div class="row mb-4">
-                <div class="col-lg-4 col-md-6">
-                    <form name="groupsearch" method="GET" class="mb-0">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fa fa-search"></i></span>
-                            <input id="groupname" type="text" name="groupname" value="{{ $groupname ?? '' }}" class="form-control" placeholder="Search for group...">
-                            <button type="submit" class="btn btn-primary">Go</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-lg-4 col-md-6 d-flex justify-content-center align-items-center">
-                    <div class="pagination-container overflow-auto w-100 d-flex justify-content-center">
+            <!-- Search and Actions Bar -->
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <!-- Search Form -->
+                    <div>
+                        <form name="groupsearch" method="GET">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-search text-gray-400"></i>
+                                    </div>
+                                    <input id="groupname"
+                                           type="text"
+                                           name="groupname"
+                                           value="{{ $groupname ?? '' }}"
+                                           class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="Search for group...">
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Go
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="flex justify-center items-center">
                         {{ $grouplist->onEachSide(5)->links() }}
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-12 d-flex flex-column justify-content-center align-items-lg-end align-items-center mt-3 mt-lg-0">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resetAllModal">
-                            <i class="fa fa-refresh me-1"></i> Reset All
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#purgeAllModal">
-                            <i class="fa fa-trash me-1"></i> Purge All
-                        </button>
+
+                    <!-- Bulk Actions -->
+                    <div class="flex justify-end items-center">
+                        <div class="flex gap-2">
+                            <button type="button"
+                                    onclick="showResetAllModal()"
+                                    class="px-3 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700">
+                                <i class="fa fa-refresh mr-1"></i> Reset All
+                            </button>
+                            <button type="button"
+                                    onclick="showPurgeAllModal()"
+                                    class="px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700">
+                                <i class="fa fa-trash mr-1"></i> Purge All
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead class="thead-light">
+            <!-- Groups Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th>Group</th>
-                            <th>First Post</th>
-                            <th>Last Post</th>
-                            <th>Last Updated</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Backfill</th>
-                            <th class="text-center">Releases</th>
-                            <th class="text-center">Min Files</th>
-                            <th class="text-center">Min Size</th>
-                            <th class="text-center">Backfill Days</th>
-                            <th class="text-center">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Post</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Post</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Backfill</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Releases</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Min Files</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Min Size</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Backfill Days</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($grouplist as $group)
-                            <tr id="grouprow-{{ $group->id }}">
-                                <td>
-                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="text-decoration-none fw-semibold">{{ str_replace('alt.binaries', 'a.b', $group->name) }}</a>
+                            <tr id="grouprow-{{ $group->id }}" class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-blue-600 hover:text-blue-800">
+                                        {{ str_replace('alt.binaries', 'a.b', $group->name) }}
+                                    </a>
                                     @if($group->description)
-                                        <div class="text-muted small">{{ $group->description }}</div>
+                                        <div class="text-sm text-gray-500">{{ $group->description }}</div>
                                     @endif
                                 </td>
-                                <td>
-                                    <div class="d-flex flex-column">
-                                        <span>{{ $group->first_record_postdate }}</span>
-                                        <small class="text-muted">{{ \Carbon\Carbon::parse($group->first_record_postdate)->diffForHumans() }}</small>
+                                <td class="px-6 py-4 text-sm">
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-900">{{ $group->first_record_postdate }}</span>
+                                        <small class="text-gray-500">{{ \Carbon\Carbon::parse($group->first_record_postdate)->diffForHumans() }}</small>
                                     </div>
                                 </td>
-                                <td>{{ $group->last_record_postdate }}</td>
-                                <td>
-                                    <span data-bs-toggle="tooltip" title="{{ $group->last_updated }}">{{ \Carbon\Carbon::parse($group->last_updated)->diffForHumans() }}</span>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ $group->last_record_postdate }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500" title="{{ $group->last_updated }}">
+                                    {{ \Carbon\Carbon::parse($group->last_updated)->diffForHumans() }}
                                 </td>
-                                <td class="text-center" id="group-{{ $group->id }}">
+                                <td class="px-6 py-4 text-center" id="group-{{ $group->id }}">
                                     @if($group->active == 1)
-                                        <button type="button" onclick="ajax_group_status({{ $group->id }}, 0)" class="btn btn-sm btn-success">
-                                            <i class="fa fa-check-circle me-1"></i>Active
+                                        <button type="button"
+                                                onclick="ajax_group_status({{ $group->id }}, 0)"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200">
+                                            <i class="fa fa-check-circle mr-1"></i>Active
                                         </button>
                                     @else
-                                        <button type="button" onclick="ajax_group_status({{ $group->id }}, 1)" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fa fa-times-circle me-1"></i>Inactive
+                                        <button type="button"
+                                                onclick="ajax_group_status({{ $group->id }}, 1)"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200">
+                                            <i class="fa fa-times-circle mr-1"></i>Inactive
                                         </button>
                                     @endif
                                 </td>
-                                <td class="text-center" id="backfill-{{ $group->id }}">
+                                <td class="px-6 py-4 text-center" id="backfill-{{ $group->id }}">
                                     @if($group->backfill == 1)
-                                        <button type="button" onclick="ajax_backfill_status({{ $group->id }}, 0)" class="btn btn-sm btn-info">
-                                            <i class="fa fa-check-circle me-1"></i>Enabled
+                                        <button type="button"
+                                                onclick="ajax_backfill_status({{ $group->id }}, 0)"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                            <i class="fa fa-check-circle mr-1"></i>Enabled
                                         </button>
                                     @else
-                                        <button type="button" onclick="ajax_backfill_status({{ $group->id }}, 1)" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fa fa-times-circle me-1"></i>Disabled
+                                        <button type="button"
+                                                onclick="ajax_backfill_status({{ $group->id }}, 1)"
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200">
+                                            <i class="fa fa-times-circle mr-1"></i>Disabled
                                         </button>
                                     @endif
                                 </td>
-                                <td class="text-center">
-                                    <span class="badge bg-secondary">{{ $group->num_releases ?? 0 }}</span>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        {{ $group->num_releases ?? 0 }}
+                                    </span>
                                 </td>
-                                <td class="text-center">
+                                <td class="px-6 py-4 text-center">
                                     @if(empty($group->minfilestoformrelease))
-                                        <span class="text-muted">n/a</span>
+                                        <span class="text-gray-400">n/a</span>
                                     @else
-                                        <span class="badge bg-secondary">{{ $group->minfilestoformrelease }}</span>
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ $group->minfilestoformrelease }}
+                                        </span>
                                     @endif
                                 </td>
-                                <td class="text-center">
+                                <td class="px-6 py-4 text-center">
                                     @if(empty($group->minsizetoformrelease))
-                                        <span class="text-muted">n/a</span>
+                                        <span class="text-gray-400">n/a</span>
                                     @else
-                                        <span class="badge bg-secondary">{{ human_filesize($group->minsizetoformrelease) }}</span>
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ human_filesize($group->minsizetoformrelease) }}
+                                        </span>
                                     @endif
                                 </td>
-                                <td class="text-center">
-                                    <span class="badge bg-secondary">{{ $group->backfill_target }}</span>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        {{ $group->backfill_target }}
+                                    </span>
                                 </td>
-                                <td class="text-center" id="groupdel-{{ $group->id }}">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="btn btn-primary" data-bs-toggle="tooltip" title="Edit this group">
+                                <td class="px-6 py-4 text-center" id="groupdel-{{ $group->id }}">
+                                    <div class="flex gap-1 justify-center">
+                                        <a href="{{ url('/admin/group-edit?id=' . $group->id) }}"
+                                           class="text-blue-600 hover:text-blue-900"
+                                           title="Edit this group">
                                             <i class="fa fa-pencil"></i>
                                         </a>
-                                        <button type="button" onclick="ajax_group_reset({{ $group->id }})" class="btn btn-warning" data-bs-toggle="tooltip" title="Reset this group">
+                                        <button type="button"
+                                                onclick="ajax_group_reset({{ $group->id }})"
+                                                class="text-yellow-600 hover:text-yellow-900"
+                                                title="Reset this group">
                                             <i class="fa fa-refresh"></i>
                                         </button>
-                                        <button type="button" onclick="confirmGroupDelete({{ $group->id }})" class="btn btn-danger" data-bs-toggle="tooltip" title="Delete this group">
+                                        <button type="button"
+                                                onclick="confirmGroupDelete({{ $group->id }})"
+                                                class="text-red-600 hover:text-red-900"
+                                                title="Delete this group">
                                             <i class="fa fa-trash"></i>
                                         </button>
-                                        <button type="button" onclick="confirmGroupPurge({{ $group->id }})" class="btn btn-danger" data-bs-toggle="tooltip" title="Purge this group">
+                                        <button type="button"
+                                                onclick="confirmGroupPurge({{ $group->id }})"
+                                                class="text-red-600 hover:text-red-900"
+                                                title="Purge this group">
                                             <i class="fa fa-eraser"></i>
                                         </button>
                                     </div>
@@ -162,131 +221,162 @@
                     </tbody>
                 </table>
             </div>
-        @else
-            <div class="alert alert-warning">
-                <i class="fa fa-exclamation-triangle me-2"></i>No groups available (eg. none have been added).
-            </div>
-        @endif
-    </div>
 
-    @if($grouplist && $grouplist->count() > 0)
-        <div class="card-footer">
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <form name="groupsearch" method="GET" class="mb-0">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fa fa-search"></i></span>
-                            <input id="groupname" type="text" name="groupname" value="{{ $groupname ?? '' }}" class="form-control" placeholder="Search for group...">
-                            <button type="submit" class="btn btn-primary">Go</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-lg-4 col-md-6 d-flex justify-content-center align-items-center mt-3 mt-lg-0">
-                    <div class="pagination-container overflow-auto w-100 d-flex justify-content-center">
+            <!-- Footer -->
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">
+                        Showing {{ $grouplist->count() }} of {{ $grouplist->total() }} groups
+                    </span>
+                    <div>
                         {{ $grouplist->onEachSide(5)->links() }}
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12 d-flex justify-content-lg-end justify-content-center mt-3 mt-lg-0">
-                    <div class="text-muted">
-                        Showing {{ $grouplist->count() }} of {{ $grouplist->total() }} groups
-                    </div>
-                </div>
             </div>
-        </div>
-    @endif
+        @else
+            <div class="px-6 py-12 text-center">
+                <i class="fa fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No groups available</h3>
+                <p class="text-gray-500 mb-4">No groups have been added yet.</p>
+                <a href="{{ url('/admin/group-bulk') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fa fa-plus-circle mr-2"></i>Add Groups
+                </a>
+            </div>
+        @endif
+    </div>
 </div>
 
-<!-- Reset All Confirmation Modal -->
-<div class="modal fade" id="resetAllModal" tabindex="-1" aria-labelledby="resetAllModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="resetAllModalLabel">Confirm Reset All Groups</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-danger"><i class="fa fa-exclamation-triangle me-2"></i>Are you sure you want to reset all groups?</p>
-                <p>This will reset the article pointers for all groups back to their current state.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning" onclick="ajax_group_reset_all()">Reset All</button>
+<!-- Reset All Modal -->
+<div id="resetAllModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Reset All Groups</h3>
+            <p class="text-sm text-red-600 mb-2">
+                <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to reset all groups?
+            </p>
+            <p class="text-sm text-gray-600 mb-4">
+                This will reset the article pointers for all groups back to their current state.
+            </p>
+            <div class="flex justify-end gap-3">
+                <button type="button"
+                        onclick="hideResetAllModal()"
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                    Cancel
+                </button>
+                <button type="button"
+                        onclick="ajax_group_reset_all()"
+                        class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
+                    Reset All
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Purge All Confirmation Modal -->
-<div class="modal fade" id="purgeAllModal" tabindex="-1" aria-labelledby="purgeAllModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="purgeAllModalLabel">Confirm Purge All Groups</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-danger"><i class="fa fa-exclamation-triangle me-2"></i>Are you sure you want to purge all groups?</p>
-                <p>This will delete all releases and binaries for all groups. This action cannot be undone!</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="ajax_group_purge_all()">Purge All</button>
+<!-- Purge All Modal -->
+<div id="purgeAllModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Purge All Groups</h3>
+            <p class="text-sm text-red-600 mb-2">
+                <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to purge all groups?
+            </p>
+            <p class="text-sm text-gray-600 mb-4">
+                This will delete all releases and binaries for all groups. This action cannot be undone!
+            </p>
+            <div class="flex justify-end gap-3">
+                <button type="button"
+                        onclick="hidePurgeAllModal()"
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                    Cancel
+                </button>
+                <button type="button"
+                        onclick="ajax_group_purge_all()"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    Purge All
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+@push('scripts')
 <script>
+function showResetAllModal() {
+    document.getElementById('resetAllModal').classList.remove('hidden');
+}
+
+function hideResetAllModal() {
+    document.getElementById('resetAllModal').classList.add('hidden');
+}
+
+function showPurgeAllModal() {
+    document.getElementById('purgeAllModal').classList.remove('hidden');
+}
+
+function hidePurgeAllModal() {
+    document.getElementById('purgeAllModal').classList.add('hidden');
+}
+
 function ajax_group_status(id, status) {
-    $.ajax({
-        type: 'POST',
-        url: '{{ url('/admin/ajax') }}',
-        data: {
-            _token: '{{ csrf_token() }}',
+    fetch('{{ url('/admin/ajax') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
             action: 'toggle_group_active_status',
             group_id: id,
             group_status: status
-        },
-        success: function(data) {
-            if (data.success) {
-                $('#group-' + id).html(data.html);
-            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('group-' + id).innerHTML = data.html;
         }
     });
 }
 
 function ajax_backfill_status(id, status) {
-    $.ajax({
-        type: 'POST',
-        url: '{{ url('/admin/ajax') }}',
-        data: {
-            _token: '{{ csrf_token() }}',
+    fetch('{{ url('/admin/ajax') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
             action: 'toggle_group_backfill',
             group_id: id,
             backfill: status
-        },
-        success: function(data) {
-            if (data.success) {
-                $('#backfill-' + id).html(data.html);
-            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('backfill-' + id).innerHTML = data.html;
         }
     });
 }
 
 function ajax_group_reset(id) {
     if (confirm('Are you sure you want to reset this group?')) {
-        $.ajax({
-            type: 'POST',
-            url: '{{ url('/admin/ajax') }}',
-            data: {
-                _token: '{{ csrf_token() }}',
+        fetch('{{ url('/admin/ajax') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
                 action: 'reset_group',
                 group_id: id
-            },
-            success: function(data) {
-                if (data.success) {
-                    location.reload();
-                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
             }
         });
     }
@@ -294,18 +384,24 @@ function ajax_group_reset(id) {
 
 function confirmGroupDelete(id) {
     if (confirm('Are you sure you want to delete this group?')) {
-        $.ajax({
-            type: 'POST',
-            url: '{{ url('/admin/ajax') }}',
-            data: {
-                _token: '{{ csrf_token() }}',
+        fetch('{{ url('/admin/ajax') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
                 action: 'delete_group',
                 group_id: id
-            },
-            success: function(data) {
-                if (data.success) {
-                    $('#grouprow-' + id).fadeOut();
-                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById('grouprow-' + id);
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 300);
             }
         });
     }
@@ -313,61 +409,66 @@ function confirmGroupDelete(id) {
 
 function confirmGroupPurge(id) {
     if (confirm('Are you sure you want to purge this group? This will delete all releases and binaries!')) {
-        $.ajax({
-            type: 'POST',
-            url: '{{ url('/admin/ajax') }}',
-            data: {
-                _token: '{{ csrf_token() }}',
+        fetch('{{ url('/admin/ajax') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
                 action: 'purge_group',
                 group_id: id
-            },
-            success: function(data) {
-                if (data.success) {
-                    location.reload();
-                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
             }
         });
     }
 }
 
 function ajax_group_reset_all() {
-    $.ajax({
-        type: 'POST',
-        url: '{{ url('/admin/ajax') }}',
-        data: {
-            _token: '{{ csrf_token() }}',
-            action: 'reset_all_groups'
+    fetch('{{ url('/admin/ajax') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-        success: function(data) {
-            if (data.success) {
-                $('#resetAllModal').modal('hide');
-                location.reload();
-            }
+        body: JSON.stringify({
+            action: 'reset_all_groups'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            hideResetAllModal();
+            location.reload();
         }
     });
 }
 
 function ajax_group_purge_all() {
-    $.ajax({
-        type: 'POST',
-        url: '{{ url('/admin/ajax') }}',
-        data: {
-            _token: '{{ csrf_token() }}',
-            action: 'purge_all_groups'
+    fetch('{{ url('/admin/ajax') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-        success: function(data) {
-            if (data.success) {
-                $('#purgeAllModal').modal('hide');
-                location.reload();
-            }
+        body: JSON.stringify({
+            action: 'purge_all_groups'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            hidePurgeAllModal();
+            location.reload();
         }
     });
 }
-
-// Initialize tooltips
-$(function () {
-    $('[data-bs-toggle="tooltip"]').tooltip();
-});
 </script>
+@endpush
 @endsection
 
