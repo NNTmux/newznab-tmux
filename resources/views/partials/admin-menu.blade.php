@@ -1,6 +1,6 @@
 <div class="space-y-2 px-4">
     <!-- Dashboard -->
-    <a href="{{ url('/admin') }}" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-800 py-2 px-3 rounded transition">
+    <a href="{{ route('admin.index') }}" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-800 py-2 px-3 rounded transition">
         <i class="fas fa-tachometer-alt"></i>
         <span>Dashboard</span>
     </a>

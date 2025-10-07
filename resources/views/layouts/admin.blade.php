@@ -18,7 +18,7 @@
         <!-- Admin Sidebar -->
         <aside class="hidden md:flex md:flex-col w-64 bg-gray-900 text-white">
             <div class="flex items-center justify-between p-4 border-b border-gray-800">
-                <a href="{{ url('/admin') }}" class="flex items-center space-x-2">
+                <a href="{{ route('admin.index') }}" class="flex items-center space-x-2">
                     <i class="fas fa-cog text-2xl text-blue-500"></i>
                     <span class="text-xl font-semibold">Admin Panel</span>
                 </a>
