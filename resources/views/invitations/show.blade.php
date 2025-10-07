@@ -1,142 +1,167 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container-fluid px-4 py-3">
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ $site->home_link }}">Home</a></li>
-            <li class="breadcrumb-item active">Invitation</li>
+<div class="max-w-4xl mx-auto px-4 py-3">
+    <nav class="flex mb-6" aria-label="breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{{ $site->home_link }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">Home</a>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <svg class="w-3 h-3 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                    <span class="text-gray-500 dark:text-gray-400">Invitation</span>
+                </div>
+            </li>
         </ol>
     </nav>
 
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fa fa-envelope-open me-2"></i>Invitation to Join {{ $site->title }}</h5>
+    <div class="bg-white rounded-lg shadow-sm dark:bg-gray-800">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
+            <h5 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <i class="fa fa-envelope-open mr-2"></i>Invitation to Join {{ $site->title }}
+            </h5>
+        </div>
+        <div class="p-6">
+            @if($preview)
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-300">
+                    <div class="flex">
+                        <i class="fa fa-user-plus text-4xl mr-4 mt-1"></i>
+                        <div>
+                            <h6 class="font-semibold mb-2">You've been invited!</h6>
+                            <p class="mb-0">
+                                <strong>{{ $preview['inviter_name'] ?? 'Someone' }}</strong> has invited you to join <strong>{{ $site->title }}</strong>.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if($preview)
-                        <div class="alert alert-info border-0 mb-4">
-                            <div class="d-flex">
-                                <i class="fa fa-user-plus fa-2x me-3 mt-1"></i>
-                                <div>
-                                    <h6 class="alert-heading mb-2">You've been invited!</h6>
-                                    <p class="mb-0">
-                                        <strong>{{ $preview['inviter_name'] ?? 'Someone' }}</strong> has invited you to join <strong>{{ $site->title }}</strong>.
-                                    </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
+                            <h6 class="font-semibold text-gray-900 dark:text-white flex items-center">
+                                <i class="fa fa-info-circle mr-2"></i>Invitation Details
+                            </h6>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-5 gap-3 mb-3">
+                                <div class="col-span-2 text-gray-600 dark:text-gray-400">
+                                    <i class="fa fa-user mr-1"></i>Invited by:
+                                </div>
+                                <div class="col-span-3 font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $preview['inviter_name'] ?? 'Anonymous' }}
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-header bg-transparent border-bottom">
-                                        <h6 class="mb-0"><i class="fa fa-info-circle me-1"></i>Invitation Details</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row mb-3">
-                                            <div class="col-5 text-muted"><i class="fa fa-user me-1"></i>Invited by:</div>
-                                            <div class="col-7 fw-medium">{{ $preview['inviter_name'] ?? 'Anonymous' }}</div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-5 text-muted"><i class="fa fa-envelope me-1"></i>Email:</div>
-                                            <div class="col-7 fw-medium">{{ $preview['email'] ?? 'N/A' }}</div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-5 text-muted"><i class="fa fa-clock-o me-1"></i>Expires:</div>
-                                            <div class="col-7">
-                                                @if(isset($preview['expires_at']))
-                                                    {{ date('M j, Y H:i', $preview['expires_at']) }}
-                                                    @if($preview['expires_at'] < time())
-                                                        <br><span class="badge bg-danger mt-1"><i class="fa fa-times me-1"></i>Expired</span>
-                                                    @elseif($preview['is_used'])
-                                                        <br><span class="badge bg-success mt-1"><i class="fa fa-check me-1"></i>Already Used</span>
-                                                    @else
-                                                        <br><span class="badge bg-success mt-1"><i class="fa fa-check me-1"></i>Valid</span>
-                                                    @endif
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </div>
-                                        </div>
-                                        @if(isset($preview['metadata']['role']) && isset($preview['role_name']))
-                                            <div class="row">
-                                                <div class="col-5 text-muted"><i class="fa fa-user-tag me-1"></i>Assigned Role:</div>
-                                                <div class="col-7 fw-medium">
-                                                    <span class="badge bg-primary">{{ $preview['role_name'] ?? 'Default' }}</span>
-                                                </div>
-                                            </div>
+                            <div class="grid grid-cols-5 gap-3 mb-3">
+                                <div class="col-span-2 text-gray-600 dark:text-gray-400">
+                                    <i class="fa fa-envelope mr-1"></i>Email:
+                                </div>
+                                <div class="col-span-3 font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $preview['email'] ?? 'N/A' }}
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-5 gap-3 mb-3">
+                                <div class="col-span-2 text-gray-600 dark:text-gray-400">
+                                    <i class="fa fa-clock-o mr-1"></i>Expires:
+                                </div>
+                                <div class="col-span-3">
+                                    @isset($preview['expires_at'])
+                                        <span class="text-gray-900 dark:text-gray-100">{{ date('M j, Y H:i', $preview['expires_at']) }}</span>
+                                        @if($preview['expires_at'] < time())
+                                            <br><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1 dark:bg-red-900 dark:text-red-200">
+                                                <i class="fa fa-times mr-1"></i>Expired
+                                            </span>
+                                        @elseif($preview['is_used'])
+                                            <br><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1 dark:bg-green-900 dark:text-green-200">
+                                                <i class="fa fa-check mr-1"></i>Already Used
+                                            </span>
+                                        @else
+                                            <br><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1 dark:bg-green-900 dark:text-green-200">
+                                                <i class="fa fa-check mr-1"></i>Valid
+                                            </span>
                                         @endif
-                                    </div>
+                                    @else
+                                        <span class="text-gray-500 dark:text-gray-400">N/A</span>
+                                    @endisset
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-4">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-header bg-transparent border-bottom">
-                                        <h6 class="mb-0"><i class="fa fa-list-ol me-1"></i>What's Next?</h6>
+                            @if(isset($preview['metadata']['role']) && isset($preview['role_name']))
+                                <div class="grid grid-cols-5 gap-3">
+                                    <div class="col-span-2 text-gray-600 dark:text-gray-400">
+                                        <i class="fa fa-user-tag mr-1"></i>Assigned Role:
                                     </div>
-                                    <div class="card-body">
-                                        <p class="mb-3">To accept this invitation and create your account:</p>
-                                        <ol class="mb-0">
-                                            <li class="mb-2">Click the "Accept Invitation" button below</li>
-                                            <li class="mb-2">Fill out the registration form with your details</li>
-                                            <li class="mb-2">Verify your email address when prompted</li>
-                                            <li class="mb-0">Start exploring {{ $site->title }}!</li>
-                                        </ol>
+                                    <div class="col-span-3 font-medium">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            {{ $preview['role_name'] ?? 'Default' }}
+                                        </span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-center mt-4">
-                            @if($preview['is_used'])
-                                <div class="alert alert-success border-0 mb-4">
-                                    <i class="fas fa-check-circle fa-2x mb-2"></i>
-                                    <h6>This invitation has already been used</h6>
-                                    <p class="mb-0">The account has been successfully created using this invitation.</p>
-                                </div>
-                                <a href="{{ url('/login') }}" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-sign-in-alt me-2"></i> Login to Your Account
-                                </a>
-                            @elseif($preview['expires_at'] < time())
-                                <div class="alert alert-danger border-0 mb-4">
-                                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
-                                    <h6>This invitation has expired</h6>
-                                    <p class="mb-0">Please contact the person who invited you for a new invitation.</p>
-                                </div>
-                                <a href="{{ url('/contact') }}" class="btn btn-outline-primary">
-                                    <i class="fa fa-envelope me-1"></i> Contact Support
-                                </a>
-                            @else
-                                <a href="{{ url('/register?invitation=' . $token) }}" class="btn btn-primary btn-lg shadow">
-                                    <i class="fas fa-user-plus me-2"></i> Accept Invitation & Create Account
-                                </a>
-                                <div class="mt-3">
-                                    <small class="text-muted">
-                                        Already have an account? <a href="{{ url('/login') }}" class="text-decoration-none">Login here</a>
-                                    </small>
                                 </div>
                             @endif
                         </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
+                            <h6 class="font-semibold text-gray-900 dark:text-white flex items-center">
+                                <i class="fa fa-list-ol mr-2"></i>What's Next?
+                            </h6>
+                        </div>
+                        <div class="p-4">
+                            <p class="mb-3 text-gray-700 dark:text-gray-300">To accept this invitation and create your account:</p>
+                            <ol class="list-decimal list-inside mb-0 space-y-2 text-gray-700 dark:text-gray-300">
+                                <li>Click the "Accept Invitation" button below</li>
+                                <li>Fill out the registration form with your details</li>
+                                <li>Verify your email address when prompted</li>
+                                <li>Start exploring {{ $site->title }}!</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    @if($preview['is_used'])
+                        <div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-6 mb-4 dark:bg-green-900 dark:border-green-700 dark:text-green-300">
+                            <i class="fas fa-check-circle text-4xl mb-2"></i>
+                            <h6 class="font-semibold mb-2">This invitation has already been used</h6>
+                            <p class="mb-0">The account has been successfully created using this invitation.</p>
+                        </div>
+                        <a href="{{ url('/login') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login to Your Account
+                        </a>
+                    @elseif($preview['expires_at'] < time())
+                        <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-6 mb-4 dark:bg-red-900 dark:border-red-700 dark:text-red-300">
+                            <i class="fas fa-exclamation-triangle text-4xl mb-2"></i>
+                            <h6 class="font-semibold mb-2">This invitation has expired</h6>
+                            <p class="mb-0">Please contact the person who invited you for a new invitation.</p>
+                        </div>
+                        <a href="{{ url('/contact') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                            <i class="fa fa-envelope mr-1"></i> Contact Support
+                        </a>
                     @else
-                        <div class="alert alert-danger border-0 text-center">
-                            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-danger"></i>
-                            <h5 class="text-danger">Invalid Invitation</h5>
-                            <p class="mb-4">This invitation link is not valid, has expired, or has been removed.</p>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <a href="{{ url('/contact') }}" class="btn btn-outline-primary">
-                                    <i class="fa fa-envelope me-1"></i> Contact Support
-                                </a>
-                                <a href="{{ url('/register') }}" class="btn btn-primary">
-                                    <i class="fa fa-user-plus me-1"></i> Register Without Invitation
-                                </a>
-                            </div>
+                        <a href="{{ url('/register?invitation=' . $token) }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-user-plus mr-2"></i> Accept Invitation & Create Account
+                        </a>
+                        <div class="mt-3">
+                            <small class="text-gray-500 dark:text-gray-400">
+                                Already have an account? <a href="{{ url('/login') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Login here</a>
+                            </small>
                         </div>
                     @endif
                 </div>
-            </div>
+            @else
+                <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-6 text-center dark:bg-red-900 dark:border-red-700 dark:text-red-300">
+                    <i class="fas fa-exclamation-triangle text-5xl mb-3 text-red-600 dark:text-red-400"></i>
+                    <h5 class="text-xl font-semibold text-red-600 mb-3 dark:text-red-400">Invalid Invitation</h5>
+                    <p class="mb-4">This invitation link is not valid, has expired, or has been removed.</p>
+                    <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                        <a href="{{ url('/contact') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                            <i class="fa fa-envelope mr-1"></i> Contact Support
+                        </a>
+                        <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fa fa-user-plus mr-1"></i> Register Without Invitation
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>
