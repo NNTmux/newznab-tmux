@@ -28,7 +28,7 @@ class BrowseGroupController extends BasePageController
         }
 
         // Render the content view
-        $content = view('browsegroup', [
+        $content = view('browsegroup.index', [
             'results' => $groupList,
             'search' => $search,
             'site' => $this->settings,
