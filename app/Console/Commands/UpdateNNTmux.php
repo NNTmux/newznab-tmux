@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Ytake\LaravelSmarty\Smarty;
 
 class UpdateNNTmux extends Command
 {
@@ -101,7 +100,6 @@ class UpdateNNTmux extends Command
             $steps++;
         }
 
-        $steps++; // smarty cache clear
         $steps++; // env merge
 
         return $steps;
@@ -260,35 +258,10 @@ class UpdateNNTmux extends Command
      */
     private function performMaintenanceTasks(): void
     {
-        // Clear Smarty cache
-        $this->info('🧹 Clearing Smarty cache...');
-        $this->clearSmartyCache();
-        $this->progressBar->advance();
-
         // Merge environment variables
         $this->info('⚙️ Merging environment configuration...');
         $this->mergeEnvironmentConfig();
         $this->progressBar->advance();
-    }
-
-    /**
-     * Clear Smarty compiled templates
-     */
-    private function clearSmartyCache(): void
-    {
-        try {
-            $smarty = new Smarty;
-            $smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
-
-            if ($smarty->clearCompiledTemplate()) {
-                $this->line('  ✓ Smarty compiled template cache cleared');
-            } else {
-                $this->warn('  ⚠ Could not clear Smarty cache automatically');
-                $this->line('    Please clear manually: '.config('ytake-laravel-smarty.compile_path'));
-            }
-        } catch (\Exception $e) {
-            $this->warn('  ⚠ Smarty cache clear failed: '.$e->getMessage());
-        }
     }
 
     /**
