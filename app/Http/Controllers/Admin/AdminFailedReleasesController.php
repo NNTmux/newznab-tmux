@@ -8,13 +8,13 @@ use App\Models\Release;
 class AdminFailedReleasesController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of failed releases
      */
     public function index()
     {
-        $title = 'Failed Releases List';
+        $meta_title = $title = 'Failed Releases List';
         $releaselist = Release::getFailedRange();
 
-        return view('admin.failrel-list', compact('title', 'releaselist'));
+        return view('admin.failrel-list', compact('title', 'meta_title', 'releaselist'));
     }
 }
