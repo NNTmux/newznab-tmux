@@ -13,35 +13,23 @@ class AdminMovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request): void
+    public function index(Request $request)
     {
-        $this->setAdminPrefs();
+        $lastSearch = $request->input('moviesearch', '');
 
         if ($request->has('moviesearch')) {
-            $lastSearch = $request->input('moviesearch');
-            $movieList = MovieInfo::getAll($request->input('moviesearch'));
+            $movielist = MovieInfo::getAll($request->input('moviesearch'));
         } else {
-            $lastSearch = '';
-            $movieList = MovieInfo::getAll();
+            $movielist = MovieInfo::getAll();
         }
 
-        $this->smarty->assign('lastSearch', $lastSearch);
+        $title = 'Movie List';
 
-        $this->smarty->assign('results', $movieList);
-
-        $meta_title = $title = 'Movie List';
-
-        $this->smarty->assign('movielist', $movieList);
-
-        $content = $this->smarty->fetch('movie-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.movie-list', compact('title', 'movielist', 'lastSearch'));
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
@@ -50,124 +38,166 @@ class AdminMovieController extends BasePageController
         if (! \defined('STDOUT')) {
             \define('STDOUT', fopen('php://stdout', 'wb'));
         }
-        $this->setAdminPrefs();
-        $movie = new Movie(['Settings' => null]);
 
-        $meta_title = $title = 'Movie Add';
+        $title = 'Movie Add';
 
+        // If no ID provided, show the add form
+        if (!$request->has('id')) {
+            return view('admin.movie-add', compact('title'));
+        }
+
+        // Validate the IMDB ID
         $id = $request->input('id');
 
-        if ($request->has('id') && is_numeric($request->input('id'))) {
-            $movCheck = $movie->getMovieInfo($id);
+        if (!is_numeric($id)) {
+            return redirect()->back()
+                ->with('error', 'Invalid IMDB ID. Please enter only numeric digits (without the "tt" prefix).')
+                ->withInput();
+        }
+
+        // Check if movie already exists
+        $movie = new Movie(['Settings' => null]);
+        $movCheck = $movie->getMovieInfo($id);
+
+        if ($movCheck !== null) {
+            return redirect()->to('/admin/movie-edit?id=' . $id)
+                ->with('warning', 'Movie already exists in the database. Redirected to edit page.');
+        }
+
+        // Try to fetch and add the movie from TMDB
+        try {
             $movieInfo = $movie->updateMovieInfo($id);
-            if ($movieInfo && ($movCheck === null || ($request->has('update') && (int) $request->input('update') === 1))) {
+
+            if ($movieInfo) {
+                // Link any existing releases to this movie
                 $forUpdate = Release::query()->where('imdbid', $id)->get(['id']);
-                if ($forUpdate !== null) {
+                if ($forUpdate !== null && $forUpdate->count() > 0) {
                     $movieInfoId = MovieInfo::query()->where('imdbid', $id)->first(['id']);
                     if ($movieInfoId !== null) {
-                        foreach ($forUpdate as $movie) {
-                            Release::query()->where('id', $movie->id)->update(['movieinfo_id' => $movieInfoId->id]);
+                        foreach ($forUpdate as $rel) {
+                            Release::query()->where('id', $rel->id)->update(['movieinfo_id' => $movieInfoId->id]);
                         }
                     }
                 }
-                if (($request->has('update') && (int) $request->input('update') === 1)) {
-                    return redirect()->back()->withInput();
-                }
 
-                return redirect()->to('/admin/movie-list');
+                return redirect()->to('/admin/movie-list')
+                    ->with('success', 'Movie successfully added! IMDB ID: ' . $id);
+            } else {
+                return redirect()->back()
+                    ->with('error', 'Could not fetch movie information from TMDB/IMDB. Please verify the IMDB ID is correct.')
+                    ->withInput();
             }
-
-            return redirect()->to('/admin/movie-list');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error adding movie: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $content = $this->smarty->fetch('movie-add.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      *
      * @throws \Exception
      */
     public function edit(Request $request)
     {
-        $this->setAdminPrefs();
-
         $movie = new Movie;
-        $meta_title = $title = 'Add Movie';
+        $title = 'Movie Edit';
 
-        // set the current action
-        $action = $request->input('action') ?? 'view';
+        // Check if ID is provided
+        if (!$request->has('id')) {
+            return redirect()->to('admin/movie-list')
+                ->with('error', 'No movie ID provided.');
+        }
 
-        if ($request->has('id')) {
-            $id = $request->input('id');
-            $mov = $movie->getMovieInfo($id);
+        $id = $request->input('id');
+        $mov = $movie->getMovieInfo($id);
 
-            if ($mov === null) {
-                abort(404, 'Movie you requested does not exist in database');
-            }
+        if ($mov === null) {
+            return redirect()->to('admin/movie-list')
+                ->with('error', 'Movie with IMDB ID ' . $id . ' does not exist in database.');
+        }
 
-            switch ($action) {
-                case 'submit':
-                    $coverLoc = storage_path('covers/movies/'.$id.'-cover.jpg');
-                    $backdropLoc = storage_path('covers/movies/'.$id.'-backdrop.jpg');
+        // Handle update from TMDB
+        if ($request->has('update') && (int) $request->input('update') === 1) {
+            try {
+                if (! \defined('STDOUT')) {
+                    \define('STDOUT', fopen('php://stdout', 'wb'));
+                }
 
-                    if ($_FILES['cover']['size'] > 0) {
-                        $tmpName = $_FILES['cover']['tmp_name'];
-                        $file_info = getimagesize($tmpName);
-                        if (! empty($file_info)) {
-                            move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
-                        }
-                    }
+                $movieInfo = $movie->updateMovieInfo($id);
 
-                    if ($_FILES['backdrop']['size'] > 0) {
-                        $tmpName = $_FILES['backdrop']['tmp_name'];
-                        $file_info = getimagesize($tmpName);
-                        if (! empty($file_info)) {
-                            move_uploaded_file($_FILES['backdrop']['tmp_name'], $backdropLoc);
-                        }
-                    }
-
-                    $request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-                    $request->merge(['backdrop' => file_exists($backdropLoc) ? 1 : 0]);
-
-                    $movie->update([
-                        'actors' => $request->input('actors'),
-                        'backdrop' => $request->input('backdrop'),
-                        'cover' => $request->input('cover'),
-                        'director' => $request->input('director'),
-                        'genre' => $request->input('genre'),
-                        'imdbid' => $id,
-                        'language' => $request->input('language'),
-                        'plot' => $request->input('plot'),
-                        'rating' => $request->input('rating'),
-                        'tagline' => $request->input('tagline'),
-                        'title' => $request->input('title'),
-                        'year' => $request->input('year'),
-                    ]);
-
-                    $movieInfo = MovieInfo::query()->where('imdbid', $id)->first(['id']);
-                    if ($movieInfo !== null) {
-                        Release::query()->where('imdbid', $id)->update(['movieinfo_id' => $movieInfo->id]);
-                    }
-
-                    return redirect()->to('admin/movie-list');
-                    break;
-                case 'view':
-                default:
-                    $meta_title = $title = 'Movie Edit';
-                    $this->smarty->assign('movie', $mov);
-                    break;
+                if ($movieInfo) {
+                    return redirect()->back()
+                        ->with('success', 'Movie information updated successfully from TMDB!');
+                } else {
+                    return redirect()->back()
+                        ->with('error', 'Failed to update movie information from TMDB. Please try again.');
+                }
+            } catch (\Exception $e) {
+                return redirect()->back()
+                    ->with('error', 'Error updating movie: ' . $e->getMessage());
             }
         }
 
-        $content = $this->smarty->fetch('movie-edit.tpl');
+        // Handle form submission
+        $action = $request->input('action') ?? 'view';
 
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
+        if ($action === 'submit') {
+            try {
+                $coverLoc = public_path('covers/movies/'.$id.'-cover.jpg');
+                $backdropLoc = public_path('covers/movies/'.$id.'-backdrop.jpg');
 
-        $this->adminrender();
+                // Ensure directory exists
+                if (!file_exists(public_path('covers/movies'))) {
+                    mkdir(public_path('covers/movies'), 0755, true);
+                }
+
+                // Handle cover upload
+                if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
+                    $coverFile = $request->file('cover');
+                    $coverFile->move(public_path('covers/movies'), $id.'-cover.jpg');
+                }
+
+                // Handle backdrop upload
+                if ($request->hasFile('backdrop') && $request->file('backdrop')->isValid()) {
+                    $backdropFile = $request->file('backdrop');
+                    $backdropFile->move(public_path('covers/movies'), $id.'-backdrop.jpg');
+                }
+
+                $request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+                $request->merge(['backdrop' => file_exists($backdropLoc) ? 1 : 0]);
+
+                $movie->update([
+                    'actors' => $request->input('actors'),
+                    'backdrop' => $request->input('backdrop'),
+                    'cover' => $request->input('cover'),
+                    'director' => $request->input('director'),
+                    'genre' => $request->input('genre'),
+                    'imdbid' => $id,
+                    'language' => $request->input('language'),
+                    'plot' => $request->input('plot'),
+                    'rating' => $request->input('rating'),
+                    'tagline' => $request->input('tagline'),
+                    'title' => $request->input('title'),
+                    'year' => $request->input('year'),
+                ]);
+
+                // Link releases to this movie
+                $movieInfo = MovieInfo::query()->where('imdbid', $id)->first(['id']);
+                if ($movieInfo !== null) {
+                    Release::query()->where('imdbid', $id)->update(['movieinfo_id' => $movieInfo->id]);
+                }
+
+                return redirect()->to('admin/movie-list')
+                    ->with('success', 'Movie updated successfully!');
+            } catch (\Exception $e) {
+                return redirect()->back()
+                    ->with('error', 'Error saving movie: ' . $e->getMessage())
+                    ->withInput();
+            }
+        }
+
+        return view('admin.movie-edit', compact('title', 'mov'))->with('movie', $mov);
     }
 }

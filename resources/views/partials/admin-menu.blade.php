@@ -52,6 +52,21 @@
         </div>
     </div>
 
+    <!-- Movies -->
+    <div class="mb-4">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition" onclick="toggleAdminSubmenu('movies-menu')">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-film"></i>
+                <span>Movies</span>
+            </div>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" id="movies-menu-icon"></i>
+        </button>
+        <div id="movies-menu" class="hidden mt-2 ml-6 space-y-1">
+            <a href="{{ url('/admin/movie-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Movie List</a>
+            <a href="{{ url('/admin/movie-add') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Add Movie</a>
+        </div>
+    </div>
+
     <!-- Blacklist -->
     <div class="mb-4">
         <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition" onclick="toggleAdminSubmenu('blacklist-menu')">

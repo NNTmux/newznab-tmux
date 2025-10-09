@@ -83,7 +83,11 @@ class MovieInfo extends Model
         }
         $sql = self::query()->select('*');
         if (! empty($search)) {
-            $sql->whereLike('title', '%'.$search.'%');
+            // Search by both title and IMDB ID
+            $sql->where(function($query) use ($search) {
+                $query->whereLike('title', '%'.$search.'%')
+                      ->orWhere('imdbid', $search);
+            });
         }
 
         $movie = $sql->paginate(config('nntmux.items_per_page'));
