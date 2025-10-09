@@ -22,7 +22,7 @@ class AdminGameController extends BasePageController
         // Get search parameter
         $search = $request->input('gamesearch', '');
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $gamelist = $game->getRange($search);
             $lastSearch = $search;
         } else {
@@ -88,6 +88,7 @@ class AdminGameController extends BasePageController
                 case 'view':
                 default:
                     $genres = $gen->getGenres(Genres::GAME_TYPE);
+
                     return view('admin.game-edit', compact('title', 'meta_title', 'game', 'genres'));
             }
         }

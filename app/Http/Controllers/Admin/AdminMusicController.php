@@ -7,41 +7,42 @@ use Blacklight\Genres;
 use Blacklight\Music;
 use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class AdminMusicController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of music
      */
-    public function index(): void
+    public function index(Request $request)
     {
-        $this->setAdminPrefs();
-
         $meta_title = $title = 'Music List';
 
-        $musicList = Utility::getRange('musicinfo');
+        // Get search parameter
+        $search = $request->input('musicsearch', '');
 
-        $this->smarty->assign('musiclist', $musicList);
+        if (! empty($search)) {
+            $musicList = Utility::getRange('musicinfo', $search);
+            $lastSearch = $search;
+        } else {
+            $musicList = Utility::getRange('musicinfo');
+            $lastSearch = '';
+        }
 
-        $content = $this->smarty->fetch('music-list.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        return view('admin.music-list', compact('title', 'meta_title', 'musicList', 'lastSearch'));
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
-     *
-     * @throws \Exception
+     * Show the form for editing music
      */
     public function edit(Request $request)
     {
-        $this->setAdminPrefs();
         $music = new Music;
         $gen = new Genres;
 
         $meta_title = $title = 'Music Edit';
 
-        // set the current action
+        // Set the current action
         $action = $request->input('action') ?? 'view';
 
         if ($request->has('id')) {
@@ -49,40 +50,52 @@ class AdminMusicController extends BasePageController
             $mus = $music->getMusicInfo($id);
 
             if (! $mus) {
-                $this->show404();
+                abort(404, 'Music not found');
             }
 
             switch ($action) {
                 case 'submit':
                     $coverLoc = storage_path('covers/music/'.$id.'.jpg');
 
-                    if ($_FILES['cover']['size'] > 0) {
-                        $tmpName = $_FILES['cover']['tmp_name'];
-                        $file_info = getimagesize($tmpName);
+                    if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
+                        $file = $request->file('cover');
+                        $file_info = getimagesize($file->getPathname());
                         if (! empty($file_info)) {
-                            move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
+                            $file->move(storage_path('covers/music/'), $id.'.jpg');
                         }
                     }
 
-                    $request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-                    $request->merge(['salesrank' => (empty($request->input('salesrank')) || ! ctype_digit($request->input('salesrank'))) ? 'null' : $request->input('salesrank')]);
-                    $request->merge(['releasedate' => (empty($request->input('releasedate')) || ! strtotime($request->input('releasedate'))) ? $mus['releasedate'] : Carbon::parse($request->input('releasedate'))->timestamp]);
+                    $cover = file_exists($coverLoc) ? 1 : 0;
+                    $salesrank = (empty($request->input('salesrank')) || ! ctype_digit($request->input('salesrank'))) ? null : $request->input('salesrank');
+                    $releasedate = (empty($request->input('releasedate')) || ! strtotime($request->input('releasedate')))
+                        ? $mus['releasedate']
+                        : Carbon::parse($request->input('releasedate'))->timestamp;
 
-                    $music->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('salesrank'), $request->input('artist'), $request->input('publisher'), $request->input('releasedate'), $request->input('year'), $request->input('tracks'), $request->input('cover'), $request->input('genre'));
+                    $music->update(
+                        $id,
+                        $request->input('title'),
+                        $request->input('asin'),
+                        $request->input('url'),
+                        $salesrank,
+                        $request->input('artist'),
+                        $request->input('publisher'),
+                        $releasedate,
+                        $request->input('year'),
+                        $request->input('tracks'),
+                        $cover,
+                        $request->input('genre')
+                    );
 
-                    return redirect()->to('admin/music-list');
+                    return redirect()->route('admin.music-list')->with('success', 'Music updated successfully');
 
-                    break;
                 case 'view':
                 default:
-                    $this->smarty->assign('music', $mus);
-                    $this->smarty->assign('genres', $gen->getGenres(Genres::MUSIC_TYPE));
-                    break;
+                    $genres = $gen->getGenres(Genres::MUSIC_TYPE);
+
+                    return view('admin.music-edit', compact('title', 'meta_title', 'mus', 'genres'));
             }
         }
 
-        $content = $this->smarty->fetch('music-edit.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        abort(404, 'Music ID required');
     }
 }
