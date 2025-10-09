@@ -11,34 +11,33 @@ use Illuminate\Support\Carbon;
 class AdminGameController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of games
      */
-    public function index(): void
+    public function index(Request $request)
     {
-        $this->setAdminPrefs();
         $game = new Games(['Settings' => null]);
 
         $meta_title = $title = 'Game List';
 
-        $gamelist = $game->getRange();
+        // Get search parameter
+        $search = $request->input('gamesearch', '');
 
-        $this->smarty->assign('gamelist', $gamelist);
+        if (!empty($search)) {
+            $gamelist = $game->getRange($search);
+            $lastSearch = $search;
+        } else {
+            $gamelist = $game->getRange();
+            $lastSearch = '';
+        }
 
-        $content = $this->smarty->fetch('game-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.game-list', compact('title', 'meta_title', 'gamelist', 'lastSearch'));
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
-     *
-     * @throws \Exception
+     * Show the form for editing a game
      */
     public function edit(Request $request)
     {
-        $this->setAdminPrefs();
         $games = new Games(['Settings' => null]);
         $gen = new Genres(['Settings' => null]);
         $meta_title = $title = 'Game Edit';
@@ -51,40 +50,48 @@ class AdminGameController extends BasePageController
             $game = $games->getGamesInfoById($id);
 
             if (! $game) {
-                $this->show404();
+                abort(404, 'Game not found');
             }
 
             switch ($action) {
                 case 'submit':
                     $coverLoc = storage_path('covers/games/').$id.'.jpg';
 
-                    if ($_FILES['cover']['size'] > 0) {
-                        $tmpName = $_FILES['cover']['tmp_name'];
-                        $file_info = getimagesize($tmpName);
+                    if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
+                        $file = $request->file('cover');
+                        $file_info = getimagesize($file->getPathname());
                         if (! empty($file_info)) {
-                            move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
+                            $file->move(storage_path('covers/games/'), $id.'.jpg');
                         }
                     }
 
-                    $request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-                    $request->merge(['releasedate' => (empty($request->input('releasedate')) || ! strtotime($request->input('releasedate'))) ? $game['releasedate'] : Carbon::parse($request->input('releasedate'))->timestamp]);
+                    $cover = file_exists($coverLoc) ? 1 : 0;
+                    $releasedate = (empty($request->input('releasedate')) || ! strtotime($request->input('releasedate')))
+                        ? $game['releasedate']
+                        : Carbon::parse($request->input('releasedate'))->timestamp;
 
-                    $games->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('publisher'), $request->input('releasedate'), $request->input('esrb'), $request->input('cover'), $request->input('trailerurl'), $request->input('genre'));
+                    $games->update(
+                        $id,
+                        $request->input('title'),
+                        $request->input('asin'),
+                        $request->input('url'),
+                        $request->input('publisher'),
+                        $releasedate,
+                        $request->input('esrb'),
+                        $cover,
+                        $request->input('trailerurl'),
+                        $request->input('genre')
+                    );
 
-                    return redirect()->to('admin/game-list');
-
-                    break;
+                    return redirect()->route('admin.game-list')->with('success', 'Game updated successfully');
 
                 case 'view':
                 default:
-                    $this->smarty->assign('game', $game);
-                    $this->smarty->assign('genres', $gen->getGenres(Genres::GAME_TYPE));
-                    break;
+                    $genres = $gen->getGenres(Genres::GAME_TYPE);
+                    return view('admin.game-edit', compact('title', 'meta_title', 'game', 'genres'));
             }
         }
 
-        $content = $this->smarty->fetch('game-edit.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        abort(404, 'Game ID required');
     }
 }
