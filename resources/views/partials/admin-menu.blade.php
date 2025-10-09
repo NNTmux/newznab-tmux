@@ -95,6 +95,7 @@
         </div>
     </div>
 
+
     <!-- Blacklist -->
     <div class="mb-4">
         <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition" onclick="toggleAdminSubmenu('blacklist-menu')">

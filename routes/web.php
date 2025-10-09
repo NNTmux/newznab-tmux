@@ -26,7 +26,6 @@ use App\Http\Controllers\Admin\AdminGameController;
 use App\Http\Controllers\Admin\AdminGroupController;
 use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
-use App\Http\Controllers\Admin\AdminNzbController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminPredbController;
 use App\Http\Controllers\Admin\AdminReleaseNamingRegexesController;
@@ -217,8 +216,6 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'movie-add', [AdminMovieController::class, 'create'])->name('admin.movie-add');
     Route::match(['GET', 'POST'], 'music-list', [AdminMusicController::class, 'index'])->name('admin.music-list');
     Route::match(['GET', 'POST'], 'music-edit', [AdminMusicController::class, 'edit'])->name('admin.music-edit');
-    Route::match(['GET', 'POST'], 'nzb-import', [AdminNzbController::class, 'import'])->name('admin.nzb-import');
-    Route::match(['GET', 'POST'], 'nzb-export', [AdminNzbController::class, 'export'])->name('admin.nzb-export');
     Route::match(['GET', 'POST'], 'predb', [AdminPredbController::class, 'index'])->name('admin.predb');
     Route::match(['GET', 'POST'], 'group-list', [AdminGroupController::class, 'index'])->name('admin.group-list');
     Route::match(['GET', 'POST'], 'group-edit', [AdminGroupController::class, 'edit'])->name('admin.group-edit');
