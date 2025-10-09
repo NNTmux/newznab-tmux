@@ -84,9 +84,9 @@ class MovieInfo extends Model
         $sql = self::query()->select('*');
         if (! empty($search)) {
             // Search by both title and IMDB ID
-            $sql->where(function($query) use ($search) {
+            $sql->where(function ($query) use ($search) {
                 $query->whereLike('title', '%'.$search.'%')
-                      ->orWhere('imdbid', $search);
+                    ->orWhere('imdbid', $search);
             });
         }
 

@@ -42,14 +42,14 @@ class AdminMovieController extends BasePageController
         $title = 'Movie Add';
 
         // If no ID provided, show the add form
-        if (!$request->has('id')) {
+        if (! $request->has('id')) {
             return view('admin.movie-add', compact('title'));
         }
 
         // Validate the IMDB ID
         $id = $request->input('id');
 
-        if (!is_numeric($id)) {
+        if (! is_numeric($id)) {
             return redirect()->back()
                 ->with('error', 'Invalid IMDB ID. Please enter only numeric digits (without the "tt" prefix).')
                 ->withInput();
@@ -60,7 +60,7 @@ class AdminMovieController extends BasePageController
         $movCheck = $movie->getMovieInfo($id);
 
         if ($movCheck !== null) {
-            return redirect()->to('/admin/movie-edit?id=' . $id)
+            return redirect()->to('/admin/movie-edit?id='.$id)
                 ->with('warning', 'Movie already exists in the database. Redirected to edit page.');
         }
 
@@ -81,7 +81,7 @@ class AdminMovieController extends BasePageController
                 }
 
                 return redirect()->to('/admin/movie-list')
-                    ->with('success', 'Movie successfully added! IMDB ID: ' . $id);
+                    ->with('success', 'Movie successfully added! IMDB ID: '.$id);
             } else {
                 return redirect()->back()
                     ->with('error', 'Could not fetch movie information from TMDB/IMDB. Please verify the IMDB ID is correct.')
@@ -89,7 +89,7 @@ class AdminMovieController extends BasePageController
             }
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error adding movie: ' . $e->getMessage())
+                ->with('error', 'Error adding movie: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -105,7 +105,7 @@ class AdminMovieController extends BasePageController
         $title = 'Movie Edit';
 
         // Check if ID is provided
-        if (!$request->has('id')) {
+        if (! $request->has('id')) {
             return redirect()->to('admin/movie-list')
                 ->with('error', 'No movie ID provided.');
         }
@@ -115,7 +115,7 @@ class AdminMovieController extends BasePageController
 
         if ($mov === null) {
             return redirect()->to('admin/movie-list')
-                ->with('error', 'Movie with IMDB ID ' . $id . ' does not exist in database.');
+                ->with('error', 'Movie with IMDB ID '.$id.' does not exist in database.');
         }
 
         // Handle update from TMDB
@@ -136,7 +136,7 @@ class AdminMovieController extends BasePageController
                 }
             } catch (\Exception $e) {
                 return redirect()->back()
-                    ->with('error', 'Error updating movie: ' . $e->getMessage());
+                    ->with('error', 'Error updating movie: '.$e->getMessage());
             }
         }
 
@@ -149,7 +149,7 @@ class AdminMovieController extends BasePageController
                 $backdropLoc = public_path('covers/movies/'.$id.'-backdrop.jpg');
 
                 // Ensure directory exists
-                if (!file_exists(public_path('covers/movies'))) {
+                if (! file_exists(public_path('covers/movies'))) {
                     mkdir(public_path('covers/movies'), 0755, true);
                 }
 
@@ -193,7 +193,7 @@ class AdminMovieController extends BasePageController
                     ->with('success', 'Movie updated successfully!');
             } catch (\Exception $e) {
                 return redirect()->back()
-                    ->with('error', 'Error saving movie: ' . $e->getMessage())
+                    ->with('error', 'Error saving movie: '.$e->getMessage())
                     ->withInput();
             }
         }
