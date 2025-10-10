@@ -21,6 +21,12 @@
         </div>
     </div>
 
+    <!-- Invitations -->
+    <a href="{{ url('/admin/invitations') }}" class="flex items-center space-x-3 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition mb-4">
+        <i class="fas fa-envelope"></i>
+        <span>Invitations</span>
+    </a>
+
     <!-- Content -->
     <div class="mb-4">
         <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition" onclick="toggleAdminSubmenu('content-menu')">

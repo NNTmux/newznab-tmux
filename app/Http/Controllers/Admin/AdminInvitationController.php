@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\InvitationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminInvitationController extends BasePageController
 {
@@ -22,7 +23,7 @@ class AdminInvitationController extends BasePageController
     /**
      * Display all invitations statistics and management page
      */
-    public function index(Request $request): void
+    public function index(Request $request): View
     {
         $this->setAdminPrefs();
 
@@ -33,7 +34,6 @@ class AdminInvitationController extends BasePageController
         $invited_by = $request->get('invited_by', '');
         $email = $request->get('email', '');
         $orderBy = $request->get('ob', 'created_at_desc');
-        $page = $request->get('page', 1);
 
         // Build query
         $query = Invitation::with(['invitedBy', 'usedBy']);
@@ -93,7 +93,7 @@ class AdminInvitationController extends BasePageController
         }
 
         // Paginate results
-        $invitations = $query->paginate(config('nntmux.items_per_page', 25));
+        $invitations = $query->paginate(config('nntmux.items_per_page', 25))->withQueryString();
 
         // Get overall statistics
         $stats = $this->getOverallStats();
@@ -101,27 +101,26 @@ class AdminInvitationController extends BasePageController
         // Get user statistics (top inviters)
         $topInviters = $this->getTopInviters();
 
-        $this->smarty->assign([
-            'invitations' => $invitations,
-            'stats' => $stats,
-            'topInviters' => $topInviters,
-            'status' => $status,
-            'invited_by' => $invited_by,
-            'email' => $email,
-            'orderBy' => $orderBy,
-            'statusOptions' => [
-                '' => 'All',
-                'pending' => 'Pending',
-                'used' => 'Used',
-                'expired' => 'Expired',
-                'cancelled' => 'Cancelled',
-            ],
-        ]);
+        $statusOptions = [
+            '' => 'All',
+            'pending' => 'Pending',
+            'used' => 'Used',
+            'expired' => 'Expired',
+            'cancelled' => 'Cancelled',
+        ];
 
-        $content = $this->smarty->fetch('admin-invitation-list.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.invitations.index', compact(
+            'invitations',
+            'stats',
+            'topInviters',
+            'status',
+            'invited_by',
+            'email',
+            'orderBy',
+            'statusOptions',
+            'title',
+            'meta_title'
+        ));
     }
 
     /**
@@ -210,7 +209,7 @@ class AdminInvitationController extends BasePageController
     /**
      * View detailed invitation
      */
-    public function show(Request $request): void
+    public function show(Request $request): View
     {
         $this->setAdminPrefs();
 
@@ -219,14 +218,7 @@ class AdminInvitationController extends BasePageController
 
         $meta_title = $title = 'Invitation Details';
 
-        $this->smarty->assign([
-            'invitation' => $invitation,
-        ]);
-
-        $content = $this->smarty->fetch('admin-invitation-show.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.invitations.show', compact('invitation', 'title', 'meta_title'));
     }
 
     /**
