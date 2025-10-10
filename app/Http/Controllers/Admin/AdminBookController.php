@@ -5,15 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\BookInfo;
 use Blacklight\Books;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\View\View;
 
 class AdminBookController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of books
      */
-    public function index(): void
+    public function index(): View
     {
         $this->setAdminPrefs();
 
@@ -21,21 +23,13 @@ class AdminBookController extends BasePageController
 
         $bookList = BookInfo::query()->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
 
-        $this->smarty->assign('booklist', $bookList);
-
-        $content = $this->smarty->fetch('book-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.books.index', compact('bookList', 'title', 'meta_title'));
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
-     *
-     * @throws \Exception
+     * Show the form for editing a book
      */
-    public function edit(Request $request)
+    public function edit(Request $request): View|RedirectResponse
     {
         $this->setAdminPrefs();
         $book = new Books;
@@ -50,38 +44,44 @@ class AdminBookController extends BasePageController
             $b = $book->getBookInfo($id);
 
             if (! $b) {
-                $this->show404();
+                abort(404);
             }
 
             switch ($action) {
                 case 'submit':
                     $coverLoc = storage_path('covers/book/'.$id.'.jpg');
 
-                    if ($_FILES['cover']['size'] > 0) {
-                        $tmpName = $_FILES['cover']['tmp_name'];
-                        $file_info = getimagesize($tmpName);
+                    if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
+                        $uploadedFile = $request->file('cover');
+                        $file_info = getimagesize($uploadedFile->getRealPath());
                         if (! empty($file_info)) {
-                            move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
+                            $uploadedFile->move(storage_path('covers/book'), $id.'.jpg');
                         }
                     }
 
-                    $request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-                    $request->merge(['publishdate' => (empty($request->input('publishdate')) || ! strtotime($request->input('publishdate'))) ? $con['publishdate'] : Carbon::parse($request->input('publishdate'))->timestamp]);
-                    $book->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('author'), $request->input('publisher'), $request->input('publishdate'), $request->input('cover'));
+                    $hasCover = file_exists($coverLoc) ? 1 : 0;
+                    $publishdate = (empty($request->input('publishdate')) || ! strtotime($request->input('publishdate')))
+                        ? ($b['publishdate'] ?? null)
+                        : Carbon::parse($request->input('publishdate'))->timestamp;
 
-                    return redirect()->to('admin/book-list');
-                    break;
+                    $book->update(
+                        $id,
+                        $request->input('title'),
+                        $request->input('asin'),
+                        $request->input('url'),
+                        $request->input('author'),
+                        $request->input('publisher'),
+                        $publishdate,
+                        $hasCover
+                    );
+
+                    return redirect()->route('admin.book-list')->with('success', 'Book updated successfully');
                 case 'view':
                 default:
-                    $this->smarty->assign('book', $b);
-                    break;
+                    return view('admin.books.edit', compact('book', 'title', 'meta_title'))->with('book', $b);
             }
         }
 
-        $content = $this->smarty->fetch('book-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return redirect()->route('admin.book-list');
     }
 }
