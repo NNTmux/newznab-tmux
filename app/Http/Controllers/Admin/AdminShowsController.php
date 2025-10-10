@@ -5,86 +5,76 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Release;
 use App\Models\Video;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminShowsController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of TV shows
      */
-    public function index(Request $request): void
+    public function index(Request $request): View
     {
         $this->setAdminPrefs();
 
         $meta_title = $title = 'TV Shows List';
 
-        $tvshowname = ($request->has('showname') && ! empty($request->input('showname')) ? $request->input('showname') : '');
+        $showname = $request->input('showname', '');
+        $tvshowlist = Video::getRange($showname);
 
-        $this->smarty->assign(
-            [
-                'showname' => $tvshowname,
-                'tvshowlist' => Video::getRange($tvshowname),
-            ]
-        );
-
-        $content = $this->smarty->fetch('show-list.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        return view('admin.shows.index', compact('tvshowlist', 'showname', 'title', 'meta_title'));
     }
 
     /**
-     * @throws \Exception
+     * Show the form for editing a TV show
      */
-    public function edit(Request $request): void
+    public function edit(Request $request): View|RedirectResponse
     {
         $this->setAdminPrefs();
 
-        switch ($request->input('action') ?? 'view') {
-            case 'submit':
-                if ($request->has('from') && ! empty($request->input('from'))) {
-                    header('Location:'.$request->input('from'));
-                    exit;
-                }
+        $action = $request->input('action', 'view');
 
-                header('Location:'.url('admin/show-list'));
-                break;
+        if ($action === 'submit') {
+            if ($request->has('from') && ! empty($request->input('from'))) {
+                return redirect($request->input('from'));
+            }
 
-            case 'view':
-            default:
-                if ($request->has('id')) {
-                    $title = 'TV Show Edit';
-                    $show = Video::getByVideoID($request->input('id'));
-                }
-                break;
+            return redirect()->route('admin.show-list')->with('success', 'TV show updated successfully');
         }
 
-        $this->smarty->assign('show', $show);
+        $show = null;
+        if ($request->has('id')) {
+            $show = Video::getByVideoID($request->input('id'));
+        }
+
+        if (! $show) {
+            return redirect()->route('admin.show-list')->with('error', 'TV show not found');
+        }
 
         $meta_title = $title = 'Edit TV Show Data';
-        $content = $this->smarty->fetch('show-edit.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+
+        return view('admin.shows.edit', compact('show', 'title', 'meta_title'));
     }
 
     /**
-     * @throws \Exception
+     * Remove video ID from releases
      */
-    public function destroy($id): void
+    public function destroy(Request $request): View
     {
         $this->setAdminPrefs();
 
+        $id = $request->route('id');
         $success = false;
+        $videoid = null;
 
         if ($id) {
             $success = Release::removeVideoIdFromReleases($id);
-            $this->smarty->assign('videoid', $id);
+            $videoid = $id;
         }
 
-        $this->smarty->assign('success', $success);
-
         $meta_title = $title = 'Remove Video and Episode IDs from Releases';
-        $content = $this->smarty->fetch('show-remove.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+
+        return view('admin.shows.remove', compact('success', 'videoid', 'title', 'meta_title'));
     }
 }
