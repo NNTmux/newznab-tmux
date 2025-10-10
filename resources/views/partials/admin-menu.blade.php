@@ -92,6 +92,21 @@
             <a href="{{ url('/admin/show-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">TV Shows List</a>
         </div>
     </div>
+
+    <!-- AniDB -->
+    <div class="mb-4">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition" onclick="toggleAdminSubmenu('anidb-menu')">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-dragon"></i>
+                <span>AniDB</span>
+            </div>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" id="anidb-menu-icon"></i>
+        </button>
+        <div id="anidb-menu" class="hidden mt-2 ml-6 space-y-1">
+            <a href="{{ url('/admin/anidb-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">AniDB List</a>
+        </div>
+    </div>
+
     <!-- Games -->
     <div class="mb-4">
         <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white transition" onclick="toggleAdminSubmenu('games-menu')">

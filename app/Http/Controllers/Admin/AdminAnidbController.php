@@ -5,48 +5,39 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Release;
 use Blacklight\AniDB;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminAnidbController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of AniDB entries
      */
-    public function index(Request $request): void
+    public function index(Request $request): View
     {
         $this->setAdminPrefs();
 
         $AniDB = new AniDB;
         $title = $meta_title = 'AniDB List';
 
-        $aname = '';
-        if ($request->has('animetitle') && ! empty($request->input('animetitle'))) {
-            $aname = $request->input('animetitle');
-        }
+        $animetitle = $request->input('animetitle', '');
+        $anidblist = $AniDB->getAnimeRange($animetitle);
 
-        $this->smarty->assign('animetitle', $aname);
-
-        $anidblist = $AniDB->getAnimeRange($aname);
-        $this->smarty->assign('anidblist', $anidblist);
-
-        $content = $this->smarty->fetch('anidb-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.anidb.index', compact('anidblist', 'animetitle', 'title', 'meta_title'));
     }
 
     /**
-     * @throws \Exception
+     * Show the form for editing an AniDB entry
      */
-    public function edit(Request $request, int $id): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function edit(Request $request, int $id): View|RedirectResponse
     {
         $this->setAdminPrefs();
 
         $AniDB = new AniDB;
 
         // Set the current action.
-        $action = $request->input('action') ?? 'view';
+        $action = $request->input('action', 'view');
 
         switch ($action) {
             case 'submit':
@@ -68,48 +59,38 @@ class AdminAnidbController extends BasePageController
                     $request->input('episodetitles')
                 );
 
-                return redirect()->to('admin/anidb-list');
-                break;
+                return redirect()->route('admin.anidb-list')->with('success', 'AniDB entry updated successfully');
 
             case 'view':
             default:
                 if (! empty($id)) {
-                    $this->title = 'AniDB Edit';
-                    $AniDBAPIArray = $AniDB->getAnimeInfo($id);
-                    $this->smarty->assign('anime', $AniDBAPIArray);
+                    $title = $meta_title = 'AniDB Edit';
+                    $anime = $AniDB->getAnimeInfo($id);
+
+                    return view('admin.anidb.edit', compact('anime', 'title', 'meta_title'));
                 }
                 break;
         }
 
-        $title = 'Edit AniDB Data';
-        $content = $this->smarty->fetch('anidb-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'content'));
-
-        $this->adminrender();
+        return redirect()->route('admin.anidb-list');
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     *
-     * @throws \Exception
+     * Remove AniDB ID from releases
      */
-    public function destroy(Request $request, int $id): void
+    public function destroy(Request $request, int $id): View
     {
         $this->setAdminPrefs();
 
         $success = false;
+        $anidbid = $id;
 
-        if ($request->has('id')) {
+        if ($id) {
             $success = Release::removeAnidbIdFromReleases($id);
-            $this->smarty->assign('anidbid', $id);
         }
-        $this->smarty->assign('success', $success);
 
-        $title = 'Remove anidbID from Releases';
-        $content = $this->smarty->fetch('anidb-remove.tpl');
-        $this->smarty->assign(compact('title', 'content'));
-        $this->adminrender();
+        $title = $meta_title = 'Remove AniDB ID from Releases';
+
+        return view('admin.anidb.remove', compact('success', 'anidbid', 'title', 'meta_title'));
     }
 }
