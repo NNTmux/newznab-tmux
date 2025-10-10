@@ -174,6 +174,7 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::get('book-list', [AdminBookController::class, 'index'])->name('admin.book-list');
     Route::match(['GET', 'POST'], 'book-edit', [AdminBookController::class, 'edit'])->name('admin.book-edit');
     Route::get('category-list', [AdminCategoryController::class, 'index'])->name('admin.category-list');
+    Route::match(['GET', 'POST'], 'category-add', [AdminCategoryController::class, 'create'])->name('admin.category-add');
     Route::match(['GET', 'POST'], 'category-edit', [AdminCategoryController::class, 'edit'])->name('admin.category-edit');
     Route::get('user-list', [AdminUserController::class, 'index'])->name('admin.user-list');
     Route::match(['GET', 'POST'], 'user-edit', [AdminUserController::class, 'edit'])->name('admin.user-edit');

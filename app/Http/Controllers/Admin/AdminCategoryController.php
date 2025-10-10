@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
+use App\Models\RootCategory;
 use Illuminate\Http\Request;
 
 class AdminCategoryController extends BasePageController
@@ -32,6 +33,63 @@ class AdminCategoryController extends BasePageController
      *
      * @throws \Exception
      */
+    public function create(Request $request)
+    {
+        $this->setAdminPrefs();
+
+        // set the current action
+        $action = $request->input('action') ?? 'view';
+
+        switch ($action) {
+            case 'submit':
+                // Create new category
+                $category = new Category();
+
+                // Allow custom ID only when creating
+                if ($request->filled('id')) {
+                    $customId = $request->input('id');
+                    // Check if ID already exists
+                    if (Category::where('id', $customId)->exists()) {
+                        return redirect()->back()->withInput()->with('error', 'Category ID ' . $customId . ' already exists. Please choose a different ID.');
+                    }
+                    $category->id = $customId;
+                }
+
+                $category->title = $request->input('title');
+                $category->root_categories_id = $request->input('root_categories_id') ?: null;
+                $category->status = Category::STATUS_ACTIVE;  // Always active
+                $category->description = $request->input('description');
+                $category->disablepreview = 0;  // Always enabled
+                $category->minsizetoformrelease = 0;
+                $category->maxsizetoformrelease = 0;
+                $category->save();
+
+                return redirect()->to('admin/category-list')->with('success', 'Category created successfully');
+            case 'view':
+            default:
+                $title = 'Add New Category';
+                break;
+        }
+
+        // Get root categories for parent selection
+        $rootCategories = RootCategory::orderBy('title')->get();
+
+        $this->viewData = array_merge($this->viewData, [
+            'category' => null,
+            'rootCategories' => $rootCategories,
+            'title' => $title,
+            'meta_title' => 'Add New Category',
+            'isCreate' => true,
+        ]);
+
+        return view('admin.categories.edit', $this->viewData);
+    }
+
+    /**
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     *
+     * @throws \Exception
+     */
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
@@ -41,16 +99,18 @@ class AdminCategoryController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                Category::updateCategory(
-                    $request->input('id'),
-                    $request->input('status'),
-                    $request->input('description'),
-                    $request->input('disablepreview'),
-                    $request->input('minsizetoformrelease'),
-                    $request->input('maxsizetoformrelease')
-                );
+                $category = Category::find($request->input('id'));
+                if ($category) {
+                    $category->root_categories_id = $request->input('root_categories_id') ?: null;
+                    $category->status = Category::STATUS_ACTIVE;  // Always active
+                    $category->description = $request->input('description');
+                    $category->disablepreview = 0;  // Always enabled
+                    $category->minsizetoformrelease = 0;
+                    $category->maxsizetoformrelease = 0;
+                    $category->save();
+                }
 
-                return redirect()->to('admin/category-list');
+                return redirect()->to('admin/category-list')->with('success', 'Category updated successfully');
             case 'view':
             default:
                 $category = null;
@@ -62,12 +122,15 @@ class AdminCategoryController extends BasePageController
                 break;
         }
 
+        // Get root categories for parent selection
+        $rootCategories = RootCategory::orderBy('title')->get();
+
         $this->viewData = array_merge($this->viewData, [
             'category' => $category,
-            'status_ids' => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE, Category::STATUS_DISABLED],
-            'status_names' => ['Yes', 'No', 'Disabled'],
+            'rootCategories' => $rootCategories,
             'title' => $title,
             'meta_title' => 'View/Edit categories',
+            'isCreate' => false,
         ]);
 
         return view('admin.categories.edit', $this->viewData);

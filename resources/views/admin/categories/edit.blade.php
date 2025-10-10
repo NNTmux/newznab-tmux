@@ -3,171 +3,140 @@
 @section('title', $title ?? 'Category Edit')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">{{ $title }}</h4>
-            <a href="{{ url('/admin/category-list') }}" class="btn btn-outline-secondary">
-                <i class="fa fa-arrow-left me-2"></i>Back to Categories
-            </a>
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                    <i class="fa fa-{{ $isCreate ?? false ? 'plus' : 'edit' }} mr-2"></i>{{ $title }}
+                </h1>
+                <a href="{{ url('/admin/category-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    <i class="fa fa-arrow-left mr-2"></i>Back to Categories
+                </a>
+            </div>
         </div>
-    </div>
 
-    @if(session('error'))
-        <div class="alert alert-danger m-3">
-            <i class="fa fa-exclamation-circle me-2"></i>{{ session('error') }}
-        </div>
-    @endif
+        <div class="px-6 py-6">
+            @if(session('error'))
+                <div class="mb-4 p-4 bg-red-50 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 text-red-800 dark:text-red-200 rounded">
+                    <i class="fa fa-exclamation-circle mr-2"></i>{{ session('error') }}
+                </div>
+            @endif
 
-    <div class="card-body">
-        @if($category)
-        <form action="{{ url('/admin/category-edit?action=submit') }}" method="POST" id="categoryForm">
-            @csrf
-            <input type="hidden" name="id" value="{{ $category->id }}"/>
+            <form action="{{ url($isCreate ?? false ? '/admin/category-add?action=submit' : '/admin/category-edit?action=submit') }}" method="POST" id="categoryForm">
+                @csrf
+                @if(!($isCreate ?? false) && $category)
+                    <input type="hidden" name="id" value="{{ $category->id }}"/>
+                @endif
 
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-4">
-                    <label class="form-label fw-bold">Title:</label>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    <p class="form-control-plaintext">{{ $category->title }}</p>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-4">
-                    <label for="parentcat" class="form-label fw-bold">Parent Category:</label>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-folder-open"></i></span>
-                        <input type="text" class="form-control" value="{{ $category->parent->title ?? 'N/A' }}" disabled>
-                    </div>
-                    <small class="text-muted">Parent category cannot be changed from this interface</small>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-4">
-                    <label for="description" class="form-label fw-bold">Description:</label>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-align-left"></i></span>
-                        <input type="text" id="description" name="description" class="form-control" value="{{ $category->description ?? '' }}"/>
-                    </div>
-                    <small class="text-muted">Brief explanation of what belongs in this category</small>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-4">
-                    <label for="minsizetoformrelease" class="form-label fw-bold">Minimum Size (Bytes):</label>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-download"></i></span>
-                        <input type="number" id="minsizetoformrelease" name="minsizetoformrelease" class="form-control" value="{{ $category->minsizetoformrelease ?? 0 }}"/>
-                    </div>
-                    <small class="text-muted">Minimum file size for releases in this category (in bytes). Set to 0 to disable.</small>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-4">
-                    <label for="maxsizetoformrelease" class="form-label fw-bold">Maximum Size (Bytes):</label>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-upload"></i></span>
-                        <input type="number" id="maxsizetoformrelease" name="maxsizetoformrelease" class="form-control" value="{{ $category->maxsizetoformrelease ?? 0 }}"/>
-                    </div>
-                    <small class="text-muted">Maximum file size for releases in this category (in bytes). Set to 0 to disable.</small>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-4">
-                    <label class="form-label fw-bold">Status:</label>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    @foreach($status_ids as $index => $statusId)
-                        <div class="form-check form-check-inline">
-                            <input type="radio" id="status_{{ $statusId }}" name="status" value="{{ $statusId }}"
-                                   class="form-check-input" {{ ($category->status ?? 0) == $statusId ? 'checked' : '' }}>
-                            <label for="status_{{ $statusId }}" class="form-check-label">{{ $status_names[$index] }}</label>
+                @if($isCreate ?? false)
+                    <!-- ID (editable for new categories) -->
+                    <div class="mb-6">
+                        <label for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Category ID: <span class="text-gray-500 text-xs">(Optional - will auto-generate if left empty)</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa fa-hashtag text-gray-400"></i>
+                            </div>
+                            <input type="number" id="id" name="id"
+                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                   placeholder="Leave empty for auto-generated ID"
+                                   value="{{ old('id') }}"/>
                         </div>
-                    @endforeach
-                    <div class="mt-2">
-                        <small class="text-muted">Inactive categories won't appear in menus but can still be used for release matching</small>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Specify a custom numeric ID or leave empty to auto-generate. Cannot be changed after creation.</p>
                     </div>
-                </div>
-            </div>
 
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-4">
-                    <label class="form-label fw-bold">Preview:</label>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    <div class="form-check form-check-inline">
-                        <input type="radio" id="disablepreview_0" name="disablepreview" value="0"
-                               class="form-check-input" {{ ($category->disablepreview ?? 0) == 0 ? 'checked' : '' }}>
-                        <label for="disablepreview_0" class="form-check-label">Enabled</label>
+                    <!-- Title (editable for new categories) -->
+                    <div class="mb-6">
+                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Title: <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa fa-tag text-gray-400"></i>
+                            </div>
+                            <input type="text" id="title" name="title" required
+                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                                   placeholder="Enter category title"
+                                   value="{{ old('title') }}"/>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input type="radio" id="disablepreview_1" name="disablepreview" value="1"
-                               class="form-check-input" {{ ($category->disablepreview ?? 0) == 1 ? 'checked' : '' }}>
-                        <label for="disablepreview_1" class="form-check-label">Disabled</label>
+                @else
+                    <!-- ID (read-only for existing categories) -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category ID:</label>
+                        <div class="px-4 py-2 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-gray-700 font-mono">
+                            {{ $category->id ?? 'N/A' }}
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Category ID cannot be changed after creation</p>
                     </div>
-                    <div class="mt-2">
-                        <small class="text-muted">Disabling prevents ffmpeg from generating previews for releases in this category</small>
-                    </div>
-                </div>
-            </div>
 
-            <div class="card-footer">
-                <div class="d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" onclick="window.location='{{ url('/admin/category-list') }}'">
-                        <i class="fa fa-times me-2"></i>Cancel
+                    <!-- Title (read-only for existing categories) -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title:</label>
+                        <p class="px-4 py-2 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-gray-700">
+                            {{ $category->title ?? 'N/A' }}
+                        </p>
+                    </div>
+                @endif
+
+                <!-- Parent Category (dropdown selector for both create and edit) -->
+                <div class="mb-6">
+                    <label for="root_categories_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Root Category:
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-folder-open text-gray-400"></i>
+                        </div>
+                        <select id="root_categories_id" name="root_categories_id"
+                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200">
+                            <option value="">-- No Root Category --</option>
+                            @foreach($rootCategories ?? [] as $rootCat)
+                                <option value="{{ $rootCat->id }}" {{ ($category->root_categories_id ?? null) == $rootCat->id ? 'selected' : '' }}>
+                                    {{ $rootCat->title }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select a root category from the root_categories table</p>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-6">
+                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description:</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-align-left text-gray-400"></i>
+                        </div>
+                        <input type="text" id="description" name="description"
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                               value="{{ $category->description ?? '' }}"
+                               placeholder="Brief explanation of what belongs in this category"/>
+                    </div>
+                </div>
+
+
+                <!-- Form Actions -->
+                <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" onclick="window.location='{{ url('/admin/category-list') }}'"
+                            class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <i class="fa fa-times mr-2"></i>Cancel
                     </button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa fa-save me-2"></i>Save Changes
+                    <button type="submit" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
+                        <i class="fa fa-save mr-2"></i>{{ $isCreate ?? false ? 'Create Category' : 'Save Changes' }}
                     </button>
                 </div>
-            </div>
-        </form>
-        @else
-        <div class="alert alert-warning">
-            <i class="fa fa-exclamation-triangle me-2"></i>No category selected. Please select a category to edit.
+            </form>
         </div>
-        <div class="text-center mt-3">
-            <a href="{{ url('/admin/category-list') }}" class="btn btn-primary">
-                <i class="fa fa-list me-2"></i>View Category List
-            </a>
-        </div>
-        @endif
     </div>
 </div>
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Form validation
-    const form = document.getElementById('categoryForm');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            const minSize = document.getElementById('minsizetoformrelease').value;
-            const maxSize = document.getElementById('maxsizetoformrelease').value;
-
-            // Validate min/max size relationship
-            if (parseInt(minSize) > parseInt(maxSize) && parseInt(maxSize) > 0) {
-                event.preventDefault();
-                alert('Minimum size cannot be greater than maximum size');
-                return false;
-            }
-        });
-    }
-});
+// Form validation can be added here if needed in the future
 </script>
 @endpush
 @endsection
