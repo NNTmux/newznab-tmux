@@ -85,6 +85,7 @@ class AdminConsoleController extends BasePageController
                 case 'view':
                 default:
                     $genres = $gen->getGenres(Genres::CONSOLE_TYPE);
+
                     return view('admin.console.edit', compact('con', 'genres', 'title', 'meta_title'));
             }
         }
