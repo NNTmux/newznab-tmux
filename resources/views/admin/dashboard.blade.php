@@ -83,6 +83,160 @@
         </div>
     </div>
 
+    <!-- User Statistics Widget -->
+    @if(isset($userStats))
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
+            <i class="fas fa-chart-line mr-2 text-blue-600 dark:text-blue-400"></i>
+            User Statistics
+        </h3>
+
+        <!-- Summary Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 text-center">
+                <p class="text-sm text-blue-600 dark:text-blue-300 font-medium mb-1">Total Users</p>
+                <p class="text-2xl font-bold text-blue-800 dark:text-blue-100">{{ number_format($userStats['summary']['total_users']) }}</p>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-lg p-4 text-center">
+                <p class="text-sm text-green-600 dark:text-green-300 font-medium mb-1">Downloads Today</p>
+                <p class="text-2xl font-bold text-green-800 dark:text-green-100">{{ number_format($userStats['summary']['downloads_today']) }}</p>
+            </div>
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 rounded-lg p-4 text-center">
+                <p class="text-sm text-purple-600 dark:text-purple-300 font-medium mb-1">Downloads (7d)</p>
+                <p class="text-2xl font-bold text-purple-800 dark:text-purple-100">{{ number_format($userStats['summary']['downloads_week']) }}</p>
+            </div>
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-lg p-4 text-center">
+                <p class="text-sm text-orange-600 dark:text-orange-300 font-medium mb-1">API Hits Today</p>
+                <p class="text-2xl font-bold text-orange-800 dark:text-orange-100">{{ number_format($userStats['summary']['api_hits_today']) }}</p>
+            </div>
+            <div class="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900 dark:to-pink-800 rounded-lg p-4 text-center">
+                <p class="text-sm text-pink-600 dark:text-pink-300 font-medium mb-1">API Hits (7d)</p>
+                <p class="text-2xl font-bold text-pink-800 dark:text-pink-100">{{ number_format($userStats['summary']['api_hits_week']) }}</p>
+            </div>
+        </div>
+
+        <!-- Tables and Graphs Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Users by Role Table -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <i class="fas fa-user-tag mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                    Users by Role
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Count</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            @php
+                                $totalUsers = collect($userStats['users_by_role'])->sum('count');
+                            @endphp
+                            @foreach($userStats['users_by_role'] as $roleData)
+                            <tr class="hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                        {{ ucfirst($roleData['role']) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
+                                    {{ number_format($roleData['count']) }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-600 dark:text-gray-400">
+                                    {{ $totalUsers > 0 ? number_format(($roleData['count'] / $totalUsers) * 100, 1) : 0 }}%
+                                </td>
+                            </tr>
+                            @endforeach
+                            @if(empty($userStats['users_by_role']))
+                            <tr>
+                                <td colspan="3" class="px-4 py-3 text-sm text-center text-gray-500 dark:text-gray-400">
+                                    No data available
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top Downloaders Table -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <i class="fas fa-trophy mr-2 text-yellow-600 dark:text-yellow-400"></i>
+                    Top Downloaders (Last 7 Days)
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rank</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Username</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Downloads</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            @foreach($userStats['top_downloaders'] as $index => $downloader)
+                            <tr class="hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                                    @if($index === 0)
+                                        <i class="fas fa-medal text-yellow-500 text-lg"></i>
+                                    @elseif($index === 1)
+                                        <i class="fas fa-medal text-gray-400 text-lg"></i>
+                                    @elseif($index === 2)
+                                        <i class="fas fa-medal text-orange-600 text-lg"></i>
+                                    @else
+                                        <span class="text-gray-500">{{ $index + 1 }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $downloader->username }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
+                                    {{ number_format($downloader->download_count) }}
+                                </td>
+                            </tr>
+                            @endforeach
+                            @if(empty($userStats['top_downloaders']))
+                            <tr>
+                                <td colspan="3" class="px-4 py-3 text-sm text-center text-gray-500 dark:text-gray-400">
+                                    No downloads in the last 7 days
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Downloads Chart -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <i class="fas fa-chart-bar mr-2 text-green-600 dark:text-green-400"></i>
+                    Downloads (Last 7 Days)
+                </h4>
+                <div style="height: 250px; max-height: 250px; position: relative;">
+                    <canvas id="downloadsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- API Hits Chart -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <i class="fas fa-chart-area mr-2 text-purple-600 dark:text-purple-400"></i>
+                    API Hits (Last 7 Days)
+                </h4>
+                <div style="height: 250px; max-height: 250px; position: relative;">
+                    <canvas id="apiHitsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- System Status -->
@@ -162,3 +316,151 @@
 </div>
 @endsection
 
+@push('scripts')
+@if(isset($userStats))
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for dark mode
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#374151';
+    const gridColor = isDarkMode ? '#374151' : '#e5e7eb';
+
+    // Downloads Chart
+    const downloadsCtx = document.getElementById('downloadsChart');
+    if (downloadsCtx) {
+        const downloadsData = {!! json_encode($userStats['downloads_per_day']) !!};
+        new Chart(downloadsCtx, {
+            type: 'bar',
+            data: {
+                labels: downloadsData.map(d => d.date),
+                datasets: [{
+                    label: 'Downloads',
+                    data: downloadsData.map(d => d.count),
+                    backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        titleColor: textColor,
+                        bodyColor: textColor,
+                        borderColor: gridColor,
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Downloads: ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: textColor,
+                            precision: 0
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // API Hits Chart
+    const apiHitsCtx = document.getElementById('apiHitsChart');
+    if (apiHitsCtx) {
+        const apiHitsData = {!! json_encode($userStats['api_hits_per_day']) !!};
+        new Chart(apiHitsCtx, {
+            type: 'line',
+            data: {
+                labels: apiHitsData.map(d => d.date),
+                datasets: [{
+                    label: 'API Hits',
+                    data: apiHitsData.map(d => d.count),
+                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                    borderColor: 'rgba(147, 51, 234, 1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: 'rgba(147, 51, 234, 1)',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        titleColor: textColor,
+                        bodyColor: textColor,
+                        borderColor: gridColor,
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'API Hits: ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: textColor,
+                            precision: 0
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+@endif
+@endpush

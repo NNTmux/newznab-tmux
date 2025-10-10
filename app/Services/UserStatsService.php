@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\User;
+use App\Models\UserDownload;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class UserStatsService
+{
+    /**
+     * Get user statistics by role
+     *
+     * @return array
+     */
+    public function getUsersByRole(): array
+    {
+        $usersByRole = DB::table('users')
+            ->join('roles', 'users.roles_id', '=', 'roles.id')
+            ->select('roles.name as role_name', DB::raw('COUNT(users.id) as count'))
+            ->whereNull('users.deleted_at')
+            ->groupBy('roles.id', 'roles.name')
+            ->get();
+
+        return $usersByRole->map(function ($item) {
+            return [
+                'role' => $item->role_name,
+                'count' => $item->count,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get downloads per day for the last 7 days
+     *
+     * @return array
+     */
+    public function getDownloadsPerDay(int $days = 7): array
+    {
+        $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
+
+        $downloads = DB::table('user_downloads')
+            ->select(DB::raw('DATE(timestamp) as date'), DB::raw('COUNT(*) as count'))
+            ->where('timestamp', '>=', $startDate)
+            ->groupBy(DB::raw('DATE(timestamp)'))
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // Fill in missing days with zero counts
+        $result = [];
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $found = $downloads->firstWhere('date', $date);
+            $result[] = [
+                'date' => Carbon::parse($date)->format('M d'),
+                'count' => $found ? $found->count : 0,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get API hits per day for the last 7 days
+     * Note: This tracks users' last API access date
+     *
+     * @return array
+     */
+    public function getApiHitsPerDay(int $days = 7): array
+    {
+        $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
+
+        // Track API access by counting apiaccess field updates
+        $apiHits = DB::table('users')
+            ->select(DB::raw('DATE(apiaccess) as date'), DB::raw('COUNT(*) as count'))
+            ->where('apiaccess', '>=', $startDate)
+            ->whereNotNull('apiaccess')
+            ->groupBy(DB::raw('DATE(apiaccess)'))
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // Fill in missing days with zero counts
+        $result = [];
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $found = $apiHits->firstWhere('date', $date);
+            $result[] = [
+                'date' => Carbon::parse($date)->format('M d'),
+                'count' => $found ? $found->count : 0,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get summary statistics
+     *
+     * @return array
+     */
+    public function getSummaryStats(): array
+    {
+        $today = Carbon::now()->startOfDay();
+
+        return [
+            'total_users' => User::whereNull('deleted_at')->count(),
+            'downloads_today' => UserDownload::where('timestamp', '>=', $today)->count(),
+            'downloads_week' => UserDownload::where('timestamp', '>=', Carbon::now()->subDays(7))->count(),
+            'api_hits_today' => User::whereDate('apiaccess', '=', $today)->count(),
+            'api_hits_week' => User::where('apiaccess', '>=', Carbon::now()->subDays(7))->count(),
+        ];
+    }
+
+    /**
+     * Get top downloaders
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTopDownloaders(int $limit = 5): array
+    {
+        $weekAgo = Carbon::now()->subDays(7);
+
+        return DB::table('user_downloads')
+            ->join('users', 'user_downloads.users_id', '=', 'users.id')
+            ->select('users.username', DB::raw('COUNT(*) as download_count'))
+            ->where('user_downloads.timestamp', '>=', $weekAgo)
+            ->groupBy('users.id', 'users.username')
+            ->orderByDesc('download_count')
+            ->limit($limit)
+            ->get()
+            ->toArray();
+    }
+}
+
