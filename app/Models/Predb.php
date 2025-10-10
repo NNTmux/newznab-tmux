@@ -195,7 +195,10 @@ class Predb extends Model
         if ($predb !== null) {
             return $predb;
         }
-        $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
+        $sql = self::query()
+            ->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')
+            ->select('predb.*', 'releases.guid')
+            ->orderByDesc('predb.predate');
         if (! empty($search)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $ids = (new ElasticSearchSiteSearch)->predbIndexSearch($search);
@@ -207,6 +210,7 @@ class Predb extends Model
         }
 
         $predb = $sql->paginate(config('nntmux.items_per_page'));
+        $predb->withPath(url('admin/predb'));
         Cache::put(md5($search), $predb, $expiresAt);
 
         return $predb;
