@@ -43,14 +43,14 @@ class AdminCategoryController extends BasePageController
         switch ($action) {
             case 'submit':
                 // Create new category
-                $category = new Category();
+                $category = new Category;
 
                 // Allow custom ID only when creating
                 if ($request->filled('id')) {
                     $customId = $request->input('id');
                     // Check if ID already exists
                     if (Category::where('id', $customId)->exists()) {
-                        return redirect()->back()->withInput()->with('error', 'Category ID ' . $customId . ' already exists. Please choose a different ID.');
+                        return redirect()->back()->withInput()->with('error', 'Category ID '.$customId.' already exists. Please choose a different ID.');
                     }
                     $category->id = $customId;
                 }
