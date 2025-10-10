@@ -51,7 +51,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Active Groups</p>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['groups'] ?? 0) }}</p>
+                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['active_groups'] ?? 0) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
                     <i class="fas fa-layer-group text-2xl text-purple-600 dark:text-purple-400"></i>
@@ -59,7 +59,7 @@
             </div>
             <div class="mt-4">
                 <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ $stats['active_groups'] ?? 0 }} currently active
+                    {{ number_format($stats['groups'] ?? 0) }} total groups
                 </span>
             </div>
         </div>

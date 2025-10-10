@@ -4,15 +4,13 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserDownload;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UserStatsService
 {
     /**
      * Get user statistics by role
-     *
-     * @return array
      */
     public function getUsersByRole(): array
     {
@@ -33,8 +31,6 @@ class UserStatsService
 
     /**
      * Get downloads per day for the last 7 days
-     *
-     * @return array
      */
     public function getDownloadsPerDay(int $days = 7): array
     {
@@ -64,8 +60,6 @@ class UserStatsService
     /**
      * Get API hits per day for the last 7 days
      * Note: This tracks users' last API access date
-     *
-     * @return array
      */
     public function getApiHitsPerDay(int $days = 7): array
     {
@@ -96,8 +90,6 @@ class UserStatsService
 
     /**
      * Get summary statistics
-     *
-     * @return array
      */
     public function getSummaryStats(): array
     {
@@ -114,9 +106,6 @@ class UserStatsService
 
     /**
      * Get top downloaders
-     *
-     * @param int $limit
-     * @return array
      */
     public function getTopDownloaders(int $limit = 5): array
     {
@@ -133,4 +122,3 @@ class UserStatsService
             ->toArray();
     }
 }
-

@@ -41,8 +41,6 @@ class AdminPageController extends BasePageController
 
     /**
      * Get default dashboard statistics
-     *
-     * @return array
      */
     protected function getDefaultStats(): array
     {
@@ -62,8 +60,6 @@ class AdminPageController extends BasePageController
 
     /**
      * Get disk space information
-     *
-     * @return string
      */
     protected function getDiskSpace(): string
     {
@@ -75,7 +71,7 @@ class AdminPageController extends BasePageController
                 $bytes /= 1024;
             }
 
-            return round($bytes, 2) . ' ' . $units[$i];
+            return round($bytes, 2).' '.$units[$i];
         } catch (\Exception $e) {
             return 'N/A';
         }
