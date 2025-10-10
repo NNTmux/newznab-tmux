@@ -5,36 +5,37 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Predb;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminPredbController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of PreDB entries
      */
-    public function index(Request $request): void
+    public function index(Request $request): View
     {
         $this->setAdminPrefs();
 
-        if ($request->has('presearch')) {
-            $lastSearch = $request->input('presearch');
-            $parr = Predb::getAll($request->input('presearch'));
+        $lastSearch = $request->input('presearch', '');
+
+        if ($lastSearch) {
+            $results = Predb::getAll($lastSearch);
         } else {
-            $lastSearch = '';
-            $parr = Predb::getAll();
+            $results = Predb::getAll();
         }
-
-        $this->smarty->assign('lastSearch', $lastSearch);
-
-        $this->smarty->assign('results', $parr);
 
         $title = 'Browse PreDb';
         $meta_title = 'View PreDb info';
         $meta_keywords = 'view,predb,info,description,details';
         $meta_description = 'View PreDb info';
 
-        $content = $this->smarty->fetch('predb.tpl');
-        $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
-
-        $this->adminrender();
+        return view('admin.predb.index', compact(
+            'results',
+            'lastSearch',
+            'title',
+            'meta_title',
+            'meta_keywords',
+            'meta_description'
+        ));
     }
 }

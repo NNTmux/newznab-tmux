@@ -121,6 +121,11 @@
         </div>
     </div>
 
+    <!-- PreDB -->
+    <a href="{{ url('/admin/predb') }}" class="flex items-center space-x-3 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition mb-4">
+        <i class="fas fa-database"></i>
+        <span>PreDB</span>
+    </a>
 
     <!-- Blacklist -->
     <div class="mb-4">
