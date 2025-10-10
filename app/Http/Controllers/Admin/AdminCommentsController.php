@@ -4,35 +4,34 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\ReleaseComment;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class AdminCommentsController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of comments
      */
-    public function index(): void
+    public function index(): View
     {
         $this->setAdminPrefs();
 
         $meta_title = $title = 'Comments List';
 
         $commentsList = ReleaseComment::getCommentsRange();
-        $this->smarty->assign('commentslist', $commentsList);
 
-        $content = $this->smarty->fetch('comments-list.tpl');
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-        $this->adminrender();
+        return view('admin.comments.index', compact('commentsList', 'title', 'meta_title'));
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse
+     * Delete a comment
      */
-    public function destroy(int $id)
+    public function destroy(int $id): RedirectResponse
     {
         if ($id) {
             ReleaseComment::deleteComment($id);
         }
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Comment deleted successfully');
     }
 }
