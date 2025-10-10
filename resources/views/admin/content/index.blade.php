@@ -1,0 +1,120 @@
+@extends('layouts.admin')
+
+@section('content')
+<div class="container mx-auto px-4 py-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-semibold text-gray-800">
+                    <i class="fa fa-file-alt mr-2"></i>{{ $title }}
+                </h1>
+                <a href="{{ url('admin/content-add?action=add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fa fa-plus mr-2"></i>Add New Content
+                </a>
+            </div>
+        </div>
+
+        <!-- Content Table -->
+        @if(count($contentlist) > 0)
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ordinal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                        @foreach($contentlist as $item)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->id }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ $item->title }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if(!empty($item->url))
+                                        <a href="{{ $item->url }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">
+                                            {{ Str::limit($item->url, 30) }}
+                                        </a>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($item->contenttype == 1)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            Useful Link
+                                        </span>
+                                    @elseif($item->contenttype == 2)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Article
+                                        </span>
+                                    @elseif($item->contenttype == 3)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                            Homepage
+                                        </span>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($item->role == 1)
+                                        Everyone
+                                    @elseif($item->role == 2)
+                                        Logged in Users
+                                    @elseif($item->role == 3)
+                                        Admins
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($item->status == 1)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            <i class="fa fa-check mr-1"></i>Enabled
+                                        </span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            <i class="fa fa-times mr-1"></i>Disabled
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->ordinal ?? 0 }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex gap-2">
+                                        <a href="{{ url('admin/content-add?id=' . $item->id) }}"
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900"
+                                           title="Edit">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url('admin/content-delete?id=' . $item->id) }}"
+                                           class="text-red-600 hover:text-red-900"
+                                           title="Delete"
+                                           onclick="return confirm('Are you sure you want to delete \'{{ $item->title }}\'?')">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="px-6 py-12 text-center">
+                <i class="fa fa-file-alt text-gray-400 text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No content found</h3>
+                <p class="text-gray-500">Create your first content to get started.</p>
+            </div>
+        @endif
+    </div>
+</div>
+@endsection
+
