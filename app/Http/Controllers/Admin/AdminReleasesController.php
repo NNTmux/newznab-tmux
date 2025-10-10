@@ -23,7 +23,7 @@ class AdminReleasesController extends BasePageController
         $page = $request->input('page', 1);
         $releaseList = Release::getReleasesRange($page);
 
-        return view('admin.release-list', [
+        return view('admin.releases.index', [
             'releaselist' => $releaseList,
             'title' => $title,
             'meta_title' => $meta_title,
@@ -75,7 +75,7 @@ class AdminReleasesController extends BasePageController
         $yesno_names = ['Yes', 'No'];
         $catlist = Category::getForSelect(false);
 
-        return view('admin.release-edit', [
+        return view('admin.releases.edit', [
             'release' => $release,
             'yesno_ids' => $yesno_ids,
             'yesno_names' => $yesno_names,

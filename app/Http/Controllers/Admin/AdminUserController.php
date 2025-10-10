@@ -82,7 +82,7 @@ class AdminUserController extends BasePageController
             'meta_title' => $meta_title,
         ], $orderByUrls);
 
-        return view('admin.user-list', $this->viewData);
+        return view('admin.users.index', $this->viewData);
     }
 
     /**
@@ -216,7 +216,7 @@ class AdminUserController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.user-edit', $this->viewData);
+        return view('admin.users.edit', $this->viewData);
     }
 
     public function destroy(Request $request): RedirectResponse

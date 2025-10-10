@@ -65,6 +65,6 @@ class AdminTmuxController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.tmux-edit', $this->viewData);
+        return view('admin.site.tmux-edit', $this->viewData);
     }
 }

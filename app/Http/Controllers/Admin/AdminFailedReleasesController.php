@@ -15,6 +15,6 @@ class AdminFailedReleasesController extends BasePageController
         $meta_title = $title = 'Failed Releases List';
         $releaselist = Release::getFailedRange();
 
-        return view('admin.failrel-list', compact('title', 'meta_title', 'releaselist'));
+        return view('admin.releases.failed', compact('title', 'meta_title', 'releaselist'));
     }
 }

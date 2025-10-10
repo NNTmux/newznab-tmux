@@ -28,7 +28,7 @@ class AdminBlacklistController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.binaryblacklist-list', $this->viewData);
+        return view('admin.blacklist.index', $this->viewData);
     }
 
     /**
@@ -109,6 +109,6 @@ class AdminBlacklistController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.binaryblacklist-edit', $this->viewData);
+        return view('admin.blacklist.edit', $this->viewData);
     }
 }

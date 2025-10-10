@@ -32,7 +32,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.release-naming-regexes-list', $this->viewData);
+        return view('admin.regexes.release-naming-list', $this->viewData);
     }
 
     /**
@@ -102,7 +102,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.release-naming-regexes-edit', $this->viewData);
+        return view('admin.regexes.release-naming-edit', $this->viewData);
     }
 
     /**
@@ -133,6 +133,6 @@ class AdminReleaseNamingRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.release-naming-regexes-test', $this->viewData);
+        return view('admin.regexes.release-naming-test', $this->viewData);
     }
 }

@@ -24,7 +24,7 @@ class AdminContentController extends BasePageController
             'title' => 'Content List',
         ]);
 
-        return view('admin.content-list', $this->viewData);
+        return view('admin.content.index', $this->viewData);
     }
 
     /**
@@ -99,7 +99,7 @@ class AdminContentController extends BasePageController
             'title' => $meta_title,
         ]);
 
-        return view('admin.content-add', $this->viewData);
+        return view('admin.content.add', $this->viewData);
     }
 
     public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application

@@ -25,7 +25,7 @@ class AdminMovieController extends BasePageController
 
         $title = 'Movie List';
 
-        return view('admin.movie-list', compact('title', 'movielist', 'lastSearch'));
+        return view('admin.movies.index', compact('title', 'movielist', 'lastSearch'));
     }
 
     /**
@@ -43,7 +43,7 @@ class AdminMovieController extends BasePageController
 
         // If no ID provided, show the add form
         if (! $request->has('id')) {
-            return view('admin.movie-add', compact('title'));
+            return view('admin.movies.add', compact('title'));
         }
 
         // Validate the IMDB ID
@@ -198,6 +198,6 @@ class AdminMovieController extends BasePageController
             }
         }
 
-        return view('admin.movie-edit', compact('title', 'mov'))->with('movie', $mov);
+        return view('admin.movies.edit', compact('title', 'mov'))->with('movie', $mov);
     }
 }

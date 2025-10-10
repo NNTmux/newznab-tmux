@@ -26,7 +26,7 @@ class AdminRoleController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.role-list', $this->viewData);
+        return view('admin.roles.index', $this->viewData);
     }
 
     /**
@@ -108,7 +108,7 @@ class AdminRoleController extends BasePageController
             'role' => $role,
         ]);
 
-        return view('admin.role-add', $this->viewData);
+        return view('admin.roles.add', $this->viewData);
     }
 
     /**
@@ -228,7 +228,7 @@ class AdminRoleController extends BasePageController
             'role' => $role,
         ]);
 
-        return view('admin.role-edit', $this->viewData);
+        return view('admin.roles.edit', $this->viewData);
     }
 
     public function destroy(Request $request): \Illuminate\Http\RedirectResponse

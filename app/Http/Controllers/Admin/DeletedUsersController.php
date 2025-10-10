@@ -97,7 +97,7 @@ class DeletedUsersController extends BasePageController
             'title' => 'Deleted Users',
         ]);
 
-        return view('admin.deleted-users', $this->viewData);
+        return view('admin.users.deleted', $this->viewData);
     }
 
     /**

@@ -17,7 +17,7 @@ class AdminGroupController extends BasePageController
         $grouplist = UsenetGroup::getGroupsRange($groupname);
         $title = 'Group List';
 
-        return view('admin.group-list', compact('title', 'groupname', 'grouplist'));
+        return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
     }
 
     /**
@@ -37,7 +37,7 @@ class AdminGroupController extends BasePageController
 
         $title = 'Bulk Add Newsgroups';
 
-        return view('admin.group-bulk', compact('title', 'groupmsglist'));
+        return view('admin.groups.bulk', compact('title', 'groupmsglist'));
     }
 
     /**
@@ -92,7 +92,7 @@ class AdminGroupController extends BasePageController
                 break;
         }
 
-        return view('admin.group-edit', compact('title', 'group'));
+        return view('admin.groups.edit', compact('title', 'group'));
     }
 
     /**
@@ -109,7 +109,7 @@ class AdminGroupController extends BasePageController
         $grouplist = UsenetGroup::getGroupsRange($gname, true);
         $title = 'Active Groups';
 
-        return view('admin.group-list', compact('title', 'groupname', 'grouplist'));
+        return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
     }
 
     /**
@@ -126,6 +126,6 @@ class AdminGroupController extends BasePageController
         $grouplist = UsenetGroup::getGroupsRange($gname, false);
         $title = 'Inactive Groups';
 
-        return view('admin.group-list', compact('title', 'groupname', 'grouplist'));
+        return view('admin.groups.index', compact('title', 'groupname', 'grouplist'));
     }
 }

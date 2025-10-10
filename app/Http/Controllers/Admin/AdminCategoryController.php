@@ -24,7 +24,7 @@ class AdminCategoryController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.category-list', $this->viewData);
+        return view('admin.categories.index', $this->viewData);
     }
 
     /**
@@ -70,6 +70,6 @@ class AdminCategoryController extends BasePageController
             'meta_title' => 'View/Edit categories',
         ]);
 
-        return view('admin.category-edit', $this->viewData);
+        return view('admin.categories.edit', $this->viewData);
     }
 }

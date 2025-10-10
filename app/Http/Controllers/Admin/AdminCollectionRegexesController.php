@@ -29,7 +29,7 @@ class AdminCollectionRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.collection-regexes-list', $this->viewData);
+        return view('admin.regexes.collection-list', $this->viewData);
     }
 
     /**
@@ -95,7 +95,7 @@ class AdminCollectionRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.collection-regexes-edit', $this->viewData);
+        return view('admin.regexes.collection-edit', $this->viewData);
     }
 
     /**
@@ -124,6 +124,6 @@ class AdminCollectionRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.collection-regexes-test', $this->viewData);
+        return view('admin.regexes.collection-test', $this->viewData);
     }
 }

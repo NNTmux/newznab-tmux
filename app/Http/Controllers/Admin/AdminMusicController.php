@@ -29,7 +29,7 @@ class AdminMusicController extends BasePageController
             $lastSearch = '';
         }
 
-        return view('admin.music-list', compact('title', 'meta_title', 'musicList', 'lastSearch'));
+        return view('admin.music.index', compact('title', 'meta_title', 'musicList', 'lastSearch'));
     }
 
     /**
@@ -92,7 +92,7 @@ class AdminMusicController extends BasePageController
                 default:
                     $genres = $gen->getGenres(Genres::MUSIC_TYPE);
 
-                    return view('admin.music-edit', compact('title', 'meta_title', 'mus', 'genres'));
+                    return view('admin.music.edit', compact('title', 'meta_title', 'mus', 'genres'));
             }
         }
 

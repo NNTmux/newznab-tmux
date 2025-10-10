@@ -138,7 +138,7 @@ class AdminSiteController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.site-edit', $this->viewData);
+        return view('admin.site.edit', $this->viewData);
     }
 
     /**
@@ -168,6 +168,6 @@ class AdminSiteController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.site-stats', $this->viewData);
+        return view('admin.site.stats', $this->viewData);
     }
 }

@@ -29,7 +29,7 @@ class AdminCategoryRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.category-regexes-list', $this->viewData);
+        return view('admin.regexes.category-list', $this->viewData);
     }
 
     /**
@@ -121,6 +121,6 @@ class AdminCategoryRegexesController extends BasePageController
             'meta_title' => $meta_title,
         ]);
 
-        return view('admin.category-regexes-edit', $this->viewData);
+        return view('admin.regexes.category-edit', $this->viewData);
     }
 }

@@ -30,7 +30,7 @@ class AdminGameController extends BasePageController
             $lastSearch = '';
         }
 
-        return view('admin.game-list', compact('title', 'meta_title', 'gamelist', 'lastSearch'));
+        return view('admin.games.index', compact('title', 'meta_title', 'gamelist', 'lastSearch'));
     }
 
     /**
@@ -89,7 +89,7 @@ class AdminGameController extends BasePageController
                 default:
                     $genres = $gen->getGenres(Genres::GAME_TYPE);
 
-                    return view('admin.game-edit', compact('title', 'meta_title', 'game', 'genres'));
+                    return view('admin.games.edit', compact('title', 'meta_title', 'game', 'genres'));
             }
         }
 
