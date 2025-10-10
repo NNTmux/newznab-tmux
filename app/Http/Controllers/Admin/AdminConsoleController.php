@@ -6,14 +6,17 @@ use App\Http\Controllers\BasePageController;
 use Blacklight\Console;
 use Blacklight\Genres;
 use Blacklight\utility\Utility;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\View\View;
 
 class AdminConsoleController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display a listing of console games
      */
-    public function index(): void
+    public function index(): View
     {
         $this->setAdminPrefs();
 
@@ -21,21 +24,13 @@ class AdminConsoleController extends BasePageController
 
         $consoleList = Utility::getRange('consoleinfo');
 
-        $this->smarty->assign('consolelist', $consoleList);
-
-        $content = $this->smarty->fetch('console-list.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return view('admin.console.index', compact('consoleList', 'title', 'meta_title'));
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
-     *
-     * @throws \Exception
+     * Show the form for editing a console game
      */
-    public function edit(Request $request)
+    public function edit(Request $request): View|RedirectResponse
     {
         $this->setAdminPrefs();
         $console = new Console(['Settings' => null]);
@@ -43,48 +38,57 @@ class AdminConsoleController extends BasePageController
         $meta_title = $title = 'Console Edit';
 
         // set the current action
-        $action = $request->input('action') ?? 'view';
+        $action = $request->input('action', 'view');
 
         if ($request->has('id')) {
             $id = $request->input('id');
             $con = $console->getConsoleInfo($id);
 
             if (! $con) {
-                $this->show404();
+                abort(404);
             }
 
             switch ($action) {
                 case 'submit':
                     $coverLoc = storage_path('covers/console/'.$id.'.jpg');
 
-                    if ($_FILES['cover']['size'] > 0) {
-                        $tmpName = $_FILES['cover']['tmp_name'];
-                        $file_info = getimagesize($tmpName);
+                    if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
+                        $uploadedFile = $request->file('cover');
+                        $file_info = getimagesize($uploadedFile->getRealPath());
                         if (! empty($file_info)) {
-                            move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
+                            $uploadedFile->move(storage_path('covers/console'), $id.'.jpg');
                         }
                     }
 
-                    $request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-                    $request->merge(['salesrank' => (empty($request->input('salesrank')) || ! ctype_digit($request->input('salesrank'))) ? 'null' : $request->input('salesrank')]);
-                    $request->merge(['releasedate' => (empty($request->input('releasedate')) || ! strtotime($request->input('releasedate'))) ? $con['releasedate'] : Carbon::parse($request->input('releasedate'))->timestamp]);
+                    $hasCover = file_exists($coverLoc) ? 1 : 0;
+                    $salesrank = (empty($request->input('salesrank')) || ! ctype_digit($request->input('salesrank'))) ? null : $request->input('salesrank');
+                    $releasedate = (empty($request->input('releasedate')) || ! strtotime($request->input('releasedate')))
+                        ? $con['releasedate']
+                        : Carbon::parse($request->input('releasedate'))->timestamp;
 
-                    $console->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('salesrank'), $request->input('platform'), $request->input('publisher'), $request->input('releasedate'), $request->input('esrb'), $request->input('cover'), $request->input('genre'));
+                    $console->update(
+                        $id,
+                        $request->input('title'),
+                        $request->input('asin'),
+                        $request->input('url'),
+                        $salesrank,
+                        $request->input('platform'),
+                        $request->input('publisher'),
+                        $releasedate,
+                        $request->input('esrb'),
+                        $hasCover,
+                        $request->input('genre')
+                    );
 
-                    return redirect()->to('admin/console-list.');
-                    break;
+                    return redirect()->route('admin.console-list')->with('success', 'Console game updated successfully');
+
                 case 'view':
                 default:
-                    $this->smarty->assign('console', $con);
-                    $this->smarty->assign('genres', $gen->getGenres(Genres::CONSOLE_TYPE));
-                    break;
+                    $genres = $gen->getGenres(Genres::CONSOLE_TYPE);
+                    return view('admin.console.edit', compact('con', 'genres', 'title', 'meta_title'));
             }
         }
 
-        $content = $this->smarty->fetch('console-edit.tpl');
-
-        $this->smarty->assign(compact('title', 'meta_title', 'content'));
-
-        $this->adminrender();
+        return redirect()->route('admin.console-list');
     }
 }
