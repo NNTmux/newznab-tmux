@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserDownload;
+use App\Models\UserRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +15,7 @@ class UserStatsService
      */
     public function getUsersByRole(): array
     {
-        $usersByRole = DB::table('users')
+        $usersByRole = User::query()
             ->join('roles', 'users.roles_id', '=', 'roles.id')
             ->select('roles.name as role_name', DB::raw('COUNT(users.id) as count'))
             ->whereNull('users.deleted_at')
@@ -36,7 +37,7 @@ class UserStatsService
     {
         $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
 
-        $downloads = DB::table('user_downloads')
+        $downloads = UserDownload::query()
             ->select(DB::raw('DATE(timestamp) as date'), DB::raw('COUNT(*) as count'))
             ->where('timestamp', '>=', $startDate)
             ->groupBy(DB::raw('DATE(timestamp)'))
@@ -66,7 +67,7 @@ class UserStatsService
         $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
 
         // Track actual API requests from user_requests table
-        $apiHits = DB::table('user_requests')
+        $apiHits = UserRequest::query()
             ->select(DB::raw('DATE(timestamp) as date'), DB::raw('COUNT(*) as count'))
             ->where('timestamp', '>=', $startDate)
             ->groupBy(DB::raw('DATE(timestamp)'))
@@ -98,8 +99,8 @@ class UserStatsService
             'total_users' => User::whereNull('deleted_at')->count(),
             'downloads_today' => UserDownload::where('timestamp', '>=', $today)->count(),
             'downloads_week' => UserDownload::where('timestamp', '>=', Carbon::now()->subDays(7))->count(),
-            'api_hits_today' => DB::table('user_requests')->where('timestamp', '>=', $today)->count(),
-            'api_hits_week' => DB::table('user_requests')->where('timestamp', '>=', Carbon::now()->subDays(7))->count(),
+            'api_hits_today' => UserRequest::query()->where('timestamp', '>=', $today)->count(),
+            'api_hits_week' => UserRequest::query()->where('timestamp', '>=', Carbon::now()->subDays(7))->count(),
         ];
     }
 
@@ -110,7 +111,7 @@ class UserStatsService
     {
         $weekAgo = Carbon::now()->subDays(7);
 
-        return DB::table('user_downloads')
+        return UserDownload::query()
             ->join('users', 'user_downloads.users_id', '=', 'users.id')
             ->select('users.username', DB::raw('COUNT(*) as download_count'))
             ->where('user_downloads.timestamp', '>=', $weekAgo)
