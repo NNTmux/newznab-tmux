@@ -5,7 +5,7 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Edit Release</h1>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Edit Release</h1>
         <nav class="text-sm text-gray-600 dark:text-gray-400 mt-2">
             <a href="{{ route('admin.index') }}" class="hover:text-blue-600">Dashboard</a>
             <i class="fas fa-chevron-right mx-2 text-xs"></i>
@@ -16,13 +16,13 @@
     </div>
 
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <div class="bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-900 text-green-700 dark:text-green-300 px-4 py-3 rounded mb-4">
             <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div class="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-900 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
             <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
         </div>
     @endif
@@ -44,7 +44,7 @@
                            id="name"
                            name="name"
                            value="{{ $release->name ?? $release['name'] ?? '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Search Name -->
@@ -56,7 +56,7 @@
                            id="searchname"
                            name="searchname"
                            value="{{ $release->searchname ?? $release['searchname'] ?? '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- From Name -->
@@ -68,7 +68,7 @@
                            id="fromname"
                            name="fromname"
                            value="{{ $release->fromname ?? $release['fromname'] ?? '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Category -->
@@ -78,7 +78,7 @@
                     </label>
                     <select id="category"
                             name="category"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                         @foreach($catlist as $catId => $catTitle)
                             <option value="{{ $catId }}" {{ ($release->categories_id ?? $release['categories_id'] ?? '') == $catId ? 'selected' : '' }}>
                                 {{ $catTitle }}
@@ -96,7 +96,7 @@
                            id="totalpart"
                            name="totalpart"
                            value="{{ $release->totalpart ?? $release['totalpart'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Grabs -->
@@ -108,7 +108,7 @@
                            id="grabs"
                            name="grabs"
                            value="{{ $release->grabs ?? $release['grabs'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Size (in bytes) -->
@@ -120,8 +120,8 @@
                            id="size"
                            name="size"
                            value="{{ $release->size ?? $release['size'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <p class="text-xs text-gray-500 mt-1">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Current: {{ number_format(($release->size ?? $release['size'] ?? 0) / 1073741824, 2) }} GB
                     </p>
                 </div>
@@ -135,7 +135,7 @@
                            id="postdate"
                            name="postdate"
                            value="{{ isset($release->postdate) || isset($release['postdate']) ? date('Y-m-d\TH:i', strtotime($release->postdate ?? $release['postdate'])) : '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Add Date -->
@@ -147,7 +147,7 @@
                            id="adddate"
                            name="adddate"
                            value="{{ isset($release->adddate) || isset($release['adddate']) ? date('Y-m-d\TH:i', strtotime($release->adddate ?? $release['adddate'])) : '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Video ID -->
@@ -159,7 +159,7 @@
                            id="videos_id"
                            name="videos_id"
                            value="{{ $release->videos_id ?? $release['videos_id'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- TV Episode ID -->
@@ -171,7 +171,7 @@
                            id="tv_episodes_id"
                            name="tv_episodes_id"
                            value="{{ $release->tv_episodes_id ?? $release['tv_episodes_id'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- IMDB ID -->
@@ -184,7 +184,7 @@
                            name="imdbid"
                            value="{{ $release->imdbid ?? $release['imdbid'] ?? '' }}"
                            placeholder="e.g., 0133093"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
                 </div>
 
                 <!-- AniDB ID -->
@@ -196,7 +196,7 @@
                            id="anidbid"
                            name="anidbid"
                            value="{{ $release->anidbid ?? $release['anidbid'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
             </div>
 
@@ -220,22 +220,22 @@
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Release Information</h3>
         <dl class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-                <dt class="font-medium text-gray-600">GUID</dt>
+                <dt class="font-medium text-gray-600 dark:text-gray-400">GUID</dt>
                 <dd class="text-gray-900 dark:text-gray-100 font-mono text-xs mt-1">{{ $release->guid ?? $release['guid'] ?? 'N/A' }}</dd>
             </div>
             <div>
-                <dt class="font-medium text-gray-600">Group</dt>
+                <dt class="font-medium text-gray-600 dark:text-gray-400">Group</dt>
                 <dd class="text-gray-900 dark:text-gray-100 mt-1">{{ $release->group_name ?? $release['group_name'] ?? 'N/A' }}</dd>
             </div>
             <div>
-                <dt class="font-medium text-gray-600">Password Status</dt>
+                <dt class="font-medium text-gray-600 dark:text-gray-400">Password Status</dt>
                 <dd class="text-gray-900 dark:text-gray-100 mt-1">
                     @if(($release->passwordstatus ?? $release['passwordstatus'] ?? 0) == 0)
-                        <span class="text-green-600"><i class="fas fa-check-circle"></i> None</span>
+                        <span class="text-green-600 dark:text-green-400"><i class="fas fa-check-circle"></i> None</span>
                     @elseif(($release->passwordstatus ?? $release['passwordstatus'] ?? 0) == 1)
-                        <span class="text-red-600"><i class="fas fa-lock"></i> Passworded</span>
+                        <span class="text-red-600 dark:text-red-400"><i class="fas fa-lock"></i> Passworded</span>
                     @else
-                        <span class="text-yellow-600"><i class="fas fa-question-circle"></i> Unknown</span>
+                        <span class="text-yellow-600 dark:text-yellow-400"><i class="fas fa-question-circle"></i> Unknown</span>
                     @endif
                 </dd>
             </div>
