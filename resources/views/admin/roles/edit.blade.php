@@ -4,8 +4,8 @@
 <div class="container mx-auto px-4 py-6">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h1 class="text-2xl font-semibold text-gray-800">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fa fa-user-shield mr-2"></i>{{ $title }}
             </h1>
         </div>
@@ -28,7 +28,7 @@
                                name="name"
                                value="{{ $role->name }}"
                                required
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -41,7 +41,7 @@
                                    id="apirequests"
                                    name="apirequests"
                                    value="{{ $role->apirequests ?? 0 }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
                         <!-- Download Requests -->
@@ -53,7 +53,7 @@
                                    id="downloadrequests"
                                    name="downloadrequests"
                                    value="{{ $role->downloadrequests ?? 0 }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
                         <!-- Default Invites -->
@@ -65,7 +65,7 @@
                                    id="defaultinvites"
                                    name="defaultinvites"
                                    value="{{ $role->defaultinvites ?? 0 }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
                         <!-- Rate Limit -->
@@ -77,7 +77,7 @@
                                    id="rate_limit"
                                    name="rate_limit"
                                    value="{{ $role->rate_limit ?? 60 }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
                         <!-- Donation -->
@@ -90,7 +90,7 @@
                                    name="donation"
                                    value="{{ $role->donation ?? 0 }}"
                                    step="0.01"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
                         <!-- Add Years -->
@@ -102,7 +102,7 @@
                                    id="addyears"
                                    name="addyears"
                                    value="{{ $role->addyears ?? 0 }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
                         <!-- Is Default -->
@@ -112,7 +112,7 @@
                             </label>
                             <select id="isdefault"
                                     name="isdefault"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno_ids as $index => $value)
                                     <option value="{{ $value }}" {{ ($role->isdefault ?? 0) == $value ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
@@ -135,7 +135,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('preview') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="canpreview" class="ml-2 text-sm text-gray-700">Can Preview</label>
+                                <label for="canpreview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Can Preview</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -144,7 +144,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('hideads') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="hideads" class="ml-2 text-sm text-gray-700">Hide Ads</label>
+                                <label for="hideads" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Hide Ads</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -153,7 +153,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('edit release') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="editrelease" class="ml-2 text-sm text-gray-700">Edit Release</label>
+                                <label for="editrelease" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Edit Release</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -162,7 +162,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view console') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewconsole" class="ml-2 text-sm text-gray-700">View Console</label>
+                                <label for="viewconsole" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View Console</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -171,7 +171,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view movies') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewmovies" class="ml-2 text-sm text-gray-700">View Movies</label>
+                                <label for="viewmovies" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View Movies</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -180,7 +180,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view audio') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewaudio" class="ml-2 text-sm text-gray-700">View Audio</label>
+                                <label for="viewaudio" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View Audio</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -189,7 +189,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view pc') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewpc" class="ml-2 text-sm text-gray-700">View PC</label>
+                                <label for="viewpc" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View PC</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -198,7 +198,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view tv') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewtv" class="ml-2 text-sm text-gray-700">View TV</label>
+                                <label for="viewtv" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View TV</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -207,7 +207,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view adult') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewadult" class="ml-2 text-sm text-gray-700">View Adult</label>
+                                <label for="viewadult" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View Adult</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -216,7 +216,7 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view books') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewbooks" class="ml-2 text-sm text-gray-700">View Books</label>
+                                <label for="viewbooks" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View Books</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="checkbox"
@@ -225,17 +225,17 @@
                                        value="1"
                                        {{ $role->hasPermissionTo('view other') ? 'checked' : '' }}
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="viewother" class="ml-2 text-sm text-gray-700">View Other</label>
+                                <label for="viewother" class="ml-2 text-sm text-gray-700 dark:text-gray-300">View Other</label>
                             </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex gap-3 pt-4 border-t border-gray-200">
-                        <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
                             <i class="fa fa-save mr-2"></i>Update Role
                         </button>
-                        <a href="{{ url('admin/role-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
+                        <a href="{{ url('admin/role-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
                             <i class="fa fa-times mr-2"></i>Cancel
                         </a>
                     </div>
