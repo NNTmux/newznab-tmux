@@ -29,7 +29,7 @@
                            name="title"
                            value="{{ is_array($content) ? ($content['title'] ?? '') : ($content->title ?? '') }}"
                            required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- URL -->
@@ -42,7 +42,7 @@
                            name="url"
                            value="{{ is_array($content) ? ($content['url'] ?? '') : ($content->url ?? '') }}"
                            placeholder="/page-slug or https://example.com"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
                     <p class="mt-1 text-sm text-gray-500">Internal URL (e.g., /about) or external URL (e.g., https://example.com)</p>
                 </div>
 
@@ -54,7 +54,7 @@
                     <textarea id="body"
                               name="body"
                               rows="15"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ is_array($content) ? trim(($content['body'] ?? ''), '\'"') : trim(($content->body ?? ''), '\'"') }}</textarea>
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ is_array($content) ? trim(($content['body'] ?? ''), '\'"') : trim(($content->body ?? ''), '\'"') }}</textarea>
                     <p class="mt-1 text-sm text-gray-500">Use the rich text editor to format your content</p>
                 </div>
 
@@ -67,7 +67,7 @@
                         <select id="contenttype"
                                 name="contenttype"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($contenttypelist as $typeId => $typeName)
                                 <option value="{{ $typeId }}"
                                     {{ (is_array($content) ? ($content['contenttype'] ?? '') : ($content->contenttype ?? '')) == $typeId ? 'selected' : '' }}>
@@ -85,7 +85,7 @@
                         <select id="role"
                                 name="role"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($rolelist as $roleId => $roleName)
                                 <option value="{{ $roleId }}"
                                     {{ (is_array($content) ? ($content['role'] ?? '') : ($content->role ?? '')) == $roleId ? 'selected' : '' }}>
@@ -103,7 +103,7 @@
                         <select id="status"
                                 name="status"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($status_ids as $index => $statusId)
                                 <option value="{{ $statusId }}"
                                     {{ (is_array($content) ? ($content['status'] ?? '') : ($content->status ?? '')) == $statusId ? 'selected' : '' }}>
@@ -122,7 +122,7 @@
                                id="ordinal"
                                name="ordinal"
                                value="{{ is_array($content) ? ($content['ordinal'] ?? 0) : ($content->ordinal ?? 0) }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                         <p class="mt-1 text-sm text-gray-500">Lower numbers appear first</p>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
                     <textarea id="metadescription"
                               name="metadescription"
                               rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ is_array($content) ? ($content['metadescription'] ?? '') : ($content->metadescription ?? '') }}</textarea>
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ is_array($content) ? ($content['metadescription'] ?? '') : ($content->metadescription ?? '') }}</textarea>
                     <p class="mt-1 text-sm text-gray-500">SEO meta description</p>
                 </div>
 
@@ -148,7 +148,7 @@
                            id="metakeywords"
                            name="metakeywords"
                            value="{{ is_array($content) ? ($content['metakeywords'] ?? '') : ($content->metakeywords ?? '') }}"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-sm text-gray-500">Comma-separated keywords for SEO</p>
                 </div>
 
@@ -170,79 +170,120 @@
 <!-- TinyMCE 8 (Latest Version) -->
 <script src="https://cdn.tiny.cloud/1/{{ config('tinymce.api_key', 'no-api-key') }}/tinymce/8/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
-tinymce.init({
-    selector: '#body',
-    height: 500,
-    menubar: true,
-    plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
-    ],
-    toolbar: 'undo redo | blocks fontfamily fontsize | ' +
-        'bold italic underline strikethrough | forecolor backcolor | ' +
-        'alignleft aligncenter alignright alignjustify | ' +
-        'bullist numlist outdent indent | ' +
-        'link image media table emoticons | ' +
-        'removeformat code fullscreen | help',
-    toolbar_mode: 'sliding',
-    content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
-    branding: false,
-    promotion: false,
-    resize: true,
-    statusbar: true,
-    elementpath: true,
-    images_upload_url: false,
-    automatic_uploads: false,
-    file_picker_types: 'image',
-    /* Font options */
-    font_family_formats: 'Arial=arial,helvetica,sans-serif; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,geneva,sans-serif',
-    font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
-    /* Enable automatic link creation */
-    autolink_pattern: /^(https?:\/\/|www\.|(?!www\.)[a-z0-9\-]+\.[a-z]{2,13})/i,
-    link_default_protocol: 'https',
-    link_assume_external_targets: true,
-    /* Link target options */
-    link_target_list: [
-        {title: 'None', value: ''},
-        {title: 'New window', value: '_blank'},
-        {title: 'Same window', value: '_self'}
-    ],
-    /* Block formats */
-    block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Blockquote=blockquote',
-    /* Content filtering - allow all HTML */
-    valid_elements: '*[*]',
-    extended_valid_elements: '*[*]',
-    valid_children: '+body[style]',
-    /* Paste settings */
-    paste_as_text: false,
-    paste_block_drop: false,
-    paste_data_images: true,
-    paste_retain_style_properties: 'all',
-    /* Image settings */
-    image_advtab: true,
-    image_caption: true,
-    image_description: true,
-    image_dimensions: true,
-    image_title: true,
-    /* Table settings */
-    table_default_attributes: {
-        border: '1'
-    },
-    table_default_styles: {
-        'border-collapse': 'collapse',
-        'width': '100%'
-    },
-    table_responsive_width: true,
-    /* Auto-save */
-    setup: function(editor) {
-        editor.on('change', function() {
-            editor.save();
-        });
-        editor.on('blur', function() {
-            editor.save();
-        });
-    }
+// Function to detect if dark mode is active
+function isDarkMode() {
+    return document.documentElement.classList.contains('dark') ||
+           (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+
+// Function to get TinyMCE config
+function getTinyMCEConfig() {
+    const darkMode = isDarkMode();
+    return {
+        selector: '#body',
+        height: 500,
+        menubar: true,
+        skin: darkMode ? 'oxide-dark' : 'oxide',
+        content_css: darkMode ? 'dark' : 'default',
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+        ],
+        toolbar: 'undo redo | blocks fontfamily fontsize | ' +
+            'bold italic underline strikethrough | forecolor backcolor | ' +
+            'alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist outdent indent | ' +
+            'link image media table emoticons | ' +
+            'removeformat code fullscreen | help',
+        toolbar_mode: 'sliding',
+        content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
+        branding: false,
+        promotion: false,
+        resize: true,
+        statusbar: true,
+        elementpath: true,
+        images_upload_url: false,
+        automatic_uploads: false,
+        file_picker_types: 'image',
+        /* Font options */
+        font_family_formats: 'Arial=arial,helvetica,sans-serif; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,geneva,sans-serif',
+        font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
+        /* Enable automatic link creation */
+        autolink_pattern: /^(https?:\/\/|www\.|(?!www\.)[a-z0-9\-]+\.[a-z]{2,13})/i,
+        link_default_protocol: 'https',
+        link_assume_external_targets: true,
+        /* Link target options */
+        link_target_list: [
+            {title: 'None', value: ''},
+            {title: 'New window', value: '_blank'},
+            {title: 'Same window', value: '_self'}
+        ],
+        /* Block formats */
+        block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Blockquote=blockquote',
+        /* Content filtering - allow all HTML */
+        valid_elements: '*[*]',
+        extended_valid_elements: '*[*]',
+        valid_children: '+body[style]',
+        /* Paste settings */
+        paste_as_text: false,
+        paste_block_drop: false,
+        paste_data_images: true,
+        paste_retain_style_properties: 'all',
+        /* Image settings */
+        image_advtab: true,
+        image_caption: true,
+        image_description: true,
+        image_dimensions: true,
+        image_title: true,
+        /* Table settings */
+        table_default_attributes: {
+            border: '1'
+        },
+        table_default_styles: {
+            'border-collapse': 'collapse',
+            'width': '100%'
+        },
+        table_responsive_width: true,
+        /* Auto-save */
+        setup: function(editor) {
+            editor.on('change', function() {
+                editor.save();
+            });
+            editor.on('blur', function() {
+                editor.save();
+            });
+        }
+    };
+}
+
+// Initialize TinyMCE
+tinymce.init(getTinyMCEConfig());
+
+// Watch for theme changes and reinitialize TinyMCE
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'class') {
+            const editor = tinymce.get('body');
+            if (editor) {
+                // Save current content
+                const content = editor.getContent();
+                // Remove the editor
+                tinymce.remove('#body');
+                // Reinitialize with new theme
+                tinymce.init(getTinyMCEConfig()).then(function(editors) {
+                    // Restore content
+                    editors[0].setContent(content);
+                });
+            }
+        }
+    });
+});
+
+// Start observing theme changes on the html element
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
 });
 </script>
 @endpush
