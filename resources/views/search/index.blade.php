@@ -108,7 +108,7 @@
             <a href="{{ url('/search?search_type=adv') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition inline-flex items-center">
                 <i class="fas fa-sliders-h mr-2"></i> Advanced Search
             </a>
-            <a href="{{ route('search') }}" class="px-6 py-2 bg-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 transition">
+            <a href="{{ route('search') }}" class="px-6 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-100 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 transition">
                 Clear
             </a>
         </div>
