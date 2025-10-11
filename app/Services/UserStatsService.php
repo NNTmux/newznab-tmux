@@ -59,18 +59,17 @@ class UserStatsService
 
     /**
      * Get API hits per day for the last 7 days
-     * Note: This tracks users' last API access date
+     * Note: This tracks actual API requests from user_requests table
      */
     public function getApiHitsPerDay(int $days = 7): array
     {
         $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
 
-        // Track API access by counting apiaccess field updates
-        $apiHits = DB::table('users')
-            ->select(DB::raw('DATE(apiaccess) as date'), DB::raw('COUNT(*) as count'))
-            ->where('apiaccess', '>=', $startDate)
-            ->whereNotNull('apiaccess')
-            ->groupBy(DB::raw('DATE(apiaccess)'))
+        // Track actual API requests from user_requests table
+        $apiHits = DB::table('user_requests')
+            ->select(DB::raw('DATE(timestamp) as date'), DB::raw('COUNT(*) as count'))
+            ->where('timestamp', '>=', $startDate)
+            ->groupBy(DB::raw('DATE(timestamp)'))
             ->orderBy('date', 'asc')
             ->get();
 
@@ -99,8 +98,8 @@ class UserStatsService
             'total_users' => User::whereNull('deleted_at')->count(),
             'downloads_today' => UserDownload::where('timestamp', '>=', $today)->count(),
             'downloads_week' => UserDownload::where('timestamp', '>=', Carbon::now()->subDays(7))->count(),
-            'api_hits_today' => User::whereDate('apiaccess', '=', $today)->count(),
-            'api_hits_week' => User::where('apiaccess', '>=', Carbon::now()->subDays(7))->count(),
+            'api_hits_today' => DB::table('user_requests')->where('timestamp', '>=', $today)->count(),
+            'api_hits_week' => DB::table('user_requests')->where('timestamp', '>=', Carbon::now()->subDays(7))->count(),
         ];
     }
 
