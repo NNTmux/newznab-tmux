@@ -23,7 +23,7 @@
 
 <!-- Search Filter -->
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
-    <div class="p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
+    <div class="p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
         <form method="get" action="{{ url('/browsegroup') }}">
             <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
                 <div class="flex-1">
@@ -36,7 +36,7 @@
                             name="search"
                             value="{{ $search ?? '' }}"
                             placeholder="Search group names..."
-                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         />
                     </div>
                 </div>
@@ -59,7 +59,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Header -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-            <h5 class="text-lg font-semibold text-gray-900">Browse Groups</h5>
+            <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Browse Groups</h5>
             <div class="flex items-center">
                 {{ $results->onEachSide(3)->links() }}
             </div>
@@ -67,23 +67,23 @@
 
         <!-- Table -->
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Name
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Description
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Last Updated
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($results as $result)
-                        <tr class="hover:bg-gray-50 dark:bg-gray-900 transition-colors">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <a
                                     href="{{ url('/browse/group?g=' . $result->name) }}"
@@ -93,10 +93,10 @@
                                     {{ str_replace('alt.binaries', 'a.b', $result->name) }}
                                 </a>
                             </td>
-                            <td class="px-6 py-4 text-gray-700">
+                            <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
                                 {{ $result->description ?? '' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">
                                 <i class="fa fa-clock-o text-gray-400 mr-2"></i>
                                 <span title="{{ $result->last_updated ?? '' }}">
                                     {{ isset($result->last_updated) ? \Carbon\Carbon::parse($result->last_updated)->diffForHumans() : 'N/A' }}
@@ -109,12 +109,12 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-                <div class="text-sm text-gray-600">
+                <div class="text-sm text-gray-600 dark:text-gray-400">
                     <span class="font-medium">Found {{ $results->total() }} groups</span>
                     @if(!empty($search))
-                        <span class="ml-2">for "<strong class="text-gray-900">{{ $search }}</strong>"</span>
+                        <span class="ml-2">for "<strong class="text-gray-900 dark:text-gray-100">{{ $search }}</strong>"</span>
                     @endif
                 </div>
                 <div>
