@@ -23,11 +23,11 @@
         @else
             <!-- Series Info Card -->
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm mb-4">
-                <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
-                    <h5 class="text-xl font-bold text-gray-800">
-                        <i class="fa fa-tv mr-2 text-indigo-600"></i>{{ $seriestitles ?? '' }}
+                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                    <h5 class="text-xl font-bold text-gray-800 dark:text-white">
+                        <i class="fa fa-tv mr-2 text-indigo-600 dark:text-indigo-400"></i>{{ $seriestitles ?? '' }}
                         @if(!empty($show['publisher']))
-                            <span class="text-sm font-normal text-gray-600 dark:text-gray-400 ml-2">({{ $show['publisher'] }})</span>
+                            <span class="text-sm font-normal text-gray-600 dark:text-gray-300 ml-2">({{ $show['publisher'] }})</span>
                         @endif
                     </h5>
                 </div>
