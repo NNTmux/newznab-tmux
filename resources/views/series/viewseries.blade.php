@@ -200,9 +200,9 @@
             <!-- Episodes by Season - Tabbed Interface -->
             @if(!empty($seasons))
                 <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-                    <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                        <h5 class="text-lg font-semibold text-gray-800">
-                            <i class="fa fa-list mr-2 text-blue-600"></i>
+                    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                        <h5 class="text-lg font-semibold text-gray-800 dark:text-white">
+                            <i class="fa fa-list mr-2 text-blue-600 dark:text-blue-400"></i>
                             Episodes & Releases
                         </h5>
                     </div>
