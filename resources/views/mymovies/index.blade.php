@@ -5,8 +5,14 @@
     .info-card-gradient {
         background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
     }
+    .dark .info-card-gradient {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    }
     .table-header-gradient {
         background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    }
+    .dark .table-header-gradient {
+        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
     }
     .movie-poster-shadow {
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -14,8 +20,16 @@
     .category-badge {
         background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     }
+    .dark .category-badge {
+        background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+        color: #93c5fd !important;
+        border-color: #2563eb !important;
+    }
     .empty-state-bg {
         background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    }
+    .dark .empty-state-bg {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
     }
 </style>
 
@@ -51,7 +65,7 @@
             </div>
             <div class="ml-4 flex-1">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Automatic Downloads via RSS</h3>
-                <p class="text-sm text-gray-700">
+                <p class="text-sm text-gray-700 dark:text-gray-300">
                     Using 'My Movies' you can search for movies and add them to a wishlist. If the movie becomes available it will be added to your
                     <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
                        class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline inline-flex items-center">
@@ -70,7 +84,7 @@
            title="Browse all available movies">
             <i class="fa fa-list mr-2"></i>Browse All Movies
         </a>
-        <a class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+        <a class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
            href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
            title="All movies in your watchlist as an RSS feed">
             <i class="fa fa-rss mr-2 text-orange-500"></i>RSS Feed
@@ -79,9 +93,9 @@
 
     <!-- Movies Table/Cards -->
     @if(count($movies ?? []) > 0)
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
             <!-- Table Header -->
-            <div class="table-header-gradient px-6 py-4 border-b-2 border-gray-300">
+            <div class="table-header-gradient px-6 py-4 border-b-2 border-gray-300 dark:border-gray-600">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                         <i class="fa fa-bookmark mr-2 text-blue-600"></i>
@@ -92,9 +106,9 @@
 
             <!-- Desktop Table View -->
             <div class="hidden lg:block">
-                <div class="divide-y divide-gray-200">
+                <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($movies as $movie)
-                        <div class="p-6 hover:bg-blue-50 transition-colors duration-150">
+                        <div class="p-6 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
                             <div class="flex gap-6">
                                 <!-- Movie Poster -->
                                 <div class="flex-shrink-0">
@@ -141,31 +155,31 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                         @if(!empty($movie['genre']))
                                             <div class="flex items-center text-sm">
-                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i class="fa fa-tag mr-1 text-blue-600"></i>Genre:</span>
-                                                <span class="text-gray-600">{{ e($movie['genre']) }}</span>
+                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i class="fa fa-tag mr-1 text-blue-600 dark:text-blue-400"></i>Genre:</span>
+                                                <span class="text-gray-600 dark:text-gray-400">{{ e($movie['genre']) }}</span>
                                             </div>
                                         @endif
 
                                         @if(!empty($movie['director']))
                                             <div class="flex items-center text-sm">
-                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i class="fa fa-video-camera mr-1 text-blue-600"></i>Director:</span>
-                                                <span class="text-gray-600">{{ e($movie['director']) }}</span>
+                                                <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2"><i class="fa fa-video-camera mr-1 text-blue-600 dark:text-blue-400"></i>Director:</span>
+                                                <span class="text-gray-600 dark:text-gray-400">{{ e($movie['director']) }}</span>
                                             </div>
                                         @endif
                                     </div>
 
                                     @if(!empty($movie['actors']))
                                         <div class="flex items-start text-sm mb-3">
-                                            <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2 flex-shrink-0"><i class="fa fa-users mr-1 text-blue-600"></i>Starring:</span>
-                                            <span class="text-gray-600">{{ e($movie['actors']) }}</span>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2 flex-shrink-0"><i class="fa fa-users mr-1 text-blue-600 dark:text-blue-400"></i>Starring:</span>
+                                            <span class="text-gray-600 dark:text-gray-400">{{ e($movie['actors']) }}</span>
                                         </div>
                                     @endif
 
-                                    <div class="flex items-center gap-4 pt-3 border-t border-gray-200">
+                                    <div class="flex items-center gap-4 pt-3 border-t border-gray-200 dark:border-gray-700">
                                         <span class="inline-flex items-center px-3 py-1.5 category-badge text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
                                             <i class="fa fa-folder-open mr-1.5"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All Categories' }}
                                         </span>
-                                        <span class="text-xs text-gray-500 flex items-center">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
                                             <i class="fa fa-calendar mr-1"></i>Added {{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
                                         </span>
                                         <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
@@ -185,7 +199,7 @@
             <!-- Mobile/Tablet Card View -->
             <div class="lg:hidden">
                 @foreach($movies as $movie)
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 transition-colors duration-150">
+                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
                         <div class="flex gap-4 mb-4">
                             <div class="flex-shrink-0">
                                 <img class="rounded-lg movie-poster-shadow w-24 h-36 object-cover"
@@ -215,14 +229,14 @@
                             <p class="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-3">{{ e($movie['plot']) }}</p>
                         @endif
 
-                        <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
                             <div class="flex gap-2">
-                                <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
+                                <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-semibold rounded-full transition-colors"
                                    target="_blank"
                                    href="{{ $site->dereferrer_link }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
                                     <i class="fa fa-external-link mr-1"></i>IMDB
                                 </a>
-                                <span class="text-xs text-gray-500 flex items-center">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
                                     <i class="fa fa-calendar mr-1"></i>{{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
                                 </span>
                             </div>
@@ -245,7 +259,7 @@
         </div>
     @else
         <!-- Empty State -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
             <div class="text-center py-16 px-6">
                 <div class="mx-auto h-24 w-24 empty-state-bg rounded-full flex items-center justify-center mb-6 shadow-sm">
                     <i class="fa fa-film text-5xl text-blue-600"></i>
