@@ -1,6 +1,9 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\View\View;
+
 class PrivacyPolicyController extends BasePageController
 {
     /**
@@ -14,6 +17,7 @@ class PrivacyPolicyController extends BasePageController
         $meta_description = 'Privacy Policy for '.config('app.name');
         // Get privacy policy content from settings (if available)
         $privacy_content = $this->settings->privacy_policy ?? null;
+
         return view('privacy-policy', compact('title', 'meta_title', 'meta_keywords', 'meta_description', 'privacy_content'));
     }
 }
