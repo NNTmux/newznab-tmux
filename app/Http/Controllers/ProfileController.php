@@ -312,7 +312,7 @@ class ProfileController extends BasePageController
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not authenticated'], 401);
         }
 
