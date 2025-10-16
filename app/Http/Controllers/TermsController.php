@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+
 class TermsController extends BasePageController
 {
     /**
-     * @throws \Exception
+     * Display the terms and conditions page.
      */
-    public function terms(): void
+    public function terms(): View
     {
         $title = 'Terms and Conditions';
         $meta_title = config('app.name').' - Terms and conditions';
         $meta_keywords = 'terms,conditions';
         $meta_description = 'Terms and Conditions for '.config('app.name');
 
-        $content = $this->smarty->fetch('terms.tpl');
+        // Get terms content from settings
+        $terms_content = $this->settings->tandc ?? '<p>No terms and conditions have been set yet.</p>';
 
-        $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
-
-        $this->pagerender();
+        return view('terms', compact('title', 'meta_title', 'meta_keywords', 'meta_description', 'terms_content'));
     }
 }
