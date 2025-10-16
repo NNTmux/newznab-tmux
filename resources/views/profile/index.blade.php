@@ -147,10 +147,18 @@
                                     <i class="fa fa-palette mr-2"></i>Theme Mode
                                 </h3>
                                 <div class="flex items-center">
-                                    @if($user->dark_mode)
+                                    @php
+                                        $themePreference = $user->theme_preference ?? 'light';
+                                    @endphp
+                                    @if($themePreference === 'dark')
                                         <div class="flex items-center px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 rounded-lg">
                                             <i class="fas fa-moon text-indigo-600 dark:text-indigo-400 text-lg mr-2"></i>
                                             <span class="font-medium">Dark Mode</span>
+                                        </div>
+                                    @elseif($themePreference === 'system')
+                                        <div class="flex items-center px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg">
+                                            <i class="fas fa-desktop text-blue-600 dark:text-blue-400 text-lg mr-2"></i>
+                                            <span class="font-medium">System (Auto)</span>
                                         </div>
                                     @else
                                         <div class="flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg">

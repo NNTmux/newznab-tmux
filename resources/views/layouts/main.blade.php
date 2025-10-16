@@ -20,14 +20,24 @@
         (function() {
             @auth
                 // Use user's database preference when authenticated
-                const userDarkMode = {{ auth()->user()->dark_mode ? 'true' : 'false' }};
-                if (userDarkMode) {
+                const userThemePreference = '{{ auth()->user()->theme_preference ?? 'light' }}';
+
+                if (userThemePreference === 'system') {
+                    // Use OS preference
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                    }
+                } else if (userThemePreference === 'dark') {
                     document.documentElement.classList.add('dark');
                 }
             @else
                 // Fallback to localStorage for non-authenticated users
                 const theme = localStorage.getItem('theme') || 'light';
-                if (theme === 'dark') {
+                if (theme === 'system') {
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                    }
+                } else if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                 }
             @endauth
@@ -102,9 +112,9 @@
     </button>
 
     <!-- Dark Mode Toggle -->
-    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700 text-gray-800 dark:text-gray-200 dark:text-gray-200 p-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200" title="Toggle dark mode">
-        <i class="fas fa-moon dark-mode-icon hidden dark:inline"></i>
-        <i class="fas fa-sun light-mode-icon inline dark:hidden"></i>
+    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200" title="Toggle theme">
+        <i class="fas fa-moon theme-icon-dark hidden dark:inline"></i>
+        <i class="fas fa-sun theme-icon-light inline dark:hidden"></i>
     </button>
 
     <!-- Toast Notification Container -->
@@ -119,50 +129,97 @@
     @stack('scripts')
 
     <script>
-        // Dark mode toggle
-        const themeToggle = document.getElementById('theme-toggle');
+        // Theme management with system preference support
+        (function() {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        themeToggle?.addEventListener('click', function() {
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
+            function applyTheme(themePreference) {
+                const html = document.documentElement;
 
-            if (isDark) {
-                html.classList.remove('dark');
-                @auth
-                    // Save to backend for authenticated users
-                    fetch('{{ route('profile.update-theme') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ dark_mode: false })
-                    });
-                @else
-                    localStorage.setItem('theme', 'light');
-                @endauth
-            } else {
-                html.classList.add('dark');
-                @auth
-                    // Save to backend for authenticated users
-                    fetch('{{ route('profile.update-theme') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ dark_mode: true })
-                    });
-                @else
-                    localStorage.setItem('theme', 'dark');
-                @endauth
+                if (themePreference === 'system') {
+                    if (mediaQuery.matches) {
+                        html.classList.add('dark');
+                    } else {
+                        html.classList.remove('dark');
+                    }
+                } else if (themePreference === 'dark') {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
             }
-        });
 
-        // Mobile sidebar toggle
-        document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function() {
-            document.getElementById('sidebar')?.classList.toggle('hidden');
-        });
+            // Listen for OS theme changes
+            mediaQuery.addEventListener('change', () => {
+                @auth
+                    const userThemePreference = '{{ auth()->user()->theme_preference ?? 'light' }}';
+                    if (userThemePreference === 'system') {
+                        applyTheme('system');
+                    }
+                @else
+                    const theme = localStorage.getItem('theme') || 'light';
+                    if (theme === 'system') {
+                        applyTheme('system');
+                    }
+                @endauth
+            });
+
+            // Dark mode toggle - cycles through light -> dark -> system
+            const themeToggle = document.getElementById('theme-toggle');
+            @auth
+                let currentTheme = '{{ auth()->user()->theme_preference ?? 'light' }}';
+            @else
+                let currentTheme = localStorage.getItem('theme') || 'light';
+            @endauth
+
+            themeToggle?.addEventListener('click', function() {
+                let nextTheme;
+
+                // Cycle through: light -> dark -> system -> light
+                if (currentTheme === 'light') {
+                    nextTheme = 'dark';
+                } else if (currentTheme === 'dark') {
+                    nextTheme = 'system';
+                } else {
+                    nextTheme = 'light';
+                }
+
+                applyTheme(nextTheme);
+
+                // Update button title
+                const titles = {
+                    'light': 'Theme: Light',
+                    'dark': 'Theme: Dark',
+                    'system': 'Theme: System (Auto)'
+                };
+                this.setAttribute('title', titles[nextTheme]);
+
+                @auth
+                    // Save to backend for authenticated users
+                    fetch('{{ route('profile.update-theme') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ theme_preference: nextTheme })
+                    }).then(response => response.json())
+                      .then(data => {
+                          if (data.success) {
+                              currentTheme = nextTheme;
+                          }
+                      });
+                @else
+                    localStorage.setItem('theme', nextTheme);
+                    currentTheme = nextTheme;
+                @endauth
+            });
+
+            // Mobile sidebar toggle
+            document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function() {
+                document.getElementById('sidebar')?.classList.toggle('hidden');
+            });
+        })();
     </script>
 </body>
 </html>

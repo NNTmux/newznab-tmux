@@ -67,8 +67,8 @@
                     <i class="fas fa-palette mr-2 text-blue-600 dark:text-blue-400"></i>Theme Preference
                 </h3>
                 <div class="space-y-3">
-                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ $user->dark_mode ? 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' }}">
-                        <input type="radio" name="dark_mode" value="0" {{ !$user->dark_mode ? 'checked' : '' }}
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'light' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
+                        <input type="radio" name="theme_preference" value="light" {{ ($user->theme_preference ?? 'light') === 'light' ? 'checked' : '' }}
                             class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                         <div class="ml-3 flex-1">
                             <div class="flex items-center">
@@ -80,8 +80,8 @@
                             </div>
                         </div>
                     </label>
-                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ $user->dark_mode ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
-                        <input type="radio" name="dark_mode" value="1" {{ $user->dark_mode ? 'checked' : '' }}
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'dark' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
+                        <input type="radio" name="theme_preference" value="dark" {{ ($user->theme_preference ?? 'light') === 'dark' ? 'checked' : '' }}
                             class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                         <div class="ml-3 flex-1">
                             <div class="flex items-center">
@@ -89,6 +89,19 @@
                                 <div>
                                     <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">Dark Mode</span>
                                     <span class="block text-xs text-gray-600 dark:text-gray-400">Easy on the eyes, especially at night</span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'system' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
+                        <input type="radio" name="theme_preference" value="system" {{ ($user->theme_preference ?? 'light') === 'system' ? 'checked' : '' }}
+                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <div class="ml-3 flex-1">
+                            <div class="flex items-center">
+                                <i class="fas fa-desktop text-blue-500 text-xl mr-3"></i>
+                                <div>
+                                    <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">System (Auto)</span>
+                                    <span class="block text-xs text-gray-600 dark:text-gray-400">Match your operating system's theme</span>
                                 </div>
                             </div>
                         </div>
@@ -318,27 +331,36 @@
 <script>
     // Theme preference instant preview
     document.addEventListener('DOMContentLoaded', function() {
-        const themeRadios = document.querySelectorAll('input[name="dark_mode"]');
+        const themeRadios = document.querySelectorAll('input[name="theme_preference"]');
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        themeRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const html = document.documentElement;
-                const isDarkMode = this.value === '1';
+        function applyTheme(themeValue) {
+            const html = document.documentElement;
 
-                if (isDarkMode) {
+            if (themeValue === 'system') {
+                // Use OS preference
+                if (mediaQuery.matches) {
                     html.classList.add('dark');
                 } else {
                     html.classList.remove('dark');
                 }
+            } else if (themeValue === 'dark') {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        }
 
-                // Update the visual selection of the radio button containers
+        themeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                applyTheme(this.value);
                 updateThemeSelection();
             });
         });
 
         function updateThemeSelection() {
-            const selectedValue = document.querySelector('input[name="dark_mode"]:checked').value;
-            const labels = document.querySelectorAll('input[name="dark_mode"]').forEach((radio, index) => {
+            const selectedValue = document.querySelector('input[name="theme_preference"]:checked').value;
+            document.querySelectorAll('input[name="theme_preference"]').forEach((radio) => {
                 const label = radio.closest('label');
                 const isSelected = radio.value === selectedValue;
 
@@ -351,6 +373,14 @@
                 }
             });
         }
+
+        // Listen for OS theme changes when system mode is selected
+        mediaQuery.addEventListener('change', (e) => {
+            const selectedTheme = document.querySelector('input[name="theme_preference"]:checked').value;
+            if (selectedTheme === 'system') {
+                applyTheme('system');
+            }
+        });
     });
 </script>
 @endpush

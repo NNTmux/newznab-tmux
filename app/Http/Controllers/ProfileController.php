@@ -142,9 +142,12 @@ class ProfileController extends BasePageController
                         'None',
                     );
 
-                    // Update dark mode preference
-                    if ($request->has('dark_mode')) {
-                        User::where('id', $userid)->update(['dark_mode' => (bool) $request->input('dark_mode')]);
+                    // Update theme preference
+                    if ($request->has('theme_preference')) {
+                        $themeValue = $request->input('theme_preference');
+                        if (in_array($themeValue, ['light', 'dark', 'system'])) {
+                            User::where('id', $userid)->update(['theme_preference' => $themeValue]);
+                        }
                     }
 
                     // Handle Console permission
@@ -317,16 +320,16 @@ class ProfileController extends BasePageController
         }
 
         $validator = Validator::make($request->all(), [
-            'dark_mode' => ['required', 'boolean'],
+            'theme_preference' => ['required', 'in:light,dark,system'],
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'message' => 'Invalid input'], 400);
         }
 
-        $user->dark_mode = $request->input('dark_mode');
+        $user->theme_preference = $request->input('theme_preference');
         $user->save();
 
-        return response()->json(['success' => true, 'dark_mode' => $user->dark_mode]);
+        return response()->json(['success' => true, 'theme_preference' => $user->theme_preference]);
     }
 }
