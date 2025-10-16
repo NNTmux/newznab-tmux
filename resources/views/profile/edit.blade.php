@@ -61,6 +61,44 @@
                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
 
+            <!-- Theme Preference -->
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                    <i class="fas fa-palette mr-2 text-blue-600 dark:text-blue-400"></i>Theme Preference
+                </h3>
+                <div class="space-y-3">
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ $user->dark_mode ? 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' }}">
+                        <input type="radio" name="dark_mode" value="0" {{ !$user->dark_mode ? 'checked' : '' }}
+                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <div class="ml-3 flex-1">
+                            <div class="flex items-center">
+                                <i class="fas fa-sun text-yellow-500 text-xl mr-3"></i>
+                                <div>
+                                    <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">Light Mode</span>
+                                    <span class="block text-xs text-gray-600 dark:text-gray-400">Bright and clean interface</span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ $user->dark_mode ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
+                        <input type="radio" name="dark_mode" value="1" {{ $user->dark_mode ? 'checked' : '' }}
+                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <div class="ml-3 flex-1">
+                            <div class="flex items-center">
+                                <i class="fas fa-moon text-indigo-500 text-xl mr-3"></i>
+                                <div>
+                                    <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">Dark Mode</span>
+                                    <span class="block text-xs text-gray-600 dark:text-gray-400">Easy on the eyes, especially at night</span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>Your theme preference will be applied across all devices and browsers when you're logged in.
+                </p>
+            </div>
+
             <!-- View Preferences -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Cover View Preferences</h3>
@@ -275,4 +313,45 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Theme preference instant preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeRadios = document.querySelectorAll('input[name="dark_mode"]');
+
+        themeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const html = document.documentElement;
+                const isDarkMode = this.value === '1';
+
+                if (isDarkMode) {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+
+                // Update the visual selection of the radio button containers
+                updateThemeSelection();
+            });
+        });
+
+        function updateThemeSelection() {
+            const selectedValue = document.querySelector('input[name="dark_mode"]:checked').value;
+            const labels = document.querySelectorAll('input[name="dark_mode"]').forEach((radio, index) => {
+                const label = radio.closest('label');
+                const isSelected = radio.value === selectedValue;
+
+                if (isSelected) {
+                    label.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-gray-50', 'dark:bg-gray-700');
+                    label.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+                } else {
+                    label.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+                    label.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-gray-50', 'dark:bg-gray-700');
+                }
+            });
+        }
+    });
+</script>
+@endpush
 

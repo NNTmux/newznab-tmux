@@ -142,6 +142,11 @@ class ProfileController extends BasePageController
                         'None',
                     );
 
+                    // Update dark mode preference
+                    if ($request->has('dark_mode')) {
+                        User::where('id', $userid)->update(['dark_mode' => (bool) $request->input('dark_mode')]);
+                    }
+
                     // Handle Console permission
                     if ($request->has('viewconsole')) {
                         if (! $this->userdata->hasDirectPermission('view console')) {
@@ -298,5 +303,30 @@ class ProfileController extends BasePageController
         }
 
         return view('errors.503')->with('warning', 'Dont try to delete another user account!');
+    }
+
+    /**
+     * Update user's dark mode preference
+     */
+    public function updateTheme(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not authenticated'], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'dark_mode' => ['required', 'boolean'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Invalid input'], 400);
+        }
+
+        $user->dark_mode = $request->input('dark_mode');
+        $user->save();
+
+        return response()->json(['success' => true, 'dark_mode' => $user->dark_mode]);
     }
 }

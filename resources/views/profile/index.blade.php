@@ -140,30 +140,57 @@
                                 <i class="fa fa-sliders-h text-blue-600 dark:text-blue-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">UI Preferences</h2>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+
+                            <!-- Theme Preference -->
+                            <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    <i class="fa fa-palette mr-2"></i>Theme Mode
+                                </h3>
                                 <div class="flex items-center">
-                                    <i class="fa {{ $user->movieview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
-                                    <span>Movie Covers</span>
+                                    @if($user->dark_mode)
+                                        <div class="flex items-center px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 rounded-lg">
+                                            <i class="fas fa-moon text-indigo-600 dark:text-indigo-400 text-lg mr-2"></i>
+                                            <span class="font-medium">Dark Mode</span>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg">
+                                            <i class="fas fa-sun text-yellow-600 dark:text-yellow-400 text-lg mr-2"></i>
+                                            <span class="font-medium">Light Mode</span>
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="flex items-center">
-                                    <i class="fa {{ $user->musicview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
-                                    <span>Music Covers</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fa {{ $user->consoleview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
-                                    <span>Console Covers</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fa {{ $user->gameview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
-                                    <span>Game Covers</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fa {{ $user->bookview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
-                                    <span>Book Covers</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fa {{ $user->xxxview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
-                                    <span>XXX Covers</span>
+                            </div>
+
+                            <!-- Cover Preferences -->
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                    <i class="fa fa-images mr-2"></i>Cover Display
+                                </h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="flex items-center">
+                                        <i class="fa {{ $user->movieview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <span>Movie Covers</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fa {{ $user->musicview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <span>Music Covers</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fa {{ $user->consoleview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <span>Console Covers</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fa {{ $user->gameview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <span>Game Covers</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fa {{ $user->bookview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <span>Book Covers</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fa {{ $user->xxxview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
+                                        <span>XXX Covers</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

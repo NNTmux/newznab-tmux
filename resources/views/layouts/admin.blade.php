@@ -17,10 +17,19 @@
     <script>
         // Initialize theme before page renders to prevent flash
         (function() {
-            const theme = localStorage.getItem('theme') || 'light';
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            }
+            @auth
+                // Use user's database preference when authenticated
+                const userDarkMode = {{ auth()->user()->dark_mode ? 'true' : 'false' }};
+                if (userDarkMode) {
+                    document.documentElement.classList.add('dark');
+                }
+            @else
+                // Fallback to localStorage for non-authenticated users
+                const theme = localStorage.getItem('theme') || 'light';
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            @endauth
         })();
     </script>
 </head>
@@ -100,10 +109,34 @@
 
             if (isDark) {
                 html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
+                @auth
+                    // Save to backend for authenticated users
+                    fetch('{{ route('profile.update-theme') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ dark_mode: false })
+                    });
+                @else
+                    localStorage.setItem('theme', 'light');
+                @endauth
             } else {
                 html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
+                @auth
+                    // Save to backend for authenticated users
+                    fetch('{{ route('profile.update-theme') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ dark_mode: true })
+                    });
+                @else
+                    localStorage.setItem('theme', 'dark');
+                @endauth
             }
         });
     </script>
