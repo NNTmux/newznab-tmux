@@ -111,10 +111,29 @@
         <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Dark Mode Toggle -->
-    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200" title="Toggle theme">
-        <i class="fas fa-moon theme-icon-dark hidden dark:inline"></i>
-        <i class="fas fa-sun theme-icon-light inline dark:hidden"></i>
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2"
+            title="{{ ucfirst(auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light') }} Mode">
+        <i id="theme-icon" class="fas
+            @if(auth()->check())
+                @if((auth()->user()->theme_preference ?? 'light') === 'dark')
+                    fa-moon
+                @elseif((auth()->user()->theme_preference ?? 'light') === 'system')
+                    fa-desktop
+                @else
+                    fa-sun
+                @endif
+            @else
+                fa-sun
+            @endif
+        "></i>
+        <span id="theme-label" class="text-xs font-medium hidden sm:inline">
+            @if(auth()->check())
+                {{ ucfirst(auth()->user()->theme_preference ?? 'light') }}
+            @else
+                Light
+            @endif
+        </span>
     </button>
 
     <!-- Toast Notification Container -->
@@ -149,6 +168,41 @@
                 }
             }
 
+            function updateThemeButton(theme) {
+                const themeIcon = document.getElementById('theme-icon');
+                const themeLabel = document.getElementById('theme-label');
+                const themeToggle = document.getElementById('theme-toggle');
+
+                const icons = {
+                    'light': 'fa-sun',
+                    'dark': 'fa-moon',
+                    'system': 'fa-desktop'
+                };
+                const labels = {
+                    'light': 'Light',
+                    'dark': 'Dark',
+                    'system': 'System'
+                };
+                const titles = {
+                    'light': 'Light Mode',
+                    'dark': 'Dark Mode',
+                    'system': 'System Mode'
+                };
+
+                if (themeIcon) {
+                    // Remove all possible icon classes first
+                    themeIcon.classList.remove('fa-sun', 'fa-moon', 'fa-desktop');
+                    // Add the correct icon class
+                    themeIcon.classList.add(icons[theme]);
+                }
+                if (themeLabel) {
+                    themeLabel.textContent = labels[theme];
+                }
+                if (themeToggle) {
+                    themeToggle.setAttribute('title', titles[theme]);
+                }
+            }
+
             // Listen for OS theme changes
             mediaQuery.addEventListener('change', () => {
                 @auth
@@ -162,6 +216,19 @@
                         applyTheme('system');
                     }
                 @endauth
+            });
+
+            // Listen for custom theme change events from sidebar
+            document.addEventListener('themeChanged', function(e) {
+                if (e.detail && e.detail.theme) {
+                    updateThemeButton(e.detail.theme);
+                    applyTheme(e.detail.theme);
+                    @auth
+                        currentTheme = e.detail.theme;
+                    @else
+                        currentTheme = e.detail.theme;
+                    @endauth
+                }
             });
 
             // Dark mode toggle - cycles through light -> dark -> system
@@ -185,14 +252,7 @@
                 }
 
                 applyTheme(nextTheme);
-
-                // Update button title
-                const titles = {
-                    'light': 'Theme: Light',
-                    'dark': 'Theme: Dark',
-                    'system': 'Theme: System (Auto)'
-                };
-                this.setAttribute('title', titles[nextTheme]);
+                updateThemeButton(nextTheme);
 
                 @auth
                     // Save to backend for authenticated users
@@ -207,11 +267,15 @@
                       .then(data => {
                           if (data.success) {
                               currentTheme = nextTheme;
+                              // Dispatch event to update sidebar
+                              document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
                           }
                       });
                 @else
                     localStorage.setItem('theme', nextTheme);
                     currentTheme = nextTheme;
+                    // Dispatch event to update sidebar
+                    document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
                 @endauth
             });
 
