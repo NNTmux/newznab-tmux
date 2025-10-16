@@ -157,12 +157,16 @@
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         @if(!$user->verified)
-                                            <a href="{{ url('admin/verify?id=' . $user->id) }}"
-                                               class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
-                                               title="Verify User"
-                                               onclick="return confirm('Are you sure you want to verify this user?')">
-                                                <i class="fa fa-check-circle"></i>
-                                            </a>
+                                            <form method="POST" action="{{ route('admin.verify') }}" class="inline verify-user-form">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{ $user->id }}">
+                                                <button type="button"
+                                                        class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 border-0 bg-transparent cursor-pointer p-0"
+                                                        title="Verify User"
+                                                        onclick="showVerifyModal(event, this.closest('form'))">
+                                                    <i class="fa fa-check-circle"></i>
+                                                </button>
+                                            </form>
                                             <a href="{{ url('admin/resendverification?id=' . $user->id) }}"
                                                class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
                                                title="Resend Verification">
@@ -196,5 +200,70 @@
         @endif
     </div>
 </div>
+
+<!-- Verify User Confirmation Modal -->
+<div id="verifyUserModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
+                <i class="fa fa-check-circle text-green-600 dark:text-green-400 text-2xl"></i>
+            </div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mt-4">Verify User</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Are you sure you want to manually verify this user? This will mark their email as verified.
+                </p>
+            </div>
+            <div class="flex gap-3 px-4 py-3">
+                <button onclick="hideVerifyModal()"
+                        class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-base font-medium rounded-md shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+                <button onclick="submitVerifyForm()"
+                        class="flex-1 px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-base font-medium rounded-md shadow-sm hover:bg-green-700 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Verify
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
+
+@push('scripts')
+<script>
+let currentVerifyForm = null;
+
+function showVerifyModal(event, form) {
+    event.preventDefault();
+    currentVerifyForm = form;
+    document.getElementById('verifyUserModal').classList.remove('hidden');
+}
+
+function hideVerifyModal() {
+    document.getElementById('verifyUserModal').classList.add('hidden');
+    currentVerifyForm = null;
+}
+
+function submitVerifyForm() {
+    if (currentVerifyForm) {
+        currentVerifyForm.submit();
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('verifyUserModal')?.addEventListener('click', function(event) {
+    if (event.target === this) {
+        hideVerifyModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        hideVerifyModal();
+    }
+});
+</script>
+@endpush
 

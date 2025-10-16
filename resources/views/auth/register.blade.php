@@ -41,6 +41,7 @@
                 <!-- Register Form -->
                 <form method="POST" action="{{ route('register') }}" class="space-y-5">
                     @csrf
+                    <input type="hidden" name="action" value="submit">
 
                     <!-- Username Field -->
                     <div>
