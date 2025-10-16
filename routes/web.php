@@ -64,6 +64,7 @@ use App\Http\Controllers\MyMoviesController;
 use App\Http\Controllers\MyShowsController;
 use App\Http\Controllers\NfoController;
 use App\Http\Controllers\PasswordSecurityController;
+use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSecurityController;
 use App\Http\Controllers\RssController;
@@ -86,6 +87,7 @@ Route::post('register', [RegisterController::class, 'register'])->name('register
 
 Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth', 'VerifyCsrfToken', 'web']);
 Route::match(['GET', 'POST'], 'terms-and-conditions', [TermsController::class, 'terms'])->name('terms-and-conditions');
+Route::match(['GET', 'POST'], 'privacy-policy', [PrivacyPolicyController::class, 'privacyPolicy'])->name('privacy-policy');
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login.post');
