@@ -25,18 +25,20 @@ class CoverController extends Controller
         }
 
         // Build the file path
-        $filePath = storage_path("covers/{$type}/{$filename}");
-
-        // For preview and sample images, try with _thumb suffix if original doesn't exist
-        if (! file_exists($filePath) && in_array($type, ['preview', 'sample'])) {
-            // Try with _thumb suffix
+        // For preview and sample images, try with _thumb suffix first
+        if (in_array($type, ['preview', 'sample'])) {
             $pathInfo = pathinfo($filename);
             $thumbFilename = $pathInfo['filename'].'_thumb.'.($pathInfo['extension'] ?? 'jpg');
             $thumbPath = storage_path("covers/{$type}/{$thumbFilename}");
 
+            // Use thumb path if it exists, otherwise fall back to original filename
             if (file_exists($thumbPath)) {
                 $filePath = $thumbPath;
+            } else {
+                $filePath = storage_path("covers/{$type}/{$filename}");
             }
+        } else {
+            $filePath = storage_path("covers/{$type}/{$filename}");
         }
 
         // Check if file exists
