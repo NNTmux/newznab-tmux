@@ -1,21 +1,6 @@
 @extends('layouts.admin')
 
-@push('styles')
-<style>
-/* Select color states - Light mode */
-#tmuxForm select.select-yes { background-color: #d1e7dd !important; border-color: #badbcc !important; color: #0f5132 !important; }
-#tmuxForm select.select-no { background-color: #f8d7da !important; border-color: #f5c2c7 !important; color: #842029 !important; }
-#tmuxForm select.select-other { background-color: #e2e3e5 !important; border-color: #d3d6d8 !important; color: #41464b !important; }
-#tmuxForm select:focus { box-shadow: 0 0 0 .25rem rgba(13,110,253,.25); }
-
-/* Select color states - Dark mode */
-@media (prefers-color-scheme: dark) {
-    #tmuxForm select.select-yes { background-color: #1a3a2a !important; border-color: #2d5a3d !important; color: #7fc99b !important; }
-    #tmuxForm select.select-no { background-color: #3a1a1d !important; border-color: #5a2d31 !important; color: #f5a9b0 !important; }
-    #tmuxForm select.select-other { background-color: #2a2a2a !important; border-color: #3d3d3d !important; color: #b0b0b0 !important; }
-}
-</style>
-@endpush
+{{-- Styles moved to resources/css/csp-safe.css --}}
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
@@ -64,7 +49,7 @@
                         <x-form.group label="Tmux Scripts Running" for="running" help="Shutdown switch. When on, scripts run; when off, all scripts are terminated.">
                             <x-select id="running" name="running" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->running ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['running'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach
@@ -73,13 +58,13 @@
 
                         <x-form.group label="Monitor Loop Timer" for="monitor_delay" help="Time between query refreshes. Lower = more frequent DB queries.">
                             <div class="flex gap-2">
-                                <x-input id="monitor_delay" name="monitor_delay" type="number" value="{{ $site->monitor_delay ?? 300 }}" class="flex-1" />
+                                <x-input id="monitor_delay" name="monitor_delay" type="number" value="{{ $site['monitor_delay'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
                         <x-form.group label="Tmux Session Name" for="tmux_session" help="Session name for tmux. No spaces allowed. Can't be changed after scripts start.">
-                            <x-input id="tmux_session" name="tmux_session" type="text" value="{{ $site->tmux_session ?? 'nntmux' }}" class="w-full" />
+                            <x-input id="tmux_session" name="tmux_session" type="text" value="{{ $site['tmux_session'] ?? 'nntmux' }}" class="w-full" />
                         </x-form.group>
                     </div>
                 </div>
@@ -91,7 +76,7 @@
                         <x-form.group label="Run Sequential" for="sequential" help="Sequential runs update_binaries, backfill and update releases sequentially.">
                             <x-select id="sequential" name="sequential" class="w-full">
                                 @foreach($sequential_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->sequential ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['sequential'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $sequential_names[$index] }}
                                     </option>
                                 @endforeach
@@ -100,7 +85,7 @@
 
                         <x-form.group label="Sequential Sleep Timer" for="seq_timer">
                             <div class="flex gap-2">
-                                <x-input id="seq_timer" name="seq_timer" type="number" value="{{ $site->seq_timer ?? 60 }}" class="flex-1" />
+                                <x-input id="seq_timer" name="seq_timer" type="number" value="{{ $site['seq_timer'] ?? 60 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
@@ -118,7 +103,7 @@
                         <x-form.group label="Update Binaries" for="binaries" help="Gets from your last_record to now.">
                             <x-select id="binaries" name="binaries" class="w-full">
                                 @foreach($binaries_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->binaries ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['binaries'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $binaries_names[$index] }}
                                     </option>
                                 @endforeach
@@ -127,14 +112,14 @@
 
                         <x-form.group label="Update Binaries Sleep Timer" for="bins_timer">
                             <div class="flex gap-2">
-                                <x-input id="bins_timer" name="bins_timer" type="number" value="{{ $site->bins_timer ?? 10 }}" class="flex-1" />
+                                <x-input id="bins_timer" name="bins_timer" type="number" value="{{ $site['bins_timer'] ?? 10 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
                         <x-form.group label="Binaries Kill Timer" for="bins_kill_timer" help="Time allowed to run with no updates.">
                             <div class="flex gap-2">
-                                <x-input id="bins_kill_timer" name="bins_kill_timer" type="number" value="{{ $site->bins_kill_timer ?? 30 }}" class="flex-1" />
+                                <x-input id="bins_kill_timer" name="bins_kill_timer" type="number" value="{{ $site['bins_kill_timer'] ?? 30 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">minutes</span>
                             </div>
                         </x-form.group>
@@ -149,7 +134,7 @@
                             <x-form.group label="Backfill Mode" for="backfill">
                                 <x-select id="backfill" name="backfill" class="w-full">
                                     @foreach($backfill_ids as $index => $val)
-                                        <option value="{{ $val }}" {{ ($site->backfill ?? '') == $val ? 'selected' : '' }}>
+                                        <option value="{{ $val }}" {{ ($site['backfill'] ?? '') == $val ? 'selected' : '' }}>
                                             {{ $backfill_names[$index] }}
                                         </option>
                                     @endforeach
@@ -159,7 +144,7 @@
                             <x-form.group label="Backfill Order" for="backfill_order">
                                 <x-select id="backfill_order" name="backfill_order" class="w-full">
                                     @foreach($backfill_group_ids as $index => $val)
-                                        <option value="{{ $val }}" {{ ($site->backfill_order ?? '') == $val ? 'selected' : '' }}>
+                                        <option value="{{ $val }}" {{ ($site['backfill_order'] ?? '') == $val ? 'selected' : '' }}>
                                             {{ $backfill_group[$index] }}
                                         </option>
                                     @endforeach
@@ -169,7 +154,7 @@
                             <x-form.group label="Backfill Days" for="backfill_days">
                                 <x-select id="backfill_days" name="backfill_days" class="w-full">
                                     @foreach($backfill_days_ids as $index => $val)
-                                        <option value="{{ $val }}" {{ ($site->backfill_days ?? '') == $val ? 'selected' : '' }}>
+                                        <option value="{{ $val }}" {{ ($site['backfill_days'] ?? '') == $val ? 'selected' : '' }}>
                                             {{ $backfill_days[$index] }}
                                         </option>
                                     @endforeach
@@ -178,16 +163,16 @@
                         </div>
 
                         <x-form.group label="Backfill Quantity" for="backfill_qty" help="Number of headers per group per thread to download.">
-                            <x-input id="backfill_qty" name="backfill_qty" type="number" value="{{ $site->backfill_qty ?? 20000 }}" class="w-full" />
+                            <x-input id="backfill_qty" name="backfill_qty" type="number" value="{{ $site['backfill_qty'] ?? 20000 }}" class="w-full" />
                         </x-form.group>
 
                         <x-form.group label="Backfill Groups" for="backfill_groups" help="Number of groups to backfill per loop.">
-                            <x-input id="backfill_groups" name="backfill_groups" type="number" value="{{ $site->backfill_groups ?? 1 }}" class="w-full" />
+                            <x-input id="backfill_groups" name="backfill_groups" type="number" value="{{ $site['backfill_groups'] ?? 1 }}" class="w-full" />
                         </x-form.group>
 
                         <x-form.group label="Backfill Sleep Timer" for="back_timer">
                             <div class="flex gap-2">
-                                <x-input id="back_timer" name="back_timer" type="number" value="{{ $site->back_timer ?? 300 }}" class="flex-1" />
+                                <x-input id="back_timer" name="back_timer" type="number" value="{{ $site['back_timer'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
@@ -195,7 +180,7 @@
                         <x-form.group label="Variable Sleep Timer" for="progressive" help="Vary backfill sleep depending on collection count.">
                             <x-select id="progressive" name="progressive" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->progressive ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['progressive'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach
@@ -211,7 +196,7 @@
                         <x-form.group label="Update Releases" for="releases" help="Create releases. Only turn off when you only want to post process.">
                             <x-select id="releases" name="releases" class="w-full">
                                 @foreach($releases_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->releases ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['releases'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $releases_names[$index] }}
                                     </option>
                                 @endforeach
@@ -220,7 +205,7 @@
 
                         <x-form.group label="Update Releases Sleep Timer" for="rel_timer">
                             <div class="flex gap-2">
-                                <x-input id="rel_timer" name="rel_timer" type="number" value="{{ $site->rel_timer ?? 15 }}" class="flex-1" />
+                                <x-input id="rel_timer" name="rel_timer" type="number" value="{{ $site['rel_timer'] ?? 15 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
@@ -234,7 +219,7 @@
                         <x-form.group label="Postprocess Additional" for="post" help="Deep rar inspection, preview/sample creation, NFO processing.">
                             <x-select id="post" name="post" class="w-full">
                                 @foreach($post_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->post ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['post'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $post_names[$index] }}
                                     </option>
                                 @endforeach
@@ -243,14 +228,14 @@
 
                         <x-form.group label="Postprocess Additional Sleep Timer" for="post_timer">
                             <div class="flex gap-2">
-                                <x-input id="post_timer" name="post_timer" type="number" value="{{ $site->post_timer ?? 300 }}" class="flex-1" />
+                                <x-input id="post_timer" name="post_timer" type="number" value="{{ $site['post_timer'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
                         <x-form.group label="Postprocess Kill Timer" for="post_kill_timer" help="Time allowed with no screen updates.">
                             <div class="flex gap-2">
-                                <x-input id="post_kill_timer" name="post_kill_timer" type="number" value="{{ $site->post_kill_timer ?? 300 }}" class="flex-1" />
+                                <x-input id="post_kill_timer" name="post_kill_timer" type="number" value="{{ $site['post_kill_timer'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
@@ -258,7 +243,7 @@
                         <x-form.group label="Postprocess Amazon" for="post_amazon" help="Books, music and games lookups.">
                             <x-select id="post_amazon" name="post_amazon" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->post_amazon ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['post_amazon'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach
@@ -267,7 +252,7 @@
 
                         <x-form.group label="Postprocess Amazon Sleep Timer" for="post_timer_amazon">
                             <div class="flex gap-2">
-                                <x-input id="post_timer_amazon" name="post_timer_amazon" type="number" value="{{ $site->post_timer_amazon ?? 300 }}" class="flex-1" />
+                                <x-input id="post_timer_amazon" name="post_timer_amazon" type="number" value="{{ $site['post_timer_amazon'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
@@ -275,7 +260,7 @@
                         <x-form.group label="Postprocess Non-Amazon" for="post_non" help="Movies, anime and TV lookups.">
                             <x-select id="post_non" name="post_non" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->post_non ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['post_non'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach
@@ -284,7 +269,7 @@
 
                         <x-form.group label="Postprocess Non-Amazon Sleep Timer" for="post_timer_non">
                             <div class="flex gap-2">
-                                <x-input id="post_timer_non" name="post_timer_non" type="number" value="{{ $site->post_timer_non ?? 300 }}" class="flex-1" />
+                                <x-input id="post_timer_non" name="post_timer_non" type="number" value="{{ $site['post_timer_non'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
@@ -298,7 +283,7 @@
                         <x-form.group label="Fix Release Names" for="fix_names" help="Fix release names using NFOs, par2 files, filenames, md5 and sha1.">
                             <x-select id="fix_names" name="fix_names" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->fix_names ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['fix_names'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach
@@ -307,7 +292,7 @@
 
                         <x-form.group label="Fix Release Names Sleep Timer" for="fix_timer">
                             <div class="flex gap-2">
-                                <x-input id="fix_timer" name="fix_timer" type="number" value="{{ $site->fix_timer ?? 60 }}" class="flex-1" />
+                                <x-input id="fix_timer" name="fix_timer" type="number" value="{{ $site['fix_timer'] ?? 60 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
@@ -321,7 +306,7 @@
                         <x-form.group label="Remove Crap Releases" for="fix_crap_opt" help="Remove passworded and other junk releases.">
                             <x-select id="fix_crap_opt" name="fix_crap_opt" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site->fix_crap_opt ?? '') == $val ? 'selected' : '' }}>
+                                    <option value="{{ $val }}" {{ ($site['fix_crap_opt'] ?? '') == $val ? 'selected' : '' }}>
                                         {{ $yesno_names[$index] }}
                                     </option>
                                 @endforeach
@@ -330,7 +315,7 @@
 
                         <x-form.group label="Remove Crap Sleep Timer" for="crap_timer">
                             <div class="flex gap-2">
-                                <x-input id="crap_timer" name="crap_timer" type="number" value="{{ $site->crap_timer ?? 300 }}" class="flex-1" />
+                                <x-input id="crap_timer" name="crap_timer" type="number" value="{{ $site['crap_timer'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>

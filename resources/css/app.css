@@ -1,9 +1,9 @@
 /* Import FontAwesome */
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 
-/* Import other necessary libraries */
-@import 'animate.css/animate.min.css';
-@import 'datatables/media/css/jquery.dataTables.min.css';
+
+/* Import custom CSP-safe styles */
+@import './csp-safe.css';
 
 @tailwind base;
 @tailwind components;
@@ -122,5 +122,236 @@
 
 .table-actions .btn {
     @apply flex-shrink-0;
+}
+
+/* Mobile Responsive Improvements */
+@layer utilities {
+    /* Mobile-friendly tables */
+    @media (max-width: 768px) {
+        .table-responsive {
+            @apply overflow-x-auto -mx-4 px-4;
+        }
+
+        .table-responsive table {
+            @apply min-w-max;
+        }
+
+        /* Card-style table rows for mobile */
+        .table-mobile-cards tbody tr {
+            @apply block border border-gray-200 dark:border-gray-700 rounded-lg mb-4 p-4;
+        }
+
+        .table-mobile-cards tbody td {
+            @apply block text-left;
+            padding-left: 50% !important;
+            position: relative;
+        }
+
+        .table-mobile-cards tbody td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 1rem;
+            font-weight: 600;
+            @apply text-gray-700 dark:text-gray-300;
+        }
+
+        .table-mobile-cards thead {
+            @apply hidden;
+        }
+
+        /* Stack buttons vertically on mobile */
+        .btn-group {
+            @apply flex-col space-x-0 space-y-2;
+        }
+
+        /* Full width buttons on mobile */
+        .btn-mobile-full {
+            @apply w-full justify-center;
+        }
+
+        /* Mobile search forms */
+        .search-form-mobile {
+            @apply flex-col space-y-2;
+        }
+
+        .search-form-mobile select,
+        .search-form-mobile input {
+            @apply w-full rounded;
+        }
+
+        /* Reduce padding on small screens */
+        .container {
+            @apply px-2;
+        }
+
+        /* Stack navigation items */
+        .nav-mobile-stack {
+            @apply flex-col space-x-0 space-y-2;
+        }
+
+        /* Hide non-essential columns on mobile */
+        .hide-mobile {
+            @apply hidden;
+        }
+
+        /* Smaller text on mobile */
+        .text-mobile-sm {
+            @apply text-xs;
+        }
+
+        /* Mobile dropdown menus should be full width */
+        .dropdown-menu {
+            @apply left-0 right-0 w-auto mx-2;
+        }
+
+        /* Mobile modal adjustments */
+        .modal-content {
+            @apply mx-2 max-h-[90vh] overflow-y-auto;
+        }
+
+        /* Smaller font sizes for headings on mobile */
+        h1 {
+            @apply text-2xl;
+        }
+
+        h2 {
+            @apply text-xl;
+        }
+
+        h3 {
+            @apply text-lg;
+        }
+
+        /* Mobile grid adjustments */
+        .grid-mobile-1 {
+            @apply grid-cols-1;
+        }
+
+        /* Touch-friendly sizing */
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+    }
+
+    /* Small mobile devices */
+    @media (max-width: 480px) {
+        /* Even smaller text on very small screens */
+        body {
+            @apply text-sm;
+        }
+
+        .btn {
+            @apply text-xs px-3 py-2;
+        }
+
+        /* Stack form fields */
+        .form-grid {
+            @apply grid-cols-1 gap-2;
+        }
+
+        /* Compact headers */
+        .page-header {
+            @apply text-xl py-2;
+        }
+
+        /* Reduce card padding */
+        .card-mobile-compact {
+            @apply p-3;
+        }
+    }
+
+    /* Tablet improvements */
+    @media (min-width: 768px) and (max-width: 1024px) {
+        /* 2-column layout on tablets where appropriate */
+        .tablet-cols-2 {
+            @apply grid-cols-2;
+        }
+
+        /* Tablet-optimized navigation */
+        .nav-tablet {
+            @apply space-x-2;
+        }
+    }
+
+    /* Landscape mobile optimization */
+    @media (max-height: 600px) and (orientation: landscape) {
+        /* Reduce vertical padding in landscape */
+        .py-6 {
+            @apply py-2;
+        }
+
+        /* Compact modals in landscape */
+        .modal-content {
+            max-height: 85vh;
+        }
+
+        /* Smaller fixed buttons */
+        #mobile-sidebar-toggle,
+        #theme-toggle {
+            @apply p-2 text-sm;
+        }
+    }
+
+    /* Mobile-optimized badges and labels */
+    @media (max-width: 768px) {
+        .badge {
+            @apply text-xs px-2 py-1;
+        }
+
+        /* Improve readability of release titles */
+        .release-title {
+            @apply text-sm leading-tight;
+        }
+
+        /* Stack action buttons in cards */
+        .card-actions {
+            @apply flex-col space-y-2 space-x-0;
+        }
+
+        /* Make pagination more compact */
+        .pagination {
+            @apply text-sm;
+        }
+
+        .pagination .page-link {
+            @apply px-2 py-1 min-w-[2rem];
+        }
+
+        /* Optimize data tables for mobile */
+        table.dataTable {
+            font-size: 0.875rem;
+        }
+
+        table.dataTable td,
+        table.dataTable th {
+            padding: 0.5rem 0.25rem;
+        }
+
+        /* Improve form labels */
+        label {
+            @apply text-sm font-medium;
+        }
+
+        /* Better spacing for form groups */
+        .form-group {
+            @apply mb-3;
+        }
+
+        /* Mobile-friendly alerts */
+        .alert {
+            @apply text-sm px-3 py-2;
+        }
+
+        /* Compact breadcrumbs */
+        .breadcrumb {
+            @apply text-xs;
+        }
+
+        /* Stack filter options vertically */
+        .filter-options {
+            @apply flex-col space-y-2;
+        }
+    }
 }
 

@@ -185,28 +185,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-// Delete confirmation handling
-function confirmDelete(id) {
-    const modal = document.getElementById('deleteModal');
-    const deleteLink = document.getElementById('confirmDeleteLink');
-    deleteLink.href = `{{ url('/admin/category-delete?id=') }}${id}`;
-    modal.classList.remove('hidden');
-}
-
-function closeDeleteModal() {
-    const modal = document.getElementById('deleteModal');
-    modal.classList.add('hidden');
-}
-
-// Close modal when clicking outside
-document.getElementById('deleteModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
-    }
-});
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

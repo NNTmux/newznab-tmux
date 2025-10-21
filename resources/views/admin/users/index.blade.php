@@ -107,6 +107,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Username</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role Expiry</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Host</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Country</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Verified</th>
@@ -126,6 +127,33 @@
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                         {{ $user->roles->first()->name ?? 'N/A' }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                    @if($user->rolechangedate)
+                                        @php
+                                            $expiryDate = \Carbon\Carbon::parse($user->rolechangedate);
+                                            $isExpired = $expiryDate->isPast();
+                                            $isExpiringSoon = !$isExpired && $expiryDate->diffInDays(now()) <= 7;
+                                        @endphp
+                                        <div class="flex flex-col gap-1">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-fit
+                                                @if($isExpired) bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                                                @elseif($isExpiringSoon) bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                                                @else bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300
+                                                @endif">
+                                                <i class="fa fa-calendar mr-1"></i>{{ $expiryDate->format('M j, Y') }}
+                                                @if($isExpired) <i class="fa fa-exclamation-circle ml-1"></i>@endif
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                                                <i class="fa fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
+                                                <span class="ml-2 italic">({{ $expiryDate->diffForHumans() }})</span>
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500 flex items-center">
+                                            <i class="fa fa-infinity mr-1"></i>Never
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->host ?? 'N/A' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -173,12 +201,16 @@
                                                 <i class="fa fa-envelope"></i>
                                             </a>
                                         @endif
-                                        <a href="{{ url('admin/user-delete?id=' . $user->id) }}"
-                                           class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                           title="Delete"
-                                           onclick="return confirm('Are you sure you want to delete user \'{{ $user->username }}\'?')">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
+                                        <form action="{{ url('admin/user-delete') }}" method="POST" class="inline-form">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $user->id }}">
+                                            <button type="submit"
+                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                    title="Delete"
+                                                    data-confirm="Are you sure you want to delete user '{{ $user->username }}'?">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -230,40 +262,5 @@
 
 @endsection
 
-@push('scripts')
-<script>
-let currentVerifyForm = null;
-
-function showVerifyModal(event, form) {
-    event.preventDefault();
-    currentVerifyForm = form;
-    document.getElementById('verifyUserModal').classList.remove('hidden');
-}
-
-function hideVerifyModal() {
-    document.getElementById('verifyUserModal').classList.add('hidden');
-    currentVerifyForm = null;
-}
-
-function submitVerifyForm() {
-    if (currentVerifyForm) {
-        currentVerifyForm.submit();
-    }
-}
-
-// Close modal when clicking outside
-document.getElementById('verifyUserModal')?.addEventListener('click', function(event) {
-    if (event.target === this) {
-        hideVerifyModal();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        hideVerifyModal();
-    }
-});
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 

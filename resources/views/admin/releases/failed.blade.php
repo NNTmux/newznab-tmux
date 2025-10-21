@@ -76,8 +76,8 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Size</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Files</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Post Date</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Add Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Post Date</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Grabs</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -110,17 +110,17 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     <div class="flex items-center">
-                                        <i class="fa fa-calendar text-gray-400 mr-2"></i>
-                                        <span title="{{ $release->postdate }}">
-                                            {{ \Carbon\Carbon::parse($release->postdate)->format('Y-m-d H:i') }}
+                                        <i class="fa fa-calendar-plus-o text-gray-400 mr-2"></i>
+                                        <span title="{{ $release->adddate }}">
+                                            {{ \Carbon\Carbon::parse($release->adddate)->format('Y-m-d H:i') }}
                                         </span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     <div class="flex items-center">
-                                        <i class="fa fa-calendar-plus-o text-gray-400 mr-2"></i>
-                                        <span title="{{ $release->adddate }}">
-                                            {{ \Carbon\Carbon::parse($release->adddate)->format('Y-m-d H:i') }}
+                                        <i class="fa fa-calendar text-gray-400 mr-2"></i>
+                                        <span title="{{ $release->postdate }}">
+                                            {{ \Carbon\Carbon::parse($release->postdate)->format('Y-m-d H:i') }}
                                         </span>
                                     </div>
                                 </td>

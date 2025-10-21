@@ -1,0 +1,583 @@
+/* Sidebar Menu Animations */
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+.sidebar-toggle .fa-chevron-down,
+[data-toggle-submenu] .fa-chevron-down {
+    transition: transform 0.3s ease;
+}
+
+.sidebar-submenu {
+    transition: all 0.3s ease;
+}
+
+/* Mobile Sidebar */
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100vh;
+        width: 280px;
+        z-index: 999;
+        transition: left 0.3s ease-in-out;
+        overflow-y: auto;
+    }
+
+    #sidebar.mobile-open {
+        left: 0;
+        display: flex !important;
+    }
+
+    /* Mobile overlay */
+    .mobile-sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+        display: none;
+    }
+
+    .mobile-sidebar-overlay.active {
+        display: block;
+    }
+}
+
+/* Admin Dashboard Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px;
+    }
+}
+
+/* Toast Notifications */
+#toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+/* Mobile Toast Notifications */
+@media (max-width: 640px) {
+    #toast-container {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        max-width: 100%;
+    }
+}
+
+.toast-notification {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    animation: slideIn 0.3s ease-out;
+    pointer-events: auto;
+    transition: all 0.3s ease;
+}
+
+.toast-notification.removing {
+    animation: slideOut 0.3s ease-in;
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* Success Toast */
+.toast-notification.success {
+    background-color: #10b981;
+    color: white;
+}
+
+.dark .toast-notification.success {
+    background-color: #059669;
+}
+
+/* Error Toast */
+.toast-notification.error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.dark .toast-notification.error {
+    background-color: #dc2626;
+}
+
+/* Info Toast */
+.toast-notification.info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.dark .toast-notification.info {
+    background-color: #2563eb;
+}
+
+/* Warning Toast */
+.toast-notification.warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.dark .toast-notification.warning {
+    background-color: #d97706;
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.5rem;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.toast-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Inline form display */
+.inline-form {
+    display: inline;
+}
+
+/* Line clamp utility for text truncation */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Admin Tmux - Select color states - Light mode */
+#tmuxForm select.select-yes {
+    background-color: #d1e7dd !important;
+    border-color: #badbcc !important;
+    color: #0f5132 !important;
+}
+
+#tmuxForm select.select-no {
+    background-color: #f8d7da !important;
+    border-color: #f5c2c7 !important;
+    color: #842029 !important;
+}
+
+#tmuxForm select.select-other {
+    background-color: #e2e3e5 !important;
+    border-color: #d3d6d8 !important;
+    color: #41464b !important;
+}
+
+#tmuxForm select:focus {
+    box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+}
+
+/* Admin Tmux - Select color states - Dark mode */
+@media (prefers-color-scheme: dark) {
+    #tmuxForm select.select-yes {
+        background-color: #1a3a2a !important;
+        border-color: #2d5a3d !important;
+        color: #7fc99b !important;
+    }
+
+    #tmuxForm select.select-no {
+        background-color: #3a1a1d !important;
+        border-color: #5a2d31 !important;
+        color: #f5a9b0 !important;
+    }
+
+    #tmuxForm select.select-other {
+        background-color: #2a2a2a !important;
+        border-color: #3d3d3d !important;
+        color: #b0b0b0 !important;
+    }
+}
+
+/* Also support dark mode class on html element */
+html.dark #tmuxForm select.select-yes {
+    background-color: #1a3a2a !important;
+    border-color: #2d5a3d !important;
+    color: #7fc99b !important;
+}
+
+html.dark #tmuxForm select.select-no {
+    background-color: #3a1a1d !important;
+    border-color: #5a2d31 !important;
+    color: #f5a9b0 !important;
+}
+
+html.dark #tmuxForm select.select-other {
+    background-color: #2a2a2a !important;
+    border-color: #3d3d3d !important;
+    color: #b0b0b0 !important;
+}
+/* Dropdown menu hidden by default */
+.dropdown-menu {
+    display: none;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+/* Chart container heights */
+.chart-container {
+    height: 250px;
+    max-height: 250px;
+    position: relative;
+}
+
+/* Fixed widths for table columns */
+.col-width-180 {
+    width: 180px;
+}
+
+.col-width-160 {
+    width: 160px;
+}
+
+.col-width-170 {
+    width: 170px;
+}
+
+.col-width-200 {
+    width: 200px;
+}
+
+/* Image max heights */
+.img-max-h-400 {
+    max-height: 400px;
+}
+
+/* Forum quote styling */
+.forum-quote {
+    border-color: #eee;
+}
+
+.dark .forum-quote {
+    border-color: #374151;
+}
+
+/* Email styles (for email templates) */
+.email-text-center {
+    text-align: center;
+}
+
+.email-code-block {
+    word-break: break-all;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+/* Profile Page Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content:first-of-type,
+.tab-content.active {
+    display: block;
+}
+
+.dark .email-code-block {
+    background-color: #1f2937;
+}
+
+/* Modal z-index and display */
+.modal-hidden {
+    display: none;
+    z-index: 9999 !important;
+}
+
+.modal-visible {
+    display: flex;
+    z-index: 9999 !important;
+}
+
+/* Modal content max height */
+.modal-content-scroll {
+    max-height: calc(90vh - 80px);
+}
+
+/* Cart table column width */
+.cart-checkbox-col {
+    width: 30px;
+}
+
+/* Admin Groups Management - Fade Out Animation */
+.fade-out {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+/* My Movies/Shows Page Styles */
+.header-gradient {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.info-card-gradient {
+    background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+}
+
+.dark .info-card-gradient {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+
+.table-header-gradient {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.dark .table-header-gradient {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+}
+
+.movie-poster-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.category-badge {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.dark .category-badge {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    color: #93c5fd !important;
+    border-color: #2563eb !important;
+}
+
+.empty-state-bg {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+}
+
+.dark .empty-state-bg {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+
+.show-avatar {
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+}
+
+/* My Shows Table Borders */
+table {
+    border-collapse: collapse;
+}
+
+table thead tr {
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.dark table thead tr {
+    border-bottom-color: #4b5563;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dark table tbody tr {
+    border-bottom-color: #374151;
+}
+
+table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Checkbox :has() fallback for older browsers */
+@supports not selector(:has(*)) {
+    label:has(input[type="checkbox"]:checked) {
+        background-color: #eff6ff !important;
+        border-color: #3b82f6 !important;
+        color: #1e40af !important;
+    }
+}
+
+/* Content Page Prose Styles */
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    font-weight: 600;
+}
+
+.prose p {
+    margin-bottom: 1em;
+}
+
+.prose ul, .prose ol {
+    margin-bottom: 1em;
+    padding-left: 1.5em;
+}
+
+.prose a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.prose a:hover {
+    color: #1d4ed8;
+}
+
+.prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1.5em 0;
+}
+
+.prose blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 1em;
+    color: #6b7280;
+    font-style: italic;
+    margin: 1.5em 0;
+}
+
+.prose code {
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* Cart Confirmation Modal Styles */
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.confirmation-modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    padding: 24px;
+    animation: slideUp 0.3s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+    .confirmation-modal-content {
+        background: #1f2937;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.confirmation-modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Contact Page Container */
+.contact-page-container {
+    max-width: 75% !important;
+    width: 75% !important;
+}
+
+@media (min-width: 1536px) {
+    .contact-page-container {
+        max-width: 1200px !important;
+    }
+}
+
+/* Toast Container Override */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    max-width: 350px;
+    pointer-events: none;
+}
+
+/* Preview/Sample Image Modal */
+#previewModal {
+    z-index: 9999 !important;
+}

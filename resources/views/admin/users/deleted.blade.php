@@ -107,6 +107,13 @@
             </div>
         @endif
 
+        <!-- Validation Error Messages (for bulk actions) -->
+        <div id="validationError" class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg hidden">
+            <p class="text-yellow-800 dark:text-yellow-300">
+                <i class="fa fa-exclamation-triangle mr-2"></i><span id="validationErrorMessage"></span>
+            </p>
+        </div>
+
         <!-- Deleted Users Table -->
         @if(count($deletedusers) > 0)
             <form method="post" action="{{ url('admin/deleted-users/bulk') }}" id="bulkActionForm">
@@ -195,18 +202,24 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex gap-2">
-                                            <a href="{{ url('admin/deleted-users/restore/' . $user->id) }}"
-                                               class="text-green-600 hover:text-green-900"
-                                               title="Restore User"
-                                               onclick="return confirm('Are you sure you want to restore user \'{{ $user->username }}\'?')">
-                                                <i class="fa fa-undo"></i>
-                                            </a>
-                                            <a href="{{ url('admin/deleted-users/permanent-delete/' . $user->id) }}"
-                                               class="text-red-600 hover:text-red-900"
-                                               title="Permanently Delete"
-                                               onclick="return confirm('Are you sure you want to PERMANENTLY delete user \'{{ $user->username }}\'? This action cannot be undone!')">
-                                                <i class="fa fa-trash-alt"></i>
-                                            </a>
+                                            <form action="{{ url('admin/deleted-users/restore/' . $user->id) }}" method="POST" class="inline-form">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="text-green-600 hover:text-green-900 bg-transparent border-0 p-0 cursor-pointer"
+                                                        title="Restore User"
+                                                        data-confirm="Are you sure you want to restore user '{{ $user->username }}'?">
+                                                    <i class="fa fa-undo"></i>
+                                                </button>
+                                            </form>
+                                            <form action="{{ url('admin/deleted-users/permanent-delete/' . $user->id) }}" method="POST" class="inline-form">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="text-red-600 hover:text-red-900 bg-transparent border-0 p-0 cursor-pointer"
+                                                        title="Permanently Delete"
+                                                        data-confirm="Are you sure you want to PERMANENTLY delete user '{{ $user->username }}'? This action cannot be undone!">
+                                                    <i class="fa fa-trash-alt"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -230,36 +243,6 @@
     </div>
 </div>
 
-<script>
-// Select all checkbox functionality
-document.getElementById('selectAll')?.addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('.user-checkbox');
-    checkboxes.forEach(cb => cb.checked = this.checked);
-});
-
-// Confirm bulk action
-function confirmBulkAction() {
-    const action = document.getElementById('bulkAction').value;
-    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
-
-    if (!action) {
-        alert('Please select an action.');
-        return false;
-    }
-
-    if (checkedBoxes.length === 0) {
-        alert('Please select at least one user.');
-        return false;
-    }
-
-    if (action === 'delete') {
-        return confirm(`Are you sure you want to PERMANENTLY delete ${checkedBoxes.length} user(s)? This action cannot be undone!`);
-    } else if (action === 'restore') {
-        return confirm(`Are you sure you want to restore ${checkedBoxes.length} user(s)?`);
-    }
-
-    return true;
-}
-</script>
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

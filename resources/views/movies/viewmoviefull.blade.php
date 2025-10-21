@@ -7,7 +7,7 @@
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
+                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                 </li>
@@ -162,14 +162,26 @@
                                             <span>
                                                 <i class="fas fa-hdd mr-1"></i>{{ number_format($release['size'] / 1073741824, 2) }} GB
                                             </span>
-                                            @if($release['postdate'])
-                                                <span>
-                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($release['postdate'])->format('M d, Y') }}
-                                                </span>
-                                            @endif
                                             @if($release['adddate'])
                                                 <span>
                                                     <i class="fas fa-plus-circle mr-1"></i>Added: {{ \Carbon\Carbon::parse($release['adddate'])->diffForHumans() }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="flex flex-wrap gap-2 mt-2 text-xs">
+                                            @if(!empty($release['group_name']))
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                                    <i class="fas fa-users mr-1"></i> {{ $release['group_name'] }}
+                                                </span>
+                                            @endif
+                                            @if($release['postdate'])
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($release['postdate'])->format('M d, Y H:i') }}
+                                                </span>
+                                            @endif
+                                            @if(!empty($release['fromname']))
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono">
+                                                    <i class="fas fa-user mr-1"></i>{{ $release['fromname'] }}
                                                 </span>
                                             @endif
                                         </div>
@@ -178,7 +190,7 @@
                                         <a href="{{ url('/getnzb/' . $release['guid']) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
                                             <i class="fas fa-download mr-2"></i> Download
                                         </a>
-                                        <button onclick="addToCart('{{ $release['guid'] }}')" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">
+                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $release['guid'] }}">
                                             <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
                                         </button>
                                         <a href="{{ url('/details/' . $release['guid']) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
@@ -206,33 +218,5 @@
         </div>
     @endif
 </div>
-
-@push('scripts')
-<script>
-function addToCart(guid) {
-    fetch('{{ url("/cart/add") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ id: guid })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.showToast('Added to cart successfully!', 'success');
-        } else {
-            window.showToast('Failed to add to cart', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        window.showToast('An error occurred', 'error');
-    });
-}
-</script>
-@endpush
 @endsection
 

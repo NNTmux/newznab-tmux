@@ -3,7 +3,7 @@
     <nav aria-label="breadcrumb">
         <ol class="flex items-center space-x-2 text-sm">
             <li>
-                <a href="{{ url($site->home_link) }}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors">
+                <a href="{{ url($site['home_link']) }}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors">
                     Home
                 </a>
             </li>
@@ -19,7 +19,7 @@
     </nav>
 </div>
 
-{!! $site->adbrowse ?? '' !!}
+{!! $site['adbrowse'] ?? '' !!}
 
 <!-- Search Filter -->
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">

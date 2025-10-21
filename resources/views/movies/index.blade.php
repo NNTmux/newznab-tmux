@@ -7,7 +7,7 @@
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
+                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                 </li>
@@ -97,18 +97,18 @@
                                 @if($guid)
                                     <a href="{{ url('/details/' . $guid) }}" class="block">
                                         @if(isset($result->cover) && $result->cover)
-                                            <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded" style="width: 192px; height: 288px;">
+                                            <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded w-192 h-288">
                                         @else
-                                            <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
+                                            <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded w-192 h-288">
                                                 <i class="fas fa-film text-gray-400 text-3xl"></i>
                                             </div>
                                         @endif
                                     </a>
                                 @else
                                     @if(isset($result->cover) && $result->cover)
-                                        <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded" style="width: 192px; height: 288px;">
+                                        <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded w-192 h-288">
                                     @else
-                                        <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded" style="width: 192px; height: 288px;">
+                                        <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded w-192 h-288">
                                             <i class="fas fa-film text-gray-400 text-3xl"></i>
                                         </div>
                                     @endif
@@ -208,6 +208,10 @@
                                         $releaseGuids = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid) : [];
                                         $releasePostDates = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate) : [];
                                         $releaseAddDates = isset($result->grp_release_adddate) ? explode(',', $result->grp_release_adddate) : [];
+                                        $releaseHasPreview = isset($result->grp_haspreview) ? explode(',', $result->grp_haspreview) : [];
+                                        $releaseJpgStatus = isset($result->grp_jpgstatus) ? explode(',', $result->grp_jpgstatus) : [];
+                                        $releaseNfoStatus = isset($result->grp_nfostatus) ? explode(',', $result->grp_nfostatus) : [];
+                                        $releaseFromNames = isset($result->grp_release_fromname) ? explode(',', $result->grp_release_fromname) : [];
 
                                         // Limit to maximum 2 releases
                                         $maxReleases = 2;
@@ -217,6 +221,10 @@
                                         $releaseGuids = array_slice($releaseGuids, 0, $maxReleases);
                                         $releasePostDates = array_slice($releasePostDates, 0, $maxReleases);
                                         $releaseAddDates = array_slice($releaseAddDates, 0, $maxReleases);
+                                        $releaseHasPreview = array_slice($releaseHasPreview, 0, $maxReleases);
+                                        $releaseJpgStatus = array_slice($releaseJpgStatus, 0, $maxReleases);
+                                        $releaseNfoStatus = array_slice($releaseNfoStatus, 0, $maxReleases);
+                                        $releaseFromNames = array_slice($releaseFromNames, 0, $maxReleases);
                                     @endphp
 
                                     @if(!empty($releaseNames[0]))
@@ -236,6 +244,37 @@
                                                                     <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $releaseName }}">
                                                                         {{ $releaseName }}
                                                                     </a>
+                                                                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                                                                        @if(isset($releaseHasPreview[$index]) && $releaseHasPreview[$index] == 1)
+                                                                            <button type="button"
+                                                                                    class="preview-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800 transition cursor-pointer"
+                                                                                    data-guid="{{ $releaseGuids[$index] }}"
+                                                                                    title="View preview image">
+                                                                                <i class="fas fa-image mr-1"></i> Preview
+                                                                            </button>
+                                                                        @endif
+                                                                        @if(isset($releaseJpgStatus[$index]) && $releaseJpgStatus[$index] == 1)
+                                                                            <button type="button"
+                                                                                    class="sample-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800 transition cursor-pointer"
+                                                                                    data-guid="{{ $releaseGuids[$index] }}"
+                                                                                    title="View sample image">
+                                                                                <i class="fas fa-images mr-1"></i> Sample
+                                                                            </button>
+                                                                        @endif
+                                                                        @if(isset($releaseNfoStatus[$index]) && $releaseNfoStatus[$index] == 1)
+                                                                            <button type="button"
+                                                                                    class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition cursor-pointer"
+                                                                                    data-guid="{{ $releaseGuids[$index] }}"
+                                                                                    title="View NFO file">
+                                                                                <i class="fas fa-file-alt mr-1"></i> NFO
+                                                                            </button>
+                                                                        @endif
+                                                                        @if(isset($releaseFromNames[$index]) && !empty($releaseFromNames[$index]))
+                                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200" title="Poster/Uploader">
+                                                                                <i class="fas fa-user mr-1"></i> {{ $releaseFromNames[$index] }}
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
                                                                     <div class="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
                                                                         @if(isset($releaseSizes[$index]))
                                                                             <span>
@@ -258,7 +297,7 @@
                                                                     <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-green-600 dark:bg-green-700 text-white text-xs font-medium rounded hover:bg-green-700 dark:hover:bg-green-800 transition">
                                                                         <i class="fas fa-download mr-1"></i> Download
                                                                     </a>
-                                                                    <button onclick="addToCart('{{ $releaseGuids[$index] }}')" class="inline-flex items-center px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs font-medium rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition">
+                                                                    <button class="add-to-cart inline-flex items-center px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs font-medium rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $releaseGuids[$index] }}">
                                                                         <i class="fas fa-shopping-cart mr-1"></i> Cart
                                                                     </button>
                                                                     <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-gray-600 text-white text-xs font-medium rounded hover:bg-gray-700 transition">
@@ -290,34 +329,25 @@
             <p class="text-gray-600 dark:text-gray-400 text-lg">No movies found.</p>
         </div>
     @endif
-</div>
 
-@push('scripts')
-<script>
-function addToCart(guid) {
-    fetch('{{ url("/cart/add") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ id: guid })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.showToast('Added to cart successfully!', 'success');
-        } else {
-            window.showToast('Failed to add to cart', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        window.showToast('An error occurred', 'error');
-    });
-}
-</script>
-@endpush
+    <!-- Preview/Sample Image Modal -->
+    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+        <div class="relative max-w-4xl w-full">
+            <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="text-center mb-2">
+                <h3 id="previewTitle" class="text-white text-lg font-semibold"></h3>
+            </div>
+            <img id="previewImage" src="" alt="Preview" class="max-w-full max-h-[90vh] mx-auto rounded-lg shadow-2xl">
+            <div class="text-center mt-4">
+                <p id="previewError" class="text-red-400 hidden"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- NFO Modal -->
+    @include('partials.nfo-modal')
+</div>
 @endsection
 

@@ -193,10 +193,10 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $downloader->username }}
+                                    {{ $downloader['username'] }}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
-                                    {{ number_format($downloader->download_count) }}
+                                    {{ number_format($downloader['download_count']) }}
                                 </td>
                             </tr>
                             @endforeach
@@ -218,8 +218,8 @@
                     <i class="fas fa-chart-bar mr-2 text-green-600 dark:text-green-400"></i>
                     Downloads (Last 7 Days)
                 </h4>
-                <div style="height: 250px; max-height: 250px; position: relative;">
-                    <canvas id="downloadsChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="downloadsChart" data-chart-data="{{ json_encode($userStats['downloads_per_day']) }}"></canvas>
                 </div>
             </div>
 
@@ -229,8 +229,158 @@
                     <i class="fas fa-chart-area mr-2 text-purple-600 dark:text-purple-400"></i>
                     API Hits (Last 7 Days)
                 </h4>
-                <div style="height: 250px; max-height: 250px; position: relative;">
-                    <canvas id="apiHitsChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="apiHitsChart" data-chart-data="{{ json_encode($userStats['api_hits_per_day']) }}"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- System Metrics (CPU & RAM) -->
+    @if(isset($systemMetrics))
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
+            <i class="fas fa-server mr-2 text-orange-600 dark:text-orange-400"></i>
+            System Resources
+        </h3>
+
+        <!-- Current Usage Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <p class="text-sm text-orange-600 dark:text-orange-300 font-medium mb-1">CPU Usage</p>
+                        <p class="text-3xl font-bold text-orange-800 dark:text-orange-100" data-metric="cpu-current">{{ number_format($systemMetrics['cpu']['current'], 1) }}%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-200 dark:bg-orange-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-microchip text-2xl text-orange-600 dark:text-orange-300"></i>
+                    </div>
+                </div>
+                <div class="border-t border-orange-200 dark:border-orange-700 pt-3 space-y-2">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-orange-600 dark:text-orange-300">Cores:</span>
+                        <span class="font-semibold text-orange-800 dark:text-orange-100">{{ $systemMetrics['cpu']['cores'] }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-orange-600 dark:text-orange-300">Threads:</span>
+                        <span class="font-semibold text-orange-800 dark:text-orange-100">{{ $systemMetrics['cpu']['threads'] }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-orange-600 dark:text-orange-300">Load (1m):</span>
+                        <span class="font-semibold text-orange-800 dark:text-orange-100" data-metric="cpu-load-1min">{{ $systemMetrics['cpu']['load_average']['1min'] }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-orange-600 dark:text-orange-300">Load (5m):</span>
+                        <span class="font-semibold text-orange-800 dark:text-orange-100" data-metric="cpu-load-5min">{{ $systemMetrics['cpu']['load_average']['5min'] }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-orange-600 dark:text-orange-300">Load (15m):</span>
+                        <span class="font-semibold text-orange-800 dark:text-orange-100" data-metric="cpu-load-15min">{{ $systemMetrics['cpu']['load_average']['15min'] }}</span>
+                    </div>
+                    @if($systemMetrics['cpu']['model'] !== 'Unknown')
+                    <div class="pt-2 border-t border-orange-200 dark:border-orange-700">
+                        <p class="text-xs text-orange-600 dark:text-orange-300 truncate" title="{{ $systemMetrics['cpu']['model'] }}">
+                            <i class="fas fa-info-circle mr-1"></i>{{ $systemMetrics['cpu']['model'] }}
+                        </p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900 dark:to-cyan-800 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-cyan-600 dark:text-cyan-300 font-medium mb-1">RAM Usage</p>
+                        <p class="text-3xl font-bold text-cyan-800 dark:text-cyan-100" data-metric="ram-current">{{ number_format($systemMetrics['ram']['percentage'], 1) }}%</p>
+                        <p class="text-xs text-cyan-600 dark:text-cyan-300 mt-1" data-metric="ram-details">
+                            {{ number_format($systemMetrics['ram']['used'], 2) }} GB / {{ number_format($systemMetrics['ram']['total'], 2) }} GB
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-cyan-200 dark:bg-cyan-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-memory text-2xl text-cyan-600 dark:text-cyan-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Updated Indicator -->
+        <div class="mb-4 text-right">
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+                <i class="fas fa-sync-alt mr-1"></i>Last updated: <span data-metric="last-updated">{{ now()->format('H:i:s') }}</span>
+                <span class="ml-2 text-green-600 dark:text-green-400">(Auto-updates every minute)</span>
+            </span>
+        </div>
+
+        <!-- Historical Graphs -->
+        <div class="space-y-6">
+            <!-- 24 Hour Charts -->
+            <div>
+                <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                    <i class="fas fa-clock mr-2 text-blue-600 dark:text-blue-400"></i>
+                    Last 24 Hours (Hour by Hour)
+                </h4>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- CPU Usage 24h Graph -->
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                        <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                            <i class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>
+                            CPU Usage
+                        </h5>
+                        <div class="chart-container">
+                            <canvas id="cpuHistory24hChart"
+                                    data-history="{{ json_encode($systemMetrics['cpu']['history_24h']) }}"
+                                    data-chart-label="CPU Usage %"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- RAM Usage 24h Graph -->
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                        <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                            <i class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>
+                            RAM Usage
+                        </h5>
+                        <div class="chart-container">
+                            <canvas id="ramHistory24hChart"
+                                    data-history="{{ json_encode($systemMetrics['ram']['history_24h']) }}"
+                                    data-chart-label="RAM Usage %"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 30 Day Charts -->
+            <div>
+                <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                    <i class="fas fa-calendar-alt mr-2 text-purple-600 dark:text-purple-400"></i>
+                    Last 30 Days (Day by Day)
+                </h4>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- CPU Usage 30d Graph -->
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                        <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                            <i class="fas fa-microchip mr-2 text-orange-600 dark:text-orange-400"></i>
+                            CPU Usage
+                        </h5>
+                        <div class="chart-container">
+                            <canvas id="cpuHistory30dChart"
+                                    data-history="{{ json_encode($systemMetrics['cpu']['history_30d']) }}"
+                                    data-chart-label="CPU Usage %"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- RAM Usage 30d Graph -->
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                        <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                            <i class="fas fa-memory mr-2 text-cyan-600 dark:text-cyan-400"></i>
+                            RAM Usage
+                        </h5>
+                        <div class="chart-container">
+                            <canvas id="ramHistory30dChart"
+                                    data-history="{{ json_encode($systemMetrics['ram']['history_30d']) }}"
+                                    data-chart-label="RAM Usage %"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -319,148 +469,5 @@
 @push('scripts')
 @if(isset($userStats))
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Check for dark mode
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    const textColor = isDarkMode ? '#e5e7eb' : '#374151';
-    const gridColor = isDarkMode ? '#374151' : '#e5e7eb';
-
-    // Downloads Chart
-    const downloadsCtx = document.getElementById('downloadsChart');
-    if (downloadsCtx) {
-        const downloadsData = {!! json_encode($userStats['downloads_per_day']) !!};
-        new Chart(downloadsCtx, {
-            type: 'bar',
-            data: {
-                labels: downloadsData.map(d => d.date),
-                datasets: [{
-                    label: 'Downloads',
-                    data: downloadsData.map(d => d.count),
-                    backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                    borderColor: 'rgba(34, 197, 94, 1)',
-                    borderWidth: 2,
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Downloads: ' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: textColor,
-                            precision: 0
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // API Hits Chart
-    const apiHitsCtx = document.getElementById('apiHitsChart');
-    if (apiHitsCtx) {
-        const apiHitsData = {!! json_encode($userStats['api_hits_per_day']) !!};
-        new Chart(apiHitsCtx, {
-            type: 'line',
-            data: {
-                labels: apiHitsData.map(d => d.date),
-                datasets: [{
-                    label: 'API Hits',
-                    data: apiHitsData.map(d => d.count),
-                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                    borderColor: 'rgba(147, 51, 234, 1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: 'rgba(147, 51, 234, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'API Hits: ' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: textColor,
-                            precision: 0
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-});
-</script>
 @endif
 @endpush

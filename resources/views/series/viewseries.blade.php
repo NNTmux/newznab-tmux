@@ -6,7 +6,7 @@
     <div class="px-6 py-4 border-b border-gray-200">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
-                <li><a href="{{ url($site->home_link ?? '/') }}" class="hover:text-blue-600">Home</a></li>
+                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600">Home</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                 <li><a href="{{ route('series') }}" class="hover:text-blue-600">TV Series</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
@@ -140,7 +140,7 @@
                                     @if(!empty($show['tvdb']) && $show['tvdb'] > 0)
                                         <a class="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site->dereferrer_link }}http://thetvdb.com/?tab=series&id={{ $show['tvdb'] }}"
+                                           href="{{ $site['dereferrer_link'] }}http://thetvdb.com/?tab=series&id={{ $show['tvdb'] }}"
                                            title="View at TheTVDB">
                                             <i class="fa fa-database mr-2"></i> TheTVDB
                                         </a>
@@ -149,7 +149,7 @@
                                     @if(!empty($show['tvmaze']) && $show['tvmaze'] > 0)
                                         <a class="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site->dereferrer_link }}http://tvmaze.com/shows/{{ $show['tvmaze'] }}"
+                                           href="{{ $site['dereferrer_link'] }}http://tvmaze.com/shows/{{ $show['tvmaze'] }}"
                                            title="View at TVMaze">
                                             <i class="fa fa-tv mr-2"></i> TVMaze
                                         </a>
@@ -158,7 +158,7 @@
                                     @if(!empty($show['trakt']) && $show['trakt'] > 0)
                                         <a class="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site->dereferrer_link }}http://www.trakt.tv/shows/{{ $show['trakt'] }}"
+                                           href="{{ $site['dereferrer_link'] }}http://www.trakt.tv/shows/{{ $show['trakt'] }}"
                                            title="View at TraktTv">
                                             <i class="fa fa-heart mr-2"></i> Trakt
                                         </a>
@@ -167,7 +167,7 @@
                                     @if(!empty($show['tvrage']) && $show['tvrage'] > 0)
                                         <a class="px-4 py-2 bg-orange-100 text-orange-800 rounded-lg hover:bg-orange-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site->dereferrer_link }}http://www.tvrage.com/shows/id-{{ $show['tvrage'] }}"
+                                           href="{{ $site['dereferrer_link'] }}http://www.tvrage.com/shows/id-{{ $show['tvrage'] }}"
                                            title="View at TV Rage">
                                             <i class="fa fa-external-link-alt mr-2"></i> TV Rage
                                         </a>
@@ -176,7 +176,7 @@
                                     @if(!empty($show['imdb']) && $show['imdb'] > 0)
                                         <a class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site->dereferrer_link }}https://www.imdb.com/title/tt{{ str_pad($show['imdb'], 7, '0', STR_PAD_LEFT) }}"
+                                           href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ str_pad($show['imdb'], 7, '0', STR_PAD_LEFT) }}"
                                            title="View at IMDb">
                                             <i class="fa fa-film mr-2"></i> IMDb
                                         </a>
@@ -185,7 +185,7 @@
                                     @if(!empty($show['tmdb']) && $show['tmdb'] > 0)
                                         <a class="px-4 py-2 bg-cyan-100 text-cyan-800 rounded-lg hover:bg-cyan-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site->dereferrer_link }}https://www.themoviedb.org/tv/{{ $show['tmdb'] }}"
+                                           href="{{ $site['dereferrer_link'] }}https://www.themoviedb.org/tv/{{ $show['tmdb'] }}"
                                            title="View at TMDb">
                                             <i class="fa fa-video mr-2"></i> TMDb
                                         </a>
@@ -213,8 +213,7 @@
                             @foreach($seasons as $seasonNumber => $episodes)
                                 <button type="button"
                                         class="season-tab whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200 {{ $loop->first ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300' }}"
-                                        data-season="{{ $seasonNumber }}"
-                                        onclick="switchSeason({{ $seasonNumber }})">
+                                        data-season="{{ $seasonNumber }}">
                                     Season {{ $seasonNumber }}
                                     <span class="ml-2 px-2 py-0.5 rounded-full text-xs {{ $loop->first ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 dark:bg-gray-800 text-gray-600' }}">
                                         {{ count($episodes) }}
@@ -239,7 +238,7 @@
                                                     <div class="flex-1">
                                                         <div class="flex items-center gap-2 flex-wrap">
                                                             <a href="{{ url('/details/' . $release->guid) }}"
-                                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
+                                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words break-all">
                                                                 {{ $release->searchname }}
                                                             </a>
                                                             @if(!empty($release->failed) && $release->failed->count() > 0)
@@ -249,20 +248,29 @@
                                                                 </span>
                                                             @endif
                                                         </div>
-                                                        <div class="text-xs text-gray-500 mt-1">
+                                                        <div class="text-xs text-gray-500 mt-1 flex flex-wrap gap-2">
                                                             <span class="mr-3">
                                                                 <i class="fa fa-hdd-o mr-1"></i>{{ formatBytes($release->size) }}
                                                             </span>
                                                             <span>
-                                                                <i class="fa fa-clock-o mr-1"></i>{{ \Carbon\Carbon::parse($release->postdate)->diffForHumans() }}
+                                                                <i class="fa fa-clock-o mr-1"></i>Added: {{ \Carbon\Carbon::parse($release->adddate)->diffForHumans() }}
                                                             </span>
+                                                            @if(!empty($release->postdate))
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                                    <i class="fas fa-calendar mr-1"></i> Posted: {{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}
+                                                                </span>
+                                                            @endif
+                                                            @if(!empty($release->fromname))
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono">
+                                                                    <i class="fas fa-user mr-1"></i>{{ $release->fromname }}
+                                                                </span>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                     <div class="flex gap-2">
                                                         <a href="{{ url('/getnzb?id=' . $release->guid) }}"
-                                                           class="px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm"
-                                                           title="Download NZB"
-                                                           onclick="showToast('Downloading NZB...', 'success')">
+                                                           class="download-nzb px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm"
+                                                           title="Download NZB">
                                                             <i class="fa fa-download"></i>
                                                         </a>
                                                         <a href="{{ url('/details/' . $release->guid) }}"

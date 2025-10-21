@@ -125,7 +125,8 @@
                                         </a>
                                         <button type="button"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                onclick="confirmDelete({{ $row->id }})"
+                                                data-delete-regex="{{ $row->id }}"
+                                                data-delete-url="{{ url('/admin/category_regexes-delete') }}"
                                                 title="Delete this regex">
                                             <i class="fa fa-trash"></i>
                                         </button>
@@ -173,63 +174,4 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-<script>
-function confirmDelete(id) {
-    if (confirm('Are you sure you want to delete this regex? This action cannot be undone.')) {
-        deleteRegex(id);
-    }
-}
-
-function deleteRegex(id) {
-    fetch('{{ url("/admin/category_regexes-delete") }}?id=' + id, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const row = document.getElementById('row-' + id);
-            row.style.transition = 'opacity 0.3s';
-            row.style.opacity = '0';
-            setTimeout(() => row.remove(), 300);
-            showMessage('Regex deleted successfully', 'success');
-        } else {
-            showMessage('Error deleting regex', 'error');
-        }
-    })
-    .catch(error => {
-        showMessage('Error deleting regex', 'error');
-    });
-}
-
-function showMessage(message, type = 'success') {
-    const messageDiv = document.getElementById('message');
-    const bgColor = type === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200';
-    const textColor = type === 'success' ? 'text-green-800' : 'text-red-800';
-    const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
-
-    messageDiv.innerHTML = `
-        <div class="mt-4 p-4 ${bgColor} border rounded-lg">
-            <div class="flex items-center justify-between">
-                <p class="${textColor}">
-                    <i class="fa fa-${icon} mr-2"></i>${message}
-                </p>
-                <button type="button" class="${textColor} hover:opacity-75" onclick="this.parentElement.parentElement.remove()">
-                    <i class="fa fa-times"></i>
-                </button>
-            </div>
-        </div>
-    `;
-    setTimeout(() => {
-        messageDiv.innerHTML = '';
-    }, 5000);
-}
-</script>
-@endpush
-@endsection
-
+{{-- Regex management functions moved to resources/js/csp-safe.js --}}

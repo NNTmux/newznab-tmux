@@ -105,7 +105,7 @@
 
     <!-- Sign Out -->
     @auth
-        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();" class="flex items-center px-4 py-3 text-white hover:bg-gray-800 rounded transition mt-4">
+        <a href="{{ route('logout') }}" data-logout class="flex items-center px-4 py-3 text-white hover:bg-gray-800 rounded transition mt-4">
             <i class="fa fa-sign-out-alt fa-fw mr-3"></i>
             <span>Sign Out</span>
         </a>
@@ -115,25 +115,5 @@
     @endauth
 </nav>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Sidebar toggle functionality
-    const sidebarToggles = document.querySelectorAll('.sidebar-toggle');
 
-    sidebarToggles.forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const submenu = document.getElementById(targetId);
-            const chevron = this.querySelector('.fa-chevron-down');
-
-            if (submenu) {
-                submenu.classList.toggle('hidden');
-                if (chevron) {
-                    chevron.classList.toggle('rotate-180');
-                }
-            }
-        });
-    });
-});
-</script>
 

@@ -200,16 +200,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            alert('Link copied to clipboard!');
-        }, function(err) {
-            console.error('Could not copy text: ', err);
-        });
-    }
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

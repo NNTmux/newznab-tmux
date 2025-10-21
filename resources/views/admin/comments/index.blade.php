@@ -184,79 +184,8 @@
     </div>
 </div>
 
-@push('styles')
-<style>
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
-@endpush
+{{-- Styles moved to resources/css/csp-safe.css --}}
 
-@push('scripts')
-<script>
-function openDeleteModal(commentId, commentText) {
-    const modal = document.getElementById('deleteModal');
-    const form = document.getElementById('deleteForm');
-    const preview = document.getElementById('deleteCommentPreview');
-
-    // Set the form action
-    form.action = "{{ url('admin/comments-delete') }}/" + commentId;
-
-    // Set the comment preview
-    preview.textContent = '"' + commentText + (commentText.length >= 50 ? '..."' : '"');
-
-    // Show the modal
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
-}
-
-function closeDeleteModal() {
-    const modal = document.getElementById('deleteModal');
-
-    // Hide the modal
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-
-    // Restore body scroll
-    document.body.style.overflow = '';
-}
-
-// Close modal on escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeDeleteModal();
-    }
-});
-
-// Close modal when clicking outside
-document.getElementById('deleteModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
-    }
-});
-
-// Auto-dismiss flash messages after 5 seconds
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        const flashMessages = document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"]');
-        flashMessages.forEach(function(message) {
-            if (message.querySelector('.fa-check-circle') || message.querySelector('.fa-exclamation-circle')) {
-                message.style.transition = 'opacity 0.5s';
-                message.style.opacity = '0';
-                setTimeout(function() {
-                    message.remove();
-                }, 500);
-            }
-        });
-    }, 5000);
-});
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

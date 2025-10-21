@@ -10,7 +10,7 @@
             </h3>
             <nav aria-label="breadcrumb">
                 <ol class="flex items-center space-x-2 text-sm text-gray-600">
-                    <li><a href="{{ url($site->home_link ?? '/') }}" class="hover:text-blue-600">Home</a></li>
+                    <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600">Home</a></li>
                     <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                     <li class="text-gray-500">TV Series List</li>
                 </ol>
@@ -70,10 +70,10 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
-                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:120px">Network</th>
-                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:120px">Country</th>
-                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:140px">Actions</th>
-                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700" style="width:200px">External Links</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-120">Network</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-120">Country</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-140">Actions</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700 col-width-200">External Links</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
@@ -140,21 +140,21 @@
                                                     @if(!empty($sData['tvdb']) && $sData['tvdb'] > 0)
                                                         <a class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:bg-gray-700 text-xs"
                                                            title="View at TVDB" target="_blank"
-                                                           href="{{ $site->dereferrer_link }}http://thetvdb.com/?tab=series&id={{ $sData['tvdb'] }}">
+                                                           href="{{ $site['dereferrer_link'] }}http://thetvdb.com/?tab=series&id={{ $sData['tvdb'] }}">
                                                             TVDB
                                                         </a>
                                                     @endif
                                                     @if(!empty($sData['tvmaze']) && $sData['tvmaze'] > 0)
                                                         <a class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:bg-gray-700 text-xs"
                                                            title="View at TVMaze" target="_blank"
-                                                           href="{{ $site->dereferrer_link }}http://tvmaze.com/shows/{{ $sData['tvmaze'] }}">
+                                                           href="{{ $site['dereferrer_link'] }}http://tvmaze.com/shows/{{ $sData['tvmaze'] }}">
                                                             TVMaze
                                                         </a>
                                                     @endif
                                                     @if(!empty($sData['trakt']) && $sData['trakt'] > 0)
                                                         <a class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:bg-gray-700 text-xs"
                                                            title="View at Trakt" target="_blank"
-                                                           href="{{ $site->dereferrer_link }}http://www.trakt.tv/shows/{{ $sData['trakt'] }}">
+                                                           href="{{ $site['dereferrer_link'] }}http://www.trakt.tv/shows/{{ $sData['trakt'] }}">
                                                             Trakt
                                                         </a>
                                                     @endif

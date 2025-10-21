@@ -178,7 +178,7 @@
                                         </form>
                                         <form method="POST" action="{{ url('admin/invitations/' . $invitation->id . '/cancel') }}" class="inline">
                                             @csrf
-                                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Cancel" onclick="return confirm('Are you sure you want to cancel this invitation?')">
+                                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Cancel" data-confirm="Are you sure you want to cancel this invitation?">
                                                 <i class="fas fa-ban"></i>
                                             </button>
                                         </form>
@@ -205,7 +205,7 @@
                                 <option value="cancel">Cancel Selected</option>
                                 <option value="delete">Delete Selected</option>
                             </select>
-                            <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900" onclick="return confirm('Are you sure you want to perform this bulk action?')">
+                            <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900" data-confirm="Are you sure you want to perform this bulk action?">
                                 Apply
                             </button>
                         </div>
@@ -280,15 +280,6 @@
     @endif
 </div>
 
-@push('scripts')
-<script>
-    // Select all checkbox functionality
-    document.getElementById('select_all')?.addEventListener('change', function(e) {
-        document.querySelectorAll('.invitation-checkbox').forEach(cb => {
-            cb.checked = e.target.checked;
-        });
-    });
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

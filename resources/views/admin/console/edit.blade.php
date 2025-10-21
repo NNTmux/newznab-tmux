@@ -166,8 +166,7 @@
                                 @if($hasCover)
                                     <img src="{{ asset('covers/console/' . $con['id'] . '.jpg') }}"
                                          alt="{{ $con['title'] }}"
-                                         class="max-w-full h-auto mx-auto rounded shadow-lg"
-                                         style="max-height: 400px;">
+                                         class="max-w-full h-auto mx-auto rounded shadow-lg img-max-h-400">
                                 @else
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
                                         <i class="fas fa-gamepad text-6xl mb-3"></i>
@@ -239,22 +238,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-    // Preview image before upload
-    document.getElementById('cover')?.addEventListener('change', function(e) {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = document.querySelector('img[alt="{{ $con['title'] ?? '' }}"]');
-                if (img) {
-                    img.src = event.target.result;
-                }
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

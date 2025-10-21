@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="max-w-full px-4 py-6">
+<div class="max-w-full px-4 py-6" data-ajax-url="{{ url('/admin/ajax') }}" data-csrf-token="{{ csrf_token() }}">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -78,12 +78,12 @@
                     <div class="flex justify-end items-center">
                         <div class="flex gap-2">
                             <button type="button"
-                                    onclick="showResetAllModal()"
+                                    data-action="show-reset-modal"
                                     class="px-3 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700">
                                 <i class="fa fa-refresh mr-1"></i> Reset All
                             </button>
                             <button type="button"
-                                    onclick="showPurgeAllModal()"
+                                    data-action="show-purge-modal"
                                     class="px-3 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700">
                                 <i class="fa fa-trash mr-1"></i> Purge All
                             </button>
@@ -134,13 +134,17 @@
                                 <td class="px-6 py-4 text-center" id="group-{{ $group->id }}">
                                     @if($group->active == 1)
                                         <button type="button"
-                                                onclick="ajax_group_status({{ $group->id }}, 0)"
+                                                data-action="toggle-group-status"
+                                                data-group-id="{{ $group->id }}"
+                                                data-status="0"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200">
                                             <i class="fa fa-check-circle mr-1"></i>Active
                                         </button>
                                     @else
                                         <button type="button"
-                                                onclick="ajax_group_status({{ $group->id }}, 1)"
+                                                data-action="toggle-group-status"
+                                                data-group-id="{{ $group->id }}"
+                                                data-status="1"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
                                             <i class="fa fa-times-circle mr-1"></i>Inactive
                                         </button>
@@ -149,13 +153,17 @@
                                 <td class="px-6 py-4 text-center" id="backfill-{{ $group->id }}">
                                     @if($group->backfill == 1)
                                         <button type="button"
-                                                onclick="ajax_backfill_status({{ $group->id }}, 0)"
+                                                data-action="toggle-backfill"
+                                                data-group-id="{{ $group->id }}"
+                                                data-status="0"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200">
                                             <i class="fa fa-check-circle mr-1"></i>Enabled
                                         </button>
                                     @else
                                         <button type="button"
-                                                onclick="ajax_backfill_status({{ $group->id }}, 1)"
+                                                data-action="toggle-backfill"
+                                                data-group-id="{{ $group->id }}"
+                                                data-status="1"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
                                             <i class="fa fa-times-circle mr-1"></i>Disabled
                                         </button>
@@ -197,19 +205,22 @@
                                             <i class="fa fa-pencil"></i>
                                         </a>
                                         <button type="button"
-                                                onclick="ajax_group_reset({{ $group->id }})"
+                                                data-action="reset-group"
+                                                data-group-id="{{ $group->id }}"
                                                 class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
                                                 title="Reset this group">
                                             <i class="fa fa-refresh"></i>
                                         </button>
                                         <button type="button"
-                                                onclick="confirmGroupDelete({{ $group->id }})"
+                                                data-action="delete-group"
+                                                data-group-id="{{ $group->id }}"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                 title="Delete this group">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                         <button type="button"
-                                                onclick="confirmGroupPurge({{ $group->id }})"
+                                                data-action="purge-group"
+                                                data-group-id="{{ $group->id }}"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                 title="Purge this group">
                                             <i class="fa fa-eraser"></i>
@@ -259,12 +270,12 @@
             </p>
             <div class="flex justify-end gap-3">
                 <button type="button"
-                        onclick="hideResetAllModal()"
+                        data-action="hide-reset-modal"
                         class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     Cancel
                 </button>
                 <button type="button"
-                        onclick="ajax_group_reset_all()"
+                        data-action="reset-all"
                         class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
                     Reset All
                 </button>
@@ -286,12 +297,12 @@
             </p>
             <div class="flex justify-end gap-3">
                 <button type="button"
-                        onclick="hidePurgeAllModal()"
+                        data-action="hide-purge-modal"
                         class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     Cancel
                 </button>
                 <button type="button"
-                        onclick="ajax_group_purge_all()"
+                        data-action="purge-all"
                         class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700">
                     Purge All
                 </button>
@@ -300,175 +311,5 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-function showResetAllModal() {
-    document.getElementById('resetAllModal').classList.remove('hidden');
-}
-
-function hideResetAllModal() {
-    document.getElementById('resetAllModal').classList.add('hidden');
-}
-
-function showPurgeAllModal() {
-    document.getElementById('purgeAllModal').classList.remove('hidden');
-}
-
-function hidePurgeAllModal() {
-    document.getElementById('purgeAllModal').classList.add('hidden');
-}
-
-function ajax_group_status(id, status) {
-    fetch('{{ url('/admin/ajax') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            action: 'toggle_group_active_status',
-            group_id: id,
-            group_status: status
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('group-' + id).innerHTML = data.html;
-        }
-    });
-}
-
-function ajax_backfill_status(id, status) {
-    fetch('{{ url('/admin/ajax') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            action: 'toggle_group_backfill',
-            group_id: id,
-            backfill: status
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('backfill-' + id).innerHTML = data.html;
-        }
-    });
-}
-
-function ajax_group_reset(id) {
-    if (confirm('Are you sure you want to reset this group?')) {
-        fetch('{{ url('/admin/ajax') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                action: 'reset_group',
-                group_id: id
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            }
-        });
-    }
-}
-
-function confirmGroupDelete(id) {
-    if (confirm('Are you sure you want to delete this group?')) {
-        fetch('{{ url('/admin/ajax') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                action: 'delete_group',
-                group_id: id
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const row = document.getElementById('grouprow-' + id);
-                row.style.transition = 'opacity 0.3s';
-                row.style.opacity = '0';
-                setTimeout(() => row.remove(), 300);
-            }
-        });
-    }
-}
-
-function confirmGroupPurge(id) {
-    if (confirm('Are you sure you want to purge this group? This will delete all releases and binaries!')) {
-        fetch('{{ url('/admin/ajax') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                action: 'purge_group',
-                group_id: id
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            }
-        });
-    }
-}
-
-function ajax_group_reset_all() {
-    fetch('{{ url('/admin/ajax') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            action: 'reset_all_groups'
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            hideResetAllModal();
-            location.reload();
-        }
-    });
-}
-
-function ajax_group_purge_all() {
-    fetch('{{ url('/admin/ajax') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            action: 'purge_all_groups'
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            hidePurgeAllModal();
-            location.reload();
-        }
-    });
-}
-</script>
-@endpush
 @endsection
 

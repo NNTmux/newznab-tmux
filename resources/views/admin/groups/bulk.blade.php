@@ -178,32 +178,5 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('groupBulkForm');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            const groupfilter = document.getElementById('groupfilter').value.trim();
-
-            if (groupfilter === '') {
-                event.preventDefault();
-                alert('Please enter a group pattern');
-                return false;
-            }
-
-            // Simple regex validation
-            try {
-                new RegExp(groupfilter);
-            } catch(e) {
-                event.preventDefault();
-                alert('Invalid regex pattern: ' + e.message);
-                return false;
-            }
-        });
-    }
-});
-</script>
-@endpush
 @endsection
 

@@ -6,7 +6,7 @@
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><a href="{{ url($site->home_link ?? '/') }}" class="hover:text-blue-600 dark:hover:text-blue-400">Home</a></li>
+                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600 dark:hover:text-blue-400">Home</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                 <li class="text-gray-500 dark:text-gray-400">Download Basket</li>
             </ol>
@@ -73,7 +73,7 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <a href="{{ url('/details/' . $result->release->guid) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold">
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold break-words break-all">
                                             {{ $result->release->searchname }}
                                         </a>
                                     </td>

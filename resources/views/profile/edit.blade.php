@@ -222,21 +222,60 @@
 
             @if($user->passwordSecurity()->exists() && $user->passwordSecurity->google2fa_enable)
                 <!-- 2FA is Enabled -->
-                <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4">
+                <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded-lg p-4">
                     <div class="flex items-start">
-                        <i class="fas fa-check-circle text-green-600 text-xl mr-3 mt-1"></i>
+                        <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl mr-3 mt-1"></i>
                         <div class="flex-1">
-                            <h4 class="text-green-800 font-semibold mb-1">Two-Factor Authentication is Active</h4>
-                            <p class="text-green-700 text-sm mb-4">Your account is protected with an additional layer of security. You'll need your authenticator app to log in.</p>
+                            <h4 class="text-green-800 dark:text-green-200 font-semibold mb-1">Two-Factor Authentication is Active</h4>
+                            <p class="text-green-700 dark:text-green-300 text-sm mb-4">Your account is protected with an additional layer of security. You'll need your authenticator app to log in.</p>
 
-                            <form method="POST" action="{{ route('profileedit.disable2fa') }}" class="inline">
-                                @csrf
-                                <button type="submit"
-                                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition"
-                                        onclick="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')">
+                            <!-- Collapsible Disable Form -->
+                            <div class="space-y-3">
+                                <button id="toggle-disable-2fa-btn"
+                                        type="button"
+                                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
                                     <i class="fas fa-times-circle mr-2"></i>Disable 2FA
                                 </button>
-                            </form>
+
+                                <div id="disable-2fa-form-container"
+                                     style="display: none;"
+                                     class="bg-white dark:bg-gray-800 border border-red-200 dark:border-red-700 rounded-lg p-4 mt-3">
+                                    <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 mr-2 mt-0.5"></i>
+                                            <div class="text-sm text-yellow-800 dark:text-yellow-200">
+                                                <strong>Warning:</strong> Disabling 2FA will make your account less secure. Please enter your password to confirm.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <form method="POST" action="{{ route('profileedit.disable2fa') }}" class="space-y-3">
+                                        @csrf
+                                        <div>
+                                            <label for="disable_2fa_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                Current Password
+                                            </label>
+                                            <input type="password"
+                                                   id="disable_2fa_password"
+                                                   name="current-password"
+                                                   required
+                                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                                   placeholder="Enter your password">
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button type="submit"
+                                                    class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
+                                                <i class="fas fa-check mr-2"></i>Confirm Disable
+                                            </button>
+                                            <button id="cancel-disable-2fa-btn"
+                                                    type="button"
+                                                    class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition">
+                                                <i class="fas fa-times mr-2"></i>Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -265,19 +304,19 @@
                             </p>
 
 
-                            <form method="POST" action="{{ route('enable2fa') }}" class="space-y-3">
+                            <form method="POST" action="{{ route('profileedit.enable2fa') }}" class="space-y-3">
                                 @csrf
                                 <div>
-                                    <label for="one_time_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <label for="verify-code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Enter Verification Code
                                     </label>
                                     <input type="text"
-                                           id="one_time_password"
-                                           name="one_time_password"
+                                           id="verify-code"
+                                           name="verify-code"
                                            placeholder="Enter 6-digit code"
                                            maxlength="6"
                                            required
-                                           class="w-full md:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest">
+                                           class="w-full md:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
                                 </div>
                                 <div class="flex gap-2">
                                     <button type="submit" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
@@ -327,61 +366,4 @@
 </div>
 @endsection
 
-@push('scripts')
-<script>
-    // Theme preference instant preview
-    document.addEventListener('DOMContentLoaded', function() {
-        const themeRadios = document.querySelectorAll('input[name="theme_preference"]');
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-        function applyTheme(themeValue) {
-            const html = document.documentElement;
-
-            if (themeValue === 'system') {
-                // Use OS preference
-                if (mediaQuery.matches) {
-                    html.classList.add('dark');
-                } else {
-                    html.classList.remove('dark');
-                }
-            } else if (themeValue === 'dark') {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-        }
-
-        themeRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                applyTheme(this.value);
-                updateThemeSelection();
-            });
-        });
-
-        function updateThemeSelection() {
-            const selectedValue = document.querySelector('input[name="theme_preference"]:checked').value;
-            document.querySelectorAll('input[name="theme_preference"]').forEach((radio) => {
-                const label = radio.closest('label');
-                const isSelected = radio.value === selectedValue;
-
-                if (isSelected) {
-                    label.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-gray-50', 'dark:bg-gray-700');
-                    label.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
-                } else {
-                    label.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
-                    label.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-gray-50', 'dark:bg-gray-700');
-                }
-            });
-        }
-
-        // Listen for OS theme changes when system mode is selected
-        mediaQuery.addEventListener('change', (e) => {
-            const selectedTheme = document.querySelector('input[name="theme_preference"]:checked').value;
-            if (selectedTheme === 'system') {
-                applyTheme('system');
-            }
-        });
-    });
-</script>
-@endpush
 

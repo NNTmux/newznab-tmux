@@ -27,18 +27,10 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Settings - model for settings table.
  *
- * @property string $section
- * @property string $subsection
  * @property string $name
  * @property string $value
- * @property string $hint
- * @property string $setting
  *
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereHint($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSection($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSetting($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSubsection($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereValue($value)
  *
  * @mixin \Eloquent
@@ -67,26 +59,19 @@ class Settings extends Model
 
     public const ERR_BADTMPUNRARPATH = -6;
 
-    public const ERR_BADNZBPATH_UNREADABLE = -7;
-
-    public const ERR_BADNZBPATH_UNSET = -8;
-
-    public const ERR_BAD_COVERS_PATH = -9;
-
-    public const ERR_BAD_YYDECODER_PATH = -10;
-
     public const ERR_BADLAMEPATH = -11;
 
     public const ERR_SABCOMPLETEPATH = -12;
 
     /**
-     * @var array
+     * @var string
      */
-    protected $primaryKey = ['section', 'subsection', 'name'];
+    protected $primaryKey = 'name';
 
     /**
      * @var string
      */
+    protected $keyType = 'string';
 
     /**
      * @var bool
@@ -111,6 +96,16 @@ class Settings extends Model
     protected static $settingsCollection;
 
     /**
+     * Get the value attribute and convert empty strings to null and numeric strings to numbers.
+     *
+     * @param  string  $value
+     */
+    public function getValueAttribute($value): mixed
+    {
+        return self::convertValue($value);
+    }
+
+    /**
      * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
      *
      * @return mixed
@@ -130,41 +125,60 @@ class Settings extends Model
     }
 
     /**
-     * Return a tree-like array of all or selected settings.
-     *
-     * @param  bool  $excludeUnsectioned  If rows with empty 'section' field should be excluded.
-     *                                    Note this doesn't prevent empty 'subsection' fields.
+     * Return a simple key-value array of all settings.
      *
      * @throws \RuntimeException
      */
     public static function toTree(bool $excludeUnsectioned = true): array
     {
-        $results = self::cursor()->remember();
+        $results = self::query()->pluck('value', 'name')->toArray();
 
-        $tree = [];
-        if (! empty($results)) {
-            foreach ($results as $result) {
-                if (! $excludeUnsectioned || ! empty($result->section)) {
-                    $tree[$result->section][$result->subsection][$result->name] =
-                        ['value' => $result->value, 'hint' => $result->hint];
-                }
-            }
-        } else {
+        if (empty($results)) {
             throw new \RuntimeException(
                 'No results from Settings table! Check your table has been created and populated.'
             );
         }
 
-        return $tree;
+        return $results;
     }
 
     public static function settingValue($setting): mixed
     {
-        return self::query()->where(
-            [
-                'name' => $setting,
-            ]
-        )->value('value');
+        $value = self::query()->where('name', $setting)->value('value');
+
+        // Apply the same conversion logic as the accessor
+        return self::convertValue($value);
+    }
+
+    /**
+     * Convert setting value: numeric strings to numbers, preserve empty strings.
+     *
+     * @param  string|null  $value
+     */
+    public static function convertValue($value): mixed
+    {
+        // Handle null
+        if ($value === null) {
+            return null;
+        }
+
+        // Keep empty strings as empty strings (don't convert to null)
+        // Many settings expect empty strings, not null
+        if ($value === '') {
+            return '';
+        }
+
+        // Convert numeric strings to actual numbers
+        if (is_numeric($value)) {
+            // Check if it's an integer or float
+            if (strpos($value, '.') !== false) {
+                return (float) $value;
+            }
+
+            return (int) $value;
+        }
+
+        return $value;
     }
 
     public static function settingsUpdate(array $data = []): void

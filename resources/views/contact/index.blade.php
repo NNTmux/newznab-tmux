@@ -1,19 +1,5 @@
 @extends('layouts.main')
 
-@push('styles')
-<style>
-    /* Override the container constraint for contact page */
-    .contact-page-container {
-        max-width: 75% !important;
-        width: 75% !important;
-    }
-    @media (min-width: 1536px) {
-        .contact-page-container {
-            max-width: 1200px !important;
-        }
-    }
-</style>
-@endpush
 
 @section('content')
 <div class="w-full contact-page-container mx-auto">
@@ -22,7 +8,7 @@
             <h4 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-0">Contact Us</h4>
             <nav class="mt-2" aria-label="breadcrumb">
                 <ol class="flex space-x-2 text-sm">
-                    <li><a href="{{ url($site->home_link ?? '/') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">Home</a></li>
+                    <li><a href="{{ url($site['home_link'] ?? '/') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">Home</a></li>
                     <li class="text-gray-500">/</li>
                     <li class="text-gray-600">Contact</li>
                 </ol>
@@ -113,11 +99,11 @@
                     @enderror
                 </div>
 
-                @if(config('captcha.enabled') == true && !empty(config('captcha.sitekey')) && !empty(config('captcha.secret')))
+                @if(\App\Support\CaptchaHelper::isEnabled())
                     <div class="mb-6 flex justify-center">
-                        {!! NoCaptcha::display() !!}
+                        {!! \App\Support\CaptchaHelper::display() !!}
                     </div>
-                    @error('g-recaptcha-response')
+                    @error(\App\Support\CaptchaHelper::getResponseFieldName())
                         <div class="text-red-500 text-center text-sm mb-6">{{ $message }}</div>
                     @enderror
                 @endif
@@ -138,9 +124,5 @@
         </div>
     </div>
 </div>
-
-@if(config('captcha.enabled') == true && !empty(config('captcha.sitekey')) && !empty(config('captcha.secret')))
-    {!! NoCaptcha::renderJs() !!}
-@endif
 @endsection
 

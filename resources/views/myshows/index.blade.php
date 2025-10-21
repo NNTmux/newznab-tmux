@@ -1,55 +1,3 @@
-<style>
-    .header-gradient {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    }
-    .info-card-gradient {
-        background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
-    }
-    .dark .info-card-gradient {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-    }
-    .table-header-gradient {
-        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-    }
-    .dark .table-header-gradient {
-        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-    }
-    .show-avatar {
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-    }
-    .category-badge {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    }
-    .dark .category-badge {
-        background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-        color: #93c5fd !important;
-        border-color: #2563eb !important;
-    }
-    .empty-state-bg {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-    }
-    .dark .empty-state-bg {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-    }
-    table {
-        border-collapse: collapse;
-    }
-    table thead tr {
-        border-bottom: 2px solid #e5e7eb;
-    }
-    .dark table thead tr {
-        border-bottom-color: #4b5563;
-    }
-    table tbody tr {
-        border-bottom: 1px solid #e5e7eb;
-    }
-    .dark table tbody tr {
-        border-bottom-color: #374151;
-    }
-    table tbody tr:last-child {
-        border-bottom: none;
-    }
-</style>
 
 <div class="max-w-7xl mx-auto">
     <!-- Header Section -->
@@ -64,7 +12,7 @@
                 </div>
                 <nav aria-label="breadcrumb">
                     <ol class="flex items-center space-x-2 text-sm text-blue-100">
-                        <li><a href="{{ url($site->home_link) }}" class="hover:text-white transition">Home</a></li>
+                        <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
                         <li class="text-white font-medium">My TV Shows</li>
                     </ol>
@@ -135,13 +83,13 @@
                             <th scope="col" class="px-8 py-5 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Series Name
                             </th>
-                            <th scope="col" class="px-8 py-5 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider" style="width:180px">
+                            <th scope="col" class="px-8 py-5 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider col-width-180">
                                 Categories
                             </th>
-                            <th scope="col" class="px-8 py-5 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider" style="width:160px">
+                            <th scope="col" class="px-8 py-5 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider col-width-160">
                                 Added Date
                             </th>
-                            <th scope="col" class="px-8 py-5 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider" style="width:170px">
+                            <th scope="col" class="px-8 py-5 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider col-width-170">
                                 Actions
                             </th>
                         </tr>

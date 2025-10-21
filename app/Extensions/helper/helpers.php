@@ -530,3 +530,20 @@ if (! function_exists('formatBytes')) {
         return round($bytes, 2).' '.$units[$pow];
     }
 }
+
+if (! function_exists('csp_nonce')) {
+    /**
+     * Generate a CSP nonce for inline scripts
+     * This should be stored in the request and reused across the request lifecycle
+     */
+    function csp_nonce(): string
+    {
+        static $nonce = null;
+
+        if ($nonce === null) {
+            $nonce = base64_encode(random_bytes(16));
+        }
+
+        return $nonce;
+    }
+}

@@ -134,10 +134,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-// Form validation can be added here if needed in the future
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

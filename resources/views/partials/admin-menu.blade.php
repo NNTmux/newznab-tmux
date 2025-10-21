@@ -9,7 +9,7 @@
 
     <!-- Users -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('users-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="users-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-users"></i>
                 <span>Users</span>
@@ -33,7 +33,7 @@
 
     <!-- Content -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('content-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="content-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-file-alt"></i>
                 <span>Content</span>
@@ -56,7 +56,7 @@
 
     <!-- Releases -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('releases-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="releases-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-download"></i>
                 <span>Releases</span>
@@ -72,7 +72,7 @@
 
     <!-- Movies -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('movies-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="movies-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-film"></i>
                 <span>Movies</span>
@@ -87,7 +87,7 @@
 
     <!-- TV Shows -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('shows-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="shows-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-tv"></i>
                 <span>TV Shows</span>
@@ -101,7 +101,7 @@
 
     <!-- AniDB -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('anidb-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="anidb-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-dragon"></i>
                 <span>AniDB</span>
@@ -115,7 +115,7 @@
 
     <!-- Games -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('games-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="games-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-gamepad"></i>
                 <span>Games</span>
@@ -129,7 +129,7 @@
 
     <!-- Console -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('console-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="console-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-gamepad"></i>
                 <span>Console</span>
@@ -143,7 +143,7 @@
 
     <!-- Music -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('music-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="music-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-music"></i>
                 <span>Music</span>
@@ -157,7 +157,7 @@
 
     <!-- Books -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('books-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="books-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-book"></i>
                 <span>Books</span>
@@ -179,7 +179,7 @@
 
     <!-- Blacklist -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('blacklist-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="blacklist-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-ban"></i>
                 <span>Blacklist</span>
@@ -193,7 +193,7 @@
 
     <!-- Regexes -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('regexes-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="regexes-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-code"></i>
                 <span>Regexes</span>
@@ -209,7 +209,7 @@
 
     <!-- Groups -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('groups-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="groups-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-server"></i>
                 <span>Groups Management</span>
@@ -226,7 +226,7 @@
 
     <!-- System -->
     <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" onclick="toggleAdminSubmenu('system-menu')">
+        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="system-menu">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-cog"></i>
                 <span>System</span>
@@ -241,12 +241,4 @@
     </div>
 </div>
 
-<script>
-function toggleAdminSubmenu(id) {
-    const submenu = document.getElementById(id);
-    const icon = document.getElementById(id + '-icon');
-    submenu.classList.toggle('hidden');
-    icon.classList.toggle('rotate-180');
-}
-</script>
 

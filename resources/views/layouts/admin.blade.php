@@ -13,35 +13,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 
-    <!-- Dark Mode Script (must be inline to prevent flash) -->
-    <script>
-        // Initialize theme before page renders to prevent flash
-        (function() {
-            @auth
-                // Use user's database preference when authenticated
-                const userThemePreference = '{{ auth()->user()->theme_preference ?? 'light' }}';
-
-                if (userThemePreference === 'system') {
-                    // Use OS preference
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        document.documentElement.classList.add('dark');
-                    }
-                } else if (userThemePreference === 'dark') {
-                    document.documentElement.classList.add('dark');
-                }
-            @else
-                // Fallback to localStorage for non-authenticated users
-                const theme = localStorage.getItem('theme') || 'light';
-                if (theme === 'system') {
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        document.documentElement.classList.add('dark');
-                    }
-                } else if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                }
-            @endauth
-        })();
-    </script>
+    <!-- Dark Mode - Set via meta tag for CSP compliance -->
+    <meta name="theme-preference" content="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}">
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
     <div class="min-h-screen flex">
@@ -70,7 +43,7 @@
                             <i class="fas fa-home mr-1"></i> Back to Site
                         </a>
                         <a href="{{ route('logout') }}"
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                           data-logout
                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
                             <i class="fas fa-sign-out-alt mr-1"></i> Logout
                         </a>
@@ -109,94 +82,11 @@
     <!-- Scripts -->
     @stack('scripts')
 
-    <script>
-        // Theme management with system preference support
-        (function() {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-            function applyTheme(themePreference) {
-                const html = document.documentElement;
-
-                if (themePreference === 'system') {
-                    if (mediaQuery.matches) {
-                        html.classList.add('dark');
-                    } else {
-                        html.classList.remove('dark');
-                    }
-                } else if (themePreference === 'dark') {
-                    html.classList.add('dark');
-                } else {
-                    html.classList.remove('dark');
-                }
-            }
-
-            // Listen for OS theme changes
-            mediaQuery.addEventListener('change', () => {
-                @auth
-                    const userThemePreference = '{{ auth()->user()->theme_preference ?? 'light' }}';
-                    if (userThemePreference === 'system') {
-                        applyTheme('system');
-                    }
-                @else
-                    const theme = localStorage.getItem('theme') || 'light';
-                    if (theme === 'system') {
-                        applyTheme('system');
-                    }
-                @endauth
-            });
-
-            // Dark mode toggle - cycles through light -> dark -> system
-            const themeToggle = document.getElementById('theme-toggle');
-            @auth
-                let currentTheme = '{{ auth()->user()->theme_preference ?? 'light' }}';
-            @else
-                let currentTheme = localStorage.getItem('theme') || 'light';
-            @endauth
-
-            themeToggle?.addEventListener('click', function() {
-                let nextTheme;
-
-                // Cycle through: light -> dark -> system -> light
-                if (currentTheme === 'light') {
-                    nextTheme = 'dark';
-                } else if (currentTheme === 'dark') {
-                    nextTheme = 'system';
-                } else {
-                    nextTheme = 'light';
-                }
-
-                applyTheme(nextTheme);
-
-                // Update button title
-                const titles = {
-                    'light': 'Theme: Light',
-                    'dark': 'Theme: Dark',
-                    'system': 'Theme: System (Auto)'
-                };
-                this.setAttribute('title', titles[nextTheme]);
-
-                @auth
-                    // Save to backend for authenticated users
-                    fetch('{{ route('profile.update-theme') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ theme_preference: nextTheme })
-                    }).then(response => response.json())
-                      .then(data => {
-                          if (data.success) {
-                              currentTheme = nextTheme;
-                          }
-                      });
-                @else
-                    localStorage.setItem('theme', nextTheme);
-                    currentTheme = nextTheme;
-                @endauth
-            });
-        })();
-    </script>
+    <!-- Meta tags for theme management (CSP-safe) -->
+    @auth
+        <meta name="user-authenticated" content="true">
+        <meta name="update-theme-url" content="{{ route('profile.update-theme') }}">
+    @endauth
 </body>
 </html>
 

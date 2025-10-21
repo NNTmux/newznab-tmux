@@ -11,7 +11,6 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Password as PasswordFacade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -130,12 +129,19 @@ class RegisterController extends Controller
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
+        ], [
+            'password.min' => 'The password must be at least 8 characters.',
+            'password.letters' => 'The password must contain letters.',
+            'password.mixed_case' => 'The password must contain both uppercase and lowercase letters.',
+            'password.numbers' => 'The password must contain at least one number.',
+            'password.symbols' => 'The password must contain at least one symbol.',
+            'password.uncompromised' => 'The password appears in a data breach and should not be used.',
         ]);
 
         if ($validator->fails()) {
-            $error = implode('', Arr::collapse($validator->errors()->toArray()));
-
-            return $this->showRegistrationForm($request, $error);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput($request->except('password', 'password_confirmation'));
         }
 
         $action = $request->input('action') ?? 'view';
@@ -164,7 +170,7 @@ class RegisterController extends Controller
 
                 // Check invitation validity using custom system
                 $invitationValid = $this->isInvitationValid($inviteCode, $email);
-                $registrationOpen = Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE;
+                $registrationOpen = Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_OPEN;
 
                 if ($invitationValid || $registrationOpen) {
                     // Get invited_by from invitation if available
@@ -229,12 +235,10 @@ class RegisterController extends Controller
                 break;
 
             case 'view':
-                // See if it is a valid invite.
+                // Don't set showRegister here - let showRegistrationForm handle it
+                // Only validate invite code if present
                 if (($inviteCode !== null) && ! $this->isInvitationTokenValid($inviteCode)) {
                     $error = 'Invalid invitation token!';
-                    $showRegister = 0;
-                } else {
-                    $showRegister = 1;
                 }
                 break;
         }

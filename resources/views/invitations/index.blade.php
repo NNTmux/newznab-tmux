@@ -15,7 +15,7 @@
     <nav class="flex" aria-label="breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ $site->home_link }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
+                <a href="{{ $site['home_link'] }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
             </li>
             <li>
                 <div class="flex items-center">
@@ -208,7 +208,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-red-300 rounded text-xs font-medium text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:text-red-400 dark:border-red-600 dark:hover:bg-gray-600" title="Cancel Invitation"
-                                                        onclick="return confirm('Are you sure you want to cancel this invitation?')">
+                                                        data-confirm="Are you sure you want to cancel this invitation?">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </form>

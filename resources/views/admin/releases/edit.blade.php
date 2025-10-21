@@ -227,6 +227,16 @@
                 <dt class="font-medium text-gray-600 dark:text-gray-400">Group</dt>
                 <dd class="text-gray-900 dark:text-gray-100 mt-1">{{ $release->group_name ?? $release['group_name'] ?? 'N/A' }}</dd>
             </div>
+            @if(!empty($release->fromname ?? $release['fromname'] ?? ''))
+                <div>
+                    <dt class="font-medium text-gray-600 dark:text-gray-400">Posted By</dt>
+                    <dd class="text-gray-900 dark:text-gray-100 mt-1">
+                        <span class="inline-flex items-center px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono text-xs">
+                            <i class="fas fa-user mr-1"></i>{{ $release->fromname ?? $release['fromname'] }}
+                        </span>
+                    </dd>
+                </div>
+            @endif
             <div>
                 <dt class="font-medium text-gray-600 dark:text-gray-400">Password Status</dt>
                 <dd class="text-gray-900 dark:text-gray-100 mt-1">

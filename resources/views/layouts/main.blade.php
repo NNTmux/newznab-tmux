@@ -2,10 +2,13 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $meta_title ?? config('app.name') }}@if(isset($meta_title) && $meta_title != '' && $site->metatitle != '') - @endif{{ $site->metatitle ?? '' }}</title>
+    <title>{{ $meta_title ?? config('app.name') }}@if(isset($meta_title) && $meta_title != '' && $site['metatitle'] != '') - @endif{{ $site['metatitle'] ?? '' }}</title>
 
     <meta name="keywords" content="{{ $meta_keywords ?? '' }}">
     <meta name="description" content="{{ $meta_description ?? '' }}">
@@ -50,8 +53,8 @@
         @auth
             <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white transition-all duration-300">
                 <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
-                    <a href="{{ $site->home_link ?? url('/') }}" class="flex items-center space-x-2">
-                        <i class="fas fa-file-download text-2xl text-blue-500 dark:text-blue-400" aria-hidden="true"></i>
+                    <a href="{{ $site['home_link'] ?? url('/') }}" class="flex items-center space-x-3">
+                        <img src="{{ asset('assets/images/newznab-logo.svg') }}" alt="Newznab Logo" class="w-12 h-12" aria-hidden="true">
                         <span class="text-xl font-semibold">{{ config('app.name') }}</span>
                     </a>
                 </div>
@@ -107,12 +110,12 @@
     </div>
 
     <!-- Mobile Sidebar Toggle -->
-    <button id="mobile-sidebar-toggle" class="md:hidden fixed bottom-4 right-4 z-50 bg-blue-600 dark:bg-blue-700 dark:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 dark:hover:bg-blue-800">
-        <i class="fas fa-bars"></i>
+    <button id="mobile-sidebar-toggle" class="md:hidden fixed bottom-20 right-4 z-50 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-all touch-target" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars text-lg"></i>
     </button>
 
     <!-- Theme Toggle -->
-    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2"
+    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target"
             title="{{ ucfirst(auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light') }} Mode">
         <i id="theme-icon" class="fas
             @if(auth()->check())

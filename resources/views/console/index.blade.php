@@ -7,7 +7,7 @@
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
+                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                 </li>
@@ -98,7 +98,7 @@
                                         <!-- External Links -->
                                         <div class="flex flex-wrap gap-1 mb-2">
                                             @if(!empty($result->url))
-                                                <a target="_blank" href="{{ $site->dereferrer_link }}{{ $result->url }}"
+                                                <a target="_blank" href="{{ $site['dereferrer_link'] }}{{ $result->url }}"
                                                    title="View Game page" class="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700">
                                                    <i class="fa fa-shopping-cart mr-1"></i>Amazon
                                                 </a>
@@ -184,15 +184,32 @@
 
                                             <div class="flex items-center text-gray-500 text-sm mb-3">
                                                 <i class="fa fa-clock-o mr-2"></i>
-                                                <span>Posted {{ \Carbon\Carbon::parse($result->postdate)->diffForHumans() }}</span>
+                                                <span>Added {{ \Carbon\Carbon::parse($result->adddate)->diffForHumans() }}</span>
+                                            </div>
+
+                                            <div class="flex flex-wrap gap-2 text-xs mb-3">
+                                                @if(!empty($result->group_name))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                                        <i class="fas fa-users mr-1"></i> {{ $result->group_name }}
+                                                    </span>
+                                                @endif
+                                                @if(!empty($result->postdate))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                        <i class="fas fa-calendar mr-1"></i> Posted: {{ \Carbon\Carbon::parse($result->postdate)->format('M d, Y H:i') }}
+                                                    </span>
+                                                @endif
+                                                @if(!empty($result->fromname))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono">
+                                                        <i class="fas fa-user mr-1"></i> {{ $result->fromname }}
+                                                    </span>
+                                                @endif
                                             </div>
 
                                             <!-- Action Buttons -->
                                             <div class="flex flex-wrap gap-2" id="guid{{ $result->guid }}">
                                                 <a class="px-3 py-1.5 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-sm inline-flex items-center"
                                                    title="Download NZB"
-                                                   href="{{ url('/getnzb?id=' . $result->guid) }}"
-                                                   onclick="showToast('Downloading NZB...', 'success')">
+                                                   href="{{ url('/getnzb?id=' . $result->guid) }}">
                                                     <i class="fa fa-cloud-download mr-1"></i>
                                                     <span class="px-1.5 py-0.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded ml-1">{{ $result->grabs }}</span>
                                                 </a>

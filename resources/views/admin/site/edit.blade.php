@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
+
 <div class="container mx-auto px-4 py-6">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
@@ -42,7 +43,7 @@
                             <label for="strapline" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-quote-right mr-1"></i>Strapline
                             </label>
-                            <input type="text" id="strapline" name="strapline" value="{{ $site->strapline ?? '' }}"
+                            <input type="text" id="strapline" name="strapline" value="{{ $site['strapline'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">Displayed in the header on every public page.</p>
                         </div>
@@ -51,7 +52,7 @@
                             <label for="metatitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-heading mr-1"></i>Meta Title
                             </label>
-                            <input type="text" id="metatitle" name="metatitle" value="{{ $site->metatitle ?? '' }}"
+                            <input type="text" id="metatitle" name="metatitle" value="{{ $site['metatitle'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">Stem meta-tag appended to all page title tags.</p>
                         </div>
@@ -61,7 +62,7 @@
                                 <i class="fa fa-comment mr-1"></i>Meta Description
                             </label>
                             <textarea id="metadescription" name="metadescription" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site->metadescription ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['metadescription'] ?? '' }}</textarea>
                             <p class="mt-1 text-sm text-gray-500">Stem meta-description appended to all page meta description tags.</p>
                         </div>
 
@@ -70,7 +71,7 @@
                                 <i class="fa fa-tags mr-1"></i>Meta Keywords
                             </label>
                             <textarea id="metakeywords" name="metakeywords" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site->metakeywords ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['metakeywords'] ?? '' }}</textarea>
                             <p class="mt-1 text-sm text-gray-500">Stem meta-keywords appended to all page meta keyword tags.</p>
                         </div>
 
@@ -79,7 +80,7 @@
                                 <i class="fa fa-copyright mr-1"></i>Footer
                             </label>
                             <textarea id="footer" name="footer" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site->footer ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['footer'] ?? '' }}</textarea>
                             <p class="mt-1 text-sm text-gray-500">Displayed in the footer section of every public page.</p>
                         </div>
 
@@ -87,7 +88,7 @@
                             <label for="home_link" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-home mr-1"></i>Default Home Page
                             </label>
-                            <input type="text" id="home_link" name="home_link" value="{{ $site->home_link ?? '' }}"
+                            <input type="text" id="home_link" name="home_link" value="{{ $site['home_link'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The relative path to the landing page shown when a user logs in, or clicks the home link.</p>
                         </div>
@@ -96,7 +97,7 @@
                             <label for="dereferrer_link" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-external-link-alt mr-1"></i>Dereferrer Link
                             </label>
-                            <input type="text" id="dereferrer_link" name="dereferrer_link" value="{{ $site->dereferrer_link ?? '' }}"
+                            <input type="text" id="dereferrer_link" name="dereferrer_link" value="{{ $site['dereferrer_link'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">Optional URL to prepend to external links.</p>
                         </div>
@@ -106,7 +107,7 @@
                                 <i class="fa fa-gavel mr-1"></i>Terms and Conditions
                             </label>
                             <textarea id="tandc" name="tandc" rows="5"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site->tandc ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['tandc'] ?? '' }}</textarea>
                             <p class="mt-1 text-sm text-gray-500">Text displayed in the terms and conditions page.</p>
                         </div>
                     </div>
@@ -121,7 +122,7 @@
                             <label for="nzbsplitlevel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-folder-tree mr-1"></i>NZB File Path Level Deep
                             </label>
-                            <input type="text" id="nzbsplitlevel" name="nzbsplitlevel" value="{{ $site->nzbsplitlevel ?? '' }}"
+                            <input type="text" id="nzbsplitlevel" name="nzbsplitlevel" value="{{ $site['nzbsplitlevel'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">Levels deep to store the nzb Files. <strong>If you change this you must run the misc/testing/DB/nzb-reorg script!</strong></p>
                         </div>
@@ -130,7 +131,7 @@
                             <label for="partretentionhours" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-clock mr-1"></i>Part Retention Hours
                             </label>
-                            <input type="text" id="partretentionhours" name="partretentionhours" value="{{ $site->partretentionhours ?? '' }}"
+                            <input type="text" id="partretentionhours" name="partretentionhours" value="{{ $site['partretentionhours'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of hours incomplete parts and binaries will be retained.</p>
                         </div>
@@ -139,7 +140,7 @@
                             <label for="releaseretentiondays" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-calendar-days mr-1"></i>Release Retention
                             </label>
-                            <input type="text" id="releaseretentiondays" name="releaseretentiondays" value="{{ $site->releaseretentiondays ?? '' }}"
+                            <input type="text" id="releaseretentiondays" name="releaseretentiondays" value="{{ $site['releaseretentiondays'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of days releases will be retained for use throughout site. Set to 0 to disable.</p>
                         </div>
@@ -148,7 +149,7 @@
                             <label for="miscotherretentionhours" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-hourglass mr-1"></i>Other->Misc Retention Hours
                             </label>
-                            <input type="text" id="miscotherretentionhours" name="miscotherretentionhours" value="{{ $site->miscotherretentionhours ?? '' }}"
+                            <input type="text" id="miscotherretentionhours" name="miscotherretentionhours" value="{{ $site['miscotherretentionhours'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of hours releases categorized as Misc->Other will be retained. Set to 0 to disable.</p>
                         </div>
@@ -157,7 +158,7 @@
                             <label for="mischashedretentionhours" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-hashtag mr-1"></i>Other->Hashed Retention Hours
                             </label>
-                            <input type="text" id="mischashedretentionhours" name="mischashedretentionhours" value="{{ $site->mischashedretentionhours ?? '' }}"
+                            <input type="text" id="mischashedretentionhours" name="mischashedretentionhours" value="{{ $site['mischashedretentionhours'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of hours releases categorized as Misc->Hashed will be retained. Set to 0 to disable.</p>
                         </div>
@@ -166,7 +167,7 @@
                             <label for="partsdeletechunks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-trash mr-1"></i>Parts Delete In Chunks
                             </label>
-                            <input type="text" id="partsdeletechunks" name="partsdeletechunks" value="{{ $site->partsdeletechunks ?? '' }}"
+                            <input type="text" id="partsdeletechunks" name="partsdeletechunks" value="{{ $site['partsdeletechunks'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">Default is 0 (off), which will remove parts in one go. If backfilling or importing and parts table is large, using chunks of 5000+ will speed up removal. Normal indexing is fastest with this setting at 0.</p>
                         </div>
@@ -175,7 +176,7 @@
                             <label for="minfilestoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-file-alt mr-1"></i>Minimum Files to Make a Release
                             </label>
-                            <input type="text" id="minfilestoformrelease" name="minfilestoformrelease" value="{{ $site->minfilestoformrelease ?? '' }}"
+                            <input type="text" id="minfilestoformrelease" name="minfilestoformrelease" value="{{ $site['minfilestoformrelease'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The minimum number of files to make a release. i.e. if set to two, then releases which only contain one file will not be created.</p>
                         </div>
@@ -184,7 +185,7 @@
                             <label for="minsizetoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-compress mr-1"></i>Minimum File Size to Make a Release
                             </label>
-                            <input type="text" id="minsizetoformrelease" name="minsizetoformrelease" value="{{ $site->minsizetoformrelease ?? '' }}"
+                            <input type="text" id="minsizetoformrelease" name="minsizetoformrelease" value="{{ $site['minsizetoformrelease'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The minimum total size in bytes to make a release. If set to 0, then ignored.</p>
                         </div>
@@ -193,7 +194,7 @@
                             <label for="maxsizetoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-expand mr-1"></i>Maximum File Size to Make a Release
                             </label>
-                            <input type="text" id="maxsizetoformrelease" name="maxsizetoformrelease" value="{{ $site->maxsizetoformrelease ?? '' }}"
+                            <input type="text" id="maxsizetoformrelease" name="maxsizetoformrelease" value="{{ $site['maxsizetoformrelease'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum total size in bytes to make a release. If set to 0, then ignored. Only deletes during release creation.</p>
                         </div>
@@ -202,7 +203,7 @@
                             <label for="completionpercent" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-percentage mr-1"></i>Minimum Completion Percent
                             </label>
-                            <input type="text" id="completionpercent" name="completionpercent" value="{{ $site->completionpercent ?? '' }}"
+                            <input type="text" id="completionpercent" name="completionpercent" value="{{ $site['completionpercent'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The minimum completion percent to make a release. i.e. if set to 97, then releases under 97% completion will not be created. If set to 0, then ignored.</p>
                         </div>
@@ -212,9 +213,9 @@
                                 <i class="fa fa-sync mr-1"></i>Update Grabs
                             </label>
                             <select id="grabstatus" name="grabstatus" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->grabstatus ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['grabstatus'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -225,7 +226,7 @@
                             <label for="crossposttime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-clock mr-1"></i>Crossposted Time Check
                             </label>
-                            <input type="text" id="crossposttime" name="crossposttime" value="{{ $site->crossposttime ?? '' }}"
+                            <input type="text" id="crossposttime" name="crossposttime" value="{{ $site['crossposttime'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The time in hours to check for crossposted releases - this will delete 1 of the releases if the 2 are posted by the same person in the same time period.</p>
                         </div>
@@ -234,7 +235,7 @@
                             <label for="maxmssgs" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-envelope mr-1"></i>Max Messages
                             </label>
-                            <input type="text" id="maxmssgs" name="maxmssgs" value="{{ $site->maxmssgs ?? '' }}"
+                            <input type="text" id="maxmssgs" name="maxmssgs" value="{{ $site['maxmssgs'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum number of messages to fetch at a time from the server.</p>
                         </div>
@@ -243,7 +244,7 @@
                             <label for="max_headers_iteration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-list-ol mr-1"></i>Max Headers Iteration
                             </label>
-                            <input type="text" id="max_headers_iteration" name="max_headers_iteration" value="{{ $site->max_headers_iteration ?? '' }}"
+                            <input type="text" id="max_headers_iteration" name="max_headers_iteration" value="{{ $site['max_headers_iteration'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum number of headers that update binaries sees as the total range. This ensures that a total of no more than this is attempted to be downloaded at one time per group.</p>
                         </div>
@@ -253,21 +254,21 @@
                                 <i class="fa fa-question-circle mr-1"></i>Where to Start New Groups
                             </label>
                             <select id="newgroupscanmethod" name="newgroupscanmethod" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-2">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->newgroupscanmethod ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $newgroupscan_names[$index] ?? $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['newgroupscanmethod'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $newgroupscan_names[$index] ?? $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label for="newgroupdaystoscan" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Days to Scan</label>
-                                    <input type="text" id="newgroupdaystoscan" name="newgroupdaystoscan" value="{{ $site->newgroupdaystoscan ?? '' }}"
+                                    <input type="text" id="newgroupdaystoscan" name="newgroupdaystoscan" value="{{ $site['newgroupdaystoscan'] ?? '' }}"
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 </div>
                                 <div>
                                     <label for="newgroupmsgstoscan" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Posts to Scan</label>
-                                    <input type="text" id="newgroupmsgstoscan" name="newgroupmsgstoscan" value="{{ $site->newgroupmsgstoscan ?? '' }}"
+                                    <input type="text" id="newgroupmsgstoscan" name="newgroupmsgstoscan" value="{{ $site['newgroupmsgstoscan'] ?? '' }}"
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 </div>
                             </div>
@@ -278,7 +279,7 @@
                             <label for="safebackfilldate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-calendar-alt mr-1"></i>Safe Backfill Date
                             </label>
-                            <input type="text" id="safebackfilldate" name="safebackfilldate" value="{{ $site->safebackfilldate ?? '' }}"
+                            <input type="text" id="safebackfilldate" name="safebackfilldate" value="{{ $site['safebackfilldate'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The target date for safe backfill. Format: YYYY-MM-DD</p>
                         </div>
@@ -288,9 +289,9 @@
                                 <i class="fa fa-power-off mr-1"></i>Auto Disable Groups During Backfill
                             </label>
                             <select id="disablebackfillgroup" name="disablebackfillgroup" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->disablebackfillgroup ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['disablebackfillgroup'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -309,9 +310,9 @@
                                 <i class="fa fa-tv mr-1"></i>Lookup TV
                             </label>
                             <select id="lookuptv" name="lookuptv" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($lookuptv_ids as $index => $lookuptvId)
-                                    <option value="{{ $lookuptvId }}" {{ ($site->lookuptv ?? '') == $lookuptvId ? 'selected' : '' }}>
-                                        {{ $lookuptv_names[$index] }}
+                                @foreach($lookuptv['ids'] as $index => $lookuptvId)
+                                    <option value="{{ $lookuptvId }}" {{ ($site['lookuptv'] ?? '') == $lookuptvId ? 'selected' : '' }}>
+                                        {{ $lookuptv['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -323,9 +324,9 @@
                                 <i class="fa fa-book mr-1"></i>Lookup Books
                             </label>
                             <select id="lookupbooks" name="lookupbooks" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($lookupbooks_ids as $index => $lookupbooksId)
-                                    <option value="{{ $lookupbooksId }}" {{ ($site->lookupbooks ?? '') == $lookupbooksId ? 'selected' : '' }}>
-                                        {{ $lookupbooks_names[$index] }}
+                                @foreach($lookupbooks['ids'] as $index => $lookupbooksId)
+                                    <option value="{{ $lookupbooksId }}" {{ ($site['lookupbooks'] ?? '') == $lookupbooksId ? 'selected' : '' }}>
+                                        {{ $lookupbooks['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -337,9 +338,9 @@
                                 <i class="fa fa-list mr-1"></i>Type of Books to Look Up
                             </label>
                             <select id="book_reqids" name="book_reqids[]" multiple class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" size="4">
-                                @foreach($book_reqids_ids as $index => $bookReqId)
-                                    <option value="{{ $bookReqId }}" {{ in_array($bookReqId, $book_reqids_selected ?? []) ? 'selected' : '' }}>
-                                        {{ $book_reqids_names[$index] }}
+                                @foreach($book_reqids['ids'] as $index => $bookReqId)
+                                    <option value="{{ $bookReqId }}" {{ in_array($bookReqId, $book_reqids['selected'] ?? []) ? 'selected' : '' }}>
+                                        {{ $book_reqids['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -351,9 +352,9 @@
                                 <i class="fa fa-film mr-1"></i>Lookup Movies
                             </label>
                             <select id="lookupimdb" name="lookupimdb" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($lookupmovies_ids as $index => $lookupmoviesId)
-                                    <option value="{{ $lookupmoviesId }}" {{ ($site->lookupimdb ?? '') == $lookupmoviesId ? 'selected' : '' }}>
-                                        {{ $lookupmovies_names[$index] }}
+                                @foreach($lookupmovies['ids'] as $index => $lookupmoviesId)
+                                    <option value="{{ $lookupmoviesId }}" {{ ($site['lookupimdb'] ?? '') == $lookupmoviesId ? 'selected' : '' }}>
+                                        {{ $lookupmovies['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -365,9 +366,9 @@
                                 <i class="fa fa-language mr-1"></i>Movie Lookup Language
                             </label>
                             <select id="lookuplanguage" name="lookuplanguage" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($lookuplanguage_iso as $index => $languageIso)
-                                    <option value="{{ $languageIso }}" {{ ($site->lookuplanguage ?? '') == $languageIso ? 'selected' : '' }}>
-                                        {{ $lookuplanguage_names[$index] }}
+                                @foreach($lookuplanguage['iso'] as $index => $languageIso)
+                                    <option value="{{ $languageIso }}" {{ ($site['lookuplanguage'] ?? '') == $languageIso ? 'selected' : '' }}>
+                                        {{ $lookuplanguage['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -379,9 +380,9 @@
                                 <i class="fa fa-dragon mr-1"></i>Lookup AniDB
                             </label>
                             <select id="lookupanidb" name="lookupanidb" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->lookupanidb ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['lookupanidb'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -393,9 +394,9 @@
                                 <i class="fa fa-music mr-1"></i>Lookup Music
                             </label>
                             <select id="lookupmusic" name="lookupmusic" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($lookupmusic_ids as $index => $lookupmusicId)
-                                    <option value="{{ $lookupmusicId }}" {{ ($site->lookupmusic ?? '') == $lookupmusicId ? 'selected' : '' }}>
-                                        {{ $lookupmusic_names[$index] }}
+                                @foreach($lookupmusic['ids'] as $index => $lookupmusicId)
+                                    <option value="{{ $lookupmusicId }}" {{ ($site['lookupmusic'] ?? '') == $lookupmusicId ? 'selected' : '' }}>
+                                        {{ $lookupmusic['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -407,9 +408,9 @@
                                 <i class="fa fa-music mr-1"></i>Save Audio Preview
                             </label>
                             <select id="saveaudiopreview" name="saveaudiopreview" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->saveaudiopreview ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['saveaudiopreview'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -421,9 +422,9 @@
                                 <i class="fa fa-gamepad mr-1"></i>Lookup Games
                             </label>
                             <select id="lookupgames" name="lookupgames" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($lookupgames_ids as $index => $lookupgamesId)
-                                    <option value="{{ $lookupgamesId }}" {{ ($site->lookupgames ?? '') == $lookupgamesId ? 'selected' : '' }}>
-                                        {{ $lookupgames_names[$index] }}
+                                @foreach($lookupgames['ids'] as $index => $lookupgamesId)
+                                    <option value="{{ $lookupgamesId }}" {{ ($site['lookupgames'] ?? '') == $lookupgamesId ? 'selected' : '' }}>
+                                        {{ $lookupgames['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -435,9 +436,9 @@
                                 <i class="fa fa-video mr-1"></i>Lookup XXX
                             </label>
                             <select id="lookupxxx" name="lookupxxx" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->lookupxxx ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['lookupxxx'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -456,9 +457,9 @@
                                 <i class="fa fa-globe mr-1"></i>Categorize Foreign
                             </label>
                             <select id="categorizeforeign" name="categorizeforeign" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->categorizeforeign ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['categorizeforeign'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -470,9 +471,9 @@
                                 <i class="fa fa-cloud-download-alt mr-1"></i>Categorize WEB-DL
                             </label>
                             <select id="catwebdl" name="catwebdl" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->catwebdl ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['catwebdl'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -491,9 +492,9 @@
                                 <i class="fa fa-user-plus mr-1"></i>Registration Status
                             </label>
                             <select id="registerstatus" name="registerstatus" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($registerstatus_ids as $index => $statusId)
-                                    <option value="{{ $statusId }}" {{ ($site->registerstatus ?? '') == $statusId ? 'selected' : '' }}>
-                                        {{ $registerstatus_names[$index] }}
+                                @foreach($registerstatus['ids'] as $index => $statusId)
+                                    <option value="{{ $statusId }}" {{ ($site['registerstatus'] ?? '') == $statusId ? 'selected' : '' }}>
+                                        {{ $registerstatus['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -504,7 +505,7 @@
                             <label for="userdownloadpurgedays" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-calendar mr-1"></i>User Downloads Purge Days
                             </label>
-                            <input type="text" id="userdownloadpurgedays" name="userdownloadpurgedays" value="{{ $site->userdownloadpurgedays ?? '' }}"
+                            <input type="text" id="userdownloadpurgedays" name="userdownloadpurgedays" value="{{ $site['userdownloadpurgedays'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of days to preserve user download history, for use when checking limits being hit. Set to zero will remove all records of what users download, but retain history of when, so that role based limits can still be applied.</p>
                         </div>
@@ -513,7 +514,7 @@
                             <label for="userhostexclusion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-shield mr-1"></i>IP Whitelist
                             </label>
-                            <input type="text" id="userhostexclusion" name="userhostexclusion" value="{{ $site->userhostexclusion ?? '' }}"
+                            <input type="text" id="userhostexclusion" name="userhostexclusion" value="{{ $site['userhostexclusion'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">A comma separated list of IP addresses which will be excluded from user limits on number of requests and downloads per IP address. Include values for google reader and other shared services which may be being used.</p>
                         </div>
@@ -526,7 +527,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="nzbpath" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">NZB Path</label>
-                            <input type="text" id="nzbpath" name="nzbpath" value="{{ $site->nzbpath ?? '' }}"
+                            <input type="text" id="nzbpath" name="nzbpath" value="{{ $site['nzbpath'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">Path where NZB files are stored</p>
                         </div>
@@ -549,9 +550,9 @@
                                 <i class="fa fa-file-archive mr-1"></i>Download Last Compressed File
                             </label>
                             <select id="end" name="end" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->end ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['end'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -563,9 +564,9 @@
                                 <i class="fa fa-lock mr-1"></i>Show Passworded Releases
                             </label>
                             <select id="showpasswordedrelease" name="showpasswordedrelease" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($passworded_ids as $index => $passwordedId)
-                                    <option value="{{ $passwordedId }}" {{ ($site->showpasswordedrelease ?? '') == $passwordedId ? 'selected' : '' }}>
-                                        {{ $passworded_names[$index] }}
+                                @foreach($passworded['ids'] as $index => $passwordedId)
+                                    <option value="{{ $passwordedId }}" {{ ($site['showpasswordedrelease'] ?? '') == $passwordedId ? 'selected' : '' }}>
+                                        {{ $passworded['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -584,7 +585,7 @@
                                 <i class="fa fa-file-archive mr-1"></i>Maximum Release Size to Post Process
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="maxsizetopostprocess" name="maxsizetopostprocess" value="{{ $site->maxsizetopostprocess ?? '' }}"
+                                <input type="text" id="maxsizetopostprocess" name="maxsizetopostprocess" value="{{ $site['maxsizetopostprocess'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">GB</span>
                             </div>
@@ -596,7 +597,7 @@
                                 <i class="fa fa-file-archive mr-1"></i>Minimum Release Size to Post Process
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="minsizetopostprocess" name="minsizetopostprocess" value="{{ $site->minsizetopostprocess ?? '' }}"
+                                <input type="text" id="minsizetopostprocess" name="minsizetopostprocess" value="{{ $site['minsizetopostprocess'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">MB</span>
                             </div>
@@ -614,7 +615,7 @@
                             <label for="maxnzbsprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-file-code mr-1"></i>Maximum NZBs Stage5
                             </label>
-                            <input type="text" id="maxnzbsprocessed" name="maxnzbsprocessed" value="{{ $site->maxnzbsprocessed ?? '' }}"
+                            <input type="text" id="maxnzbsprocessed" name="maxnzbsprocessed" value="{{ $site['maxnzbsprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of NZB files to create on stage 5 at a time in update_releases. If more are to be created it will loop stage 5 until none remain.</p>
                         </div>
@@ -624,9 +625,9 @@
                                 <i class="fa fa-toolbox mr-1"></i>Part Repair
                             </label>
                             <select id="partrepair" name="partrepair" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->partrepair ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['partrepair'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -638,9 +639,9 @@
                                 <i class="fa fa-shield-alt mr-1"></i>Part Repair for Backfill Scripts
                             </label>
                             <select id="safepartrepair" name="safepartrepair" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->safepartrepair ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['safepartrepair'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -651,7 +652,7 @@
                             <label for="maxpartrepair" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tools mr-1"></i>Maximum Repair Per Run
                             </label>
-                            <input type="text" id="maxpartrepair" name="maxpartrepair" value="{{ $site->maxpartrepair ?? '' }}"
+                            <input type="text" id="maxpartrepair" name="maxpartrepair" value="{{ $site['maxpartrepair'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of articles to attempt to repair at a time. If you notice that you are getting a lot of parts into the missed_parts table, it is possible that you USP is not keeping up with the requests. Try to reduce the threads to safe scripts or stop using safe scripts until improves.</p>
                         </div>
@@ -660,7 +661,7 @@
                             <label for="partrepairmaxtries" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-redo mr-1"></i>Maximum Repair Tries
                             </label>
-                            <input type="text" id="partrepairmaxtries" name="partrepairmaxtries" value="{{ $site->partrepairmaxtries ?? '' }}"
+                            <input type="text" id="partrepairmaxtries" name="partrepairmaxtries" value="{{ $site['partrepairmaxtries'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">Maximum amount of times to try part repair.</p>
                         </div>
@@ -670,9 +671,9 @@
                                 <i class="fa fa-image mr-1"></i>Process JPG
                             </label>
                             <select id="processjpg" name="processjpg" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->processjpg ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['processjpg'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -684,9 +685,9 @@
                                 <i class="fa fa-file-image mr-1"></i>Process Video Thumbnails
                             </label>
                             <select id="processthumbnails" name="processthumbnails" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->processthumbnails ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['processthumbnails'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -698,9 +699,9 @@
                                 <i class="fa fa-film mr-1"></i>Process Video Samples
                             </label>
                             <select id="processvideos" name="processvideos" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->processvideos ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['processvideos'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -711,7 +712,7 @@
                             <label for="segmentstodownload" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-download mr-1"></i>Number of Segments to Download
                             </label>
-                            <input type="text" id="segmentstodownload" name="segmentstodownload" value="{{ $site->segmentstodownload ?? '' }}"
+                            <input type="text" id="segmentstodownload" name="segmentstodownload" value="{{ $site['segmentstodownload'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum number of segments to download to generate the sample video file or jpg sample image. (Default 2)</p>
                         </div>
@@ -721,7 +722,7 @@
                                 <i class="fa fa-film mr-1"></i>Video Sample File Duration
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="ffmpeg_duration" name="ffmpeg_duration" value="{{ $site->ffmpeg_duration ?? '' }}"
+                                <input type="text" id="ffmpeg_duration" name="ffmpeg_duration" value="{{ $site['ffmpeg_duration'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">seconds</span>
                             </div>
@@ -733,7 +734,7 @@
                                 <i class="fa fa-layer-group mr-1"></i>Nested Archive Depth
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="maxnestedlevels" name="maxnestedlevels" value="{{ $site->maxnestedlevels ?? '' }}"
+                                <input type="text" id="maxnestedlevels" name="maxnestedlevels" value="{{ $site['maxnestedlevels'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">levels</span>
                             </div>
@@ -745,7 +746,7 @@
                                 <i class="fa fa-ban mr-1"></i>Inner File Black List Regex
                             </label>
                             <textarea id="innerfileblacklist" name="innerfileblacklist" rows="3" placeholder="Example: /setup\.exe|password\.url/i"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site->innerfileblacklist ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['innerfileblacklist'] ?? '' }}</textarea>
                             <p class="mt-1 text-sm text-gray-500">You can add a regex here to set releases to potentially passworded when a file name inside a rar/zip matches this regex. <strong>You must ensure this regex is valid, a non valid regex will cause errors during processing!</strong></p>
                         </div>
                     </div>
@@ -761,9 +762,9 @@
                                 <i class="fa fa-play-circle mr-1"></i>Fetch/Display Movie Trailers
                             </label>
                             <select id="trailers_display" name="trailers_display" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->trailers_display ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['trailers_display'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -775,7 +776,7 @@
                                 <i class="fa fa-arrows-alt-h mr-1"></i>Trailers Width
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="trailers_size_x" name="trailers_size_x" value="{{ $site->trailers_size_x ?? '' }}"
+                                <input type="text" id="trailers_size_x" name="trailers_size_x" value="{{ $site['trailers_size_x'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">px</span>
                             </div>
@@ -787,7 +788,7 @@
                                 <i class="fa fa-arrows-alt-v mr-1"></i>Trailers Height
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="trailers_size_y" name="trailers_size_y" value="{{ $site->trailers_size_y ?? '' }}"
+                                <input type="text" id="trailers_size_y" name="trailers_size_y" value="{{ $site['trailers_size_y'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">px</span>
                             </div>
@@ -806,7 +807,7 @@
                                 <i class="fa fa-clock mr-1"></i>Time in Seconds to Kill Unrar/7zip/Mediainfo/FFmpeg/Avconv
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="timeoutseconds" name="timeoutseconds" value="{{ $site->timeoutseconds ?? '' }}"
+                                <input type="text" id="timeoutseconds" name="timeoutseconds" value="{{ $site['timeoutseconds'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">seconds</span>
                             </div>
@@ -817,7 +818,7 @@
                             <label for="maxaddprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-list-ol mr-1"></i>Maximum Add PP Per Run
                             </label>
-                            <input type="text" id="maxaddprocessed" name="maxaddprocessed" value="{{ $site->maxaddprocessed ?? '' }}"
+                            <input type="text" id="maxaddprocessed" name="maxaddprocessed" value="{{ $site['maxaddprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of releases to process for passwords/previews/mediainfo per run. Every release gets processed here. This uses NNTP an connection, 1 per thread. This does not query Amazon.</p>
                         </div>
@@ -826,7 +827,7 @@
                             <label for="maxpartsprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-download mr-1"></i>Maximum Add PP Parts Downloaded
                             </label>
-                            <input type="text" id="maxpartsprocessed" name="maxpartsprocessed" value="{{ $site->maxpartsprocessed ?? '' }}"
+                            <input type="text" id="maxpartsprocessed" name="maxpartsprocessed" value="{{ $site['maxpartsprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">If a part fails to download while post processing, this will retry up to the amount you set, then give up.</p>
                         </div>
@@ -835,7 +836,7 @@
                             <label for="passchkattempts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-check-double mr-1"></i>Maximum Add PP Parts Checked
                             </label>
-                            <input type="text" id="passchkattempts" name="passchkattempts" value="{{ $site->passchkattempts ?? '' }}"
+                            <input type="text" id="passchkattempts" name="passchkattempts" value="{{ $site['passchkattempts'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">This overrides the above setting if set above 1. How many parts to check for a password before giving up. This slows down post processing massively, better to leave it 1.</p>
                         </div>
@@ -844,7 +845,7 @@
                             <label for="maxrageprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tv mr-1"></i>Maximum TVRage Per Run
                             </label>
-                            <input type="text" id="maxrageprocessed" name="maxrageprocessed" value="{{ $site->maxrageprocessed ?? '' }}"
+                            <input type="text" id="maxrageprocessed" name="maxrageprocessed" value="{{ $site['maxrageprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of TV shows to process with TVRage per run. This does not use an NNTP connection or query Amazon.</p>
                         </div>
@@ -853,7 +854,7 @@
                             <label for="maximdbprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-film mr-1"></i>Maximum Movies Per Run
                             </label>
-                            <input type="text" id="maximdbprocessed" name="maximdbprocessed" value="{{ $site->maximdbprocessed ?? '' }}"
+                            <input type="text" id="maximdbprocessed" name="maximdbprocessed" value="{{ $site['maximdbprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of movies to process with IMDB per run. This does not use an NNTP connection or query Amazon.</p>
                         </div>
@@ -862,7 +863,7 @@
                             <label for="maxanidbprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-dragon mr-1"></i>Maximum AniDB Per Run
                             </label>
-                            <input type="text" id="maxanidbprocessed" name="maxanidbprocessed" value="{{ $site->maxanidbprocessed ?? '' }}"
+                            <input type="text" id="maxanidbprocessed" name="maxanidbprocessed" value="{{ $site['maxanidbprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of anime to process with anidb per run. This does not use an NNTP connection or query Amazon.</p>
                         </div>
@@ -871,7 +872,7 @@
                             <label for="maxmusicprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-music mr-1"></i>Maximum Music Per Run
                             </label>
-                            <input type="text" id="maxmusicprocessed" name="maxmusicprocessed" value="{{ $site->maxmusicprocessed ?? '' }}"
+                            <input type="text" id="maxmusicprocessed" name="maxmusicprocessed" value="{{ $site['maxmusicprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of music to process with amazon per run. This does not use an NNTP connection.</p>
                         </div>
@@ -880,7 +881,7 @@
                             <label for="maxgamesprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-gamepad mr-1"></i>Maximum Games Per Run
                             </label>
-                            <input type="text" id="maxgamesprocessed" name="maxgamesprocessed" value="{{ $site->maxgamesprocessed ?? '' }}"
+                            <input type="text" id="maxgamesprocessed" name="maxgamesprocessed" value="{{ $site['maxgamesprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of games to process with amazon per run. This does not use an NNTP connection.</p>
                         </div>
@@ -889,7 +890,7 @@
                             <label for="maxbooksprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-book mr-1"></i>Maximum Books Per Run
                             </label>
-                            <input type="text" id="maxbooksprocessed" name="maxbooksprocessed" value="{{ $site->maxbooksprocessed ?? '' }}"
+                            <input type="text" id="maxbooksprocessed" name="maxbooksprocessed" value="{{ $site['maxbooksprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of books to process with amazon per run. This does not use an NNTP connection</p>
                         </div>
@@ -898,7 +899,7 @@
                             <label for="maxxxxprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-video mr-1"></i>Maximum XXX Per Run
                             </label>
-                            <input type="text" id="maxxxxprocessed" name="maxxxxprocessed" value="{{ $site->maxxxxprocessed ?? '' }}"
+                            <input type="text" id="maxxxxprocessed" name="maxxxxprocessed" value="{{ $site['maxxxxprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of XXX to process per run. This does not use an NNTP connection or query Amazon.</p>
                         </div>
@@ -907,7 +908,7 @@
                             <label for="fixnamesperrun" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-edit mr-1"></i>fixReleaseNames Per Run
                             </label>
-                            <input type="text" id="fixnamesperrun" name="fixnamesperrun" value="{{ $site->fixnamesperrun ?? '' }}"
+                            <input type="text" id="fixnamesperrun" name="fixnamesperrun" value="{{ $site['fixnamesperrun'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum number of releases to check per run (threaded script only).</p>
                         </div>
@@ -917,7 +918,7 @@
                                 <i class="fa fa-hourglass mr-1"></i>Amazon Sleep Time
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="amazonsleep" name="amazonsleep" value="{{ $site->amazonsleep ?? '' }}"
+                                <input type="text" id="amazonsleep" name="amazonsleep" value="{{ $site['amazonsleep'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">ms</span>
                             </div>
@@ -936,9 +937,9 @@
                                 <i class="fa fa-file-alt mr-1"></i>Lookup NFO
                             </label>
                             <select id="lookupnfo" name="lookupnfo" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->lookupnfo ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['lookupnfo'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -949,7 +950,7 @@
                             <label for="maxnfoprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-file-text mr-1"></i>Maximum NFO Files Per Run
                             </label>
-                            <input type="text" id="maxnfoprocessed" name="maxnfoprocessed" value="{{ $site->maxnfoprocessed ?? '' }}"
+                            <input type="text" id="maxnfoprocessed" name="maxnfoprocessed" value="{{ $site['maxnfoprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of NFO files to process per run. This uses NNTP an connection, 1 per thread. This does not query Amazon.</p>
                         </div>
@@ -959,7 +960,7 @@
                                 <i class="fa fa-upload mr-1"></i>Maximum Release Size to Process NFOs
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="maxsizetoprocessnfo" name="maxsizetoprocessnfo" value="{{ $site->maxsizetoprocessnfo ?? '' }}"
+                                <input type="text" id="maxsizetoprocessnfo" name="maxsizetoprocessnfo" value="{{ $site['maxsizetoprocessnfo'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">GB</span>
                             </div>
@@ -971,7 +972,7 @@
                                 <i class="fa fa-download mr-1"></i>Minimum Release Size to Process NFOs
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="minsizetoprocessnfo" name="minsizetoprocessnfo" value="{{ $site->minsizetoprocessnfo ?? '' }}"
+                                <input type="text" id="minsizetoprocessnfo" name="minsizetoprocessnfo" value="{{ $site['minsizetoprocessnfo'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">MB</span>
                             </div>
@@ -983,7 +984,7 @@
                                 <i class="fa fa-refresh mr-1"></i>Maximum Amount of Times to Redownload a NFO
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" id="maxnforetries" name="maxnforetries" value="{{ $site->maxnforetries ?? '' }}"
+                                <input type="text" id="maxnforetries" name="maxnforetries" value="{{ $site['maxnforetries'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">times</span>
                             </div>
@@ -1001,7 +1002,7 @@
                             <label for="nntpretries" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-refresh mr-1"></i>NNTP Retry Attempts
                             </label>
-                            <input type="text" id="nntpretries" name="nntpretries" value="{{ $site->nntpretries ?? '' }}"
+                            <input type="text" id="nntpretries" name="nntpretries" value="{{ $site['nntpretries'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum number of retry attempts to connect to nntp provider. On error, each retry takes approximately 5 seconds nntp returns reply. (Default 10)</p>
                         </div>
@@ -1010,7 +1011,7 @@
                             <label for="delaytime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-clock-o mr-1"></i>Delay Time Check
                             </label>
-                            <input type="text" id="delaytime" name="delaytime" value="{{ $site->delaytime ?? '' }}"
+                            <input type="text" id="delaytime" name="delaytime" value="{{ $site['delaytime'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The time in hours to wait, since last activity, before releases without parts counts in the subject are are created.<br>Setting this below 2 hours could create incomplete releases.</p>
                         </div>
@@ -1019,7 +1020,7 @@
                             <label for="collection_timeout" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-hourglass-end mr-1"></i>Collection Timeout Check
                             </label>
-                            <input type="text" id="collection_timeout" name="collection_timeout" value="{{ $site->collection_timeout ?? '' }}"
+                            <input type="text" id="collection_timeout" name="collection_timeout" value="{{ $site['collection_timeout'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">How many hours to wait before converting a collection into a release that is considered "stuck".<br>Default value is 48 hours.</p>
                         </div>
@@ -1036,9 +1037,9 @@
                                 <i class="fa fa-bug mr-1"></i>Log Dropped Headers
                             </label>
                             <select id="showdroppedyencparts" name="showdroppedyencparts" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno_ids as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site->showdroppedyencparts ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
+                                @foreach($yesno['ids'] as $index => $yesnoId)
+                                    <option value="{{ $yesnoId }}" {{ ($site['showdroppedyencparts'] ?? '') == $yesnoId ? 'selected' : '' }}>
+                                        {{ $yesno['names'][$index] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -1056,7 +1057,7 @@
                             <label for="binarythreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tasks mr-1"></i>Update Binaries Threads
                             </label>
-                            <input type="text" id="binarythreads" name="binarythreads" value="{{ $site->binarythreads ?? '' }}"
+                            <input type="text" id="binarythreads" name="binarythreads" value="{{ $site['binarythreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of threads for update_binaries. If you notice that you are getting a lot of parts into the missed_parts table, it is possible that you USP is not keeping up with the requests. Try to reduce the threads. At least until the cause can be determined.</p>
                         </div>
@@ -1065,7 +1066,7 @@
                             <label for="backfillthreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tasks mr-1"></i>Backfill Threads
                             </label>
-                            <input type="text" id="backfillthreads" name="backfillthreads" value="{{ $site->backfillthreads ?? '' }}"
+                            <input type="text" id="backfillthreads" name="backfillthreads" value="{{ $site['backfillthreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of threads for backfill.</p>
                         </div>
@@ -1074,7 +1075,7 @@
                             <label for="releasethreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tasks mr-1"></i>Update Releases Threads
                             </label>
-                            <input type="text" id="releasethreads" name="releasethreads" value="{{ $site->releasethreads ?? '' }}"
+                            <input type="text" id="releasethreads" name="releasethreads" value="{{ $site['releasethreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of threads for releases update scripts.</p>
                         </div>
@@ -1083,7 +1084,7 @@
                             <label for="postthreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tasks mr-1"></i>Postprocessing Additional Threads
                             </label>
-                            <input type="text" id="postthreads" name="postthreads" value="{{ $site->postthreads ?? '' }}"
+                            <input type="text" id="postthreads" name="postthreads" value="{{ $site['postthreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of threads for additional postprocessing. This includes deep rar inspection, preview and sample creation and nfo processing.</p>
                         </div>
@@ -1092,7 +1093,7 @@
                             <label for="nfothreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tasks mr-1"></i>NFO Threads
                             </label>
-                            <input type="text" id="nfothreads" name="nfothreads" value="{{ $site->nfothreads ?? '' }}"
+                            <input type="text" id="nfothreads" name="nfothreads" value="{{ $site['nfothreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of threads for nfo postprocessing. The max is 16, if you set anything higher it will use 16.</p>
                         </div>
@@ -1101,7 +1102,7 @@
                             <label for="postthreadsnon" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tasks mr-1"></i>Postprocessing Non-Amazon Threads
                             </label>
-                            <input type="text" id="postthreadsnon" name="postthreadsnon" value="{{ $site->postthreadsnon ?? '' }}"
+                            <input type="text" id="postthreadsnon" name="postthreadsnon" value="{{ $site['postthreadsnon'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of threads for non-amazon postprocessing. This includes movies, anime and tv lookups.</p>
                         </div>
@@ -1110,7 +1111,7 @@
                             <label for="fixnamethreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-tasks mr-1"></i>fixReleaseNames Threads
                             </label>
-                            <input type="text" id="fixnamethreads" name="fixnamethreads" value="{{ $site->fixnamethreads ?? '' }}"
+                            <input type="text" id="fixnamethreads" name="fixnamethreads" value="{{ $site['fixnamethreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The number of threads for fixReleasesNames. This includes md5, nfos, par2 and filenames.</p>
                         </div>

@@ -134,7 +134,7 @@
                     </div>
 
                     <!-- UI Preferences Tab -->
-                    <div id="preferences" class="tab-content" style="display: none;">
+                    <div id="preferences" class="tab-content hidden-by-default">
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
                             <div class="flex items-center mb-4">
                                 <i class="fa fa-sliders-h text-blue-600 dark:text-blue-400 mr-2"></i>
@@ -205,7 +205,7 @@
                     </div>
 
                     <!-- API & Downloads Tab -->
-                    <div id="api" class="tab-content" style="display: none;">
+                    <div id="api" class="tab-content hidden-by-default">
                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
                             <div class="flex items-center mb-4">
                                 <i class="fa fa-key text-blue-600 dark:text-blue-400 mr-2"></i>
@@ -242,7 +242,7 @@
 
                     <!-- Recent Downloads Tab -->
                     @if(($isadmin ?? false) && isset($downloadlist) && count($downloadlist) > 0)
-                        <div id="downloads" class="tab-content" style="display: none;">
+                        <div id="downloads" class="tab-content hidden-by-default">
                             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
                                 <div class="flex items-center mb-4">
                                     <i class="fa fa-download text-blue-600 dark:text-blue-400 mr-2"></i>
@@ -251,7 +251,7 @@
                                 <div class="space-y-2">
                                     @foreach($downloadlist->take(20) as $download)
                                         <div class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
-                                            <a href="{{ url('/details/' . $download->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex-1 truncate">
+                                            <a href="{{ url('/details/' . $download->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex-1 break-words break-all">
                                                 {{ $download->searchname }}
                                             </a>
                                             <span class="text-sm text-gray-500 ml-4">{{ \Carbon\Carbon::parse($download->created_at)->diffForHumans() }}</span>
@@ -265,66 +265,5 @@
             </div>
     </div>
 </div>
-
-@push('styles')
-<style>
-    .tab-content {
-        display: none;
-    }
-    .tab-content:first-of-type,
-    .tab-content.active {
-        display: block;
-    }
-</style>
-@endpush
-
-@push('scripts')
-<script>
-    // Tab switching functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const tabLinks = document.querySelectorAll('.tab-link');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-
-        tabLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
-
-                // Update active states on tab links
-                tabLinks.forEach(l => {
-                    l.classList.remove('bg-blue-50', 'text-blue-700', 'font-medium');
-                    l.classList.add('text-gray-700');
-                });
-                this.classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
-                this.classList.remove('text-gray-700');
-
-                // Hide all tab contents
-                tabContents.forEach(content => {
-                    content.style.display = 'none';
-                });
-
-                // Show selected tab content
-                const targetContent = document.getElementById(targetId);
-                if (targetContent) {
-                    targetContent.style.display = 'block';
-                }
-
-                // Update URL hash without scrolling
-                history.pushState(null, null, '#' + targetId);
-            });
-        });
-
-        // Handle initial hash
-        const hash = window.location.hash.substring(1);
-        if (hash && document.getElementById(hash)) {
-            const link = document.querySelector(`a[href="#${hash}"]`);
-            if (link) {
-                link.click();
-            }
-        }
-    });
-</script>
-@endpush
 @endsection
 

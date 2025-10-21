@@ -8,7 +8,7 @@
                 </h3>
                 <nav aria-label="breadcrumb">
                     <ol class="flex items-center space-x-2 text-sm text-blue-100">
-                        <li><a href="{{ url($site->home_link) }}" class="hover:text-white transition">Home</a></li>
+                        <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
                         <li><a href="{{ url('/myshows') }}" class="hover:text-white transition">My Shows</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
@@ -23,7 +23,7 @@
                 <div class="flex items-center gap-4 mb-4">
                     <img class="rounded-lg shadow-md w-24 h-auto"
                          src="{{ url("/covers/tvshows/{$video}_thumb.jpg") }}"
-                         onerror="this.src='{{ url('/covers/tvshows/no-cover.jpg') }}'"
+                         data-fallback-src="{{ url('/covers/tvshows/no-cover.jpg') }}"
                          alt="{{ e($show['title'] ?? '') }}" />
 
                     <div>
@@ -87,14 +87,4 @@
     </div>
 </div>
 
-<style>
-/* Fallback for browsers that don't support :has() pseudo-class */
-@supports not selector(:has(*)) {
-    label:has(input[type="checkbox"]:checked) {
-        background-color: #eff6ff !important;
-        border-color: #3b82f6 !important;
-        color: #1e40af !important;
-    }
-}
-</style>
 

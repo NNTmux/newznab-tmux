@@ -5,7 +5,7 @@
     <nav class="flex mb-6" aria-label="breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ $site->home_link }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
+                <a href="{{ $site['home_link'] }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
             </li>
             <li aria-current="page">
                 <div class="flex items-center">
@@ -19,7 +19,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                <i class="fa fa-envelope-open mr-2"></i>Invitation to Join {{ $site->title }}
+                <i class="fa fa-envelope-open mr-2"></i>Invitation to Join {{ $site['title'] }}
             </h5>
         </div>
         <div class="p-6">
@@ -30,7 +30,7 @@
                         <div>
                             <h6 class="font-semibold mb-2">You've been invited!</h6>
                             <p class="mb-0">
-                                <strong>{{ $preview['inviter_name'] ?? 'Someone' }}</strong> has invited you to join <strong>{{ $site->title }}</strong>.
+                                <strong>{{ $preview['inviter_name'] ?? 'Someone' }}</strong> has invited you to join <strong>{{ $site['title'] }}</strong>.
                             </p>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                                 <li>Click the "Accept Invitation" button below</li>
                                 <li>Fill out the registration form with your details</li>
                                 <li>Verify your email address when prompted</li>
-                                <li>Start exploring {{ $site->title }}!</li>
+                                <li>Start exploring {{ $site['title'] }}!</li>
                             </ol>
                         </div>
                     </div>

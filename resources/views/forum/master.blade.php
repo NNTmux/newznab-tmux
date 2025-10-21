@@ -81,10 +81,10 @@
                                 </svg>
                             </a>
                             <div class="border absolute left-0 bg-white dark:bg-gray-800 rounded-md w-44 divide-y" :class="{ hidden: isUserDropdownCollapsed }" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="block px-4 py-2" href="{{ url('/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <a class="block px-4 py-2" href="{{ url('/logout') }}" data-logout>
                                     Log out
                                 </a>
-                                <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+                                <form id="logout-form" action="{{ url('/logout') }}" method="POST" class="hidden">
                                     @csrf
                                 </form>
                             </div>

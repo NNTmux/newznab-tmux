@@ -6,7 +6,7 @@
     <div class="px-6 py-4 border-b border-gray-200">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
-                <li><a href="{{ url($site->home_link ?? '/') }}" class="hover:text-blue-600">Home</a></li>
+                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600">Home</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                 <li><a href="{{ url('/browse/Books') }}" class="hover:text-blue-600">Books</a></li>
                 @if(!empty($categorytitle) && $categorytitle !== 'All')
@@ -92,7 +92,7 @@
                                 <img src="{{ url('/covers/book/' . $result->cover) }}"
                                      alt="{{ $result->title ?? $result->searchname }}"
                                      class="w-full h-64 object-cover"
-                                     onerror="this.src='{{ url('/images/no-cover.png') }}'">
+                                     data-fallback-src="{{ url('/images/no-cover.png') }}">
                             @else
                                 <div class="w-full h-64 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                     <i class="fa fa-book text-4xl text-gray-400"></i>
@@ -106,7 +106,7 @@
                                 </div>
                             @endif
                             <div class="p-3">
-                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1" title="{{ $result->title ?? $result->searchname }}">
+                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1 break-words break-all" title="{{ $result->title ?? $result->searchname }}">
                                     {{ $result->title ?? $result->searchname }}
                                 </h3>
                                 @if(!empty($result->author))

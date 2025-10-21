@@ -37,6 +37,12 @@ class ForgotPasswordController extends Controller
      */
     public function showLinkRequestForm(Request $request)
     {
+        // If it's a GET request, just show the form
+        if ($request->isMethod('get')) {
+            return view('auth.passwords.email');
+        }
+
+        // Handle POST request
         $sent = '';
         $email = $request->input('email') ?? '';
         $rssToken = $request->input('apikey') ?? '';
@@ -45,10 +51,8 @@ class ForgotPasswordController extends Controller
             return view('auth.passwords.email')->withErrors(['error' => 'Missing parameter (email and/or apikey) to send password reset']);
         }
 
-        if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-            $validate = Validator::make($request->all(), [
-                'g-recaptcha-response' => 'required|captcha',
-            ]);
+        if (\App\Support\CaptchaHelper::isEnabled()) {
+            $validate = Validator::make($request->all(), \App\Support\CaptchaHelper::getValidationRules());
             if ($validate->fails()) {
                 return view('auth.passwords.email')->withErrors(['error' => 'Captcha validation failed.']);
             }

@@ -1,28 +1,23 @@
 import './bootstrap';
 
-// Import jQuery and make it globally available
-import $ from 'jquery';
-window.$ = window.jQuery = $;
+// Import CSP-safe styles and scripts
+import '../css/csp-safe.css';
+import './csp-safe.js';
 
-// Import Bootstrap JS
-import 'bootstrap';
+// Theme initialization - must run early to prevent flash
+(function() {
+    const themePreference = document.querySelector('meta[name="theme-preference"]')?.content || 'light';
+
+    if (themePreference === 'system') {
+        // Use OS preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    } else if (themePreference === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
+})();
 
 // Import FontAwesome
 import '@fortawesome/fontawesome-free/js/all.min.js';
-
-// Import DataTables
-import 'datatables';
-
-// Import other necessary libraries
-import autosize from 'autosize';
-window.autosize = autosize;
-
-// Initialize autosize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-resize textareas
-    const textareas = document.querySelectorAll('textarea[data-autosize]');
-    if (textareas.length > 0) {
-        autosize(textareas);
-    }
-});
 

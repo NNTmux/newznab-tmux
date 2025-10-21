@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -73,7 +74,13 @@ class LoginController extends Controller
         }
 
         if ($validator->passes()) {
-            $user = User::query()->orWhere(['username' => $request->input('username'), 'email' => $request->input('username')])->withTrashed()->first();
+            $user = User::query()
+                ->where(function ($query) use ($request) {
+                    $query->where('username', $request->input('username'))
+                        ->orWhere('email', $request->input('username'));
+                })
+                ->withTrashed()
+                ->first();
             if ($user !== null) {
                 // Check if user is soft deleted
                 if ($user->trashed()) {
@@ -147,9 +154,11 @@ class LoginController extends Controller
                 }
 
                 $this->incrementLoginAttempts($request);
+                Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
                 $request->session()->flash('message', 'Username or email and password combination used does not match our records!');
             } else {
                 $this->incrementLoginAttempts($request);
+                Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
                 $request->session()->flash('message', 'Username or email used do not match our records!');
             }
 
@@ -158,6 +167,7 @@ class LoginController extends Controller
 
         $this->incrementLoginAttempts($request);
         $request->session()->flash('message', implode('', Arr::collapse($validator->errors()->toArray())));
+        Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
 
         return redirect()->to('login');
     }

@@ -182,26 +182,7 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('regexForm');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            const groupRegex = document.getElementById('group_regex');
-            const regex = document.getElementById('regex');
-            const ordinal = document.getElementById('ordinal');
-
-            if (!groupRegex.value.trim() || !regex.value.trim() || !ordinal.value) {
-                event.preventDefault();
-                alert('Please fill in all required fields.');
-                return false;
-            }
-        });
-    }
-});
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 
 

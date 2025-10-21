@@ -1,37 +1,3 @@
-<style>
-    .header-gradient {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    }
-    .info-card-gradient {
-        background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
-    }
-    .dark .info-card-gradient {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-    }
-    .table-header-gradient {
-        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-    }
-    .dark .table-header-gradient {
-        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-    }
-    .movie-poster-shadow {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .category-badge {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    }
-    .dark .category-badge {
-        background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-        color: #93c5fd !important;
-        border-color: #2563eb !important;
-    }
-    .empty-state-bg {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-    }
-    .dark .empty-state-bg {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-    }
-</style>
 
 <div class="max-w-7xl mx-auto">
     <!-- Header Section -->
@@ -46,7 +12,7 @@
                 </div>
                 <nav aria-label="breadcrumb">
                     <ol class="flex items-center space-x-2 text-sm text-blue-100">
-                        <li><a href="{{ url($site->home_link) }}" class="hover:text-white transition">Home</a></li>
+                        <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
                         <li class="text-white font-medium">My Movies</li>
                     </ol>
@@ -184,7 +150,7 @@
                                         </span>
                                         <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 dark:text-gray-100 text-xs font-semibold rounded-full transition-colors"
                                            target="_blank"
-                                           href="{{ $site->dereferrer_link }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
+                                           href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
                                            title="View on IMDB">
                                             <i class="fa fa-external-link mr-1"></i>IMDB
                                         </a>
@@ -233,7 +199,7 @@
                             <div class="flex gap-2">
                                 <a class="inline-flex items-center px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-semibold rounded-full transition-colors"
                                    target="_blank"
-                                   href="{{ $site->dereferrer_link }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
+                                   href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
                                     <i class="fa fa-external-link mr-1"></i>IMDB
                                 </a>
                                 <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">

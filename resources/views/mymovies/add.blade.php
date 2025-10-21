@@ -8,7 +8,7 @@
                 </h3>
                 <nav aria-label="breadcrumb">
                     <ol class="flex items-center space-x-2 text-sm text-blue-100">
-                        <li><a href="{{ url($site->home_link) }}" class="hover:text-white transition">Home</a></li>
+                        <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
                         <li><a href="{{ url('/mymovies') }}" class="hover:text-white transition">My Movies</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
@@ -23,7 +23,7 @@
                 <div class="flex items-center gap-4 mb-4">
                     <img class="rounded-lg shadow-md w-24 h-auto"
                          src="{{ url("/covers/movies/{$imdbid}-cover.jpg") }}"
-                         onerror="this.src='{{ url('/covers/movies/no-cover.jpg') }}'"
+                         data-fallback-src="{{ url('/covers/movies/no-cover.jpg') }}"
                          alt="{{ e($movie['title'] ?? '') }}" />
 
                     <div>
@@ -86,19 +86,6 @@
         </div>
     </div>
 </div>
-
-<style>
-/* Fallback for browsers that don't support :has() pseudo-class */
-@supports not selector(:has(*)) {
-    label:has(input[type="checkbox"]:checked) {
-        background-color: #eff6ff !important;
-        border-color: #3b82f6 !important;
-        color: #1e40af !important;
-    }
-}
-</style>
-
-</style>
 <div class="card card-default shadow-sm mb-4">
     <div class="card-header bg-light">
         <div class="d-flex justify-content-between align-items-center">
@@ -106,7 +93,7 @@
             <div class="breadcrumb-wrapper">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 py-0">
-                        <li class="breadcrumb-item"><a href="{{ url($site->home_link) }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url($site['home_link']) }}">Home</a></li>
                         <li class="breadcrumb-item active">My Movies</li>
                     </ol>
                 </nav>
@@ -195,7 +182,7 @@
 
                                     <div class="mt-2">
                                         <a class="badge bg-warning text-dark" target="_blank"
-                                           href="{{ $site->dereferrer_link }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
+                                           href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
                                            data-bs-toggle="tooltip" data-bs-placement="top" title="View on IMDB">
                                             <i class="fa fa-external-link me-1"></i>IMDB
                                         </a>

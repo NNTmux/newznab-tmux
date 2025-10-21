@@ -690,4 +690,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(PasswordSecurity::class);
     }
+
+    public static function canPost($user_id): bool
+    {
+        // return true if can_post column is true and false if can_post column is false
+        return self::where('id', $user_id)->value('can_post');
+    }
 }

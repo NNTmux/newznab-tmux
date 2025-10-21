@@ -115,9 +115,8 @@
                                 @if(isset($book['cover']) && $book['cover'] == 1)
                                     <img src="{{ asset('storage/covers/book/' . $book['id'] . '.jpg') }}"
                                          alt="{{ $book['title'] }}"
-                                         class="max-w-full h-auto mx-auto rounded shadow-lg"
-                                         style="max-height: 400px;"
-                                         onerror="this.src='{{ asset('images/no-cover.png') }}'">
+                                         class="max-w-full h-auto mx-auto rounded shadow-lg img-max-h-400"
+                                         data-fallback-src="{{ asset('images/no-cover.png') }}">
                                 @else
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
                                         <i class="fas fa-book text-6xl mb-3"></i>
@@ -189,22 +188,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-    // Preview image before upload
-    document.getElementById('cover')?.addEventListener('change', function(e) {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = document.querySelector('img[alt="{{ $book['title'] ?? '' }}"]');
-                if (img) {
-                    img.src = event.target.result;
-                }
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

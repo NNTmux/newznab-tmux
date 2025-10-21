@@ -37,7 +37,7 @@
                                     <img src="{{ asset('storage/covers/book/' . $book->id . '.jpg') }}"
                                          alt="{{ $book->title }}"
                                          class="h-16 w-12 object-cover rounded shadow"
-                                         onerror="this.src='{{ asset('images/no-cover.png') }}'">
+                                         data-fallback-src="{{ asset('images/no-cover.png') }}">
                                 @else
                                     <div class="h-16 w-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
                                         <i class="fas fa-book text-gray-400"></i>

@@ -7,7 +7,7 @@
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ url($site->home_link ?? '/') }}" class="text-gray-700 dark:text-gray-300 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-400 inline-flex items-center">
+                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-400 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                 </li>
@@ -92,7 +92,7 @@
                     <div class="flex items-center justify-end">
                         <div class="flex items-center gap-2">
                             <label class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">Sort by:</label>
-                            <select class="border border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-white dark:bg-gray-800 dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400" onchange="window.location.href=this.value">
+                            <select class="border border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-white dark:bg-gray-800 dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400" data-redirect-on-change>
                                 <option value="{{ $orderbyposted ?? '#' }}" {{ request('ob') == 'posted_desc' ? 'selected' : '' }}>Posted</option>
                                 <option value="{{ $orderbyname ?? '#' }}" {{ request('ob') == 'name_asc' ? 'selected' : '' }}>Name</option>
                                 <option value="{{ $orderbysize ?? '#' }}" {{ request('ob') == 'size_desc' ? 'selected' : '' }}>Size</option>
@@ -119,7 +119,7 @@
                             </th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Name</th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Category</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Posted</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Added</th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Size</th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Files</th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Stats</th>
@@ -139,7 +139,7 @@
                                         @endif
                                         <div class="flex-1">
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:hover:text-blue-300 font-medium">{{ $result->searchname }}</a>
+                                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:hover:text-blue-300 font-medium break-words break-all">{{ $result->searchname }}</a>
                                                 @if(!empty($result->failed) && $result->failed > 0)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                                                           title="{{ $result->failed }} user(s) reported download failure">
@@ -186,10 +186,20 @@
                                                     </button>
                                                 @endif
                                             </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-2">
                                                 @if($result->group_name)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 dark:bg-gray-700 text-gray-700 dark:text-gray-300 dark:text-gray-300">
                                                         <i class="fas fa-users mr-1"></i> {{ $result->group_name }}
+                                                    </span>
+                                                @endif
+                                                @if(!empty($result->postdate))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                        <i class="fas fa-calendar mr-1"></i> Posted: {{ \Carbon\Carbon::parse($result->postdate)->format('M d, Y H:i') }}
+                                                    </span>
+                                                @endif
+                                                @if(!empty($result->fromname))
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono">
+                                                        <i class="fas fa-user mr-1"></i> {{ $result->fromname }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -202,7 +212,7 @@
                                     </span>
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
-                                    {{ \Carbon\Carbon::parse($result->postdate)->diffForHumans() }}
+                                    {{ \Carbon\Carbon::parse($result->adddate)->diffForHumans() }}
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
                                     {{ $result->size_formatted ?? number_format($result->size / 1073741824, 2) . ' GB' }}
@@ -227,7 +237,7 @@
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-1 flex-wrap">
-                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 dark:hover:bg-green-800 transition text-sm" title="Download NZB" onclick="showToast('Downloading NZB...', 'success')">
+                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZB">
                                             <i class="fa fa-download"></i>
                                         </a>
                                         <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-blue-600 dark:bg-blue-700 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 dark:hover:bg-blue-800 transition text-sm" title="View Details">
@@ -324,519 +334,4 @@
     @include('partials.nfo-modal')
 </div>
 @endsection
-
-@push('scripts')
-<script>
-function closePreviewModal() {
-    const modal = document.getElementById('previewModal');
-    modal.style.display = 'none';
-    modal.classList.add('hidden');
-}
-
-function showPreviewImage(guid, type = 'preview') {
-    const modal = document.getElementById('previewModal');
-    const img = document.getElementById('previewImage');
-    const error = document.getElementById('previewError');
-    const title = document.getElementById('previewTitle');
-
-    modal.style.display = 'flex';
-    modal.classList.remove('hidden');
-    title.textContent = type === 'sample' ? 'Sample Image' : 'Preview Image';
-
-    const imageUrl = '/covers/' + type + '/' + guid + '.jpg';
-    img.src = imageUrl;
-    error.classList.add('hidden');
-    img.style.display = 'block';
-
-    img.onerror = function() {
-        error.textContent = (type === 'sample' ? 'Sample' : 'Preview') + ' image not available';
-        error.classList.remove('hidden');
-        img.style.display = 'none';
-    };
-
-    img.onload = function() {
-        img.style.display = 'block';
-    };
-}
-
-function closeMediainfoModal() {
-    const modal = document.getElementById('mediainfoModal');
-    modal.style.display = 'none';
-}
-
-function closeFilelistModal() {
-    const modal = document.getElementById('filelistModal');
-    modal.style.display = 'none';
-}
-
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function showFilelist(guid) {
-    let modal = document.getElementById('filelistModal');
-    if (modal && modal.parentElement !== document.body) {
-        document.body.appendChild(modal);
-    }
-
-    const content = document.getElementById('filelistContent');
-    modal.style.display = 'flex';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.right = '0';
-    modal.style.bottom = '0';
-    modal.style.zIndex = '99999';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-
-    content.innerHTML = `
-        <div class="text-center py-8">
-            <i class="fas fa-spinner fa-spin text-3xl text-green-600"></i>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Loading file list...</p>
-        </div>
-    `;
-
-    const apiUrl = '/api/release/' + guid + '/filelist';
-
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load file list');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!data.files || data.files.length === 0) {
-                content.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 py-8">No files available</p>';
-                return;
-            }
-
-            let html = '<div class="space-y-4">';
-            html += `
-                <div class="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-4 mb-4">
-                    <h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 mb-2">${escapeHtml(data.release.searchname)}</h4>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">Total Files: ${data.total}</p>
-                </div>
-            `;
-
-            html += `
-                <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-700">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-100 dark:bg-gray-800 dark:bg-gray-900">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">File Name</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 uppercase tracking-wider">Size</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            `;
-
-            data.files.forEach((file, index) => {
-                const rowClass = index % 2 === 0 ? 'bg-white dark:bg-gray-800 dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-900 dark:bg-gray-750';
-                const fileName = file.title || file.name || 'Unknown';
-                const fileSize = file.size ? formatFileSize(file.size) : 'N/A';
-
-                html += `
-                    <tr class="${rowClass} hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100 break-all">${escapeHtml(fileName)}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 whitespace-nowrap">${fileSize}</td>
-                    </tr>
-                `;
-            });
-
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            html += '</div>';
-            content.innerHTML = html;
-        })
-        .catch(error => {
-            content.innerHTML = `
-                <div class="text-center py-8">
-                    <i class="fas fa-exclamation-circle text-3xl text-red-600"></i>
-                    <p class="text-red-600 mt-2">${error.message}</p>
-                </div>
-            `;
-        });
-}
-
-
-function showMediainfo(releaseId) {
-    let modal = document.getElementById('mediainfoModal');
-
-    // If modal doesn't have body as parent, move it there
-    if (modal && modal.parentElement !== document.body) {
-        document.body.appendChild(modal);
-    }
-
-    const content = document.getElementById('mediainfoContent');
-
-    // Show modal with loading state
-    modal.style.display = 'flex';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.right = '0';
-    modal.style.bottom = '0';
-    modal.style.zIndex = '99999';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-
-    content.innerHTML = `
-        <div class="text-center py-8">
-            <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Loading media information...</p>
-        </div>
-    `;
-
-    // Fetch mediainfo data
-    const apiUrl = '/api/release/' + releaseId + '/mediainfo';
-
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load media information');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!data.video && !data.audio && !data.subs) {
-                content.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 py-8">No media information available</p>';
-                return;
-            }
-
-            let html = '<div class="space-y-6">';
-
-            // Video information
-            if (data.video) {
-                html += `
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-4">
-                        <h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 mb-3 flex items-center">
-                            <i class="fas fa-video mr-2 text-blue-600 dark:text-blue-400 dark:text-blue-400"></i> Video Information
-                        </h4>
-                        <dl class="grid grid-cols-2 gap-3">
-                `;
-
-                if (data.video.containerformat) {
-                    html += `
-                        <div>
-                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Container</dt>
-                            <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${data.video.containerformat}</dd>
-                        </div>
-                    `;
-                }
-                if (data.video.videocodec) {
-                    html += `
-                        <div>
-                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Codec</dt>
-                            <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${data.video.videocodec}</dd>
-                        </div>
-                    `;
-                }
-                if (data.video.videowidth && data.video.videoheight) {
-                    html += `
-                        <div>
-                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Resolution</dt>
-                            <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${data.video.videowidth}x${data.video.videoheight}</dd>
-                        </div>
-                    `;
-                }
-                if (data.video.videoaspect) {
-                    html += `
-                        <div>
-                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Aspect Ratio</dt>
-                            <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${data.video.videoaspect}</dd>
-                        </div>
-                    `;
-                }
-                if (data.video.videoframerate) {
-                    html += `
-                        <div>
-                            <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Frame Rate</dt>
-                            <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${data.video.videoframerate} fps</dd>
-                        </div>
-                    `;
-                }
-                if (data.video.videoduration) {
-                    // videoduration is in milliseconds, convert to minutes
-                    const durationMs = parseInt(data.video.videoduration);
-                    if (!isNaN(durationMs) && durationMs > 0) {
-                        const minutes = Math.round(durationMs / 1000 / 60);
-                        html += `
-                            <div>
-                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Duration</dt>
-                                <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${minutes} minutes</dd>
-                            </div>
-                        `;
-                    }
-                }
-
-                html += '</dl></div>';
-            }
-
-            // Audio information
-            if (data.audio && data.audio.length > 0) {
-                html += `
-                    <div class="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-4">
-                        <h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 mb-3 flex items-center">
-                            <i class="fas fa-volume-up mr-2 text-green-600 dark:text-green-400"></i> Audio Information
-                        </h4>
-                `;
-
-                data.audio.forEach((audio, index) => {
-                    if (index > 0) html += '<hr class="my-3 border-gray-200 dark:border-gray-700 dark:border-gray-700">';
-                    html += '<dl class="grid grid-cols-2 gap-3">';
-
-                    if (audio.audioformat) {
-                        html += `
-                            <div>
-                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Format</dt>
-                                <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${audio.audioformat}</dd>
-                            </div>
-                        `;
-                    }
-                    if (audio.audiochannels) {
-                        html += `
-                            <div>
-                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Channels</dt>
-                                <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${audio.audiochannels}</dd>
-                            </div>
-                        `;
-                    }
-                    if (audio.audiobitrate) {
-                        html += `
-                            <div>
-                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Bit Rate</dt>
-                                <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${audio.audiobitrate}</dd>
-                            </div>
-                        `;
-                    }
-                    if (audio.audiolanguage) {
-                        html += `
-                            <div>
-                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Language</dt>
-                                <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${audio.audiolanguage}</dd>
-                            </div>
-                        `;
-                    }
-                    if (audio.audiosamplerate) {
-                        html += `
-                            <div>
-                                <dt class="text-xs font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Sample Rate</dt>
-                                <dd class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${audio.audiosamplerate}</dd>
-                            </div>
-                        `;
-                    }
-
-                    html += '</dl>';
-                });
-
-                html += '</div>';
-            }
-
-            // Subtitle information
-            if (data.subs) {
-                html += `
-                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 rounded-lg p-4">
-                        <h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 mb-3 flex items-center">
-                            <i class="fas fa-closed-captioning mr-2 text-purple-600 dark:text-purple-400"></i> Subtitles
-                        </h4>
-                        <p class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">${data.subs}</p>
-                    </div>
-                `;
-            }
-
-            html += '</div>';
-            content.innerHTML = html;
-        })
-        .catch(error => {
-            content.innerHTML = `
-                <div class="text-center py-8">
-                    <i class="fas fa-exclamation-circle text-3xl text-red-600"></i>
-                    <p class="text-red-600 mt-2">${error.message}</p>
-                </div>
-            `;
-        });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Preview and Sample badge click handlers
-    document.addEventListener('click', function(e) {
-        const previewBadge = e.target.closest('.preview-badge');
-        if (previewBadge) {
-            e.preventDefault();
-            const guid = previewBadge.dataset.guid;
-            showPreviewImage(guid, 'preview');
-        }
-
-        const sampleBadge = e.target.closest('.sample-badge');
-        if (sampleBadge) {
-            e.preventDefault();
-            const guid = sampleBadge.dataset.guid;
-            showPreviewImage(guid, 'sample');
-        }
-
-        // Mediainfo badge click handlers
-        const mediainfoBadge = e.target.closest('.mediainfo-badge');
-        if (mediainfoBadge) {
-            e.preventDefault();
-            const releaseId = mediainfoBadge.dataset.releaseId;
-            showMediainfo(releaseId);
-        }
-
-        // File list badge click handlers
-        const filelistBadge = e.target.closest('.filelist-badge');
-        if (filelistBadge) {
-            e.preventDefault();
-            const guid = filelistBadge.dataset.guid;
-            showFilelist(guid);
-        }
-    });
-
-    // Close modal on background click
-    document.getElementById('previewModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closePreviewModal();
-        }
-    });
-
-    document.getElementById('mediainfoModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeMediainfoModal();
-        }
-    });
-
-    document.getElementById('filelistModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeFilelistModal();
-        }
-    });
-
-    // Close modal on ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closePreviewModal();
-            closeMediainfoModal();
-            closeFilelistModal();
-        }
-    });
-
-    // Select all checkbox functionality
-    document.getElementById('chkSelectAll')?.addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.chkRelease');
-        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-    });
-    // Multi-operations download
-    document.querySelector('.nzb_multi_operations_download')?.addEventListener('click', function() {
-        const selected = Array.from(document.querySelectorAll('.chkRelease:checked')).map(cb => cb.value);
-        if (selected.length === 0) {
-            return;
-        }
-        selected.forEach(guid => {
-            window.open('/getnzb/' + guid, '_blank');
-        });
-        showToast(`Downloading ${selected.length} NZB${selected.length > 1 ? 's' : ''}...`, 'success');
-    });
-
-    // Multi-operations cart
-    document.querySelector('.nzb_multi_operations_cart')?.addEventListener('click', function() {
-        const selected = Array.from(document.querySelectorAll('.chkRelease:checked')).map(cb => cb.value);
-        if (selected.length === 0) {
-            showToast('Please select at least one release', 'error');
-            return;
-        }
-        // Add to cart via AJAX
-        fetch('/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ id: selected.join(',') })
-        }).then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  showToast(data.message || `Added ${selected.length} item${selected.length > 1 ? 's' : ''} to cart`, 'success');
-              } else {
-                  showToast('Failed to add items to cart', 'error');
-              }
-          })
-          .catch(error => {
-              showToast('An error occurred', 'error');
-          });
-    });
-
-    // Individual add to cart buttons
-    document.addEventListener('click', function(e) {
-        const cartBtn = e.target.closest('.add-to-cart');
-
-        if (cartBtn) {
-            e.preventDefault();
-
-            const guid = cartBtn.dataset.guid;
-            const iconElement = cartBtn.querySelector('.icon_cart');
-
-            if (!guid) {
-                console.error('No GUID found for cart item');
-                return;
-            }
-
-            // Prevent double-clicking
-            if (iconElement && iconElement.classList.contains('icon_cart_clicked')) {
-                return;
-            }
-
-            // Send AJAX request to add item to cart
-            fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ id: guid })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Visual feedback
-                    if (iconElement) {
-                        iconElement.classList.remove('fa-shopping-basket');
-                        iconElement.classList.add('fa-check', 'icon_cart_clicked');
-
-                        // Reset icon after 2 seconds
-                        setTimeout(() => {
-                            iconElement.classList.remove('fa-check', 'icon_cart_clicked');
-                            iconElement.classList.add('fa-shopping-basket');
-                        }, 2000);
-                    }
-
-                    // Show success notification
-                    showToast('Added to cart successfully!', 'success');
-                } else {
-                    showToast('Failed to add item to cart', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error adding to cart:', error);
-                showToast('An error occurred', 'error');
-            });
-        }
-    });
-});
-</script>
-@endpush
 

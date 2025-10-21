@@ -113,7 +113,7 @@
                                         </a>
                                         <button type="button"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                onclick="if(confirm('Are you sure? This will delete the blacklist from this list.')) { ajax_binaryblacklist_delete({{ $bin->id }}) }"
+                                                data-delete-blacklist="{{ $bin->id }}"
                                                 title="Delete this blacklist">
                                             <i class="fa fa-trash"></i>
                                         </button>
@@ -147,56 +147,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-function ajax_binaryblacklist_delete(id) {
-    fetch('{{ url("/admin/binaryblacklist-delete") }}?id=' + id, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const row = document.getElementById('row-' + id);
-            row.style.transition = 'opacity 0.3s';
-            row.style.opacity = '0';
-            setTimeout(() => row.remove(), 300);
-            showMessage('Blacklist entry deleted successfully', 'success');
-        } else {
-            showMessage('Error deleting blacklist entry', 'error');
-        }
-    })
-    .catch(error => {
-        showMessage('Error deleting blacklist entry', 'error');
-    });
-}
-
-function showMessage(message, type = 'success') {
-    const messageDiv = document.getElementById('message');
-    const bgColor = type === 'success' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
-    const textColor = type === 'success' ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300';
-    const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
-
-    messageDiv.innerHTML = `
-        <div class="mt-4 p-4 ${bgColor} border rounded-lg">
-            <div class="flex items-center justify-between">
-                <p class="${textColor}">
-                    <i class="fa fa-${icon} mr-2"></i>${message}
-                </p>
-                <button type="button" class="${textColor} hover:opacity-75" onclick="this.parentElement.parentElement.remove()">
-                    <i class="fa fa-times"></i>
-                </button>
-            </div>
-        </div>
-    `;
-    setTimeout(() => {
-        messageDiv.innerHTML = '';
-    }, 5000);
-}
-</script>
-@endpush
+{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

@@ -7,7 +7,7 @@
         <nav class="text-sm text-gray-600">
             <a href="{{ url('/') }}" class="hover:text-blue-600">Home</a>
             <i class="fas fa-chevron-right mx-2 text-xs"></i>
-            <span>{{ $release->searchname }}</span>
+            <span class="break-words break-all">{{ $release->searchname }}</span>
         </nav>
     </div>
 
@@ -22,14 +22,14 @@
                         <img src="{{ getReleaseCover($release) }}"
                              alt="{{ $release->searchname }}"
                              class="w-48 h-72 object-cover rounded-lg shadow-md max-w-[192px] max-h-[288px]"
-                             style="width: 192px; height: 288px;"
-                             onerror="this.src='{{ asset('assets/images/no-cover.png') }}'">
+                             class="rounded-lg shadow-lg object-cover w-192 h-288"
+                             data-fallback-src="{{ asset('assets/images/no-cover.png') }}">
                     </div>
 
                     <!-- Title and Actions -->
                     <div class="flex-1">
                         <div class="mb-3">
-                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ $release->searchname }}</h2>
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 break-words break-all">{{ $release->searchname }}</h2>
                             @if(!empty($failed) && $failed > 0)
                                 <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-100 text-red-800 border border-red-200">
                                     <i class="fas fa-exclamation-triangle mr-2"></i>
@@ -83,8 +83,8 @@
                         @if($hasPreviewImage)
                             <!-- Preview image -->
                             <div>
-                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/preview/' . $release->guid . '.jpg') }}', 'Preview Image')">
-                                    <img src="{{ url('/covers/preview/' . $release->guid . '.jpg') }}"
+                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/preview/' . $release->guid . '_thumb.jpg') }}', 'Preview Image')">
+                                    <img src="{{ url('/covers/preview/' . $release->guid . '_thumb.jpg') }}"
                                          alt="Preview"
                                          class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
                                          loading="lazy">
@@ -96,8 +96,8 @@
                         @if($hasSampleImage)
                             <!-- Sample image -->
                             <div>
-                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/sample/' . $release->guid . '.jpg') }}', 'Sample Image')">
-                                    <img src="{{ url('/covers/sample/' . $release->guid . '.jpg') }}"
+                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/sample/' . $release->guid . '_thumb.jpg') }}', 'Sample Image')">
+                                    <img src="{{ url('/covers/sample/' . $release->guid . '_thumb.jpg') }}"
                                          alt="Sample"
                                          class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
                                          loading="lazy">
@@ -503,6 +503,53 @@
                 </div>
             @endif
 
+            <!-- Password Information -->
+            @if(isset($release->passwordstatus) && $release->passwordstatus > 0)
+                <div class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900 rounded-lg p-6 border border-red-100 dark:border-red-800">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                        <i class="fas fa-lock mr-2 text-red-600 dark:text-red-400"></i> Password Protected Release
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">Password Status</dt>
+                            <dd class="mt-1">
+                                @if($release->passwordstatus == 1)
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                        <i class="fas fa-question-circle mr-1"></i> Password Unknown
+                                    </span>
+                                @elseif($release->passwordstatus == 2)
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        <i class="fas fa-check-circle mr-1"></i> Password Available
+                                    </span>
+                                @endif
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Password</dt>
+                            <dd class="mt-1">
+                                @if(!empty($release->password))
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-300 dark:border-gray-700">
+                                        <code class="text-sm text-gray-900 dark:text-gray-100 font-mono break-all">{{ $release->password }}</code>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        This password is embedded in the NZB file and will be automatically recognized by NZBGet or SABnzbd.
+                                    </p>
+                                @else
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-300 dark:border-gray-700">
+                                        <code class="text-sm text-gray-500 dark:text-gray-400 font-mono">None</code>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        No password information available in the database.
+                                    </p>
+                                @endif
+                            </dd>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Video/Audio Metadata -->
             @if(!empty($reVideo) || !empty($reAudio) || !empty($reSubs))
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
@@ -832,13 +879,27 @@
                         <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $release->totalpart ?? 0 }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Posted</dt>
-                        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}</dd>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Added</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ \Carbon\Carbon::parse($release->adddate)->format('M d, Y H:i') }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Group</dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $release->group_name ?? 'Unknown' }}</dd>
                     </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Posted</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}</dd>
+                    </div>
+                    @if(!empty($release->fromname))
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Posted By</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 break-all">
+                                <span class="inline-flex items-center px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-mono">
+                                    <i class="fas fa-user mr-1"></i>{{ $release->fromname }}
+                                </span>
+                            </dd>
+                        </div>
+                    @endif
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Grabs</dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $release->grabs ?? 0 }}</dd>
@@ -861,7 +922,7 @@
 @endsection
 
 <!-- Image Modal -->
-<div id="imageModal" class="fixed inset-0 bg-transparent hidden items-center justify-center p-4" style="z-index: 9999; backdrop-filter: blur(10px);">
+<div id="imageModal" class="fixed inset-0 bg-transparent hidden items-center justify-center p-4">
     <div class="relative max-w-7xl w-full h-full flex items-center justify-center">
         <button type="button" onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-10 bg-black bg-opacity-70 rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
             <i class="fas fa-times"></i>
@@ -878,44 +939,5 @@
 
 @push('scripts')
 @include('partials.cart-script')
-
-<script>
-function openImageModal(imageUrl, title) {
-    const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('imageModalImage');
-    const modalTitle = document.getElementById('imageModalTitle');
-
-    modalImage.src = imageUrl;
-    modalTitle.textContent = title;
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-
-    // Prevent body scroll when modal is open
-    document.body.style.overflow = 'hidden';
-}
-
-function closeImageModal() {
-    const modal = document.getElementById('imageModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-
-    // Restore body scroll
-    document.body.style.overflow = '';
-}
-
-// Close modal when clicking outside the image
-document.getElementById('imageModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeImageModal();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeImageModal();
-    }
-});
-</script>
 @endpush
 
