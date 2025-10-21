@@ -94,7 +94,6 @@
         "propaganistas/laravel-disposable-email": "^2.4",
         "riari/laravel-forum": "^7.0",
         "sentry/sentry-laravel": "^4.13",
-        "smarty/smarty": "^4.3",
         "spatie/async": "^1.7",
         "spatie/laravel-directory-cleanup": "^1.10",
         "spatie/laravel-fractal": "^6.3",
