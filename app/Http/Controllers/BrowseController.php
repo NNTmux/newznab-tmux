@@ -74,6 +74,7 @@ class BrowseController extends BasePageController
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $covgroup = '';
+        $shows = false;
         if ($category === -1 && $grp === -1) {
             $catname = 'All';
         } elseif ($category !== -1 && $grp === -1) {
@@ -92,6 +93,8 @@ class BrowseController extends BasePageController
                     $covgroup = 'music';
                 } elseif ($cdata->root_categories_id === Category::BOOKS_ROOT) {
                     $covgroup = 'books';
+                } elseif ($cdata->root_categories_id === Category::TV_ROOT) {
+                    $shows = true;
                 }
             }
         } else {
@@ -112,7 +115,7 @@ class BrowseController extends BasePageController
             }
         }
 
-        $this->viewData = array_merge($this->viewData, [
+        $viewData = [
             'parentcat' => ucfirst($parentCategory),
             'category' => $category,
             'catname' => $catname,
@@ -122,7 +125,13 @@ class BrowseController extends BasePageController
             'meta_title' => $meta_title,
             'meta_keywords' => 'browse,nzb,description,details',
             'meta_description' => 'Browse for Nzbs',
-        ], $orderByUrls);
+        ];
+
+        if ($shows) {
+            $viewData['shows'] = true;
+        }
+
+        $this->viewData = array_merge($this->viewData, $viewData, $orderByUrls);
 
         return view('browse.index', $this->viewData);
     }

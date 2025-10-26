@@ -14,19 +14,34 @@ class ReleaseStat extends Model
 
     public static function insertRecentlyAdded(): void
     {
-        $categories = Category::query()->with('parent')->where('r.adddate', '>', now()->subWeek())->select([
-            'root_categories_id', DB::raw('COUNT(r.id) as count'), 'title',
-        ])->join('releases as r', 'r.categories_id', '=',
-            'categories.id')->groupBy('title')->orderByDesc('count')->get();
+        $categories = Category::query()
+            ->with('parent')
+            ->where('r.adddate', '>', now()->subWeek())
+            ->select([
+                'categories.id',
+                'root_categories_id',
+                DB::raw('COUNT(r.id) as count'),
+                'categories.title',
+            ])
+            ->join('releases as r', 'r.categories_id', '=', 'categories.id')
+            ->whereNotIn('categories.id', [10, 20]) // Exclude OTHER_MISC and OTHER_HASHED
+            ->groupBy('categories.id', 'root_categories_id', 'categories.title')
+            ->orderByDesc('count')
+            ->get();
 
         foreach ($categories as $category) {
+            // Build the category display name with root category prefix
+            $categoryDisplay = $category->parent
+                ? $category->parent->title.' > '.$category->title
+                : $category->title;
+
             // Check if we already have the information and if we do just update the count
-            if (self::query()->where('category', $category->title)->exists()) {
-                self::query()->where('category', $category->title)->update(['count' => $category->count]);
+            if (self::query()->where('category', $categoryDisplay)->exists()) {
+                self::query()->where('category', $categoryDisplay)->update(['count' => $category->count]);
 
                 continue;
             }
-            self::query()->create(['category' => $category->title, 'count' => $category->count]);
+            self::query()->create(['category' => $categoryDisplay, 'count' => $category->count]);
         }
     }
 

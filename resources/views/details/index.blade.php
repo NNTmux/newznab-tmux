@@ -229,7 +229,7 @@
                             <div>
                                 <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">TVDB</dt>
                                 <dd class="mt-1">
-                                    <a href="https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                    <a href="{{ $site['dereferrer_link'] }}https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                                         View on TVDB <i class="fas fa-external-link-alt text-xs"></i>
                                     </a>
                                 </dd>
@@ -880,7 +880,7 @@
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Added</dt>
-                        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ \Carbon\Carbon::parse($release->adddate)->format('M d, Y H:i') }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ userDate($release->adddate, 'M d, Y H:i') }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Group</dt>
@@ -888,7 +888,7 @@
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Posted</dt>
-                        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ userDate($release->postdate, 'M d, Y H:i') }}</dd>
                     </div>
                     @if(!empty($release->fromname))
                         <div>
@@ -908,7 +908,7 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">IMDB</dt>
                             <dd class="mt-1">
-                                <a href="https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                                     View on IMDB <i class="fas fa-external-link-alt text-xs"></i>
                                 </a>
                             </dd>

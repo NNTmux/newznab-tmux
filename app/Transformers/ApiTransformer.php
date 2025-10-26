@@ -31,7 +31,6 @@ class ApiTransformer extends TransformerAbstract
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
-                'poster' => $releases->fromname,
                 'imdbid' => $releases->imdbid !== null && $releases->imdbid !== 0 ? $releases->imdbid : $this->null(),
                 'tmdbid' => $releases->tmdbid !== null && $releases->tmdbid !== 0 ? $releases->tmdbid : $this->null(),
                 'traktid' => $releases->traktid !== null && $releases->traktid !== 0 ? $releases->traktid : $this->null(),
@@ -39,7 +38,6 @@ class ApiTransformer extends TransformerAbstract
                 'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
                 'password' => $releases->passwordstatus,
                 'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-                'group' => $releases->group_name,
             ];
         }
 
@@ -53,7 +51,6 @@ class ApiTransformer extends TransformerAbstract
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
-                'poster' => $releases->fromname,
                 'episode_title' => $releases->title ?? $this->null(),
                 'season' => $releases->series ?? $this->null(),
                 'episode' => $releases->episode ?? $this->null(),
@@ -68,7 +65,6 @@ class ApiTransformer extends TransformerAbstract
                 'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
                 'password' => $releases->passwordstatus,
                 'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-                'group' => $releases->group_name,
             ];
         }
 
@@ -81,12 +77,10 @@ class ApiTransformer extends TransformerAbstract
             'added' => Carbon::parse($releases->adddate)->toRssString(),
             'size' => $releases->size,
             'files' => $releases->totalpart,
-            'poster' => $releases->fromname,
             'grabs' => $releases->grabs !== 0 ? $releases->grabs : $this->null(),
             'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
             'password' => $releases->passwordstatus,
             'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-            'group' => $releases->group_name,
         ];
     }
 }

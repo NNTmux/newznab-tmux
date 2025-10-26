@@ -112,7 +112,7 @@
                                     <div class="flex items-center">
                                         <i class="fa fa-calendar-plus-o text-gray-400 mr-2"></i>
                                         <span title="{{ $release->adddate }}">
-                                            {{ \Carbon\Carbon::parse($release->adddate)->format('Y-m-d H:i') }}
+                                            {{ userDate($release->adddate, 'Y-m-d H:i') }}
                                         </span>
                                     </div>
                                 </td>
@@ -120,7 +120,7 @@
                                     <div class="flex items-center">
                                         <i class="fa fa-calendar text-gray-400 mr-2"></i>
                                         <span title="{{ $release->postdate }}">
-                                            {{ \Carbon\Carbon::parse($release->postdate)->format('Y-m-d H:i') }}
+                                            {{ userDate($release->postdate, 'Y-m-d H:i') }}
                                         </span>
                                     </div>
                                 </td>

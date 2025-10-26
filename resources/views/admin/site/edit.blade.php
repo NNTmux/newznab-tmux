@@ -106,9 +106,10 @@
                             <label for="tandc" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fa fa-gavel mr-1"></i>Terms and Conditions
                             </label>
-                            <textarea id="tandc" name="tandc" rows="5"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['tandc'] ?? '' }}</textarea>
-                            <p class="mt-1 text-sm text-gray-500">Text displayed in the terms and conditions page.</p>
+                            <textarea id="tandc" name="tandc" rows="15"
+                                      data-tinymce-api-key="{{ config('tinymce.api_key', 'no-api-key') }}"
+                                      class="tinymce-editor w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['tandc'] ?? '' }}</textarea>
+                            <p class="mt-1 text-sm text-gray-500">Text displayed in the terms and conditions page. Use the rich text editor to format your content.</p>
                         </div>
                     </div>
                 </div>
@@ -521,24 +522,6 @@
                     </div>
                 </div>
 
-                <!-- Path Settings -->
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Path Settings</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="nzbpath" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">NZB Path</label>
-                            <input type="text" id="nzbpath" name="nzbpath" value="{{ $site['nzbpath'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">Path where NZB files are stored</p>
-                        </div>
-                        <div>
-                            <label for="coverspath" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Covers Path</label>
-                            <input type="text" id="coverspath" name="coverspath" value="{{ $coversPath ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">Path where cover images are stored</p>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Password Settings -->
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-6">

@@ -48,6 +48,8 @@
                             <div class="flex flex-wrap gap-2 text-sm">
                                 <a href="{{ route('series') }}" class="text-blue-600 dark:text-blue-400 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:hover:text-blue-300" title="View available TV series">Series List</a>
                                 <span class="text-gray-400 dark:text-gray-500">|</span>
+                                <a href="{{ route('trending-tv') }}" class="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300" title="View trending TV shows"><i class="fas fa-fire mr-1"></i>Trending TV</a>
+                                <span class="text-gray-400 dark:text-gray-500">|</span>
                                 <a href="{{ route('myshows') }}" class="text-blue-600 dark:text-blue-400 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:hover:text-blue-300" title="Manage your shows">Manage My Shows</a>
                                 <span class="text-gray-400 dark:text-gray-500">|</span>
                                 <a href="{{ url('/rss/myshows?dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token) }}" class="text-blue-600 dark:text-blue-400 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:hover:text-blue-300" title="RSS Feed">RSS Feed</a>
@@ -194,7 +196,7 @@
                                                 @endif
                                                 @if(!empty($result->postdate))
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                        <i class="fas fa-calendar mr-1"></i> Posted: {{ \Carbon\Carbon::parse($result->postdate)->format('M d, Y H:i') }}
+                                                        <i class="fas fa-calendar mr-1"></i> Posted: {{ userDate($result->postdate, 'M d, Y H:i') }}
                                                     </span>
                                                 @endif
                                                 @if(!empty($result->fromname))
@@ -212,7 +214,7 @@
                                     </span>
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
-                                    {{ \Carbon\Carbon::parse($result->adddate)->diffForHumans() }}
+                                    {{ userDateDiffForHumans($result->adddate) }}
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
                                     {{ $result->size_formatted ?? number_format($result->size / 1073741824, 2) . ' GB' }}

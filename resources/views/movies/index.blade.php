@@ -23,6 +23,18 @@
 
     <!-- Movies Filter Section -->
     <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Filter Movies</h2>
+            <div class="flex gap-2">
+                <!-- Layout Toggle Button -->
+                <button id="layoutToggle" class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800 transition shadow-md" title="Toggle layout">
+                    <i class="fas {{ ($movie_layout ?? 2) == 1 ? 'fa-th-list' : 'fa-th-large' }} mr-2"></i> <span id="layoutToggleText">{{ ($movie_layout ?? 2) == 1 ? '1 Column' : '2 Columns' }}</span>
+                </button>
+                <a href="{{ route('trending-movies') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md">
+                    <i class="fas fa-fire mr-2"></i> View Trending Movies
+                </a>
+            </div>
+        </div>
         <form method="get" action="{{ route('Movies') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
@@ -84,32 +96,32 @@
                 </div>
             </div>
 
-            <div class="space-y-4">
+            <div id="moviesGrid" class="grid {{ ($movie_layout ?? 2) == 1 ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2' }} gap-4" data-user-layout="{{ $movie_layout ?? 2 }}">
                 @foreach($results as $result)
                     @php
                         // Get the first GUID from the comma-separated list
                         $guid = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid)[0] : null;
                     @endphp
                     <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                        <div class="flex flex-col md:flex-row">
+                        <div class="flex flex-row">
                             <!-- Movie Poster -->
                             <div class="flex-shrink-0">
                                 @if($guid)
                                     <a href="{{ url('/details/' . $guid) }}" class="block">
                                         @if(isset($result->cover) && $result->cover)
-                                            <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded w-192 h-288">
+                                            <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="{{ ($movie_layout ?? 2) == 1 ? 'w-48 h-72' : 'w-32 h-48' }} object-cover">
                                         @else
-                                            <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded w-192 h-288">
-                                                <i class="fas fa-film text-gray-400 text-3xl"></i>
+                                            <div class="{{ ($movie_layout ?? 2) == 1 ? 'w-48 h-72' : 'w-32 h-48' }} bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                <i class="fas fa-film text-gray-400 text-2xl"></i>
                                             </div>
                                         @endif
                                     </a>
                                 @else
                                     @if(isset($result->cover) && $result->cover)
-                                        <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="w-48 h-72 object-cover rounded w-192 h-288">
+                                        <img src="{{ $result->cover }}" alt="{{ $result->title }}" class="{{ ($movie_layout ?? 2) == 1 ? 'w-48 h-72' : 'w-32 h-48' }} object-cover">
                                     @else
-                                        <div class="w-48 h-72 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded w-192 h-288">
-                                            <i class="fas fa-film text-gray-400 text-3xl"></i>
+                                        <div class="{{ ($movie_layout ?? 2) == 1 ? 'w-48 h-72' : 'w-32 h-48' }} bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                            <i class="fas fa-film text-gray-400 text-2xl"></i>
                                         </div>
                                     @endif
                                 @endif
@@ -154,17 +166,17 @@
                                         <!-- External Links -->
                                         <div class="flex items-center gap-3 mt-2 text-xs">
                                             @if(isset($result->imdbid) && $result->imdbid)
-                                                <a href="https://www.imdb.com/title/tt{{ $result->imdbid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition">
+                                                <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $result->imdbid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition">
                                                     <i class="fab fa-imdb mr-1"></i> IMDb
                                                 </a>
                                             @endif
                                             @if(isset($result->tmdbid) && $result->tmdbid)
-                                                <a href="https://www.themoviedb.org/movie/{{ $result->tmdbid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition">
+                                                <a href="{{ $site['dereferrer_link'] }}https://www.themoviedb.org/movie/{{ $result->tmdbid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition">
                                                     <i class="fas fa-film mr-1"></i> TMDb
                                                 </a>
                                             @endif
                                             @if(isset($result->traktid) && $result->traktid)
-                                                <a href="https://trakt.tv/movies/{{ $result->traktid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition">
+                                                <a href="{{ $site['dereferrer_link'] }}https://trakt.tv/movies/{{ $result->traktid }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition">
                                                     <i class="fas fa-heart mr-1"></i> Trakt
                                                 </a>
                                             @endif
@@ -238,13 +250,31 @@
                                             <div class="space-y-2">
                                                 @foreach($releaseNames as $index => $releaseName)
                                                     @if($releaseName && isset($releaseGuids[$index]))
-                                                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200">
-                                                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
-                                                                <div class="flex-1 min-w-0">
-                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $releaseName }}">
+                                                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
+                                                            <div class="release-card-container {{ ($movie_layout ?? 2) == 1 ? 'flex flex-row items-start justify-between gap-3' : 'space-y-2' }}">
+                                                                <div class="release-info-wrapper {{ ($movie_layout ?? 2) == 1 ? 'flex-1 min-w-0' : '' }}">
+                                                                    <!-- Release Name -->
+                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all" title="{{ $releaseName }}">
                                                                         {{ $releaseName }}
                                                                     </a>
-                                                                    <div class="flex flex-wrap items-center gap-2 mt-1">
+
+                                                                    <!-- Info Badges -->
+                                                                    <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                                                                        @if(isset($releaseSizes[$index]))
+                                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                                <i class="fas fa-hdd mr-1"></i>{{ number_format($releaseSizes[$index] / 1073741824, 2) }} GB
+                                                                            </span>
+                                                                        @endif
+                                                                        @if(isset($releasePostDates[$index]))
+                                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                                <i class="fas fa-calendar-alt mr-1"></i>{{ userDate($releasePostDates[$index],'M d, Y H:i') }}
+                                                                            </span>
+                                                                        @endif
+                                                                        @if(isset($releaseAddDates[$index]))
+                                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                                <i class="fas fa-plus-circle mr-1"></i>{{ userDateDiffForHumans($releaseAddDates[$index]) }}
+                                                                            </span>
+                                                                        @endif
                                                                         @if(isset($releaseHasPreview[$index]) && $releaseHasPreview[$index] == 1)
                                                                             <button type="button"
                                                                                     class="preview-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800 transition cursor-pointer"
@@ -275,32 +305,17 @@
                                                                             </span>
                                                                         @endif
                                                                     </div>
-                                                                    <div class="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
-                                                                        @if(isset($releaseSizes[$index]))
-                                                                            <span>
-                                                                                <i class="fas fa-hdd mr-1"></i>{{ number_format($releaseSizes[$index] / 1073741824, 2) }} GB
-                                                                            </span>
-                                                                        @endif
-                                                                        @if(isset($releasePostDates[$index]))
-                                                                            <span>
-                                                                                <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($releasePostDates[$index])->format('M d, Y') }}
-                                                                            </span>
-                                                                        @endif
-                                                                        @if(isset($releaseAddDates[$index]))
-                                                                            <span>
-                                                                                <i class="fas fa-plus-circle mr-1"></i>Added: {{ \Carbon\Carbon::parse($releaseAddDates[$index])->diffForHumans() }}
-                                                                            </span>
-                                                                        @endif
-                                                                    </div>
                                                                 </div>
-                                                                <div class="flex gap-2 flex-shrink-0">
-                                                                    <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-green-600 dark:bg-green-700 text-white text-xs font-medium rounded hover:bg-green-700 dark:hover:bg-green-800 transition">
+
+                                                                <!-- Action Buttons -->
+                                                                <div class="release-actions flex {{ ($movie_layout ?? 2) == 1 ? 'flex-shrink-0 flex-row items-center' : 'flex-wrap items-center' }} gap-1.5">
+                                                                    <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
                                                                         <i class="fas fa-download mr-1"></i> Download
                                                                     </a>
-                                                                    <button class="add-to-cart inline-flex items-center px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs font-medium rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $releaseGuids[$index] }}">
+                                                                    <button class="add-to-cart inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $releaseGuids[$index] }}">
                                                                         <i class="fas fa-shopping-cart mr-1"></i> Cart
                                                                     </button>
-                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-3 py-1 bg-gray-600 text-white text-xs font-medium rounded hover:bg-gray-700 transition">
+                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
                                                                         <i class="fas fa-info-circle mr-1"></i> Details
                                                                     </a>
                                                                 </div>
@@ -331,7 +346,7 @@
     @endif
 
     <!-- Preview/Sample Image Modal -->
-    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4">
         <div class="relative max-w-4xl w-full">
             <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
                 <i class="fas fa-times"></i>
@@ -349,5 +364,6 @@
     <!-- NFO Modal -->
     @include('partials.nfo-modal')
 </div>
+
 @endsection
 

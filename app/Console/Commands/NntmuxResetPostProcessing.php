@@ -51,6 +51,14 @@ class NntmuxResetPostProcessing extends Command
      */
     public function handle(): void
     {
+
+        // Allow resetting categories only if environment is local and category is 'misc'
+        if (app()->environment() !== 'local' && ((isset($this->option('category')['0']) && $this->option('category')[0] !== 'misc') || ! isset($this->option('category')['0']))) {
+            $this->error('This command can only be run in local environment');
+
+            return;
+        }
+
         $raw = (array) $this->option('category');
         if (empty($raw)) {
             $qry = Release::query()->select(['id'])->get();

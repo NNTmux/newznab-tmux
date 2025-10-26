@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Support\CaptchaHelper;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginLoginRequest extends FormRequest
@@ -11,15 +12,6 @@ class LoginLoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-            return [
-                'g-recaptcha-response' => [
-                    'required',
-                    'captcha',
-                ],
-            ];
-        } else {
-            return [];
-        }
+        return CaptchaHelper::getValidationRules();
     }
 }

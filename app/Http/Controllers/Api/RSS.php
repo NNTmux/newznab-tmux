@@ -98,6 +98,7 @@ class RSS extends ApiController
     public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1)
     {
         $sql = sprintf(
+
             "SELECT DISTINCT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, v.id, v.title, g.name AS group_name, CONCAT(cp.title, '-', c.title) AS category_name, COALESCE(cp.id,0) AS parentid FROM releases r INNER JOIN user_series us ON us.videos_id = r.videos_id AND us.users_id = %d LEFT JOIN categories c ON c.id = r.categories_id INNER JOIN root_categories cp ON cp.id = c.root_categories_id LEFT JOIN usenet_groups g ON g.id = r.groups_id LEFT OUTER JOIN videos v ON v.id = r.videos_id LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id WHERE (us.categories IS NULL OR us.categories = '' OR us.categories = 'NULL' OR FIND_IN_SET(r.categories_id, REPLACE(us.categories,'|',',')) > 0)%s%s AND r.categories_id BETWEEN %d AND %d AND r.passwordstatus %s ORDER BY postdate DESC %s",
             $userID,
             (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),

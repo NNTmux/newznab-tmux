@@ -253,11 +253,11 @@
                                                                 <i class="fa fa-hdd-o mr-1"></i>{{ formatBytes($release->size) }}
                                                             </span>
                                                             <span>
-                                                                <i class="fa fa-clock-o mr-1"></i>Added: {{ \Carbon\Carbon::parse($release->adddate)->diffForHumans() }}
+                                                                <i class="fa fa-clock-o mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
                                                             </span>
                                                             @if(!empty($release->postdate))
-                                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                                    <i class="fas fa-calendar mr-1"></i> Posted: {{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}
+                                                                <span>
+                                                                    <i class="fas fa-calendar mr-1"></i> Posted: {{ userDate($release->postdate, 'M d, Y H:i') }}
                                                                 </span>
                                                             @endif
                                                             @if(!empty($release->fromname))

@@ -16,8 +16,7 @@ use App\Http\Controllers\Api\ApiInformController;
 use App\Http\Controllers\Api\ApiV2Controller;
 
 Route::prefix('v1')->group(function () {
-    Route::get('api', [ApiController::class, 'api']);
-    Route::post('api', [ApiController::class, 'api']);
+    Route::match(['post', 'get'], 'api', [ApiController::class, 'api']);
 });
 
 Route::prefix('v2')->group(function () {

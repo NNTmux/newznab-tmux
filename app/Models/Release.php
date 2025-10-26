@@ -98,11 +98,6 @@ class Release extends Model
         return $this->belongsTo(TvEpisode::class, 'tv_episodes_id');
     }
 
-    public function movieInfo(): BelongsTo
-    {
-        return $this->belongsTo(MovieInfo::class, 'movieinfo_id');
-    }
-
     /**
      * Insert a single release returning the ID on success or false on failure.
      *
@@ -135,6 +130,7 @@ class Release extends Model
                     'isrenamed' => $parameters['isrenamed'],
                     'iscategorized' => 1,
                     'predb_id' => $parameters['predb_id'],
+                    'source' => $parameters['source'] ?? null,
                     'ishashed' => $parameters['ishashed'] ?? 0,
                 ]
             );
@@ -361,9 +357,9 @@ class Release extends Model
             $release->parent_category = $release->category->parent->title ?? null;
             $release->sub_category = $release->category->title ?? null;
             $release->category_name = $release->parent_category.' > '.$release->sub_category;
-            $release->category_ids = $release->category->parentid.','.$release->category->id;
+            $release->category_ids = $release->category ? ($release->category->parentid.','.$release->category->id) : '';
             $release->group_names = $release->releaseGroup->map(function ($relGroup) {
-                return $relGroup->group->name;
+                return $relGroup->group ? $relGroup->group->name : null;
             })->implode(',');
         });
 

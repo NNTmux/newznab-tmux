@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initProfileEdit();
     initDetailsPageImageModal();
     initAddToCart();
+    initMoviesLayoutToggle();
 });
 
 // Event delegation for dynamically added elements
@@ -986,6 +987,201 @@ function initMediainfoAndFilelist() {
 
 // Cart and Multi-select functionality
 function initCartFunctionality() {
+    // Global showConfirmation function for cart page
+    window.showConfirmation = function(message, onConfirm) {
+        const modal = document.createElement('div');
+        modal.className = 'confirmation-modal';
+        modal.innerHTML = `
+            <div class="confirmation-modal-content">
+                <div class="confirmation-modal-header">
+                    <div class="confirmation-modal-icon">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="confirmation-modal-title">Confirm Deletion</h3>
+                </div>
+                <div class="confirmation-modal-body">
+                    ${message}
+                </div>
+                <div class="confirmation-modal-footer">
+                    <button class="btn-cancel">Cancel</button>
+                    <button class="btn-confirm">Delete</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const cancelBtn = modal.querySelector('.btn-cancel');
+        const confirmBtn = modal.querySelector('.btn-confirm');
+
+        function closeModal() {
+            modal.style.animation = 'fadeOut 0.2s ease-out';
+            setTimeout(() => modal.remove(), 200);
+        }
+
+        cancelBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        confirmBtn.addEventListener('click', function() {
+            closeModal();
+            onConfirm();
+        });
+
+        // Focus on cancel button by default
+        setTimeout(() => cancelBtn.focus(), 100);
+
+        // ESC key to close
+        const escHandler = function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+    };
+
+    // Cart page specific functionality
+    const checkAll = document.getElementById('check-all');
+    const checkboxes = document.querySelectorAll('.cart-checkbox');
+
+    if (checkAll && checkboxes.length > 0) {
+        // Function to update the check-all checkbox state
+        function updateCheckAllState() {
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            checkAll.checked = checkedCount === checkboxes.length;
+            checkAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+        }
+
+        // Handle check-all checkbox change
+        checkAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+
+        // Handle individual checkbox changes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateCheckAllState);
+        });
+
+        // Initialize the check-all state on page load
+        updateCheckAllState();
+
+        // Download selected
+        document.querySelectorAll('.nzb_multi_operations_download_cart').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const selected = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                if (selected.length === 0) {
+                    if (typeof showToast === 'function') {
+                        showToast('Please select at least one item', 'error');
+                    } else {
+                        alert('Please select at least one item');
+                    }
+                    return;
+                }
+
+                // Download all selected NZBs
+                selected.forEach(guid => {
+                    window.open('/getnzb?id=' + guid, '_blank');
+                });
+
+                if (typeof showToast === 'function') {
+                    showToast('Downloading ' + selected.length + ' item(s)', 'success');
+                }
+            });
+        });
+
+        // Delete selected
+        document.querySelectorAll('.nzb_multi_operations_cartdelete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const selected = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                if (selected.length === 0) {
+                    if (typeof showToast === 'function') {
+                        showToast('Please select at least one item', 'error');
+                    } else {
+                        alert('Please select at least one item');
+                    }
+                    return;
+                }
+
+                showConfirmation(
+                    `Are you sure you want to delete <strong>${selected.length}</strong> item(s) from your cart?`,
+                    function() {
+                        // Delete via AJAX
+                        fetch('/cart/delete/' + selected.join(','), {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                if (typeof showToast === 'function') {
+                                    showToast('Items deleted successfully', 'success');
+                                }
+                                setTimeout(() => window.location.reload(), 1000);
+                            } else {
+                                if (typeof showToast === 'function') {
+                                    showToast('Failed to delete items', 'error');
+                                } else {
+                                    alert('Failed to delete items');
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            if (typeof showToast === 'function') {
+                                showToast('Failed to delete items', 'error');
+                            } else {
+                                alert('Failed to delete items');
+                            }
+                        });
+                    }
+                );
+            });
+        });
+
+        // Individual delete confirmation
+        document.querySelectorAll('.cart-delete-link').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const releaseName = this.getAttribute('data-release-name');
+                const deleteUrl = this.getAttribute('data-delete-url');
+
+                showConfirmation(
+                    `Are you sure you want to remove <strong>${releaseName}</strong> from your cart?`,
+                    function() {
+                        if (typeof showToast === 'function') {
+                            showToast('Removing item from cart...', 'info');
+                        }
+
+                        setTimeout(() => {
+                            window.location.href = deleteUrl;
+                        }, 500);
+                    }
+                );
+            });
+        });
+    }
+
     // Select all checkbox functionality
     const selectAllCheckbox = document.getElementById('chkSelectAll');
     if (selectAllCheckbox) {
@@ -1766,8 +1962,8 @@ function escapeHtml(text) {
 
 // TinyMCE Initialization for Admin Content Pages
 function initTinyMCE() {
-    // Only initialize if TinyMCE editor element exists
-    if (!document.getElementById('body')) {
+    // Only initialize if TinyMCE editor element exists (check for #body or .tinymce-editor)
+    if (!document.getElementById('body') && !document.querySelector('.tinymce-editor')) {
         return;
     }
 
@@ -1782,6 +1978,7 @@ function initTinyMCE() {
 
             // Get API key from textarea data attribute or create meta tag
             const bodyTextarea = document.getElementById('body');
+            const tinymceEditors = document.querySelectorAll('.tinymce-editor');
             let apiKey = 'no-api-key';
 
             // Try to get from existing meta tag first
@@ -1794,6 +1991,14 @@ function initTinyMCE() {
                     apiKey = window.NNTmuxConfig.tinymceApiKey;
                 } else if (bodyTextarea && bodyTextarea.dataset.tinymceApiKey) {
                     apiKey = bodyTextarea.dataset.tinymceApiKey;
+                } else if (tinymceEditors.length > 0) {
+                    // Check if any tinymce-editor has the API key
+                    for (let i = 0; i < tinymceEditors.length; i++) {
+                        if (tinymceEditors[i].dataset.tinymceApiKey) {
+                            apiKey = tinymceEditors[i].dataset.tinymceApiKey;
+                            break;
+                        }
+                    }
                 }
 
                 // Create and append meta tag
@@ -1838,7 +2043,7 @@ function initTinyMCE() {
         const apiKey = apiKeyMeta ? apiKeyMeta.content : 'no-api-key';
 
         return {
-            selector: '#body',
+            selector: '#body, .tinymce-editor',
             height: 500,
             menubar: true,
             skin: darkMode ? 'oxide-dark' : 'oxide',
@@ -1918,18 +2123,25 @@ function initTinyMCE() {
     function doInitTinyMCE() {
         // Initialize TinyMCE
         tinymce.init(getTinyMCEConfig()).then(function(editors) {
-            if (editors && editors[0]) {
-                console.log('TinyMCE initialized successfully');
+            if (editors && editors.length > 0) {
+                console.log('TinyMCE initialized successfully for ' + editors.length + ' editor(s)');
 
-                // Add form submission handler to sync content
-                const textarea = document.getElementById('body');
-                if (textarea && textarea.form) {
-                    textarea.form.addEventListener('submit', function(e) {
-                        // Sync all TinyMCE editors before form submission
-                        tinymce.triggerSave();
-                        console.log('TinyMCE content synced to textarea before form submission');
-                    });
-                }
+                // Add form submission handler to sync content for all editors
+                editors.forEach(function(editor) {
+                    const textarea = document.getElementById(editor.id);
+                    if (textarea && textarea.form) {
+                        // Remove any existing listeners to avoid duplicates
+                        const form = textarea.form;
+                        if (!form.hasAttribute('data-tinymce-handler')) {
+                            form.addEventListener('submit', function(e) {
+                                // Sync all TinyMCE editors before form submission
+                                tinymce.triggerSave();
+                                console.log('TinyMCE content synced to textareas before form submission');
+                            });
+                            form.setAttribute('data-tinymce-handler', 'true');
+                        }
+                    }
+                });
             }
         }).catch(function(error) {
             console.error('TinyMCE initialization failed:', error);
@@ -1939,17 +2151,27 @@ function initTinyMCE() {
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.attributeName === 'class') {
-                    const editor = tinymce.get('body');
-                    if (editor) {
-                        // Save current content
-                        const content = editor.getContent();
-                        // Remove the editor
-                        tinymce.remove('#body');
+                    // Get all active TinyMCE editors
+                    const allEditors = tinymce.editors;
+                    if (allEditors && allEditors.length > 0) {
+                        // Save content from all editors
+                        const editorContents = {};
+                        allEditors.forEach(function(editor) {
+                            editorContents[editor.id] = editor.getContent();
+                        });
+
+                        // Remove all editors
+                        tinymce.remove();
+
                         // Reinitialize with new theme
                         tinymce.init(getTinyMCEConfig()).then(function(editors) {
-                            // Restore content
-                            if (editors && editors[0]) {
-                                editors[0].setContent(content);
+                            // Restore content to each editor
+                            if (editors && editors.length > 0) {
+                                editors.forEach(function(editor) {
+                                    if (editorContents[editor.id]) {
+                                        editor.setContent(editorContents[editor.id]);
+                                    }
+                                });
                             }
                         });
                     }
@@ -1972,14 +2194,16 @@ function initTinyMCE() {
         })
         .catch(function(error) {
             console.error('Failed to load TinyMCE:', error);
-            // Show error message to user
-            const bodyTextarea = document.getElementById('body');
-            if (bodyTextarea && bodyTextarea.parentElement) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'mt-2 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded';
-                errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>TinyMCE editor failed to load. Please refresh the page or check your internet connection.';
-                bodyTextarea.parentElement.insertBefore(errorDiv, bodyTextarea.nextSibling);
-            }
+            // Show error message to user for all TinyMCE textareas
+            const textareas = document.querySelectorAll('#body, .tinymce-editor');
+            textareas.forEach(function(textarea) {
+                if (textarea && textarea.parentElement) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'mt-2 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded';
+                    errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>TinyMCE editor failed to load. Please refresh the page or check your internet connection.';
+                    textarea.parentElement.insertBefore(errorDiv, textarea.nextSibling);
+                }
+            });
         });
 }
 
@@ -2308,17 +2532,19 @@ function initAdminDashboardCharts() {
         cpu24h: null,
         ram24h: null,
         cpu30d: null,
-        ram30d: null
+        ram30d: null,
+        downloadsMinute: null,
+        apiHitsMinute: null
     };
 
-    // Downloads Chart
+    // Downloads Chart (Hourly)
     const downloadsCtx = document.getElementById('downloadsChart');
     if (downloadsCtx) {
         const downloadsData = JSON.parse(downloadsCtx.getAttribute('data-chart-data') || '[]');
         new Chart(downloadsCtx, {
             type: 'bar',
             data: {
-                labels: downloadsData.map(d => d.date),
+                labels: downloadsData.map(d => d.time || d.date),
                 datasets: [{
                     label: 'Downloads',
                     data: downloadsData.map(d => d.count),
@@ -2364,7 +2590,10 @@ function initAdminDashboardCharts() {
                     },
                     x: {
                         ticks: {
-                            color: textColor
+                            color: textColor,
+                            maxRotation: 45,
+                            minRotation: 45,
+                            maxTicksLimit: 24
                         },
                         grid: {
                             display: false
@@ -2375,14 +2604,14 @@ function initAdminDashboardCharts() {
         });
     }
 
-    // API Hits Chart
+    // API Hits Chart (Hourly)
     const apiHitsCtx = document.getElementById('apiHitsChart');
     if (apiHitsCtx) {
         const apiHitsData = JSON.parse(apiHitsCtx.getAttribute('data-chart-data') || '[]');
         new Chart(apiHitsCtx, {
             type: 'line',
             data: {
-                labels: apiHitsData.map(d => d.date),
+                labels: apiHitsData.map(d => d.time || d.date),
                 datasets: [{
                     label: 'API Hits',
                     data: apiHitsData.map(d => d.count),
@@ -2434,7 +2663,158 @@ function initAdminDashboardCharts() {
                     },
                     x: {
                         ticks: {
-                            color: textColor
+                            color: textColor,
+                            maxRotation: 45,
+                            minRotation: 45,
+                            maxTicksLimit: 24
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Downloads Per Minute Chart
+    const downloadsMinuteCtx = document.getElementById('downloadsMinuteChart');
+    if (downloadsMinuteCtx) {
+        const downloadsMinuteData = JSON.parse(downloadsMinuteCtx.getAttribute('data-chart-data') || '[]');
+        window.adminCharts.downloadsMinute = new Chart(downloadsMinuteCtx, {
+            type: 'line',
+            data: {
+                labels: downloadsMinuteData.map(d => d.time),
+                datasets: [{
+                    label: 'Downloads',
+                    data: downloadsMinuteData.map(d => d.count),
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                    pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        titleColor: textColor,
+                        bodyColor: textColor,
+                        borderColor: gridColor,
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Downloads: ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: textColor,
+                            precision: 0
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor,
+                            maxRotation: 45,
+                            minRotation: 45,
+                            maxTicksLimit: 12
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // API Hits Per Minute Chart
+    const apiHitsMinuteCtx = document.getElementById('apiHitsMinuteChart');
+    if (apiHitsMinuteCtx) {
+        const apiHitsMinuteData = JSON.parse(apiHitsMinuteCtx.getAttribute('data-chart-data') || '[]');
+        window.adminCharts.apiHitsMinute = new Chart(apiHitsMinuteCtx, {
+            type: 'line',
+            data: {
+                labels: apiHitsMinuteData.map(d => d.time),
+                datasets: [{
+                    label: 'API Hits',
+                    data: apiHitsMinuteData.map(d => d.count),
+                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                    borderColor: 'rgba(147, 51, 234, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                    pointBackgroundColor: 'rgba(147, 51, 234, 1)',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        titleColor: textColor,
+                        bodyColor: textColor,
+                        borderColor: gridColor,
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'API Hits: ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: textColor,
+                            precision: 0
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor,
+                            maxRotation: 45,
+                            minRotation: 45,
+                            maxTicksLimit: 12
                         },
                         grid: {
                             color: gridColor,
@@ -2850,6 +3230,30 @@ function startSystemMetricsAutoRefresh() {
             });
     }
 
+    // Update user activity minute charts
+    function updateUserActivityMinutes() {
+        fetch('/admin/api/user-activity/minutes')
+            .then(response => response.json())
+            .then(data => {
+                // Update Downloads Per Minute chart
+                if (window.adminCharts && window.adminCharts.downloadsMinute) {
+                    window.adminCharts.downloadsMinute.data.labels = data.downloads.map(d => d.time);
+                    window.adminCharts.downloadsMinute.data.datasets[0].data = data.downloads.map(d => d.count);
+                    window.adminCharts.downloadsMinute.update('none');
+                }
+
+                // Update API Hits Per Minute chart
+                if (window.adminCharts && window.adminCharts.apiHitsMinute) {
+                    window.adminCharts.apiHitsMinute.data.labels = data.api_hits.map(d => d.time);
+                    window.adminCharts.apiHitsMinute.data.datasets[0].data = data.api_hits.map(d => d.count);
+                    window.adminCharts.apiHitsMinute.update('none');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user activity minutes:', error);
+            });
+    }
+
     // Initial update
     updateCurrentMetrics();
 
@@ -2858,6 +3262,11 @@ function startSystemMetricsAutoRefresh() {
 
     // Update historical charts every 5 minutes (to reduce load)
     setInterval(updateHistoricalCharts, 300000);
+
+    // Update user activity minute charts every 60 seconds (1 minute)
+    if (window.adminCharts && (window.adminCharts.downloadsMinute || window.adminCharts.apiHitsMinute)) {
+        setInterval(updateUserActivityMinutes, 60000);
+    }
 }
 
 // Admin Groups Management
@@ -3828,4 +4237,129 @@ window.confirmBulkAction = function(event) {
 
     return true;
 };
+
+// Movies Layout Toggle Functionality
+function initMoviesLayoutToggle() {
+    const layoutToggle = document.getElementById('layoutToggle');
+    const layoutToggleText = document.getElementById('layoutToggleText');
+    const moviesGrid = document.getElementById('moviesGrid');
+
+    if (!layoutToggle || !layoutToggleText || !moviesGrid) {
+        return; // Not on movies page
+    }
+
+    // Get saved layout preference from data attribute (from database)
+    // 1 = 1-column, 2 = 2-columns
+    let currentLayout = parseInt(moviesGrid.dataset.userLayout) || 2;
+
+    // Apply the saved layout on page load
+    applyLayout(currentLayout);
+
+    // Toggle layout on button click
+    layoutToggle.addEventListener('click', function() {
+        if (currentLayout === 2) {
+            currentLayout = 1;
+        } else {
+            currentLayout = 2;
+        }
+
+        // Save preference to database via AJAX
+        fetch('/movies/update-layout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                layout: currentLayout
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Apply layout after successful save
+                applyLayout(currentLayout);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving layout preference:', error);
+            // Still apply layout even if save failed
+            applyLayout(currentLayout);
+        });
+    });
+
+    function applyLayout(layout) {
+        // Get all movie poster images and placeholder divs
+        const posterImages = moviesGrid.querySelectorAll('img[alt], .bg-gray-200.dark\\:bg-gray-700');
+
+        // Get all release card containers
+        const releaseCardContainers = moviesGrid.querySelectorAll('.release-card-container');
+
+        if (layout === 1) {
+            // 1-column layout: larger images (w-48 h-72, original size)
+            moviesGrid.classList.remove('lg:grid-cols-2');
+            moviesGrid.classList.add('grid-cols-1');
+            layoutToggleText.textContent = '1 Column';
+            layoutToggle.querySelector('i').className = 'fas fa-th-list mr-2';
+
+            // Update image sizes to larger
+            posterImages.forEach(el => {
+                el.classList.remove('w-32', 'h-48');
+                el.classList.add('w-48', 'h-72');
+            });
+
+            // Update release card layout for 1-column view - side by side on all screens
+            releaseCardContainers.forEach(container => {
+                // Change container to flex-row with items on sides
+                container.classList.remove('space-y-2');
+                container.classList.add('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
+
+                // Make info wrapper take available space
+                const infoWrapper = container.querySelector('.release-info-wrapper');
+                if (infoWrapper) {
+                    infoWrapper.classList.add('flex-1', 'min-w-0');
+                }
+
+                // Make actions wrapper stay on the right in a horizontal row
+                const actionsWrapper = container.querySelector('.release-actions');
+                if (actionsWrapper) {
+                    actionsWrapper.classList.remove('flex-wrap');
+                    actionsWrapper.classList.add('flex-shrink-0', 'flex-row', 'items-center');
+                }
+            });
+        } else {
+            // 2-column layout: smaller images (w-32 h-48)
+            moviesGrid.classList.remove('grid-cols-1');
+            moviesGrid.classList.add('lg:grid-cols-2');
+            layoutToggleText.textContent = '2 Columns';
+            layoutToggle.querySelector('i').className = 'fas fa-th-large mr-2';
+
+            // Update image sizes to smaller
+            posterImages.forEach(el => {
+                el.classList.remove('w-48', 'h-72');
+                el.classList.add('w-32', 'h-48');
+            });
+
+            // Update release card layout for 2-column view - stacked vertically
+            releaseCardContainers.forEach(container => {
+                // Change back to stacked layout
+                container.classList.add('space-y-2');
+                container.classList.remove('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
+
+                // Remove special styling from info wrapper
+                const infoWrapper = container.querySelector('.release-info-wrapper');
+                if (infoWrapper) {
+                    infoWrapper.classList.remove('flex-1', 'min-w-0');
+                }
+
+                // Restore normal flex-wrap for actions wrapper
+                const actionsWrapper = container.querySelector('.release-actions');
+                if (actionsWrapper) {
+                    actionsWrapper.classList.add('flex-wrap', 'items-center');
+                    actionsWrapper.classList.remove('flex-shrink-0', 'flex-row');
+                }
+            });
+        }
+    }
+}
 

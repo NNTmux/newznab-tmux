@@ -1218,7 +1218,6 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT 0,
   `verification_token` varchar(255) DEFAULT NULL,
-  `bad_user` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ux_users_api_token` (`api_token`),
   KEY `ix_user_roles` (`roles_id`)
@@ -1403,7 +1402,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (86,'2023_12_08_191
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (87,'2024_01_06_173518_create_payments_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (88,'2019_08_14_123627_create_poster_renames_table',2);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (89,'2019_08_15_145634_add_source_to_releases_table',2);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (90,'2019_10_03_112445_add_bad_user_to_users_table',2);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (91,'2024_01_11_203725_create_predb_crcs_table',2);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (92,'2024_01_12_193533_alter_filedate_column_predb_crcs_table',2);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (93,'2024_01_12_194256_add_back_timestamps_column_to__predb_crcs_table',2);

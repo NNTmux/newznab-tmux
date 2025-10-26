@@ -213,20 +213,16 @@ if (! function_exists('runCmd')) {
 }
 
 if (! function_exists('escapeString')) {
-    /**
-     * @return string
-     */
-    function escapeString($string)
+
+    function escapeString($string): string
     {
         return DB::connection()->getPdo()->quote($string);
     }
 }
 
 if (! function_exists('realDuration')) {
-    /**
-     * @return string
-     */
-    function realDuration($milliseconds)
+
+    function realDuration($milliseconds): string
     {
         $time = round($milliseconds / 1000);
 
@@ -236,45 +232,44 @@ if (! function_exists('realDuration')) {
 
 if (! function_exists('is_it_json')) {
     /**
-     * @param  array|string  $isIt
-     * @return bool
+     * @throws JsonException
      */
-    function is_it_json($isIt)
+    function is_it_json($isIt): bool
     {
         if (is_array($isIt)) {
             return false;
         }
-        json_decode($isIt, true);
+        json_decode($isIt, true, 512, JSON_THROW_ON_ERROR);
 
         return json_last_error() === JSON_ERROR_NONE;
     }
 }
 
-/**
- * @throws Exception
- */
-function getStreamingZip(array $guids = [])
-{
-    $nzb = new NZB;
-    $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
-    foreach ($guids as $guid) {
-        $nzbPath = $nzb->NZBPath($guid);
-
-        if ($nzbPath) {
-            $nzbContents = Utility::unzipGzipFile($nzbPath);
-
-            if ($nzbContents) {
-                $filename = $guid;
-                $r = Release::query()->where('guid', $guid)->first();
-                if ($r !== null) {
-                    $filename = $r->searchname;
+if (! function_exists('getStreamingZip')) {
+    /**
+     * @throws Exception
+     */
+    function getStreamingZip(array $guids = []): STS\ZipStream\Builder
+    {
+        $nzb = new NZB;
+        $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
+        foreach ($guids as $guid) {
+            $nzbPath = $nzb->NZBPath($guid);
+            if ($nzbPath) {
+                $nzbContents = Utility::unzipGzipFile($nzbPath);
+                if ($nzbContents) {
+                    $filename = $guid;
+                    $r = Release::query()->where('guid', $guid)->first();
+                    if ($r) {
+                        $filename = $r['searchname'];
+                    }
+                    $zipped->addRaw($nzbContents, $filename.'.nzb');
                 }
-                $zipped->addRaw($nzbContents, $filename.'.nzb');
             }
         }
-    }
 
-    return $zipped;
+        return $zipped;
+    }
 }
 
 if (! function_exists('release_flag')) {
@@ -282,9 +277,8 @@ if (! function_exists('release_flag')) {
     /**
      * @param  string  $text  Text to match against.
      * @param  string  $page  Type of page. browse or search.
-     * @return bool|string
      */
-    function release_flag($text, $page)
+    function release_flag(string $text, string $page): bool|string
     {
         $code = $language = '';
 
@@ -545,5 +539,98 @@ if (! function_exists('csp_nonce')) {
         }
 
         return $nonce;
+    }
+}
+
+if (! function_exists('userDate')) {
+    /**
+     * Format a date/time string according to the authenticated user's timezone
+     *
+     * @param  string|null  $date  The date to format
+     * @param  string  $format  The format string (default: 'M d, Y H:i')
+     * @return string The formatted date in user's timezone
+     */
+    function userDate(?string $date, string $format = 'M d, Y H:i'): string
+    {
+        if (empty($date)) {
+            return '';
+        }
+
+        try {
+            // Parse the date in the app's timezone (which should be UTC)
+            // If dates in DB are stored in server timezone, they'll be parsed correctly
+            $appTimezone = config('app.timezone', 'UTC');
+            $carbon = \Illuminate\Support\Carbon::parse($date, $appTimezone);
+
+            // If user is authenticated and has a timezone set, convert to it
+            if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->timezone) {
+                $carbon->setTimezone(\Illuminate\Support\Facades\Auth::user()->timezone);
+            }
+
+            return $carbon->format($format);
+        } catch (\Exception $e) {
+            return $date;
+        }
+    }
+}
+
+if (! function_exists('userDateDiffForHumans')) {
+    /**
+     * Format a date/time string as a human-readable diff according to the authenticated user's timezone
+     *
+     * @param  string|null  $date  The date to format
+     * @return string The formatted date diff in user's timezone
+     */
+    function userDateDiffForHumans(?string $date): string
+    {
+        if (empty($date)) {
+            return '';
+        }
+
+        try {
+            // Parse the date in the app's timezone (which should be UTC)
+            // If dates in DB are stored in server timezone, they'll be parsed correctly
+            $appTimezone = config('app.timezone', 'UTC');
+            $carbon = \Illuminate\Support\Carbon::parse($date, $appTimezone);
+
+            // If user is authenticated and has a timezone set, convert to it
+            if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->timezone) {
+                $carbon->setTimezone(\Illuminate\Support\Facades\Auth::user()->timezone);
+            }
+
+            return $carbon->diffForHumans();
+        } catch (\Exception $e) {
+            return $date;
+        }
+    }
+}
+
+if (! function_exists('getAvailableTimezones')) {
+    /**
+     * Get a list of available timezones grouped by region
+     *
+     * @return array Array of timezones grouped by region
+     */
+    function getAvailableTimezones(): array
+    {
+        $timezones = [];
+        $regions = [
+            'Africa' => \DateTimeZone::AFRICA,
+            'America' => \DateTimeZone::AMERICA,
+            'Antarctica' => \DateTimeZone::ANTARCTICA,
+            'Arctic' => \DateTimeZone::ARCTIC,
+            'Asia' => \DateTimeZone::ASIA,
+            'Atlantic' => \DateTimeZone::ATLANTIC,
+            'Australia' => \DateTimeZone::AUSTRALIA,
+            'Europe' => \DateTimeZone::EUROPE,
+            'Indian' => \DateTimeZone::INDIAN,
+            'Pacific' => \DateTimeZone::PACIFIC,
+        ];
+
+        foreach ($regions as $name => $region) {
+            $timezones[$name] = \DateTimeZone::listIdentifiers($region);
+        }
+
+        return $timezones;
     }
 }

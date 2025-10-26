@@ -184,7 +184,7 @@
 
                                             <div class="flex items-center text-gray-500 text-sm mb-3">
                                                 <i class="fa fa-clock-o mr-2"></i>
-                                                <span>Added {{ \Carbon\Carbon::parse($result->adddate)->diffForHumans() }}</span>
+                                                <span>Added {{ userDateDiffForHumans($result->adddate) }}</span>
                                             </div>
 
                                             <div class="flex flex-wrap gap-2 text-xs mb-3">
@@ -194,8 +194,8 @@
                                                     </span>
                                                 @endif
                                                 @if(!empty($result->postdate))
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                        <i class="fas fa-calendar mr-1"></i> Posted: {{ \Carbon\Carbon::parse($result->postdate)->format('M d, Y H:i') }}
+                                                    <span>
+                                                        <i class="fas fa-calendar mr-1"></i> Posted: {{ userDate($result->postdate, 'M d, Y H:i') }}
                                                     </span>
                                                 @endif
                                                 @if(!empty($result->fromname))

@@ -31,6 +31,14 @@ Schedule::command('cloudflare:reload')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
 Schedule::command('nntmux:collect-stats')->hourly();
 Schedule::command('nntmux:populate-steam-apps')->monthly();
+// Collect system metrics every 5 minutes
+Schedule::command('metrics:collect')->everyFiveMinutes()->withoutOverlapping();
+// Cleanup old system metrics daily (keep last 60 days)
+Schedule::command('metrics:collect --cleanup')->dailyAt('03:00');
+// Cleanup old user activity stats weekly (keep last 90 days)
+Schedule::call(function () {
+    \App\Models\UserActivityStat::cleanupOldStats(90);
+})->weeklyOn(1, '04:00');
 if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
     Schedule::job(new PurgeDeletedAccounts)->daily();

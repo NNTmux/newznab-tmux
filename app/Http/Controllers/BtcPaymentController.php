@@ -17,7 +17,7 @@ class BtcPaymentController extends BasePageController
     {
         $hashCheck = 'sha256='.hash_hmac('sha256', $request->getContent(), config('nntmux.btcpay_webhook_secret'));
         if ($hashCheck !== $request->header('btcpay-sig')) {
-            Log::error('BTCPay webhook hash check failed: '.$request->header('btcpay-sig'));
+            Log::channel('btc_payment')->error('BTCPay webhook hash check failed: '.$request->header('btcpay-sig'));
 
             return response('Not Found', 404);
         }
@@ -28,7 +28,7 @@ class BtcPaymentController extends BasePageController
             if ($user) {
                 $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->first();
                 if ($checkOrder !== null) {
-                    Log::error('Duplicate BTCPay webhook: '.$payload['webhookId']);
+                    Log::channel('btc_payment')->error('Duplicate BTCPay webhook: '.$payload['webhookId']);
 
                     return response('OK', 200);
                 }
@@ -50,7 +50,7 @@ class BtcPaymentController extends BasePageController
                 return response('OK', 200);
             }
 
-            Log::error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
+            Log::channel('btc_payment')->error('User not found for BTCPay webhook: '.$payload['metadata']['buyerEmail']);
 
             return response('Not Found', 404);
         }
@@ -67,12 +67,12 @@ class BtcPaymentController extends BasePageController
                     User::updateUserRole($user->id, $matches['role']);
                     User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
                     $checkOrder->update(['invoice_status' => 'Settled']);
-                    Log::info('User: '.$user->username.' upgraded to '.$matches['role'].' for BTCPay webhook: '.$checkOrder->webhook_id);
+                    Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$matches['role'].' for BTCPay webhook: '.$checkOrder->webhook_id);
 
                     return response('OK', 200);
                 }
 
-                Log::error('User not found for BTCPay webhook: '.$checkOrder->webhook_id);
+                Log::channel('btc_payment')->error('User not found for BTCPay webhook: '.$checkOrder->webhook_id);
 
                 return response('Not Found', 404);
             }

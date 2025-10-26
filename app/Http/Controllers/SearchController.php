@@ -103,12 +103,37 @@ class SearchController extends BasePageController
             $searchVars[$searchVarKey] = ($request->has($searchVarKey) ? (string) $request->input($searchVarKey) : '');
         }
 
+        // Map new form field names to old internal names
+        if ($request->has('minage')) {
+            $searchVars['searchadvdaysnew'] = (string) $request->input('minage');
+        }
+        if ($request->has('maxage')) {
+            $searchVars['searchadvdaysold'] = (string) $request->input('maxage');
+        }
+        if ($request->has('group')) {
+            $searchVars['searchadvgroups'] = (string) $request->input('group');
+        }
+        if ($request->has('minsize')) {
+            $searchVars['searchadvsizefrom'] = (string) $request->input('minsize');
+        }
+        if ($request->has('maxsize')) {
+            $searchVars['searchadvsizeto'] = (string) $request->input('maxsize');
+        }
+        // Map basic search field to advanced search when in advanced mode
+        if ($request->has('search') && $searchType === 'advanced') {
+            $searchVars['searchadvr'] = (string) $request->input('search');
+        }
+        // Map basic category field to advanced category when in advanced mode
+        if ($request->has('t') && $searchType === 'advanced') {
+            $searchVars['searchadvcat'] = (string) $request->input('t');
+        }
+
         $searchVars['selectedgroup'] = $searchVars['searchadvgroups'];
         $searchVars['selectedcat'] = $searchVars['searchadvcat'];
         $searchVars['selectedsizefrom'] = $searchVars['searchadvsizefrom'];
         $searchVars['selectedsizeto'] = $searchVars['searchadvsizeto'];
 
-        if ($searchType !== 'basic' && $request->missing('id') && $request->missing('subject') && $request->anyFilled(['searchadvr', 'searchadvsubject', 'searchadvfilename', 'searchadvposter'])) {
+        if ($searchType !== 'basic' && $request->missing('id') && $request->missing('subject') && $request->anyFilled(['searchadvr', 'searchadvsubject', 'searchadvfilename', 'searchadvposter', 'minage', 'maxage', 'group', 'minsize', 'maxsize', 'search'])) {
             $orderByString = '';
             foreach ($searchVars as $searchVarKey => $searchVar) {
                 $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);

@@ -12,6 +12,7 @@ use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
+use Blacklight\NZB;
 use Blacklight\Releases;
 use Blacklight\utility\Utility;
 use Illuminate\Contracts\Foundation\Application;
@@ -19,6 +20,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -66,6 +69,9 @@ class ApiController extends BasePageController
                 case 'info':
                     $function = 'n';
                     break;
+                case 'nzbadd':
+                    $function = 'nzbAdd';
+                    break;
                 default:
                     return Utility::showApiError(202, 'No such function ('.$request->input('t').')');
             }
@@ -82,12 +88,12 @@ class ApiController extends BasePageController
         if ($function !== 'c' && $function !== 'r') {
             if ($request->missing('apikey') || ($request->has('apikey') && empty($request->input('apikey')))) {
                 return Utility::showApiError(200, 'Missing parameter (apikey)');
-            } else {
-                $apiKey = $request->input('apikey');
-                $res = User::getByRssToken($apiKey);
-                if ($res === null) {
-                    return Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
-                }
+            }
+
+            $apiKey = $request->input('apikey');
+            $res = User::getByRssToken($apiKey);
+            if ($res === null) {
+                return Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
             }
 
             if ($res->hasRole('Disabled')) {
@@ -314,6 +320,58 @@ class ApiController extends BasePageController
                 } else {
                     return Utility::showApiError(300, 'Release does not exist.');
                 }
+                break;
+                //
+                // nzb add request
+                // curl -X POST -F "file=@./The.File.nzb" "https://www.tabula-rasa.pw/api/V1/api?t=nzbadd&apikey=xxx"
+                //
+            case 'nzbAdd':
+                if (! User::canPost($uid)) {
+                    return response('User does not have permission to post', 403);
+                }
+
+                if ($request->missing('file')) {
+                    return response('Missing parameter (file is required for adding an NZB)', 400);
+                }
+                if ($request->missing('apikey')) {
+                    return response('Missing parameter (apikey is required for adding an NZB)', 400);
+                }
+
+                if (! $request->hasFile('file')) {
+                    return response('Missing parameter (file is required for adding an NZB)', 400);
+                }
+
+                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+
+                $nzbFile = $request->file('file');
+
+                // Save the file to the server, get the name without the extension.
+                if (File::isFile($nzbFile)) {
+                    // We need to check if file is an actual nzb file.
+                    if ($nzbFile->getClientOriginalExtension() !== 'nzb') {
+                        return response('File is not an NZB file', 400);
+                    }
+                    // Check if the file is proper xml nzb file.
+                    if (! Utility::isValidNewznabNzb($nzbFile->getContent())) {
+                        return response('File is not a valid Newznab NZB file', 400);
+                    }
+                    if (! File::isDirectory(config('nntmux.nzb_upload_folder'))) {
+                        @File::makeDirectory(config('nntmux.nzb_upload_folder'), 0775, true);
+                    }
+
+                    if (File::put(config('nntmux.nzb_upload_folder').$nzbFile->getClientOriginalName(), $nzbFile->getContent())) {
+                        Log::channel('nzb_upload')->info('NZB file uploaded by API: '.$nzbFile->getClientOriginalName());
+
+                        return response('NZB file uploaded successfully', 200);
+                    }
+
+                    Log::channel('nzb_upload')->warning('NZB file uploaded by API failed: '.$nzbFile->getClientOriginalName());
+                } else {
+                    Log::channel('nzb_upload')->warning('NZB file uploaded by API failed: '.$nzbFile->getClientOriginalName());
+
+                    return response('NZB file upload failed', 500);
+                }
+
                 break;
 
                 // Capabilities request.

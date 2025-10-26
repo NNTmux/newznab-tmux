@@ -18,7 +18,8 @@ class ImportNzbs extends Command
         {--folder= : Import folder path}
         {--filename : Use filename true or false}
         {--delete : Delete files after import}
-        {--delete-failed : Delete files after failed import}';
+        {--delete-failed : Delete files after failed import}
+        {--source= : Source of the NZB files}';
 
     /**
      * The console command description.
@@ -48,6 +49,11 @@ class ImportNzbs extends Command
             } else {
                 $deleteFailedNZB = false;
             }
+            if ($this->option('source')) {
+                $source = $this->option('source');
+            } else {
+                $source = 1;
+            }
             $importFolder = $this->option('folder');
             $folders = File::directories($importFolder);
             if (empty($folders)) {
@@ -56,7 +62,7 @@ class ImportNzbs extends Command
                 $NZBImport = new NZBImport;
 
                 try {
-                    $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB);
+                    $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB, $source);
                 } catch (FileNotFoundException $e) {
                     $this->error($e->getMessage());
                 }
@@ -67,7 +73,7 @@ class ImportNzbs extends Command
                     $NZBImport = new NZBImport;
 
                     try {
-                        $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB);
+                        $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB, $source);
                     } catch (FileNotFoundException $e) {
                         $this->error($e->getMessage());
                     }

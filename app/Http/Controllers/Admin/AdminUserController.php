@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
-use App\Jobs\SendAccountChangedEmail;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -153,12 +152,18 @@ class AdminUserController extends BasePageController
                     if ($request->input('password') !== null) {
                         User::updatePassword($editedUser->id, $request->input('password'));
                     }
-                    if ($request->input('rolechangedate') !== null) {
-                        User::updateUserRoleChangeDate($editedUser->id, $request->input('rolechangedate'));
+                    // Handle rolechangedate - update if has value, clear if empty
+                    if ($request->has('rolechangedate')) {
+                        $roleChangeDate = $request->input('rolechangedate');
+                        if (! empty($roleChangeDate)) {
+                            User::updateUserRoleChangeDate($editedUser->id, $roleChangeDate);
+                        } else {
+                            // Clear the rolechangedate if empty string is provided
+                            $editedUser->update(['rolechangedate' => null]);
+                        }
                     }
                     if ($request->input('role') !== null) {
                         $editedUser->refresh();
-                        SendAccountChangedEmail::dispatch($editedUser)->onQueue('emails');
                     }
                 }
 

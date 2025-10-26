@@ -12,10 +12,8 @@ class ContactUsController extends BasePageController
      */
     public function contact(ContactContactURequest $request)
     {
-        if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
-            $this->validate($request, [
-                'g-recaptcha-response' => 'required|captcha',
-            ]);
+        if (\App\Support\CaptchaHelper::isEnabled()) {
+            $this->validate($request, \App\Support\CaptchaHelper::getValidationRules());
         }
 
         $msg = '';
@@ -25,8 +23,9 @@ class ContactUsController extends BasePageController
             $mailTo = config('mail.from.address');
             $mailBody = 'Values submitted from contact form: ';
 
+            $captchaFieldName = \App\Support\CaptchaHelper::getResponseFieldName();
             foreach ($request->all() as $key => $value) {
-                if ($key !== 'submit' && $key !== '_token' && $key !== 'g-recaptcha-response') {
+                if ($key !== 'submit' && $key !== '_token' && $key !== 'g-recaptcha-response' && $key !== 'cf-turnstile-response') {
                     $mailBody .= "$key : $value".PHP_EOL;
                 }
             }

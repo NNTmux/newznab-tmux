@@ -37,7 +37,7 @@
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
                 <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror">
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('email') border-red-500 dark:border-red-600 @enderror">
                 @error('email')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -47,8 +47,8 @@
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password (leave blank to keep current)</label>
                 <input type="password" name="password" id="password"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror">
-                <p class="mt-1 text-xs text-gray-500">Must contain at least 8 characters, including uppercase, lowercase, numbers and special characters</p>
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('password') border-red-500 dark:border-red-600 @enderror">
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Must contain at least 8 characters, including uppercase, lowercase, numbers and special characters</p>
                 @error('password')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -58,7 +58,7 @@
             <div>
                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
                 <input type="password" name="password_confirmation" id="password_confirmation"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
             </div>
 
             <!-- Theme Preference -->
@@ -110,6 +110,38 @@
                 <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
                     <i class="fas fa-info-circle mr-1"></i>Your theme preference will be applied across all devices and browsers when you're logged in.
                 </p>
+            </div>
+
+            <!-- Timezone Preference -->
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                    <i class="fas fa-clock mr-2 text-blue-600 dark:text-blue-400"></i>Timezone Preference
+                </h3>
+                <div>
+                    <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Select Your Timezone
+                    </label>
+                    <select name="timezone" id="timezone"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        @php
+                            $timezones = getAvailableTimezones();
+                            $currentTimezone = old('timezone', $user->timezone ?? 'UTC');
+                        @endphp
+                        <option value="UTC" {{ $currentTimezone === 'UTC' ? 'selected' : '' }}>UTC (Coordinated Universal Time)</option>
+                        @foreach($timezones as $region => $tzList)
+                            <optgroup label="{{ $region }}">
+                                @foreach($tzList as $tz)
+                                    <option value="{{ $tz }}" {{ $currentTimezone === $tz ? 'selected' : '' }}>
+                                        {{ str_replace('_', ' ', $tz) }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>All dates and times will be displayed in your selected timezone. Current server time: {{ now()->format('Y-m-d H:i:s T') }}
+                    </p>
+                </div>
             </div>
 
             <!-- View Preferences -->
@@ -365,5 +397,3 @@
     </div>
 </div>
 @endsection
-
-

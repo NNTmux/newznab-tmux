@@ -239,6 +239,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's timezone or default to UTC
+     */
+    public function getTimezone(): string
+    {
+        return $this->timezone ?? 'UTC';
+    }
+
+    /**
      * @throws \Exception
      */
     public static function deleteUser($id): void

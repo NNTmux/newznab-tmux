@@ -175,4 +175,61 @@ class SeriesController extends BasePageController
             return view('series.viewserieslist', $this->viewData);
         }
     }
+
+    /**
+     * Show trending TV shows (top 15 most downloaded in last 48 hours)
+     *
+     * @throws \Exception
+     */
+    public function showTrending(Request $request)
+    {
+        // Cache key for trending TV shows (48 hours)
+        $cacheKey = 'trending_tv_top_15_48h';
+
+        // Get trending TV shows from cache or calculate (refresh every hour)
+        $trendingShows = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () {
+            // Calculate timestamp for 48 hours ago
+            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+
+            // Get TV shows with their download counts from last 48 hours
+            // Join with user_downloads to get actual download timestamps
+            $query = \Illuminate\Support\Facades\DB::table('videos as v')
+                ->join('tv_info as ti', 'v.id', '=', 'ti.videos_id')
+                ->join('releases as r', 'v.id', '=', 'r.videos_id')
+                ->leftJoin('user_downloads as ud', 'r.id', '=', 'ud.releases_id')
+                ->select([
+                    'v.id',
+                    'v.title',
+                    'v.started',
+                    'v.tvdb',
+                    'v.tvmaze',
+                    'v.trakt',
+                    'v.tmdb',
+                    'v.countries_id',
+                    'ti.summary',
+                    'ti.image',
+                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
+                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT r.id) as release_count'),
+                ])
+                ->where('v.type', 0) // 0 = TV
+                ->where('v.title', '!=', '')
+                ->where('ud.timestamp', '>=', $fortyEightHoursAgo)
+                ->groupBy('v.id', 'v.title', 'v.started', 'v.tvdb', 'v.tvmaze', 'v.trakt', 'v.tmdb', 'v.countries_id', 'ti.summary', 'ti.image')
+                ->havingRaw('COUNT(DISTINCT ud.id) > 0')
+                ->orderByDesc('total_downloads')
+                ->limit(15)
+                ->get();
+
+            return $query;
+        });
+
+        $this->viewData = array_merge($this->viewData, [
+            'trendingShows' => $trendingShows,
+            'meta_title' => 'Trending TV Shows - Last 48 Hours',
+            'meta_keywords' => 'trending,tv,shows,series,popular,downloads,recent',
+            'meta_description' => 'Browse the most popular and downloaded TV shows in the last 48 hours',
+        ]);
+
+        return view('series.trending', $this->viewData);
+    }
 }

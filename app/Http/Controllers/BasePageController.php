@@ -12,7 +12,7 @@ use Illuminate\View\View;
 
 class BasePageController extends Controller
 {
-    public Settings $settings;
+    public \Illuminate\Support\Collection $settings;
 
     public string $title = '';
 
@@ -48,16 +48,21 @@ class BasePageController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'privacyPolicy', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release', 'reset', 'showLinkRequestForm');
+        $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'btcPayCallback', 'getNzb', 'terms', 'privacyPolicy', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'release', 'reset', 'showLinkRequestForm');
 
-        // Buffer settings/DB connection.
-        $this->settings = new Settings;
+        // Load settings as collection
+        $this->settings = Settings::query()->pluck('value', 'name');
 
-        // Initialize view data
+        // Initialize view data FIRST with serverroot
         $this->viewData = [
             'serverroot' => url('/'),
-            'site' => $this->settings,
         ];
+
+        // Then add the converted settings array as 'site'
+        // Using array assignment instead of constructor assignment to ensure it persists
+        $this->viewData['site'] = $this->settings->map(function ($value) {
+            return Settings::convertValue($value);
+        })->all();
 
         // Initialize userdata property for controllers that need it
         $this->middleware(function ($request, $next) {

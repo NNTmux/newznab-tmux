@@ -363,6 +363,38 @@ html.dark #tmuxForm select.select-other {
     width: 30px;
 }
 
+/* Checkbox visibility improvements for dark mode */
+input[type="checkbox"].form-checkbox,
+input[type="checkbox"].cart-checkbox {
+    border-width: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+    input[type="checkbox"].form-checkbox,
+    input[type="checkbox"].cart-checkbox {
+        background-color: #374151;
+        border-color: #6b7280;
+    }
+
+    input[type="checkbox"].form-checkbox:checked,
+    input[type="checkbox"].cart-checkbox:checked {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+    }
+}
+
+html.dark input[type="checkbox"].form-checkbox,
+html.dark input[type="checkbox"].cart-checkbox {
+    background-color: #374151;
+    border-color: #6b7280;
+}
+
+html.dark input[type="checkbox"].form-checkbox:checked,
+html.dark input[type="checkbox"].cart-checkbox:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
 /* Admin Groups Management - Fade Out Animation */
 .fade-out {
     transition: opacity 0.3s ease;
@@ -471,6 +503,16 @@ table tbody tr:last-child {
     text-decoration: underline;
 }
 
+/* Preview Modal Styles */
+#previewModal {
+    display: none;
+    z-index: 9999 !important;
+}
+
+#previewModal:not(.hidden) {
+    display: flex;
+}
+
 .prose a:hover {
     color: #1d4ed8;
 }
@@ -535,12 +577,161 @@ table tbody tr:last-child {
     margin-bottom: 16px;
 }
 
+.confirmation-modal-icon {
+    width: 48px;
+    height: 48px;
+    background-color: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .confirmation-modal-icon {
+        background-color: #7f1d1d;
+    }
+}
+
+html.dark .confirmation-modal-icon {
+    background-color: #7f1d1d;
+}
+
+.confirmation-modal-icon i {
+    color: #ef4444;
+    font-size: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .confirmation-modal-icon i {
+        color: #fca5a5;
+    }
+}
+
+html.dark .confirmation-modal-icon i {
+    color: #fca5a5;
+}
+
+.confirmation-modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+@media (prefers-color-scheme: dark) {
+    .confirmation-modal-title {
+        color: #f3f4f6;
+    }
+}
+
+html.dark .confirmation-modal-title {
+    color: #f3f4f6;
+}
+
+.confirmation-modal-body {
+    color: #6b7280;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+    .confirmation-modal-body {
+        color: #d1d5db;
+    }
+}
+
+html.dark .confirmation-modal-body {
+    color: #d1d5db;
+}
+
+.confirmation-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.confirmation-modal-footer button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 14px;
+}
+
+.btn-cancel {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.btn-cancel:hover {
+    background-color: #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn-cancel {
+        background-color: #374151;
+        color: #d1d5db;
+    }
+
+    .btn-cancel:hover {
+        background-color: #4b5563;
+    }
+}
+
+html.dark .btn-cancel {
+    background-color: #374151;
+    color: #d1d5db;
+}
+
+html.dark .btn-cancel:hover {
+    background-color: #4b5563;
+}
+
+.btn-confirm {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn-confirm {
+        background-color: #dc2626;
+    }
+
+    .btn-confirm:hover {
+        background-color: #b91c1c;
+    }
+}
+
+html.dark .btn-confirm {
+    background-color: #dc2626;
+}
+
+html.dark .btn-confirm:hover {
+    background-color: #b91c1c;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
     }
     to {
         opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
     }
 }
 

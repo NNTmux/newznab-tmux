@@ -58,6 +58,8 @@
         </div>
 
         @if(request('search_type') == 'adv')
+            <!-- Hidden field to maintain advanced search mode -->
+            <input type="hidden" name="search_type" value="adv">
             <!-- Advanced Search Options -->
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Advanced Options</h3>
@@ -229,7 +231,7 @@
                                             @endif
                                             @if(!empty($result->postdate))
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                    <i class="fas fa-calendar mr-1"></i> Posted: {{ \Carbon\Carbon::parse($result->postdate)->format('M d, Y H:i') }}
+                                                    <i class="fas fa-calendar mr-1"></i> Posted: {{ userDate($result->postdate, 'M d, Y H:i') }}
                                                 </span>
                                             @endif
                                             @if(!empty($result->fromname))
@@ -245,8 +247,8 @@
                                         {{ $result->category_name ?? 'Other' }}
                                     </span>
                                 </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                    {{ \Carbon\Carbon::parse($result->adddate)->diffForHumans() }}
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
+                                    {{ userDateDiffForHumans($result->adddate) }}
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                     {{ number_format($result->size / 1073741824, 2) }} GB
@@ -319,7 +321,7 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                         {{ $result->category_name ?? 'Other' }}
                                     </span>
-                                    <span><i class="fas fa-clock mr-1"></i>{{ \Carbon\Carbon::parse($result->postdate)->diffForHumans() }}</span>
+                                    <span><i class="fas fa-clock mr-1"></i>{{ userDateDiffForHumans($result->postdate) }}</span>
                                     <span><i class="fas fa-hdd mr-1"></i>{{ number_format($result->size / 1073741824, 2) }} GB</span>
                                     <span><i class="fas fa-file mr-1"></i>{{ $result->totalpart ?? 0 }} files</span>
                                     <span title="Grabs"><i class="fas fa-download text-green-600 dark:text-green-400 mr-1"></i>{{ $result->grabs ?? 0 }}</span>

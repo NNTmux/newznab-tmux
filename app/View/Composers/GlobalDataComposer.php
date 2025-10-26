@@ -16,11 +16,15 @@ class GlobalDataComposer
      */
     public function compose(View $view): void
     {
-        $settings = new Settings;
+        // Load settings as array with type conversions (empty strings -> null, numeric strings -> numbers)
+        $siteArray = Settings::query()
+            ->pluck('value', 'name')
+            ->map(fn ($value) => Settings::convertValue($value))
+            ->all();
 
         $viewData = [
             'serverroot' => url('/'),
-            'site' => $settings,
+            'site' => $siteArray,  // Now it's a proper array, not a Settings model
             'theme' => 'Gentele',
         ];
 

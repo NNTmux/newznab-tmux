@@ -7,6 +7,7 @@ use App\Models\GrabStat;
 use App\Models\ReleaseStat;
 use App\Models\RoleStat;
 use App\Models\SignupStat;
+use App\Models\UserActivityStat;
 use Illuminate\Console\Command;
 
 class CollectStats extends Command
@@ -41,6 +42,8 @@ class CollectStats extends Command
         $this->info('New users by month collected.');
         RoleStat::insertUsersByRole();
         $this->info('Users by role collected.');
+        UserActivityStat::collectDailyStats();
+        $this->info('User activity stats collected.');
         $this->info('Site stats collected.');
     }
 }

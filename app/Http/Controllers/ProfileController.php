@@ -150,6 +150,15 @@ class ProfileController extends BasePageController
                         }
                     }
 
+                    // Update timezone preference
+                    if ($request->has('timezone')) {
+                        $timezoneValue = $request->input('timezone');
+                        $validTimezones = array_merge(['UTC'], ...array_values(getAvailableTimezones()));
+                        if (in_array($timezoneValue, $validTimezones)) {
+                            User::where('id', $userid)->update(['timezone' => $timezoneValue]);
+                        }
+                    }
+
                     // Handle Console permission
                     if ($request->has('viewconsole')) {
                         if (! $this->userdata->hasDirectPermission('view console')) {

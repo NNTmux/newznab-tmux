@@ -28,5 +28,13 @@ class UpdateUserLoggedIn
                 'host' => $event->ip,
             ]
         );
+
+        // Log the user login event
+        \Log::channel('user_login')->info('User logged in', [
+            'user_id' => $event->user->id,
+            'username' => $event->user->username,
+            'ip' => $event->ip,
+            'time' => now(),
+        ]);
     }
 }

@@ -115,7 +115,7 @@
                                    value="{{ $movie['imdbid'] ?? $movie->imdbid ?? '' }}"
                                    readonly
                                    class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
-                            <a href="https://www.imdb.com/title/tt{{ $movie['imdbid'] ?? $movie->imdbid ?? '' }}"
+                            <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie['imdbid'] ?? $movie->imdbid ?? '' }}"
                                target="_blank"
                                class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">
                                 <i class="fa fa-external-link"></i> View on IMDB
@@ -320,7 +320,7 @@
                         @foreach($movielist as $movie)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                    <a href="https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                    <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
                                         {{ $movie->imdbid }}
                                     </a>
                                 </td>

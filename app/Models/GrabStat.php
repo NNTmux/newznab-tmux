@@ -22,6 +22,6 @@ class GrabStat extends Model
 
     public static function getTopGrabbers(): array
     {
-        return self::query()->select(['username', 'grabs'])->get()->toArray();
+        return self::query()->select(['username', 'grabs'])->orderByDesc('grabs')->limit(10)->get()->toArray();
     }
 }

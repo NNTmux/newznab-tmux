@@ -74,20 +74,12 @@ class PasswordSecurityController extends Controller
             $user->passwordSecurity->google2fa_enable = 1;
             $user->passwordSecurity->save();
 
-            // Check if we should redirect to profile page
-            if ($request->has('redirect_to_profile')) {
-                return redirect()->to('profileedit#security')->with('success_2fa', '2FA is Enabled Successfully.');
-            }
-
-            return redirect()->to('2fa')->with('success', '2FA is Enabled Successfully.');
+            // Always redirect to profile page after enabling 2FA
+            return redirect()->to('profileedit#security')->with('success_2fa', '2FA is Enabled Successfully.');
         }
 
-        // Check if we should redirect to profile page on failure as well
-        if ($request->has('redirect_to_profile')) {
-            return redirect()->to('profileedit#security')->with('error_2fa', 'Invalid Verification Code, Please try again.');
-        }
-
-        return redirect()->to('2fa')->with('error', 'Invalid Verification Code, Please try again.');
+        // Always redirect to profile page on failure as well
+        return redirect()->to('profileedit#security')->with('error_2fa', 'Invalid Verification Code, Please try again.');
     }
 
     public function cancelSetup(Request $request): RedirectResponse
@@ -107,25 +99,20 @@ class PasswordSecurityController extends Controller
     public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         if (! (Hash::check($request->get('current-password'), $request->user()->password))) {
-            // Password doesn't match
-            if ($request->has('redirect_to_profile') || $request->has('from_profile')) {
-                return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
-            }
-
-            return redirect()->back()->with('error', 'Your password does not match with your account password. Please try again.');
+            // Password doesn't match - always redirect to profile page with error
+            return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
         }
 
         $validatedData = $request->validated();
         $user = $request->user();
-        $user->passwordSecurity->google2fa_enable = 0;
-        $user->passwordSecurity->save();
 
-        // Check if this request is from the profile edit page
-        if ($request->has('redirect_to_profile') || $request->has('from_profile')) {
-            return redirect()->to('profileedit#security')->with('success_2fa', '2FA is now Disabled.');
+        // Delete the password security record entirely to fully disable 2FA
+        if ($user->passwordSecurity) {
+            $user->passwordSecurity->delete();
         }
 
-        return redirect()->to('2fa')->with('success', '2FA is now Disabled.');
+        // Always redirect to profile page after disabling 2FA
+        return redirect()->to('profileedit#security')->with('success_2fa', '2FA is now Disabled.');
     }
 
     /**
@@ -256,17 +243,7 @@ class PasswordSecurityController extends Controller
                 ->withErrors(['msg' => 'User not found. Please login again.']);
         }
 
-        $theme = 'Gentele';
-        $meta_title = 'Two Factor Authentication';
-        $meta_keywords = 'Two Factor Authentication, 2FA';
-        $meta_description = 'Two Factor Authentication Verification';
-
-        app('smarty.view')->assign(compact('meta_title', 'meta_keywords', 'meta_description', 'user'));
-
-        // Create a response with the rendered content instead of directly outputting
-        $content = app('smarty.view')->fetch($theme.'/2fa_verify.tpl');
-
-        return response($content);
+        return view('auth.2fa_verify', compact('user'));
     }
 
     /**

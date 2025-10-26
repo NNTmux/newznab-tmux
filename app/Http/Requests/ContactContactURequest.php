@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\CaptchaHelper;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ContactContactURequest extends FormRequest
@@ -11,9 +12,6 @@ class ContactContactURequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['g-recaptcha-response' => [
-            'required',
-            'captcha',
-        ], ];
+        return CaptchaHelper::getValidationRules();
     }
 }

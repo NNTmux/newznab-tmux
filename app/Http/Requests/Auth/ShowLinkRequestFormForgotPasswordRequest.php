@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Support\CaptchaHelper;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ShowLinkRequestFormForgotPasswordRequest extends FormRequest
@@ -13,6 +14,6 @@ class ShowLinkRequestFormForgotPasswordRequest extends FormRequest
      */
     public function rules()
     {
-        return ['g-recaptcha-response' => 'required|captcha'];
+        return CaptchaHelper::getValidationRules();
     }
 }

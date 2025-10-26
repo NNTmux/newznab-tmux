@@ -34,13 +34,11 @@ class DetailsTransformer extends TransformerAbstract
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
-                'poster' => $releases->fromname,
                 'imdbid' => $releases->imdbid,
                 'grabs' => $releases->grabs,
                 'comments' => $releases->comments,
                 'password' => $releases->passwordstatus,
                 'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-                'group' => $releases->group_name,
             ];
         }
 
@@ -54,7 +52,6 @@ class DetailsTransformer extends TransformerAbstract
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
-                'poster' => $releases->fromname,
                 'tvairdate' => $releases->firstaired,
                 'tvdbid' => $releases->tvdb,
                 'traktid' => $releases->trakt,
@@ -66,7 +63,6 @@ class DetailsTransformer extends TransformerAbstract
                 'comments' => $releases->comments,
                 'password' => $releases->passwordstatus,
                 'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-                'group' => $releases->group_name,
             ];
         }
 
@@ -79,12 +75,10 @@ class DetailsTransformer extends TransformerAbstract
             'added' => Carbon::parse($releases->adddate)->toRssString(),
             'size' => $releases->size,
             'files' => $releases->totalpart,
-            'poster' => $releases->fromname,
             'grabs' => $releases->grabs,
             'comments' => $releases->comments,
             'password' => $releases->passwordstatus,
             'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-            'group' => $releases->group_name,
         ];
     }
 }

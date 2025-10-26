@@ -47,6 +47,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web([
             \Illuminate\Session\Middleware\AuthenticateSession::class,
             \App\Http\Middleware\TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
+            \App\Http\Middleware\ContentSecurityPolicy::class, // Add CSP middleware for security
+            \App\Http\Middleware\SetUserTimezone::class, // Set user timezone
         ]);
 
         $middleware->throttleApi('60,1');
@@ -62,5 +64,5 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        \Sentry\Laravel\Integration::handles($exceptions);
     })->create();

@@ -440,7 +440,6 @@ class XML_Response
 
         if ((int) $this->parameters['extended'] === 1) {
             $this->writeZedAttr('files', $this->release->totalpart);
-            $this->writeZedAttr('poster', $this->release->fromname);
             if (($this->release->videos_id > 0 || $this->release->tv_episodes_id > 0) && $this->namespace === 'newznab') {
                 $this->setTvAttr();
             }

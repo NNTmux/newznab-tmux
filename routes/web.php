@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\AdminSiteController;
 use App\Http\Controllers\Admin\AdminTmuxController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DeletedUsersController;
+use App\Http\Controllers\Admin\SystemMetricsController;
 use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\AnimeController;
@@ -85,7 +86,7 @@ Route::match(['GET', 'POST'], '/', [ContentController::class, 'show'])->name('ho
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register'])->name('register.post');
 
-Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth', 'VerifyCsrfToken', 'web']);
+Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth']);
 Route::match(['GET', 'POST'], 'terms-and-conditions', [TermsController::class, 'terms'])->name('terms-and-conditions');
 Route::match(['GET', 'POST'], 'privacy-policy', [PrivacyPolicyController::class, 'privacyPolicy'])->name('privacy-policy');
 
@@ -94,6 +95,7 @@ Route::post('login', [LoginController::class, 'login'])->name('login.post');
 Route::match(['GET', 'POST'], 'logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('2fa/verify', [PasswordSecurityController::class, 'getVerify2fa'])->name('2fa.verify');
+Route::post('2fa/verify', [PasswordSecurityController::class, 'verify2fa'])->name('2fa.post');
 Route::post('2faVerify', [PasswordSecurityController::class, 'verify2fa'])->name('2faVerify');
 
 Route::middleware('isVerified')->group(function () {
@@ -126,10 +128,12 @@ Route::middleware('isVerified')->group(function () {
 
     Route::middleware('clearance')->group(function () {
         Route::match(['GET', 'POST'], 'Games', [GamesController::class, 'show'])->name('Games');
+        Route::match(['GET', 'POST'], 'trending-movies', [MovieController::class, 'showTrending'])->name('trending-movies');
         Route::match(['GET', 'POST'], 'movie/{imdbid}', [MovieController::class, 'showMovie'])->name('movie.view');
         Route::match(['GET', 'POST'], 'Movies/{id?}', [MovieController::class, 'showMovies'])->name('Movies');
         Route::match(['GET', 'POST'], 'movie', [MovieController::class, 'showMovies'])->name('movie');
         Route::match(['GET', 'POST'], 'movietrailers', [MovieController::class, 'showTrailer'])->name('movietrailers');
+        Route::post('movies/update-layout', [MovieController::class, 'updateLayout'])->name('movies.update-layout');
         Route::match(['GET', 'POST'], 'Audio/{id?}', [MusicController::class, 'show'])->name('Audio');
         Route::match(['GET', 'POST'], 'Console/{id?}', [ConsoleController::class, 'show'])->name('Console');
         Route::match(['GET', 'POST'], 'XXX/{id?}', [AdultController::class, 'show'])->name('XXX');
@@ -152,6 +156,7 @@ Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'filelist/{guid}', [FileListController::class, 'show'])->name('filelist');
     Route::get('api/release/{guid}/filelist', [\App\Http\Controllers\Api\FileListApiController::class, 'getFileList'])->name('api.filelist');
     Route::match(['GET', 'POST'], 'series/{id?}', [SeriesController::class, 'index'])->name('series');
+    Route::match(['GET', 'POST'], 'trending-tv', [SeriesController::class, 'showTrending'])->name('trending-tv');
     Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
     Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
     Route::get('2fa/enable', [PasswordSecurityController::class, 'showEnable2faForm'])->name('2fa.enable');
@@ -169,6 +174,14 @@ Route::middleware('isVerified')->group(function () {
 
 Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::get('index', [AdminPageController::class, 'index'])->name('admin.index');
+
+    // System Metrics API endpoints
+    Route::get('api/system-metrics/current', [SystemMetricsController::class, 'getCurrentMetrics'])->name('admin.api.metrics.current');
+    Route::get('api/system-metrics/historical', [SystemMetricsController::class, 'getHistoricalMetrics'])->name('admin.api.metrics.historical');
+
+    // User Activity API endpoints
+    Route::get('api/user-activity/minutes', [AdminPageController::class, 'getUserActivityMinutes'])->name('admin.api.user-activity.minutes');
+
     Route::post('anidb-delete/{id}', [AdminAnidbController::class, 'destroy'])->name('admin.anidb-delete');
     Route::match(['GET', 'POST'], 'anidb-edit/{id}', [AdminAnidbController::class, 'edit'])->name('admin.anidb-edit');
     Route::get('anidb-list', [AdminAnidbController::class, 'index'])->name('admin.anidb-list');
@@ -238,6 +251,10 @@ Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('ad
     Route::match(['GET', 'POST'], 'release-edit', [AdminReleasesController::class, 'edit'])->name('admin.release-edit');
 });
 
+// Redirect btcpay route to btc payment server
+Route::get('btcpay', function () {
+    return redirect()->to('https://simplegate.space/apps/3MjgKvosMZtc2sSxiRBwadDCn1zA/pos');
+})->name('btcpay');
 // Invitation management routes
 Route::prefix('invitations')->name('invitations.')->group(function () {
     Route::get('/', [InvitationController::class, 'index'])->name('index');

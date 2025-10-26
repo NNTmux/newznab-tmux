@@ -54,7 +54,7 @@
             <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white transition-all duration-300">
                 <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
                     <a href="{{ $site['home_link'] ?? url('/') }}" class="flex items-center space-x-3">
-                        <img src="{{ asset('assets/images/newznab-logo.svg') }}" alt="Newznab Logo" class="w-12 h-12" aria-hidden="true">
+                        <img src="{{ asset('assets/images/logo.svg') }}" alt="{{ config('app.name') }} Logo" class="w-12 h-12" aria-hidden="true">
                         <span class="text-xl font-semibold">{{ config('app.name') }}</span>
                     </a>
                 </div>

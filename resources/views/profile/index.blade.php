@@ -125,9 +125,36 @@
                                     </div>
                                 @endif
 
-                                <div class="flex pb-3">
+                                <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Grabs</div>
                                     <div class="w-2/3 font-semibold text-green-600">{{ number_format($user->grabs ?? 0) }}</div>
+                                </div>
+
+                                <div class="flex pb-3">
+                                    <div class="w-1/3 text-gray-600">Timezone</div>
+                                    <div class="w-2/3">
+                                        @php
+                                            $userTimezone = $user->timezone ?? 'UTC';
+                                            $timezoneDisplay = str_replace('_', ' ', $userTimezone);
+
+                                            // Get current time in user's timezone
+                                            try {
+                                                $currentTime = \Carbon\Carbon::now($userTimezone)->format('H:i');
+                                                $currentDate = \Carbon\Carbon::now($userTimezone)->format('M d, Y');
+                                            } catch (\Exception $e) {
+                                                $currentTime = \Carbon\Carbon::now('UTC')->format('H:i');
+                                                $currentDate = \Carbon\Carbon::now('UTC')->format('M d, Y');
+                                            }
+                                        @endphp
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock text-blue-600 dark:text-blue-400 mr-2"></i>
+                                            <span class="font-medium">{{ $timezoneDisplay }}</span>
+                                        </div>
+                                        <div class="mt-1 text-sm text-gray-500">
+                                            <i class="fa fa-calendar-alt text-gray-400 mr-1"></i>
+                                            Current time: {{ $currentDate }} {{ $currentTime }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

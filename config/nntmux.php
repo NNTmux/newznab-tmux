@@ -14,6 +14,7 @@ return [
     'admin_username' => env('ADMIN_USER', 'admin'),
     'admin_password' => env('ADMIN_PASS', 'admin'),
     'admin_email' => env('ADMIN_EMAIL', 'admin@example.com'),
+    'crc_token' => env('CRC_TOKEN', null),
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
     'stream_fork_output' => env('STREAM_FORK_OUTPUT', false),
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
@@ -22,4 +23,6 @@ return [
     'btcpay_webhook_secret' => env('BTCPAY_SECRET'),
     'tmp_unrar_path' => env('TEMP_UNRAR_PATH', storage_path('tmp/unrar/')),
     'tmp_unzip_path' => env('TEMP_UNZIP_PATH', storage_path('tmp/unzip/')),
+    'nzb_import_folder' => env('NZB_IMPORT_FOLDER'),
+    'nzb_upload_folder' => env('NZB_UPLOAD_FOLDER'),
 ];

@@ -78,6 +78,7 @@ class MovieController extends BasePageController
             'meta_title' => 'Browse Movies',
             'meta_keywords' => 'browse,nzb,description,details',
             'meta_description' => 'Browse for Movies',
+            'movie_layout' => $this->userdata->movie_layout ?? 2,
         ]);
 
         // Return the appropriate view
@@ -214,5 +215,93 @@ class MovieController extends BasePageController
         }
 
         return response()->json(['message' => 'Invalid movie ID.'], 400);
+    }
+
+    /**
+     * Show trending movies (top 15 most downloaded in last 48 hours)
+     *
+     * @throws \Exception
+     */
+    public function showTrending(Request $request)
+    {
+        $movie = new Movie(['Settings' => $this->settings]);
+
+        // Cache key for trending movies (48 hours)
+        $cacheKey = 'trending_movies_top_15_48h';
+
+        // Get trending movies from cache or calculate (refresh every hour)
+        $trendingMovies = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () {
+            // Calculate timestamp for 48 hours ago
+            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+
+            // Get movies with their download counts from last 48 hours
+            // Join with user_downloads to get actual download timestamps
+            $query = \Illuminate\Support\Facades\DB::table('movieinfo as m')
+                ->join('releases as r', 'm.imdbid', '=', 'r.imdbid')
+                ->leftJoin('user_downloads as ud', 'r.id', '=', 'ud.releases_id')
+                ->select([
+                    'm.imdbid',
+                    'm.title',
+                    'm.year',
+                    'm.rating',
+                    'm.plot',
+                    'm.genre',
+                    'm.cover',
+                    'm.tmdbid',
+                    'm.traktid',
+                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
+                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT r.id) as release_count'),
+                ])
+                ->where('m.title', '!=', '')
+                ->where('m.imdbid', '!=', '0000000')
+                ->where('ud.timestamp', '>=', $fortyEightHoursAgo)
+                ->groupBy('m.imdbid', 'm.title', 'm.year', 'm.rating', 'm.plot', 'm.genre', 'm.cover', 'm.tmdbid', 'm.traktid')
+                ->havingRaw('COUNT(DISTINCT ud.id) > 0')
+                ->orderByDesc('total_downloads')
+                ->limit(15)
+                ->get();
+
+            // Process the results
+            return $query->map(function ($item) {
+                // Add cover image URL using helper function
+                $coverArray = [
+                    'imdbid' => $item->imdbid,
+                    'tmdbid' => $item->tmdbid,
+                    'cover' => $item->cover,
+                ];
+                $item->cover = getReleaseCover($coverArray);
+
+                return $item;
+            });
+        });
+
+        $this->viewData = array_merge($this->viewData, [
+            'trendingMovies' => $trendingMovies,
+            'meta_title' => 'Trending Movies - Last 48 Hours',
+            'meta_keywords' => 'trending,movies,popular,downloads,recent',
+            'meta_description' => 'Browse the most popular and downloaded movies in the last 48 hours',
+        ]);
+
+        return view('movies.trending', $this->viewData);
+    }
+
+    /**
+     * Update user's movie layout preference
+     */
+    public function updateLayout(Request $request)
+    {
+        $request->validate([
+            'layout' => 'required|integer|in:1,2',
+        ]);
+
+        $user = auth()->user();
+        if ($user) {
+            $user->movie_layout = (int) $request->input('layout');
+            $user->save();
+
+            return response()->json(['success' => true, 'layout' => $user->movie_layout]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'User not authenticated'], 401);
     }
 }

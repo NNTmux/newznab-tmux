@@ -216,10 +216,10 @@
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                     <i class="fas fa-chart-bar mr-2 text-green-600 dark:text-green-400"></i>
-                    Downloads (Last 7 Days)
+                    Downloads (Last 7 Days - Hourly)
                 </h4>
                 <div class="chart-container">
-                    <canvas id="downloadsChart" data-chart-data="{{ json_encode($userStats['downloads_per_day']) }}"></canvas>
+                    <canvas id="downloadsChart" data-chart-data="{{ json_encode($userStats['downloads_per_hour']) }}"></canvas>
                 </div>
             </div>
 
@@ -227,10 +227,32 @@
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                     <i class="fas fa-chart-area mr-2 text-purple-600 dark:text-purple-400"></i>
-                    API Hits (Last 7 Days)
+                    API Hits (Last 7 Days - Hourly)
                 </h4>
                 <div class="chart-container">
-                    <canvas id="apiHitsChart" data-chart-data="{{ json_encode($userStats['api_hits_per_day']) }}"></canvas>
+                    <canvas id="apiHitsChart" data-chart-data="{{ json_encode($userStats['api_hits_per_hour']) }}"></canvas>
+                </div>
+            </div>
+
+            <!-- Downloads Per Minute Chart -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <i class="fas fa-chart-line mr-2 text-green-600 dark:text-green-400"></i>
+                    Downloads (Last 60 Minutes)
+                </h4>
+                <div class="chart-container">
+                    <canvas id="downloadsMinuteChart" data-chart-data="{{ json_encode($userStats['downloads_per_minute']) }}"></canvas>
+                </div>
+            </div>
+
+            <!-- API Hits Per Minute Chart -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <i class="fas fa-chart-line mr-2 text-purple-600 dark:text-purple-400"></i>
+                    API Hits (Last 60 Minutes)
+                </h4>
+                <div class="chart-container">
+                    <canvas id="apiHitsMinuteChart" data-chart-data="{{ json_encode($userStats['api_hits_per_minute']) }}"></canvas>
                 </div>
             </div>
         </div>

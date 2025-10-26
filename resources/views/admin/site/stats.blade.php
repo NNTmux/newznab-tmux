@@ -51,42 +51,6 @@
             </div>
         @endif
 
-        <!-- Top Downloads -->
-        @if(!empty($topdownloads) && count($topdownloads) > 0)
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                <div class="bg-gradient-to-r from-purple-400 to-purple-500 px-6 py-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-10 h-10 bg-purple-700 bg-opacity-40 rounded-lg">
-                            <i class="fa fa-download text-purple-100 text-lg"></i>
-                        </div>
-                        <h2 class="text-xl font-bold text-white">Top Downloads</h2>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-3">
-                        @foreach($topdownloads as $index => $download)
-                            <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 border border-gray-200 dark:border-transparent">
-                                <div class="flex items-center space-x-4 flex-1 min-w-0">
-                                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-purple-400 dark:bg-purple-600 text-white font-bold text-sm flex-shrink-0 shadow-sm">
-                                        {{ $index + 1 }}
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="font-medium text-gray-700 dark:text-gray-100 truncate" title="{{ $download['searchname'] }}">
-                                            {{ $download['searchname'] }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-2 ml-4 flex-shrink-0">
-                                    <span class="px-4 py-2 bg-purple-600 dark:bg-purple-500 text-white rounded-full text-sm font-bold shadow-md">
-                                        {{ number_format($download['grabs']) }}
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        @endif
 
         <!-- Recently Added -->
         @if(!empty($recent) && count($recent) > 0)
@@ -182,7 +146,7 @@
         @endif
     </div>
 
-    @if(empty($topgrabs) && empty($topdownloads) && empty($recent) && empty($usersbymonth) && empty($usersbyrole))
+    @if(empty($topgrabs) && empty($recent) && empty($usersbymonth) && empty($usersbyrole))
         <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-12 text-center border border-gray-300 dark:border-gray-700">
             <div class="flex justify-center mb-6">
                 <div class="flex items-center justify-center w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full">

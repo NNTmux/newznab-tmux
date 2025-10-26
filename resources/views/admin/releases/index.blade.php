@@ -70,10 +70,10 @@
                                     {{ $release->totalpart ?? 0 }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ \Carbon\Carbon::parse($release->adddate)->format('Y-m-d H:i') }}
+                                    {{ userDate($release->adddate, 'Y-m-d H:i') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ \Carbon\Carbon::parse($release->postdate)->format('Y-m-d H:i') }}
+                                    {{ userDate($release->postdate, 'Y-m-d H:i') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ $release->grabs ?? 0 }}
