@@ -43,7 +43,114 @@ class AdminPageController extends BasePageController
             'userStats' => $userStats,
             'stats' => $this->getDefaultStats(),
             'systemMetrics' => $this->getSystemMetrics(),
+            'recent_activity' => $this->getRecentUserActivity(),
         ]));
+    }
+
+    /**
+     * Get recent user activity (registrations, deletions, activations, role changes)
+     */
+    protected function getRecentUserActivity(): array
+    {
+        $activities = [];
+
+        // Get newly registered users (last 7 days)
+        $newUsers = \App\Models\User::select('id', 'username', 'created_at')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        foreach ($newUsers as $user) {
+            $activities[] = (object) [
+                'type' => 'registration',
+                'message' => "New user registered: {$user->username}",
+                'icon' => 'user-plus',
+                'icon_bg' => 'bg-green-100 dark:bg-green-900',
+                'icon_color' => 'text-green-600 dark:text-green-400',
+                'created_at' => $user->created_at,
+                'username' => $user->username,
+            ];
+        }
+
+        // Get recently deleted users (last 7 days) - only soft deleted
+        $deletedUsers = \App\Models\User::onlyTrashed()
+            ->select('id', 'username', 'deleted_at')
+            ->where('deleted_at', '>=', now()->subDays(7))
+            ->orderBy('deleted_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        foreach ($deletedUsers as $user) {
+            $activities[] = (object) [
+                'type' => 'deletion',
+                'message' => "User deleted: {$user->username}",
+                'icon' => 'user-minus',
+                'icon_bg' => 'bg-red-100 dark:bg-red-900',
+                'icon_color' => 'text-red-600 dark:text-red-400',
+                'created_at' => $user->deleted_at,
+                'username' => $user->username,
+            ];
+        }
+
+        // Get recently activated users (last 7 days)
+        $activatedUsers = \App\Models\User::select('id', 'username', 'email_verified_at')
+            ->whereNotNull('email_verified_at')
+            ->where('email_verified_at', '>=', now()->subDays(7))
+            ->orderBy('email_verified_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        foreach ($activatedUsers as $user) {
+            $activities[] = (object) [
+                'type' => 'activation',
+                'message' => "User activated: {$user->username}",
+                'icon' => 'user-check',
+                'icon_bg' => 'bg-blue-100 dark:bg-blue-900',
+                'icon_color' => 'text-blue-600 dark:text-blue-400',
+                'created_at' => $user->email_verified_at,
+                'username' => $user->username,
+            ];
+        }
+
+        // Get users with recent role changes (last 7 days)
+        $roleChanges = \App\Models\User::select('id', 'username', 'rolechangedate', 'roles_id')
+            ->whereNotNull('rolechangedate')
+            ->where('rolechangedate', '>=', now()->subDays(7))
+            ->orderBy('rolechangedate', 'desc')
+            ->limit(10)
+            ->get();
+
+        foreach ($roleChanges as $user) {
+            // Get role name safely
+            $roleName = 'Unknown';
+            if ($user->roles_id) {
+                try {
+                    $role = \Spatie\Permission\Models\Role::find($user->roles_id);
+                    $roleName = $role ? $role->name : 'Unknown';
+                } catch (\Exception $e) {
+                    $roleName = 'Role #'.$user->roles_id;
+                }
+            }
+
+            $activities[] = (object) [
+                'type' => 'role_change',
+                'message' => "User role changed: {$user->username} → {$roleName}",
+                'icon' => 'user-tag',
+                'icon_bg' => 'bg-purple-100 dark:bg-purple-900',
+                'icon_color' => 'text-purple-600 dark:text-purple-400',
+                'created_at' => \Carbon\Carbon::parse($user->rolechangedate),
+                'username' => $user->username,
+            ];
+        }
+
+        // Sort all activities by date (most recent first)
+        usort($activities, function ($a, $b) {
+            return $b->created_at <=> $a->created_at;
+        });
+
+        // Return only the 10 most recent
+        return array_slice($activities, 0, 10);
     }
 
     /**

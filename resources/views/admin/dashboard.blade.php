@@ -441,23 +441,26 @@
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Recent Activity</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                <i class="fas fa-history mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                Recent User Activity
+            </h3>
             <div class="space-y-3">
                 @if(isset($recent_activity) && count($recent_activity) > 0)
                     @foreach($recent_activity as $activity)
-                        <div class="flex items-start">
-                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                                <i class="fas fa-{{ $activity->icon ?? 'info' }} text-blue-600 dark:text-blue-400 text-sm"></i>
+                        <div class="flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+                            <div class="w-8 h-8 {{ $activity->icon_bg }} rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                <i class="fas fa-{{ $activity->icon }} {{ $activity->icon_color }} text-sm"></i>
                             </div>
                             <div class="flex-1">
-                                <p class="text-sm text-gray-800">{{ $activity->message }}</p>
-                                <p class="text-xs text-gray-500">{{ $activity->created_at->diffForHumans() }}</p>
+                                <p class="text-sm text-gray-800 dark:text-gray-200">{{ $activity->message }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $activity->created_at->diffForHumans() }}</p>
                             </div>
                         </div>
                     @endforeach
                 @else
-                    <p class="text-gray-500 text-center py-4">No recent activity</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-center py-4">No recent activity</p>
                 @endif
             </div>
         </div>
