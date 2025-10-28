@@ -140,7 +140,7 @@
     </button>
 
     <!-- Toast Notification Container -->
-    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 99999; max-width: 350px; pointer-events: none;">
+    <div id="toast-container">
         <!-- Toast notifications will be dynamically inserted here -->
     </div>
 
@@ -286,6 +286,29 @@
             document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function() {
                 document.getElementById('sidebar')?.classList.toggle('hidden');
             });
+
+            // Display flash messages as toast notifications
+            @if(session('success'))
+                window.showToast('{{ session('success') }}', 'success');
+            @endif
+
+            @if(session('error'))
+                @if(is_array(session('error')))
+                    @foreach(session('error') as $error)
+                        window.showToast('{{ $error }}', 'error');
+                    @endforeach
+                @else
+                    window.showToast('{{ session('error') }}', 'error');
+                @endif
+            @endif
+
+            @if(session('warning'))
+                window.showToast('{{ session('warning') }}', 'warning');
+            @endif
+
+            @if(session('info'))
+                window.showToast('{{ session('info') }}', 'info');
+            @endif
         })();
     </script>
 </body>

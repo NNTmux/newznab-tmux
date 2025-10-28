@@ -79,8 +79,41 @@
         <i class="fas fa-sun theme-icon-light inline dark:hidden"></i>
     </button>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container">
+        <!-- Toast notifications will be dynamically inserted here -->
+    </div>
+
     <!-- Scripts -->
+    <!-- Toast Notifications (must load before other scripts) -->
+    @include('partials.toast-notifications')
+
     @stack('scripts')
+
+    <script>
+        // Display flash messages as toast notifications
+        @if(session('success'))
+            window.showToast('{{ session('success') }}', 'success');
+        @endif
+
+        @if(session('error'))
+            @if(is_array(session('error')))
+                @foreach(session('error') as $error)
+                    window.showToast('{{ $error }}', 'error');
+                @endforeach
+            @else
+                window.showToast('{{ session('error') }}', 'error');
+            @endif
+        @endif
+
+        @if(session('warning'))
+            window.showToast('{{ session('warning') }}', 'warning');
+        @endif
+
+        @if(session('info'))
+            window.showToast('{{ session('info') }}', 'info');
+        @endif
+    </script>
 
     <!-- Meta tags for theme management (CSP-safe) -->
     @auth
