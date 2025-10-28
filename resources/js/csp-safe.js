@@ -1266,6 +1266,131 @@ function initCartFunctionality() {
         });
     }
 
+    // Multi-operations delete (Admin only)
+    const multiDeleteBtn = document.querySelector('.nzb_multi_operations_delete');
+    if (multiDeleteBtn) {
+        console.log('Delete button found and event listener being attached');
+        multiDeleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Delete button clicked');
+
+            const checkboxes = document.querySelectorAll('.chkRelease:checked');
+            const selected = Array.from(checkboxes);
+
+            console.log('Selected releases:', selected.length);
+
+            if (selected.length === 0) {
+                if (typeof showToast === 'function') {
+                    showToast('Please select at least one release to delete', 'error');
+                } else {
+                    alert('Please select at least one release to delete');
+                }
+                return;
+            }
+
+            const confirmMessage = `Are you sure you want to delete <strong>${selected.length}</strong> release${selected.length > 1 ? 's' : ''}? This action cannot be undone.`;
+
+            // Use the custom confirmation modal
+            showConfirmation(confirmMessage, function() {
+                console.log('User confirmed deletion');
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    if (typeof showToast === 'function') {
+                        showToast('Security token not found. Please refresh the page.', 'error');
+                    } else {
+                        alert('Security token not found. Please refresh the page.');
+                    }
+                    return;
+                }
+
+                let deletedCount = 0;
+                let errorCount = 0;
+
+                if (typeof showToast === 'function') {
+                    showToast(`Deleting ${selected.length} release${selected.length > 1 ? 's' : ''}...`, 'info');
+                }
+
+                // Delete releases one by one
+                const deletePromises = selected.map(checkbox => {
+                    const guid = checkbox.value;
+                    const row = checkbox.closest('tr');
+
+                    console.log('Attempting to delete release:', guid);
+
+                    return fetch('/admin/release-delete/' + guid, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        console.log('Delete response status:', response.status, 'for guid:', guid);
+                        if (response.ok) {
+                            deletedCount++;
+                            // Fade out and remove the row
+                            if (row) {
+                                row.style.transition = 'opacity 0.3s';
+                                row.style.opacity = '0';
+                                setTimeout(() => row.remove(), 300);
+                            }
+                            return true;
+                        } else {
+                            errorCount++;
+                            console.error('Failed to delete release:', guid, 'Status:', response.status);
+                            return response.text().then(text => {
+                                console.error('Error response:', text);
+                                return false;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting release:', guid, error);
+                        errorCount++;
+                        return false;
+                    });
+                });
+
+                // Wait for all deletes to complete
+                Promise.all(deletePromises).then(() => {
+                    console.log('All delete operations completed. Deleted:', deletedCount, 'Errors:', errorCount);
+
+                    // Uncheck the select all checkbox
+                    const selectAllCheckbox = document.getElementById('chkSelectAll');
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = false;
+                    }
+
+                    // Show final result
+                    if (deletedCount > 0 && errorCount === 0) {
+                        if (typeof showToast === 'function') {
+                            showToast(`Successfully deleted ${deletedCount} release${deletedCount > 1 ? 's' : ''}`, 'success');
+                        }
+                    } else if (deletedCount > 0 && errorCount > 0) {
+                        if (typeof showToast === 'function') {
+                            showToast(`Deleted ${deletedCount} release${deletedCount > 1 ? 's' : ''}, ${errorCount} failed`, 'error');
+                        }
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast('Failed to delete releases', 'error');
+                        }
+                    }
+
+                    // Reload page if all items on current page were deleted
+                    const remainingRows = document.querySelectorAll('.chkRelease');
+                    if (remainingRows.length === 0) {
+                        setTimeout(() => window.location.reload(), 1500);
+                    }
+                });
+            });
+        });
+    } else {
+        console.log('Delete button not found on page');
+    }
+
     // Individual add to cart buttons
     document.addEventListener('click', function(e) {
         const cartBtn = e.target.closest('.add-to-cart');

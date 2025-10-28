@@ -85,13 +85,30 @@ class AdminReleasesController extends BasePageController
         ]);
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy($id)
     {
         try {
             if ($id) {
                 $releases = new Releases;
                 $releases->deleteMultiple($id);
+
+                // Handle AJAX requests
+                if (request()->wantsJson() || request()->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Release deleted successfully'
+                    ]);
+                }
+
                 session()->flash('success', 'Release deleted successfully');
+            }
+
+            // Handle AJAX requests
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No release ID provided'
+                ], 400);
             }
 
             // Check if request is coming from the NZB details page
@@ -107,6 +124,14 @@ class AdminReleasesController extends BasePageController
 
             return redirect($redirectUrl);
         } catch (\Exception $e) {
+            // Handle AJAX requests
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting release: '.$e->getMessage()
+                ], 500);
+            }
+
             session()->flash('error', 'Error deleting release: '.$e->getMessage());
 
             return redirect()->route('admin.release-list');

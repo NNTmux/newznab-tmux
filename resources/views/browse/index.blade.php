@@ -66,16 +66,16 @@
                         @endif
 
                         <div class="flex flex-wrap items-center gap-2">
-                            <small class="text-gray-600 dark:text-gray-400 dark:text-gray-400">With Selected:</small>
+                            <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                             <div class="flex gap-1">
-                                <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
+                                <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
                                     <i class="fa fa-cloud-download"></i>
                                 </button>
-                                <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
+                                <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
                                     <i class="fa fa-shopping-basket"></i>
                                 </button>
-                                @if(auth()->user()->hasRole('Admin'))
-                                    <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 dark:hover:bg-red-800 transition text-sm" title="Delete">
+                                @if(auth()->check() && auth()->user()->hasRole('Admin'))
+                                    <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition text-sm" title="Delete">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 @endif
